@@ -118,20 +118,6 @@ jobs:
       - run: pnpm build
       - run: echo "No tests configured for SDKs"
 
-  build-base:
-    needs: detect-changes
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "18"
-      - run: ls -la
-      - run: test -f package.json && echo "package.json found" || echo "No package.json in root"
-      - run: test -f package-lock.json && npm install || echo "No package-lock.json, skipping npm install"
-      - run: npm run build:check || echo "No build:check script, continuing..."
-      - run: echo "Base validation completed"
-
   deploy:
     needs: [detect-changes, build-api, build-cli, build-docs, build-sdks]
     if: github.ref == 'refs/heads/main' && success()
