@@ -122,4 +122,4 @@ Join our [community Discord](https://discord.gg/yb4FnBmh) for discussions and he
 
 ### Security
 
-For security vulnerabilities, please follow our [Security Policy](https://github.com/lomiafrica/lomi.?tab=security-ov-file). Please do not report security vulnerabilities through public GitHub issues.
+For security vulnerabilities, please follow our [Security Policy](https://github.com/lomiafrica/lomi.?tab=security-ov-file). Please do not report security vulnerabilities through public GitHub issues.test
