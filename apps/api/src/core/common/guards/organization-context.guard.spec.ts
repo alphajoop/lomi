@@ -66,8 +66,8 @@ describe('OrganizationContextGuard', () => {
       headers: {},
     };
 
-    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
+    await expect(
+      guard.canActivate(buildContext(request)),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 });

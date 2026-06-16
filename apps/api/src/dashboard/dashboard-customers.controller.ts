@@ -1,4 +1,10 @@
-import { Controller, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SupabaseSessionGuard } from '../core/common/guards/supabase-session.guard';
 import { OrganizationContextGuard } from '../core/common/guards/organization-context.guard';

@@ -21,7 +21,10 @@ import { InternalCronGuard } from '../common/guards/internal-cron.guard';
       },
     }),
   ],
-  controllers: [SubscriptionsController, SubscriptionRenewalsInternalController],
+  controllers: [
+    SubscriptionsController,
+    SubscriptionRenewalsInternalController,
+  ],
   providers: [
     SubscriptionsService,
     SubscriptionRenewalsService,

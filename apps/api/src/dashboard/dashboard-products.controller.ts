@@ -1,4 +1,10 @@
-import { Controller, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SupabaseSessionGuard } from '../core/common/guards/supabase-session.guard';
 import { OrganizationContextGuard } from '../core/common/guards/organization-context.guard';
@@ -22,7 +28,8 @@ export class DashboardProductsController {
   list(
     @CurrentDashboardUser() user: DashboardUserContext,
     @Query('isActive') isActiveStr?: string,
-    @Query('productType') productType?: 'one_time' | 'recurring' | 'usage_based',
+    @Query('productType')
+    productType?: 'one_time' | 'recurring' | 'usage_based',
     @Query('search') search?: string,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
     @Query('offset', new ParseIntPipe({ optional: true })) offset?: number,

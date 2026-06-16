@@ -16,7 +16,8 @@ export class InternalJobsController {
   @Post()
   @ApiOperation({
     summary: 'Enqueue a background job for apps/worker',
-    description: 'Called from SQL via enqueue_notification or internal systems.',
+    description:
+      'Called from SQL via enqueue_notification or internal systems.',
   })
   enqueue(@Body() body: EnqueueJobBody) {
     return this.internalJobsService.enqueue(body);

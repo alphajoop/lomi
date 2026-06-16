@@ -7,7 +7,9 @@ import type { DashboardUserContext } from './decorators/dashboard-user.decorator
 
 describe('DashboardProductsController', () => {
   let controller: DashboardProductsController;
-  let productsService: jest.Mocked<Pick<DashboardProductsService, 'listProducts'>>;
+  let productsService: jest.Mocked<
+    Pick<DashboardProductsService, 'listProducts'>
+  >;
 
   const user: DashboardUserContext = {
     merchantId: 'merchant-1',

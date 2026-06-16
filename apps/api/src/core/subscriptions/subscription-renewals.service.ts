@@ -90,7 +90,9 @@ export class SubscriptionRenewalsService {
     };
   }
 
-  private async processSubscription(sub: DueSubscription): Promise<RenewalResult> {
+  private async processSubscription(
+    sub: DueSubscription,
+  ): Promise<RenewalResult> {
     const result: RenewalResult = {
       subscription_id: sub.subscription_id,
       status: 'pending',
@@ -119,9 +121,12 @@ export class SubscriptionRenewalsService {
         this.logger.log(
           `Missing Stripe credentials for ${sub.subscription_id}, falling back to manual renewal`,
         );
-        await this.supabase.rpc('fallback_subscription_renewal_to_manual_checkout', {
-          p_subscription_id: sub.subscription_id,
-        });
+        await this.supabase.rpc(
+          'fallback_subscription_renewal_to_manual_checkout',
+          {
+            p_subscription_id: sub.subscription_id,
+          },
+        );
         result.status = 'fallback_manual';
         return result;
       }
@@ -211,7 +216,9 @@ export class SubscriptionRenewalsService {
       return result;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      this.logger.error(`Error processing subscription ${sub.subscription_id}: ${message}`);
+      this.logger.error(
+        `Error processing subscription ${sub.subscription_id}: ${message}`,
+      );
       result.error = message;
 
       const stripePaymentIntentId = this.extractStripePaymentIntentId(err);
@@ -277,13 +284,11 @@ export class SubscriptionRenewalsService {
       });
     }
 
-    const { data: dunningResult, error: dunningError } = await this.supabase.rpc(
-      'handle_subscription_renewal_payment_failure',
-      {
+    const { data: dunningResult, error: dunningError } =
+      await this.supabase.rpc('handle_subscription_renewal_payment_failure', {
         p_subscription_id: subscriptionId,
         p_error: error,
-      },
-    );
+      });
 
     if (dunningError) {
       throw new Error(dunningError.message);

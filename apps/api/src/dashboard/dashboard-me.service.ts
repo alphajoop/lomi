@@ -12,10 +12,7 @@ export class DashboardMeService {
       organization_id:
         'organizationId' in user ? user.organizationId : undefined,
       environment: 'environment' in user ? user.environment : undefined,
-      email:
-        'email' in user && user.email
-          ? user.email
-          : undefined,
+      email: 'email' in user && user.email ? user.email : undefined,
     };
   }
 

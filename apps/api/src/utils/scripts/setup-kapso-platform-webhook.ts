@@ -54,13 +54,17 @@ function parseArgs(argv: string[]): Args {
   const supabaseUrlIdx = argv.indexOf('--supabase-url');
   const dashboardUrlIdx = argv.indexOf('--dashboard-url');
   const explicitSecret =
-    secretIdx >= 0 ? argv[secretIdx + 1] : process.env.KAPSO_WEBHOOK_SECRET?.trim();
+    secretIdx >= 0
+      ? argv[secretIdx + 1]
+      : process.env.KAPSO_WEBHOOK_SECRET?.trim();
 
   return {
     dryRun,
     applySecrets,
     projectRef:
-      projectRefIdx >= 0 ? (argv[projectRefIdx + 1] ?? 'mdswvokxrnfggrujsfjd') : 'mdswvokxrnfggrujsfjd',
+      projectRefIdx >= 0
+        ? (argv[projectRefIdx + 1] ?? 'mdswvokxrnfggrujsfjd')
+        : 'mdswvokxrnfggrujsfjd',
     kapsoWebhookSecret: explicitSecret || undefined,
     supabaseUrl:
       (supabaseUrlIdx >= 0 ? argv[supabaseUrlIdx + 1] : undefined) ??
@@ -100,7 +104,9 @@ async function kapsoFetch<T>(
   try {
     body = (text ? JSON.parse(text) : {}) as T;
   } catch {
-    throw new Error(`Kapso API ${response.status}: invalid JSON: ${text.slice(0, 200)}`);
+    throw new Error(
+      `Kapso API ${response.status}: invalid JSON: ${text.slice(0, 200)}`,
+    );
   }
 
   if (!response.ok) {
@@ -122,7 +128,9 @@ function webhookEndpoint(supabaseUrl: string): string {
 }
 
 async function listProjectWebhooks(): Promise<KapsoWebhook[]> {
-  const { body } = await kapsoFetch<{ data?: KapsoWebhook[] }>('/whatsapp/webhooks?per_page=100');
+  const { body } = await kapsoFetch<{ data?: KapsoWebhook[] }>(
+    '/whatsapp/webhooks?per_page=100',
+  );
   return body.data ?? [];
 }
 
@@ -141,18 +149,21 @@ async function createProjectWebhook(
   targetUrl: string,
   secret: string,
 ): Promise<KapsoWebhook> {
-  const { body } = await kapsoFetch<{ data: KapsoWebhook }>('/whatsapp/webhooks', {
-    method: 'POST',
-    body: JSON.stringify({
-      whatsapp_webhook: {
-        url: targetUrl,
-        secret_key: secret,
-        events: [WEBHOOK_EVENT],
-        payload_version: 'v2',
-        active: true,
-      },
-    }),
-  });
+  const { body } = await kapsoFetch<{ data: KapsoWebhook }>(
+    '/whatsapp/webhooks',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        whatsapp_webhook: {
+          url: targetUrl,
+          secret_key: secret,
+          events: [WEBHOOK_EVENT],
+          payload_version: 'v2',
+          active: true,
+        },
+      }),
+    },
+  );
   return body.data;
 }
 
@@ -183,7 +194,9 @@ function inboundWebhookEndpoint(supabaseUrl: string): string {
   return `${supabaseUrl.replace(/\/$/, '')}/functions/v1/whatsapp-webhook`;
 }
 
-async function listPhoneNumberWebhooks(phoneNumberId: string): Promise<KapsoWebhook[]> {
+async function listPhoneNumberWebhooks(
+  phoneNumberId: string,
+): Promise<KapsoWebhook[]> {
   const { body } = await kapsoFetch<{ data?: KapsoWebhook[] }>(
     `/whatsapp/phone_numbers/${encodeURIComponent(phoneNumberId)}/webhooks?per_page=100`,
   );
@@ -196,12 +209,11 @@ async function registerInboundMetaWebhook(
   metaAppSecret?: string,
 ): Promise<KapsoWebhook> {
   const existing = await listPhoneNumberWebhooks(phoneNumberId);
-  const match = existing.find(
-    (w) => w.kind === 'meta' && w.url === targetUrl,
-  );
+  const match = existing.find((w) => w.kind === 'meta' && w.url === targetUrl);
 
   // Kapso requires secret_key on create; Meta signature verification uses META_APP_SECRET separately.
-  const kapsoSecretKey = metaAppSecret || crypto.randomBytes(32).toString('hex');
+  const kapsoSecretKey =
+    metaAppSecret || crypto.randomBytes(32).toString('hex');
 
   const payload = {
     whatsapp_webhook: {
@@ -234,10 +246,7 @@ async function registerInboundMetaWebhook(
 }
 
 function resolvePhoneNumberId(): string {
-  return (
-    process.env.PHONE_NUMBER_ID?.trim() ||
-    DEFAULT_PHONE_NUMBER_ID
-  );
+  return process.env.PHONE_NUMBER_ID?.trim() || DEFAULT_PHONE_NUMBER_ID;
 }
 
 function applySupabaseSecrets(
@@ -341,7 +350,11 @@ async function main() {
         active: true,
         phone_number_id: phoneNumberId,
       }
-    : await registerInboundMetaWebhook(phoneNumberId, inboundUrl, metaAppSecret);
+    : await registerInboundMetaWebhook(
+        phoneNumberId,
+        inboundUrl,
+        metaAppSecret,
+      );
   console.log(`  id:     ${inboundWebhook.id}`);
   console.log(`  kind:   ${inboundWebhook.kind}`);
   console.log(`  active: ${inboundWebhook.active}`);
@@ -378,4 +391,3 @@ void main().catch((error: unknown) => {
   console.error(error instanceof Error ? error.message : String(error));
   process.exit(1);
 });
-
