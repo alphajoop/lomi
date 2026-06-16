@@ -18,6 +18,7 @@
  */
 import * as crypto from 'crypto';
 import { execFileSync } from 'child_process';
+import * as path from 'path';
 
 const KAPSO_BASE = 'https://api.kapso.ai/platform/v1';
 const DEFAULT_SUPABASE_URL = 'https://mdswvokxrnfggrujsfjd.supabase.co';
@@ -260,7 +261,7 @@ function applySupabaseSecrets(
 
   execFileSync(cmd, args, {
     stdio: 'inherit',
-    cwd: new URL('../../../../dashboard', import.meta.url).pathname,
+    cwd: path.join(__dirname, '../../../../dashboard'),
   });
 }
 
