@@ -284,7 +284,7 @@ export async function GET() {
       `- [Payment state machine](${docsOrigin}/api/payment-state-machine) — status transitions and balances`,
     );
   }
-  const mcp = pageBySlugPath(pages, 'reference/integrations/mcp');
+  const mcp = pageBySlugPath(pages, 'build/ecommerce-extensions/mcp');
   if (mcp) {
     lines.push(`- [${mcp.data.title ?? 'MCP'}](${docsOrigin}${mcp.url})`);
   }
@@ -296,7 +296,7 @@ export async function GET() {
     'Prefer section sidebars on the docs site for exhaustive lists. High-level areas:',
   );
   lines.push('');
-  const catOrder = ['core', 'reference', 'api', 'openapi'];
+  const catOrder = ['start', 'build', 'api', 'resources'];
   const byCat = new Map<
     string,
     { title: string; url: string; description?: string }[]

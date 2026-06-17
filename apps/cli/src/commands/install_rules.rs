@@ -43,7 +43,7 @@ pub async fn run(common: &CommonOptions, args: InstallRulesArgs) -> Result<()> {
     println!();
     println!(
         "Learn more: {}",
-        format!("{DOCS_URL}/reference/setup/integration").bright_blue()
+        format!("{DOCS_URL}/start/first-payment").bright_blue()
     );
     cli::banner::print_outro("Agent rules installed successfully");
     let _ = common;

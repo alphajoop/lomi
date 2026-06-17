@@ -134,5 +134,5 @@ MIT - see [LICENSE](./LICENSE) for details.
 ## Support
 
 - **Email:** hello@lomi.africa
-- **Docs:** https://lomi.africa/docs/
+- **Docs:** https://docs.lomi.africa
 - **Discord:** https://discord.gg/yb4FnBmh

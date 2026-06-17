@@ -29,7 +29,7 @@ const wave = await lomiApi.charges.createWaveCharge({
 });
 ```
 
-Use sandbox test numbers from https://docs.lomi.africa/reference/setup/sandbox-payments
+Use sandbox test numbers from https://docs.lomi.africa/start/sandbox-payments
 
 ## Confirming payment
 

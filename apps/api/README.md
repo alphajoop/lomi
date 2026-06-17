@@ -62,7 +62,7 @@ Vercel ignores Railway/Docker files; Railway ignores `vercel.json`.
 ## Documentation
 
 - [API reference](https://docs.lomi.africa/api)
-- [Getting started](https://docs.lomi.africa/docs/core/fundamentals/)
+- [Getting started](https://docs.lomi.africa/start/integration-journey)
 
 ## Support
 
