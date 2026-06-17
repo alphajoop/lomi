@@ -18,6 +18,17 @@ The Subscriptions API lists and retrieves **subscription instances** (a customer
   For signup flows (trials, first payment types, checkout session amounts), see **[Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)**.
 </Callout>
 
+## How subscriptions are created
+
+Subscription instances are created when a customer buys a **recurring product** through:
+
+- [Hosted checkout](/build/checkout) or [payment links](/build/payment-links) with a recurring `product_id`
+- Your storefront subscribe flow
+
+There is no standalone "create subscription" API for signup—the checkout or link flow creates the instance after the first successful payment (or trial rules on the product).
+
+Monitor **webhook events** to track payment confirmations for each billing cycle. Listen for `SUBSCRIPTION_RENEWED` and renewal-related `PAYMENT_FAILED` events—see [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
+
 ## List subscriptions
 
 Retrieve all subscriptions for your organization.

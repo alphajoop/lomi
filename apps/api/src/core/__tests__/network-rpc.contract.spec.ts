@@ -65,9 +65,6 @@ describe('Network Supabase RPC identifiers (contract)', () => {
   const networkFunctionsSql = readMigration(
     'apps/dashboard/supabase/migrations/20250226000105_network_functions.sql',
   );
-  const networkPaymentWebhookSql = readMigration(
-    'apps/dashboard/supabase/migrations/20250226000106_network_payment_complete_webhook.sql',
-  );
   const apiSystemSql = readMigration(
     'apps/dashboard/supabase/migrations/20250226000058_api_system.sql',
   );
@@ -113,10 +110,10 @@ describe('Network Supabase RPC identifiers (contract)', () => {
   });
 
   it('defines direct-charge payment completion webhook trigger', () => {
-    expect(networkPaymentWebhookSql).toContain(
+    expect(networkFunctionsSql).toContain(
       'enqueue_network_payment_webhooks_on_transaction_complete',
     );
-    expect(networkPaymentWebhookSql).toContain(
+    expect(networkFunctionsSql).toContain(
       'trigger_enqueue_network_payment_webhooks_on_transaction_complete',
     );
   });

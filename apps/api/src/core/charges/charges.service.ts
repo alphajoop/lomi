@@ -90,9 +90,12 @@ export class ChargesService {
               p_environment: paymentEnvironment,
             } as never,
           )
-        : await this.supabaseService.rpc('fetch_wave_provider_settings' as any, {
-            p_organization_id: organizationId,
-          });
+        : await this.supabaseService.rpc(
+            'fetch_wave_provider_settings' as any,
+            {
+              p_organization_id: organizationId,
+            },
+          );
 
       const waveSettings = Array.isArray(providerSettings)
         ? providerSettings[0]
@@ -371,18 +374,22 @@ export class ChargesService {
       );
     }
 
-    const networkContext = await recordNetworkContext(this.supabaseService, user, {
-      transactionId,
-      amount: totalAmount,
-      currencyCode: currency,
-      capabilityKey: 'payment.create',
-      metadata: {
-        provider: 'MTN',
-        reference_id: referenceId ?? null,
-        external_id: externalId,
-        source: 'api_direct_charge',
+    const networkContext = await recordNetworkContext(
+      this.supabaseService,
+      user,
+      {
+        transactionId,
+        amount: totalAmount,
+        currencyCode: currency,
+        capabilityKey: 'payment.create',
+        metadata: {
+          provider: 'MTN',
+          reference_id: referenceId ?? null,
+          external_id: externalId,
+          source: 'api_direct_charge',
+        },
       },
-    });
+    );
     assertNetworkContextRecorded(user, networkContext, 'mtn charge');
 
     return {

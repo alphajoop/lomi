@@ -632,7 +632,10 @@ describe('RefundsService', () => {
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ success: true, refundReferenceId: 'mtn-ref-partial' }),
+      json: async () => ({
+        success: true,
+        refundReferenceId: 'mtn-ref-partial',
+      }),
     });
 
     const result = await service.create(

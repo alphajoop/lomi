@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
 import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
@@ -51,7 +47,9 @@ export class MtnWebhookService {
     }
 
     if (payload.status !== 'SUCCESSFUL' && payload.status !== 'FAILED') {
-      throw new BadRequestException(`Unsupported MTN status: ${payload.status}`);
+      throw new BadRequestException(
+        `Unsupported MTN status: ${payload.status}`,
+      );
     }
 
     const dedupeKey = `${payload.externalId ?? referenceId ?? 'unknown'}:${payload.status}:${payload.financialTransactionId ?? ''}`;
@@ -225,7 +223,10 @@ export class MtnWebhookService {
 
       const txnData = Array.isArray(txnRows) ? txnRows[0] : txnRows;
       if (txnError || !txnData) {
-        this.logger.error('Failed to fetch transaction for MTN webhook:', txnError);
+        this.logger.error(
+          'Failed to fetch transaction for MTN webhook:',
+          txnError,
+        );
         return;
       }
 

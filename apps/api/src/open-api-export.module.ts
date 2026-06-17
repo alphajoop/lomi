@@ -17,12 +17,12 @@ import { AccountsModule } from './core/accounts/accounts.module';
 import { OrganizationsModule } from './core/organizations/organizations.module';
 import { MerchantsModule } from './core/merchants/merchants.module';
 import { ProvidersModule } from './core/providers/providers.module';
-import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
+import { CustomerSubscriptionsOpenApiModule } from './core/customer-subscriptions/customer-subscriptions-open-api.module';
 import { CustomersModule } from './core/customers/customers.module';
 import { PaymentRequestsModule } from './core/payment-requests/payment-requests.module';
 import { RefundsModule } from './core/refunds/refunds.module';
 import { ProductsModule } from './core/products/products.module';
-import { SubscriptionsModule } from './core/subscriptions/subscriptions.module';
+import { SubscriptionsOpenApiModule } from './core/subscriptions/subscriptions-open-api.module';
 import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.module';
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
@@ -51,13 +51,13 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     OrganizationsModule,
     MerchantsModule,
     ProvidersModule,
-    CustomerSubscriptionsModule,
+    CustomerSubscriptionsOpenApiModule,
     TransactionsModule,
     CustomersModule,
     PaymentRequestsModule,
     RefundsModule,
     ProductsModule,
-    SubscriptionsModule,
+    SubscriptionsOpenApiModule,
     DiscountCouponsModule,
     CheckoutSessionsModule,
     PaymentLinksModule,

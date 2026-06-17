@@ -43,7 +43,7 @@ export class RefundsController {
   @ApiOperation({
     summary: 'Créer un remboursement',
     description:
-      'Rembourse une transaction terminée (carte Stripe, Wave ou MTN MoMo). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels. En mode test, les remboursements MTN sont comptables uniquement (pas d’appel API MTN). En live, MTN MoMo exige une référence RequestToPay sur la transaction d’origine.',
+      'Refunds a completed transaction (card, Wave, or MTN MoMo). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN MoMo requires a RequestToPay reference on the original transaction.',
   })
   @ApiBody({ type: CreateRefundDto })
   @ApiResponse({

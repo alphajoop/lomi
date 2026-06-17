@@ -24,7 +24,7 @@ Live charges require MTN connected for your organization and a valid MSISDN. Ref
 
 ### See also
 
-[Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
+[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication
@@ -90,7 +90,38 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Encaissement MTN initié (RequestToPay) |
+| `201` | MTN charge initiated — test keys return `completed` immediately; live returns `PENDING` |
+| `400` | Invalid input or MTN API error |
+
+**Test key** example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "transaction_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "external_id": "ext_abc123",
+    "reference_id": null,
+    "status": "completed"
+  }
+}
+```
+
+**Live key** example (customer must approve on device):
+
+```json
+{
+  "success": true,
+  "data": {
+    "transaction_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "external_id": "ext_abc123",
+    "reference_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "status": "PENDING"
+  }
+}
+```
+
+See [Mobile money](/build/mobile-money) for verification and webhooks.
 
 ## Errors
 

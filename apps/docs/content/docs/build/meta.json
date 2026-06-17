@@ -5,11 +5,13 @@
   "icon": "Blocks",
   "pages": [
     "choose-integration",
+    "payment-channels",
     "---Accept payments---",
     "checkout",
     "embed-widget",
     "payment-links",
     "payment-requests",
+    "direct-charges",
     "mobile-money",
     "cards",
     "payments",

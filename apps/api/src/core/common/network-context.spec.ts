@@ -84,11 +84,15 @@ describe('network-context', () => {
       getClient: () => ({ rpc, from }),
     } as unknown as SupabaseService;
 
-    const result = await recordNetworkOperatorFeeReversal(supabase, networkUser(), {
-      refundId: 'refund-1',
-      transactionId: 'txn-1',
-      refundAmount: 1000,
-    });
+    const result = await recordNetworkOperatorFeeReversal(
+      supabase,
+      networkUser(),
+      {
+        refundId: 'refund-1',
+        transactionId: 'txn-1',
+        refundAmount: 1000,
+      },
+    );
 
     expect(result).toBe('fee-reversal-1');
     expect(rpc).toHaveBeenCalledWith(

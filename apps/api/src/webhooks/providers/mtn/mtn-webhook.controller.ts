@@ -64,10 +64,7 @@ export class MtnWebhookController {
         }
       }
 
-      return await this.mtnWebhookService.handleWebhook(
-        headers,
-        parsedBody,
-      );
+      return await this.mtnWebhookService.handleWebhook(headers, parsedBody);
     } catch (error) {
       this.logger.error(
         `MTN webhook processing error: ${error.message}`,

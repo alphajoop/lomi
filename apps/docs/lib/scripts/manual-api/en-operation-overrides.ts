@@ -49,7 +49,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     caveats:
       'Follow the provider instructions in the response; UX is rail-specific (USSD, app redirect, etc.).',
     related:
-      '[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   ChargesController_createMtnCharge: {
     summary: 'Create MTN MoMo charge',
@@ -59,7 +59,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     caveats:
       'Live charges require MTN connected for your organization and a valid MSISDN. Refunds on live MTN payments use the Disbursement refund API via [Create refund](/api/refunds/RefundsController_create).',
     related:
-      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',

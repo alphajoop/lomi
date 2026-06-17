@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="apps/docs/public/company/monorepo-icon.webp" width="400" height="225" alt="lomi. icon">
+	<img src="apps/docs/public/company/monorepo-icon.webp" width="200" height="112" alt="lomi. icon">
 <p align="center">
     Helping West African ventures sell online
   </p>

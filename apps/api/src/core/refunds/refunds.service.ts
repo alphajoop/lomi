@@ -155,17 +155,21 @@ export class RefundsService {
       );
     }
 
-    const networkContext = await recordNetworkContext(this.supabaseService, user, {
-      refundId: result.refund_id ?? null,
-      amount: dto.amount,
-      currencyCode: tx.currency_code,
-      capabilityKey: 'refund.create',
-      metadata: {
-        source: 'api_refund',
-        transaction_id: dto.transaction_id,
-        refund_type: dto.refund_type ?? null,
+    const networkContext = await recordNetworkContext(
+      this.supabaseService,
+      user,
+      {
+        refundId: result.refund_id ?? null,
+        amount: dto.amount,
+        currencyCode: tx.currency_code,
+        capabilityKey: 'refund.create',
+        metadata: {
+          source: 'api_refund',
+          transaction_id: dto.transaction_id,
+          refund_type: dto.refund_type ?? null,
+        },
       },
-    });
+    );
     assertNetworkContextRecorded(user, networkContext, 'refund');
 
     await recordNetworkOperatorFeeReversal(this.supabaseService, user, {
@@ -1068,7 +1072,9 @@ export class RefundsService {
     return tx.environment === 'test';
   }
 
-  private resolveMtnApiEnvironment(user: AuthContext): 'development' | 'production' {
+  private resolveMtnApiEnvironment(
+    user: AuthContext,
+  ): 'development' | 'production' {
     const paymentEnvironment = environmentFromAuth(user);
     return paymentEnvironment === 'test' ? 'development' : 'production';
   }
@@ -1218,7 +1224,8 @@ export class RefundsService {
     const mtnApiEnvironment = this.resolveMtnApiEnvironment(user);
     const countryCode =
       typeof body.countryCode === 'string' ? body.countryCode : 'CI';
-    const { targetEnvironment: countryTarget } = getMtnCountryConfig(countryCode);
+    const { targetEnvironment: countryTarget } =
+      getMtnCountryConfig(countryCode);
     const targetEnvironment =
       mtnApiEnvironment === 'development' ? 'sandbox' : countryTarget;
 

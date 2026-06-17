@@ -5,6 +5,7 @@
   "icon": "Compass",
   "pages": [
     "overview",
+    "integration-journey",
     "create-account",
     "api-keys",
     "cli-quickstart",

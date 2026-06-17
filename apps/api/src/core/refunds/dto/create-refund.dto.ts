@@ -11,8 +11,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRefundDto {
   @ApiProperty({
-    description:
-      'UUID of a completed transaction (Stripe card, Wave, or MTN MoMo)',
+    description: 'UUID of a completed transaction (card, Wave, or MTN MoMo)',
     type: String,
     format: 'uuid',
   })

@@ -1,0 +1,79 @@
+---
+title: 'Which payment channels does lomi. support?'
+description: 'Country, currency, and channel matrix for hosted checkout and direct charges in francophone West Africa and MTN markets.'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Use this page to confirm which rails and currencies you can offer before you pick an integration path. For the decision tree, see [Which payment integration should I choose?](/build/choose-integration).
+
+<Callout type="info">
+  Exact availability depends on your organization's enabled providers in the dashboard. Contact support if a channel you need is not active.
+</Callout>
+
+## Recommended path by channel
+
+| Channel | Hosted checkout / links | Direct API |
+| --- | --- | --- |
+| Cards (Visa, Mastercard, Amex, …) | Yes | `POST /charge/card` + Payment Elements |
+| Wave | Yes | `POST /charge/wave` |
+| MTN MoMo | Yes | `POST /charge/mtn` |
+| Orange Money, SPI, bank transfer | Yes (hosted) | Use hosted checkout unless documented otherwise |
+
+**Default:** hosted checkout or payment links. Direct charges when you own the payment UI and understand rail-specific async behavior.
+
+## Markets and currencies
+
+| Region / focus | Primary currencies | Mobile money | Cards |
+| --- | --- | --- | --- |
+| UEMOA (Wave-first) | `XOF` | Wave | Yes |
+| MTN MoMo countries (see table below) | `XOF`, `XAF`, `GHS`, `UGX`, `ZMW`, `NGN`, `ZAR`, … | MTN MoMo | Yes (where enabled) |
+| International cards | `USD`, `EUR` (product-dependent) | — | Yes |
+
+## MTN MoMo — supported countries
+
+Hosted checkout and `POST /charge/mtn` support these MTN target environments:
+
+| Country | Dial prefix | MTN target environment |
+| --- | --- | --- |
+| Côte d'Ivoire (CI) | `+225` | `mtnivorycoast` |
+| Cameroon (CM) | `+237` | `mtncameroon` |
+| Ghana (GH) | `+233` | `mtnghana` |
+| Uganda (UG) | `+256` | `mtnuganda` |
+| Zambia (ZM) | `+260` | `mtnzambia` |
+| Benin (BJ) | `+229` | `mtnbenin` |
+| Congo (CG) | `+242` | `mtncongo` |
+| Eswatini (SZ) | `+268` | `mtnswaziland` |
+| Guinea (GN) | `+224` | `mtnguineaconakry` |
+| South Africa (ZA) | `+27` | `mtnsouthafrica` |
+| Liberia (LR) | `+231` | `mtnliberia` |
+| Nigeria (NG) | `+234` | `mtnnigeria` |
+
+Pass `countryCode` (ISO 3166-1 alpha-2) on direct MTN charges when the payer is outside CI. Default is `CI`.
+
+## Wave
+
+Wave direct charges require **XOF**. The customer completes payment in the Wave app via `wave_launch_url` or `checkout_url` in the API response.
+
+In **test** mode, the ledger may credit your test balance when the session is created. In **live** mode, wait for webhooks or poll `GET /transactions/{id}` before fulfilling the order.
+
+## Cards
+
+Sandbox test numbers and 3D Secure scenarios are listed in [Sandbox payments](/start/sandbox-payments). Use test keys only with test card numbers.
+
+## Test vs live
+
+Environment is determined by your **API key** (`lomi_sk_test_...` vs `lomi_sk_live_...`), not the hostname alone.
+
+| | Test | Live |
+| --- | --- | --- |
+| API base | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
+| MTN direct charge | `status: completed` immediately | `status: PENDING` until customer approves |
+| Webhooks | `environment: "test"` | `environment: "live"` |
+
+## Related
+
+- [Mobile money](/build/mobile-money)
+- [Direct charges](/build/direct-charges)
+- [Sandbox payments](/start/sandbox-payments)
+- [Providers API](/api/providers/ProvidersController_findAll)

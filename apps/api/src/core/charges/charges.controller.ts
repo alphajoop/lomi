@@ -17,6 +17,8 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import { CardChargeResponseDto } from './dto/card-charge-response.dto';
+import { MtnChargeResponseDto } from './dto/mtn-charge-response.dto';
+import { WaveChargeResponseDto } from './dto/wave-charge-response.dto';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
@@ -30,20 +32,20 @@ export class ChargesController {
 
   @Post('wave')
   @ApiLomiAccountHeader()
-  @ApiOperation({ summary: 'Lancer un encaissement direct Wave' })
+  @ApiOperation({
+    summary: 'Create direct Wave charge',
+    description:
+      'Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.',
+  })
   @ApiBody({ type: CreateWaveChargeDto })
   @ApiResponse({
     status: 201,
-    description:
-      'Encaissement initié (corps JSON renvoyé par la fonction edge Wave)',
-    schema: {
-      type: 'object',
-      additionalProperties: true,
-    },
+    description: 'Wave charge initiated',
+    type: WaveChargeResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Entrée invalide ou erreur API Wave',
+    description: 'Invalid input or Wave API error',
   })
   async createWaveCharge(
     @Body() createChargeDto: CreateWaveChargeDto,
@@ -57,15 +59,15 @@ export class ChargesController {
   @Post('mtn')
   @ApiLomiAccountHeader()
   @ApiOperation({
-    summary: 'Lancer un encaissement direct MTN MoMo',
+    summary: 'Create MTN MoMo charge',
     description:
-      'Initie un RequestToPay MTN MoMo. Avec une clé API test, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.',
+      'Initiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.',
   })
   @ApiBody({ type: CreateMtnChargeDto })
   @ApiResponse({
     status: 201,
-    description: 'Encaissement MTN initié (RequestToPay)',
-    schema: { type: 'object', additionalProperties: true },
+    description: 'MTN charge initiated',
+    type: MtnChargeResponseDto,
   })
   async createMtnCharge(
     @Body() createChargeDto: CreateMtnChargeDto,
@@ -79,13 +81,13 @@ export class ChargesController {
   @Post('card')
   @ApiLomiAccountHeader()
   @ApiOperation({
-    summary: 'Créer un encaissement carte (client_secret)',
+    summary: 'Create card charge (client_secret)',
     description:
-      'Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.',
+      'Creates an embedded card charge and returns the client_secret for your payment UI.',
   })
   @ApiResponse({
     status: 201,
-    description: 'Encaissement carte créé',
+    description: 'Card charge created',
     type: CardChargeResponseDto,
   })
   @ApiBody({ type: CreateCardChargeDto })
@@ -98,11 +100,11 @@ export class ChargesController {
 
   @Get('card/:id')
   @ApiLomiAccountHeader()
-  @ApiOperation({ summary: 'Obtenir un encaissement carte' })
+  @ApiOperation({ summary: 'Retrieve card charge' })
   @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
   @ApiResponse({
     status: 200,
-    description: 'Encaissement carte',
+    description: 'Card charge',
     type: CardChargeResponseDto,
   })
   getCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
@@ -111,9 +113,9 @@ export class ChargesController {
 
   @Post('card/:id/cancel')
   @ApiLomiAccountHeader()
-  @ApiOperation({ summary: 'Annuler un encaissement carte' })
+  @ApiOperation({ summary: 'Cancel card charge' })
   @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
-  @ApiResponse({ status: 200, description: 'Encaissement carte annulé' })
+  @ApiResponse({ status: 200, description: 'Card charge cancelled' })
   cancelCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.cardChargeService.cancel(id, user);
   }

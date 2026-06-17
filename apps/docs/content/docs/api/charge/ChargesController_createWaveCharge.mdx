@@ -1,6 +1,6 @@
 ---
-title: "Create direct mobile-money charge"
-description: "Create direct mobile-money charge"
+title: "Create direct Wave charge"
+description: "Create direct Wave charge"
 full: true
 method: post
 path: /charge/wave
@@ -9,22 +9,22 @@ operationId: ChargesController_createWaveCharge
 
 ## Overview
 
-Create direct mobile-money charge
+Create direct Wave charge
 
-Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer.
+Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.
 
 
 ### When to use this
 
-Use for server-initiated mobile-money collection when you are **not** using a hosted checkout session.
+Use for server-initiated Wave collection when you are **not** using a hosted checkout session.
 
 ### Good to know
 
-Follow the provider instructions in the response; UX is rail-specific (USSD, app redirect, etc.).
+Follow the provider instructions in the response; UX is rail-specific (app redirect, etc.). Currency must be **XOF**. See [Mobile money](/build/mobile-money) and [Direct charges](/build/direct-charges).
 
 ### See also
 
-[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
+[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication
@@ -54,15 +54,56 @@ _No query parameters._
 
 ### Request body
 
-_No application/json body for this operation._
+JSON request payload.
+
+Schema: `CreateWaveChargeDto`
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Yes | `number` | Amount in XOF (minimum 100) |
+| `currency` | Yes | `string` | Must be `XOF` for Wave |
+| `customer` | Yes | `object` | `name`, `phoneNumber` (E.164), optional `email` |
+| `description` | No | `string` | Payment description |
+| `successUrl` | No | `string` | Redirect after success |
+| `errorUrl` | No | `string` | Redirect after failure |
+
+Example body:
+
+```json
+{
+  "amount": 1000,
+  "currency": "XOF",
+  "customer": {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "phoneNumber": "+2250707070707"
+  },
+  "description": "Invoice #42",
+  "successUrl": "https://example.com/success",
+  "errorUrl": "https://example.com/error"
+}
+```
 
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `201` | Encaissement initié (corps JSON renvoyé par la fonction edge Wave) |
-| `400` | Entrée invalide ou erreur API Wave |
+| `201` | Wave charge initiated — includes `wave_launch_url` and/or `transaction_id` |
+| `400` | Invalid input or Wave API error |
+
+Example `201` response:
+
+```json
+{
+  "transactionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "wave_launch_url": "https://pay.wave.com/c/abc123",
+  "checkout_url": "https://checkout.lomi.africa/checkout/wave/abc123",
+  "status": "pending"
+}
+```
+
+Field names may vary slightly by edge function version; always read `wave_launch_url` or `checkout_url` for the customer redirect.
 
 ## Errors
 
@@ -74,7 +115,14 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "amount": 1000,
+    "currency": "XOF",
+    "customer": {
+      "name": "Jane Doe",
+      "phoneNumber": "+2250707070707"
+    }
+  }'
 ```
 
 ## OpenAPI

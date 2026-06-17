@@ -33,12 +33,20 @@ export class CustomerDto {
 }
 
 export class CreateWaveChargeDto {
-  @ApiProperty({ type: Number, example: 1000, description: 'Amount in XOF (minimum 100)' })
+  @ApiProperty({
+    type: Number,
+    example: 1000,
+    description: 'Amount in XOF (minimum 100)',
+  })
   @IsNumber()
   @Min(1)
   amount: number;
 
-  @ApiProperty({ type: String, example: 'XOF', description: 'Must be XOF for Wave' })
+  @ApiProperty({
+    type: String,
+    example: 'XOF',
+    description: 'Must be XOF for Wave',
+  })
   @IsString()
   @IsNotEmpty()
   currency: string;
@@ -64,7 +72,10 @@ export class CreateWaveChargeDto {
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ type: String, example: 'https://your-site.com/success' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'https://your-site.com/success',
+  })
   @IsString()
   @IsOptional()
   successUrl?: string;

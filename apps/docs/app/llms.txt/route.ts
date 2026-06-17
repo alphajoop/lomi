@@ -65,19 +65,31 @@ export async function GET() {
   lines.push(
     '2. Build against **sandbox** first (`https://sandbox.api.lomi.africa`), then switch to **live** (`https://api.lomi.africa`) with live keys.',
   );
-  const integrationPage = pageBySlugPath(pages, 'reference/setup/integration');
-  const createAccountPage = pageBySlugPath(
-    pages,
-    'core/fundamentals/create-account',
+  lines.push(
+    '3. **Default integration path:** hosted checkout sessions or payment links before direct `/charge/*` calls unless you need a custom server-initiated flow.',
   );
-  if (integrationPage) {
+  lines.push(
+    '4. **Environment is determined by the API key**, not the hostname alone—sandbox keys only work against sandbox; live keys only against live.',
+  );
+  lines.push(
+    '5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.',
+  );
+  const integrationJourney = pageBySlugPath(pages, 'start/integration-journey');
+  const paymentChannels = pageBySlugPath(pages, 'build/payment-channels');
+  const sandboxPayments = pageBySlugPath(pages, 'start/sandbox-payments');
+  if (integrationJourney) {
     lines.push(
-      `3. Follow the [integration overview](${docsOrigin}${integrationPage.url}) for headers, environments, and product choices.`,
+      `6. Follow the [integration journey](${docsOrigin}${integrationJourney.url}) for sandbox → webhooks → go-live.`,
     );
   }
-  if (createAccountPage) {
+  if (paymentChannels) {
     lines.push(
-      `4. If you have not already, see [${createAccountPage.data.title ?? 'Create account'}](${docsOrigin}${createAccountPage.url}).`,
+      `- Supported countries and rails: [${paymentChannels.data.title ?? 'Payment channels'}](${docsOrigin}${paymentChannels.url}).`,
+    );
+  }
+  if (sandboxPayments) {
+    lines.push(
+      `- Test cards and MoMo sandbox behavior: [${sandboxPayments.data.title ?? 'Sandbox payments'}](${docsOrigin}${sandboxPayments.url}).`,
     );
   }
   lines.push('');
@@ -85,7 +97,7 @@ export async function GET() {
   lines.push('## Authentication and environments');
   lines.push('');
   lines.push(
-    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**.',
+    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live—not the request URL alone.**',
   );
   lines.push('');
   lines.push('- **Sandbox base URL**: `https://sandbox.api.lomi.africa`');
@@ -108,7 +120,7 @@ export async function GET() {
   lines.push('## Payment flows (pick one)');
   lines.push('');
   lines.push(
-    'Choose the path that matches your UX—not every merchant needs every API.',
+    'Choose the path that matches your UX—not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.',
   );
   lines.push('');
   const hostedCheckout = pages.find(
@@ -193,6 +205,11 @@ export async function GET() {
   if (whatIs) {
     lines.push(
       `- [${whatIs.data.title ?? 'What is lomi.?'}](${docsOrigin}${whatIs.url})`,
+    );
+  }
+  if (integrationJourney) {
+    lines.push(
+      `- [${integrationJourney.data.title ?? 'Integration journey'}](${docsOrigin}${integrationJourney.url})`,
     );
   }
   const psm = pages.find(

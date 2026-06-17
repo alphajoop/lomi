@@ -251,7 +251,11 @@ export class CardChargeService {
       if (orgId && orgId !== user.organizationId) {
         throw new ForbiddenException('Access denied to this payment intent');
       }
-      if (merchantId && !isNetworkRequest(user) && merchantId !== user.merchantId) {
+      if (
+        merchantId &&
+        !isNetworkRequest(user) &&
+        merchantId !== user.merchantId
+      ) {
         throw new ForbiddenException('Access denied to this payment intent');
       }
       if (merchantId && isNetworkRequest(user)) {

@@ -6,7 +6,6 @@ import { createGetUrl, getSlugs } from 'fumadocs-core/source';
 import { TOCItemType } from 'fumadocs-core/toc';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import matter from 'gray-matter';
 import { remarkInclude } from 'fumadocs-mdx/config';
 import remarkMdx from 'remark-mdx';
 import { visit } from 'unist-util-visit';
@@ -460,11 +459,36 @@ async function checkOpenApiDocs(): Promise<void> {
   console.log('OpenAPI docs checks passed.');
 }
 
+function parseMdxFrontmatter(content: string) {
+  const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/m.exec(content);
+  if (!match) return { data: {}, content };
+  const data: Record<string, unknown> = {};
+  for (const line of match[1].split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const colon = trimmed.indexOf(':');
+    if (colon === -1) continue;
+    const key = trimmed.slice(0, colon).trim();
+    let value: unknown = trimmed.slice(colon + 1).trim();
+    if (value === 'true') value = true;
+    else if (value === 'false') value = false;
+    else if (
+      typeof value === 'string' &&
+      value.startsWith('"') &&
+      value.endsWith('"')
+    ) {
+      value = value.slice(1, -1);
+    }
+    data[key] = value;
+  }
+  return { data, content: match[2] ?? '' };
+}
+
 async function readFromPath(file: string) {
   const content = await fs
     .readFile(path.resolve(file))
     .then((res) => res.toString());
-  const parsed = matter(content);
+  const parsed = parseMdxFrontmatter(content);
 
   return {
     path: file,

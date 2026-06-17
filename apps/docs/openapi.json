@@ -837,16 +837,6 @@
         "operationId": "TransactionsController_findAll",
         "parameters": [
           {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
-          {
             "name": "isPos",
             "required": false,
             "in": "query",
@@ -945,6 +935,16 @@
               "example": "WAVE",
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
           }
         ],
         "responses": {
@@ -980,6 +980,15 @@
         "operationId": "TransactionsController_findOne",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de la transaction",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -987,15 +996,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de la transaction",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1031,16 +1031,6 @@
         "description": "Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.",
         "operationId": "CustomersController_findAll",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "pageSize",
             "required": false,
@@ -1088,6 +1078,16 @@
             "description": "Recherche par nom ou e-mail",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
             }
           }
         ],
@@ -1245,6 +1245,15 @@
         "operationId": "CustomersController_findOne",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -1252,15 +1261,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1295,6 +1295,15 @@
         "operationId": "CustomersController_update",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -1302,15 +1311,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1392,16 +1392,6 @@
         "operationId": "CustomersController_remove",
         "parameters": [
           {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
-          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -1448,16 +1438,6 @@
         "description": "Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.",
         "operationId": "CustomersController_getPortalAudit",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "eventType",
             "required": false,
@@ -1515,6 +1495,15 @@
         "operationId": "CustomersController_getTransactions",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -1522,15 +1511,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1569,16 +1549,6 @@
         "description": "Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.",
         "operationId": "CustomersController_createPortalLaunchSession",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1858,7 +1828,7 @@
     },
     "/refunds": {
       "post": {
-        "description": "Rembourse une transaction terminée (carte bancaire, Wave ou MTN MoMo). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels. En mode test, les remboursements MTN sont comptables uniquement (pas d’appel API MTN). En live, MTN MoMo exige une référence RequestToPay sur la transaction d’origine.",
+        "description": "Refunds a completed transaction (card, Wave, or MTN MoMo). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN MoMo requires a RequestToPay reference on the original transaction.",
         "operationId": "RefundsController_create",
         "parameters": [
           {
@@ -1909,16 +1879,6 @@
         "operationId": "RefundsController_findAll",
         "parameters": [
           {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
-          {
             "name": "offset",
             "required": false,
             "in": "query",
@@ -1957,6 +1917,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
           }
         ],
         "responses": {
@@ -1978,6 +1948,13 @@
         "operationId": "RefundsController_findOne",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Refund ID",
+            "schema": {}
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -1986,13 +1963,6 @@
               "type": "string",
               "example": "acct_1234567890"
             }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Refund ID",
-            "schema": {}
           }
         ],
         "responses": {
@@ -2595,16 +2565,6 @@
         "operationId": "CheckoutSessionsController_findAll",
         "parameters": [
           {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
-          {
             "name": "offset",
             "required": false,
             "in": "query",
@@ -2667,16 +2627,6 @@
         "description": "Renvoie le détail d’une session (statut, client et produits associés).",
         "operationId": "CheckoutSessionsController_findOne",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -3397,6 +3347,7 @@
     },
     "/charge/wave": {
       "post": {
+        "description": "Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.",
         "operationId": "ChargesController_createWaveCharge",
         "parameters": [
           {
@@ -3410,20 +3361,29 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWaveChargeDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Encaissement initié (corps JSON renvoyé par la fonction edge Wave)",
+            "description": "Wave charge initiated",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/WaveChargeResponseDto"
                 }
               }
             }
           },
           "400": {
-            "description": "Entrée invalide ou erreur API Wave"
+            "description": "Invalid input or Wave API error"
           }
         },
         "security": [
@@ -3431,13 +3391,13 @@
             "api-key": []
           }
         ],
-        "summary": "Lancer un encaissement direct Wave",
+        "summary": "Create direct Wave charge",
         "tags": ["Advanced Direct Charges"]
       }
     },
     "/charge/mtn": {
       "post": {
-        "description": "Initie un RequestToPay MTN MoMo. Avec une clé API test, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.",
+        "description": "Initiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.",
         "operationId": "ChargesController_createMtnCharge",
         "parameters": [
           {
@@ -3463,12 +3423,11 @@
         },
         "responses": {
           "201": {
-            "description": "Encaissement MTN initié (RequestToPay)",
+            "description": "MTN charge initiated",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/MtnChargeResponseDto"
                 }
               }
             }
@@ -3479,13 +3438,13 @@
             "api-key": []
           }
         ],
-        "summary": "Lancer un encaissement direct MTN MoMo",
+        "summary": "Create MTN MoMo charge",
         "tags": ["Advanced Direct Charges"]
       }
     },
     "/charge/card": {
       "post": {
-        "description": "Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.",
+        "description": "Creates an embedded card charge and returns the client_secret for your payment UI.",
         "operationId": "ChargesController_createCardCharge",
         "parameters": [
           {
@@ -3511,7 +3470,7 @@
         },
         "responses": {
           "201": {
-            "description": "Encaissement carte créé",
+            "description": "Card charge created",
             "content": {
               "application/json": {
                 "schema": {
@@ -3526,7 +3485,7 @@
             "api-key": []
           }
         ],
-        "summary": "Créer un encaissement carte (client_secret)",
+        "summary": "Create card charge (client_secret)",
         "tags": ["Advanced Direct Charges"]
       }
     },
@@ -3535,6 +3494,13 @@
         "operationId": "ChargesController_getCardCharge",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Card payment id (pi_...)",
+            "schema": {}
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -3543,18 +3509,11 @@
               "type": "string",
               "example": "acct_1234567890"
             }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Card payment id (pi_...)",
-            "schema": {}
           }
         ],
         "responses": {
           "200": {
-            "description": "Encaissement carte",
+            "description": "Card charge",
             "content": {
               "application/json": {
                 "schema": {
@@ -3569,7 +3528,7 @@
             "api-key": []
           }
         ],
-        "summary": "Obtenir un encaissement carte",
+        "summary": "Retrieve card charge",
         "tags": ["Advanced Direct Charges"]
       }
     },
@@ -3577,6 +3536,13 @@
       "post": {
         "operationId": "ChargesController_cancelCardCharge",
         "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Card payment id (pi_...)",
+            "schema": {}
+          },
           {
             "name": "Lomi-Account",
             "in": "header",
@@ -3586,18 +3552,11 @@
               "type": "string",
               "example": "acct_1234567890"
             }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Card payment id (pi_...)",
-            "schema": {}
           }
         ],
         "responses": {
           "200": {
-            "description": "Encaissement carte annulé"
+            "description": "Card charge cancelled"
           }
         },
         "security": [
@@ -3605,7 +3564,7 @@
             "api-key": []
           }
         ],
-        "summary": "Annuler un encaissement carte",
+        "summary": "Cancel card charge",
         "tags": ["Advanced Direct Charges"]
       }
     }
@@ -4729,6 +4688,35 @@
           "updated_at"
         ]
       },
+      "CreateRefundDto": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "description": "UUID of a completed transaction (card, Wave, or MTN MoMo)",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount to refund (same currency as the transaction)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for the refund"
+          },
+          "refund_type": {
+            "type": "string",
+            "description": "Full or partial refund. If omitted, full when amount equals transaction gross amount.",
+            "enum": ["full", "partial"]
+          },
+          "subscription_action": {
+            "type": "string",
+            "description": "Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none.",
+            "enum": ["default", "cancel", "pause", "none"]
+          }
+        },
+        "required": ["transaction_id", "amount"]
+      },
       "RefundSubscriptionActionDto": {
         "type": "object",
         "properties": {
@@ -4749,36 +4737,6 @@
             "type": "string"
           }
         }
-      },
-      "CreateRefundDto": {
-        "type": "object",
-        "properties": {
-          "transaction_id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "UUID of a completed transaction (card payment, Wave, or MTN MoMo)"
-          },
-          "amount": {
-            "type": "number",
-            "minimum": 0.01,
-            "description": "Amount to refund (same currency as the transaction)"
-          },
-          "reason": {
-            "type": "string",
-            "description": "Reason for the refund"
-          },
-          "refund_type": {
-            "type": "string",
-            "enum": ["full", "partial"],
-            "description": "Full or partial refund. If omitted, full when amount equals transaction gross amount."
-          },
-          "subscription_action": {
-            "type": "string",
-            "enum": ["default", "cancel", "pause", "none"],
-            "description": "Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none."
-          }
-        },
-        "required": ["transaction_id", "amount"]
       },
       "CreateRefundResponseDto": {
         "type": "object",
@@ -5871,17 +5829,98 @@
         },
         "required": ["name", "phoneNumber"]
       },
-      "CreateMtnChargeDto": {
+      "CreateWaveChargeDto": {
         "type": "object",
         "properties": {
           "amount": {
             "type": "number",
             "example": 1000,
-            "minimum": 1
+            "description": "Amount in XOF (minimum 100)"
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Must be XOF for Wave"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerDto"
+          },
+          "description": {
+            "type": "string",
+            "example": "Payment for Service"
+          },
+          "successUrl": {
+            "type": "string",
+            "example": "https://your-site.com/success"
+          },
+          "errorUrl": {
+            "type": "string",
+            "example": "https://your-site.com/error"
+          },
+          "environment": {
+            "type": "string",
+            "enum": ["live", "test"]
+          }
+        },
+        "required": ["amount", "currency", "customer"]
+      },
+      "WaveChargeResponseDto": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "wave_launch_url": {
+            "type": "string",
+            "example": "https://pay.wave.com/c/abc123",
+            "description": "URL to open Wave so the customer can approve the payment."
+          },
+          "checkout_url": {
+            "type": "string",
+            "example": "https://checkout.lomi.africa/checkout/wave/abc123"
+          },
+          "status": {
+            "type": "string",
+            "example": "pending"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Nested session data when returned by the edge function."
+          }
+        }
+      },
+      "CreateMtnChargeDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 1000
           },
           "currency": {
             "type": "string",
             "example": "XOF"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantId": {
+            "type": "string",
+            "format": "uuid"
           },
           "customer": {
             "$ref": "#/components/schemas/CustomerDto"
@@ -5892,8 +5931,7 @@
           },
           "countryCode": {
             "type": "string",
-            "example": "CI",
-            "description": "ISO 3166-1 alpha-2 (default CI)"
+            "example": "CI"
           },
           "productId": {
             "type": "string",
@@ -5906,11 +5944,47 @@
           "quantity": {
             "type": "number",
             "example": 1,
-            "default": 1,
-            "minimum": 1
+            "default": 1
           }
         },
         "required": ["amount", "currency", "customer"]
+      },
+      "MtnChargeDataDto": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "external_id": {
+            "type": "string",
+            "example": "ext_abc123"
+          },
+          "reference_id": {
+            "type": "string",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING",
+            "description": "Test keys return `completed` immediately; live returns `PENDING` until the customer approves."
+          }
+        },
+        "required": ["transaction_id", "external_id", "status"]
+      },
+      "MtnChargeResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/MtnChargeDataDto"
+          }
+        },
+        "required": ["success", "data"]
       },
       "CreateCardChargeDto": {
         "type": "object",

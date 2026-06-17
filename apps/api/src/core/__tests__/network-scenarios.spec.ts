@@ -40,7 +40,8 @@ describe('Network beta-exit scenario matrix', () => {
       layer: 'api+sql',
       automated:
         'network-context + enqueue_network_payment_webhooks_on_transaction_complete trigger',
-      manual: 'Operator receives NETWORK_PAYMENT_CREATED webhook after payment completes',
+      manual:
+        'Operator receives NETWORK_PAYMENT_CREATED webhook after payment completes',
     },
     {
       id: 'webhook-operator-fee',
@@ -51,8 +52,7 @@ describe('Network beta-exit scenario matrix', () => {
     {
       id: 'api-refund-delegated',
       layer: 'api',
-      automated:
-        'refunds.service network list/get + create fee reversal RPCs',
+      automated: 'refunds.service network list/get + create fee reversal RPCs',
       manual: 'POST /refunds with Lomi-Account → refund completes',
     },
     {

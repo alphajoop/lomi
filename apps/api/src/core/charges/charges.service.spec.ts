@@ -44,7 +44,9 @@ describe('ChargesService (network)', () => {
     } as unknown as SupabaseService;
 
     service = new ChargesService(
-      { get: jest.fn().mockReturnValue('https://lomi.africa') } as unknown as ConfigService,
+      {
+        get: jest.fn().mockReturnValue('https://lomi.africa'),
+      } as unknown as ConfigService,
       supabase,
     );
   });
