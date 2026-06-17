@@ -187,15 +187,17 @@ In test mode, lomi. creates a **completed** transaction and credits your **test 
 
 ### MTN MoMo
 
-In test mode, lomi. also marks the transaction **completed** and credits your test balance when the MTN payment is initiated. Status updates in test are treated as successful for ledger purposes. Checkout talks to the **MTN sandbox** when the session is in test mode.
+In test mode, lomi. marks the MTN transaction **completed** and credits your **test balance** when the payment is initiated—**without calling the MTN sandbox**. No real MSISDN or sandbox credentials are required for the ledger flow.
 
-**How to test:**
+**Test refunds:** `POST /refunds` (or the dashboard refund dialog) on a completed test MTN transaction updates your test balance immediately. **No MTN Disbursement API call** is made in test mode.
+
+**How to test payments:**
 
 1. Use a **test** payment link or session with MTN enabled.
-2. Enter a valid MSISDN for your country (international format, without spaces in the API path).
+2. Enter any valid MSISDN for your country (international format).
 3. Confirm the transaction appears as completed in the dashboard test view.
 
-For sandbox phone numbers allowed by MTN, see the [MTN MoMo developer portal](https://momodeveloper.mtn.com/).
+For live MTN integration and sandbox MSISDNs, see the [MTN MoMo developer portal](https://momodeveloper.mtn.com/).
 
 **Supported countries (hosted checkout)**
 
@@ -326,7 +328,7 @@ See **[Webhooks](/build/webhooks)** for subscription management and verification
 | Card confirms but no test balance | Webhook not reaching your stack; wrong environment on session | Ensure test link/session; check dashboard transaction status |
 | Test key but checkout feels “live” | Payment link created in **Live** mode | Recreate link in **Test** mode (dashboard or with a test API key) |
 | Wave/MTN shows success, balance unchanged | Viewing **live** balance instead of **test** | Toggle dashboard to Test |
-| MTN sandbox errors | Invalid sandbox MSISDN or credentials | Use numbers from MTN developer docs for your country |
+| MTN live charge/refund errors | Missing provider reference or disbursement balance | Ensure payment completed with RequestToPay reference; check MTN disbursement wallet |
 | No customer email | Expected in test | Notifications are disabled for test transactions |
 
 ## Related documentation

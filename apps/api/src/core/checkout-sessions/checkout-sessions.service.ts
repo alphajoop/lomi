@@ -11,6 +11,7 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import {
+  assertNetworkContextRecorded,
   namespaceNetworkIdempotency,
   recordNetworkContext,
 } from '../common/network-context';
@@ -240,13 +241,14 @@ export class CheckoutSessionsService {
       return;
     }
 
-    await recordNetworkContext(this.supabase, user, {
+    const networkContext = await recordNetworkContext(this.supabase, user, {
       checkoutSessionId,
       capabilityKey: 'payment.create',
       metadata: {
         source: 'api_checkout_session',
       },
     });
+    assertNetworkContextRecorded(user, networkContext, 'checkout session');
   }
 
   private async findBlockingInvoice(

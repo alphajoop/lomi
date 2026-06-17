@@ -6,6 +6,8 @@
     "CustomerSubscriptionsController_remove",
     "CustomerSubscriptionsController_update",
     "SubscriptionsController_cancel",
+    "SubscriptionsController_uncancel",
+    "SubscriptionsController_changePlan",
     "SubscriptionsController_findAll",
     "SubscriptionsController_findByCustomer",
     "SubscriptionsController_findOne",

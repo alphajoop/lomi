@@ -20,6 +20,18 @@ describe('CheckoutSessionsService', () => {
     environment: 'test-env',
   };
 
+  const networkUser = {
+    ...mockUser,
+    actorOrganizationId: 'operator-org',
+    targetOrganizationId: 'test-org-id',
+    isNetworkRequest: true,
+    networkMembershipId: 'nm-checkout',
+    networkAccountId: 'na-checkout',
+    lomiAccount: 'acct_member',
+    publicAccountId: 'acct_member',
+    networkCapabilityKey: 'payment.create',
+  };
+
   beforeEach(async () => {
     mockSupabaseClient = {
       rpc: jest
@@ -130,6 +142,31 @@ describe('CheckoutSessionsService', () => {
         p_organization_id: mockUser.organizationId,
         p_customer_id: 'customer-1',
         p_product_id: 'product-1',
+      }),
+    );
+  });
+
+  it('namespaces idempotency keys for Network checkout sessions', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseService.rpc.mockResolvedValue({
+      data: { checkout_session_id: 'session-network' },
+      error: null,
+    });
+
+    await service.create(createDto, networkUser as AuthContext, {
+      key: 'checkout-1',
+      bodyHash: 'body-hash',
+    });
+
+    expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_idempotency_key: expect.stringMatching(/^network:nm-checkout:/),
+        p_idempotency_body_hash: expect.not.stringMatching(/^body-hash$/),
       }),
     );
   });

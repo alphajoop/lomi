@@ -1858,7 +1858,7 @@
     },
     "/refunds": {
       "post": {
-        "description": "Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.",
+        "description": "Rembourse une transaction terminée (carte bancaire, Wave ou MTN MoMo). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels. En mode test, les remboursements MTN sont comptables uniquement (pas d’appel API MTN). En live, MTN MoMo exige une référence RequestToPay sur la transaction d’origine.",
         "operationId": "RefundsController_create",
         "parameters": [
           {
@@ -1872,6 +1872,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRefundDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Remboursement enregistré",
@@ -3427,6 +3437,7 @@
     },
     "/charge/mtn": {
       "post": {
+        "description": "Initie un RequestToPay MTN MoMo. Avec une clé API test, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.",
         "operationId": "ChargesController_createMtnCharge",
         "parameters": [
           {
@@ -3440,6 +3451,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMtnChargeDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Encaissement MTN initié (RequestToPay)",
@@ -4729,6 +4750,36 @@
           }
         }
       },
+      "CreateRefundDto": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of a completed transaction (card payment, Wave, or MTN MoMo)"
+          },
+          "amount": {
+            "type": "number",
+            "minimum": 0.01,
+            "description": "Amount to refund (same currency as the transaction)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for the refund"
+          },
+          "refund_type": {
+            "type": "string",
+            "enum": ["full", "partial"],
+            "description": "Full or partial refund. If omitted, full when amount equals transaction gross amount."
+          },
+          "subscription_action": {
+            "type": "string",
+            "enum": ["default", "cancel", "pause", "none"],
+            "description": "Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none."
+          }
+        },
+        "required": ["transaction_id", "amount"]
+      },
       "CreateRefundResponseDto": {
         "type": "object",
         "properties": {
@@ -5800,6 +5851,66 @@
           "verification_token",
           "webhook_id"
         ]
+      },
+      "CustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "jane@example.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+2250707070707",
+            "description": "E.164 phone number required for mobile-money rails"
+          }
+        },
+        "required": ["name", "phoneNumber"]
+      },
+      "CreateMtnChargeDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 1000,
+            "minimum": 1
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerDto"
+          },
+          "description": {
+            "type": "string",
+            "example": "Payment for Service"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "CI",
+            "description": "ISO 3166-1 alpha-2 (default CI)"
+          },
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1,
+            "default": 1,
+            "minimum": 1
+          }
+        },
+        "required": ["amount", "currency", "customer"]
       },
       "CreateCardChargeDto": {
         "type": "object",

@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 The lomi. customer portal provides a hosted customer account area at `customers.lomi.africa` where end-users can:
 
-![Placeholder customer portal](/placeholder.webp)
+<DocsScreenshot name="build/customer-portal" alt="lomi. customer portal for payment history and subscriptions" />
 
 - View payment history and open invoice receipts when available
 - View and manage subscriptions (pause, resume, cancel at period end, uncancel)
@@ -160,8 +160,8 @@ Pass `Authorization: Bearer <portal_session_token>`.
 
 When `allow_payment_method_update` is enabled in portal policy (default: on), customers can:
 
-1. Create a Stripe SetupIntent via `POST /customer-portal/payment-methods/setup-intent`
-2. Confirm the SetupIntent client-side with Stripe.js
+1. Create a card setup intent via `POST /customer-portal/payment-methods/setup-intent`
+2. Confirm the setup intent client-side with your card payment SDK
 3. Persist the card with your attach flow (hosted portal calls the attach edge function after confirmation)
 
 Use `POST /customer-portal/payment-methods/{id}/default` to set the default card and sync active subscriptions. Use `DELETE /customer-portal/payment-methods/{id}` to remove a card (blocked when it is the sole card on a billable subscription).

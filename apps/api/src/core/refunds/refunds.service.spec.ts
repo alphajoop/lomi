@@ -46,6 +46,26 @@ describe('RefundsService', () => {
     status: 'completed',
   };
 
+  const completedMtnTx = {
+    transaction_id: 'tx-mtn',
+    organization_id: user.organizationId,
+    customer_id: 'cust-1',
+    gross_amount: 10000,
+    net_amount: 9500,
+    fee_amount: 500,
+    currency_code: 'XOF',
+    provider_code: 'MTN',
+    payment_method_code: 'MOBILE_MONEY',
+    status: 'completed',
+    environment: 'live',
+  };
+
+  const completedMtnTestTx = {
+    ...completedMtnTx,
+    transaction_id: 'tx-mtn-test',
+    environment: 'test',
+  };
+
   const networkUser: AuthContext = {
     ...user,
     isNetworkRequest: true,
@@ -65,25 +85,43 @@ describe('RefundsService', () => {
     const rpc = jest.fn((name: string, args: Record<string, unknown>) =>
       Promise.resolve(rpcImpl(name, args)),
     );
-    const from = jest.fn(() => ({
-      select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          eq: jest.fn(() => ({
-            limit: jest.fn(() =>
-              Promise.resolve({
-                data: [{ provider_transaction_id: providerChargeId }],
-                error: null,
-              }),
-            ),
-            maybeSingle: jest.fn(() =>
-              Promise.resolve({
-                data: { provider_transaction_id: providerChargeId },
-                error: null,
-              }),
-            ),
-          })),
-        })),
-      })),
+    const createQueryChain = (table?: string) => {
+      const chain = {
+        eq: jest.fn(function eq() {
+          return chain;
+        }),
+        limit: jest.fn(() =>
+          Promise.resolve({
+            data: [{ provider_transaction_id: providerChargeId }],
+            error: null,
+          }),
+        ),
+        maybeSingle: jest.fn(() => {
+          if (table === 'network_memberships') {
+            return Promise.resolve({
+              data: {
+                accepted_by_merchant_id: 'member-merchant-1',
+                operator_fee_rule_id: null,
+              },
+              error: null,
+            });
+          }
+          if (table === 'network_operator_fee_entries') {
+            return Promise.resolve({
+              data: { amount: 25, currency_code: 'XOF' },
+              error: null,
+            });
+          }
+          return Promise.resolve({
+            data: { provider_transaction_id: providerChargeId },
+            error: null,
+          });
+        }),
+      };
+      return chain;
+    };
+    const from = jest.fn((table?: string) => ({
+      select: jest.fn(() => createQueryChain(table)),
     }));
     const client = { rpc, from };
     const supabaseService = {
@@ -123,7 +161,7 @@ describe('RefundsService', () => {
           data: [
             {
               ...completedCardTx,
-              provider_code: 'MTN',
+              provider_code: 'ORANGE',
               payment_method_code: 'MOBILE_MONEY',
             },
           ],
@@ -428,6 +466,204 @@ describe('RefundsService', () => {
     restore();
   });
 
+  it('creates MTN full refund via ledger RPC then mtn edge with refundId', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedMtnTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_mtn_refund_request_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-mtn-full',
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, refundReferenceId: 'mtn-ref-1' }),
+    });
+
+    const result = await service.create(
+      { transaction_id: 'tx-mtn', amount: 10000, refund_type: 'full' },
+      user,
+    );
+
+    expect(result.refund_id).toBe('ref-mtn-full');
+    expect(rpc).toHaveBeenCalledWith(
+      'create_mtn_refund_request_api',
+      expect.objectContaining({
+        p_transaction_id: 'tx-mtn',
+        p_refund_amount: 10000,
+      }),
+    );
+
+    const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
+    expect(fetchUrl).toContain('/functions/v1/mtn');
+    const fetchBody = JSON.parse(
+      (global.fetch as jest.Mock).mock.calls[0][1].body,
+    );
+    expect(fetchBody.path).toBe('/refund');
+    expect(fetchBody.body.refundId).toBe('ref-mtn-full');
+
+    restore();
+  });
+
+  it('skips MTN edge for test-environment transactions', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedMtnTestTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_mtn_refund_request_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-mtn-test',
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    const result = await service.create(
+      { transaction_id: 'tx-mtn-test', amount: 10000, refund_type: 'full' },
+      user,
+    );
+
+    expect(result.refund_id).toBe('ref-mtn-test');
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(rpc).toHaveBeenCalledWith(
+      'create_mtn_refund_request_api',
+      expect.objectContaining({ p_transaction_id: 'tx-mtn-test' }),
+    );
+
+    restore();
+  });
+
+  it('rolls back MTN full refund when edge call fails', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedMtnTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_mtn_refund_request_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-mtn-full',
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      if (name === 'rollback_mtn_refund') {
+        return {
+          data: { success: true, refund_id: 'ref-mtn-full' },
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      text: async () => 'MTN error',
+    });
+
+    await expect(
+      service.create(
+        { transaction_id: 'tx-mtn', amount: 10000, refund_type: 'full' },
+        user,
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(rpc).toHaveBeenCalledWith(
+      'rollback_mtn_refund',
+      expect.objectContaining({ p_refund_id: 'ref-mtn-full' }),
+    );
+
+    restore();
+  });
+
+  it('creates MTN partial refund via ledger then edge and apply_mtn_partial_refund_charges', async () => {
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedMtnTx], error: null };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'get_customer') {
+        return {
+          data: [{ name: 'Alice', phone_number: '+225071234567' }],
+          error: null,
+        };
+      }
+      if (name === 'create_mtn_refund_request_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-mtn-partial',
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      if (name === 'apply_mtn_partial_refund_charges') {
+        return { data: [{ success: true, error_message: null }], error: null };
+      }
+      return { data: null, error: null };
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, refundReferenceId: 'mtn-ref-partial' }),
+    });
+
+    const result = await service.create(
+      {
+        transaction_id: 'tx-mtn',
+        amount: 5000,
+        refund_type: 'partial',
+      },
+      user,
+    );
+
+    expect(result.refund_id).toBe('ref-mtn-partial');
+    expect(rpc).toHaveBeenCalledWith(
+      'create_mtn_refund_request_api',
+      expect.objectContaining({
+        p_transaction_id: 'tx-mtn',
+        p_refund_amount: 5000,
+        p_subscription_action: 'none',
+      }),
+    );
+    expect(rpc).toHaveBeenCalledWith(
+      'apply_mtn_partial_refund_charges',
+      expect.objectContaining({
+        p_transaction_id: 'tx-mtn',
+        p_refund_id: 'ref-mtn-partial',
+      }),
+    );
+
+    restore();
+  });
+
   it('findOne throws when refund missing', async () => {
     const { service, restore } = buildService((name) => {
       if (name === 'get_refund') {
@@ -504,6 +740,70 @@ describe('RefundsService', () => {
         p_network_membership_id: networkUser.networkMembershipId,
         p_refund_id: 'ref-network',
         p_read_scope: 'all',
+      }),
+    );
+
+    restore();
+  });
+
+  it('records network context and fee reversal after a delegated card refund', async () => {
+    stripeRefundsCreate.mockResolvedValue({ id: 're_network' });
+
+    const { service, rpc, restore } = buildService((name) => {
+      if (name === 'get_transaction') {
+        return { data: [completedCardTx], error: null };
+      }
+      if (name === 'get_network_transaction_for_api') {
+        return {
+          data: [{ transaction_id: 'tx-card' }],
+          error: null,
+        };
+      }
+      if (name.startsWith('get_effective_other_fee_config')) {
+        return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
+      }
+      if (name === 'create_stripe_card_refund_api') {
+        return {
+          data: {
+            success: true,
+            refund_id: 'ref-network',
+            refunded_amount: 10000,
+            status: 'completed',
+          },
+          error: null,
+        };
+      }
+      if (name === 'record_network_transaction_context') {
+        return { data: 'ctx-network', error: null };
+      }
+      if (name === 'record_network_operator_fee_reversal') {
+        return { data: 'fee-reversal-network', error: null };
+      }
+      if (name === 'enqueue_network_webhook_event') {
+        return { data: null, error: null };
+      }
+      return { data: null, error: null };
+    });
+
+    const result = await service.create(
+      { transaction_id: 'tx-card', amount: 10000, refund_type: 'full' },
+      networkUser,
+    );
+
+    expect(result.refund_id).toBe('ref-network');
+    expect(rpc).toHaveBeenCalledWith(
+      'record_network_transaction_context',
+      expect.objectContaining({
+        p_network_membership_id: networkUser.networkMembershipId,
+        p_refund_id: 'ref-network',
+        p_capability_key: 'refund.create',
+      }),
+    );
+    expect(rpc).toHaveBeenCalledWith(
+      'record_network_operator_fee_reversal',
+      expect.objectContaining({
+        p_refund_id: 'ref-network',
+        p_transaction_id: 'tx-card',
       }),
     );
 

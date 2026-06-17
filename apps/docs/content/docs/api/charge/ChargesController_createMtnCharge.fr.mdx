@@ -11,9 +11,20 @@ operationId: ChargesController_createMtnCharge
 
 Lancer un encaissement direct MTN MoMo
 
+Initie un encaissement RequestToPay MTN MoMo. Avec une clé API **test**, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.
+
+
 ### Quand utiliser cet endpoint
 
-Utilisez cet endpoint quand vous devez exécuter `POST /charge/mtn` (Lancer un encaissement direct MTN MoMo).
+Pour un encaissement MTN initié côté serveur lorsque vous n’utilisez **pas** une session checkout hébergée.
+
+### Bon à savoir
+
+Les encaissements live exigent MTN connecté pour votre organisation et un MSISDN valide. Les remboursements MTN live passent par l’API Disbursement via [Créer un remboursement](/api/refunds/RefundsController_create).
+
+### Voir aussi
+
+[Encaissement Wave](/api/charge/ChargesController_createWaveCharge) · [Créer un remboursement](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentification
@@ -43,7 +54,36 @@ _Aucun paramètre de requête._
 
 ### Corps de la requête
 
-_Aucun corps application/json pour cette opération._
+Charge utile JSON.
+
+Schéma : `CreateMtnChargeDto`
+
+| Champ | Requis | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Oui | `number` | Montant (minimum 1) |
+| `currency` | Oui | `string` | Code devise (ex. `XOF`) |
+| `customer` | Oui | `object` | Payeur (`name`, `phoneNumber`, `email` optionnel) |
+| `description` | Non | `string` | Description du paiement |
+| `countryCode` | Non | `string` | Pays ISO 3166-1 alpha-2 (défaut `CI`) |
+| `productId` | Non | `string` (uuid) | Produit optionnel |
+| `subscriptionId` | Non | `string` (uuid) | Abonnement optionnel |
+| `quantity` | Non | `number` | Quantité (défaut `1`) |
+
+Exemple :
+
+```json
+{
+  "amount": 1000,
+  "currency": "XOF",
+  "countryCode": "CI",
+  "description": "Facture #42",
+  "customer": {
+    "name": "Jane Doe",
+    "phoneNumber": "+2250707070707",
+    "email": "jane@example.com"
+  }
+}
+```
 
 
 ## Réponses
@@ -54,7 +94,7 @@ _Aucun corps application/json pour cette opération._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent le format JSON standard. **401** : clé invalide ; **404** : ressource introuvable ; **429** : limitation de débit.
 
 ## Exemple
 
@@ -62,7 +102,15 @@ Les erreurs suivent le format JSON standard (code de statut et message lisible p
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "amount": 1000,
+    "currency": "XOF",
+    "countryCode": "CI",
+    "customer": {
+      "name": "Jane Doe",
+      "phoneNumber": "+2250707070707"
+    }
+  }'
 ```
 
 ## OpenAPI
@@ -70,4 +118,4 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
 - **operationId**: `ChargesController_createMtnCharge`
 - **Operation**: `POST /charge/mtn`
 
-Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `apps/docs/openapi.json`.

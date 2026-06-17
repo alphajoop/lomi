@@ -512,7 +512,7 @@ export class WebhookSenderService {
 
     const first = jobs[0]!;
     const event = first.event_type as WebhookEvent;
-    let data = first.payload as Record<string, unknown>;
+    const data = first.payload as Record<string, unknown>;
     const merchantId = first.merchant_id;
 
     if (event === 'PAYMENT_SUCCEEDED' || event === 'PAYMENT_FAILED') {

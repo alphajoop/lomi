@@ -20,7 +20,6 @@ import { CardChargeResponseDto } from './dto/card-charge-response.dto';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @Controller('charge')
 @UseGuards(ApiKeyGuard)
 export class ChargesController {
@@ -30,7 +29,9 @@ export class ChargesController {
   ) {}
 
   @Post('wave')
+  @ApiLomiAccountHeader()
   @ApiOperation({ summary: 'Lancer un encaissement direct Wave' })
+  @ApiBody({ type: CreateWaveChargeDto })
   @ApiResponse({
     status: 201,
     description:
@@ -54,7 +55,13 @@ export class ChargesController {
   }
 
   @Post('mtn')
-  @ApiOperation({ summary: 'Lancer un encaissement direct MTN MoMo' })
+  @ApiLomiAccountHeader()
+  @ApiOperation({
+    summary: 'Lancer un encaissement direct MTN MoMo',
+    description:
+      'Initie un RequestToPay MTN MoMo. Avec une clé API test, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.',
+  })
+  @ApiBody({ type: CreateMtnChargeDto })
   @ApiResponse({
     status: 201,
     description: 'Encaissement MTN initié (RequestToPay)',
@@ -70,6 +77,7 @@ export class ChargesController {
   }
 
   @Post('card')
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Créer un encaissement carte (client_secret)',
     description:
@@ -89,6 +97,7 @@ export class ChargesController {
   }
 
   @Get('card/:id')
+  @ApiLomiAccountHeader()
   @ApiOperation({ summary: 'Obtenir un encaissement carte' })
   @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
   @ApiResponse({
@@ -101,6 +110,7 @@ export class ChargesController {
   }
 
   @Post('card/:id/cancel')
+  @ApiLomiAccountHeader()
   @ApiOperation({ summary: 'Annuler un encaissement carte' })
   @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
   @ApiResponse({ status: 200, description: 'Encaissement carte annulé' })

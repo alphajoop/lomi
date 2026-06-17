@@ -8,6 +8,7 @@ import { WebhookListener } from './listeners/webhook.listener';
 import { WebhookQueueProcessor } from './processors/webhook.processor';
 import { WaveWebhookModule } from './providers/wave/wave-webhook.module';
 import { StripeWebhookModule } from './providers/stripe/stripe-webhook.module';
+import { MtnWebhookModule } from './providers/mtn/mtn-webhook.module';
 import { CliModule } from '../cli/cli.module';
 import { InternalCronGuard } from '../core/common/guards/internal-cron.guard';
 
@@ -24,6 +25,7 @@ import { InternalCronGuard } from '../core/common/guards/internal-cron.guard';
     }),
     WaveWebhookModule,
     StripeWebhookModule,
+    MtnWebhookModule,
     CliModule,
   ],
   controllers: [WebhooksController, WebhooksInternalController],

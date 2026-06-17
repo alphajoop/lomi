@@ -17,6 +17,8 @@ import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
 import { PricingTable } from '@/components/lomi-ui/pricing-table';
 import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';
 import { UsageMeter } from '@/components/lomi-ui/usage-meter';
+import { DocsScreenshot } from '@/components/docs/docs-screenshot';
+
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...(icons as unknown as MDXComponents),
@@ -37,6 +39,7 @@ export function getMDXComponents(components?: MDXComponents) {
     PricingTable,
     SubscriptionManagementCard,
     UsageMeter,
+    DocsScreenshot,
     ...components,
   } satisfies MDXComponents;
 }

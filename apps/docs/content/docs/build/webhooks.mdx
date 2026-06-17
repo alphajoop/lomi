@@ -78,7 +78,7 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 
 ### `SUBSCRIPTION_UPDATED` payload
 
-Non-terminal subscription changes use a Stripe-style envelope: current state in `object`, what changed in `previous_attributes`, and optional `context` for debugging.
+Non-terminal subscription changes use a structured event envelope: current state in `object`, what changed in `previous_attributes`, and optional `context` for debugging.
 
 ```json filename="Example webhook payload (SUBSCRIPTION_UPDATED)"
 {

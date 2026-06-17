@@ -40,13 +40,13 @@ import {
 
 @ApiTags('Sessions de paiement')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('checkout-sessions')
 export class CheckoutSessionsController {
   constructor(private readonly service: CheckoutSessionsService) {}
 
   @Post()
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Créer une session de paiement',
     description:

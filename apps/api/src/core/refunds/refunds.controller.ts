@@ -16,6 +16,7 @@ import {
   ApiResponse,
   ApiQuery,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
@@ -32,18 +33,19 @@ import {
 
 @ApiTags('Remboursements')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('refunds')
 export class RefundsController {
   constructor(private readonly refundsService: RefundsService) {}
 
   @Post()
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Créer un remboursement',
     description:
-      'Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.',
+      'Rembourse une transaction terminée (carte Stripe, Wave ou MTN MoMo). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels. En mode test, les remboursements MTN sont comptables uniquement (pas d’appel API MTN). En live, MTN MoMo exige une référence RequestToPay sur la transaction d’origine.',
   })
+  @ApiBody({ type: CreateRefundDto })
   @ApiResponse({
     status: 201,
     description: 'Remboursement enregistré',
@@ -61,6 +63,7 @@ export class RefundsController {
   }
 
   @Get()
+  @ApiLomiAccountHeader()
   @ApiOperation({ summary: 'Lister les remboursements' })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'startDate', required: false, type: String })
@@ -87,6 +90,7 @@ export class RefundsController {
   }
 
   @Get(':id')
+  @ApiLomiAccountHeader()
   @ApiOperation({ summary: 'Obtenir un remboursement' })
   @ApiParam({ name: 'id', description: 'Refund ID' })
   @ApiResponse({

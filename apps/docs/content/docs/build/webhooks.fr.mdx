@@ -78,7 +78,7 @@ Lors de la création ou de la mise à jour d’un webhook, vous souscrivez à de
 
 ### Charge utile `SUBSCRIPTION_UPDATED`
 
-Les changements non terminaux utilisent une enveloppe de type Stripe : état actuel dans `object`, ce qui a changé dans `previous_attributes`, et `context` optionnel pour le débogage.
+Les changements non terminaux utilisent une enveloppe d’événement structurée : état actuel dans `object`, ce qui a changé dans `previous_attributes`, et `context` optionnel pour le débogage.
 
 ```json filename="Exemple de charge (SUBSCRIPTION_UPDATED)"
 {

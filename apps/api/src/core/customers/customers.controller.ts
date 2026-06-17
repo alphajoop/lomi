@@ -38,7 +38,6 @@ import {
 
 @ApiTags('Clients')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @ApiExtraModels(
   CustomerResponseDto,
   TransactionResponseDto,
@@ -50,6 +49,7 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
   @Get()
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Lister les clients',
     description:
@@ -133,6 +133,7 @@ export class CustomersController {
   }
 
   @Get(':id')
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Obtenir un client par ID',
     description:
@@ -161,6 +162,7 @@ export class CustomersController {
   }
 
   @Post()
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Créer un client',
     description:
@@ -214,6 +216,7 @@ export class CustomersController {
   }
 
   @Patch(':id')
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Mettre à jour un client',
     description:
@@ -352,6 +355,7 @@ export class CustomersController {
   }
 
   @Get(':id/transactions')
+  @ApiLomiAccountHeader()
   @ApiOperation({
     summary: 'Transactions du client',
     description:

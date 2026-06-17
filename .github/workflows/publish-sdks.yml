@@ -238,6 +238,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -247,17 +249,17 @@ jobs:
 
       - name: Bump version
         if: inputs.version_bump != 'skip'
-        working-directory: apps/shared/receipt-pdf
+        working-directory: apps/design/shared/receipt-pdf
         run: npm version ${{ inputs.version_bump }} --no-git-tag-version
 
       - name: Install dependencies and build
-        working-directory: apps/shared/receipt-pdf
+        working-directory: apps/design/shared/receipt-pdf
         run: |
           npm ci
           npm run build
 
       - name: Publish to npm
-        working-directory: apps/shared/receipt-pdf
+        working-directory: apps/design/shared/receipt-pdf
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

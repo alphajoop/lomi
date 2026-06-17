@@ -14,7 +14,6 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
-import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
 import { BillingService } from './billing.service';
 import { UsageCreditsService } from './usage-credits.service';
@@ -22,7 +21,6 @@ import { EntitlementsService } from './entitlements.service';
 
 @ApiTags('Usage billing')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('usage-billing')
 export class UsageBillingController {

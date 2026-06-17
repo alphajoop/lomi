@@ -53,13 +53,13 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   ChargesController_createMtnCharge: {
     summary: 'Create MTN MoMo charge',
-    body: 'Starts a payer-facing MTN Mobile Money charge; the response includes the next step for the customer.',
+    body: 'Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox.',
     whenToUse:
       'Use for server-initiated MTN collection when you are **not** using a hosted checkout session.',
     caveats:
-      'Follow the provider instructions in the response; UX is rail-specific (USSD, app prompt, etc.).',
+      'Live charges require MTN connected for your organization and a valid MSISDN. Refunds on live MTN payments use the Disbursement refund API via [Create refund](/api/refunds/RefundsController_create).',
     related:
-      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
@@ -320,13 +320,13 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   RefundsController_create: {
     summary: 'Create refund',
-    body: 'Refunds a completed transaction (card or mobile money). Merchant balance updates immediately.',
+    body: 'Refunds a **completed** transaction on **Stripe (card)**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.',
     whenToUse:
       'Use for buyer reversals on eligible completed transactions; supports full and partial amounts.',
     caveats:
-      'Card customer credit is completed separately by operations. Mobile money partial refunds require a customer phone on file.',
+      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only—no MTN API call. Partial MTN refunds also require a customer phone on file.',
     related:
-      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne)',
+      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/refunds)',
   },
   RefundsController_findAll: {
     summary: 'List refunds',
@@ -348,6 +348,22 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use when the customer ends service or you enforce policy cancellations.',
     related:
       '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne)',
+  },
+  SubscriptionsController_uncancel: {
+    summary: 'Uncancel subscription',
+    body: 'Removes a scheduled end-of-period cancellation so the subscription keeps renewing.',
+    whenToUse:
+      'Use when a customer reverses a pending cancel-at-period-end before the billing period ends.',
+    related:
+      '[Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)',
+  },
+  SubscriptionsController_changePlan: {
+    summary: 'Change subscription plan',
+    body: 'Updates the `price_id` on an active subscription for upgrades or downgrades.',
+    whenToUse:
+      'Use when moving a customer to a different recurring price on the same product line.',
+    related:
+      '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Update subscription](/api/subscriptions/SubscriptionsController_update)',
   },
   SubscriptionsController_findAll: {
     summary: 'List subscriptions',

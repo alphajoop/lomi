@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="apps/docs/public/company/lomi_l.webp" width="150" height="150" alt="lomi. icon">
+	<img src="apps/docs/public/company/monorepo-icon.web.webp" width="400" height="225" alt="lomi. icon">
 <p align="center">
     Helping West African ventures sell online
   </p>
@@ -29,14 +29,6 @@
   </a>
   <a href="https://join.slack.com/t/lomi-a/shared_invite/zt-3hezykfvo-eW1jX6IkXAqht875Y1wUOw">
     <img src="https://img.shields.io/badge/Slack-lomi--a-4A154B?style=flat&logo=slack" alt="Join us on Slack" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://www.producthunt.com/posts/lomi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-lomi" target="_blank">
-    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=720260&theme=dark&t=1736800231403" 
-    alt="lomi. - Simplifying payments across francophone West Africa | Product Hunt"
-    width="250" height="54" />
   </a>
 </p>
 
