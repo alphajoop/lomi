@@ -19,6 +19,7 @@ import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-ma
 import { UsageMeter } from '@/components/lomi-ui/usage-meter';
 import { DocsScreenshot } from '@/components/docs/docs-screenshot';
 import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+import { InlineCommand } from '@/components/docs/inline-command';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -42,6 +43,7 @@ export function getMDXComponents(components?: MDXComponents) {
     UsageMeter,
     DocsScreenshot,
     DocsAgentIndex,
+    InlineCommand,
     ...components,
   } satisfies MDXComponents;
 }
