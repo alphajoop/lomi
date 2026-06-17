@@ -11,9 +11,9 @@ type DocsScreenshotProps = {
 /** Theme-aware doc screenshot with graceful fallback when WebP assets are not yet captured. */
 export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
   const base = `/docs/images/${name}`;
-  const [missingTheme, setMissingTheme] = useState<'none' | 'light' | 'dark' | 'both'>(
-    'none',
-  );
+  const [missingTheme, setMissingTheme] = useState<
+    'none' | 'light' | 'dark' | 'both'
+  >('none');
 
   const onLightError = () => {
     setMissingTheme((prev) => (prev === 'dark' ? 'both' : 'light'));
@@ -28,7 +28,8 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
       <figure className="not-prose my-6 flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-fd-muted/30 px-4 text-center text-sm text-fd-muted-foreground">
         <span className="font-medium text-fd-foreground">{alt}</span>
         <span>
-          Screenshot pending — add <code className="text-xs">{name}-light.webp</code> and{' '}
+          Screenshot pending — add{' '}
+          <code className="text-xs">{name}-light.webp</code> and{' '}
           <code className="text-xs">{name}-dark.webp</code> per{' '}
           <code className="text-xs">SCREENSHOT-MANIFEST.md</code>.
         </span>

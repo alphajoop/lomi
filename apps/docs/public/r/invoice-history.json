@@ -4,9 +4,7 @@
   "type": "registry:block",
   "title": "Invoice History",
   "description": "A compact invoice and receipt table for customer billing surfaces.",
-  "dependencies": [
-    "lucide-react"
-  ],
+  "dependencies": ["lucide-react"],
   "files": [
     {
       "path": "components/lomi-ui/invoice-history.tsx",

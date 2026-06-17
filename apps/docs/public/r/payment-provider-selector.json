@@ -4,9 +4,7 @@
   "type": "registry:block",
   "title": "Payment Provider Selector",
   "description": "Select Wave, MTN, Orange Money, SPI, or card payment rails.",
-  "dependencies": [
-    "lucide-react"
-  ],
+  "dependencies": ["lucide-react"],
   "files": [
     {
       "path": "components/lomi-ui/payment-provider-selector.tsx",

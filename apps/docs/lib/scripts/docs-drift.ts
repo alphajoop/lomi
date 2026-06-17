@@ -31,8 +31,7 @@ const LLMS_REQUIRED_SLUGS = [
   'api/payment-state-machine',
 ] as const;
 
-const INTERNAL_LINK_RE =
-  /\]\(\/(start|build|api|resources)\/([^)\s#]+)/g;
+const INTERNAL_LINK_RE = /\]\(\/(start|build|api|resources)\/([^)\s#]+)/g;
 
 function slugFromMdxFile(relativeToContent: string): string {
   const withoutExt = relativeToContent.replace(/\.mdx$/, '');
@@ -80,9 +79,9 @@ async function checkOpenApiParity(errors: string[]): Promise<void> {
     operations.map((o) => `${o.method.toUpperCase()} ${o.path}`),
   );
 
-  const docFiles = (await glob('content/docs/api/*/*.mdx', { cwd: DOCS_ROOT })).filter(
-    (file) => !/\/index(?:\.fr)?\.mdx$/.test(file),
-  );
+  const docFiles = (
+    await glob('content/docs/api/*/*.mdx', { cwd: DOCS_ROOT })
+  ).filter((file) => !/\/index(?:\.fr)?\.mdx$/.test(file));
 
   const documented = new Set<string>();
 
@@ -103,7 +102,9 @@ async function checkOpenApiParity(errors: string[]): Promise<void> {
 
   for (const op of documented) {
     if (!expected.has(op)) {
-      errors.push(`MDX documents unknown or non-public OpenAPI operation: ${op}`);
+      errors.push(
+        `MDX documents unknown or non-public OpenAPI operation: ${op}`,
+      );
     }
   }
 }

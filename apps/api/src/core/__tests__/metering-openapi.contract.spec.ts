@@ -20,7 +20,12 @@ const METERING_OPERATION_IDS = [
   'UsageBillingController_checkEntitlement',
 ] as const;
 
-const METERING_PATH_PREFIXES = ['/meters', '/usage-events', '/usage-subscriptions', '/usage-billing'];
+const METERING_PATH_PREFIXES = [
+  '/meters',
+  '/usage-events',
+  '/usage-subscriptions',
+  '/usage-billing',
+];
 
 function readExportedOpenApi(): {
   paths: Record<string, Record<string, { operationId?: string }>>;
@@ -31,7 +36,9 @@ function readExportedOpenApi(): {
   };
 }
 
-function collectOperationIds(document: ReturnType<typeof readExportedOpenApi>): Set<string> {
+function collectOperationIds(
+  document: ReturnType<typeof readExportedOpenApi>,
+): Set<string> {
   const ids = new Set<string>();
   for (const [pathKey, pathItem] of Object.entries(document.paths)) {
     for (const [method, operation] of Object.entries(pathItem)) {
@@ -54,10 +61,14 @@ describe('Metering OpenAPI export (contract)', () => {
 
   it('only includes metering paths that are on the public REST allowlist', () => {
     for (const pathKey of Object.keys(document.paths)) {
-      if (!METERING_PATH_PREFIXES.some((prefix) => pathKey.startsWith(prefix))) {
+      if (
+        !METERING_PATH_PREFIXES.some((prefix) => pathKey.startsWith(prefix))
+      ) {
         continue;
       }
-      for (const [method, operation] of Object.entries(document.paths[pathKey])) {
+      for (const [method, operation] of Object.entries(
+        document.paths[pathKey],
+      )) {
         if (method === 'parameters' || !operation?.operationId) continue;
         expect(isPublicRestApiOperation(method, pathKey)).toBe(true);
       }

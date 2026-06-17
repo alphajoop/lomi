@@ -4,9 +4,7 @@
   "type": "registry:block",
   "title": "Mobile Money Checkout Card",
   "description": "A focused checkout card for Wave, MTN, Orange Money, and SPI.",
-  "dependencies": [
-    "lucide-react"
-  ],
+  "dependencies": ["lucide-react"],
   "files": [
     {
       "path": "components/lomi-ui/mobile-money-checkout-card.tsx",

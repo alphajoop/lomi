@@ -17,7 +17,8 @@ export class ChargeNextActionDto {
 
   @ApiPropertyOptional({
     type: String,
-    description: 'Present when type is await_webhook (e.g. PENDING, completed).',
+    description:
+      'Present when type is await_webhook (e.g. PENDING, completed).',
   })
   status?: string;
 

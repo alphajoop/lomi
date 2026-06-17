@@ -8,17 +8,13 @@
       "name": "payment-provider-selector",
       "title": "Payment Provider Selector",
       "description": "Select Wave, MTN, Orange Money, SPI, or card payment rails.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     },
     {
       "name": "mobile-money-checkout-card",
       "title": "Mobile Money Checkout Card",
       "description": "A focused checkout card for Wave, MTN, Orange Money, and SPI.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     },
     {
       "name": "checkout-summary-card",
@@ -29,33 +25,25 @@
       "name": "payment-status-card",
       "title": "Payment Status Card",
       "description": "Show success, failed, and pending checkout outcomes.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     },
     {
       "name": "pricing-table",
       "title": "Pricing Table",
       "description": "A Lomi-styled plan selector for checkout, subscription, and pricing pages.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     },
     {
       "name": "invoice-history",
       "title": "Invoice History",
       "description": "A compact invoice and receipt table for customer billing surfaces.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     },
     {
       "name": "subscription-management-card",
       "title": "Subscription Management Card",
       "description": "Show and manage a customer's current subscription.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     },
     {
       "name": "usage-meter",
@@ -66,9 +54,7 @@
       "name": "payment-failure-card",
       "title": "Payment Failure Card",
       "description": "Help customers retry or recover from a failed payment.",
-      "dependencies": [
-        "lucide-react"
-      ]
+      "dependencies": ["lucide-react"]
     }
   ]
 }
