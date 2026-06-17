@@ -6,7 +6,7 @@ description: 'Use test keys, test payment methods, test balances, and webhook ve
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The lomi. **test environment** lets you run full payment flows—hosted checkout, embedded card forms, and mobile money—without moving real money or touching live balances. This page is the single reference for **simulating payments**: which test card numbers to use, how Wave and MTN MoMo behave in test mode, and what to expect in your dashboard and webhooks.
+lomi. **test environment** lets you run full payment flows—hosted checkout, embedded card forms, and mobile money—without moving real money or touching live balances. This page is the single reference for **simulating payments**: which test card numbers to use, how Wave and MTN MoMo behave in test mode, and what to expect in your dashboard and webhooks.
 
 For API keys, base URLs, and rate limits, see **[Authentication](/start/api-keys)**. For your first authenticated request, see **[API integration](/start/first-payment)**.
 
@@ -197,7 +197,23 @@ In test mode, lomi. marks the MTN transaction **completed** and credits your **t
 2. Enter any valid MSISDN for your country (international format).
 3. Confirm the transaction appears as completed in the dashboard test view.
 
-**Direct charge scenarios (`X-Scenario-Key`, test key only):** On `POST /charge/mtn` and `POST /charge/wave`, send `X-Scenario-Key: pending` to keep the charge in `PENDING` without auto-completing, or `failed` to simulate a `400` error. Omit the header for default test behavior.
+**Direct charge scenarios (`X-Scenario-Key`, test key only):** On `POST /charge/mtn` and `POST /charge/wave`, send `X-Scenario-Key: pending` to keep the charge in `PENDING` without auto-completing, or `failed` to simulate a `400` error. Omit the header for default test behavior. Hosted checkout and card charges do not read this header.
+
+```bash
+# MTN — pending (no auto-complete)
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+
+# Wave — simulate failure
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: failed" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
 
 For live MTN integration and sandbox MSISDNs, see the [MTN MoMo developer portal](https://momodeveloper.mtn.com/).
 

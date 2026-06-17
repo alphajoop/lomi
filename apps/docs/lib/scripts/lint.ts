@@ -347,7 +347,7 @@ function collectOpenApiSecurityErrors(
 const REST_API_HEADING_ALTERNATIVES = [
   ['## Overview', '## Aperçu'],
   ['## Authentication', '## Authentification'],
-  ['## Endpoint', '## Point de terminaison'],
+  ['## Endpoint', '## Endpoint'],
   ['## Request', '## Requête'],
   ['## Responses', '## Réponses'],
   ['## Errors', '## Erreurs'],

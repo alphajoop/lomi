@@ -3197,6 +3197,115 @@
         ]
       }
     },
+    "/settlements": {
+      "get": {
+        "description": "Returns completed payment totals grouped by availability date and currency. Each settlement_id is {currency}:{YYYY-MM-DD} (UTC date of available_at).",
+        "operationId": "SettlementsController_findAll",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settlement periods"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List settlement periods",
+        "tags": [
+          "Settlements"
+        ]
+      }
+    },
+    "/settlements/{id}/transactions": {
+      "get": {
+        "description": "Returns completed transactions whose available_at falls on the settlement date for the given currency.",
+        "operationId": "SettlementsController_findTransactions",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Settlement id, format {currency}:{YYYY-MM-DD}",
+            "schema": {
+              "example": "XOF:2026-06-01"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transactions in settlement"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List transactions in a settlement period",
+        "tags": [
+          "Settlements"
+        ]
+      }
+    },
     "/webhook-delivery-logs": {
       "get": {
         "description": "Renvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.",

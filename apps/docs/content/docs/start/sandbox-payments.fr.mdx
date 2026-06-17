@@ -192,7 +192,7 @@ En mode test, la transaction est aussi **completed** et le solde de test est cr�
 **Comment tester :**
 
 1. Lien ou session en **test** avec MTN activé.
-2. Saisir un MSISDN valide pour le pays (format international).
+2. Saisir un numéro de téléphone valide pour le pays (format international).
 3. Vérifier la transaction completed dans la vue test du tableau de bord.
 
 Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur MTN MoMo](https://momodeveloper.mtn.com/).
@@ -310,8 +310,8 @@ Les renouvellements planifiés en test utilisent des dates futures ; inspectez `
 
 ## Webhooks en test
 
-1. Dans le tableau de bord (**Developers → Webhooks**), ajoutez un point de terminaison en mode **Test**.
-2. Utilisez le **secret de signature** de ce point de terminaison pour vérifier la signature sur le **corps brut** de la requête.
+1. Dans le tableau de bord (**Developers → Webhooks**), ajoutez une URL en mode **Test**.
+2. Utilisez le **secret de signature** de cette URL pour vérifier la signature sur le **corps brut** de la requête.
 3. Les paiements de test réussis émettent des événements comme **`PAYMENT_SUCCEEDED`** avec `"environment": "test"` le cas échéant.
 4. Utilisez **Test webhook** pour envoyer un exemple `PAYMENT_SUCCEEDED` sans paiement réel.
 
@@ -326,7 +326,7 @@ Voir **[Webhooks](/build/webhooks)**. Pour l’automatisation, voir le **[Guide 
 | Carte OK mais pas de solde de test | Webhook absent ; mauvais environnement sur la session | Lien/session en test ; statut transaction dans le tableau de bord |
 | Clé de test mais checkout « live » | Lien créé en mode **Live** | Recréer le lien en mode **Test** (tableau de bord ou clé API de test) |
 | Wave/MTN OK, solde inchangé | Consultation du solde **live** au lieu du **test** | Basculer le tableau de bord en Test |
-| Erreurs bac à sable MTN | MSISDN ou identifiants invalides | Numéros documentés par MTN pour votre pays |
+| Erreurs bac à sable MTN | numéro de téléphone ou identifiants invalides | Numéros documentés par MTN pour votre pays |
 | Pas d’e-mail client | Normal en test | Notifications désactivées en test |
 
 ## Documentation associée

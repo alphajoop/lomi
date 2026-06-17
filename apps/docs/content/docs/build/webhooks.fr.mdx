@@ -44,11 +44,11 @@ Testez les événements réussis, échoués, dupliqués et retardés en sandbox.
 
 ## Sécurité des webhooks
 
-Pour garantir l’authenticité et l’intégrité des événements, lomi. signe chaque requête envoyée vers votre point de terminaison avec un secret propre à ce webhook.
+Pour garantir l’authenticité et l’intégrité des événements, lomi. signe chaque requête envoyée vers votre URL avec un secret propre à ce webhook.
 
 1.  **En-tête de signature :** chaque requête inclut l’en-tête HTTP `` `X-Lomi-Signature` ``.
 2.  **Secret webhook :** à la création d’un webhook via l’API, un `` `secret` `` (préfixe `` `whsec_` ``) est renvoyé. **Conservez ce secret en lieu sûr : il ne sera plus affiché.**
-3.  **Vérification :** votre point de terminaison doit recalculer un hachage `` `HMAC-SHA256` `` du corps brut de la requête avec ce secret et le comparer à la valeur de l’en-tête.
+3.  **Vérification :** votre URL doit recalculer un hachage `` `HMAC-SHA256` `` du corps brut de la requête avec ce secret et le comparer à la valeur de l’en-tête.
 
 **Livraison sortante :** les requêtes de **lomi. vers votre URL** ne s’authentifient pas avec `` `Authorization` `` / `` `X-API-Key` `` — seule la signature compte. Un middleware qui impose Bearer ou clé API sur **tous** les POST renverra souvent `` `401` `` ([détails](/build/advanced-guides/handling-webhooks#verify-signatures)).
 
@@ -110,7 +110,7 @@ Réconciliez les droits d’accès à partir de `data.object`. Utilisez `previou
 
 _(Les autres charges sont documentées sur les ressources API concernées — Transactions, Abonnements, etc.)_
 
-Les abonnements et les corps JSON utilisent des noms d’événement en **SCREAMING_SNAKE_CASE** (par ex. `PAYMENT_SUCCEEDED`). Certains outils peuvent afficher des alias avec **points** (par ex. `payment.succeeded`) — utilisez les valeurs ci-dessus pour configurer vos points de terminaison et comparer le champ `event`.
+Les abonnements et les corps JSON utilisent des noms d’événement en **SCREAMING_SNAKE_CASE** (par ex. `PAYMENT_SUCCEEDED`). Certains outils peuvent afficher des alias avec **points** (par ex. `payment.succeeded`) — utilisez les valeurs ci-dessus pour configurer vos URLs et comparer le champ `event`.
 
 Pour le comportement opérationnel (nouvelles tentatives, idempotence, journaux), voir [Fiabilité des webhooks](/build/advanced-guides/webhook-reliability).
 
@@ -120,7 +120,7 @@ Vous pouvez tester les webhooks via l’API ou `` `curl``.
 
 ### Créer un webhook de test
 
-Créez d’abord un point de terminaison vers un récepteur de test (par ex. [Webhook.site](https://webhook.site/) ou tunnel local ngrok).
+Créez d’abord une URL vers un récepteur de test (par ex. [Webhook.site](https://webhook.site/) ou tunnel local ngrok).
 
 ```bash filename="Terminal"
 curl -X POST "https://api.lomi.africa/webhooks" \
@@ -152,7 +152,7 @@ lomi. journalise chaque tentative et expose des endpoints pour consulter les jou
 
 ### Obtenir les journaux de livraison
 
-**Point de terminaison :** `` `GET /webhooks/{id}/logs` ``
+**URL :** `` `GET /webhooks/{id}/logs` ``
 
 | Paramètre       | Type            | Description                         |
 | --------------- | --------------- | ----------------------------------- |
@@ -163,9 +163,9 @@ lomi. journalise chaque tentative et expose des endpoints pour consulter les jou
 
 ### Relancer une livraison
 
-**Point de terminaison :** `` `POST /webhooks/{webhook_id}/logs/{log_id}/retry` ``
+**URL :** `` `POST /webhooks/{webhook_id}/logs/{log_id}/retry` ``
 
-**Nouvelles tentatives automatiques :** lorsque votre point de terminaison rejette une livraison (réponse **non‑`2xx`**), franchit le délai d’expiration côté lomi ou subit une panne transitoire, la plateforme enregistre l’échec et peut planifier **d’autres essais**, selon la sémantique HTTP et le chemin technique. Ces relances sont **bornées** : elles suivent des politiques de **backoff exponentiel** sur l’infrastructure webhook, pas une boucle infinie.
+**Nouvelles tentatives automatiques :** lorsque votre URL rejette une livraison (réponse **non‑`2xx`**), franchit le délai d’expiration côté lomi ou subit une panne transitoire, la plateforme enregistre l’échec et peut planifier **d’autres essais**, selon la sémantique HTTP et le chemin technique. Ces relances sont **bornées** : elles suivent des politiques de **backoff exponentiel** sur l’infrastructure webhook, pas une boucle infinie.
 
 En général les **erreurs client `4xx`** sont **terminales** pour la séquence automatique (corriger la configuration côté destinataire), tandis que les **erreurs transitoires** (**`5xx`**, timeouts, défauts réseau ponctuels) peuvent être rejouées jusqu’à un plafond qui dépend du chemin **synchrone** ou **mis en file** (worker/outbox). Pour le détail chiffré — timeout HTTP **≈ quatre secondes**, jusqu’à **quatre** essais synchrone, **cinq** exécutions de job lorsque Bull est utilisé, sens de **`lomi_environment`** — voir **[Fiabilité des webhooks — Délais et tentatives](/build/advanced-guides/webhook-reliability#when-lomi-retries-and-when-it-does-not)**.
 

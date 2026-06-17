@@ -11,7 +11,7 @@ operationId: SubscriptionsController_changePlan
 
 Met à jour le `price_id` d’un abonnement actif (montée ou descente de gamme).
 
-### Quand utiliser cet endpoint
+### Quand l'utiliser
 
 Utilisez cet endpoint lorsqu’un client passe à un autre tarif récurrent.
 
@@ -21,9 +21,9 @@ Utilisez cet endpoint lorsqu’un client passe à un autre tarif récurrent.
 
 ## Authentification
 
-Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
 
-## Point de terminaison
+## Endpoint
 
 `POST /subscriptions/{id}/change-plan`
 
@@ -42,7 +42,7 @@ URLs de base :
 
 ### Corps de requête
 
-Charge utile JSON.
+Corps JSON.
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
@@ -66,7 +66,7 @@ Exemple :
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code HTTP et message lisible par machine). Validez les entrées avant l’appel ; **401** indique une clé manquante ou invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit.
+Les erreurs suivent le format JSON standard (code HTTP et message d'erreur). Validez les entrées avant l’appel ; **401** indique une clé manquante ou invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes.
 
 ## Exemple
 

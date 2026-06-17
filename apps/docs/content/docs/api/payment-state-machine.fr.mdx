@@ -1,20 +1,20 @@
 ---
-title: Machine d’état des paiements
-description: Transitions entre statuts transaction et prestataire, expiration, impact sur les soldes.
+title: Statuts des paiements
+description: Comment un paiement change de statut, expire, et met à jour votre solde.
 docType: explanation
 ---
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
-Référence canonique du cycle de vie des paiements dans lomi. Détails d’implémentation : [Pour les contributeurs](#pour-les-contributeurs).
+Ce guide décrit le cycle de vie d'un paiement dans lomi., du `pending` au `completed`, en passant par l'échec ou l'expiration. Pour le code côté serveur, voir [Pour les contributeurs](#pour-les-contributeurs).
 
-## Cycle entrée d’argent
+## Parcours d'un paiement
 
 ```mermaid
 stateDiagram-v2
-  [*] --> pending: paiement live initié
+  [*] --> pending: paiement en production
   [*] --> completed: paiement test (sandbox)
-  pending --> completed: confirmation prestataire
+  pending --> completed: confirmé par le prestataire
   pending --> failed: refus ou échec
   pending --> expired: délai dépassé
   completed --> refunded: remboursement
@@ -23,17 +23,21 @@ stateDiagram-v2
   refunded --> [*]
 ```
 
-## Statuts de transaction
+En **test**, un paiement est souvent `completed` tout de suite. En **production**, il reste en général `pending` jusqu'à ce que le client valide (mobile money, carte, etc.).
 
-| Statut | Signification |
+## Les statuts
+
+| Statut | Ce que ça veut dire |
 | --- | --- |
-| `pending` | Initié ; résultat final non confirmé (fréquent en **live**). |
-| `completed` | Succès ; solde et frais selon les règles plateforme. |
-| `failed` | Échec du paiement. |
-| `expired` | Délai d’attente dépassé. |
-| `refunded` | Remboursement sur le paiement d’origine. |
+| `pending` | Paiement lancé, résultat pas encore connu (fréquent en production). |
+| `completed` | Paiement réussi ; le solde est crédité selon les règles lomi. |
+| `failed` | Le paiement n'a pas abouti. |
+| `expired` | Le client n'a pas finalisé à temps. |
+| `refunded` | Remboursement effectué sur ce paiement. |
 
-## Correspondance prestataire
+## Côté prestataire (Wave, MTN, etc.)
+
+Chaque statut transaction a un équivalent côté prestataire :
 
 | Statut transaction | Statut prestataire |
 | --- | --- |
@@ -43,14 +47,39 @@ stateDiagram-v2
 | `expired` | `expired` |
 | `refunded` | `refunded` |
 
-## Guides associés
+Voir [Transactions](/build/transactions) pour les champs dans les réponses API.
+
+## Quand le statut passe à `completed`
+
+- Un **double webhook** ne crédite pas le solde deux fois : lomi. fusionne les métadonnées et ne crédite qu'une fois.
+- Les **métadonnées** s'ajoutent au fil des webhooks, elles ne sont pas écrasées.
+
+## Expiration
+
+Un paiement `pending` peut expirer automatiquement :
+
+- après un certain **délai** ;
+- ou quand la **session prestataire** expire (ex. Wave).
+
+L'info d'expiration est stockée dans `expiration_info` sur la transaction.
+
+## Effets d'un paiement réussi
+
+1. Le **coupon** utilisé est comptabilisé.
+2. Le **solde** est mis à jour (`metadata.balance_updated` évite un double crédit).
+3. Un **abonnement** lié peut passer de `pending` à `active`.
+
+Pour le délai de disponibilité des fonds, voir [Solde et règlement](/build/balance-and-settlement).
+
+## Voir aussi
 
 - [Cycle de vie des paiements](/build/guides/payment-lifecycle)
 - [Vérifier les paiements](/build/guides/verify-payments)
-- [Comportement checkout](/build/payments/checkout-behavior)
+- [Comportement du checkout](/build/payments/checkout-behavior)
+- [Recevoir les webhooks](/build/advanced-guides/handling-webhooks)
 
 <Accordions type="single">
   <Accordion title="Pour les contributeurs" id="pour-les-contributeurs">
-    Alignement serveur : `create_transaction`, `update_transaction_status`, jobs d’expiration et soldes dans `apps/api`. Après modification, mettre à jour cette page et lancer `pnpm docs:drift`.
+    Côté serveur : `create_transaction`, `update_transaction_status`, jobs d'expiration et soldes dans `apps/api`. Si vous changez un statut, mettez à jour cette page et lancez `pnpm docs:drift`.
   </Accordion>
 </Accordions>

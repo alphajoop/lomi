@@ -1,0 +1,50 @@
+---
+title: Carte gestion d'abonnement
+description: Affichez et gérez l'abonnement actuel d'un client.
+---
+
+import { SubscriptionManagementCardDemo } from '@/components/lomi-ui/demo';
+
+# Carte gestion d'abonnement
+
+Utilisez-la quand les clients doivent voir leur forfait actif et les actions d'abonnement courantes.
+
+## Aperçu
+
+<SubscriptionManagementCardDemo />
+
+## Installation
+
+<Installation name="subscription-management-card" />
+
+## Utilisation
+
+```tsx
+import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';
+
+<SubscriptionManagementCard
+  planName="Growth"
+  status="active"
+  amount={25000}
+  currency="XOF"
+  interval="month"
+  nextBillingDate="June 28, 2026"
+  paymentMethod="Wave ending 4821"
+  features={['Payment links', 'Subscriptions', 'Webhooks']}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `planName` | `string` | Nom du forfait actuel. |
+| `status` | `'active' \| 'trialing' \| 'past_due' \| 'cancelled'` | Statut de l'abonnement. |
+| `amount` | `number` | Montant récurrent. |
+| `currency` | `string` | Code devise ISO. |
+| `interval` | `'month' \| 'year'` | Intervalle de facturation. |
+| `nextBillingDate` | `string` | Date de facturation lisible. |
+| `paymentMethod` | `string` | Libellé du moyen de paiement actuel. |
+| `features` | `string[]` | Fonctionnalités du forfait actuel. |
+| `onUpdatePlan` | `() => void` | Action de mise à jour. |
+| `onCancel` | `() => void` | Action d'annulation. |

@@ -1,0 +1,47 @@
+---
+title: Carte checkout mobile money
+description: Une carte checkout ciblée pour Wave, MTN, Orange Money et SPI.
+---
+
+import { MobileMoneyCheckoutCardDemo } from '@/components/lomi-ui/demo';
+
+# Carte checkout mobile money
+
+Utilisez-la comme panneau de paiement principal pour un tunnel de checkout léger.
+
+## Aperçu
+
+<MobileMoneyCheckoutCardDemo />
+
+## Installation
+
+<Installation name="mobile-money-checkout-card" />
+
+## Utilisation
+
+```tsx
+import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
+
+<MobileMoneyCheckoutCard
+  amount={12500}
+  currency="XOF"
+  merchantName="Keur Studio"
+  selectedProvider="wave"
+  phoneNumber="+225 07 00 00 00 00"
+  onSubmit={() => createCheckoutSession()}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `amount` | `number` | Montant à afficher. |
+| `currency` | `string` | Code devise ISO, par exemple `XOF`. |
+| `merchantName` | `string` | Nom du marchand ou du produit affiché en haut. |
+| `selectedProvider` | `ProviderId` | Sélection de fournisseur actuelle. |
+| `phoneNumber` | `string` | Valeur contrôlée du champ téléphone. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Déclenché quand le client change de fournisseur. |
+| `onPhoneNumberChange` | `(phoneNumber: string) => void` | Déclenché quand le champ téléphone change. |
+| `onSubmit` | `() => void` | Déclenché quand le client appuie sur payer. |
+| `loading` | `boolean` | Affiche l'état de chargement sur le bouton payer. |

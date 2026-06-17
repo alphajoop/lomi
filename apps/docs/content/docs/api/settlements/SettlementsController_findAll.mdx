@@ -1,0 +1,76 @@
+---
+title: "List settlement periods"
+description: "List settlement periods grouped by availability date and currency"
+full: true
+method: get
+path: /settlements
+operationId: SettlementsController_findAll
+---
+
+## Overview
+
+List settlement periods
+
+Returns completed payment totals grouped by `available_at` calendar date (UTC) and currency. Each `settlement_id` uses the format `{currency}:{YYYY-MM-DD}` (for example `XOF:2026-06-01`).
+
+### When to use this
+
+Use for accounting reconciliation: see what became withdrawable on each date before requesting payouts.
+
+### See also
+
+[List settlement transactions](/api/settlements/SettlementsController_findTransactions)
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /settlements`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+### Query parameters
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `start_date` | query | No | `string` (date) | Filter periods on or after this date (`YYYY-MM-DD`) |
+| `end_date` | query | No | `string` (date) | Filter periods on or before this date (`YYYY-MM-DD`) |
+| `currency` | query | No | `string` | Filter by currency code (`XOF`, `USD`, `EUR`) |
+| `page` | query | No | `integer` | Page number (default `1`) |
+| `pageSize` | query | No | `integer` | Page size (default `50`) |
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `200` | Settlement periods |
+
+## Errors
+
+Errors follow the standard JSON error format. **401** indicates a missing/invalid key; **400** for invalid query parameters.
+
+## Example
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements?start_date=2026-06-01&end_date=2026-06-30&page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `SettlementsController_findAll`
+- **Operation**: `GET /settlements`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

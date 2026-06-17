@@ -1,0 +1,32 @@
+---
+title: Thème
+description: Personnalisez les composants lomi. UI sans perdre l'ambiance checkout.
+---
+
+# Thème
+
+Les composants lomi. UI sont volontairement simples. Ils utilisent des classes Tailwind, de petits rayons, des surfaces neutres et un état sélectionné bleu inspiré du checkout hébergé.
+
+## Valeurs par défaut
+
+| Token | Défaut |
+| ----- | ------ |
+| État sélectionné | `#56A5F9` |
+| Rayon de carte | `rounded-sm` |
+| Surface | récapitulatif checkout blanc ou quasi noir |
+| Bordure | bordures grises subtiles |
+| Focus | anneaux de focus bleus visibles |
+
+## Personnalisation
+
+Comme chaque composant est copié dans votre application, personnalisez les classes directement :
+
+```tsx
+<PaymentProviderSelector
+  className="grid-cols-2"
+  selectedProvider="wave"
+  onProviderChange={setProvider}
+/>
+```
+
+Gardez l'état sélectionné évident, en particulier sur les cartes de fournisseur mobile money où les utilisateurs doivent confirmer le rail exact avant de payer.

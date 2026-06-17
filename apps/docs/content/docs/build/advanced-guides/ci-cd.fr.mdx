@@ -152,7 +152,7 @@ async function runPreDeploymentChecks(): Promise<void> {
     }
     console.log(`Récupération de ${providers.data.length} prestataires réussie.`);
 
-    // Facultatif : test du point de terminaison webhook si pertinent
+    // Facultatif : test de l’URL webhook si pertinent
     // Le SDK peut ne pas exposer de méthode dédiée ; contrôle personnalisé ou tests d’intégration.
 
     console.log('Contrôles pré-déploiement réussis !');
@@ -167,7 +167,7 @@ runPreDeploymentChecks();
 
 ### Tests d’intégration
 
-Écrivez des tests qui simulent des parcours utilisateur impliquant lomi..
+Écrivez des tests qui simulent des parcours utilisateur impliquant lomi.
 
 ```typescript filename="Exemple de test d’intégration (Jest)"
 // tests/integration/payment.test.ts

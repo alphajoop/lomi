@@ -23,6 +23,7 @@ import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
+import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
@@ -137,6 +138,7 @@ const logger = new Logger('RedisConfig');
     CheckoutSessionsModule,
     PaymentLinksModule,
     PayoutsModule,
+    SettlementsModule,
     WebhookDeliveryLogsModule,
     WebhooksModule,
     ChargesModule,

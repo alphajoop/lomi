@@ -1,0 +1,38 @@
+---
+title: lomi. UI
+description: Composants checkout prêts à copier-coller pour des expériences de paiement construites avec lomi.
+index: true
+---
+
+# lomi. UI
+
+lomi. UI est une petite collection de composants de paiement pour les équipes qui construisent des tunnels de checkout sur lomi. Elle suit le même modèle copy-paste que shadcn/ui : installez le composant dans votre application, conservez le code source et adaptez-le à votre produit.
+
+<DocsScreenshot name="build/lomi-ui" alt="Aperçu des composants de paiement lomi. UI sur le site de documentation" />
+
+Le premier kit se concentre sur le checkout :
+
+- sélection de fournisseur pour Wave, MTN, Orange Money, SPI et cartes
+- cartes de collecte mobile money
+- récapitulatifs de checkout
+- états de paiement réussi, échoué et en attente
+
+## Installer un composant
+
+```bash
+lomi ui add payment-provider-selector
+```
+
+Équivalent avec shadcn directement :
+
+```bash
+npx shadcn@latest add https://docs.lomi.africa/r/payment-provider-selector.json
+```
+
+Lister tous les composants : `lomi ui list`. Mettre à jour les copies installées : `lomi ui update`. Voir [Commandes CLI UI](/build/cli/ui).
+
+## Langage de design
+
+Les composants s'inspirent du checkout hébergé lomi. : cartes à petit rayon, surfaces neutres, bordures subtiles et `#56A5F9` pour les états de paiement sélectionnés.
+
+<DocsCategory />

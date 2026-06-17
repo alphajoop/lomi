@@ -19,6 +19,7 @@
     "transactions",
     "refunds",
     "payouts",
+    "settlements",
     "webhooks",
     "meters",
     "usage-events",

@@ -49,6 +49,25 @@ pnpm run dev
 
 See [Mobile money](/build/mobile-money) for the full guide.
 
+## Sandbox scenarios (test key only)
+
+With a **test** API key, direct Wave and MTN charges auto-complete by default. To test async or failure paths in CI, send `X-Scenario-Key`:
+
+| Value | Result |
+| --- | --- |
+| `pending` | Charge stays `PENDING` (no auto-complete) |
+| `failed` | `400` error |
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
+
+Hosted checkout and card direct charges do **not** support this header yet. See [Simulate errors](/build/guides/simulate-errors) and [Sandbox payments](/start/sandbox-payments#testing-mobile-money).
+
 ## lomi. Network
 
 Operators can create direct charges on behalf of connected member accounts:

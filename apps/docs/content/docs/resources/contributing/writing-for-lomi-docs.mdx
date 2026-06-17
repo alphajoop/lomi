@@ -49,7 +49,7 @@ Hand-authored guides should link to canonical references instead of duplicating 
 
 ## Bilingual policy
 
-New pages under `start/`, `build/guides/`, and `build/payment-methods/` require **English** (`.mdx`) and **French** (`.fr.mdx`) siblings. API operation summaries are English-canonical with French following OpenAPI over time.
+Every English page under `content/docs/` (`.mdx` without a locale suffix) requires a **French** sibling (`.fr.mdx`). Spanish (`.es.mdx`) and Chinese (`.zh.mdx`) pages are optional locale variants. `pnpm docs:drift` enforces EN/FR parity.
 
 ## Generated REST pages
 

@@ -1,13 +1,13 @@
 ---
 title: WooCommerce
 description:
-  Install and configure the lomi. WooCommerce gateway — hosted checkout
+  Install and configure lomi. WooCommerce gateway — hosted checkout
   sessions, return handler, and signed webhooks.
 ---
 
 # WooCommerce
 
-WordPress plugin that redirects shoppers to **Lomi hosted checkout** and confirms payment via the WooCommerce REST listener plus merchant webhooks.
+WordPress plugin that redirects shoppers to **lomi. hosted checkout** and confirms payment via the WooCommerce REST listener plus merchant webhooks.
 
 ## Requirements
 
@@ -43,7 +43,7 @@ To build locally from the monorepo: `cd apps/plugins/woo && npm run release`.
 
 1. Customer selects **lomi.** and places the order.
 2. Plugin calls `POST /v1/checkout-sessions` with success/cancel URLs and metadata (`wc_order_id`, etc.).
-3. Customer completes payment on Lomi Checkout.
+3. Customer completes payment on lomi. Checkout.
 4. **Return URL** hits the WooCommerce API listener (`WC_Gateway_Lomi`), which loads `GET /v1/checkout-sessions/{id}` and completes the order when status is `completed`.
 5. **Webhook** `PAYMENT_SUCCEEDED` can finalize the order if the return URL is delayed; signature verified with `X-Lomi-Signature` over the raw body.
 6. On success the plugin stores **`_lomi_transaction_id`**, **`_lomi_subscription_id`** (subscriptions), and **`_lomi_price_id`** on the Woo order.
@@ -61,7 +61,7 @@ Implementation reference: [`class-wc-gateway-lomi.php`](https://github.com/lomia
 1. On each subscription product (or variation), set **lomi price ID** in the product editor **lomi.** tab (`_lomi_price_id`).
 2. Checkout is **blocked** if a subscription line has no mapping.
 3. First payment sends `price_id` / `product_id` to `POST /checkout-sessions` so lomi creates a subscription.
-4. **Renewals** are billed by the lomi subscription engine — WooCommerce does not auto-charge renewals with hosted checkout.
+4. **Renewals** are billed by lomi. subscription engine — WooCommerce does not auto-charge renewals with hosted checkout.
 
 ## Webhooks
 

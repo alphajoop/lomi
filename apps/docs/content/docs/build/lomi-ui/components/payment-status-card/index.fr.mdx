@@ -1,0 +1,44 @@
+---
+title: Carte statut de paiement
+description: Affichez les résultats de checkout réussi, échoué et en attente.
+---
+
+import { PaymentStatusCardDemo } from '@/components/lomi-ui/demo';
+
+# Carte statut de paiement
+
+Utilisez-la après le checkout, dans une vue de reçu ou dans un tableau de bord marchand.
+
+## Aperçu
+
+<PaymentStatusCardDemo />
+
+## Installation
+
+<Installation name="payment-status-card" />
+
+## Utilisation
+
+```tsx
+import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
+
+<PaymentStatusCard
+  status="success"
+  amount={11750}
+  currency="XOF"
+  provider="wave"
+  transactionId="txn_7n4Pq3b9"
+  primaryAction={{ label: 'View transaction', href: '/transactions/txn_7n4Pq3b9' }}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `status` | `'success' \| 'failed' \| 'pending'` | Résultat de paiement à afficher. |
+| `amount` | `number` | Montant du paiement. |
+| `currency` | `string` | Code devise ISO. |
+| `provider` | `ProviderId` | Fournisseur utilisé pour le paiement. |
+| `transactionId` | `string` | Identifiant de transaction lomi. optionnel. |
+| `primaryAction` | `{ label: string; href?: string; onClick?: () => void }` | Action principale optionnelle. |

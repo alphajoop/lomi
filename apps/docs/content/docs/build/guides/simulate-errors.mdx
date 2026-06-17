@@ -24,6 +24,8 @@ Use this index to exercise failure paths in **sandbox**. Full test card numbers 
 | 3D Secure / authentication | Auth-required test cards | `requires_action` or challenge UI | [Sandbox payments](/start/sandbox-payments) |
 | Wave (test) | Select Wave on sandbox checkout | Often immediate `completed` | [Wave](/build/payment-methods/wave) |
 | MTN MoMo (test) | `POST /charge/mtn` with test MSISDN | Immediate `completed` on test key | [MTN MoMo](/build/payment-methods/mtn-momo) |
+| Direct MoMo `pending` (test) | `X-Scenario-Key: pending` on `POST /charge/mtn` or `/charge/wave` | Charge stays `PENDING`; no auto-complete | [Sandbox payments — scenarios](/start/sandbox-payments#testing-mobile-money) |
+| Direct MoMo `failed` (test) | `X-Scenario-Key: failed` on `POST /charge/mtn` or `/charge/wave` | `400` error response | Same section |
 | MTN MoMo (live) | Real MSISDN, live key | Starts `PENDING` | [Verify payments](/build/guides/verify-payments) |
 | Pending expiration | Wait beyond session/transaction TTL | `expired` or `failed` | [Payment state machine](/api/payment-state-machine) |
 | Webhook signature failure | POST without valid `X-Lomi-Signature` | Your endpoint returns 4xx; lomi. retries | [Handling webhooks](/build/advanced-guides/handling-webhooks) |
@@ -31,6 +33,32 @@ Use this index to exercise failure paths in **sandbox**. Full test card numbers 
 | Insufficient balance payout | Test payout rules in sandbox | `400` or `failed` payout | [Payouts in test mode](/start/sandbox-payments#payouts-in-test-mode) |
 | Invalid API key | Omit or wrong `X-API-Key` | `401` | [Authentication](/api/authentication) |
 | Rate limit | Burst requests in test | `429` | [Error handling](/build/advanced-guides/error-handling) |
+
+## Direct charge scenarios (test key only)
+
+On **`POST /charge/mtn`** and **`POST /charge/wave`**, send `X-Scenario-Key` to override default test behavior. This applies to **direct charges only**—hosted checkout and card charges do not read this header yet.
+
+| Header value | Behavior |
+| --- | --- |
+| *(omit)* | Default: test charge auto-completes and credits test balance |
+| `pending` | Charge remains `PENDING`; no auto-complete (poll or webhook) |
+| `failed` | Request fails with `400` |
+
+```bash
+# Keep charge pending (CI / dunning tests)
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+
+# Simulate provider failure
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: failed" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
 
 ## Automation
 

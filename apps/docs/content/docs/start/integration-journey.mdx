@@ -56,6 +56,8 @@ Webhooks are especially useful for payment methods and events that happen outsid
 2. Follow [Setting up webhooks](/build/webhooks) and [Handling webhooks](/build/advanced-guides/handling-webhooks).
 3. Verify signatures from the raw request body before you parse JSON.
 
+**Subscription renewals:** Card subscriptions renew off-session; listen for `SUBSCRIPTION_RENEWED` and renewal `PAYMENT_FAILED`. **Wave and MTN subscriptions** use a **manual renewal checkout link** sent before each billing date—the customer must pay that link; there is no silent wallet debit. See [Subscriptions — Renewals](/build/subscriptions#renewals-and-failed-payments).
+
 ## Step 5 — Go live
 
 When sandbox flows pass your checklist:

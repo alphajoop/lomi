@@ -138,7 +138,7 @@ Specific idempotency-related errors (though less common if using UUIDs correctly
 
 ## Common scenarios
 
-- **Creating Payments/Checkout Sessions:** Essential to prevent charging a customer twice if your initial request times out but was actually processed by lomi..
+- **Creating Payments/Checkout Sessions:** Essential to prevent charging a customer twice if your initial request times out but was actually processed by lomi.
 - **Creating Refunds:** Prevents accidentally refunding a transaction multiple times.
 - **Creating Customers/Products/Webhooks:** Useful to avoid creating duplicate resources due to retries.
 

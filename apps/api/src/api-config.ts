@@ -429,6 +429,8 @@ export const EXPOSED_FUNCTIONS = [
   'get_webhook_delivery_logs',
   'get_webhook_delivery_log',
   'fetch_payouts',
+  'fetch_settlement_periods',
+  'fetch_settlement_transactions',
   'create_mtn_transaction',
   'update_mtn_provider_reference',
   'get_mtn_transaction_by_external_id',

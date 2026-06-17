@@ -1,0 +1,48 @@
+---
+title: Tableau de tarification
+description: Un sélecteur de forfait au style lomi. pour checkout, abonnement et pages de tarification.
+---
+
+import { PricingTableDemo } from '@/components/lomi-ui/demo';
+
+# Tableau de tarification
+
+Utilisez-le pour la sélection de forfait avant de créer une session de checkout ou un abonnement.
+
+## Aperçu
+
+<PricingTableDemo />
+
+## Installation
+
+<Installation name="pricing-table" />
+
+## Utilisation
+
+```tsx
+import { PricingTable } from '@/components/lomi-ui/pricing-table';
+
+<PricingTable
+  plans={[
+    {
+      id: 'growth',
+      name: 'Growth',
+      description: 'For teams scaling payment operations.',
+      monthlyPrice: 25000,
+      yearlyPrice: 250000,
+      currency: 'XOF',
+      highlighted: true,
+      features: ['Mobile money + cards', 'Subscriptions', 'Webhooks'],
+    },
+  ]}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `plans` | `PricingPlan[]` | Forfaits à afficher. |
+| `title` | `string` | Titre optionnel. |
+| `description` | `string` | Texte d'accompagnement optionnel. |
+| `onPlanSelect` | `(planId, interval) => void` | Déclenché quand un forfait est sélectionné. |

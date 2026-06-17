@@ -1,0 +1,76 @@
+---
+title: "Liste des règlements"
+description: "Liste des règlements groupées par date de disponibilité et devise"
+full: true
+method: get
+path: /settlements
+operationId: SettlementsController_findAll
+---
+
+## Aperçu
+
+Liste des règlements
+
+Retourne les totaux des paiements complétés, groupés par date calendaire `available_at` (UTC) et par devise. Chaque `settlement_id` suit le format `{currency}:{YYYY-MM-DD}` (par exemple `XOF:2026-06-01`).
+
+### Quand l'utiliser
+
+Pour la rapprochement comptable : voir ce qui est devenu retirable à chaque date avant de demander des virements.
+
+### Voir aussi
+
+[Lister les transactions d’un règlement](/api/settlements/SettlementsController_findTransactions)
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /settlements`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `start_date` | query | Non | `string` (date) | Filtrer les périodes à partir de cette date (`YYYY-MM-DD`) |
+| `end_date` | query | Non | `string` (date) | Filtrer les périodes jusqu’à cette date (`YYYY-MM-DD`) |
+| `currency` | query | Non | `string` | Filtrer par code devise (`XOF`, `USD`, `EUR`) |
+| `page` | query | Non | `integer` | Numéro de page (défaut `1`) |
+| `pageSize` | query | Non | `integer` | Taille de page (défaut `50`) |
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Règlements |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard. **401** indique une clé manquante ou invalide ; **400** pour des paramètres de requête invalides.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements?start_date=2026-06-01&end_date=2026-06-30&page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `SettlementsController_findAll`
+- **Operation**: `GET /settlements`
+
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

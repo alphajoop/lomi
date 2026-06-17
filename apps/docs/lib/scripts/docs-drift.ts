@@ -9,11 +9,19 @@ import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operati
 const DOCS_ROOT = process.cwd();
 const CONTENT_ROOT = path.join(DOCS_ROOT, 'content/docs');
 
-const BILINGUAL_PREFIXES = [
-  'start/',
-  'build/guides/',
-  'build/payment-methods/',
-] as const;
+/** English MDX without a locale suffix must have a `.fr.mdx` sibling. */
+async function checkAllFrenchSiblings(errors: string[]): Promise<void> {
+  const files = await glob('**/*.mdx', { cwd: CONTENT_ROOT });
+  const frFiles = new Set(files.filter((f) => f.endsWith('.fr.mdx')));
+
+  for (const file of files) {
+    if (/\.(fr|es|zh)\.mdx$/.test(file)) continue;
+    const frSibling = file.replace(/\.mdx$/, '.fr.mdx');
+    if (!frFiles.has(frSibling)) {
+      errors.push(`Missing French sibling: ${frSibling} (for ${file})`);
+    }
+  }
+}
 
 const LLMS_REQUIRED_SLUGS = [
   'start/integration-journey',
@@ -100,21 +108,6 @@ async function checkOpenApiParity(errors: string[]): Promise<void> {
   }
 }
 
-async function checkBilingualSiblings(errors: string[]): Promise<void> {
-  const files = await glob('**/*.mdx', { cwd: CONTENT_ROOT });
-
-  for (const file of files) {
-    const normalized = file.replace(/\\/g, '/');
-    if (!BILINGUAL_PREFIXES.some((p) => normalized.startsWith(p))) continue;
-    if (normalized.endsWith('.fr.mdx')) continue;
-
-    const frSibling = normalized.replace(/\.mdx$/, '.fr.mdx');
-    if (!files.includes(frSibling)) {
-      errors.push(`Missing French sibling: ${frSibling} (for ${normalized})`);
-    }
-  }
-}
-
 async function checkInternalLinks(
   errors: string[],
   validSlugs: Set<string>,
@@ -157,7 +150,7 @@ async function main(): Promise<void> {
   const validSlugs = await collectValidSlugs();
 
   await checkOpenApiParity(errors);
-  await checkBilingualSiblings(errors);
+  await checkAllFrenchSiblings(errors);
   await checkInternalLinks(errors, validSlugs);
   await checkLlmsTxtRoute(errors);
 

@@ -14,13 +14,13 @@ Lancer un encaissement direct MTN MoMo
 Initie un encaissement RequestToPay MTN MoMo. Avec une clé API **test**, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.
 
 
-### Quand utiliser cet endpoint
+### Quand l'utiliser
 
 Pour un encaissement MTN initié côté serveur lorsque vous n’utilisez **pas** une session checkout hébergée.
 
 ### Bon à savoir
 
-Les encaissements live exigent MTN connecté pour votre organisation et un MSISDN valide. Les remboursements MTN live passent par l’API Disbursement via [Créer un remboursement](/api/refunds/RefundsController_create).
+Les encaissements live exigent MTN connecté pour votre organisation et un numéro de téléphone valide. Les remboursements MTN live passent par l’API Disbursement via [Créer un remboursement](/api/refunds/RefundsController_create).
 
 ### Voir aussi
 
@@ -29,9 +29,9 @@ Les encaissements live exigent MTN connecté pour votre organisation et un MSISD
 
 ## Authentification
 
-Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
 
-## Point de terminaison
+## Endpoint
 
 `POST /charge/mtn`
 
@@ -54,7 +54,7 @@ _Aucun paramètre de requête._
 
 ### Corps de la requête
 
-Charge utile JSON.
+Corps JSON.
 
 Schéma : `CreateMtnChargeDto`
 
@@ -94,7 +94,7 @@ Exemple :
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard. **401** : clé invalide ; **404** : ressource introuvable ; **429** : limitation de débit.
+Les erreurs suivent le format JSON standard. **401** : clé invalide ; **404** : ressource introuvable ; **429** : limite de requêtes.
 
 ## Exemple
 
