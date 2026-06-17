@@ -4,7 +4,9 @@
   "type": "registry:block",
   "title": "Payment Failure Card",
   "description": "Help customers retry or recover from a failed payment.",
-  "dependencies": ["lucide-react"],
+  "dependencies": [
+    "lucide-react"
+  ],
   "files": [
     {
       "path": "components/lomi-ui/payment-failure-card.tsx",

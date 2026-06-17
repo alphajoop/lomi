@@ -4,7 +4,9 @@
   "type": "registry:block",
   "title": "Payment Status Card",
   "description": "Show success, failed, and pending checkout outcomes.",
-  "dependencies": ["lucide-react"],
+  "dependencies": [
+    "lucide-react"
+  ],
   "files": [
     {
       "path": "components/lomi-ui/payment-status-card.tsx",
