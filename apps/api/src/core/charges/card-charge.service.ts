@@ -19,6 +19,10 @@ import {
 } from '../common/network-context';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import {
+  attachChargeNextAction,
+  deriveCardChargeNextAction,
+} from './charge-next-action';
+import {
   assertOptionalUuid,
   assertCardChargeReconciliationInput,
 } from './dto/assert-card-charge-reconciliation';
@@ -184,31 +188,32 @@ export class CardChargeService {
     });
     assertNetworkContextRecorded(user, networkContext, 'card charge');
 
-    return {
-      success: true,
-      data: {
-        id: paymentIntent.id,
-        client_secret: paymentIntent.client_secret,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        original_amount: amount,
-        original_currency: sourceCurrency,
-        status: paymentIntent.status,
-        appearance:
-          createDto.appearance_theme !== undefined ||
-          createDto.appearance_border_radius !== undefined ||
-          createDto.appearance_billing_address !== undefined
-            ? {
-                theme: toLomiTheme(createDto.appearance_theme),
-                border_radius:
-                  createDto.appearance_border_radius !== undefined
-                    ? Number(createDto.appearance_border_radius)
-                    : undefined,
-                billing_address: createDto.appearance_billing_address,
-              }
-            : undefined,
-      },
+    const data = {
+      id: paymentIntent.id,
+      client_secret: paymentIntent.client_secret,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      original_amount: amount,
+      original_currency: sourceCurrency,
+      status: paymentIntent.status,
+      appearance:
+        createDto.appearance_theme !== undefined ||
+        createDto.appearance_border_radius !== undefined ||
+        createDto.appearance_billing_address !== undefined
+          ? {
+              theme: toLomiTheme(createDto.appearance_theme),
+              border_radius:
+                createDto.appearance_border_radius !== undefined
+                  ? Number(createDto.appearance_border_radius)
+                  : undefined,
+              billing_address: createDto.appearance_billing_address,
+            }
+          : undefined,
     };
+    return attachChargeNextAction(
+      { success: true, data },
+      deriveCardChargeNextAction(data),
+    );
   }
 
   async findOne(paymentIntentId: string, user: AuthContext) {

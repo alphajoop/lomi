@@ -1,23 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUsageSubscriptionDto {
-  @ApiProperty({ description: 'Customer to enroll' })
+  @ApiProperty({ type: String, description: 'Customer to enroll' })
   customer_id: string;
 
-  @ApiProperty({ description: 'usage_based product id' })
+  @ApiProperty({ type: String, description: 'usage_based product id' })
   product_id: string;
 
-  @ApiProperty({
-    required: false,
+  @ApiPropertyOptional({
+    type: String,
     description: 'Price id (defaults to product default price)',
   })
   price_id?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   metadata?: Record<string, unknown>;
 }
 
 export class UsageSubscriptionResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   subscription_id: string;
 }

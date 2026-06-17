@@ -18,6 +18,12 @@ import {
 } from '../common/network-context';
 import { getMtnCountryConfig } from './mtn-country';
 import { randomUUID } from 'crypto';
+import {
+  attachChargeNextAction,
+  deriveMtnChargeNextAction,
+  deriveWaveChargeNextAction,
+} from './charge-next-action';
+import type { ChargeScenarioKey } from './charge-scenario';
 
 @Injectable()
 export class ChargesService {
@@ -31,6 +37,7 @@ export class ChargesService {
   async createWaveCharge(
     createChargeDto: CreateWaveChargeDto,
     user: AuthContext,
+    scenarioKey?: ChargeScenarioKey,
   ) {
     const {
       amount,
@@ -114,6 +121,26 @@ export class ChargesService {
         `Initiating Wave charge for organization ${organizationId} with Aggregated Merchant ID ${waveSettings.provider_merchant_id}`,
       );
 
+      if (paymentEnvironment === 'test' && scenarioKey === 'failed') {
+        throw new BadRequestException('Charge failed (test scenario)');
+      }
+
+      if (paymentEnvironment === 'test' && scenarioKey === 'pending') {
+        const frontendUrl =
+          this.configService.get('FRONTEND_URL') || 'https://lomi.africa';
+        const pendingUrl = `${frontendUrl}/checkout/wave/test-pending`;
+        const payload = {
+          transaction_id: randomUUID(),
+          status: 'PENDING',
+          wave_launch_url: pendingUrl,
+          checkout_url: pendingUrl,
+        };
+        return attachChargeNextAction(
+          payload,
+          deriveWaveChargeNextAction(payload),
+        );
+      }
+
       // Prepare URLs
       const frontendUrl =
         this.configService.get('FRONTEND_URL') || 'https://lomi.africa';
@@ -180,7 +207,14 @@ export class ChargesService {
         assertNetworkContextRecorded(user, networkContext, 'wave charge');
       }
 
-      return edgeResponse;
+      const wavePayload =
+        edgeResponse && typeof edgeResponse === 'object'
+          ? (edgeResponse as Record<string, unknown>)
+          : {};
+      return attachChargeNextAction(
+        wavePayload,
+        deriveWaveChargeNextAction(wavePayload),
+      );
     } catch (error) {
       this.logger.error(`Wave charge failed: ${error.message}`);
       throw error;
@@ -190,6 +224,7 @@ export class ChargesService {
   async createMtnCharge(
     createChargeDto: CreateMtnChargeDto,
     user: AuthContext,
+    scenarioKey?: ChargeScenarioKey,
   ) {
     const {
       amount,
@@ -300,6 +335,23 @@ export class ChargesService {
       txRow as { transaction_id: string; external_id: string };
 
     if (paymentEnvironment === 'test') {
+      if (scenarioKey === 'failed') {
+        throw new BadRequestException('Charge failed (test scenario)');
+      }
+
+      if (scenarioKey === 'pending') {
+        const pendingData = {
+          transaction_id: transactionId,
+          external_id: externalId,
+          reference_id: null,
+          status: 'PENDING',
+        };
+        return attachChargeNextAction(
+          { success: true, data: pendingData },
+          deriveMtnChargeNextAction(pendingData),
+        );
+      }
+
       const networkContext = await recordNetworkContext(
         this.supabaseService,
         user,
@@ -318,15 +370,16 @@ export class ChargesService {
       );
       assertNetworkContextRecorded(user, networkContext, 'mtn charge');
 
-      return {
-        success: true,
-        data: {
-          transaction_id: transactionId,
-          external_id: externalId,
-          reference_id: null,
-          status: 'completed',
-        },
+      const completedData = {
+        transaction_id: transactionId,
+        external_id: externalId,
+        reference_id: null,
+        status: 'completed',
       };
+      return attachChargeNextAction(
+        { success: true, data: completedData },
+        deriveMtnChargeNextAction(completedData),
+      );
     }
 
     const totalAmount = amount * quantity;
@@ -392,16 +445,17 @@ export class ChargesService {
     );
     assertNetworkContextRecorded(user, networkContext, 'mtn charge');
 
-    return {
-      success: true,
-      data: {
-        transaction_id: transactionId,
-        external_id: externalId,
-        reference_id: referenceId,
-        status: (mtnResponse as { status?: string })?.status ?? 'PENDING',
-        mtn_response: mtnResponse,
-      },
+    const liveData = {
+      transaction_id: transactionId,
+      external_id: externalId,
+      reference_id: referenceId,
+      status: (mtnResponse as { status?: string })?.status ?? 'PENDING',
+      mtn_response: mtnResponse,
     };
+    return attachChargeNextAction(
+      { success: true, data: liveData },
+      deriveMtnChargeNextAction(liveData),
+    );
   }
 }
 

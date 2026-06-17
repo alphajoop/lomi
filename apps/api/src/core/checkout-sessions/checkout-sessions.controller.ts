@@ -9,6 +9,7 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   Headers,
+  Res,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -37,6 +38,7 @@ import {
   fingerprintRequestBody,
   normalizeIdempotencyKey,
 } from '../../utils/idempotency-fingerprint';
+import type { Response } from 'express';
 
 @ApiTags('Sessions de paiement')
 @ApiSecurity('api-key')
@@ -143,6 +145,7 @@ export class CheckoutSessionsController {
     @CurrentUser() user: AuthContext,
     @Headers('idempotency-key')
     idempotencyKey?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
   ) {
     const normalizedKey = normalizeIdempotencyKey(idempotencyKey);
     const dtoPayload = JSON.parse(JSON.stringify(createDto)) as Record<
@@ -157,7 +160,12 @@ export class CheckoutSessionsController {
           }
         : undefined;
 
-    return this.service.create(createDto, user, idempotency);
+    return this.service.create(createDto, user, idempotency).then((result) => {
+      if (result.idempotencyCacheHit && res) {
+        res.setHeader('Idempotency-Cache-Hit', 'true');
+      }
+      return result.data;
+    });
   }
 
   @Get()

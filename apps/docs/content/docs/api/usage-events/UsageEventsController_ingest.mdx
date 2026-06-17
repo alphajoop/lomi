@@ -1,0 +1,76 @@
+---
+title: "Record a usage event"
+description: "Record a usage event"
+full: true
+method: post
+path: /usage-events
+operationId: UsageEventsController_ingest
+---
+
+## Overview
+
+Record a usage event
+
+Idempotent usage ingest. Events are processed asynchronously and update meter balances.
+
+
+### When to use this
+
+Use this endpoint when your flow needs `POST /usage-events` (Record a usage event).
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`POST /usage-events`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+_No query parameters._
+
+
+### Request body
+
+_No application/json body for this operation._
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `202` | — |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/usage-events" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## OpenAPI
+
+- **operationId**: `UsageEventsController_ingest`
+- **Operation**: `POST /usage-events`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

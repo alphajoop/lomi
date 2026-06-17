@@ -1,0 +1,69 @@
+---
+title: "Get a meter"
+description: "Get a meter"
+full: true
+method: get
+path: /meters/{id}
+operationId: MetersController_findOne
+---
+
+## Aperçu
+
+Get a meter
+
+### Quand utiliser cet endpoint
+
+Utilisez cet endpoint quand vous devez exécuter `GET /meters/&#123;id&#125;` (Get a meter).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /meters/{id}`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | Meter ID |
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | — |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/meters/value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `MetersController_findOne`
+- **Operation**: `GET /meters/{id}`
+
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

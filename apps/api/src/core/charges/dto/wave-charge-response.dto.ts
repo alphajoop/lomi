@@ -1,4 +1,5 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ChargeNextActionDto } from './charge-next-action.dto';
 
 /**
  * Wave direct-charge responses mirror the Wave edge checkout session payload.
@@ -43,4 +44,7 @@ export class WaveChargeResponseDto {
     description: 'Nested session data when returned by the edge function.',
   })
   data?: Record<string, unknown>;
+
+  @ApiPropertyOptional({ type: ChargeNextActionDto })
+  next_action?: ChargeNextActionDto;
 }

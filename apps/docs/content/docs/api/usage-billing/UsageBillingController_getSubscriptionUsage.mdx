@@ -1,0 +1,68 @@
+---
+title: "Get meter usage for a subscription"
+description: "Get meter usage for a subscription"
+full: true
+method: get
+path: /usage-billing/subscriptions/{subscriptionId}/usage
+operationId: UsageBillingController_getSubscriptionUsage
+---
+
+## Overview
+
+Get meter usage for a subscription
+
+### When to use this
+
+Use this endpoint when your flow needs `GET /usage-billing/subscriptions/&#123;subscriptionId&#125;/usage` (Get meter usage for a subscription).
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /usage-billing/subscriptions/{subscriptionId}/usage`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+_No query parameters._
+
+
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `200` | — |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/usage-billing/subscriptions/subscriptionId_value/usage" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `UsageBillingController_getSubscriptionUsage`
+- **Operation**: `GET /usage-billing/subscriptions/{subscriptionId}/usage`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

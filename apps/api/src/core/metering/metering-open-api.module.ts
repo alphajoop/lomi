@@ -2,7 +2,7 @@
 
 /** OpenAPI export graph — no BullMQ workers. */
 import { Module } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { SupabaseModule } from '../../utils/supabase/supabase.module';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { MetersController } from './meters.controller';
@@ -15,7 +15,7 @@ import { UsageCreditsService } from './usage-credits.service';
 import { EntitlementsService } from './entitlements.service';
 
 @Module({
-  imports: [SupabaseModule],
+  imports: [SupabaseModule, EventEmitterModule],
   controllers: [
     MetersController,
     UsageEventsController,

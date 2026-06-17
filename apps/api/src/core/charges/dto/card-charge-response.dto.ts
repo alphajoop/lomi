@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ChargeNextActionDto } from './charge-next-action.dto';
 
 export class CardChargeAppearanceDto {
   @ApiPropertyOptional({ example: 'light', type: String })
@@ -44,4 +44,7 @@ export class CardChargeResponseDto {
 
   @ApiProperty({ type: CardChargeDataDto })
   data: CardChargeDataDto;
+
+  @ApiPropertyOptional({ type: ChargeNextActionDto })
+  next_action?: ChargeNextActionDto;
 }

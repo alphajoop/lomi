@@ -31,6 +31,7 @@ import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
+import { MeteringOpenApiModule } from './core/metering/metering-open-api.module';
 import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
 import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
 @Module({
@@ -65,6 +66,7 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
+    MeteringOpenApiModule,
   ],
   controllers: [AppController],
   providers: [

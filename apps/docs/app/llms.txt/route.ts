@@ -60,7 +60,7 @@ export async function GET() {
     '1. Read **Authentication** and **Integration quickstart** below.',
   );
   lines.push(
-    '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, or payouts).',
+    '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, usage billing, or payouts).',
   );
   lines.push(
     `3. Use the [REST API hub](${docsOrigin}/api/index) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
@@ -205,6 +205,15 @@ export async function GET() {
   if (subList) {
     lines.push(
       `- **Subscriptions** → explore [${subList.data.title ?? 'Subscriptions'}](${docsOrigin}${subList.url}) (list, cancel, per-customer).`,
+    );
+  }
+  const usageBillingGuide = pageBySlugPath(pages, 'build/usage-billing');
+  const metersCreate = pages.find(
+    (p) => p.slugs[2] === 'MetersController_create',
+  );
+  if (usageBillingGuide && metersCreate) {
+    lines.push(
+      `- **Usage billing (metered products)** → [${usageBillingGuide.data.title ?? 'Usage billing'}](${docsOrigin}${usageBillingGuide.url}) — meters, usage events, billing periods ([Create meter](${docsOrigin}${metersCreate.url})).`,
     );
   }
   const payouts = firstApiPageInFolder(pages, 'payouts');

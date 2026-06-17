@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -19,6 +19,8 @@ import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import { CardChargeResponseDto } from './dto/card-charge-response.dto';
 import { MtnChargeResponseDto } from './dto/mtn-charge-response.dto';
 import { WaveChargeResponseDto } from './dto/wave-charge-response.dto';
+import { normalizeScenarioKey } from './charge-scenario';
+import { environmentFromAuth } from '../common/auth-environment';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
@@ -50,10 +52,19 @@ export class ChargesController {
   async createWaveCharge(
     @Body() createChargeDto: CreateWaveChargeDto,
     @CurrentUser() user: AuthContext,
+    @Headers('x-scenario-key') scenarioHeader?: string | string[],
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
-    return this.chargesService.createWaveCharge(createChargeDto, user);
+    const scenarioKey =
+      environmentFromAuth(user) === 'test'
+        ? normalizeScenarioKey(scenarioHeader)
+        : undefined;
+    return this.chargesService.createWaveCharge(
+      createChargeDto,
+      user,
+      scenarioKey,
+    );
   }
 
   @Post('mtn')
@@ -72,10 +83,19 @@ export class ChargesController {
   async createMtnCharge(
     @Body() createChargeDto: CreateMtnChargeDto,
     @CurrentUser() user: AuthContext,
+    @Headers('x-scenario-key') scenarioHeader?: string | string[],
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
-    return this.chargesService.createMtnCharge(createChargeDto, user);
+    const scenarioKey =
+      environmentFromAuth(user) === 'test'
+        ? normalizeScenarioKey(scenarioHeader)
+        : undefined;
+    return this.chargesService.createMtnCharge(
+      createChargeDto,
+      user,
+      scenarioKey,
+    );
   }
 
   @Post('card')

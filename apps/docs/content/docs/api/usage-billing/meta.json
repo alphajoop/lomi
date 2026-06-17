@@ -1,0 +1,11 @@
+{
+  "title": "Usage Billing",
+  "pages": [
+    "UsageBillingController_checkEntitlement",
+    "UsageBillingController_createEntitlement",
+    "UsageBillingController_creditWallet",
+    "UsageBillingController_getRevenue",
+    "UsageBillingController_getSubscriptionUsage",
+    "UsageBillingController_listPeriods"
+  ]
+}

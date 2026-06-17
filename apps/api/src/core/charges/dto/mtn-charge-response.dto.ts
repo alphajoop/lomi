@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ChargeNextActionDto } from './charge-next-action.dto';
 
 export class MtnChargeDataDto {
   @ApiProperty({
@@ -32,4 +33,7 @@ export class MtnChargeResponseDto {
 
   @ApiProperty({ type: MtnChargeDataDto })
   data: MtnChargeDataDto;
+
+  @ApiPropertyOptional({ type: ChargeNextActionDto })
+  next_action?: ChargeNextActionDto;
 }

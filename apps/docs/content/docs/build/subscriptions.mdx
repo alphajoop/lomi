@@ -29,6 +29,18 @@ There is no standalone "create subscription" API for signup—the checkout or li
 
 Monitor **webhook events** to track payment confirmations for each billing cycle. Listen for `SUBSCRIPTION_RENEWED` and renewal-related `PAYMENT_FAILED` events—see [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
 
+## Renewals and failed payments
+
+lomi. bills recurring subscriptions automatically when the product and checkout flow created the instance. Your integration should:
+
+1. **Listen for `SUBSCRIPTION_RENEWED`** — successful billing cycle; extend access or send a receipt.
+2. **Listen for `PAYMENT_FAILED`** on renewal transactions — customer may need to update payment method in the [customer portal](/build/customer-portal) or a new checkout session.
+3. **Poll or list subscriptions** via `GET /subscriptions` or `GET /customer-subscriptions` when webhooks are delayed—use `status` and `next_billing_date` from the API response only.
+
+Cancel or pause via `POST /subscriptions/{id}/cancel` or `PATCH /subscriptions/{id}` as documented in the [Subscriptions API](/api/subscriptions).
+
+For **metered / usage-based** products (API calls, credits, seats), see **[Usage billing](/build/usage-billing)**—usage subscriptions and meters are separate from recurring checkout subscriptions.
+
 ## List subscriptions
 
 Retrieve all subscriptions for your organization.

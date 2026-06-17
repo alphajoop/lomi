@@ -37,6 +37,11 @@ describe('CheckoutSessionsService', () => {
       rpc: jest
         .fn()
         .mockResolvedValue({ data: null, error: { message: 'not found' } }),
+      from: jest.fn(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+      })),
     };
 
     mockSupabaseService = {
@@ -79,7 +84,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual(expectedResponse);
+    expect(result.data).toEqual(expectedResponse);
     expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
       'create_checkout_session',
       expect.objectContaining({
@@ -125,7 +130,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       payment_required: true,
       reason: 'invoice_payment_required',
       blocking_invoice: {
@@ -152,10 +157,19 @@ describe('CheckoutSessionsService', () => {
       currency_code: 'XOF',
     } as CreateCheckoutSessionDto;
 
-    mockSupabaseService.rpc.mockResolvedValue({
-      data: { checkout_session_id: 'session-network' },
-      error: null,
+    mockSupabaseService.rpc.mockImplementation(async (name: string) => {
+      if (name === 'record_network_transaction_context') {
+        return { data: 'ctx-network', error: null };
+      }
+      if (name === 'calculate_network_operator_fee') {
+        return { data: 0, error: null };
+      }
+      return {
+        data: { checkout_session_id: 'session-network' },
+        error: null,
+      };
     });
+    mockSupabaseClient.rpc.mockImplementation(mockSupabaseService.rpc);
 
     await service.create(createDto, networkUser as AuthContext, {
       key: 'checkout-1',
@@ -302,7 +316,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual(expectedResponse);
+    expect(result.data).toEqual(expectedResponse);
     expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
       'create_checkout_session_with_line_items',
       expect.objectContaining({

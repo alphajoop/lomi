@@ -5,6 +5,7 @@
   "icon": "Blocks",
   "pages": [
     "choose-integration",
+    "payment-channels",
     "---Guides---",
     "guides/verify-payments",
     "guides/payment-lifecycle",
@@ -24,6 +25,7 @@
     "---Billing and money movement---",
     "products",
     "subscriptions",
+    "usage-billing",
     "customer-portal",
     "discount-coupons",
     "transactions",

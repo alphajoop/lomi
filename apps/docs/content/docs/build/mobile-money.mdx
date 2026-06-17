@@ -49,7 +49,7 @@ Most merchants should use **hosted checkout** or **payment links** first.
 
 ## Direct API — Wave
 
-`POST /charge/wave` with XOF amount and customer details. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.
+`POST /charge/wave` with XOF amount and customer details. Redirect the customer to `wave_launch_url` or `checkout_url` in the response—or read the normalized **`next_action`** field (`type: redirect` with `url`).
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
@@ -71,7 +71,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
 
 ## Direct API — MTN MoMo
 
-`POST /charge/mtn` with amount, currency, `countryCode`, and customer MSISDN.
+`POST /charge/mtn` with amount, currency, `countryCode`, and customer MSISDN. The response includes **`next_action`** (`type: await_webhook` with `status`) alongside `data.status`.
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \

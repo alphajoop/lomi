@@ -1,20 +1,19 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ListUsageEventsQueryDto {
-  @ApiProperty({ required: false, default: 1 })
+  @ApiPropertyOptional({ type: Number, default: 1 })
   page?: number;
 
-  @ApiProperty({ required: false, default: 50 })
+  @ApiPropertyOptional({ type: Number, default: 50 })
   page_size?: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String })
   customer_id?: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String })
   code?: string;
 
-  @ApiProperty({
-    required: false,
+  @ApiPropertyOptional({
     enum: ['pending', 'processed', 'failed'],
   })
   status?: string;

@@ -43,7 +43,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   ChargesController_createWaveCharge: {
     summary: 'Create direct mobile-money charge',
-    body: 'Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer.',
+    body: 'Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer. Check **`next_action`** (`redirect` with `url`) in addition to `wave_launch_url` / `checkout_url`.',
     whenToUse:
       'Use for server-initiated mobile-money collection when you are **not** using a hosted checkout session.',
     caveats:
@@ -53,7 +53,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   ChargesController_createMtnCharge: {
     summary: 'Create MTN MoMo charge',
-    body: 'Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox.',
+    body: 'Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox. Responses include **`next_action`** (`await_webhook` with `status`) alongside `data.status`.',
     whenToUse:
       'Use for server-initiated MTN collection when you are **not** using a hosted checkout session.',
     caveats:
@@ -523,6 +523,128 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use when a merchant ID is the scope key for wallet or treasury displays.',
     caveats: 'Requires `currency_code` (XOF, USD, or EUR).',
     related: '[Account balances](/api/balances/AccountsController_getBalance)',
+  },
+  MetersController_create: {
+    summary: 'Create a meter',
+    body: 'Defines a billable metric for usage-based products. Events with a matching `code` update meter balances when processed.',
+    whenToUse:
+      'First step in usage billing: create a meter before ingesting usage events or enrolling customers on usage-based products.',
+    related:
+      '[Usage billing guide](/build/usage-billing) · [Record usage event](/api/usage-events/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)',
+  },
+  MetersController_findAll: {
+    summary: 'List meters',
+    body: 'Returns meters for your organization, optionally filtered by product or active status.',
+    whenToUse:
+      'Use to display configured billable metrics or pick a `meter_id` for balance reads.',
+    related:
+      '[Create meter](/api/meters/MetersController_create) · [Get meter](/api/meters/MetersController_findOne)',
+  },
+  MetersController_findOne: {
+    summary: 'Get a meter',
+    body: 'Returns one meter by ID, including filter and aggregation configuration.',
+    whenToUse:
+      'Use when you store a meter ID and need the latest filter/aggregation rules.',
+    related:
+      '[List meters](/api/meters/MetersController_findAll) · [Meter balance](/api/meters/MetersController_getBalance)',
+  },
+  MetersController_update: {
+    summary: 'Update a meter',
+    body: 'Updates filter, aggregation, or active status on an existing meter.',
+    whenToUse:
+      'Use when billing rules change—deactivate meters instead of deleting when historical usage must remain.',
+    related: '[Get meter](/api/meters/MetersController_findOne)',
+  },
+  MetersController_getBalance: {
+    summary: 'Get meter balance for a customer',
+    body: 'Returns consumed, credited, and net balance units for a customer on a specific meter.',
+    whenToUse:
+      'Use for prepaid wallets, usage dashboards, or entitlement checks before granting access.',
+    related:
+      '[Credit wallet](/api/usage-billing/UsageBillingController_creditWallet) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageEventsController_findAll: {
+    summary: 'List usage events',
+    body: 'Lists ingested usage events with pagination and optional filters for customer, code, and processing status.',
+    whenToUse:
+      'Use for support, reconciliation, or debugging failed usage ingest.',
+    related:
+      '[Record usage event](/api/usage-events/UsageEventsController_ingest) · [Get usage event](/api/usage-events/UsageEventsController_findOne)',
+  },
+  UsageEventsController_findOne: {
+    summary: 'Get a usage event',
+    body: 'Returns one usage event by ID, including processing status and error details when failed.',
+    whenToUse:
+      'Use after ingest to confirm processing or investigate a specific event.',
+    related:
+      '[List usage events](/api/usage-events/UsageEventsController_findAll) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageEventsController_ingest: {
+    summary: 'Record a usage event',
+    body: 'Idempotent usage ingest. Events are processed asynchronously and update meter balances when matched.',
+    whenToUse:
+      'Call from your app whenever billable usage occurs—use a stable `transaction_id` per logical event.',
+    caveats:
+      'Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage-events/{id}`.',
+    related:
+      '[Usage billing guide](/build/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage-events/UsageEventsController_createUsageSubscription)',
+  },
+  UsageEventsController_createUsageSubscription: {
+    summary: 'Create a usage subscription',
+    body: 'Enrolls a customer on a `usage_based` product without an upfront charge. Required before billing metered usage to that customer.',
+    whenToUse:
+      'After creating a usage-based product and meter—enroll each customer before sending usage events tied to a subscription.',
+    related:
+      '[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage)',
+  },
+  UsageBillingController_listPeriods: {
+    summary: 'List usage billing periods',
+    body: 'Returns billing periods for usage subscriptions, optionally filtered by subscription ID.',
+    whenToUse:
+      'Use for invoicing windows, period-close reconciliation, or support lookups.',
+    related:
+      '[Get subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage) · [Usage billing guide](/build/usage-billing)',
+  },
+  UsageBillingController_getSubscriptionUsage: {
+    summary: 'Get meter usage for a subscription',
+    body: 'Returns aggregated meter usage for a usage subscription across its billing period.',
+    whenToUse:
+      'Use on invoices, customer usage dashboards, or before closing a billing period.',
+    related:
+      '[List billing periods](/api/usage-billing/UsageBillingController_listPeriods) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageBillingController_getRevenue: {
+    summary: 'Combined revenue metrics',
+    body: 'Returns MRR, usage revenue, and one-time revenue for a date range.',
+    whenToUse:
+      'Use for finance reporting that combines subscription MRR with metered usage and one-off charges.',
+    caveats: 'Requires `start_date` and `end_date` query parameters.',
+    related:
+      '[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Usage billing guide](/build/usage-billing)',
+  },
+  UsageBillingController_creditWallet: {
+    summary: 'Credit prepaid usage units',
+    body: 'Adds credited units to a customer meter wallet (prepaid or promotional credits).',
+    whenToUse:
+      'Use for prepaid packs, promotions, or manual adjustments before usage draws down balance.',
+    related:
+      '[Get meter balance](/api/meters/MetersController_getBalance) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageBillingController_createEntitlement: {
+    summary: 'Create or update an entitlement',
+    body: 'Defines a plan entitlement feature keyed by `feature_key` for usage or access gating.',
+    whenToUse:
+      'Use when feature access is tied to plan entitlements rather than raw meter balance alone.',
+    related:
+      '[Check entitlement](/api/usage-billing/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/usage-billing)',
+  },
+  UsageBillingController_checkEntitlement: {
+    summary: 'Check customer entitlement',
+    body: 'Returns whether a customer has an active entitlement for the given `feature_key`.',
+    whenToUse:
+      'Use at request time to gate features without loading full subscription objects.',
+    related:
+      '[Create entitlement](/api/usage-billing/UsageBillingController_createEntitlement)',
   },
   ProvidersController_findAll: {
     summary: 'List payment providers',
