@@ -14,6 +14,14 @@ const config = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
+  async rewrites() {
+    return [
+      {
+        source: '/:path*.mdx',
+        destination: '/llms.mdx/:path*',
+      },
+    ];
+  },
 };
 
 export default withMDX(config);
