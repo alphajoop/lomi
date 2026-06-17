@@ -6,6 +6,16 @@ import { source } from '@/lib/utils/source';
 
 export const revalidate = false;
 
+/** Slugs referenced in llms.txt output (validated by `pnpm docs:drift`). */
+const LLMS_CURATED_SLUGS = [
+  'start/integration-journey',
+  'build/guides/verify-payments',
+  'build/guides/payment-lifecycle',
+  'build/guides/payment-methods',
+  'api/payment-state-machine',
+] as const;
+void LLMS_CURATED_SLUGS;
+
 function sectionTitleFromFolder(folder: string): string {
   return folder
     .replace(/[-_]+/g, ' ')
@@ -60,6 +70,16 @@ export async function GET() {
   lines.push('## Integration quickstart');
   lines.push('');
   lines.push(
+    '- **Amounts (XOF):** integer **centimes** (minor units) unless a field documents otherwise.',
+  );
+  lines.push(
+    '- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…` — the **API key selects sandbox vs live**, not the hostname alone.',
+  );
+  lines.push(
+    '- **Verify server-side before fulfill:** never trust client-only success; use webhooks + `GET /transactions/{id}`.',
+  );
+  lines.push('');
+  lines.push(
     '1. Create a merchant account and API keys in the [dashboard](https://dashboard.lomi.africa).',
   );
   lines.push(
@@ -75,16 +95,34 @@ export async function GET() {
     '5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.',
   );
   const integrationJourney = pageBySlugPath(pages, 'start/integration-journey');
-  const paymentChannels = pageBySlugPath(pages, 'build/payment-channels');
+  const paymentMethodsHub = pageBySlugPath(
+    pages,
+    'build/guides/payment-methods',
+  );
+  const verifyPayments = pageBySlugPath(pages, 'build/guides/verify-payments');
+  const paymentLifecycle = pageBySlugPath(
+    pages,
+    'build/guides/payment-lifecycle',
+  );
   const sandboxPayments = pageBySlugPath(pages, 'start/sandbox-payments');
   if (integrationJourney) {
     lines.push(
       `6. Follow the [integration journey](${docsOrigin}${integrationJourney.url}) for sandbox → webhooks → go-live.`,
     );
   }
-  if (paymentChannels) {
+  if (verifyPayments) {
     lines.push(
-      `- Supported countries and rails: [${paymentChannels.data.title ?? 'Payment channels'}](${docsOrigin}${paymentChannels.url}).`,
+      `- [${verifyPayments.data.title ?? 'Verify payments'}](${docsOrigin}${verifyPayments.url}) — confirm status before fulfilling.`,
+    );
+  }
+  if (paymentLifecycle) {
+    lines.push(
+      `- [${paymentLifecycle.data.title ?? 'Payment lifecycle'}](${docsOrigin}${paymentLifecycle.url}) — merchant-facing lifecycle hub.`,
+    );
+  }
+  if (paymentMethodsHub) {
+    lines.push(
+      `- Supported countries and rails: [${paymentMethodsHub.data.title ?? 'Payment methods'}](${docsOrigin}${paymentMethodsHub.url}).`,
     );
   }
   if (sandboxPayments) {
@@ -212,14 +250,29 @@ export async function GET() {
       `- [${integrationJourney.data.title ?? 'Integration journey'}](${docsOrigin}${integrationJourney.url})`,
     );
   }
-  const psm = pages.find(
-    (p) =>
-      p.url.includes('payment-state-machine') ||
-      p.slugs.join('/').includes('payment-state-machine'),
-  );
+  if (verifyPayments) {
+    lines.push(
+      `- [${verifyPayments.data.title ?? 'Verify payments'}](${docsOrigin}${verifyPayments.url})`,
+    );
+  }
+  if (paymentLifecycle) {
+    lines.push(
+      `- [${paymentLifecycle.data.title ?? 'Payment lifecycle'}](${docsOrigin}${paymentLifecycle.url})`,
+    );
+  }
+  if (paymentMethodsHub) {
+    lines.push(
+      `- [${paymentMethodsHub.data.title ?? 'Payment methods'}](${docsOrigin}${paymentMethodsHub.url})`,
+    );
+  }
+  const psm = pageBySlugPath(pages, 'api/payment-state-machine');
   if (psm) {
     lines.push(
       `- [${psm.data.title ?? 'Payment state machine'}](${docsOrigin}${psm.url}) — status transitions and balances`,
+    );
+  } else {
+    lines.push(
+      `- [Payment state machine](${docsOrigin}/api/payment-state-machine) — status transitions and balances`,
     );
   }
   const mcp = pageBySlugPath(pages, 'reference/integrations/mcp');

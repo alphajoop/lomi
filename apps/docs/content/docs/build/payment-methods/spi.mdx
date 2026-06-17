@@ -1,0 +1,29 @@
+---
+title: 'What is SPI and how do I use it?'
+description: 'SPI bank and mobile-money network coverage, BNPL, and hosted checkout in West Africa.'
+docType: explanation
+---
+
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+**SPI** (Système de Paiement Interopérable) connects mobile-money operators and banks across West Africa. On lomi., SPI-backed methods appear on **hosted checkout** alongside Wave, MTN, Orange Money, and cards.
+
+## Integration path
+
+Use [hosted checkout](/build/checkout) or [payment links](/build/payment-links). SPI-specific UX (operator selection, USSD, app redirect) is handled on the hosted page.
+
+## BNPL (buy now, pay later)
+
+SPI-backed BNPL plans use organization BNPL configuration and are limited to compatible currencies (typically **XOF** for West Africa BNPL). See [BNPL](/build/payments/bnpl) for fee models and installment behavior.
+
+## Payouts
+
+Some payout rails use SPI for bank or mobile-money disbursements. See [Payouts](/build/payouts) and [Sandbox payouts](/start/sandbox-payments#payouts-in-test-mode).
+
+## Related
+
+- [Orange Money](/build/payment-methods/orange-money)
+- [Payment methods hub](/build/guides/payment-methods)
+- [Providers API](/api/providers/ProvidersController_findAll)

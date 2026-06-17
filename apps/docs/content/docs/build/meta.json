@@ -5,7 +5,13 @@
   "icon": "Blocks",
   "pages": [
     "choose-integration",
-    "payment-channels",
+    "---Guides---",
+    "guides/verify-payments",
+    "guides/payment-lifecycle",
+    "guides/payment-methods",
+    "guides/simulate-errors",
+    "---Payment channels---",
+    "payment-methods",
     "---Accept payments---",
     "checkout",
     "embed-widget",
@@ -33,7 +39,6 @@
     "cli",
     "sdks",
     "ecommerce-extensions",
-    "lomi-ui",
-    "fundamentals"
+    "lomi-ui"
   ]
 }

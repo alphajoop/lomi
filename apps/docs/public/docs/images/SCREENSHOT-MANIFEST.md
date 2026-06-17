@@ -1,98 +1,39 @@
-# Docs screenshot capture specification
+# Docs screenshots — manual capture guide
 
-Drop **28 WebP files** (12 screens × light + dark). Same images are used for EN and FR pages.
+You need **28 files** (12 screens × light + dark). Drop them in this folder; docs pages pick them up automatically — **no MDX edits** if filenames match.
 
-**Folder:** `apps/docs/public/docs/images/`  
-**Subfolders:** `start/`, `build/`  
-**Naming:** `{path}-{light|dark}.webp` (e.g. `start/create-account-light.webp`)
-
-After adding files, docs pages update automatically — no MDX edit needed if filenames match this manifest.
-
----
-
-## Global rules (every file)
-
-| Rule             | Value                                                          |
-| ---------------- | -------------------------------------------------------------- |
-| **Export ratio** | **16:9**                                                       |
-| **Export size**  | **1280 × 720 px** (or 1920 × 1080 for retina)                  |
-| **Format**       | WebP, quality ~85                                              |
-| **Light file**   | App/docs in **light** theme → `*-light.webp`                   |
-| **Dark file**    | Same viewport & crop, **dark** theme → `*-dark.webp`           |
-| **Composition**  | Put **subject UI in the center**; edges may be clipped in docs |
-
-`DocsScreenshot` renders at 16:9 (`aspect-video`). Export at 16:9 so nothing important is cropped.
+```
+apps/docs/public/docs/images/
+├── start/     ← 3 screens (6 files)
+└── build/     ← 9 screens (18 files)
+```
 
 ---
 
-## Group A — Dashboard (wide app chrome)
+## Before you start (same for every shot)
 
-**Profile:** Desktop **1280 × 720**. Include **sidebar + top bar** unless noted. **Test mode** ON. Never expose live `lomi_sk_live_` keys.
+1. **Browser window:** 1280 × 720 px (16:9).
+2. **Export:** WebP, quality ~85, **exactly 1280×720**.
+3. **Two versions per screen:** same crop, only theme changes.
+   - `*-light.webp` → light mode
+   - `*-dark.webp` → dark mode
+4. **Framing:** keep the important UI **centered** — docs crop edges on small screens.
+5. **Secrets:** never ship real `lomi_sk_live_…` keys; blur or use test keys only.
 
-| #   | Files (light + dark)   | Ratio           | Viewport / crop             | Exact UI state                                                                                                     | URL                                                 |
-| --- | ---------------------- | --------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
-| 1   | `start/create-account` | 16:9 @ 1280×720 | Full window (no sidebar)    | Onboarding step with **business type / profile form** visible (name, country, use case). Not empty welcome splash. | `dashboard.lomi.africa/onboarding`                  |
-| 2   | `start/api-keys`       | 16:9 @ 1280×720 | Main panel (sidebar OK)     | **Access tokens** — Test + Live sections with `lomi_sk_test_…` / `lomi_pk_test_…` (mask secrets if needed).        | `/{orgId}/settings/access-tokens`                   |
-| 5   | `build/payment-links`  | 16:9 @ 1280×720 | Table fills main area       | Payment links list with **≥1 row** (name, amount, status). No empty state.                                         | `/{orgId}/payment-links`                            |
-| 8   | `build/balance`        | 16:9 @ 1280×720 | Balance hero + history rows | **Test** balance amount + at least one **completed** credit line.                                                  | `/{orgId}/balance`                                  |
-| 9   | `build/payouts`        | 16:9 @ 1280×720 | Withdrawals main panel      | Payout methods list or **add withdrawal method** (bank / Wave / SPI).                                              | `/{orgId}/settings/withdrawals`                     |
-| 10  | `build/subscriptions`  | 16:9 @ 1280×720 | Detail panel centered       | One subscription: plan name, **status**, customer, billing period / next charge.                                   | `/{orgId}/customers/subscriptions/{subscriptionId}` |
+**Theme toggle**
 
----
-
-## Group B — Hosted checkout (narrow ~490px UI)
-
-Checkout is **~490px centered** on page. Use browser **1280×720** with checkout centered (neutral margins on sides), or mobile **390×844** letterboxed to 16:9.
-
-**Session:** Sandbox checkout (`lomi checkout create` or [sandbox recipe](/start/sandbox-payments)) → open `checkout_url` on `checkout.lomi.africa`.
-
-| #   | Files (light + dark)       | Ratio           | Viewport / crop          | Exact UI state                                                                    | Step             |
-| --- | -------------------------- | --------------- | ------------------------ | --------------------------------------------------------------------------------- | ---------------- |
-| 3   | `start/hosted-checkout`    | 16:9 @ 1280×720 | Checkout centered        | **Default pay step** — org logo, title/amount, **Pay** CTA. Not success/cancel.   | Initial checkout |
-| 4   | `build/choose-integration` | 16:9 @ 1280×720 | Tight on provider picker | **Method selection** — Wave, MTN, Orange, SPI, Card tiles visible. Not card form. | Provider picker  |
-| 6   | `build/mobile-money`       | 16:9 @ 1280×720 | MoMo step                | **Wave or MTN selected** — phone field, USSD/push copy visible.                   | After MoMo rail  |
-| 7   | `build/cards`              | 16:9 @ 1280×720 | Card form                | **Card** selected — number, expiry, CVC fields. Optional `4242 4242 4242 4242`.   | After Card rail  |
+| App | Where to switch theme |
+| --- | --------------------- |
+| Dashboard | Portal theme toggle |
+| Checkout | Checkout theme (if available) or system appearance |
+| Customer portal | Portal theme |
+| Docs (lomi-ui only) | Docs site theme toggle (top bar) |
 
 ---
 
-## Group C — Customer portal
+## Your checklist
 
-| #   | Files (light + dark)    | Ratio           | Viewport / crop | Exact UI state                                                                       | URL                     |
-| --- | ----------------------- | --------------- | --------------- | ------------------------------------------------------------------------------------ | ----------------------- |
-| 11  | `build/customer-portal` | 16:9 @ 1280×720 | Portal home     | Logged-in **Payments** or **Subscriptions** tab with **≥1 row**. Not OTP/email gate. | `customers.lomi.africa` |
-
----
-
-## Group D — Docs site (Lomi UI)
-
-| #   | Files (light + dark) | Ratio           | Viewport / crop         | Exact UI state                                                                            | URL                                                                   |
-| --- | -------------------- | --------------- | ----------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| 12  | `build/lomi-ui`      | 16:9 @ 1280×720 | Preview block + heading | **Payment Provider Selector** demo under “Preview”. Toggle **docs** theme (not checkout). | `docs.lomi.africa/build/lomi-ui/components/payment-provider-selector` |
-
----
-
-## Quick reference
-
-| Files                                   | Ratio           | One-line context              |
-| --------------------------------------- | --------------- | ----------------------------- |
-| `start/create-account-{light,dark}`     | 16:9 · 1280×720 | Onboarding form step          |
-| `start/api-keys-{light,dark}`           | 16:9 · 1280×720 | Settings → access tokens      |
-| `start/hosted-checkout-{light,dark}`    | 16:9 · 1280×720 | Sandbox checkout pay step     |
-| `build/choose-integration-{light,dark}` | 16:9 · 1280×720 | Checkout provider picker      |
-| `build/payment-links-{light,dark}`      | 16:9 · 1280×720 | Dashboard payment links table |
-| `build/mobile-money-{light,dark}`       | 16:9 · 1280×720 | Checkout Wave/MTN step        |
-| `build/cards-{light,dark}`              | 16:9 · 1280×720 | Checkout card entry form      |
-| `build/balance-{light,dark}`            | 16:9 · 1280×720 | Dashboard test balance        |
-| `build/payouts-{light,dark}`            | 16:9 · 1280×720 | Settings → withdrawals        |
-| `build/subscriptions-{light,dark}`      | 16:9 · 1280×720 | Subscription detail           |
-| `build/customer-portal-{light,dark}`    | 16:9 · 1280×720 | Portal payments/subscriptions |
-| `build/lomi-ui-{light,dark}`            | 16:9 · 1280×720 | Docs component preview        |
-
-**Total: 28 files**
-
----
-
-## Capture checklist
+Copy this list and tick as you go:
 
 - [ ] `start/create-account-light.webp` + `start/create-account-dark.webp`
 - [ ] `start/api-keys-light.webp` + `start/api-keys-dark.webp`
@@ -109,50 +50,159 @@ Checkout is **~490px centered** on page. Use browser **1280×720** with checkout
 
 ---
 
-## Pages wired to each asset
+## 1. Create account
 
-| Asset prefix               | MDX files                                                  |
-| -------------------------- | ---------------------------------------------------------- |
-| `start/create-account`     | `content/docs/start/create-account.mdx`, `.fr.mdx`         |
-| `start/api-keys`           | `content/docs/start/api-keys.mdx`, `.fr.mdx`               |
-| `start/hosted-checkout`    | `content/docs/start/first-payment.mdx`, `.fr.mdx`          |
-| `build/choose-integration` | `content/docs/build/choose-integration.mdx`, `.fr.mdx`     |
-| `build/payment-links`      | `content/docs/build/payment-links.mdx`, `.fr.mdx`          |
-| `build/mobile-money`       | `content/docs/build/mobile-money.mdx`, `.fr.mdx`           |
-| `build/cards`              | `content/docs/build/cards.mdx`, `.fr.mdx`                  |
-| `build/balance`            | `content/docs/build/balance-and-settlement.mdx`, `.fr.mdx` |
-| `build/payouts`            | `content/docs/build/payouts.mdx`, `.fr.mdx`                |
-| `build/subscriptions`      | `content/docs/build/subscriptions.mdx`, `.fr.mdx`          |
-| `build/customer-portal`    | `content/docs/build/customer-portal.mdx`, `.fr.mdx`        |
-| `build/lomi-ui`            | `content/docs/build/lomi-ui/index.mdx`                     |
+| | |
+| --- | --- |
+| **Save as** | `start/create-account-light.webp` and `start/create-account-dark.webp` |
+| **Open** | https://dashboard.lomi.africa/onboarding |
+| **Show** | The step with the **business profile form** (name, country, use case / business type). |
+| **Do not show** | Empty welcome splash with no form fields. |
+| **Chrome** | Full window — onboarding usually has **no sidebar**. |
 
 ---
 
-## Full file paths (copy-paste)
+## 2. API keys
 
-```
-public/docs/images/start/create-account-light.webp
-public/docs/images/start/create-account-dark.webp
-public/docs/images/start/api-keys-light.webp
-public/docs/images/start/api-keys-dark.webp
-public/docs/images/start/hosted-checkout-light.webp
-public/docs/images/start/hosted-checkout-dark.webp
-public/docs/images/build/choose-integration-light.webp
-public/docs/images/build/choose-integration-dark.webp
-public/docs/images/build/payment-links-light.webp
-public/docs/images/build/payment-links-dark.webp
-public/docs/images/build/mobile-money-light.webp
-public/docs/images/build/mobile-money-dark.webp
-public/docs/images/build/cards-light.webp
-public/docs/images/build/cards-dark.webp
-public/docs/images/build/balance-light.webp
-public/docs/images/build/balance-dark.webp
-public/docs/images/build/payouts-light.webp
-public/docs/images/build/payouts-dark.webp
-public/docs/images/build/subscriptions-light.webp
-public/docs/images/build/subscriptions-dark.webp
-public/docs/images/build/customer-portal-light.webp
-public/docs/images/build/customer-portal-dark.webp
-public/docs/images/build/lomi-ui-light.webp
-public/docs/images/build/lomi-ui-dark.webp
-```
+| | |
+| --- | --- |
+| **Save as** | `start/api-keys-light.webp` and `start/api-keys-dark.webp` |
+| **Open** | `https://dashboard.lomi.africa/{your-org-id}/settings/access-tokens` |
+| **Show** | **Access tokens** page — **Test** and **Live** sections both visible with `lomi_sk_test_…` / `lomi_pk_test_…` style keys. |
+| **Do not show** | Live secret keys unmasked (blur if needed). |
+| **Chrome** | Sidebar + top bar OK; crop to main panel. |
+
+---
+
+## 3. Hosted checkout (first payment)
+
+| | |
+| --- | --- |
+| **Save as** | `start/hosted-checkout-light.webp` and `start/hosted-checkout-dark.webp` |
+| **Open** | A **sandbox** checkout URL from `checkout_url` after creating a session ([sandbox guide](https://docs.lomi.africa/start/sandbox-payments)) |
+| **Show** | Default **pay** step — org logo, product/amount, **Pay** button. Checkout card centered in the 16:9 frame. |
+| **Do not show** | Success page, cancel page, or error state. |
+
+**Get a URL:** `lomi checkout create` or `POST https://sandbox.api.lomi.africa/checkout-sessions` with your test key → open the `checkout_url`.
+
+---
+
+## 4. Choose integration (provider picker)
+
+| | |
+| --- | --- |
+| **Save as** | `build/choose-integration-light.webp` and `build/choose-integration-dark.webp` |
+| **Open** | Same sandbox checkout session as above |
+| **Show** | Step where the customer **picks a payment method** — **Wave, MTN, Orange, SPI, Card** (or your enabled subset) as selectable tiles. |
+| **Do not show** | Card number / expiry / CVC fields — that is shot #7, not this one. |
+| **Framing** | Crop tighter on the **provider picker** if needed. |
+
+---
+
+## 5. Payment links
+
+| | |
+| --- | --- |
+| **Save as** | `build/payment-links-light.webp` and `build/payment-links-dark.webp` |
+| **Open** | `https://dashboard.lomi.africa/{your-org-id}/payment-links` |
+| **Show** | Table with **at least one row** (name, amount, status e.g. active). **Test mode** ON. |
+| **Do not show** | Empty “no payment links” state. |
+| **Chrome** | Sidebar OK; table fills the main area. |
+
+---
+
+## 6. Mobile money
+
+| | |
+| --- | --- |
+| **Save as** | `build/mobile-money-light.webp` and `build/mobile-money-dark.webp` |
+| **Open** | Sandbox checkout — after selecting **Wave** or **MTN** |
+| **Show** | Phone number field, USSD/push instructions, or other MoMo-specific copy. Must read clearly as **mobile money**. |
+| **Do not show** | Generic checkout with no MoMo UI, or card form. |
+
+---
+
+## 7. Cards
+
+| | |
+| --- | --- |
+| **Save as** | `build/cards-light.webp` and `build/cards-dark.webp` |
+| **Open** | Sandbox checkout — after selecting **Card** |
+| **Show** | Card **number**, **expiry**, and **CVC** fields. Optional: `4242 4242 4242 4242` in the number field. |
+| **Do not show** | Provider picker only (that is shot #4). |
+
+---
+
+## 8. Balance
+
+| | |
+| --- | --- |
+| **Save as** | `build/balance-light.webp` and `build/balance-dark.webp` |
+| **Open** | `https://dashboard.lomi.africa/{your-org-id}/balance` |
+| **Show** | **Test mode** ON — test balance amount visible + at least one **completed** credit line in history. |
+| **Chrome** | Balance hero + first rows of history. |
+
+---
+
+## 9. Payouts / withdrawals
+
+| | |
+| --- | --- |
+| **Save as** | `build/payouts-light.webp` and `build/payouts-dark.webp` |
+| **Open** | `https://dashboard.lomi.africa/{your-org-id}/settings/withdrawals` |
+| **Show** | Payout methods list **or** “add withdrawal method” UI (bank / Wave / SPI). |
+| **Do not show** | Empty error state. |
+
+---
+
+## 10. Subscriptions
+
+| | |
+| --- | --- |
+| **Save as** | `build/subscriptions-light.webp` and `build/subscriptions-dark.webp` |
+| **Open** | `https://dashboard.lomi.africa/{your-org-id}/customers/subscriptions/{subscription-id}` |
+| **Show** | One subscription detail: plan name, **status** (active/trialing), customer, billing period / next charge. |
+| **Chrome** | Detail panel centered in frame. |
+
+---
+
+## 11. Customer portal
+
+| | |
+| --- | --- |
+| **Save as** | `build/customer-portal-light.webp` and `build/customer-portal-dark.webp` |
+| **Open** | https://customers.lomi.africa — **after** launch-session login (not the OTP/email gate) |
+| **Show** | **Payments** or **Subscriptions** tab with **≥1 row** (invoice, payment, or subscription). |
+
+---
+
+## 12. Lomi UI (docs preview)
+
+| | |
+| --- | --- |
+| **Save as** | `build/lomi-ui-light.webp` and `build/lomi-ui-dark.webp` |
+| **Open** | https://docs.lomi.africa/build/lomi-ui/components/payment-provider-selector#preview |
+| **Show** | **“Preview”** heading + **Payment Provider Selector** demo (Wave, MTN, Orange, π-SPI, Card radios). |
+| **Theme** | Use the **docs** theme toggle — not checkout theme. |
+| **Framing** | Scroll so Preview block + heading fit the 16:9 crop. |
+
+---
+
+## Which docs pages use each image?
+
+| Files | MDX pages |
+| --- | --- |
+| `start/create-account` | `start/create-account` (EN + FR) |
+| `start/api-keys` | `start/api-keys` (EN + FR) |
+| `start/hosted-checkout` | `start/first-payment` (EN + FR) |
+| `build/choose-integration` | `build/choose-integration` (EN + FR) |
+| `build/payment-links` | `build/payment-links` (EN + FR) |
+| `build/mobile-money` | `build/mobile-money` (EN + FR) |
+| `build/cards` | `build/cards` (EN + FR) |
+| `build/balance` | `build/balance-and-settlement` (EN + FR) |
+| `build/payouts` | `build/payouts` (EN + FR) |
+| `build/subscriptions` | `build/subscriptions` (EN + FR) |
+| `build/customer-portal` | `build/customer-portal` (EN + FR) |
+| `build/lomi-ui` | `build/lomi-ui/index` |
+
+Component in docs: `<DocsScreenshot name="start/create-account" alt="…" />` — `name` matches the path **without** `-light`/`-dark`.

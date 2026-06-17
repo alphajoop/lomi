@@ -1,0 +1,29 @@
+---
+title: 'Comment accepter Orange Money ?'
+description: 'Orange Money et flux mobile money UEMOA via checkout hébergé.'
+docType: how-to
+---
+
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Orange Money est disponible via **checkout hébergé** et **liens de paiement** lorsque le prestataire est activé pour votre organisation.
+
+## Intégration recommandée
+
+1. [Checkout hébergé](/build/checkout) ou [liens](/build/payment-links) avec `currency_code: "XOF"`.
+2. Le client choisit Orange Money.
+3. Approbation sur appareil (USSD ou app).
+4. [Vérification serveur](/build/guides/verify-payments) avant livraison.
+
+Les charges directes `POST /charge/*` ne sont pas le chemin par défaut pour Orange Money.
+
+## Comportement asynchrone
+
+Affichez **en attente** jusqu’à `transaction_status: completed`.
+
+## Voir aussi
+
+- [Hub moyens de paiement](/build/guides/payment-methods)
+- [SPI](/build/payment-methods/spi)

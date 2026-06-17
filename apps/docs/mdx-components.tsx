@@ -18,6 +18,7 @@ import { PricingTable } from '@/components/lomi-ui/pricing-table';
 import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';
 import { UsageMeter } from '@/components/lomi-ui/usage-meter';
 import { DocsScreenshot } from '@/components/docs/docs-screenshot';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -40,6 +41,7 @@ export function getMDXComponents(components?: MDXComponents) {
     SubscriptionManagementCard,
     UsageMeter,
     DocsScreenshot,
+    DocsAgentIndex,
     ...components,
   } satisfies MDXComponents;
 }

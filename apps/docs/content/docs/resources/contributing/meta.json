@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "index",
+    "writing-for-lomi-docs",
+    "api-reference-authoring",
+    "best-practices",
+    "branching-strategy",
+    "code-of-conduct",
+    "code-reviews",
+    "using-cli",
+    "versioning"
+  ]
+}

@@ -1,0 +1,43 @@
+---
+title: 'How do I accept MTN MoMo payments?'
+description: 'MTN Mobile Money across CI and regional markets—hosted checkout, POST /charge/mtn, and country codes.'
+docType: how-to
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+MTN MoMo supports multiple countries beyond UEMOA. Use [hosted checkout](/build/checkout) unless you need `POST /charge/mtn`.
+
+## Direct charge essentials
+
+- Pass `phone_number` in E.164 format (e.g. `+2250700000000`).
+- Pass `countryCode` (ISO 3166-1 alpha-2) when the payer is outside CI—default is `CI`.
+- **Live:** response status is `PENDING` until the customer approves on their phone.
+- **Test:** with a test API key, status may be `completed` immediately.
+
+See [Charges API — MTN](/api/charge/ChargesController_createMtnCharge).
+
+## Supported countries
+
+Full dial-prefix and MTN environment table: [Payment methods hub](/build/guides/payment-methods#mtn-momo--supported-countries).
+
+Sandbox MSISDN patterns and test behavior: [Sandbox payments — MTN](/start/sandbox-payments).
+
+## Verify before fulfill
+
+<Callout type="warn">
+  Live MTN flows are **asynchronous**. Poll `GET /transactions/{id}` or use webhooks; see [Verify payments](/build/guides/verify-payments).
+</Callout>
+
+## Refunds
+
+Live MTN refunds require the original payment’s provider reference and may use the Disbursement API asynchronously. Test refunds are ledger-only. See [Refunds](/build/refunds).
+
+## Related
+
+- [MTN MoMo developer portal](https://momodeveloper.mtn.com/)
+- [Mobile money](/build/mobile-money)
+- [Direct charges](/build/direct-charges)

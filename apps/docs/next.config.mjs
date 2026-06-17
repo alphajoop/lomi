@@ -68,7 +68,39 @@ function legacyDocsRedirects() {
     },
     {
       source: '/core/fundamentals/:path*',
-      destination: '/build/fundamentals/:path*',
+      destination: '/start/integration-journey',
+    },
+    {
+      source: '/build/fundamentals',
+      destination: '/start/integration-journey',
+    },
+    {
+      source: '/build/fundamentals/create-account',
+      destination: '/start/create-account',
+    },
+    {
+      source: '/build/fundamentals/access-tokens',
+      destination: '/start/api-keys',
+    },
+    {
+      source: '/build/fundamentals/webhooks',
+      destination: '/build/webhooks',
+    },
+    {
+      source: '/build/fundamentals/transactions',
+      destination: '/build/transactions',
+    },
+    {
+      source: '/build/fundamentals/:path*',
+      destination: '/start/integration-journey',
+    },
+    {
+      source: '/build/payment-channels',
+      destination: '/build/guides/payment-methods',
+    },
+    {
+      source: '/build/payment-channels/:path*',
+      destination: '/build/guides/payment-methods',
     },
     {
       source: '/core/advanced-guides/:path*',

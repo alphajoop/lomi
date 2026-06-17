@@ -1,39 +1,43 @@
 ---
 title: Payment state machine
 description: How transaction and provider statuses transition, expire, and map to balances.
+docType: explanation
 ---
 
-This page is the canonical behavior reference for payment lifecycle logic in lomi. It aligns with server-side functions in `create_transaction`, `update_transaction_status`, expiration jobs, and balance updates.
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+Canonical behavior reference for payment lifecycle logic in lomi. For implementation details (database functions, jobs), see [For contributors](#for-contributors).
+
+## Money-in lifecycle
+
+```mermaid
+stateDiagram-v2
+  [*] --> pending: live payment initiated
+  [*] --> completed: test payment (sandbox)
+  pending --> completed: provider confirms success
+  pending --> failed: provider decline or hard failure
+  pending --> expired: timeout or session expiry
+  completed --> refunded: refund processed
+  failed --> [*]
+  expired --> [*]
+  refunded --> [*]
+```
+
+In **test**, new payments often start as `completed` immediately. In **live**, they typically start `pending` until the customer approves mobile money or the card issuer confirms.
 
 ## Transaction statuses
-
-Common `transaction_status` values you will see:
 
 | Status | Meaning |
 | --- | --- |
 | `pending` | Payment initiated; final outcome not yet confirmed (typical in **live**). |
-| `completed` | Payment succeeded; merchant balance and fees are settled per platform rules. |
+| `completed` | Payment succeeded; merchant balance and fees settle per platform rules. |
 | `failed` | Payment did not succeed (including some expiration paths). |
-| `expired` | Pending payment timed out (alternative to `failed`, depending on expiration job used). |
+| `expired` | Pending payment timed out. |
 | `refunded` | Refund processed against the original payment. |
-
-### Test vs live
-
-When a transaction is created:
-
-- In **test** environment, status may be **`completed` immediately** (no asynchronous provider confirmation).
-- In **live** environment, new payments typically start **`pending`** until the provider confirms success.
-
-## Status updates: idempotency and metadata
-
-When status moves to `completed`:
-
-- **Duplicate completion is ignored** for the balance path: if completion is attempted again, the row is still updated with **merged** metadata (new provider IDs are preserved), but balance is not double-applied.
-- **Metadata is merged**, not replaced, so webhook retries can append fields safely.
 
 ## Provider-facing status mapping
 
-Platform `transaction_status` is reflected in `provider_payment_status` on linked provider records, for example:
+Platform `transaction_status` is reflected in `provider_payment_status` on linked provider records:
 
 | Transaction status | Provider payment status |
 | --- | --- |
@@ -43,29 +47,41 @@ Platform `transaction_status` is reflected in `provider_payment_status` on linke
 | `expired` | `expired` |
 | `refunded` | `refunded` |
 
-Exact field names in API responses follow your OpenAPI / resource models; see [Transactions](/build/transactions).
+See [Transactions](/build/transactions) for field names in API responses.
+
+## Status updates: idempotency and metadata
+
+When status moves to `completed`:
+
+- **Duplicate completion** does not double-apply balance: metadata is merged, but balance is credited once.
+- **Metadata is merged**, not replaced, so webhook retries can append fields safely.
 
 ## Pending expiration
 
 Pending transactions can be expired by scheduled jobs:
 
 - By **age** (e.g. older than N hours).
-- Optionally also by **provider session expiry** (e.g. Wave session `when_expires`), depending on which expiration function is used.
+- Optionally by **provider session expiry** (e.g. Wave session `when_expires`).
 
 Expired rows carry `expiration_info` in metadata describing why they closed.
 
 ## What happens on `completed`
 
-In order:
+1. **Coupon usage** may be incremented.
+2. **Balances** update via an idempotent path (`metadata.balance_updated` prevents double crediting).
+3. **Subscriptions** linked to the transaction may move from `pending` to `active`.
 
-1. **Coupon usage** may be incremented for completed transactions.
-2. **Balances** are updated via a single idempotent path that checks `metadata.balance_updated` to avoid double crediting.
-3. **Subscriptions** linked to the transaction may move from `pending` to `active` when applicable.
-
-For balance and availability timing, see [Balance and settlement](/build/balance-and-settlement).
+For balance timing, see [Balance and settlement](/build/balance-and-settlement).
 
 ## Related guides
 
+- [Payment lifecycle (Build)](/build/guides/payment-lifecycle)
+- [Verify payments](/build/guides/verify-payments)
 - [Checkout behavior](/build/payments/checkout-behavior)
 - [Handling webhooks](/build/advanced-guides/handling-webhooks)
-- [Webhook reliability](/build/advanced-guides/webhook-reliability)
+
+<Accordions type="single">
+  <Accordion title="For contributors" id="for-contributors">
+    Server-side alignment: `create_transaction`, `update_transaction_status`, expiration jobs, and balance updates in `apps/api`. When changing status semantics, update this page and run `pnpm docs:drift` in `apps/docs`.
+  </Accordion>
+</Accordions>

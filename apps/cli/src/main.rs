@@ -64,6 +64,8 @@ enum Commands {
     Update(commands::update::UpdateArgs),
     /// Install and update Lomi UI checkout components
     Ui(commands::ui::UiArgs),
+    /// Documentation lint and drift checks (monorepo apps/docs)
+    Docs(commands::docs_cmd::DocsArgs),
     /// List all CLI profiles
     ListProfiles(commands::list_profiles::ListProfilesArgs),
     /// Switch the default CLI profile
@@ -96,6 +98,7 @@ async fn main() -> Result<()> {
         Commands::InstallRules(args) => commands::install_rules::run(&cli.common, args).await,
         Commands::Update(args) => commands::update::run(&cli.common, args).await,
         Commands::Ui(args) => commands::ui::run(&cli.common, args).await,
+        Commands::Docs(args) => commands::docs_cmd::run(&cli.common, args).await,
         Commands::ListProfiles(args) => commands::list_profiles::run(&cli.common, args).await,
         Commands::Switch(args) => commands::switch::run(&cli.common, args).await,
     }

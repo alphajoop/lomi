@@ -1,0 +1,45 @@
+---
+title: 'Comment accepter les paiements par carte ?'
+description: 'Cartes sur checkout hébergé et Payment Elements embarqués via POST /charge/card.'
+docType: how-to
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsScreenshot } from '@/components/docs/docs-screenshot';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Les cartes fonctionnent en **checkout hébergé** (le plus rapide) ou en flux embarqué avec [Payment Elements](/build/payments/lomi-payment-elements) et `POST /charge/card`.
+
+<DocsScreenshot name="build/cards" alt="Formulaire carte sur le checkout hébergé lomi." />
+
+## Checkout hébergé (recommandé)
+
+1. Créez une session checkout.
+2. Le client choisit **Carte** sur la page lomi.
+3. Gérez la 3D Secure si nécessaire.
+4. Vérifiez via webhooks avant livraison.
+
+## Charge carte embarquée
+
+1. `POST /charge/card` → `client_secret`.
+2. Confirmez avec Payment Elements.
+3. Webhook ou polling pour le statut final.
+
+Voir [Cartes](/build/cards) et [API Charges](/api/charge/ChargesController_createCardCharge).
+
+## Cartes test
+
+| PAN | Comportement |
+| --- | --- |
+| `4242 4242 4242 4242` | Succès |
+| Autres | [Bac à sable — cartes](/start/sandbox-payments#testing-card-payments) |
+
+<Callout type="warn">
+  N’utilisez jamais de vraies cartes en test ni de numéros test en live.
+</Callout>
+
+## Voir aussi
+
+- [Vérifier les paiements](/build/guides/verify-payments)

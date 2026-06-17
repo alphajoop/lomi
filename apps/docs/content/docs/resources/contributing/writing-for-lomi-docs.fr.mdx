@@ -1,0 +1,54 @@
+---
+title: Rédiger la doc lomi.
+description: Contrat éditorial pour guides, pages API et documentation orientée agents sur docs.lomi.africa.
+docType: explanation
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Contrat **canonique** pour la documentation développeur lomi. : types Diátaxis, voix, marque et règles d’intégration.
+
+<Callout type="info">
+  Agents : `lomi install-rules` (règle **Docs writing**). Lisez [llms.txt](https://docs.lomi.africa/llms.txt) avant d’intégrer.
+</Callout>
+
+## Marque
+
+| Contexte | Forme |
+| --- | --- |
+| Produit | **lomi.** (point final) |
+| Package npm | `@lomi./sdk` |
+| Domaines | `lomi.africa`, `docs.lomi.africa` (sans point final) |
+
+## Types Diátaxis
+
+`docType` dans le frontmatter : `tutorial` | `how-to` | `explanation` | `reference`.
+
+## Voix
+
+- Directe, centrée marchand, présent de l’indicatif.
+- Titres orientés question pour les guides Build.
+- Pas d’adjectifs vagues sans comportement concret.
+
+## Vérités d’intégration
+
+- Montants **XOF** en **centimes** (entiers).
+- L’**environnement suit la clé API**, pas seulement l’URL.
+- Mobile money **live** = asynchrone ; webhooks + `GET /transactions/{id}`.
+- Ne jamais faire confiance au seul succès côté client.
+
+## Bilingue
+
+Nouvelles pages sous `start/`, `build/guides/`, `build/payment-methods/` : `.mdx` + `.fr.mdx`.
+
+## Contrôles
+
+```bash
+cd apps/docs && pnpm lint && pnpm docs:drift
+lomi docs check
+```
+
+## Voir aussi
+
+- [Rédaction API](/resources/contributing/api-reference-authoring)
+- [Installer les règles agent](/build/cli/install-rules)

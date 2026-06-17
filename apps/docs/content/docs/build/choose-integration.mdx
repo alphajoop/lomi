@@ -1,9 +1,13 @@
 ---
 title: 'Which payment integration should I choose?'
 description: 'Choose between hosted checkout, payment links, payment requests, direct charges, subscriptions, ecommerce extensions, and UI components.'
+docType: explanation
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
 
 Choose the simplest integration that gives your customer the right payment experience. You can combine multiple lomi. products later.
 
@@ -25,10 +29,21 @@ Choose the simplest integration that gives your customer the right payment exper
 | Customer self-service (billing, subscriptions) | [Customer portal](/build/customer-portal) | Hosted portal for payment history, plan changes, and cancellations |
 | Store plugin checkout | [E-commerce extensions](/build/ecommerce-extensions) | Good for WooCommerce, Magento, PrestaShop, and Shopify |
 | Copy-paste checkout UI | [Lomi UI](/build/lomi-ui) | Good when you want UI primitives inside your app |
-| Compare channels by country | [Payment channels](/build/payment-channels) | Wave, MTN, cards, and test vs live behavior |
+| Compare channels by country | [Payment methods](/build/guides/payment-methods) | Wave, MTN, cards, and test vs live behavior |
 | Server-side Wave / MTN / card | [Direct charges](/build/direct-charges) | When you own the payment UI end-to-end |
 
 <DocsScreenshot name="build/choose-integration" alt="Hosted checkout payment method selection (Wave, MTN, cards, and more)" />
+
+## Product comparison
+
+| | Hosted checkout | Embed widget | Payment links | Payment requests | Direct charges | Subscriptions | E-commerce plugins | Lomi UI |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Dev effort** | Low | Low | Low | Medium | High | Medium | Low | Medium |
+| **UI control** | lomi.-hosted | iframe on your site | lomi.-hosted | Your app + hosted pay step | Full (you build UI) | Hosted signup | Store-native | Primitives in your app |
+| **Speed to market** | High | High | High | Medium | Low | Medium | High | Medium |
+| **Mobile money async** | Handled on hosted page | Same as hosted | Same | Same | You handle pending UX | Hosted flow | Plugin-dependent | You compose |
+| **Webhooks required** | Recommended | Recommended | Recommended | Recommended | Required (live) | Required | Recommended | Recommended |
+| **No-code dashboard** | Sessions + catalog | — | Yes | Partial | — | Plans + links | Yes | — |
 
 ## Recommended first choice
 
@@ -48,7 +63,9 @@ Every serious integration should include:
 
 ## Next steps
 
+- [Integration journey](/start/integration-journey)
 - [Make a test payment](/start/first-payment)
+- [Verify payments](/build/guides/verify-payments)
 - [Hosted checkout](/build/checkout)
 - [Webhooks](/build/webhooks)
 - [API Reference](/api)

@@ -1,0 +1,68 @@
+---
+title: 'Which payment methods does lomi. support?'
+description: 'Country, currency, and channel matrix for hosted checkout and direct charges in francophone West Africa and MTN markets.'
+docType: explanation
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Use this page to confirm which rails and currencies you can offer before you pick an integration path. For per-channel flows, see the [payment channel guides](/build/payment-methods/wave).
+
+<Callout type="info">
+  Exact availability depends on your organization's enabled providers in the dashboard. Contact support if a channel you need is not active.
+</Callout>
+
+## Recommended path by channel
+
+| Channel | Hosted checkout / links | Direct API | Deep dive |
+| --- | --- | --- | --- |
+| Cards | Yes | `POST /charge/card` | [Cards](/build/payment-methods/cards) |
+| Wave | Yes | `POST /charge/wave` | [Wave](/build/payment-methods/wave) |
+| MTN MoMo | Yes | `POST /charge/mtn` | [MTN MoMo](/build/payment-methods/mtn-momo) |
+| Orange Money, SPI | Yes (hosted) | Prefer hosted | [Orange Money](/build/payment-methods/orange-money), [SPI](/build/payment-methods/spi) |
+
+**Default:** hosted checkout or payment links. Direct charges when you own the payment UI and understand rail-specific async behavior.
+
+## Markets and currencies
+
+| Region / focus | Primary currencies | Mobile money | Cards |
+| --- | --- | --- | --- |
+| UEMOA (Wave-first) | `XOF` | Wave | Yes |
+| MTN MoMo countries | `XOF`, `XAF`, `GHS`, `UGX`, `ZMW`, `NGN`, `ZAR`, … | MTN MoMo | Yes (where enabled) |
+| International cards | `USD`, `EUR` (product-dependent) | — | Yes |
+
+## MTN MoMo — supported countries
+
+| Country | Dial prefix | MTN target environment |
+| --- | --- | --- |
+| Côte d'Ivoire (CI) | `+225` | `mtnivorycoast` |
+| Cameroon (CM) | `+237` | `mtncameroon` |
+| Ghana (GH) | `+233` | `mtnghana` |
+| Uganda (UG) | `+256` | `mtnuganda` |
+| Zambia (ZM) | `+260` | `mtnzambia` |
+| Benin (BJ) | `+229` | `mtnbenin` |
+| Congo (CG) | `+242` | `mtncongo` |
+| Eswatini (SZ) | `+268` | `mtnswaziland` |
+| Guinea (GN) | `+224` | `mtnguineaconakry` |
+| South Africa (ZA) | `+27` | `mtnsouthafrica` |
+| Liberia (LR) | `+231` | `mtnliberia` |
+| Nigeria (NG) | `+234` | `mtnnigeria` |
+
+## Test vs live
+
+| | Test | Live |
+| --- | --- | --- |
+| API base | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
+| MTN direct charge | Often `completed` immediately | `PENDING` until customer approves |
+| Webhooks | `environment: "test"` | `environment: "live"` |
+
+## Related
+
+- [Which integration should I choose?](/build/choose-integration)
+- [Mobile money](/build/mobile-money)
+- [Direct charges](/build/direct-charges)
+- [Sandbox payments](/start/sandbox-payments)
+- [Providers API](/api/providers/ProvidersController_findAll)

@@ -1,5 +1,6 @@
 pub mod checkout;
 pub mod dev;
+pub mod docs_cmd;
 pub mod init;
 pub mod install_rules;
 pub mod listen;

@@ -1,9 +1,13 @@
 ---
 title: 'Integration journey'
 description: 'Step-by-step path from sandbox account to live payments: keys, integration choice, testing, webhooks, and go-live.'
+docType: tutorial
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
 
 Follow this guide before you write production code. Each step links to the detailed page—this page is the map, not the manual.
 
@@ -34,7 +38,7 @@ lomi. supports multiple integration options depending on your stack:
 | Server-initiated mobile money or embedded cards | [Direct charges](/build/direct-charges) |
 | Recurring billing | [Subscriptions](/build/subscriptions) via checkout or links |
 
-Most teams should start with **hosted checkout**. Use [Which payment integration should I choose?](/build/choose-integration) and the [payment channels matrix](/build/payment-channels) to confirm Wave, MTN, and card coverage for your markets.
+Most teams should start with **hosted checkout**. Use [Which payment integration should I choose?](/build/choose-integration) and the [payment methods hub](/build/guides/payment-methods) to confirm Wave, MTN, and card coverage for your markets.
 
 ## Step 3 — Test end-to-end
 
@@ -62,6 +66,7 @@ When sandbox flows pass your checklist:
 
 ## Next steps
 
-- [API Reference](/api)
+- [Verify payments](/build/guides/verify-payments)
+- [Payment lifecycle](/build/guides/payment-lifecycle)
 - [CLI quickstart](/start/cli-quickstart)
 - [Payment state machine](/api/payment-state-machine)
