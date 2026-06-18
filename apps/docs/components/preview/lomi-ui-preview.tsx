@@ -1,12 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import { cn } from '@/lib/utils/cn';
 
 type LomiUiPreviewVariant = 'checkout' | 'panel' | 'theme';
-
-function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(' ');
-}
 
 export interface LomiUiPreviewProps {
   children: React.ReactNode;
@@ -14,6 +11,9 @@ export interface LomiUiPreviewProps {
   className?: string;
   innerClassName?: string;
 }
+
+const previewInnerBase =
+  'flex w-full flex-col items-center justify-center *:mx-auto *:max-w-full';
 
 export function LomiUiPreview({
   children,
@@ -30,10 +30,11 @@ export function LomiUiPreview({
     >
       <div
         className={cn(
+          previewInnerBase,
           variant === 'checkout' &&
             'lomi-checkout-ui rounded-sm border border-fd-border/60 bg-white p-4',
           variant === 'panel' &&
-            'flex justify-center rounded-sm border border-fd-border/40 bg-[#121317] p-4',
+            'rounded-sm border border-fd-border/40 bg-[#121317] p-4',
           variant === 'theme' &&
             'rounded-sm border border-fd-border/60 bg-fd-background p-4',
           innerClassName,

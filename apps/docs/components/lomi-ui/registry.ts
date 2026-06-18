@@ -38,13 +38,11 @@ const paymentChannelAssets: LomiUiRegistryAsset[] = [
   type: 'registry:file' as const,
 }));
 
-const placeholderAssets: LomiUiRegistryAsset[] = ['card.webp'].map(
-  (file) => ({
-    path: `public/placeholder/${file}`,
-    target: `public/placeholder/${file}`,
-    type: 'registry:file' as const,
-  }),
-);
+const placeholderAssets: LomiUiRegistryAsset[] = ['card.webp'].map((file) => ({
+  path: `public/placeholder/${file}`,
+  target: `public/placeholder/${file}`,
+  type: 'registry:file' as const,
+}));
 
 export const lomiUiRegistry: {
   dir: string;

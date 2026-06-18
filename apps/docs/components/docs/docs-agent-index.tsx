@@ -46,9 +46,8 @@ export async function DocsAgentIndex({
     <aside className="docs-agent-index not-prose" aria-label={copy.title}>
       <p className="docs-agent-index-text">
         <span className="docs-agent-index-label">{copy.title}</span>
-        {copy.beforeUrl}{' '}
-        <a href={`${origin}/llms.txt`}>{origin}/llms.txt</a> {copy.between}{' '}
-        <InlineCommand>{copy.command}</InlineCommand>
+        {copy.beforeUrl} <a href={`${origin}/llms.txt`}>{origin}/llms.txt</a>{' '}
+        {copy.between} <InlineCommand>{copy.command}</InlineCommand>
         {copy.after}
       </p>
     </aside>

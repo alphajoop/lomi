@@ -115,8 +115,7 @@ export function PaymentProviderSelector({
       : internalSelectedProvider;
 
   const availableProviders = React.useMemo(
-    () =>
-      providers.filter((provider) => provider !== 'spi' || spiOperational),
+    () => providers.filter((provider) => provider !== 'spi' || spiOperational),
     [providers, spiOperational],
   );
 

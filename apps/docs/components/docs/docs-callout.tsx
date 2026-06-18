@@ -41,9 +41,7 @@ export function DocsCallout({
 
   const asideIcon =
     icon ??
-    (emoji ? (
-      <span className="text-sm leading-none">{emoji}</span>
-    ) : undefined);
+    (emoji ? <span className="text-sm leading-none">{emoji}</span> : undefined);
 
   return (
     <DocsAside

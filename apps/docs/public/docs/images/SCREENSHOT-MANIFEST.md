@@ -89,13 +89,13 @@ Copy this list and tick as you go:
 
 ## 4. Choose integration (provider picker)
 
-|                 |                                                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **Save as**     | `build/choose-integration-light.webp` and `build/choose-integration-dark.webp`                                                      |
-| **Open**        | Same sandbox checkout session as above                                                                                              |
+|                 |                                                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Save as**     | `build/choose-integration-light.webp` and `build/choose-integration-dark.webp`                                              |
+| **Open**        | Same sandbox checkout session as above                                                                                      |
 | **Show**        | Step where the customer **picks a payment method** — **Wave, MTN, SPI, Card** (or your enabled subset) as selectable tiles. |
-| **Do not show** | Card number / expiry / CVC fields — that is shot #7, not this one.                                                                  |
-| **Framing**     | Crop tighter on the **provider picker** if needed.                                                                                  |
+| **Do not show** | Card number / expiry / CVC fields — that is shot #7, not this one.                                                          |
+| **Framing**     | Crop tighter on the **provider picker** if needed.                                                                          |
 
 ---
 
@@ -178,13 +178,13 @@ Copy this list and tick as you go:
 
 ## 12. lomi. UI (docs preview)
 
-|             |                                                                                                     |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| **Save as** | `build/lomi-ui-light.webp` and `build/lomi-ui-dark.webp`                                            |
-| **Open**    | https://docs.lomi.africa/build/lomi-ui/quick-start#payment-provider-selector                 |
+|             |                                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| **Save as** | `build/lomi-ui-light.webp` and `build/lomi-ui-dark.webp`                                    |
+| **Open**    | https://docs.lomi.africa/build/lomi-ui/quick-start#payment-provider-selector                |
 | **Show**    | **“Preview”** heading + **Payment Provider Selector** demo (Wave, MTN, π-SPI, Card radios). |
-| **Theme**   | Use the **docs** theme toggle — not checkout theme.                                                 |
-| **Framing** | Scroll so Preview block + heading fit the 16:9 crop.                                                |
+| **Theme**   | Use the **docs** theme toggle — not checkout theme.                                         |
+| **Framing** | Scroll so Preview block + heading fit the 16:9 crop.                                        |
 
 ---
 

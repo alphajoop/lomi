@@ -26,11 +26,17 @@ export function DocsAside({
 }: DocsAsideProps) {
   return (
     <div
-      className={cn('docs-aside not-prose', `docs-aside--${variant}`, className)}
+      className={cn(
+        'docs-aside not-prose',
+        `docs-aside--${variant}`,
+        className,
+      )}
       {...props}
     >
       {icon ? (
-        <div className="docs-aside-icon" aria-hidden="true">{icon}</div>
+        <div className="docs-aside-icon" aria-hidden="true">
+          {icon}
+        </div>
       ) : null}
       <div className="min-w-0 flex-1">
         {title ? <p className="docs-aside-title">{title}</p> : null}

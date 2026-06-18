@@ -2,6 +2,8 @@
 
 'use client';
 
+import { useRef } from 'react';
+import { Check, Clipboard } from 'lucide-react';
 import {
   Tabs,
   TabsContent,
@@ -9,6 +11,9 @@ import {
   TabsTrigger,
 } from 'fumadocs-ui/components/tabs.unstyled';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import { buttonVariants } from 'fumadocs-ui/components/ui/button';
+import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
+import { cn } from '@/lib/utils/cn';
 
 const codeThemes = {
   light: 'github-light',
@@ -16,16 +21,52 @@ const codeThemes = {
 } as const;
 
 function InstallCommand({ code }: { code: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [checked, onCopy] = useCopyButton(() => {
+    const pre = containerRef.current?.querySelector('pre');
+    navigator.clipboard.writeText(pre?.textContent ?? code);
+  });
+
   return (
-    <DynamicCodeBlock
-      lang="bash"
-      code={code}
-      codeblock={{
-        keepBackground: true,
-        className: 'my-0 rounded-none border-0 bg-transparent shadow-none',
-      }}
-      options={{ themes: codeThemes }}
-    />
+    <div
+      ref={containerRef}
+      className="docs-installation-code relative overflow-x-auto bg-zinc-100 px-4 py-2.5 pr-10 text-[0.8125rem] dark:bg-zinc-800"
+    >
+      <button
+        type="button"
+        data-checked={checked || undefined}
+        aria-label={checked ? 'Copied command' : 'Copy command'}
+        className={cn(
+          buttonVariants({
+            className:
+              'absolute top-1.5 right-2 hover:text-fd-accent-foreground data-checked:text-fd-accent-foreground',
+            size: 'icon-xs',
+          }),
+        )}
+        onClick={onCopy}
+      >
+        {checked ? <Check /> : <Clipboard />}
+      </button>
+      <DynamicCodeBlock
+        lang="bash"
+        code={code}
+        options={{
+          themes: codeThemes,
+          components: {
+            pre: (props) => (
+              <pre
+                {...props}
+                className={cn(
+                  'min-w-full w-max m-0! bg-transparent! p-0!',
+                  '[&_.line]:px-0!',
+                  props.className,
+                )}
+              />
+            ),
+          },
+        }}
+      />
+    </div>
   );
 }
 
@@ -72,7 +113,7 @@ export function Installation({ name }: { name: string }) {
         <TabsContent
           key={tab.value}
           value={tab.value}
-          className="mt-0 border-t border-fd-border"
+          className="mt-0 border-t border-fd-border p-0 data-[state=inactive]:hidden"
         >
           <InstallCommand code={commands[tab.value] ?? commands.npx} />
         </TabsContent>

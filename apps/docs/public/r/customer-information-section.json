@@ -4,10 +4,7 @@
   "type": "registry:block",
   "title": "Customer Information Section",
   "description": "Hosted checkout personal information form from customer-information-section.tsx.",
-  "dependencies": [
-    "lucide-react",
-    "react-phone-number-input"
-  ],
+  "dependencies": ["lucide-react", "react-phone-number-input"],
   "files": [
     {
       "path": "components/lomi-ui/customer-information-section.tsx",

@@ -655,7 +655,11 @@ button:active:focus {
 .docs-aside--error .docs-aside-body,
 .docs-aside--success .docs-aside-body,
 .docs-aside--idea .docs-aside-body {
-  color: color-mix(in oklch, var(--color-fd-muted-foreground) 92%, var(--color-fd-foreground));
+  color: color-mix(
+    in oklch,
+    var(--color-fd-muted-foreground) 92%,
+    var(--color-fd-foreground)
+  );
 }
 
 .docs-aside-icon {
@@ -702,7 +706,11 @@ button:active:focus {
   color: var(--color-fd-primary);
   font-weight: 500;
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklch, var(--color-fd-primary) 35%, transparent);
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--color-fd-primary) 35%,
+    transparent
+  );
   text-underline-offset: 2px;
   transition: text-decoration-color 0.15s ease;
 }
@@ -726,7 +734,11 @@ button:active:focus {
   display: inline-block;
   border-radius: calc(var(--radius) - 2px);
   border: 1px solid color-mix(in oklch, var(--color-fd-border) 90%, transparent);
-  background: color-mix(in oklch, var(--color-fd-background) 88%, var(--color-fd-muted));
+  background: color-mix(
+    in oklch,
+    var(--color-fd-background) 88%,
+    var(--color-fd-muted)
+  );
   padding: 0.125rem 0.4375rem;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: inherit;
@@ -736,11 +748,13 @@ button:active:focus {
 }
 
 .docs-aside--info {
-  border-left: 2px solid color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
+  border-left: 2px solid
+    color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
 }
 
 .docs-aside--warning {
-  border-left: 2px solid color-mix(in oklch, var(--color-fd-warning) 40%, var(--color-fd-border));
+  border-left: 2px solid
+    color-mix(in oklch, var(--color-fd-warning) 40%, var(--color-fd-border));
 }
 
 .docs-aside--error {
@@ -753,18 +767,21 @@ button:active:focus {
 }
 
 .docs-aside--success {
-  border-left: 2px solid color-mix(in oklch, var(--color-fd-success) 38%, var(--color-fd-border));
+  border-left: 2px solid
+    color-mix(in oklch, var(--color-fd-success) 38%, var(--color-fd-border));
 }
 
 .docs-aside--idea {
-  border-left: 2px solid color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
+  border-left: 2px solid
+    color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
 }
 
 /* Agent / llms.txt index — discreet meta line, not a card */
 .docs-agent-index {
   margin: 0 0 var(--docs-space-block);
   padding-top: 0.5rem;
-  border-top: 1px solid color-mix(in oklch, var(--color-fd-border) 65%, transparent);
+  border-top: 1px solid
+    color-mix(in oklch, var(--color-fd-border) 65%, transparent);
 }
 
 .docs-agent-index-text {
@@ -772,12 +789,20 @@ button:active:focus {
   font-family: var(--font-main);
   font-size: var(--docs-text-size);
   line-height: var(--docs-text-line-height);
-  color: color-mix(in oklch, var(--color-fd-muted-foreground) 94%, var(--color-fd-foreground));
+  color: color-mix(
+    in oklch,
+    var(--color-fd-muted-foreground) 94%,
+    var(--color-fd-foreground)
+  );
 }
 
 .docs-agent-index-label {
   font-weight: 500;
-  color: color-mix(in oklch, var(--color-fd-muted-foreground) 75%, var(--color-fd-foreground));
+  color: color-mix(
+    in oklch,
+    var(--color-fd-muted-foreground) 75%,
+    var(--color-fd-foreground)
+  );
 }
 
 .docs-agent-index-label::after {
@@ -789,7 +814,11 @@ button:active:focus {
 .docs-agent-index-text a {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: color-mix(in oklch, var(--color-fd-muted-foreground) 45%, transparent);
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--color-fd-muted-foreground) 45%,
+    transparent
+  );
   text-underline-offset: 2px;
   transition: text-decoration-color 0.15s ease;
 }
@@ -1065,6 +1094,26 @@ figure.shiki pre {
   box-sizing: border-box;
 }
 
+/*
+ * Language tabs (TypeScript / Python / cURL): full-bleed code.
+ * Fumadocs TabsContent uses p-4 and [&>figure:only-child]:-m-4, but MDX
+ * whitespace nodes break :only-child so the code block never expands.
+ */
+.prose .bg-fd-secondary.my-4 [role='tabpanel']:has(figure.shiki) {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.prose .bg-fd-secondary.my-4 [role='tabpanel']:has(figure.shiki) figure.shiki {
+  margin: 0;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
 /* Let fumadocs/shiki code blocks inside not-prose keep their own theme */
 .prose :where(.not-prose) pre {
   background-color: unset;
@@ -1192,7 +1241,6 @@ article .mt-auto {
 .prose > .not-prose + div.grid {
   margin-top: var(--docs-space-section);
 }
-
 
 /*
 @import 'tailwindcss' source(none);

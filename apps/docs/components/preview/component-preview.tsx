@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 
 export interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
@@ -16,11 +17,11 @@ export function ComponentPreview({
 
   return (
     <div
-      className={`not-prose relative flex flex-col rounded-sm border overflow-hidden transition-colors ${
-        isDarkMode
-          ? 'dark border-border bg-background'
-          : 'border-border bg-background'
-      } ${className || ''}`}
+      className={cn(
+        'not-prose relative flex flex-col overflow-hidden rounded-sm border border-border bg-background transition-colors',
+        isDarkMode && 'dark',
+        className,
+      )}
       {...props}
     >
       <div className="flex items-center justify-end border-b border-border bg-muted/20 p-2">
@@ -37,8 +38,10 @@ export function ComponentPreview({
           )}
         </button>
       </div>
-      <div className="flex min-h-[350px] w-full items-center justify-center p-10">
-        <div className="w-full flex justify-center">{children}</div>
+      <div className="flex min-h-[350px] w-full items-center justify-center p-6 md:p-10">
+        <div className="mx-auto flex w-full flex-col items-center *:mx-auto *:max-w-full">
+          {children}
+        </div>
       </div>
     </div>
   );
