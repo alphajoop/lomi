@@ -15,6 +15,7 @@ export function CustomerInformationSectionDemo() {
     <LomiUiPreview variant="checkout" innerClassName="flex justify-center">
       <CustomerInformationSection
         className="w-full max-w-sm"
+        defaultCountry="CI"
         fullName={fullName}
         email={email}
         phoneNumber={phoneNumber}

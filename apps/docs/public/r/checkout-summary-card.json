@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "checkout-summary-card",
   "type": "registry:block",
-  "title": "Checkout Summary Card",
+  "title": "Checkout summary card",
   "description": "Dark hosted-checkout product summary panel from the left checkout column.",
   "files": [
     {

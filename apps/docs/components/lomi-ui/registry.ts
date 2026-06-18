@@ -58,7 +58,7 @@ export const lomiUiRegistry: {
   items: [
     {
       name: 'payment-provider-selector',
-      title: 'Payment Provider Selector',
+      title: 'Payment provider selector',
       description:
         'Hosted-checkout payment method carousel for Wave, MTN, cards, and SPI.',
       files: [
@@ -87,7 +87,7 @@ export const lomiUiRegistry: {
     },
     {
       name: 'customer-information-section',
-      title: 'Customer Information Section',
+      title: 'Customer information section',
       description:
         'Hosted checkout personal information form from customer-information-section.tsx.',
       dependencies: ['lucide-react', 'react-phone-number-input'],
@@ -137,7 +137,7 @@ export const lomiUiRegistry: {
     },
     {
       name: 'mobile-money-checkout-card',
-      title: 'Mobile Money Checkout Card',
+      title: 'Mobile money checkout card',
       description:
         'Provider selection, customer form, and pay button aligned with hosted checkout.',
       dependencies: ['lucide-react', 'react-phone-number-input'],
@@ -216,7 +216,7 @@ export const lomiUiRegistry: {
     },
     {
       name: 'checkout-summary-card',
-      title: 'Checkout Summary Card',
+      title: 'Checkout summary card',
       description:
         'Dark hosted-checkout product summary panel from the left checkout column.',
       files: [
@@ -234,7 +234,7 @@ export const lomiUiRegistry: {
     },
     {
       name: 'price-selector',
-      title: 'Price Selector',
+      title: 'Price selector',
       description:
         'Hosted checkout billing cycle selector for the dark product panel.',
       files: [
@@ -252,7 +252,7 @@ export const lomiUiRegistry: {
     },
     {
       name: 'usage-meter',
-      title: 'Usage Meter',
+      title: 'Usage meter',
       description:
         'Track usage limits for checkout sessions, webhooks, payouts, or subscriptions.',
       files: [

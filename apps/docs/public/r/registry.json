@@ -7,39 +7,45 @@
     {
       "name": "payment-provider-selector",
       "type": "registry:block",
-      "title": "Payment Provider Selector",
+      "title": "Payment provider selector",
       "description": "Hosted-checkout payment method carousel for Wave, MTN, cards, and SPI."
     },
     {
       "name": "customer-information-section",
       "type": "registry:block",
-      "title": "Customer Information Section",
+      "title": "Customer information section",
       "description": "Hosted checkout personal information form from customer-information-section.tsx.",
-      "dependencies": ["lucide-react", "react-phone-number-input"]
+      "dependencies": [
+        "lucide-react",
+        "react-phone-number-input"
+      ]
     },
     {
       "name": "mobile-money-checkout-card",
       "type": "registry:block",
-      "title": "Mobile Money Checkout Card",
+      "title": "Mobile money checkout card",
       "description": "Provider selection, customer form, and pay button aligned with hosted checkout.",
-      "dependencies": ["lucide-react", "react-phone-number-input"]
+      "dependencies": [
+        "lucide-react",
+        "react-phone-number-input"
+      ]
     },
     {
       "name": "checkout-summary-card",
       "type": "registry:block",
-      "title": "Checkout Summary Card",
+      "title": "Checkout summary card",
       "description": "Dark hosted-checkout product summary panel from the left checkout column."
     },
     {
       "name": "price-selector",
       "type": "registry:block",
-      "title": "Price Selector",
+      "title": "Price selector",
       "description": "Hosted checkout billing cycle selector for the dark product panel."
     },
     {
       "name": "usage-meter",
       "type": "registry:block",
-      "title": "Usage Meter",
+      "title": "Usage meter",
       "description": "Track usage limits for checkout sessions, webhooks, payouts, or subscriptions."
     }
   ]

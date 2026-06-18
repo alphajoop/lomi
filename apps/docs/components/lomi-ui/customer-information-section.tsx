@@ -48,7 +48,7 @@ export function CustomerInformationSection({
   phoneNumber = '',
   whatsappNumber = '',
   isDifferentWhatsApp = false,
-  defaultCountry,
+  defaultCountry = 'CI',
   isPhoneValid = true,
   onFullNameChange,
   onEmailChange,

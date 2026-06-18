@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "usage-meter",
   "type": "registry:block",
-  "title": "Usage Meter",
+  "title": "Usage meter",
   "description": "Track usage limits for checkout sessions, webhooks, payouts, or subscriptions.",
   "files": [
     {

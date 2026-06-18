@@ -8,7 +8,7 @@ export function PriceSelectorDemo() {
   const [selectedPriceId, setSelectedPriceId] = React.useState('monthly');
 
   return (
-    <LomiUiPreview variant="panel" innerClassName="max-w-md">
+    <LomiUiPreview variant="panel" innerClassName="mx-auto max-w-md">
       <PriceSelector
         selectedPriceId={selectedPriceId}
         onPriceSelect={setSelectedPriceId}
