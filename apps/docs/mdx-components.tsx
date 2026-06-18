@@ -23,11 +23,13 @@ import { UsageMeter } from '@/components/lomi-ui/usage-meter';
 import { DocsScreenshot } from '@/components/docs/docs-screenshot';
 import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 import { InlineCommand } from '@/components/docs/inline-command';
+import { Callout } from '@/components/docs/docs-callout';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...(icons as unknown as MDXComponents),
     ...defaultMdxComponents,
+    Callout,
     ...TabsComponents,
     ...FilesComponents,
     Accordion,

@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { type ComponentProps, type FC, type ReactNode, type JSX } from 'react';
 import * as Twoslash from 'fumadocs-twoslash/ui';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
@@ -160,14 +160,18 @@ function DocsCategory({ url, locale }: { url: string; locale: Language }) {
   const peers = getPageTreePeers(source.getPageTree(locale), url);
   const peersArray = Array.isArray(peers) ? peers : [];
 
+  if (peersArray.length === 0) return null;
+
   return (
-    <Cards>
-      {peersArray.map((peer) => (
-        <Card key={peer.url} title={peer.name} href={peer.url}>
-          {peer.description}
-        </Card>
-      ))}
-    </Cards>
+    <div className="not-prose my-8">
+      <Cards className="gap-4">
+        {peersArray.map((peer) => (
+          <Card key={peer.url} title={peer.name} href={peer.url}>
+            {peer.description}
+          </Card>
+        ))}
+      </Cards>
+    </div>
   );
 }
 

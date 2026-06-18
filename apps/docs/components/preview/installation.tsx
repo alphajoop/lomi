@@ -17,13 +17,15 @@ const codeThemes = {
 
 function InstallCommand({ code }: { code: string }) {
   return (
-    <div className="overflow-hidden rounded-sm border border-fd-border bg-fd-muted/30">
-      <DynamicCodeBlock
-        lang="bash"
-        code={code}
-        options={{ themes: codeThemes }}
-      />
-    </div>
+    <DynamicCodeBlock
+      lang="bash"
+      code={code}
+      codeblock={{
+        keepBackground: true,
+        className: 'my-0 rounded-sm border-fd-border shadow-none',
+      }}
+      options={{ themes: codeThemes }}
+    />
   );
 }
 
@@ -37,7 +39,7 @@ export function Installation({ name }: { name: string }) {
   ];
 
   return (
-    <Tabs className="my-6" defaultValue="npx">
+    <Tabs className="not-prose my-6" defaultValue="npx">
       <TabsList className="flex flex-col gap-3 text-sm items-start p-3 bg-fd-card text-fd-card-foreground rounded-sm border border-fd-border not-prose sm:flex-row">
         <div className="me-auto">
           <p className="font-medium">Install to your codebase</p>
