@@ -75,4 +75,4 @@ Choose the path that matches your UX—not every merchant needs every API. **Pre
 
 **How do I reconcile payments?** Start from [Transactions](https://docs.lomi.africa/api/transactions) and tie provider references to your internal order IDs using metadata on creates.
 
-**How do I write or update docs?** See [Writing for lomi. docs](https://docs.lomi.africa/resources/contributing/writing-for-lomi-docs) and run `lomi docs check` from the monorepo.
+**How do I write or update docs?** See [Writing the docs](https://docs.lomi.africa/resources/contributing/writing-for-lomi-docs) and run `lomi docs check` from the monorepo.
