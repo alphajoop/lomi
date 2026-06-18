@@ -2,5 +2,5 @@
   "title": "E‑commerce",
   "description": "Hosted checkout plugins for WooCommerce, Magento, PrestaShop, and Shopify.",
   "icon": "Store",
-  "pages": ["index", "mcp", "woocommerce", "magento", "prestashop", "shopify"]
+  "pages": ["index", "woocommerce", "magento", "prestashop", "shopify"]
 }

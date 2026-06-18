@@ -38,6 +38,7 @@
     "---Outils---",
     "cli",
     "sdks",
+    "mcp",
     "ecommerce-extensions",
     "lomi-ui"
   ]

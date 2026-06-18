@@ -284,7 +284,7 @@ export async function GET() {
       `- [Payment state machine](${docsOrigin}/api/payment-state-machine) — status transitions and balances`,
     );
   }
-  const mcp = pageBySlugPath(pages, 'build/ecommerce-extensions/mcp');
+  const mcp = pageBySlugPath(pages, 'build/mcp');
   if (mcp) {
     lines.push(`- [${mcp.data.title ?? 'MCP'}](${docsOrigin}${mcp.url})`);
   }

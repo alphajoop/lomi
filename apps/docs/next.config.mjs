@@ -21,6 +21,11 @@ const config = {
         destination: '/build/lomi-ui',
         permanent: true,
       },
+      {
+        source: '/build/ecommerce-extensions/mcp',
+        destination: '/build/mcp',
+        permanent: true,
+      },
     ];
   },
   async rewrites() {
