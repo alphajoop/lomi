@@ -1094,6 +1094,13 @@ figure.shiki pre {
   box-sizing: border-box;
 }
 
+/* Bash/shell: Shiki italicizes the command name (first token) only */
+figure.shiki code.language-bash span[style*='font-style:italic'],
+figure.shiki code.language-shell span[style*='font-style:italic'],
+.docs-installation-code span[style*='font-style:italic'] {
+  font-style: normal !important;
+}
+
 /*
  * Language tabs (TypeScript / Python / cURL): full-bleed code.
  * Fumadocs TabsContent uses p-4 and [&>figure:only-child]:-m-4, but MDX

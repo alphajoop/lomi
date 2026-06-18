@@ -38,10 +38,8 @@ export function ComponentPreview({
           )}
         </button>
       </div>
-      <div className="flex min-h-[350px] w-full items-center justify-center p-6 md:p-10">
-        <div className="mx-auto flex w-full flex-col items-center *:mx-auto *:max-w-full">
-          {children}
-        </div>
+      <div className="flex min-h-[350px] w-full items-center justify-center p-10">
+        <div className="flex w-full justify-center *:mx-auto">{children}</div>
       </div>
     </div>
   );

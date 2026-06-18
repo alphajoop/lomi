@@ -12,8 +12,9 @@ export function CustomerInformationSectionDemo() {
   const [isDifferentWhatsApp, setIsDifferentWhatsApp] = React.useState(false);
 
   return (
-    <LomiUiPreview variant="checkout" innerClassName="max-w-md">
+    <LomiUiPreview variant="checkout" innerClassName="flex justify-center">
       <CustomerInformationSection
+        className="w-full max-w-sm"
         fullName={fullName}
         email={email}
         phoneNumber={phoneNumber}

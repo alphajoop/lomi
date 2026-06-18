@@ -12,8 +12,7 @@ export interface LomiUiPreviewProps {
   innerClassName?: string;
 }
 
-const previewInnerBase =
-  'flex w-full flex-col items-center justify-center *:mx-auto *:max-w-full';
+const previewInnerBase = 'flex justify-center *:mx-auto';
 
 export function LomiUiPreview({
   children,
