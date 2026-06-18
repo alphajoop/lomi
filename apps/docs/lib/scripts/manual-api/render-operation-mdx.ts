@@ -663,8 +663,8 @@ ${curlExample}
 
 ${
   lang === 'fr'
-    ? 'Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.'
-    : 'Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.'
+    ? 'Schémas complets et **Try it** : [référence API](/api).'
+    : 'Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.'
 }
 `;
 }

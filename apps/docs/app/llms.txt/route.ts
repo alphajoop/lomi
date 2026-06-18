@@ -63,7 +63,7 @@ export async function GET() {
     '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, usage billing, or payouts).',
   );
   lines.push(
-    `3. Use the [REST API hub](${docsOrigin}/api/index) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
+    `3. Use the [REST API hub](${docsOrigin}/api) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
   );
   lines.push('');
 
@@ -233,7 +233,7 @@ export async function GET() {
   lines.push('## REST API by domain');
   lines.push('');
   lines.push(
-    `Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](${docsOrigin}/api/index).`,
+    `Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](${docsOrigin}/api).`,
   );
   lines.push('');
   for (const folder of REST_API_SECTION_ORDER) {
@@ -358,7 +358,7 @@ export async function GET() {
   lines.push('## Common questions');
   lines.push('');
   lines.push(
-    `**Where do schemas live?** Use the [REST API](${docsOrigin}/api/index) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
+    `**Where do schemas live?** Use the [REST API](${docsOrigin}/api) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
   );
   const txHub = firstApiPageInFolder(pages, 'transactions');
   if (txHub) {
