@@ -93,7 +93,7 @@ Copy this list and tick as you go:
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | **Save as**     | `build/choose-integration-light.webp` and `build/choose-integration-dark.webp`                                                      |
 | **Open**        | Same sandbox checkout session as above                                                                                              |
-| **Show**        | Step where the customer **picks a payment method** — **Wave, MTN, Orange, SPI, Card** (or your enabled subset) as selectable tiles. |
+| **Show**        | Step where the customer **picks a payment method** — **Wave, MTN, SPI, Card** (or your enabled subset) as selectable tiles. |
 | **Do not show** | Card number / expiry / CVC fields — that is shot #7, not this one.                                                                  |
 | **Framing**     | Crop tighter on the **provider picker** if needed.                                                                                  |
 
@@ -182,7 +182,7 @@ Copy this list and tick as you go:
 | ----------- | --------------------------------------------------------------------------------------------------- |
 | **Save as** | `build/lomi-ui-light.webp` and `build/lomi-ui-dark.webp`                                            |
 | **Open**    | https://docs.lomi.africa/build/lomi-ui/components/payment-provider-selector#preview                 |
-| **Show**    | **“Preview”** heading + **Payment Provider Selector** demo (Wave, MTN, Orange, π-SPI, Card radios). |
+| **Show**    | **“Preview”** heading + **Payment Provider Selector** demo (Wave, MTN, π-SPI, Card radios). |
 | **Theme**   | Use the **docs** theme toggle — not checkout theme.                                                 |
 | **Framing** | Scroll so Preview block + heading fit the 16:9 crop.                                                |
 

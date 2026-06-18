@@ -18,7 +18,11 @@ Use this page to confirm which rails and currencies you can offer before you pic
 | Cards (Visa, Mastercard, Amex, …) | Yes | `POST /charge/card` + Payment Elements |
 | Wave | Yes | `POST /charge/wave` |
 | MTN MoMo | Yes | `POST /charge/mtn` |
-| Orange Money, SPI, bank transfer | Yes (hosted) | Use hosted checkout unless documented otherwise |
+| SPI, bank transfer | Yes (hosted) | Use hosted checkout unless documented otherwise |
+
+<Callout type="info">
+  **Djamo** support for Côte d'Ivoire and Senegal is coming soon.
+</Callout>
 
 **Default:** hosted checkout or payment links. Direct charges when you own the payment UI and understand rail-specific async behavior.
 
