@@ -2,8 +2,8 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "all",
   "type": "registry:block",
-  "title": "Lomi UI Checkout Kit",
-  "description": "All Lomi UI checkout components.",
+  "title": "lomi. UI Checkout Kit",
+  "description": "All lomi. UI checkout components.",
   "registryDependencies": [
     "/r/payment-provider-selector.json",
     "/r/customer-information-section.json",

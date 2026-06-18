@@ -62,7 +62,7 @@ enum Commands {
     InstallRules(commands::install_rules::InstallRulesArgs),
     /// Update @lomi./sdk to the latest version
     Update(commands::update::UpdateArgs),
-    /// Install and update Lomi UI checkout components
+    /// Install and update lomi. UI checkout components
     Ui(commands::ui::UiArgs),
     /// Documentation lint and drift checks (monorepo apps/docs)
     Docs(commands::docs_cmd::DocsArgs),

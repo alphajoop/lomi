@@ -71,7 +71,7 @@ lomi refunds create --transaction-id <id> --amount 5000 --json
 # Create a payment link
 lomi payments create
 
-# Install Lomi UI checkout components
+# Install lomi. UI checkout components
 lomi ui list
 lomi ui add payment-provider-selector
 lomi ui update
@@ -98,7 +98,7 @@ lomi ui update
 | `install-rules` | AI setup wizard: Cursor, Claude Code, Codex, llms.txt |
 | `payments create` | Create a payment link interactively |
 | `update` | Update `@lomi./sdk` in the current project |
-| `ui list` / `ui add` / `ui update` | Install Lomi UI components from docs registry (no login) |
+| `ui list` / `ui add` / `ui update` | Install lomi. UI components from docs registry (no login) |
 | `list-profiles` | List CLI auth profiles |
 | `switch` | Set the default profile |
 

@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element -- Lomi UI registry components are framework-portable copy-paste components. */
+/* eslint-disable @next/next/no-img-element -- lomi. UI registry components are framework-portable copy-paste components. */
 
 import * as React from 'react';
 
