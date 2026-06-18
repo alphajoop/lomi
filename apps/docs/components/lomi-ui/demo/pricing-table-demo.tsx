@@ -1,20 +1,19 @@
-'use client';
-
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { PricingTable } from '@/components/lomi-ui/pricing-table';
 
 export function PricingTableDemo() {
   return (
-    <div className="not-prose rounded-sm border bg-fd-background p-4">
+    <LomiUiPreview variant="theme">
       <PricingTable
         plans={[
           {
             id: 'starter',
             name: 'Starter',
-            description: 'For teams launching their first checkout flow.',
-            monthlyPrice: 0,
-            yearlyPrice: 0,
+            description: 'For early-stage teams.',
+            monthlyPrice: 10000,
+            yearlyPrice: 100000,
             currency: 'XOF',
-            features: ['Hosted checkout', 'Payment links', 'Basic webhooks'],
+            features: ['Payment links', 'Hosted checkout'],
           },
           {
             id: 'growth',
@@ -24,23 +23,10 @@ export function PricingTableDemo() {
             yearlyPrice: 250000,
             currency: 'XOF',
             highlighted: true,
-            features: [
-              'Mobile money + cards',
-              'Subscriptions',
-              'Advanced reconciliation',
-            ],
-          },
-          {
-            id: 'scale',
-            name: 'Scale',
-            description: 'For platforms with custom payment needs.',
-            monthlyPrice: 75000,
-            yearlyPrice: 750000,
-            currency: 'XOF',
-            features: ['Dedicated support', 'Custom limits', 'Payout routing'],
+            features: ['Mobile money + cards', 'Subscriptions', 'Webhooks'],
           },
         ]}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

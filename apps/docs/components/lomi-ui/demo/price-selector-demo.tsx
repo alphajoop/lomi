@@ -1,16 +1,14 @@
 'use client';
 
 import * as React from 'react';
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { PriceSelector } from '@/components/lomi-ui/price-selector';
 
 export function PriceSelectorDemo() {
   const [selectedPriceId, setSelectedPriceId] = React.useState('monthly');
 
   return (
-    <div
-      className="not-prose max-w-md rounded-sm p-4"
-      style={{ backgroundColor: '#121317' }}
-    >
+    <LomiUiPreview variant="panel" innerClassName="max-w-md">
       <PriceSelector
         selectedPriceId={selectedPriceId}
         onPriceSelect={setSelectedPriceId}
@@ -29,6 +27,6 @@ export function PriceSelectorDemo() {
           },
         ]}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

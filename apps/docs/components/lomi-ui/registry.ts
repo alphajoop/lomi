@@ -315,25 +315,6 @@ export const lomiUiRegistry: {
       ],
     },
     {
-      name: 'invoice-history',
-      title: 'Invoice History',
-      description:
-        'A compact invoice and receipt table for customer billing surfaces.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/invoice-history.tsx',
-          target: 'components/lomi-ui/invoice-history.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/invoice-history-demo.tsx',
-          target: 'components/lomi-ui/demo/invoice-history-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
       name: 'subscription-management-card',
       title: 'Subscription Management Card',
       description: "Show and manage a customer's current subscription.",

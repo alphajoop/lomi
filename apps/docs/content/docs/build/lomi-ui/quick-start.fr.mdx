@@ -1,7 +1,22 @@
 ---
 title: Démarrage rapide
-description: Ajoutez le premier composant checkout lomi. UI à votre application.
+description: Installez, personnalisez et utilisez les composants checkout lomi. UI.
 ---
+
+import {
+  CheckoutFooterDemo,
+  CheckoutSubmitButtonDemo,
+  CheckoutSummaryCardDemo,
+  CustomerInformationSectionDemo,
+  MobileMoneyCheckoutCardDemo,
+  PaymentFailureCardDemo,
+  PaymentProviderSelectorDemo,
+  PaymentStatusCardDemo,
+  PriceSelectorDemo,
+  PricingTableDemo,
+  SubscriptionManagementCardDemo,
+  UsageMeterDemo,
+} from '@/components/lomi-ui/demo';
 
 # Démarrage rapide
 
@@ -11,24 +26,13 @@ Installez un composant avec le CLI shadcn :
 npx shadcn@latest add https://docs.lomi.africa/r/mobile-money-checkout-card.json
 ```
 
-Puis affichez-le avec des props simples :
+Ou avec le CLI lomi. :
 
-```tsx
-import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
-
-export function Checkout() {
-  return (
-    <MobileMoneyCheckoutCard
-      selectedProvider="WAVE"
-      fullName="Aya Konan"
-      email="aya@example.com"
-      phoneNumber="+2250700000000"
-      payButtonBgColor="#121317"
-      onSubmit={() => console.log('Create a Lomi checkout session')}
-    />
-  );
-}
+```bash
+lomi ui add payment-provider-selector
 ```
+
+Lister tous les composants : `lomi ui list`. Mettre à jour les copies installées : `lomi ui update`. Voir [Commandes CLI UI](/build/cli/ui).
 
 Les composants n'appellent pas l'API lomi. directement. Utilisez votre backend ou l'intégration SDK pour créer des sessions de checkout, des demandes de paiement et la gestion des webhooks.
 
@@ -52,7 +56,7 @@ npm install react-phone-number-input lucide-react
 
 ## Mise à jour depuis d'anciennes copies lomi. UI
 
-Si vous avez installé des composants avant la synchronisation avec le checkout hébergé, relancez `lomi ui update` et adaptez les identifiants de fournisseur pour correspondre à la production :
+Si vous avez installé des composants avant la synchronisation avec le checkout hébergé, relancez `lomi ui update` et adaptez les identifiants de fournisseur :
 
 | Avant | Après |
 | ----- | ----- |
@@ -61,4 +65,102 @@ Si vous avez installé des composants avant la synchronisation avec le checkout 
 | `card` | `cards` |
 | `spi` | `spi` (inchangé) |
 
-Le BNPL utilise `bnpl`. Plusieurs composants checkout attendent désormais des props du checkout hébergé comme `organizationName`, `fullName` et `payButtonBgColor` au lieu des anciens exemples simplifiés.
+Le BNPL utilise `bnpl`.
+
+## Thème
+
+Les composants de paiement lomi. UI reprennent le style du checkout hébergé : bleu de sélection codé en dur, bordures grises subtiles, panneaux de paiement blancs et pas d'anneaux de focus sur les champs checkout.
+
+### Tokens du checkout hébergé
+
+| Token | Valeur production |
+| ----- | ----------------- |
+| Bordure / badge sélectionné | `#56A5F9` |
+| Fond sélectionné (rendu) | Blanc — le `checkout.css` de production remplace `bg-slate-100/50` sur `.border.bg-card` |
+| Bordure non sélectionnée | `border-border/40` |
+| Fond par défaut du bouton payer | `#121317` |
+| Rayon de carte | `rounded-sm` |
+
+Comme chaque composant est copié dans votre application, personnalisez les classes directement. Gardez l'état sélectionné `#56A5F9` évident sur les cartes fournisseur.
+
+## Composants
+
+### Sélecteur de fournisseur de paiement
+
+<PaymentProviderSelectorDemo />
+
+<Installation name="payment-provider-selector" />
+
+Identifiants : `WAVE`, `MTN`, `cards`, `spi`, `bnpl`.
+
+### Section informations client
+
+<CustomerInformationSectionDemo />
+
+<Installation name="customer-information-section" />
+
+Nécessite `react-phone-number-input` dans votre application.
+
+### Bouton de soumission checkout
+
+<CheckoutSubmitButtonDemo />
+
+<Installation name="checkout-submit-button" />
+
+### Carte checkout mobile money
+
+<MobileMoneyCheckoutCardDemo />
+
+<Installation name="mobile-money-checkout-card" />
+
+### Carte récapitulatif checkout
+
+<CheckoutSummaryCardDemo />
+
+<Installation name="checkout-summary-card" />
+
+### Sélecteur de prix
+
+<PriceSelectorDemo />
+
+<Installation name="price-selector" />
+
+Affichez-le dans un panneau `#121317` pour correspondre au checkout hébergé.
+
+### Carte statut de paiement
+
+<PaymentStatusCardDemo />
+
+<Installation name="payment-status-card" />
+
+### Carte échec de paiement
+
+<PaymentFailureCardDemo />
+
+<Installation name="payment-failure-card" />
+
+### Pied de page checkout
+
+<CheckoutFooterDemo />
+
+<Installation name="checkout-footer" />
+
+### Tableau de tarification
+
+Composant marketing autonome. Pour le cycle de facturation du checkout hébergé, utilisez le [Sélecteur de prix](#sélecteur-de-prix).
+
+<PricingTableDemo />
+
+<Installation name="pricing-table" />
+
+### Carte gestion d'abonnement
+
+<SubscriptionManagementCardDemo />
+
+<Installation name="subscription-management-card" />
+
+### Compteur d'utilisation
+
+<UsageMeterDemo />
+
+<Installation name="usage-meter" />

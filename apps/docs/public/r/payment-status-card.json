@@ -18,7 +18,7 @@
       "path": "components/lomi-ui/demo/payment-status-card-demo.tsx",
       "target": "components/lomi-ui/demo/payment-status-card-demo.tsx",
       "type": "registry:component",
-      "content": "import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';\n\nexport function PaymentStatusCardDemo() {\n  return (\n    <div className=\"not-prose flex justify-center rounded-sm border bg-background p-4 dark\">\n      <PaymentStatusCard\n        organizationName=\"Keur Studio\"\n        primaryAction={{ label: 'Continue', href: '#' }}\n      />\n    </div>\n  );\n}\n"
+      "content": "import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';\nimport { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';\n\nexport function PaymentStatusCardDemo() {\n  return (\n    <LomiUiPreview variant=\"panel\">\n      <PaymentStatusCard\n        organizationName=\"Keur Studio\"\n        primaryAction={{ label: 'Continue', href: '#' }}\n      />\n    </LomiUiPreview>\n  );\n}\n"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
   "title": "lomi. UI",
   "description": "Copy-paste checkout UI components for Lomi payment flows.",
-  "pages": ["index", "quick-start", "theming", "components"]
+  "pages": ["index", "quick-start"]
 }

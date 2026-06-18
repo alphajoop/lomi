@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { CustomerInformationSection } from '@/components/lomi-ui/customer-information-section';
 
 export function CustomerInformationSectionDemo() {
@@ -11,7 +12,7 @@ export function CustomerInformationSectionDemo() {
   const [isDifferentWhatsApp, setIsDifferentWhatsApp] = React.useState(false);
 
   return (
-    <div className="not-prose lomi-checkout-ui max-w-md bg-white p-4">
+    <LomiUiPreview variant="checkout" innerClassName="max-w-md">
       <CustomerInformationSection
         fullName={fullName}
         email={email}
@@ -24,6 +25,6 @@ export function CustomerInformationSectionDemo() {
         onWhatsAppNumberChange={(value) => setWhatsAppNumber(value ?? '')}
         onDifferentWhatsAppChange={setIsDifferentWhatsApp}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

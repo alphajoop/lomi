@@ -15,7 +15,7 @@
       "path": "components/lomi-ui/demo/checkout-summary-card-demo.tsx",
       "target": "components/lomi-ui/demo/checkout-summary-card-demo.tsx",
       "type": "registry:component",
-      "content": "import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';\n\nexport function CheckoutSummaryCardDemo() {\n  return (\n    <div className=\"not-prose flex justify-center p-4\">\n      <CheckoutSummaryCard\n        title=\"Pay for Design workshop\"\n        currency=\"XOF\"\n        description=\"A full-day workshop covering product design fundamentals.\"\n        subtotal={12500}\n        fees={[{ name: 'Processing fee', amount: 250 }]}\n        discount={1000}\n        total={11750}\n      />\n    </div>\n  );\n}\n"
+      "content": "import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';\nimport { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';\n\nexport function CheckoutSummaryCardDemo() {\n  return (\n    <LomiUiPreview variant=\"panel\">\n      <CheckoutSummaryCard\n        title=\"Pay for Design workshop\"\n        currency=\"XOF\"\n        description=\"A full-day workshop covering product design fundamentals.\"\n        subtotal={12500}\n        fees={[{ name: 'Processing fee', amount: 250 }]}\n        discount={1000}\n        total={11750}\n      />\n    </LomiUiPreview>\n  );\n}\n"
     }
   ]
 }

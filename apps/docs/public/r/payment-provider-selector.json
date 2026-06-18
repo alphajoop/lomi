@@ -27,7 +27,7 @@
       "path": "components/lomi-ui/demo/payment-provider-selector-demo.tsx",
       "target": "components/lomi-ui/demo/payment-provider-selector-demo.tsx",
       "type": "registry:component",
-      "content": "'use client';\n\nimport * as React from 'react';\nimport {\n  PaymentProviderSelector,\n  type ProviderId,\n} from '@/components/lomi-ui/payment-provider-selector';\n\nexport function PaymentProviderSelectorDemo() {\n  const [provider, setProvider] = React.useState<ProviderId>('WAVE');\n\n  return (\n    <div className=\"not-prose lomi-checkout-ui bg-white p-4\">\n      <PaymentProviderSelector\n        selectedProvider={provider}\n        onProviderChange={setProvider}\n      />\n      <p className=\"mt-3 text-sm text-fd-muted-foreground\">\n        Selected provider: <span className=\"font-medium\">{provider}</span>\n      </p>\n    </div>\n  );\n}\n"
+      "content": "'use client';\n\nimport * as React from 'react';\nimport { LomiUiPreview } from '@/components/preview/lomi-ui-preview';\nimport {\n  PaymentProviderSelector,\n  type ProviderId,\n} from '@/components/lomi-ui/payment-provider-selector';\n\nexport function PaymentProviderSelectorDemo() {\n  const [provider, setProvider] = React.useState<ProviderId>('WAVE');\n\n  return (\n    <>\n      <LomiUiPreview variant=\"checkout\">\n        <PaymentProviderSelector\n          selectedProvider={provider}\n          onProviderChange={setProvider}\n        />\n      </LomiUiPreview>\n      <p className=\"not-prose -mt-4 mb-6 text-sm text-fd-muted-foreground\">\n        Selected provider: <span className=\"font-medium\">{provider}</span>\n      </p>\n    </>\n  );\n}\n"
     }
   ],
   "assetFiles": [

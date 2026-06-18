@@ -1,9 +1,10 @@
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { CheckoutFooter } from '@/components/lomi-ui/checkout-footer';
 
 export function CheckoutFooterDemo() {
   return (
-    <div className="not-prose flex justify-center rounded-sm border bg-background p-6 dark">
+    <LomiUiPreview variant="panel" innerClassName="p-6">
       <CheckoutFooter />
-    </div>
+    </LomiUiPreview>
   );
 }

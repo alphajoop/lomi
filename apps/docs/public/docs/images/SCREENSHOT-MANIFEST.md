@@ -181,7 +181,7 @@ Copy this list and tick as you go:
 |             |                                                                                                     |
 | ----------- | --------------------------------------------------------------------------------------------------- |
 | **Save as** | `build/lomi-ui-light.webp` and `build/lomi-ui-dark.webp`                                            |
-| **Open**    | https://docs.lomi.africa/build/lomi-ui/components/payment-provider-selector#preview                 |
+| **Open**    | https://docs.lomi.africa/build/lomi-ui/quick-start#payment-provider-selector                 |
 | **Show**    | **“Preview”** heading + **Payment Provider Selector** demo (Wave, MTN, π-SPI, Card radios). |
 | **Theme**   | Use the **docs** theme toggle — not checkout theme.                                                 |
 | **Framing** | Scroll so Preview block + heading fit the 16:9 crop.                                                |

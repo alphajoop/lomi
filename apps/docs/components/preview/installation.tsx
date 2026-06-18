@@ -1,12 +1,31 @@
 /* @proprietary license */
 
+'use client';
+
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from 'fumadocs-ui/components/tabs.unstyled';
-import { CodeBlock } from '@/components/ui/code-block';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+
+const codeThemes = {
+  light: 'github-light',
+  dark: 'vesper',
+} as const;
+
+function InstallCommand({ code }: { code: string }) {
+  return (
+    <div className="overflow-hidden rounded-sm border border-fd-border bg-fd-muted/30">
+      <DynamicCodeBlock
+        lang="bash"
+        code={code}
+        options={{ themes: codeThemes }}
+      />
+    </div>
+  );
+}
 
 export function Installation({ name }: { name: string }) {
   const registryUrl = `https://docs.lomi.africa/r/${name}.json`;
@@ -19,7 +38,7 @@ export function Installation({ name }: { name: string }) {
 
   return (
     <Tabs className="my-6" defaultValue="npx">
-      <TabsList className="flex flex-col gap-3 text-sm items-start p-3 bg-fd-card text-fd-card-foreground rounded-sm border not-prose sm:flex-row">
+      <TabsList className="flex flex-col gap-3 text-sm items-start p-3 bg-fd-card text-fd-card-foreground rounded-sm border border-fd-border not-prose sm:flex-row">
         <div className="me-auto">
           <p className="font-medium">Install to your codebase</p>
           <p className="mt-1 text-fd-muted-foreground">
@@ -38,25 +57,23 @@ export function Installation({ name }: { name: string }) {
       </TabsList>
 
       <TabsContent value="npx">
-        <CodeBlock code={`npx shadcn@latest add ${registryUrl}`} lang="bash" />
+        <InstallCommand code={`npx shadcn@latest add ${registryUrl}`} />
       </TabsContent>
 
       <TabsContent value="pnpm">
-        <CodeBlock
+        <InstallCommand
           code={`pnpm dlx shadcn@latest add ${registryUrl}`}
-          lang="bash"
         />
       </TabsContent>
 
       <TabsContent value="yarn">
-        <CodeBlock
+        <InstallCommand
           code={`yarn dlx shadcn@latest add ${registryUrl}`}
-          lang="bash"
         />
       </TabsContent>
 
       <TabsContent value="bun">
-        <CodeBlock code={`bunx shadcn@latest add ${registryUrl}`} lang="bash" />
+        <InstallCommand code={`bunx shadcn@latest add ${registryUrl}`} />
       </TabsContent>
     </Tabs>
   );

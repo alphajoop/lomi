@@ -18,7 +18,7 @@
       "path": "components/lomi-ui/demo/payment-failure-card-demo.tsx",
       "target": "components/lomi-ui/demo/payment-failure-card-demo.tsx",
       "type": "registry:component",
-      "content": "'use client';\n\nimport { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';\n\nexport function PaymentFailureCardDemo() {\n  return (\n    <div className=\"not-prose flex justify-center rounded-sm border bg-background p-4 dark\">\n      <PaymentFailureCard\n        organizationName=\"Keur Studio\"\n        onRetry={() => undefined}\n      />\n    </div>\n  );\n}\n"
+      "content": "'use client';\n\nimport { LomiUiPreview } from '@/components/preview/lomi-ui-preview';\nimport { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';\n\nexport function PaymentFailureCardDemo() {\n  return (\n    <LomiUiPreview variant=\"panel\">\n      <PaymentFailureCard\n        organizationName=\"Keur Studio\"\n        onRetry={() => undefined}\n      />\n    </LomiUiPreview>\n  );\n}\n"
     }
   ]
 }

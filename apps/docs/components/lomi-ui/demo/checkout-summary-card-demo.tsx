@@ -1,8 +1,9 @@
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
 
 export function CheckoutSummaryCardDemo() {
   return (
-    <div className="not-prose flex justify-center p-4">
+    <LomiUiPreview variant="panel">
       <CheckoutSummaryCard
         title="Pay for Design workshop"
         currency="XOF"
@@ -12,6 +13,6 @@ export function CheckoutSummaryCardDemo() {
         discount={1000}
         total={11750}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

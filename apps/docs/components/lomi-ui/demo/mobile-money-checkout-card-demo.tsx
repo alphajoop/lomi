@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import type { ProviderId } from '@/components/lomi-ui/payment-provider-selector';
 import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
 
@@ -16,7 +17,7 @@ export function MobileMoneyCheckoutCardDemo() {
   >('idle');
 
   return (
-    <div className="not-prose lomi-checkout-ui flex justify-center bg-white p-4">
+    <LomiUiPreview variant="checkout" innerClassName="flex justify-center">
       <MobileMoneyCheckoutCard
         selectedProvider={provider}
         fullName={fullName}
@@ -37,6 +38,6 @@ export function MobileMoneyCheckoutCardDemo() {
           window.setTimeout(() => setPaymentStatus('idle'), 2200);
         }}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

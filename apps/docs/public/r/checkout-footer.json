@@ -15,7 +15,7 @@
       "path": "components/lomi-ui/demo/checkout-footer-demo.tsx",
       "target": "components/lomi-ui/demo/checkout-footer-demo.tsx",
       "type": "registry:component",
-      "content": "import { CheckoutFooter } from '@/components/lomi-ui/checkout-footer';\n\nexport function CheckoutFooterDemo() {\n  return (\n    <div className=\"not-prose flex justify-center rounded-sm border bg-background p-6 dark\">\n      <CheckoutFooter />\n    </div>\n  );\n}\n"
+      "content": "import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';\nimport { CheckoutFooter } from '@/components/lomi-ui/checkout-footer';\n\nexport function CheckoutFooterDemo() {\n  return (\n    <LomiUiPreview variant=\"panel\" innerClassName=\"p-6\">\n      <CheckoutFooter />\n    </LomiUiPreview>\n  );\n}\n"
     }
   ],
   "assetFiles": [

@@ -1,8 +1,9 @@
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';
 
 export function SubscriptionManagementCardDemo() {
   return (
-    <div className="not-prose flex justify-center rounded-sm border bg-fd-background p-4">
+    <LomiUiPreview variant="theme">
       <SubscriptionManagementCard
         planName="Growth"
         status="active"
@@ -11,8 +12,8 @@ export function SubscriptionManagementCardDemo() {
         interval="month"
         nextBillingDate="June 28, 2026"
         paymentMethod="Wave ending 4821"
-        features={['Payment links', 'Subscriptions', 'Webhooks', 'Payouts']}
+        features={['Payment links', 'Subscriptions', 'Webhooks']}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

@@ -18,7 +18,7 @@
       "path": "components/lomi-ui/demo/subscription-management-card-demo.tsx",
       "target": "components/lomi-ui/demo/subscription-management-card-demo.tsx",
       "type": "registry:component",
-      "content": "import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';\n\nexport function SubscriptionManagementCardDemo() {\n  return (\n    <div className=\"not-prose flex justify-center rounded-sm border bg-fd-background p-4\">\n      <SubscriptionManagementCard\n        planName=\"Growth\"\n        status=\"active\"\n        amount={25000}\n        currency=\"XOF\"\n        interval=\"month\"\n        nextBillingDate=\"June 28, 2026\"\n        paymentMethod=\"Wave ending 4821\"\n        features={['Payment links', 'Subscriptions', 'Webhooks', 'Payouts']}\n      />\n    </div>\n  );\n}\n"
+      "content": "import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';\nimport { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';\n\nexport function SubscriptionManagementCardDemo() {\n  return (\n    <LomiUiPreview variant=\"theme\">\n      <SubscriptionManagementCard\n        planName=\"Growth\"\n        status=\"active\"\n        amount={25000}\n        currency=\"XOF\"\n        interval=\"month\"\n        nextBillingDate=\"June 28, 2026\"\n        paymentMethod=\"Wave ending 4821\"\n        features={['Payment links', 'Subscriptions', 'Webhooks']}\n      />\n    </LomiUiPreview>\n  );\n}\n"
     }
   ]
 }
