@@ -1,5 +1,5 @@
 {
-  "title": "Usage Events",
+  "title": "Usage events",
   "pages": [
     "UsageEventsController_createUsageSubscription",
     "UsageEventsController_findAll",

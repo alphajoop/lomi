@@ -8,10 +8,10 @@ import { Callout } from '@/components/docs/docs-callout';
 
 lomi. offers two primary ways to process transactions and accept payments via its API: Checkout sessions and Payment links.
 
-1.  **Checkout sessions:** Ideal for single-use transactions where you dynamically generate a secure, hosted payment page for a specific customer order. Checkout Sessions expire after 60 minutes by default.
+1.  **Checkout sessions:** Ideal for single-use transactions where you dynamically generate a secure, hosted payment page for a specific customer order. Checkout sessions expire after 60 minutes by default.
 2.  **Payment links:** Best for creating reusable links tied to specific products, subscription plans, or for collecting instant, fixed-amount payments. These links can be shared easily and can be configured to expire at a specific date.
 
-This section guides you through the basics of both methods. For detailed API specifications, please refer to the [API Reference section](/api).
+This section guides you through the basics of both methods. For detailed API specifications, please refer to the [API reference section](/api).
 
 ## Creating a checkout session
 
@@ -145,7 +145,7 @@ After creating the session, redirect your customer to the `checkout_url` provide
 
 ## Creating a payment link
 
-Payment Links are ideal for reusable links tied to a specific product or service.
+Payment links are ideal for reusable links tied to a specific product or service.
 
 <Tabs items={["TypeScript", "Python", "Go", "PHP"]}>
 <Tab value="TypeScript">
@@ -218,4 +218,4 @@ echo 'Share this: ' . $link->getUrl();
 
 Once created, you can share the URL via email, social media, or embed it on your website.
 
-**Important Note on Fees:** Checkout Sessions do not automatically apply pre-configured organization fees, as the `amount` you specify is the final amount charged. Product-based Payment Links, however, will respect any fee configurations tied to the product/organization.
+**Important Note on Fees:** Checkout sessions do not automatically apply pre-configured organization fees, as the `amount` you specify is the final amount charged. Product-based Payment links, however, will respect any fee configurations tied to the product/organization.

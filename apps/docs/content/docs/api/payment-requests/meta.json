@@ -1,5 +1,5 @@
 {
-  "title": "Payment Requests",
+  "title": "Payment requests",
   "pages": [
     "PaymentRequestsController_create",
     "PaymentRequestsController_findAll",
