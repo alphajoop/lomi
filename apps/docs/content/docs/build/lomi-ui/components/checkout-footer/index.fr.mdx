@@ -1,0 +1,38 @@
+---
+title: Pied de page checkout
+description: Pied de page du checkout hébergé avec branding lomi et liens légaux.
+---
+
+import { CheckoutFooterDemo } from '@/components/lomi-ui/demo';
+
+# Pied de page checkout
+
+Correspond au bloc de pied de page des pages de succès et d'erreur du checkout hébergé.
+
+## Aperçu
+
+<CheckoutFooterDemo />
+
+## Installation
+
+<Installation name="checkout-footer" />
+
+## Utilisation
+
+```tsx
+import { CheckoutFooter } from '@/components/lomi-ui/checkout-footer';
+
+<CheckoutFooter
+  termsHref="https://lomi.africa/terms?from=checkout"
+  privacyHref="https://lomi.africa/privacy?from=checkout"
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `termsHref` | `string` | URL des conditions d'utilisation. |
+| `privacyHref` | `string` | URL de la politique de confidentialité. |
+| `logoSrc` | `string` | Chemin du logo lomi. Par défaut `/company/lomi_l.webp`. |
+| `logoAlt` | `string` | Texte alternatif du logo. |

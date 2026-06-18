@@ -1,13 +1,13 @@
 ---
 title: Carte statut de paiement
-description: Affichez les résultats de checkout réussi, échoué et en attente.
+description: Carte de résultat de succès du checkout hébergé.
 ---
 
 import { PaymentStatusCardDemo } from '@/components/lomi-ui/demo';
 
 # Carte statut de paiement
 
-Utilisez-la après le checkout, dans une vue de reçu ou dans un tableau de bord marchand.
+Correspond à la carte de succès dans `post/success.tsx`.
 
 ## Aperçu
 
@@ -23,12 +23,9 @@ Utilisez-la après le checkout, dans une vue de reçu ou dans un tableau de bord
 import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
 
 <PaymentStatusCard
-  status="success"
-  amount={11750}
-  currency="XOF"
-  provider="wave"
-  transactionId="txn_7n4Pq3b9"
-  primaryAction={{ label: 'View transaction', href: '/transactions/txn_7n4Pq3b9' }}
+  organizationName="Keur Studio"
+  organizationLogoUrl="/merchant-logo.webp"
+  primaryAction={{ label: 'Continuer', href: '/orders' }}
 />;
 ```
 
@@ -36,9 +33,9 @@ import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `status` | `'success' \| 'failed' \| 'pending'` | Résultat de paiement à afficher. |
-| `amount` | `number` | Montant du paiement. |
-| `currency` | `string` | Code devise ISO. |
-| `provider` | `ProviderId` | Fournisseur utilisé pour le paiement. |
-| `transactionId` | `string` | Identifiant de transaction lomi. optionnel. |
-| `primaryAction` | `{ label: string; href?: string; onClick?: () => void }` | Action principale optionnelle. |
+| `organizationName` | `string` | Nom du marchand pour l'avatar de repli. |
+| `organizationLogoUrl` | `string \| null` | URL du logo marchand optionnelle. |
+| `title` | `string` | Titre de succès. Par défaut `Payment successful`. |
+| `description` | `string` | Texte d'accompagnement sous le titre. |
+| `primaryAction` | `{ label: string; href?: string; onClick?: () => void }` | Bouton continuer. |
+| `children` | `React.ReactNode` | Emplacement optionnel pour téléchargements ou clés de licence. |

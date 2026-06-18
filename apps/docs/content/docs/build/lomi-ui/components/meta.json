@@ -15,6 +15,10 @@
     "invoice-history",
     "subscription-management-card",
     "usage-meter",
-    "payment-failure-card"
+    "payment-failure-card",
+    "checkout-footer",
+    "checkout-submit-button",
+    "customer-information-section",
+    "price-selector"
   ]
 }

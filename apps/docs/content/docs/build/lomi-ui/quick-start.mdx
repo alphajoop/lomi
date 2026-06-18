@@ -49,3 +49,16 @@ Customer form components require:
 ```bash
 npm install react-phone-number-input lucide-react
 ```
+
+## Upgrading from earlier Lomi UI copies
+
+If you installed components before the hosted-checkout sync, re-run `lomi ui update` and adjust provider ids to match production:
+
+| Before | After |
+| ------ | ----- |
+| `wave` | `WAVE` |
+| `mtn` | `MTN` |
+| `card` | `cards` |
+| `spi` | `spi` (unchanged) |
+
+Orange Money is no longer a default provider id. BNPL uses `bnpl`. Several checkout components now expect hosted-checkout props such as `organizationName`, `fullName`, and `payButtonBgColor` instead of the older simplified examples.

@@ -1,13 +1,13 @@
 ---
 title: Sélecteur de fournisseur de paiement
-description: Sélectionnez Wave, MTN, Orange Money, SPI ou les rails de paiement par carte.
+description: Carrousel de moyens de paiement du checkout hébergé pour Wave, MTN, cartes, SPI et BNPL.
 ---
 
 import { PaymentProviderSelectorDemo } from '@/components/lomi-ui/demo';
 
 # Sélecteur de fournisseur de paiement
 
-Utilisez-le quand un client doit choisir comment il souhaite payer.
+Correspond au carrousel de moyens de paiement du checkout hébergé dans `payment-provider-selection.tsx`.
 
 ## Aperçu
 
@@ -26,7 +26,7 @@ import {
 } from '@/components/lomi-ui/payment-provider-selector';
 
 function Example() {
-  const [provider, setProvider] = React.useState<ProviderId>('wave');
+  const [provider, setProvider] = React.useState<ProviderId>('WAVE');
 
   return (
     <PaymentProviderSelector
@@ -41,8 +41,23 @@ function Example() {
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `providers` | `ProviderId[]` | Identifiants de fournisseur à afficher. Par défaut Wave, MTN, Orange, SPI et carte. |
-| `selectedProvider` | `ProviderId` | Fournisseur sélectionné contrôlé. |
-| `onProviderChange` | `(provider: ProviderId) => void` | Déclenché quand le client choisit un fournisseur. |
-| `disabledProviders` | `ProviderId[]` | Fournisseurs à afficher en état désactivé. |
-| `variant` | `'grid' \| 'rail'` | Style de mise en page. Par défaut `rail`. |
+| `providers` | `ProviderId[]` | Moyens à afficher. Par défaut `WAVE`, `MTN`, `cards` et `spi`. |
+| `selectedProvider` | `ProviderId \| null` | Moyen sélectionné contrôlé. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Déclenché quand le client choisit un moyen. |
+| `disabledProviders` | `ProviderId[]` | Moyens affichés en état désactivé. |
+| `spiOperational` | `boolean` | Quand faux, SPI ne peut pas être sélectionné. Par défaut `true`. |
+| `cardLabel` | `string` | Libellé du moyen carte. Par défaut `Card`. |
+
+## Identifiants de fournisseur
+
+Utilisez les mêmes identifiants que le checkout hébergé : `WAVE`, `MTN`, `cards`, `spi` et `bnpl`.
+
+## Assets
+
+Copiez ces chemins dans le dossier public de votre application :
+
+- `/payment_channels/wave.webp`
+- `/payment_channels/mtn.webp`
+- `/payment_channels/pi_spi.webp`
+- `/placeholder/card.webp`
+- `/placeholder/bnpl.webp`

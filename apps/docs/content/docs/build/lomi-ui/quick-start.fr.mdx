@@ -19,11 +19,11 @@ import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-check
 export function Checkout() {
   return (
     <MobileMoneyCheckoutCard
-      amount={12500}
-      currency="XOF"
-      merchantName="Keur Studio"
-      selectedProvider="wave"
-      phoneNumber="+225 07 00 00 00 00"
+      selectedProvider="WAVE"
+      fullName="Aya Konan"
+      email="aya@example.com"
+      phoneNumber="+2250700000000"
+      payButtonBgColor="#121317"
       onSubmit={() => console.log('Create a Lomi checkout session')}
     />
   );
@@ -34,4 +34,31 @@ Les composants n'appellent pas l'API lomi. directement. Utilisez votre backend o
 
 ## Chemins des assets
 
-Les icônes de fournisseur sont installées dans `public/payment_channels`, afin que les composants puissent les référencer comme `/payment_channels/wave.webp`, `/payment_channels/mtn.webp` et d'autres URLs publiques similaires.
+Copiez les assets du checkout hébergé dans le dossier public de votre application :
+
+- `/payment_channels/wave.webp`
+- `/payment_channels/mtn.webp`
+- `/payment_channels/pi_spi.webp`
+- `/placeholder/card.webp`
+- `/placeholder/bnpl.webp`
+
+## Dépendances
+
+Les composants de formulaire client nécessitent :
+
+```bash
+npm install react-phone-number-input lucide-react
+```
+
+## Mise à jour depuis d'anciennes copies Lomi UI
+
+Si vous avez installé des composants avant la synchronisation avec le checkout hébergé, relancez `lomi ui update` et adaptez les identifiants de fournisseur pour correspondre à la production :
+
+| Avant | Après |
+| ----- | ----- |
+| `wave` | `WAVE` |
+| `mtn` | `MTN` |
+| `card` | `cards` |
+| `spi` | `spi` (inchangé) |
+
+Orange Money n'est plus un identifiant par défaut. Le BNPL utilise `bnpl`. Plusieurs composants checkout attendent désormais des props du checkout hébergé comme `organizationName`, `fullName` et `payButtonBgColor` au lieu des anciens exemples simplifiés.

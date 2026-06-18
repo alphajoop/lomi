@@ -1,13 +1,13 @@
 ---
 title: Carte échec de paiement
-description: Aidez les clients à réessayer ou à récupérer après un paiement échoué.
+description: Carte de résultat d'erreur du checkout hébergé.
 ---
 
 import { PaymentFailureCardDemo } from '@/components/lomi-ui/demo';
 
 # Carte échec de paiement
 
-Utilisez-la après une tentative de paiement échouée ou un délai d'attente du fournisseur.
+Correspond à la carte d'erreur dans `post/error.tsx`.
 
 ## Aperçu
 
@@ -23,10 +23,10 @@ Utilisez-la après une tentative de paiement échouée ou un délai d'attente du
 import { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';
 
 <PaymentFailureCard
-  amount={12500}
-  currency="XOF"
-  provider="MTN Mobile Money"
-  supportHref="/resources/support"
+  organizationName="Keur Studio"
+  organizationLogoUrl="/merchant-logo.webp"
+  errorMessage="Le fournisseur a expiré avant de confirmer le paiement."
+  onRetry={() => window.location.reload()}
 />;
 ```
 
@@ -34,10 +34,10 @@ import { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `title` | `string` | Titre optionnel. |
-| `message` | `string` | Texte de récupération. |
-| `amount` | `number` | Montant échoué optionnel. |
-| `currency` | `string` | Code devise ISO. |
-| `provider` | `string` | Libellé du fournisseur. |
-| `onRetry` | `() => void` | Action de nouvelle tentative. |
-| `supportHref` | `string` | Lien de support optionnel. |
+| `organizationName` | `string` | Nom du marchand pour l'avatar de repli. |
+| `organizationLogoUrl` | `string \| null` | URL du logo marchand optionnelle. |
+| `title` | `string` | Titre d'erreur. Par défaut `Payment failed`. |
+| `description` | `string` | Texte d'accompagnement sous le titre. |
+| `errorMessage` | `string` | Erreur détaillée optionnelle dans l'alerte rouge. |
+| `retryLabel` | `string` | Libellé du bouton réessayer. Par défaut `Try again`. |
+| `onRetry` | `() => void` | Gestionnaire de l'action réessayer. |

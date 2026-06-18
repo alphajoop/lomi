@@ -1,13 +1,13 @@
 ---
 title: Carte récapitulatif checkout
-description: Un récapitulatif checkout sombre inspiré du checkout hébergé lomi.
+description: Panneau récapitulatif produit sombre du checkout hébergé.
 ---
 
 import { CheckoutSummaryCardDemo } from '@/components/lomi-ui/demo';
 
 # Carte récapitulatif checkout
 
-Utilisez-la à côté d'un formulaire de paiement ou au-dessus sur mobile pour afficher ce que le client paie.
+Correspond au panneau gauche sombre du checkout hébergé (`product-display-section.tsx` et `line-items-display.tsx`).
 
 ## Aperçu
 
@@ -23,22 +23,41 @@ Utilisez-la à côté d'un formulaire de paiement ou au-dessus sur mobile pour a
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
 
 <CheckoutSummaryCard
-  merchantName="Keur Studio"
+  title="Payer pour l'atelier design"
   currency="XOF"
-  items={[{ name: 'Design workshop', quantity: 1, amount: 10000 }]}
+  description="Un atelier d'une journée sur les fondamentaux du design produit."
   subtotal={10000}
   total={10000}
 />;
+```
+
+## Panier multi-articles
+
+Passez plus d'un article pour afficher la mise en page panier de `line-items-display.tsx` :
+
+```tsx
+<CheckoutSummaryCard
+  title="Votre commande"
+  currency="XOF"
+  items={[
+    { name: 'Atelier design', quantity: 1, amount: 10000, unitAmount: 10000 },
+    { name: 'Pack de modèles', quantity: 1, amount: 2500, unitAmount: 2500 },
+  ]}
+  subtotal={12500}
+  total={12500}
+/>
 ```
 
 ## Props
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `merchantName` | `string` | Nom du marchand affiché dans le récapitulatif. |
-| `items` | `{ name: string; quantity?: number; amount: number }[]` | Lignes du checkout. |
+| `title` | `string` | Titre du produit ou du lien de paiement. |
+| `items` | `CheckoutSummaryItem[]` | Lignes optionnelles. Plus d'une bascule vers la mise en page panier. |
 | `subtotal` | `number` | Montant avant frais et remises. |
-| `fees` | `number` | Frais optionnels. |
+| `fees` | `number \| CheckoutSummaryFee[]` | Frais optionnels en total ou en lignes nommées. |
 | `discount` | `number` | Montant de remise optionnel. |
-| `total` | `number` | Montant final dû. |
-| `currency` | `string` | Code devise ISO. |
+| `total` | `number` | Montant final dû aujourd'hui. |
+| `currency` | `string` | Code devise ISO affiché à côté des montants. |
+| `description` | `string` | Description produit optionnelle sous le prix. |
+| `productImageUrl` | `string` | URL d'image produit optionnelle. |

@@ -1,7 +1,7 @@
 {
   "name": "lomi-ui",
   "version": "1.0.0",
-  "homepage": "https://docs.lomi.africa/ui",
+  "homepage": "https://docs.lomi.africa/build/lomi-ui",
   "registry_url": "https://docs.lomi.africa/r/registry.json",
   "items": [
     {
