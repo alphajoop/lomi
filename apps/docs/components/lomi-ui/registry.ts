@@ -38,7 +38,7 @@ const paymentChannelAssets: LomiUiRegistryAsset[] = [
   type: 'registry:file' as const,
 }));
 
-const placeholderAssets: LomiUiRegistryAsset[] = ['card.webp', 'bnpl.webp'].map(
+const placeholderAssets: LomiUiRegistryAsset[] = ['card.webp'].map(
   (file) => ({
     path: `public/placeholder/${file}`,
     target: `public/placeholder/${file}`,
@@ -62,7 +62,7 @@ export const lomiUiRegistry: {
       name: 'payment-provider-selector',
       title: 'Payment Provider Selector',
       description:
-        'Hosted-checkout payment method carousel for Wave, MTN, cards, SPI, and BNPL.',
+        'Hosted-checkout payment method carousel for Wave, MTN, cards, and SPI.',
       files: [
         {
           path: 'components/lomi-ui/payment-provider-selector.tsx',
@@ -133,30 +133,6 @@ export const lomiUiRegistry: {
           path: 'components/lomi-ui/demo/customer-information-section-demo.tsx',
           target:
             'components/lomi-ui/demo/customer-information-section-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'checkout-submit-button',
-      title: 'Checkout Submit Button',
-      description:
-        'Hosted checkout pay button with processing and outcome states.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/checkout-submit-button.tsx',
-          target: 'components/lomi-ui/checkout-submit-button.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/lib/pay-button-contrast.ts',
-          target: 'components/lomi-ui/lib/pay-button-contrast.ts',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/checkout-submit-button-demo.tsx',
-          target: 'components/lomi-ui/demo/checkout-submit-button-demo.tsx',
           type: 'registry:component',
         },
       ],
@@ -259,25 +235,6 @@ export const lomiUiRegistry: {
       ],
     },
     {
-      name: 'payment-status-card',
-      title: 'Payment Status Card',
-      description:
-        'Hosted checkout success outcome card from post/success.tsx.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/payment-status-card.tsx',
-          target: 'components/lomi-ui/payment-status-card.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/payment-status-card-demo.tsx',
-          target: 'components/lomi-ui/demo/payment-status-card-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
       name: 'price-selector',
       title: 'Price Selector',
       description:
@@ -291,44 +248,6 @@ export const lomiUiRegistry: {
         {
           path: 'components/lomi-ui/demo/price-selector-demo.tsx',
           target: 'components/lomi-ui/demo/price-selector-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'pricing-table',
-      title: 'Pricing Table',
-      description:
-        'Standalone marketing plan cards. Not the hosted checkout price selector.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/pricing-table.tsx',
-          target: 'components/lomi-ui/pricing-table.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/pricing-table-demo.tsx',
-          target: 'components/lomi-ui/demo/pricing-table-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'subscription-management-card',
-      title: 'Subscription Management Card',
-      description: "Show and manage a customer's current subscription.",
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/subscription-management-card.tsx',
-          target: 'components/lomi-ui/subscription-management-card.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/subscription-management-card-demo.tsx',
-          target:
-            'components/lomi-ui/demo/subscription-management-card-demo.tsx',
           type: 'registry:component',
         },
       ],
@@ -348,48 +267,6 @@ export const lomiUiRegistry: {
           path: 'components/lomi-ui/demo/usage-meter-demo.tsx',
           target: 'components/lomi-ui/demo/usage-meter-demo.tsx',
           type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'payment-failure-card',
-      title: 'Payment Failure Card',
-      description: 'Hosted checkout error outcome card from post/error.tsx.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/payment-failure-card.tsx',
-          target: 'components/lomi-ui/payment-failure-card.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/payment-failure-card-demo.tsx',
-          target: 'components/lomi-ui/demo/payment-failure-card-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'checkout-footer',
-      title: 'Checkout Footer',
-      description: 'Hosted checkout footer with lomi branding and legal links.',
-      files: [
-        {
-          path: 'components/lomi-ui/checkout-footer.tsx',
-          target: 'components/lomi-ui/checkout-footer.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/checkout-footer-demo.tsx',
-          target: 'components/lomi-ui/demo/checkout-footer-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-      assetFiles: [
-        {
-          path: 'public/company/lomi_l.webp',
-          target: 'public/company/lomi_l.webp',
-          type: 'registry:file' as const,
         },
       ],
     },

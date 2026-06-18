@@ -14,7 +14,7 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
 }
 
-export type ProviderId = 'WAVE' | 'MTN' | 'cards' | 'spi' | 'bnpl';
+export type ProviderId = 'WAVE' | 'MTN' | 'cards' | 'spi';
 
 type MethodInfo = {
   image: string;
@@ -34,7 +34,6 @@ const DEFAULT_LABELS: Record<ProviderId, string> = {
   MTN: 'MTN',
   cards: 'Card',
   spi: 'π—SPI',
-  bnpl: 'BNPL',
 };
 
 function getMethodInfo(method: ProviderId, cardLabel: string): MethodInfo {
@@ -74,17 +73,6 @@ function getMethodInfo(method: ProviderId, cardLabel: string): MethodInfo {
     };
   }
 
-  if (method === 'bnpl') {
-    return {
-      image: '/placeholder/bnpl.webp',
-      label: DEFAULT_LABELS.bnpl,
-      imageClass: 'object-contain',
-      containerClass: 'justify-start w-full mb-1 -ml-0',
-      width: 40,
-      height: 32,
-    };
-  }
-
   return {
     image: '',
     label: method,
@@ -119,7 +107,6 @@ export function PaymentProviderSelector({
   const [internalSelectedProvider, setInternalSelectedProvider] =
     React.useState<ProviderId | null>(null);
   const [spiAlias, setSpiAlias] = React.useState('');
-  const [bnplAlias, setBnplAlias] = React.useState('');
 
   const selectedProvider =
     controlledSelectedProvider !== undefined &&
@@ -128,7 +115,8 @@ export function PaymentProviderSelector({
       : internalSelectedProvider;
 
   const availableProviders = React.useMemo(
-    () => providers.filter((provider) => provider !== 'bnpl' || spiOperational),
+    () =>
+      providers.filter((provider) => provider !== 'spi' || spiOperational),
     [providers, spiOperational],
   );
 
@@ -166,7 +154,6 @@ export function PaymentProviderSelector({
     onProviderChange?.(provider);
 
     if (provider !== 'spi') setSpiAlias('');
-    if (provider !== 'bnpl') setBnplAlias('');
   };
 
   return (
@@ -256,18 +243,6 @@ export function PaymentProviderSelector({
               checkoutCustomerFieldClass,
               'mb-0.5 rounded-sm shadow-none',
             )}
-          />
-        </div>
-      ) : null}
-
-      {selectedProvider === 'bnpl' ? (
-        <div className="space-y-3">
-          <CheckoutInput
-            type="text"
-            value={bnplAlias}
-            onChange={(event) => setBnplAlias(event.target.value)}
-            placeholder="your-bnpl-alias"
-            className={cn(checkoutCustomerFieldClass, 'rounded-sm shadow-none')}
           />
         </div>
       ) : null}

@@ -8,7 +8,7 @@
       "name": "payment-provider-selector",
       "type": "registry:block",
       "title": "Payment Provider Selector",
-      "description": "Hosted-checkout payment method carousel for Wave, MTN, cards, SPI, and BNPL."
+      "description": "Hosted-checkout payment method carousel for Wave, MTN, cards, and SPI."
     },
     {
       "name": "customer-information-section",
@@ -18,15 +18,6 @@
       "dependencies": [
         "lucide-react",
         "react-phone-number-input"
-      ]
-    },
-    {
-      "name": "checkout-submit-button",
-      "type": "registry:block",
-      "title": "Checkout Submit Button",
-      "description": "Hosted checkout pay button with processing and outcome states.",
-      "dependencies": [
-        "lucide-react"
       ]
     },
     {
@@ -46,58 +37,16 @@
       "description": "Dark hosted-checkout product summary panel from the left checkout column."
     },
     {
-      "name": "payment-status-card",
-      "type": "registry:block",
-      "title": "Payment Status Card",
-      "description": "Hosted checkout success outcome card from post/success.tsx.",
-      "dependencies": [
-        "lucide-react"
-      ]
-    },
-    {
       "name": "price-selector",
       "type": "registry:block",
       "title": "Price Selector",
       "description": "Hosted checkout billing cycle selector for the dark product panel."
     },
     {
-      "name": "pricing-table",
-      "type": "registry:block",
-      "title": "Pricing Table",
-      "description": "Standalone marketing plan cards. Not the hosted checkout price selector.",
-      "dependencies": [
-        "lucide-react"
-      ]
-    },
-    {
-      "name": "subscription-management-card",
-      "type": "registry:block",
-      "title": "Subscription Management Card",
-      "description": "Show and manage a customer's current subscription.",
-      "dependencies": [
-        "lucide-react"
-      ]
-    },
-    {
       "name": "usage-meter",
       "type": "registry:block",
       "title": "Usage Meter",
       "description": "Track usage limits for checkout sessions, webhooks, payouts, or subscriptions."
-    },
-    {
-      "name": "payment-failure-card",
-      "type": "registry:block",
-      "title": "Payment Failure Card",
-      "description": "Hosted checkout error outcome card from post/error.tsx.",
-      "dependencies": [
-        "lucide-react"
-      ]
-    },
-    {
-      "name": "checkout-footer",
-      "type": "registry:block",
-      "title": "Checkout Footer",
-      "description": "Hosted checkout footer with lomi branding and legal links."
     }
   ]
 }

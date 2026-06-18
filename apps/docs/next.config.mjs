@@ -14,6 +14,15 @@ const config = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
+  async redirects() {
+    return [
+      {
+        source: '/build/lomi-ui/quick-start',
+        destination: '/build/lomi-ui',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

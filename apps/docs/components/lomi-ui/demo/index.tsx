@@ -1,13 +1,6 @@
-export { CheckoutFooterDemo } from './checkout-footer-demo';
-export { CheckoutSubmitButtonDemo } from './checkout-submit-button-demo';
 export { CheckoutSummaryCardDemo } from './checkout-summary-card-demo';
 export { CustomerInformationSectionDemo } from './customer-information-section-demo';
-export { HostedCheckoutFormDemo } from './hosted-checkout-form-demo';
 export { MobileMoneyCheckoutCardDemo } from './mobile-money-checkout-card-demo';
-export { PaymentFailureCardDemo } from './payment-failure-card-demo';
 export { PaymentProviderSelectorDemo } from './payment-provider-selector-demo';
-export { PaymentStatusCardDemo } from './payment-status-card-demo';
 export { PriceSelectorDemo } from './price-selector-demo';
-export { PricingTableDemo } from './pricing-table-demo';
-export { SubscriptionManagementCardDemo } from './subscription-management-card-demo';
 export { UsageMeterDemo } from './usage-meter-demo';

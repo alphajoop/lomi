@@ -92,16 +92,18 @@ export default async function Page({
         style: 'clerk',
       }}
     >
-      <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
-      <p className="text-lg text-fd-muted-foreground">
-        {page.data.description}
-      </p>
-      <div className="flex flex-row gap-2 items-center border-b -translate-y-4 pt-3 pb-6 justify-end">
-        <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-        <ViewOptions
-          markdownUrl={`${page.url}.mdx`}
-          githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
-        />
+      <div className="docs-page-header">
+        <div className="docs-page-header-main">
+          <h1 className="docs-page-title font-semibold">{page.data.title}</h1>
+          <p className="docs-page-description">{page.data.description}</p>
+        </div>
+        <div className="docs-page-actions">
+          <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
+          <ViewOptions
+            markdownUrl={`${page.url}.mdx`}
+            githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
+          />
+        </div>
       </div>
       <div className="prose flex-1 text-fd-foreground/80">
         {preview ? <PreviewRenderer preview={preview} /> : null}
@@ -163,8 +165,8 @@ function DocsCategory({ url, locale }: { url: string; locale: Language }) {
   if (peersArray.length === 0) return null;
 
   return (
-    <div className="not-prose my-8">
-      <Cards className="gap-4">
+    <div className="not-prose my-5">
+      <Cards className="gap-3">
         {peersArray.map((peer) => (
           <Card key={peer.url} title={peer.name} href={peer.url}>
             {peer.description}

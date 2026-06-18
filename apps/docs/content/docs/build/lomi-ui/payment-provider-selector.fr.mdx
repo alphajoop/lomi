@@ -1,0 +1,37 @@
+---
+title: Sélecteur de fournisseur de paiement
+description: Carrousel de méthodes de paiement du checkout hébergé pour Wave, MTN, cartes et SPI.
+---
+
+import { PaymentProviderSelectorDemo } from '@/components/lomi-ui/demo';
+
+# Sélecteur de fournisseur de paiement
+
+Reprend le carrousel de méthodes de paiement du checkout hébergé.
+
+## Aperçu
+
+<PaymentProviderSelectorDemo />
+
+## Installation
+
+<Installation name="payment-provider-selector" />
+
+## Utilisation
+
+```tsx
+import {
+  PaymentProviderSelector,
+  type ProviderId,
+} from '@/components/lomi-ui/payment-provider-selector';
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `providers` | `ProviderId[]` | Méthodes affichées. |
+| `selectedProvider` | `ProviderId \| null` | Méthode sélectionnée. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Changement de méthode. |
+
+Identifiants : `WAVE`, `MTN`, `cards`, `spi`.

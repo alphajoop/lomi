@@ -22,7 +22,7 @@ function InstallCommand({ code }: { code: string }) {
       code={code}
       codeblock={{
         keepBackground: true,
-        className: 'my-0 rounded-sm border-fd-border shadow-none',
+        className: 'my-0 rounded-none border-0 bg-transparent shadow-none',
       }}
       options={{ themes: codeThemes }}
     />
@@ -38,9 +38,19 @@ export function Installation({ name }: { name: string }) {
     { name: 'bun', value: 'bun' },
   ];
 
+  const commands: Record<string, string> = {
+    npx: `npx shadcn@latest add ${registryUrl}`,
+    pnpm: `pnpm dlx shadcn@latest add ${registryUrl}`,
+    yarn: `yarn dlx shadcn@latest add ${registryUrl}`,
+    bun: `bunx shadcn@latest add ${registryUrl}`,
+  };
+
   return (
-    <Tabs className="not-prose my-6" defaultValue="npx">
-      <TabsList className="flex flex-col gap-3 text-sm items-start p-3 bg-fd-card text-fd-card-foreground rounded-sm border border-fd-border not-prose sm:flex-row">
+    <Tabs
+      className="not-prose my-6 overflow-hidden rounded-sm border border-fd-border bg-fd-card text-fd-card-foreground"
+      defaultValue="npx"
+    >
+      <TabsList className="flex flex-col gap-3 text-sm items-start border-0 bg-transparent p-3 pb-2 not-prose sm:flex-row">
         <div className="me-auto">
           <p className="font-medium">Install to your codebase</p>
           <p className="mt-1 text-fd-muted-foreground">
@@ -58,25 +68,15 @@ export function Installation({ name }: { name: string }) {
         ))}
       </TabsList>
 
-      <TabsContent value="npx">
-        <InstallCommand code={`npx shadcn@latest add ${registryUrl}`} />
-      </TabsContent>
-
-      <TabsContent value="pnpm">
-        <InstallCommand
-          code={`pnpm dlx shadcn@latest add ${registryUrl}`}
-        />
-      </TabsContent>
-
-      <TabsContent value="yarn">
-        <InstallCommand
-          code={`yarn dlx shadcn@latest add ${registryUrl}`}
-        />
-      </TabsContent>
-
-      <TabsContent value="bun">
-        <InstallCommand code={`bunx shadcn@latest add ${registryUrl}`} />
-      </TabsContent>
+      {tabs.map((tab) => (
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className="mt-0 border-t border-fd-border"
+        >
+          <InstallCommand code={commands[tab.value] ?? commands.npx} />
+        </TabsContent>
+      ))}
     </Tabs>
   );
 }

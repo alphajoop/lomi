@@ -43,18 +43,14 @@ export async function DocsAgentIndex({
   const copy = COPY[locale] ?? COPY.en;
 
   return (
-    <blockquote className="not-prose my-4 flex flex-col gap-1 rounded-lg border border-border bg-fd-muted/50 px-4 py-2.5 text-sm text-fd-muted-foreground">
-      <p className="m-0 font-medium leading-snug text-fd-foreground">
-        {copy.title}
-      </p>
-      <p className="m-0 leading-snug">
+    <aside className="docs-agent-index not-prose" aria-label={copy.title}>
+      <p className="docs-agent-index-text">
+        <span className="docs-agent-index-label">{copy.title}</span>
         {copy.beforeUrl}{' '}
-        <a href={`${origin}/llms.txt`} className="text-fd-primary underline">
-          {origin}/llms.txt
-        </a>{' '}
-        {copy.between} <InlineCommand>{copy.command}</InlineCommand>
+        <a href={`${origin}/llms.txt`}>{origin}/llms.txt</a> {copy.between}{' '}
+        <InlineCommand>{copy.command}</InlineCommand>
         {copy.after}
       </p>
-    </blockquote>
+    </aside>
   );
 }

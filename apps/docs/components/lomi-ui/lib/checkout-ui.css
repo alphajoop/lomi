@@ -162,7 +162,7 @@
   border: none !important;
 }
 
-/* SPI/BNPL alias inputs outside customer stack */
+/* SPI alias inputs outside customer stack */
 .lomi-checkout-ui input[type='text']:not(.PhoneInputInput),
 .lomi-checkout-ui input[type='email']:not(.PhoneInputInput) {
   border-color: #d1d5db !important;
