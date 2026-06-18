@@ -3,138 +3,274 @@
 /* eslint-disable @next/next/no-img-element -- Lomi UI registry components are framework-portable copy-paste components. */
 
 import * as React from 'react';
-import { Check } from 'lucide-react';
-
-type ProviderId = 'wave' | 'mtn' | 'orange' | 'spi' | 'card';
-
-type Provider = {
-  id: ProviderId;
-  label: string;
-  description?: string;
-  icon: string;
-  iconClassName?: string;
-};
-
-export interface PaymentProviderSelectorProps {
-  providers?: ProviderId[];
-  selectedProvider?: ProviderId;
-  onProviderChange?: (provider: ProviderId) => void;
-  disabledProviders?: ProviderId[];
-  variant?: 'grid' | 'rail';
-  className?: string;
-}
-
-const providerCatalog: Record<ProviderId, Provider> = {
-  wave: {
-    id: 'wave',
-    label: 'Wave',
-    description: 'Pay from a Wave wallet.',
-    icon: '/payment_channels/wave.webp',
-  },
-  mtn: {
-    id: 'mtn',
-    label: 'MTN',
-    description: 'Mobile Money payment.',
-    icon: '/payment_channels/mtn.webp',
-  },
-  orange: {
-    id: 'orange',
-    label: 'Orange',
-    description: 'Orange Money payment.',
-    icon: '/payment_channels/orange.webp',
-  },
-  spi: {
-    id: 'spi',
-    label: 'π-SPI',
-    description: 'Instant bank payment.',
-    icon: '/payment_channels/pi_spi.webp',
-    iconClassName: 'w-16',
-  },
-  card: {
-    id: 'card',
-    label: 'Card',
-    description: 'Visa, Mastercard, and more.',
-    icon: '/payment_channels/cards.webp',
-    iconClassName: 'w-12',
-  },
-};
+import { CheckoutCard } from './lib/checkout-card';
+import {
+  CheckoutInput,
+  checkoutCustomerFieldClass,
+} from './lib/checkout-input';
+import './lib/checkout-ui.css';
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
 }
 
+export type ProviderId = 'WAVE' | 'MTN' | 'cards' | 'spi' | 'bnpl';
+
+type MethodInfo = {
+  image: string;
+  label: string;
+  imageClass: string;
+  containerClass: string;
+  width: number;
+  height: number;
+};
+
+const MOBILE_MONEY_IDS = new Set<ProviderId>(['WAVE', 'MTN']);
+
+const DEFAULT_PROVIDERS: ProviderId[] = ['WAVE', 'MTN', 'cards', 'spi'];
+
+const DEFAULT_LABELS: Record<ProviderId, string> = {
+  WAVE: 'Wave',
+  MTN: 'MTN',
+  cards: 'Card',
+  spi: 'π—SPI',
+  bnpl: 'BNPL',
+};
+
+function getMethodInfo(method: ProviderId, cardLabel: string): MethodInfo {
+  if (method === 'cards') {
+    return {
+      image: '/placeholder/card.webp',
+      label: cardLabel,
+      imageClass: 'object-contain -ml-1.5 translate-y-[3px]',
+      containerClass: 'justify-center mb-0.5',
+      width: 40,
+      height: 40,
+    };
+  }
+
+  if (MOBILE_MONEY_IDS.has(method)) {
+    return {
+      image:
+        method === 'WAVE'
+          ? '/payment_channels/wave.webp'
+          : `/payment_channels/${method.toLowerCase()}.webp`,
+      label: DEFAULT_LABELS[method],
+      imageClass: 'object-contain rounded-[4px] translate-y-1.5',
+      containerClass: 'justify-start w-full mb-2 -ml-0',
+      width: 28,
+      height: 28,
+    };
+  }
+
+  if (method === 'spi') {
+    return {
+      image: '/payment_channels/pi_spi.webp',
+      label: DEFAULT_LABELS.spi,
+      imageClass: 'object-contain translate-y-[6px]',
+      containerClass: 'justify-start w-full mb-[9px] -ml-0',
+      width: 80,
+      height: 32,
+    };
+  }
+
+  if (method === 'bnpl') {
+    return {
+      image: '/placeholder/bnpl.webp',
+      label: DEFAULT_LABELS.bnpl,
+      imageClass: 'object-contain',
+      containerClass: 'justify-start w-full mb-1 -ml-0',
+      width: 40,
+      height: 32,
+    };
+  }
+
+  return {
+    image: '',
+    label: method,
+    imageClass: '',
+    containerClass: '',
+    width: 40,
+    height: 40,
+  };
+}
+
+export interface PaymentProviderSelectorProps {
+  providers?: ProviderId[];
+  selectedProvider?: ProviderId | null;
+  onProviderChange?: (provider: ProviderId) => void;
+  disabledProviders?: ProviderId[];
+  /** When false, SPI cannot be selected (matches hosted checkout SPI gate). */
+  spiOperational?: boolean;
+  /** Label for the card payment method (production uses i18n). */
+  cardLabel?: string;
+  className?: string;
+}
+
 export function PaymentProviderSelector({
-  providers = ['wave', 'mtn', 'orange', 'spi', 'card'],
-  selectedProvider,
+  providers = DEFAULT_PROVIDERS,
+  selectedProvider: controlledSelectedProvider,
   onProviderChange,
   disabledProviders = [],
-  variant = 'rail',
+  spiOperational = true,
+  cardLabel = DEFAULT_LABELS.cards,
   className,
 }: PaymentProviderSelectorProps) {
-  const firstEnabledProvider = providers.find(
-    (provider) => !disabledProviders.includes(provider),
+  const [internalSelectedProvider, setInternalSelectedProvider] =
+    React.useState<ProviderId | null>(null);
+  const [spiAlias, setSpiAlias] = React.useState('');
+  const [bnplAlias, setBnplAlias] = React.useState('');
+
+  const selectedProvider =
+    controlledSelectedProvider !== undefined &&
+    controlledSelectedProvider !== null
+      ? controlledSelectedProvider
+      : internalSelectedProvider;
+
+  const availableProviders = React.useMemo(
+    () => providers.filter((provider) => provider !== 'bnpl' || spiOperational),
+    [providers, spiOperational],
   );
-  const currentProvider = selectedProvider ?? firstEnabledProvider;
+
+  React.useEffect(() => {
+    const isParentControlling =
+      controlledSelectedProvider !== undefined &&
+      controlledSelectedProvider !== null;
+
+    if (
+      !isParentControlling &&
+      internalSelectedProvider === null &&
+      availableProviders.length > 0
+    ) {
+      const defaultProvider = availableProviders[0];
+      if (defaultProvider) {
+        setTimeout(() => {
+          setInternalSelectedProvider(defaultProvider);
+        }, 0);
+        onProviderChange?.(defaultProvider);
+      }
+    }
+  }, [
+    availableProviders,
+    controlledSelectedProvider,
+    internalSelectedProvider,
+    onProviderChange,
+  ]);
+
+  const handleProviderSelect = (provider: ProviderId) => {
+    if (!availableProviders.includes(provider)) return;
+    if (disabledProviders.includes(provider)) return;
+    if (provider === 'spi' && !spiOperational) return;
+
+    setInternalSelectedProvider(provider);
+    onProviderChange?.(provider);
+
+    if (provider !== 'spi') setSpiAlias('');
+    if (provider !== 'bnpl') setBnplAlias('');
+  };
 
   return (
-    <div
-      className={cn(
-        variant === 'grid'
-          ? 'grid grid-cols-2 gap-3 sm:grid-cols-3'
-          : 'flex gap-3 overflow-x-auto pb-2',
-        className,
-      )}
-      role="radiogroup"
-      aria-label="Payment provider"
-    >
-      {providers.map((providerId) => {
-        const provider = providerCatalog[providerId];
-        const isSelected = currentProvider === provider.id;
-        const isDisabled = disabledProviders.includes(provider.id);
+    <div className={cn('lomi-checkout-ui space-y-0', className)}>
+      <div className="relative w-full">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pb-2 px-1">
+          {availableProviders.map((provider) => {
+            const isSelected = selectedProvider === provider;
+            const isSpiDisabled = provider === 'spi' && !spiOperational;
+            const isProviderDisabled = disabledProviders.includes(provider);
+            const methodInfo = getMethodInfo(provider, cardLabel);
 
-        return (
-          <button
-            key={provider.id}
-            type="button"
-            role="radio"
-            aria-checked={isSelected}
-            disabled={isDisabled}
-            onClick={() => onProviderChange?.(provider.id)}
-            className={cn(
-              'relative flex min-h-[78px] min-w-[112px] flex-1 flex-col items-start justify-center rounded-sm border bg-card p-4 text-left text-card-foreground shadow-sm transition-all',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              isSelected
-                ? 'border-primary bg-primary/5 shadow-md'
-                : 'border-border hover:border-border/80 hover:bg-accent',
-              isDisabled && 'cursor-not-allowed opacity-50 grayscale',
-            )}
-          >
-            <span className="mb-2 flex h-8 items-center">
-              <img
-                src={provider.icon}
-                alt=""
+            return (
+              <CheckoutCard
+                key={provider}
+                onClick={() =>
+                  !isSpiDisabled &&
+                  !isProviderDisabled &&
+                  handleProviderSelect(provider)
+                }
                 className={cn(
-                  'h-7 w-7 rounded-[4px] object-contain',
-                  provider.iconClassName,
+                  'relative flex-shrink-0 flex flex-col items-start justify-center transition-all duration-200 min-w-0 bg-white snap-center p-4 -ml-1',
+                  isSpiDisabled || isProviderDisabled
+                    ? 'cursor-not-allowed opacity-60 grayscale'
+                    : 'cursor-pointer',
+                  isSelected
+                    ? 'border-[#56A5F9] bg-slate-100/50 shadow-md'
+                    : 'border-border/40 hover:border-border/60 hover:bg-gray-50/50 hover:shadow-sm',
+                  'w-[103.25px] md:w-[142px]',
                 )}
-              />
-            </span>
-            <span className="text-xs font-medium">{provider.label}</span>
-            {variant === 'grid' && provider.description ? (
-              <span className="mt-1 text-xs leading-4 text-muted-foreground">
-                {provider.description}
-              </span>
-            ) : null}
-            {isSelected ? (
-              <span className="absolute right-2 top-2 rounded-full bg-primary p-0.5 text-primary-foreground shadow-sm">
-                <Check className="h-3 w-3" strokeWidth={3} />
-              </span>
-            ) : null}
-          </button>
-        );
-      })}
+                style={{ height: '70px' }}
+              >
+                <div
+                  className={cn('flex items-center', methodInfo.containerClass)}
+                >
+                  <img
+                    src={methodInfo.image}
+                    alt={methodInfo.label}
+                    width={methodInfo.width}
+                    height={methodInfo.height}
+                    className={methodInfo.imageClass}
+                    style={{
+                      width: methodInfo.width,
+                      height: methodInfo.height,
+                      objectFit: 'contain',
+                    }}
+                  />
+                </div>
+                <span
+                  className="text-xs font-medium text-left w-full"
+                  style={{ color: '#000' }}
+                >
+                  {methodInfo.label}
+                </span>
+                {isSelected ? (
+                  <div className="absolute top-1 right-1 bg-[#56A5F9] rounded-full p-0.5 shadow-sm">
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                ) : null}
+              </CheckoutCard>
+            );
+          })}
+        </div>
+      </div>
+
+      {selectedProvider === 'spi' ? (
+        <div className="space-y-3">
+          <CheckoutInput
+            type="text"
+            value={spiAlias}
+            onChange={(event) => setSpiAlias(event.target.value)}
+            placeholder="your-alias@bank"
+            className={cn(
+              checkoutCustomerFieldClass,
+              'mb-0.5 rounded-sm shadow-none',
+            )}
+          />
+        </div>
+      ) : null}
+
+      {selectedProvider === 'bnpl' ? (
+        <div className="space-y-3">
+          <CheckoutInput
+            type="text"
+            value={bnplAlias}
+            onChange={(event) => setBnplAlias(event.target.value)}
+            placeholder="your-bnpl-alias"
+            className={cn(checkoutCustomerFieldClass, 'rounded-sm shadow-none')}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
-
-export type { ProviderId };

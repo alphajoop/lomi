@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { CalendarDays, CreditCard, PackageCheck } from 'lucide-react';
 

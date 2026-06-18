@@ -1,125 +1,106 @@
+'use client';
+
 import * as React from 'react';
-import { AlertCircle, CheckCircle2, Clock3 } from 'lucide-react';
-import type { ProviderId } from './payment-provider-selector';
+import { CheckCircle } from 'lucide-react';
 
 export interface PaymentStatusCardProps {
-  status: 'success' | 'failed' | 'pending';
-  amount: number;
-  currency: string;
-  provider: ProviderId;
-  transactionId?: string;
+  organizationName: string;
+  organizationLogoUrl?: string | null;
+  title?: string;
+  description?: string;
   primaryAction?: {
     label: string;
     href?: string;
     onClick?: () => void;
   };
   className?: string;
+  children?: React.ReactNode;
 }
-
-const providerLabels: Record<ProviderId, string> = {
-  wave: 'Wave',
-  mtn: 'MTN',
-  orange: 'Orange Money',
-  spi: 'π-SPI',
-  card: 'Card',
-};
-
-const statusCopy = {
-  success: {
-    title: 'Payment succeeded',
-    description: 'The payment is confirmed and ready to reconcile.',
-    icon: CheckCircle2,
-    tone: 'text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/50 dark:border-emerald-900',
-  },
-  failed: {
-    title: 'Payment failed',
-    description: 'The customer can retry with the same or another provider.',
-    icon: AlertCircle,
-    tone: 'text-destructive bg-destructive/10 border-destructive/20',
-  },
-  pending: {
-    title: 'Payment pending',
-    description: 'Waiting for the customer or provider to confirm.',
-    icon: Clock3,
-    tone: 'text-primary bg-primary/10 border-primary/20',
-  },
-};
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
 }
 
-function formatMoney(amount: number, currency: string) {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
+function OrganizationAvatar({
+  name,
+  logoUrl,
+  size = 48,
+}: {
+  name: string;
+  logoUrl?: string | null;
+  size?: number;
+}) {
+  if (logoUrl) {
+    return (
+      <img
+        src={logoUrl}
+        alt={name}
+        width={size}
+        height={size}
+        className="rounded-sm object-cover"
+      />
+    );
+  }
+
+  return (
+    <div
+      className="flex items-center justify-center rounded-sm bg-muted text-sm font-medium text-muted-foreground"
+      style={{ width: size, height: size }}
+      aria-hidden="true"
+    >
+      {name.charAt(0).toUpperCase()}
+    </div>
+  );
 }
 
 export function PaymentStatusCard({
-  status,
-  amount,
-  currency,
-  provider,
-  transactionId,
+  organizationName,
+  organizationLogoUrl,
+  title = 'Payment successful',
+  description = 'Thank you for your payment. Your transaction has been completed successfully.',
   primaryAction,
   className,
+  children,
 }: PaymentStatusCardProps) {
-  const copy = statusCopy[status];
-  const Icon = copy.icon;
   const actionClass =
-    'inline-flex h-9 items-center justify-center rounded-sm bg-primary px-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+    'inline-flex h-10 w-full items-center justify-center rounded-sm bg-[#56A5F9] px-4 text-sm font-medium text-white transition-colors hover:bg-[#52A1F8] outline-none';
 
   return (
     <section
       className={cn(
-        'w-full max-w-md rounded-sm border bg-card p-5 text-card-foreground shadow-sm',
+        'w-full max-w-md rounded-sm border border-border bg-card p-6 text-center text-card-foreground',
         className,
       )}
     >
-      <div className="flex items-start gap-3">
-        <span className={cn('rounded-sm border p-2', copy.tone)}>
-          <Icon className="h-5 w-5" />
-        </span>
-        <div>
-          <h3 className="text-base font-semibold">{copy.title}</h3>
-          <p className="mt-1 text-sm leading-5 text-muted-foreground">
-            {copy.description}
-          </p>
-        </div>
+      <div className="mb-4 flex items-center justify-center gap-4">
+        <OrganizationAvatar
+          name={organizationName}
+          logoUrl={organizationLogoUrl}
+          size={48}
+        />
+        <div className="h-8 w-px bg-border" />
+        <CheckCircle className="h-10 w-10 text-green-700 dark:text-green-300" />
       </div>
 
-      <dl className="mt-5 grid gap-3 rounded-sm bg-muted/50 p-3 text-sm">
-        <div className="flex justify-between gap-4">
-          <dt className="text-muted-foreground">Amount</dt>
-          <dd className="font-medium">{formatMoney(amount, currency)}</dd>
-        </div>
-        <div className="flex justify-between gap-4">
-          <dt className="text-muted-foreground">Provider</dt>
-          <dd className="font-medium">{providerLabels[provider]}</dd>
-        </div>
-        {transactionId ? (
-          <div className="flex justify-between gap-4">
-            <dt className="text-muted-foreground">Transaction</dt>
-            <dd className="font-mono text-xs font-medium">{transactionId}</dd>
-          </div>
-        ) : null}
-      </dl>
+      <h1 className="mb-2 text-xl font-normal text-green-700 dark:text-green-300">
+        {title}
+      </h1>
+      <p className="mb-6 text-xs text-muted-foreground">{description}</p>
+
+      {children ? (
+        <div className="mb-6 space-y-3 text-left">{children}</div>
+      ) : null}
 
       {primaryAction ? (
         primaryAction.href ? (
-          <a
-            href={primaryAction.href}
-            className={cn('mt-4 w-full', actionClass)}
-          >
+          <a href={primaryAction.href} className={actionClass}>
             {primaryAction.label}
           </a>
         ) : (
           <button
             type="button"
             onClick={primaryAction.onClick}
-            className={cn('mt-4 w-full', actionClass)}
+            className={actionClass}
           >
             {primaryAction.label}
           </button>

@@ -1,13 +1,13 @@
 ---
 title: Mobile Money Checkout Card
-description: A focused checkout card for Wave, MTN, Orange Money, and SPI.
+description: Provider selection, customer form, and pay button aligned with hosted checkout.
 ---
 
 import { MobileMoneyCheckoutCardDemo } from '@/components/lomi-ui/demo';
 
 # Mobile Money Checkout Card
 
-Use this as the main payment panel for a lightweight checkout flow.
+Combines the hosted checkout provider carousel, personal information form, and pay button.
 
 ## Preview
 
@@ -23,11 +23,11 @@ Use this as the main payment panel for a lightweight checkout flow.
 import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
 
 <MobileMoneyCheckoutCard
-  amount={12500}
-  currency="XOF"
-  merchantName="Keur Studio"
-  selectedProvider="wave"
-  phoneNumber="+225 07 00 00 00 00"
+  selectedProvider="WAVE"
+  fullName="Aya Konan"
+  email="aya@example.com"
+  phoneNumber="+2250700000000"
+  payButtonBgColor="#121317"
   onSubmit={() => createCheckoutSession()}
 />;
 ```
@@ -36,12 +36,18 @@ import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-check
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `amount` | `number` | Amount to display. |
-| `currency` | `string` | ISO currency code, for example `XOF`. |
-| `merchantName` | `string` | Merchant or product name shown at the top. |
 | `selectedProvider` | `ProviderId` | Current provider selection. |
-| `phoneNumber` | `string` | Controlled phone input value. |
-| `onProviderChange` | `(provider: ProviderId) => void` | Fired when the customer changes provider. |
-| `onPhoneNumberChange` | `(phoneNumber: string) => void` | Fired when the phone field changes. |
-| `onSubmit` | `() => void` | Fired when the customer taps pay. |
-| `loading` | `boolean` | Shows the loading state on the pay button. |
+| `fullName` | `string` | Customer full name. |
+| `email` | `string` | Customer email. |
+| `phoneNumber` | `string` | Customer phone number. |
+| `whatsappNumber` | `string` | Optional separate WhatsApp number. |
+| `isDifferentWhatsApp` | `boolean` | Shows WhatsApp field instead of toggle row. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Provider change handler. |
+| `onFullNameChange` | `(value: string) => void` | Full name change handler. |
+| `onEmailChange` | `(value: string) => void` | Email change handler. |
+| `onPhoneNumberChange` | `(value?: string) => void` | Phone change handler. |
+| `onWhatsAppNumberChange` | `(value?: string) => void` | WhatsApp change handler. |
+| `onDifferentWhatsAppChange` | `(value: boolean) => void` | WhatsApp toggle handler. |
+| `onSubmit` | `() => void` | Pay button click handler. |
+| `paymentStatus` | `'idle' \| 'processing' \| 'success' \| 'error'` | Pay button state. |
+| `payButtonBgColor` | `string` | Pay button background. Defaults to `#121317`. |

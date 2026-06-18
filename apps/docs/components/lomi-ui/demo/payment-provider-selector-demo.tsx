@@ -7,10 +7,10 @@ import {
 } from '@/components/lomi-ui/payment-provider-selector';
 
 export function PaymentProviderSelectorDemo() {
-  const [provider, setProvider] = React.useState<ProviderId>('wave');
+  const [provider, setProvider] = React.useState<ProviderId>('WAVE');
 
   return (
-    <div className="not-prose rounded-sm border bg-fd-background p-4">
+    <div className="not-prose lomi-checkout-ui bg-white p-4">
       <PaymentProviderSelector
         selectedProvider={provider}
         onProviderChange={setProvider}

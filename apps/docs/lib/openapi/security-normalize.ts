@@ -4,7 +4,7 @@ import type {
   Document,
   OperationObject,
   PathItemObject,
-} from 'fumadocs-openapi';
+} from '@/lib/openapi/types';
 
 const HTTP_METHODS = [
   'get',

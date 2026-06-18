@@ -1,13 +1,13 @@
 ---
 title: Payment Status Card
-description: Show success, failed, and pending checkout outcomes.
+description: Hosted checkout success outcome card.
 ---
 
 import { PaymentStatusCardDemo } from '@/components/lomi-ui/demo';
 
 # Payment Status Card
 
-Use this after checkout, in a receipt view, or inside a merchant dashboard.
+Matches the success card in `post/success.tsx`.
 
 ## Preview
 
@@ -23,12 +23,9 @@ Use this after checkout, in a receipt view, or inside a merchant dashboard.
 import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
 
 <PaymentStatusCard
-  status="success"
-  amount={11750}
-  currency="XOF"
-  provider="wave"
-  transactionId="txn_7n4Pq3b9"
-  primaryAction={{ label: 'View transaction', href: '/transactions/txn_7n4Pq3b9' }}
+  organizationName="Keur Studio"
+  organizationLogoUrl="/merchant-logo.webp"
+  primaryAction={{ label: 'Continue', href: '/orders' }}
 />;
 ```
 
@@ -36,9 +33,9 @@ import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `status` | `'success' \| 'failed' \| 'pending'` | Payment outcome to render. |
-| `amount` | `number` | Payment amount. |
-| `currency` | `string` | ISO currency code. |
-| `provider` | `ProviderId` | Provider used for the payment. |
-| `transactionId` | `string` | Optional Lomi transaction id. |
-| `primaryAction` | `{ label: string; href?: string; onClick?: () => void }` | Optional primary action. |
+| `organizationName` | `string` | Merchant name for the avatar fallback. |
+| `organizationLogoUrl` | `string \| null` | Optional merchant logo URL. |
+| `title` | `string` | Success heading. Defaults to `Payment successful`. |
+| `description` | `string` | Supporting copy under the heading. |
+| `primaryAction` | `{ label: string; href?: string; onClick?: () => void }` | Continue button. |
+| `children` | `React.ReactNode` | Optional slot for downloads or license keys. |

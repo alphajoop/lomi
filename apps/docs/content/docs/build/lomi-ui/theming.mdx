@@ -1,32 +1,37 @@
 ---
 title: Theming
-description: Customize Lomi UI components without losing the checkout feel.
+description: Customize Lomi UI components without losing the hosted checkout feel.
 ---
 
 # Theming
 
-Lomi UI components are intentionally simple. They use Tailwind classes, small radii, neutral surfaces, and a blue selected state inspired by the hosted checkout.
+Lomi UI payment components mirror hosted checkout styling: hardcoded selection blue, subtle gray borders, white payment panel surfaces, and no focus rings on checkout inputs.
 
-## Defaults
+## Hosted checkout tokens
 
-| Token | Default |
-| ----- | ------- |
-| Selected state | `#56A5F9` |
+| Token | Production value |
+| ----- | ---------------- |
+| Selected border / check badge | `#56A5F9` |
+| Selected background (rendered) | White — production `checkout.css` overrides `bg-slate-100/50` on `.border.bg-card` |
+| Selected background (source class) | `bg-slate-100/50` (include `checkout-ui.css` or equivalent for parity) |
+| Unselected border | `border-border/40` |
+| Unselected hover border | `border-border/60` |
+| Unselected hover background | `bg-gray-50/50` |
+| Label color on provider cards | `#000` |
+| Pay button default background | `#121317` |
+| Input border | `#d1d5db` (`clamp(1px, 0.12vw, 1.3px)`) |
 | Card radius | `rounded-sm` |
-| Surface | white or near-black checkout summary |
-| Border | subtle gray borders |
-| Focus | visible blue focus rings |
+| Provider card size | `103.25px` mobile / `142px` md, height `70px` |
 
 ## Customizing
 
-Because each component is copied into your app, customize the classes directly:
+Because each component is copied into your app, customize classes directly:
 
 ```tsx
 <PaymentProviderSelector
-  className="grid-cols-2"
-  selectedProvider="wave"
+  selectedProvider="WAVE"
   onProviderChange={setProvider}
 />
 ```
 
-Keep the selected state obvious, especially on mobile money provider cards where users need to confirm the exact rail before paying.
+Keep the `#56A5F9` selected state obvious on provider cards so customers confirm the exact rail before paying.

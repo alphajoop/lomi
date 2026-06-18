@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { rimraf } from 'rimraf';
-import type { Document } from 'fumadocs-openapi';
+import type { Document } from '@/lib/openapi/types';
 import { buildRegistry } from '@/lib/scripts/build-registry';
 import { normalizeOpenApiSecurity } from '@/lib/openapi/security-normalize';
 

@@ -1,13 +1,13 @@
 ---
 title: Payment Provider Selector
-description: Select Wave, MTN, Orange Money, SPI, or card payment rails.
+description: Hosted-checkout payment method carousel for Wave, MTN, cards, SPI, and BNPL.
 ---
 
 import { PaymentProviderSelectorDemo } from '@/components/lomi-ui/demo';
 
 # Payment Provider Selector
 
-Use this when a customer needs to choose how they want to pay.
+Matches the hosted checkout payment method carousel in `payment-provider-selection.tsx`.
 
 ## Preview
 
@@ -26,7 +26,7 @@ import {
 } from '@/components/lomi-ui/payment-provider-selector';
 
 function Example() {
-  const [provider, setProvider] = React.useState<ProviderId>('wave');
+  const [provider, setProvider] = React.useState<ProviderId>('WAVE');
 
   return (
     <PaymentProviderSelector
@@ -41,8 +41,23 @@ function Example() {
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `providers` | `ProviderId[]` | Provider ids to show. Defaults to Wave, MTN, Orange, SPI, and card. |
-| `selectedProvider` | `ProviderId` | Controlled selected provider. |
-| `onProviderChange` | `(provider: ProviderId) => void` | Fired when the customer chooses a provider. |
-| `disabledProviders` | `ProviderId[]` | Providers that should render disabled. |
-| `variant` | `'grid' \| 'rail'` | Layout style. Defaults to `rail`. |
+| `providers` | `ProviderId[]` | Methods to show. Defaults to `WAVE`, `MTN`, `cards`, and `spi`. |
+| `selectedProvider` | `ProviderId \| null` | Controlled selected method. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Fired when the customer chooses a method. |
+| `disabledProviders` | `ProviderId[]` | Methods that render disabled. |
+| `spiOperational` | `boolean` | When false, SPI cannot be selected. Defaults to `true`. |
+| `cardLabel` | `string` | Card method label. Defaults to `Card`. |
+
+## Provider ids
+
+Use the same method ids as hosted checkout: `WAVE`, `MTN`, `cards`, `spi`, and `bnpl`.
+
+## Assets
+
+Copy these paths into your app public folder:
+
+- `/payment_channels/wave.webp`
+- `/payment_channels/mtn.webp`
+- `/payment_channels/pi_spi.webp`
+- `/placeholder/card.webp`
+- `/placeholder/bnpl.webp`

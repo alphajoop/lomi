@@ -5,7 +5,7 @@ import { baseOptions, linkItems, logo } from '@/lib/utils/layout.shared';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 // import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
 import type { Folder, Node, Root } from 'fumadocs-core/page-tree';
 import { t as translate } from '@/lib/i18n/translations';
@@ -139,7 +139,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
             style={
               {
                 '--tab-color': color,
-              } as object
+              } as CSSProperties
             }
           >
             {node.icon}
