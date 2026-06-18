@@ -1,0 +1,37 @@
+name: Woo Plugin CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/plugins/woo/**"
+      - ".github/workflows/woo-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/plugins/woo/**"
+      - ".github/workflows/woo-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Run plugin parity checks
+        run: apps/plugins/scripts/verify-lomi-plugins.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Woo build dependencies
+        working-directory: apps/plugins/woo
+        run: npm ci
+
+      - name: Build Woo assets
+        working-directory: apps/plugins/woo
+        run: npm run build

@@ -58,7 +58,7 @@ Lint enforces these headings:
 
 ## What we exclude
 
-- **Internal and admin-shaped routes** are not listed in the public REST reference. The public route filter excludes agent, provider, merchant-admin, organization, and account list/detail routes before parity checks run.
+- **Internal and admin-shaped routes** are not listed in the public REST reference. The public route filter excludes agent routes, webhook provider ingress, metering/invoices, and account list/detail (`GET /accounts`, `GET /accounts/{id}`). **Read-only platform** routes (`organizations`, `merchants`, `providers`) are included in the public contract and SDK allowlist.
 
 ## Legacy URLs
 

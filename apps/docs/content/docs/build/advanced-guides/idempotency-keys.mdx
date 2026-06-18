@@ -13,6 +13,8 @@ When you make a potentially mutating API request (like `POST`, `PATCH`, `DELETE`
 3.  **First Request:** lomi. processes the request normally and stores the result associated with your key.
 4.  **Subsequent Requests (Same Key):** If lomi. receives another request with the **same key** within 24 hours, it will not re-process the operation. Instead, it will return the **same response** (success or error) that it sent for the original request.
 
+When the response is served from the idempotency cache, the API adds **`Idempotency-Cache-Hit: true`**. Supported today on **`POST /checkout-sessions`** and **`POST /payment-requests`**.
+
 ## Using idempotency keys
 
 Include the `Idempotency-Key` header in your API calls. Most lomi. SDKs provide a way to pass this easily.
@@ -136,7 +138,7 @@ Specific idempotency-related errors (though less common if using UUIDs correctly
 
 ## Common scenarios
 
-- **Creating Payments/Checkout Sessions:** Essential to prevent charging a customer twice if your initial request times out but was actually processed by lomi..
+- **Creating Payments/Checkout Sessions:** Essential to prevent charging a customer twice if your initial request times out but was actually processed by lomi.
 - **Creating Refunds:** Prevents accidentally refunding a transaction multiple times.
 - **Creating Customers/Products/Webhooks:** Useful to avoid creating duplicate resources due to retries.
 

@@ -1,0 +1,9 @@
+{
+  "title": "Merchants",
+  "pages": [
+    "MerchantsController_getArr",
+    "MerchantsController_getBalance",
+    "MerchantsController_getDetails",
+    "MerchantsController_getMrr"
+  ]
+}

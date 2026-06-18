@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -69,5 +70,48 @@ export class CustomerPortalController {
       body.action,
       body.cancellation_reason,
     );
+  }
+
+  @Get('payment-methods')
+  @ApiOperation({ summary: 'List saved payment methods for portal session' })
+  listPaymentMethods(@PortalSession() session: PortalSessionContext) {
+    return this.customerPortalService.listPaymentMethods(session);
+  }
+
+  @Post('payment-methods/setup-intent')
+  @ApiOperation({ summary: 'Create Stripe SetupIntent for adding a card' })
+  createPaymentMethodSetupIntent(
+    @PortalSession() session: PortalSessionContext,
+  ) {
+    return this.customerPortalService.createPaymentMethodSetupIntent(session);
+  }
+
+  @Post('payment-methods/:id/default')
+  @ApiOperation({ summary: 'Set default payment method' })
+  setDefaultPaymentMethod(
+    @PortalSession() session: PortalSessionContext,
+    @Param('id') id: string,
+  ) {
+    return this.customerPortalService.setDefaultPaymentMethod(session, id);
+  }
+
+  @Delete('payment-methods/:id')
+  @ApiOperation({ summary: 'Remove a saved payment method' })
+  detachPaymentMethod(
+    @PortalSession() session: PortalSessionContext,
+    @Param('id') id: string,
+  ) {
+    return this.customerPortalService.detachPaymentMethod(session, id);
+  }
+
+  @Post('subscriptions/:id/retry-payment')
+  @ApiOperation({
+    summary: 'Retry off-session payment for a past_due subscription',
+  })
+  retrySubscriptionPayment(
+    @PortalSession() session: PortalSessionContext,
+    @Param('id') id: string,
+  ) {
+    return this.customerPortalService.retrySubscriptionPayment(session, id);
   }
 }

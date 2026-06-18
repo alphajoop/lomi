@@ -12,9 +12,16 @@ import { StripeClientsService } from '../../utils/stripe/stripe-clients.service'
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import {
   buildNetworkProviderMetadata,
+  assertNetworkContextRecorded,
+  isNetworkRequest,
   recordNetworkContext,
+  resolveNetworkMemberMerchantId,
 } from '../common/network-context';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
+import {
+  attachChargeNextAction,
+  deriveCardChargeNextAction,
+} from './charge-next-action';
 import {
   assertOptionalUuid,
   assertCardChargeReconciliationInput,
@@ -104,7 +111,15 @@ export class CardChargeService {
       );
     }
 
-    const resolvedCustomerId = await this.resolveCustomerId(createDto, user);
+    const ledgerMerchantId = isNetworkRequest(user)
+      ? await resolveNetworkMemberMerchantId(this.supabase, user)
+      : user.merchantId;
+
+    const resolvedCustomerId = await this.resolveCustomerId(
+      createDto,
+      user,
+      ledgerMerchantId,
+    );
 
     const { data: conversionData, error: conversionError } = await (
       this.supabase.getClient() as any
@@ -135,6 +150,7 @@ export class CardChargeService {
     const metadata = this.buildMetadata(
       createDto,
       user,
+      ledgerMerchantId,
       sourceCurrency,
       amount,
       resolvedCustomerId,
@@ -152,6 +168,7 @@ export class CardChargeService {
     const transactionId = await this.createPendingTransaction(
       createDto,
       user,
+      ledgerMerchantId,
       paymentEnv,
       sourceCurrency,
       amount,
@@ -159,44 +176,44 @@ export class CardChargeService {
       paymentIntent.id,
     );
 
-    await recordNetworkContext(this.supabase, user, {
+    const networkContext = await recordNetworkContext(this.supabase, user, {
       transactionId,
       amount,
       currencyCode: sourceCurrency,
       capabilityKey: 'payment.create',
-      enqueuePaymentCreated: true,
-      paymentEventIdempotencyKey: `network_payment_${paymentIntent.id}`,
       metadata: {
         stripe_payment_intent_id: paymentIntent.id,
         source: 'api_charge_card',
       },
     });
+    assertNetworkContextRecorded(user, networkContext, 'card charge');
 
-    return {
-      success: true,
-      data: {
-        id: paymentIntent.id,
-        client_secret: paymentIntent.client_secret,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        original_amount: amount,
-        original_currency: sourceCurrency,
-        status: paymentIntent.status,
-        appearance:
-          createDto.appearance_theme !== undefined ||
-          createDto.appearance_border_radius !== undefined ||
-          createDto.appearance_billing_address !== undefined
-            ? {
-                theme: toLomiTheme(createDto.appearance_theme),
-                border_radius:
-                  createDto.appearance_border_radius !== undefined
-                    ? Number(createDto.appearance_border_radius)
-                    : undefined,
-                billing_address: createDto.appearance_billing_address,
-              }
-            : undefined,
-      },
+    const data = {
+      id: paymentIntent.id,
+      client_secret: paymentIntent.client_secret,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      original_amount: amount,
+      original_currency: sourceCurrency,
+      status: paymentIntent.status,
+      appearance:
+        createDto.appearance_theme !== undefined ||
+        createDto.appearance_border_radius !== undefined ||
+        createDto.appearance_billing_address !== undefined
+          ? {
+              theme: toLomiTheme(createDto.appearance_theme),
+              border_radius:
+                createDto.appearance_border_radius !== undefined
+                  ? Number(createDto.appearance_border_radius)
+                  : undefined,
+              billing_address: createDto.appearance_billing_address,
+            }
+          : undefined,
     };
+    return attachChargeNextAction(
+      { success: true, data },
+      deriveCardChargeNextAction(data),
+    );
   }
 
   async findOne(paymentIntentId: string, user: AuthContext) {
@@ -236,11 +253,24 @@ export class CardChargeService {
     if (transaction) {
       const orgId = transaction.organization_id as string | undefined;
       const merchantId = transaction.merchant_id as string | undefined;
+      if (orgId && orgId !== user.organizationId) {
+        throw new ForbiddenException('Access denied to this payment intent');
+      }
       if (
-        (orgId && orgId !== user.organizationId) ||
-        (merchantId && merchantId !== user.merchantId)
+        merchantId &&
+        !isNetworkRequest(user) &&
+        merchantId !== user.merchantId
       ) {
         throw new ForbiddenException('Access denied to this payment intent');
+      }
+      if (merchantId && isNetworkRequest(user)) {
+        const memberMerchantId = await resolveNetworkMemberMerchantId(
+          this.supabase,
+          user,
+        );
+        if (merchantId !== memberMerchantId) {
+          throw new ForbiddenException('Access denied to this payment intent');
+        }
       }
     }
 
@@ -290,6 +320,7 @@ export class CardChargeService {
   private async resolveCustomerId(
     createDto: CreateCardChargeDto,
     user: AuthContext,
+    ledgerMerchantId: string = user.merchantId,
   ): Promise<string> {
     const trimmedId = createDto.customer_id?.trim();
     if (trimmedId) {
@@ -302,7 +333,7 @@ export class CardChargeService {
     const { data: custId, error } = await this.supabase.getClient().rpc(
       'create_or_update_customer' as any,
       {
-        p_merchant_id: user.merchantId,
+        p_merchant_id: ledgerMerchantId,
         p_organization_id: user.organizationId,
         p_name: name,
         p_email: email,
@@ -332,6 +363,7 @@ export class CardChargeService {
   private buildMetadata(
     createDto: CreateCardChargeDto,
     user: AuthContext,
+    ledgerMerchantId: string,
     sourceCurrency: string,
     amount: number,
     resolvedCustomerId: string,
@@ -343,7 +375,7 @@ export class CardChargeService {
   ): Stripe.MetadataParam {
     const baseMetadata: Record<string, string> = {
       organization_id: user.organizationId,
-      merchant_id: user.merchantId,
+      merchant_id: ledgerMerchantId,
       environment: user.environment || 'live',
       source: 'api_charge_card',
       original_currency: sourceCurrency,
@@ -415,6 +447,7 @@ export class CardChargeService {
   private async createPendingTransaction(
     createDto: CreateCardChargeDto,
     user: AuthContext,
+    ledgerMerchantId: string,
     paymentEnv: ReturnType<typeof normalizePaymentEnvironment>,
     sourceCurrency: string,
     merchantChargeAmount: number,
@@ -425,7 +458,7 @@ export class CardChargeService {
       const { data, error } = await this.supabase.getClient().rpc(
         'create_stripe_transaction' as any,
         {
-          p_merchant_id: user.merchantId,
+          p_merchant_id: ledgerMerchantId,
           p_organization_id: user.organizationId,
           p_customer_id: customerId,
           p_amount: merchantChargeAmount,

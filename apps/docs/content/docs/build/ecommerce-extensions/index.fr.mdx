@@ -1,7 +1,7 @@
 ---
 title: Extensions e‑commerce
 description:
-  Extensions officielles ou maintenues pour un paiement hébergé avec Lomi.
+  Extensions officielles ou maintenues pour un paiement hébergé avec lomi.
   WooCommerce, Magento 2 et PrestaShop partagent le même contrat d’API
   publique ; Shopify est traité à part.
 ---
@@ -11,11 +11,11 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 # Extensions e‑commerce
 
-Installez Lomi sur votre boutique sans recoder le tunnel de paiement. Ces modules créent des **sessions de paiement hébergées**, envoient le client vers la **page Lomi Checkout**, puis confirment le paiement via les **URL de retour** et les **webhooks marchands**.
+Installez lomi. sur votre boutique sans recoder le tunnel de paiement. Ces modules créent des **sessions de paiement hébergées**, envoient le client vers la **page lomi. Checkout**, puis confirment le paiement via les **URL de retour** et les **webhooks marchands**.
 
 ## Contrat technique partagé
 
-WooCommerce, Magento 2 et PrestaShop n’utilent que l’**API REST publique** Lomi (`/v1/checkout-sessions`). Ils **n’appellent pas** les RPC Supabase ni les endpoints internes Nest.
+WooCommerce, Magento 2 et PrestaShop n’utilent que l’**API REST publique** lomi. (`/v1/checkout-sessions`). Ils **n’appellent pas** les RPC Supabase ni les endpoints internes Nest.
 
 | Point | Contrat |
 | --- | --- |
@@ -58,11 +58,11 @@ Avant la mise en production : [Intégration API](/start/first-payment), [Authen
   />
   <Card
     title="Shopify"
-    description="Application Remix — en cours"
+    description="App personnalisée — paiement panier mobile money et cartes"
     href="/build/ecommerce-extensions/shopify"
   />
 </Cards>
 
 <Callout type="info">
-  **Shopify** repose sur OAuth, l’admin intégré et la configuration gérée par l’app — voir la page Shopify pour les limites actuelles et l’avertissement **En cours**.
+  **Shopify** est distribué en **installation personnalisée**. Activez-le depuis le tableau de bord lomi. → **Intégrations**, puis installez sur votre boutique via OAuth.
 </Callout>

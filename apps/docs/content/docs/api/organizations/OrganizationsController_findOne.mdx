@@ -1,0 +1,72 @@
+---
+title: "Organisation par ID"
+description: "Organisation par ID"
+full: true
+method: get
+path: /organizations/{id}
+operationId: OrganizationsController_findOne
+---
+
+## Overview
+
+Organisation par ID
+
+Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)
+
+
+### When to use this
+
+Use this endpoint when your flow needs `GET /organizations/&#123;id&#125;` (Organisation par ID).
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /organizations/{id}`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+_No query parameters._
+
+
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `200` | L'organisation |
+| `404` | Organisation introuvable ou accès refusé |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/organizations/id_value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `OrganizationsController_findOne`
+- **Operation**: `GET /organizations/{id}`
+
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

@@ -18,5 +18,15 @@ describe('payment-environment', () => {
       resolveMerchantWebhookRelayEnvironment({ environment: 'TEST' }),
     ).toBe('test');
     expect(resolveMerchantWebhookRelayEnvironment({ id: 'tx_1' })).toBe('live');
+    expect(
+      resolveMerchantWebhookRelayEnvironment({
+        metadata: { payment_environment: 'test' },
+      }),
+    ).toBe('test');
+    expect(
+      resolveMerchantWebhookRelayEnvironment({
+        metadata: { test_mode: true },
+      }),
+    ).toBe('test');
   });
 });

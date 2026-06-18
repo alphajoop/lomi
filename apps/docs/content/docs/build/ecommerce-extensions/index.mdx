@@ -1,9 +1,9 @@
 ---
 title: E‑commerce extensions
 description:
-  Official and maintained plugins for hosted checkout with Lomi. WooCommerce,
-  Magento 2, and PrestaShop use the same public API contract; Shopify is
-  documented separately.
+  Official and maintained plugins for hosted checkout with lomi.. WooCommerce,
+  Magento 2, PrestaShop, and Shopify use the same public API contract for
+  checkout sessions and merchant webhooks.
 ---
 
 import { Cards, Card } from 'fumadocs-ui/components/card';
@@ -11,11 +11,11 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 # E‑commerce extensions
 
-Install Lomi on your store without writing checkout plumbing yourself. These modules create **hosted checkout sessions**, redirect shoppers to Lomi Checkout, then confirm payment via **return URLs** and **merchant webhooks**.
+Install lomi. on your store without writing checkout plumbing yourself. These modules create **hosted checkout sessions**, redirect shoppers to lomi. Checkout, then confirm payment via **return URLs** and **merchant webhooks**.
 
 ## Shared technical contract
 
-WooCommerce, Magento 2, and PrestaShop talk only to Lomi’s **public REST API** (`/v1/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
+WooCommerce, Magento 2, and PrestaShop talk only to lomi.’s **public REST API** (`/v1/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
 
 | Concern | Contract |
 | --- | --- |
@@ -58,11 +58,11 @@ Before going live, also read [API integration](/start/first-payment), [Authentic
   />
   <Card
     title="Shopify"
-    description="Remix app — work in progress"
+    description="Custom app — cart pay with mobile money and cards"
     href="/build/ecommerce-extensions/shopify"
   />
 </Cards>
 
 <Callout type="info">
-  **Shopify** uses OAuth, embedded admin, and app-managed configuration — see the Shopify page for current limitations and a **Work in progress** notice.
+  **Shopify** is distributed as a **custom install app** (not App Store payments). Enable it from [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Settings → Payment channels → Integrations**, then install on your store via OAuth.
 </Callout>

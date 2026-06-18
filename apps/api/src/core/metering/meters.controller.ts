@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -20,9 +21,9 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
-import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import { MetersService } from './meters.service';
 import { CreateMeterDto } from './dto/create-meter.dto';
+import { UpdateMeterDto } from './dto/update-meter.dto';
 import {
   MeterBalanceResponseDto,
   MeterResponseDto,
@@ -30,7 +31,6 @@ import {
 
 @ApiTags('Meters')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('meters')
 export class MetersController {
@@ -62,6 +62,18 @@ export class MetersController {
         ? undefined
         : isActive === 'true' || isActive === '1';
     return this.metersService.findAll(user, productId, active);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a meter' })
+  @ApiParam({ name: 'id', description: 'Meter ID' })
+  @ApiResponse({ status: 200, type: MeterResponseDto })
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateMeterDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.metersService.update(id, dto, user);
   }
 
   @Get(':id')

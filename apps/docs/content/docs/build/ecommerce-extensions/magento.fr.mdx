@@ -12,7 +12,7 @@ Extension **Lomi_Payments** pour Magento Open Source / Adobe Commerce. Code du m
 ## Prérequis
 
 - Magento **2.4.x**, PHP selon votre version Magento (**7.4+** / **8.x**)
-- Compte Lomi et clés depuis [dashboard.lomi.africa](https://dashboard.lomi.africa)
+- Compte lomi. et clés depuis [dashboard.lomi.africa](https://dashboard.lomi.africa)
 
 ## Installation
 
@@ -35,13 +35,13 @@ Détails : [README du plugin Magento](https://github.com/lomiafrica/lomi./blob/
 **Magasins → Configuration → Ventes → Moyens de paiement → lomi.**
 
 - Activer la méthode ; **Mode test** pour le bac à sable.
-- Renseigner les **clés secrètes** test / production et les **secrets de signature webhook** (identiques au secret du point de terminaison dans le tableau de bord Lomi).
+- Renseigner les **clés secrètes** test / production et les **secrets de signature webhook** (identiques au secret de l’URL dans le tableau de bord lomi.).
 - URL webhook typique : `https://votre-boutique.example/lomi/payment/webhook` (également affichée dans l’admin).
 
 ## Parcours client
 
 1. Le client choisit **lomi.** et passe commande.
-2. Magento crée une session de paiement et redirige vers Lomi Checkout.
+2. Magento crée une session de paiement et redirige vers lomi. Checkout.
 3. URL de retour : **`lomi/payment/callback`** — vérifie la session par rapport à la commande.
 4. Webhook **`PAYMENT_SUCCEEDED`** avec **`X-Lomi-Signature`** / **`X-Lomi-Event`**.  
    Si `metadata.magento_increment_id` est absent, le module peut quand même résoudre la commande avec **`checkout_session_id`** et le champ de paiement **`lomi_checkout_session_id`**.
@@ -54,7 +54,7 @@ Défini dans [`etc/webapi.xml`](https://github.com/lomiafrica/lomi./blob/master/
 
 ## Webhooks
 
-Même contrat que les autres plugins PHP : HMAC-SHA256 hex sur le JSON **brut** ; configurer les webhooks dans le tableau de bord Lomi.
+Même contrat que les autres plugins PHP : HMAC-SHA256 hex sur le JSON **brut** ; configurer les webhooks dans le tableau de bord lomi.
 
 ## Docs partagées
 

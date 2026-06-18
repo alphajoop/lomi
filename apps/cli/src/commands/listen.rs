@@ -120,6 +120,13 @@ async fn handle_event(
         "connected" => {
             println!();
             cli::output::print_success("Stream connected");
+            if let Some(org_id) = &event.organization_id {
+                println!(
+                    "{} {}",
+                    "Organization:".bright_black(),
+                    org_id.cyan()
+                );
+            }
             if let Some(secret) = &event.webhook_secret {
                 if !secret.is_empty() {
                     println!(

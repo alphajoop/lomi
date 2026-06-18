@@ -1,0 +1,45 @@
+---
+title: 'Comment accepter les paiements Wave ?'
+description: 'Mobile money Wave via checkout hébergé ou POST /charge/wave—comportement asynchrone en live et exigence XOF.'
+docType: how-to
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Wave est le rail mobile money principal pour l’**UEMOA (XOF)**. Préférez [checkout hébergé](/build/checkout) ou [liens de paiement](/build/payment-links).
+
+## Checkout hébergé (recommandé)
+
+1. Créez une session avec `currency_code: "XOF"`.
+2. Le client choisit **Wave**.
+3. Il approuve dans l’app Wave.
+4. Confirmez via webhooks ou `GET /transactions/{id}` avant livraison.
+
+## Charge directe
+
+`POST /charge/wave` exige le **XOF**. La réponse contient `wave_launch_url` ou `checkout_url`.
+
+Voir [API Charges](/api/charge/ChargesController_createWaveCharge) et [Charges directes](/build/direct-charges).
+
+## Test vs live
+
+| | Test | Live |
+| --- | --- | --- |
+| Crédit solde | Souvent à la création | Après approbation Wave |
+| Statut | Souvent `completed` rapidement | Démarre en `pending` |
+
+<Callout type="info">
+  En live, ne livrez pas sur la seule redirection. Voir [Vérifier les paiements](/build/guides/verify-payments).
+</Callout>
+
+## Reversements
+
+Les reversements Wave bénéficiaire exigent une clé live. En test, les reversements Wave renvoient `400`. Voir [Reversements test](/start/sandbox-payments#payouts-in-test-mode).
+
+## Voir aussi
+
+- [Hub moyens de paiement](/build/guides/payment-methods)
+- [Mobile money](/build/mobile-money)

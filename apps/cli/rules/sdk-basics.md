@@ -14,15 +14,13 @@ Environment is determined by your **API key**, not the hostname.
 ## Client setup
 
 ```typescript
-import { DefaultService, OpenAPI } from '@lomi./sdk';
+import { LomiSDK } from '@lomi./sdk';
 import 'dotenv/config';
 
-OpenAPI.BASE = process.env.LOMI_API_URL || 'https://api.lomi.africa';
-OpenAPI.HEADERS = {
-  Authorization: `Bearer ${process.env.LOMI_API_KEY}`,
-};
-
-export const lomiApi = DefaultService;
+export const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: process.env.LOMI_API_KEY?.includes('_test_') ? 'test' : 'live',
+});
 ```
 
 ## Environment variables
@@ -31,7 +29,7 @@ export const lomiApi = DefaultService;
 | --- | --- |
 | `LOMI_API_KEY` | Secret API key from the dashboard |
 | `LOMI_WEBHOOK_SECRET` | Webhook signing secret (`whsec_…`) |
-| `LOMI_API_URL` | Optional API base URL override |
+| `LOMI_API_URL` | Optional API base URL override (use `baseUrl` on `LomiSDK` instead) |
 
 ## Currencies
 

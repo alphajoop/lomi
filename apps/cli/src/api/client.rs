@@ -92,14 +92,6 @@ impl ApiClient {
             .context("Failed to parse API response")
     }
 
-    pub fn token(&self) -> &str {
-        &self.token
-    }
-
-    pub fn base_url(&self) -> &str {
-        &self.base_url
-    }
-
     pub fn headers(&self) -> HeaderMap {
         let mut headers = HeaderMap::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));

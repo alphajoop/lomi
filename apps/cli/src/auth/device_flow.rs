@@ -4,7 +4,7 @@ use reqwest::StatusCode;
 use serde::Deserialize;
 use std::time::{Duration, Instant};
 
-use crate::cli::{CLI_AUTH_BASE, PRODUCTION_API_URL, SUPABASE_ANON_KEY};
+use crate::cli::{cli_auth_base, PRODUCTION_API_URL, SUPABASE_ANON_KEY};
 use crate::config::GlobalConfig;
 
 fn auth_client() -> Result<reqwest::Client> {
@@ -64,8 +64,9 @@ pub struct LoginOptions {
 pub async fn login(options: LoginOptions) -> Result<String> {
     let client = auth_client()?;
 
+    let auth_base = cli_auth_base();
     let device_auth = client
-        .post(format!("{CLI_AUTH_BASE}/device-auth"))
+        .post(format!("{auth_base}/device-auth"))
         .send()
         .await
         .context("Failed to connect to authentication service")?
@@ -141,7 +142,7 @@ pub async fn login(options: LoginOptions) -> Result<String> {
 
         let environment = environment_for_profile(&options.profile);
         let response = client
-            .post(format!("{CLI_AUTH_BASE}/token"))
+            .post(format!("{auth_base}/token"))
             .json(&serde_json::json!({
                 "device_code": device_auth.device_code,
                 "environment": environment,
@@ -211,7 +212,9 @@ pub fn environment_for_profile(profile: &str) -> &'static str {
 
 pub fn api_url_for_profile(profile: &str, override_url: Option<&str>) -> String {
     override_url.map(str::to_string).unwrap_or_else(|| {
-        if profile == "sandbox" {
+        if profile == "local" {
+            crate::cli::LOCAL_API_URL.to_string()
+        } else if profile == "sandbox" {
             crate::cli::SANDBOX_API_URL.to_string()
         } else {
             PRODUCTION_API_URL.to_string()

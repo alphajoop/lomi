@@ -1,12 +1,10 @@
 {
-  "title": "Advanced Direct Charges",
-  "description": "Lower-level payment creation for teams that need direct Wave, MTN MoMo, or embedded card flows.",
+  "title": "Charge",
   "pages": [
-    "index",
-    "ChargesController_createWaveCharge",
-    "ChargesController_createMtnCharge",
+    "ChargesController_cancelCardCharge",
     "ChargesController_createCardCharge",
-    "ChargesController_getCardCharge",
-    "ChargesController_cancelCardCharge"
+    "ChargesController_createMtnCharge",
+    "ChargesController_createWaveCharge",
+    "ChargesController_getCardCharge"
   ]
 }

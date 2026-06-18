@@ -10,10 +10,51 @@ This is the fastest way to prove your lomi. account, API key, checkout, and webh
 You need:
 
 - A lomi. account.
-- A test secret key such as `lomi_sk_test_...`.
+- CLI access via `lomi login`, or a test secret key such as `lomi_sk_test_...`.
 - A local or hosted success URL and cancel URL.
 
-## 1. Create a checkout session
+## Option A: CLI (recommended)
+
+### 1. Install and log in
+
+```bash filename="Terminal"
+npm install -g lomi.cli
+lomi login
+lomi quickstart
+```
+
+### 2. Create a checkout session
+
+Interactive:
+
+```bash filename="Terminal"
+lomi checkout create
+```
+
+Headless (for scripts and agents):
+
+```bash filename="Terminal"
+lomi checkout create \
+  --amount 10000 \
+  --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel \
+  --json
+```
+
+Open the `checkout_url` from the output in your browser.
+
+### 3. Forward webhooks (optional)
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+See [CLI quickstart](/start/cli-quickstart) for the full terminal workflow.
+
+## Option B: cURL
+
+### 1. Create a checkout session
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
@@ -30,7 +71,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
 
 The response includes a hosted checkout URL. Open it in your browser.
 
-![Placeholder hosted checkout screen](/placeholder.webp)
+<DocsScreenshot name="start/hosted-checkout" alt="lomi. hosted checkout payment page in sandbox" />
 
 ## 2. Pay with a test method
 
@@ -53,9 +94,17 @@ After payment, confirm:
 - Your test balance changes, if the method creates a completed test transaction.
 - Your webhook endpoint receives the event, if webhooks are configured.
 
+Verify from the CLI:
+
+```bash filename="Terminal"
+lomi transactions list --json
+```
+
 ## What should I build next?
 
-- Use [hosted checkout](/build/checkout) for app or store checkout.
+- Follow the full path in [Integration journey](/start/integration-journey).
+- Use [hosted checkout](/build/checkout) for app or store checkout — runnable sample: [hosted checkout reference plugin](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/payment-integration-sdk-reference).
 - Use [payment links](/build/payment-links) when you want a shareable URL.
+- For server-initiated Wave, MTN, or card flows, see [Direct charges](/build/direct-charges) and the [direct-charge reference plugin](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/direct-charge-integration-reference).
 - Use [webhooks](/build/webhooks) to reconcile payment states server-side.
 - Use the [API reference](/api) for exact endpoint details.

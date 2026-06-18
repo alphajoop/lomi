@@ -122,4 +122,12 @@ export class CreateProductDto {
     required: false,
   })
   usage_unit?: string;
+
+  @ApiProperty({
+    example: 'api_calls',
+    description:
+      'Billable metric code for usage events (usage_based products only). Defaults to slugified product name.',
+    required: false,
+  })
+  meter_code?: string;
 }

@@ -8,6 +8,10 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreatePaymentRequestDto } from './dto/create-payment-request.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { throwMappedSupabaseRpcError } from '../../utils/supabase-rpc-errors';
+import {
+  lookupIdempotencyCache,
+  type IdempotentCreateResult,
+} from '../../utils/idempotency-cache';
 
 export type PaymentRequestIdempotencyContext = {
   key: string;
@@ -26,7 +30,20 @@ export class PaymentRequestsService {
     createDto: CreatePaymentRequestDto,
     user: AuthContext,
     idempotency?: PaymentRequestIdempotencyContext,
-  ) {
+  ): Promise<IdempotentCreateResult<unknown>> {
+    if (idempotency) {
+      const cached = await lookupIdempotencyCache(this.supabase, {
+        organizationId: user.organizationId,
+        environment: user.environment || 'live',
+        endpointRoute: 'POST:/payment-requests',
+        key: idempotency.key,
+        bodyHash: idempotency.bodyHash,
+      });
+      if (cached.kind === 'hit') {
+        return { data: cached.payload, idempotencyCacheHit: true };
+      }
+    }
+
     const rpcArgs = {
       p_organization_id: user.organizationId,
       p_customer_id: createDto.customer_id || null,
@@ -60,7 +77,7 @@ export class PaymentRequestsService {
       throw new Error('Failed to create payment request');
     }
 
-    return dataArray[0];
+    return { data: dataArray[0] };
   }
 
   /**

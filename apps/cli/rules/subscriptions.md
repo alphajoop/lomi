@@ -28,13 +28,13 @@ const portal = await lomiApi.createPortalLaunchSession({
 
 ## Webhook events
 
-- `subscription.created`
-- `subscription.updated`
-- `subscription.cancelled`
+- `SUBSCRIPTION_CREATED`
+- `SUBSCRIPTION_UPDATED`
+- `SUBSCRIPTION_RENEWED`
+- `SUBSCRIPTION_CANCELLED`
 
-Handle these to provision/revoke access in your application.
+Handle these to provision/revoke access in your application. Use `SUBSCRIPTION_UPDATED` for pause, resume, plan changes, and cancel-at-period-end scheduling.
 
 ## Cancellation
 
-Update the subscription status or use the dashboard.
-Always reconcile subscription state via webhooks, not just API responses at checkout time.
+Call `POST /subscriptions/{id}/cancel` from your backend (immediate or `cancel_at_period_end`). Always reconcile subscription state via webhooks, not just API responses at checkout time.

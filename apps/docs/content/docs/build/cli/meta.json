@@ -5,6 +5,7 @@
     "overview",
     "auth",
     "init",
+    "quickstart",
     "commands",
     "dev",
     "install-rules",

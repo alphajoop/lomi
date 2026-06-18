@@ -30,13 +30,19 @@ export class ProvidersController {
   @ApiQuery({
     name: 'provider_code',
     required: false,
-    enum: ['STRIPE', 'WAVE', 'MTN', 'SPI'],
+    enum: ['CARD', 'WAVE', 'MTN', 'SPI'],
+    description:
+      'Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay).',
   })
   @ApiResponse({ status: 200, description: 'Provider settings' })
   findAll(
     @CurrentUser() user: AuthContext,
-    @Query('provider_code') providerCode?: ProviderCode,
+    @Query('provider_code') providerCode?: string,
   ) {
-    return this.providersService.findAll(user, providerCode);
+    const normalized =
+      providerCode === 'CARD' || providerCode === 'STRIPE'
+        ? ('STRIPE' as ProviderCode)
+        : (providerCode as ProviderCode | undefined);
+    return this.providersService.findAll(user, normalized);
   }
 }

@@ -1,0 +1,74 @@
+---
+title: "Get merchant details"
+description: "Get merchant details"
+full: true
+method: get
+path: /merchants/{id}
+operationId: MerchantsController_getDetails
+---
+
+## Aperçu
+
+Get merchant details
+
+Returns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.
+
+
+### Quand l'utiliser
+
+Utilisez cet endpoint pour `GET /merchants/&#123;id&#125;` (Get merchant details).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /merchants/{id}`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | Merchant UUID |
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | — |
+| `403` | Merchant ID mismatch |
+| `404` | Merchant not found |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/merchants/value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `MerchantsController_getDetails`
+- **Operation**: `GET /merchants/{id}`
+
+Schémas complets et **Try it** : [référence API](/api).

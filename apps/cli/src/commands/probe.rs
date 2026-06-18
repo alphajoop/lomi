@@ -49,9 +49,9 @@ pub async fn run(common: &CommonOptions, args: ProbeArgs) -> Result<()> {
     match client.get::<MeResponse>("/me").await {
         Ok(identity) => {
             println!(
-                "  {} {} ({})",
+                "  {} Identity: {} ({})",
                 "✓".green(),
-                format!("Identity: {}", identity.organization_name),
+                identity.organization_name,
                 identity.environment
             );
             passed += 1;

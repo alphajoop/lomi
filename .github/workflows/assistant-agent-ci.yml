@@ -1,0 +1,46 @@
+name: Assistant Agent CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/dashboard/supabase/functions/_shared/agent/**"
+      - "apps/dashboard/supabase/functions/assistant/**"
+      - "apps/dashboard/supabase/functions/assistant-resume/**"
+      - "apps/dashboard/supabase/functions/assistant-cancel/**"
+      - "apps/dashboard/src/lib/assistant/**"
+      - "apps/dashboard/scripts/generate-assistant-tool-manifest.mjs"
+      - ".github/workflows/assistant-agent-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/dashboard/supabase/functions/_shared/agent/**"
+      - "apps/dashboard/supabase/functions/assistant/**"
+      - "apps/dashboard/supabase/functions/assistant-resume/**"
+      - "apps/dashboard/supabase/functions/assistant-cancel/**"
+      - "apps/dashboard/src/lib/assistant/**"
+      - "apps/dashboard/scripts/generate-assistant-tool-manifest.mjs"
+      - ".github/workflows/assistant-agent-ci.yml"
+
+jobs:
+  assistant-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Generate tool manifest
+        working-directory: apps/dashboard
+        run: node scripts/generate-assistant-tool-manifest.mjs
+
+      - name: Check manifest drift
+        working-directory: apps/dashboard
+        run: |
+          git diff --exit-code src/lib/assistant/tool-manifest.generated.json src/lib/assistant/ui-tool-ids.generated.ts
+
+      - name: Run assistant eval tests
+        working-directory: apps/dashboard/supabase/functions/_shared/agent
+        run: deno test __tests__/assistant.eval.test.ts --allow-read --no-check

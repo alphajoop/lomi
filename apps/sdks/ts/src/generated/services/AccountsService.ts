@@ -19,18 +19,6 @@ export class AccountsService {
     }
 
     /**
-     * OpenAPI operationId: `AccountsController_findOne`.
-     * Obtenir un compte par ID
-     */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
-            method: 'GET',
-            url: '/accounts/{id}',
-            path: { id: id },
-        });
-    }
-
-    /**
      * OpenAPI operationId: `AccountsController_getBalance`.
      * Solde du compte
      */
@@ -51,17 +39,6 @@ export class AccountsService {
             method: 'GET',
             url: '/accounts/balance/breakdown',
             query: options,
-        });
-    }
-
-    /**
-     * OpenAPI operationId: `AccountsController_findAll`.
-     * Lister les comptes
-     */
-    public static async list(): Promise<any> {
-        return await request<any>({
-            method: 'GET',
-            url: '/accounts',
         });
     }
 }

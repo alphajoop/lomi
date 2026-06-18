@@ -1,6 +1,6 @@
 ---
 title: 'Premiers pas'
-description: 'Installez la CLI lomi., vérifiez votre installation et lancez vos premières commandes.'
+description: 'Installez le CLI lomi., vérifiez votre installation et lancez vos premières commandes.'
 ---
 
 La **CLI lomi.** est distribuée via **npm** sous le nom `lomi.cli`. Elle sert à s’authentifier, générer des projets SDK, tester les webhooks en local, créer des sessions de checkout et des liens de paiement, et installer des règles pour les assistants IA.
@@ -118,11 +118,14 @@ lomi dev
 | `lomi whoami` | Profil actif |
 | `lomi status` | Connexion et API |
 | `lomi init` | Générer les fichiers SDK |
+| `lomi quickstart` | Parcours rapide et prochaines étapes |
 | `lomi listen` | Relais webhook cloud (sandbox) |
 | `lomi dev` | Serveur webhook local |
 | `lomi probe` | Vérifications d'intégration |
 | `lomi checkout create` | Créer une session checkout |
 | `lomi payments create` | Créer un lien de paiement |
+| `lomi transactions list` / `get` | Lister ou récupérer une transaction |
+| `lomi refunds create` / `list` / `get` | Remboursements |
 | `lomi install-rules` | Documentation pour assistants IA |
 | `lomi update` | Mettre à jour `@lomi./sdk` |
 | `lomi list-profiles` | Lister les profils |
@@ -138,6 +141,7 @@ Référence complète : [Commandes](/build/cli/commands).
 | `-a, --api-url <url>` | URL de base de l’API |
 | `-l, --log-level <niveau>` | `debug`, `info`, `warn`, `error` |
 | `--skip-telemetry` | Désactiver la télémétrie |
+| `--json` | Sortie JSON (par défaut si stdout n’est pas un TTY) |
 
 ## Deux types d’identifiants
 

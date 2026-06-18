@@ -1,16 +1,14 @@
 {
   "title": "Webhooks",
-  "description": "Webhook endpoints, test events, retries, and delivery log inspection.",
   "pages": [
-    "index",
+    "WebhookDeliveryLogsController_findAll",
+    "WebhookDeliveryLogsController_findOne",
     "WebhooksController_create",
     "WebhooksController_findAll",
     "WebhooksController_findOne",
-    "WebhooksController_update",
-    "WebhooksController_test",
-    "WebhooksController_retryDelivery",
     "WebhooksController_remove",
-    "WebhookDeliveryLogsController_findAll",
-    "WebhookDeliveryLogsController_findOne"
+    "WebhooksController_retryDelivery",
+    "WebhooksController_test",
+    "WebhooksController_update"
   ]
 }

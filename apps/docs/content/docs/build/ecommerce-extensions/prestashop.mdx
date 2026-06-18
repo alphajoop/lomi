@@ -25,7 +25,7 @@ Detailed steps: [PrestaShop module README](https://github.com/lomiafrica/lomi./b
 
 ## Webhook URL
 
-Point your Lomi dashboard webhook to:
+Point your lomi. dashboard webhook to:
 
 `https://YOUR-SHOP/index.php?fc=module&module=lomi&controller=webhook`
 
@@ -33,7 +33,7 @@ Your shop may expose a **friendly URL** for the same controller — either works
 
 ## Payment flow
 
-1. Customer chooses **Pay with lomi.** → POST to **validation** controller creates the checkout session and redirects to Lomi Checkout.
+1. Customer chooses **Pay with lomi.** → POST to **validation** controller creates the checkout session and redirects to lomi. Checkout.
 2. **callback** controller verifies the session (cart id + customer secure key), then validates the PrestaShop order when status is `completed` and amount/currency match.
 
 Source: [`validation.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/validation.php), [`callback.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/callback.php), [`webhook.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/webhook.php)

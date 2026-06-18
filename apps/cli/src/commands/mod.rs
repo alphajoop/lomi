@@ -1,5 +1,6 @@
 pub mod checkout;
 pub mod dev;
+pub mod docs_cmd;
 pub mod init;
 pub mod install_rules;
 pub mod listen;
@@ -9,6 +10,8 @@ pub mod logout;
 pub mod payments;
 pub mod probe;
 pub mod products;
+pub mod quickstart;
+pub mod refunds;
 pub mod status;
 pub mod switch;
 pub mod transactions;

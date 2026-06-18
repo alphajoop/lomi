@@ -33,6 +33,16 @@ export function LLMCopyButton({
     try {
       const response = await fetch(markdownUrl);
       const content = await response.text();
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch markdown (${response.status})`);
+      }
+
+      const trimmed = content.trimStart();
+      if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html')) {
+        throw new Error('Received HTML instead of markdown');
+      }
+
       cache.set(markdownUrl, content);
       await navigator.clipboard.writeText(content);
     } finally {

@@ -6,7 +6,7 @@ description: Official TypeScript/JavaScript SDK for lomi. payments API.
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Official Node.js/TypeScript SDK for the lomi. payments API. Works with Node.js, Deno, Bun, and browser environments.
+Official Node.js/TypeScript SDK for lomi.. payments API. Works with Node.js, Deno, Bun, and browser environments.
 
 ## Installation
 
@@ -48,7 +48,7 @@ const lomi = new LomiSDK({
 
 ## First API call (sandbox)
 
-Copy-paste runnable example: install the SDK, set `LOMI_SECRET_KEY` in `.env`, then list accounts on the sandbox API.
+Copy-paste runnable example: install the SDK, set `LOMI_SECRET_KEY` in `.env`, then fetch your sandbox balance.
 
 ```typescript
 import { LomiSDK, LomiError } from '@lomi./sdk';
@@ -60,8 +60,8 @@ const lomi = new LomiSDK({
 
 async function main() {
   try {
-    const accounts = await lomi.accounts.list();
-    console.log('Accounts:', accounts);
+    const balance = await lomi.accounts.getBalance();
+    console.log('Balance:', balance);
   } catch (error) {
     if (error instanceof LomiError) {
       console.error(`API error [${error.status}]: ${error.message}`);
@@ -84,7 +84,7 @@ npm install @lomi./sdk
 npx tsx first-call.ts
 ```
 
-Expected: a JSON list of accounts from `GET https://sandbox.api.lomi.africa/accounts`. For raw HTTP without the SDK, see [API integration](/start/first-payment).
+Expected: balance payload from `GET https://sandbox.api.lomi.africa/accounts/balance`. For raw HTTP without the SDK, see [API integration](/start/first-payment).
 
 ---
 
@@ -306,22 +306,23 @@ interface LomiConfig {
 
 | Service | Methods |
 |---------|---------|
-| `accounts` | `list`, `get`, `getBalance`, `getBalanceBreakdown`, `checkBalance` |
-| `charges` | `createWaveCharge` |
+| `accounts` | `getBalance`, `getBalanceBreakdown`, `checkBalance` |
+| `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `getCardCharge`, `cancelCardCharge` |
 | `checkoutSessions` | `list`, `get`, `create` |
-| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions` |
+| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions`, `createPortalLaunchSession`, `getPortalAudit` |
 | `discountCoupons` | `list`, `get`, `create`, `getPerformance` |
+| `merchants` | `get`, `getArr`, `getBalance`, `getMrr` |
 | `organizations` | `list`, `get`, `getMetrics` |
 | `paymentLinks` | `list`, `get`, `create` |
 | `paymentRequests` | `list`, `get`, `create` |
 | `payouts` | `create`, `list`, `get` |
-| `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `getCardCharge`, `cancelCardCharge` |
 | `products` | `list`, `get`, `create`, `addPrice`, `setDefaultPrice` |
+| `providers` | `list` |
 | `refunds` | `create`, `list`, `get` |
-| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel` |
+| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel`, `uncancel`, `changePlan`, `update` |
 | `transactions` | `list`, `get` |
 | `webhookDeliveryLogs` | `list`, `get` |
-| `webhooks` | `list`, `get`, `update` |
+| `webhooks` | `list`, `get`, `create`, `update`, `delete`, `test`, `retryDelivery` |
 
 ---
 

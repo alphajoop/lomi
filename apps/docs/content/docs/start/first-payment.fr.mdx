@@ -10,10 +10,51 @@ C’est le chemin le plus rapide pour vérifier que votre compte lomi., votre cl
 Il vous faut :
 
 - Un compte lomi.
-- Une clé secrète de test comme `lomi_sk_test_...`.
+- Accès CLI via `lomi login`, ou une clé secrète de test comme `lomi_sk_test_...`.
 - Une URL de succès et une URL d’annulation, locales ou hébergées.
 
-## 1. Créer une session de checkout
+## Option A : CLI (recommandé)
+
+### 1. Installer et se connecter
+
+```bash filename="Terminal"
+npm install -g lomi.cli
+lomi login
+lomi quickstart
+```
+
+### 2. Créer une session de checkout
+
+Mode interactif :
+
+```bash filename="Terminal"
+lomi checkout create
+```
+
+Sans interaction (scripts et agents) :
+
+```bash filename="Terminal"
+lomi checkout create \
+  --amount 10000 \
+  --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel \
+  --json
+```
+
+Ouvrez le `checkout_url` de la sortie dans le navigateur.
+
+### 3. Relayer les webhooks (optionnel)
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+Voir [Démarrer avec le CLI](/start/cli-quickstart) pour le parcours terminal complet.
+
+## Option B : cURL
+
+### 1. Créer une session de checkout
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
@@ -30,7 +71,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
 
 La réponse contient une URL de checkout hébergé. Ouvrez-la dans votre navigateur.
 
-![Écran de checkout hébergé à remplacer](/placeholder.webp)
+<DocsScreenshot name="start/hosted-checkout" alt="Page de paiement checkout hébergé lomi. en sandbox" />
 
 ## 2. Payer avec un moyen de test
 
@@ -52,6 +93,12 @@ Après le paiement, vérifiez :
 - La transaction apparaît dans la vue test du tableau de bord.
 - Votre solde de test évolue si la méthode crée une transaction complétée.
 - Votre endpoint webhook reçoit l’événement si les webhooks sont configurés.
+
+Depuis le CLI :
+
+```bash filename="Terminal"
+lomi transactions list --json
+```
 
 ## Que construire ensuite ?
 

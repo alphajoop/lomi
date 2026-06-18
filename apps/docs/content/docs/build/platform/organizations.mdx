@@ -1,0 +1,212 @@
+---
+title: Organizations
+description: Retrieve organization details and metrics.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+The Organizations API provides access to your organization's details and business metrics.
+
+Most integrations should treat the **organization** as the primary scope for API keys, balances, and settings. The [Merchants](/build/platform/merchants) API remains useful for merchant profile reads and legacy paths that still expose a merchant id.
+
+## Pricing configuration
+
+Each organization has a pricing mode that determines how transaction fees are resolved:
+
+- `volume_tiered`: dynamic pricing based on processed volume tiers
+- `fixed`: stable organization fee schedule
+- `custom`: negotiated fee schedule (also resolved from organization-level fee configuration)
+
+In practice:
+
+- `volume_tiered` organizations use their current tier fee structure for supported categories.
+- `fixed` and `custom` organizations use organization fee configuration directly.
+- Additional fees (for example refunds, disputes, international card surcharges, subscription add-ons) can still apply depending on your setup.
+
+For the operational fee values currently applied to your account, rely on dashboard pricing screens and your latest commercial agreement.
+
+## Get organization details
+
+Retrieve details of your authenticated organization.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const org = await lomi.organizations.list();
+console.log(`Organization: ${org[0].name}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+orgs = client.organizations.list()
+print(f"Organization: {orgs[0]['name']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/organizations" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Get organization by ID
+
+Retrieve a specific organization (must match your authenticated organization).
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const org = await lomi.organizations.get('org_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+org = client.organizations.get('org_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/organizations/org_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Get organization metrics
+
+Retrieve pre-calculated business metrics including MRR, ARR, revenue, and customer counts.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const metrics = await lomi.organizations.getMetrics();
+
+console.log(`MRR: ${metrics.mrr} ${metrics.currency_code}`);
+console.log(`ARR: ${metrics.arr} ${metrics.currency_code}`);
+console.log(`Total Revenue: ${metrics.total_revenue}`);
+console.log(`Total Customers: ${metrics.total_customers}`);
+console.log(`Total Transactions: ${metrics.total_transactions}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+metrics = client.organizations.get_metrics()
+
+print(f"MRR: {metrics['mrr']} {metrics['currency_code']}")
+print(f"ARR: {metrics['arr']} {metrics['currency_code']}")
+print(f"Total Revenue: {metrics['total_revenue']}")
+print(f"Total Customers: {metrics['total_customers']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/organizations/metrics" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+### Response
+
+```json
+{
+  "mrr": 50000,
+  "arr": 600000,
+  "total_revenue": 250000,
+  "total_transactions": 1234,
+  "total_customers": 567,
+  "currency_code": "XOF",
+  "calculated_at": "2024-01-15T00:00:00Z"
+}
+```
+
+---
+
+## Metrics Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mrr` | `number` | Monthly Recurring Revenue |
+| `arr` | `number` | Annual Recurring Revenue |
+| `total_revenue` | `number` | Total revenue generated |
+| `total_transactions` | `number` | Total transaction count |
+| `total_customers` | `number` | Total customer count |
+| `currency_code` | `string` | Currency for monetary values |
+| `calculated_at` | `string` | Calculation timestamp |
+
+---
+
+## Organization object
+
+These fields align with the **organization** resource returned by `GET /organizations` (see [API reference](/api)). Pricing **modes** (`volume_tiered`, `fixed`, `custom`) are explained above and in [Pricing](/resources/merchant-of-record/pricing); they are not required to appear as a dedicated column on every organization payload.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `organization_id` | `string` | Unique organization identifier |
+| `name` | `string` | Organization name |
+| `email` | `string` | Contact email |
+| `phone_number` | `string` | Primary phone |
+| `verification_status` | `string` | `unverified`, `starter`, or `verified` |
+| `website_url` | `string` \| `null` | Website |
+| `logo_url` | `string` \| `null` | Logo URL |
+| `status` | `string` | `active`, `inactive`, or `suspended` |
+| `default_currency` | `string` | Default currency (`XOF`, `USD`, `EUR`) |
+| `slug` | `string` \| `null` | URL-friendly slug |
+| `storefront_enabled` | `boolean` | Storefront enabled |
+| `total_revenue` | `number` \| `null` | Total revenue (when present) |
+| `total_transactions` | `number` \| `null` | Transaction count |
+| `total_merchants` | `number` \| `null` | Merchant count |
+| `total_customers` | `number` \| `null` | Customer count |
+| `mrr` | `number` | Monthly recurring revenue |
+| `arr` | `number` | Annual recurring revenue |
+| `merchant_lifetime_value` | `number` | Average customer lifetime value |
+| `employee_number` | `string` \| `null` | Employee range label |
+| `industry` | `string` \| `null` | Industry |
+| `has_payout_pin` | `boolean` | Whether org requires PIN for manual payouts |
+| `is_starter_business` | `boolean` | Starter business flag |
+| `metadata` | `object` | Additional metadata |
+| `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
+| `is_deleted` | `boolean` | Soft-deleted |
+| `deleted_at` | `string` \| `null` | Deletion time |
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `401` | Invalid or missing API key |
+| `404` | Organization not found or access denied |

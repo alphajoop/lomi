@@ -11,16 +11,16 @@ operationId: WebhooksController_test
 
 Envoyer un événement test au webhook
 
-### Quand utiliser cet endpoint
+### Quand l'utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /webhooks/&#123;id&#125;/test` (Envoyer un événement test au webhook).
+Utilisez cet endpoint pour `POST /webhooks/&#123;id&#125;/test` (Envoyer un événement test au webhook).
 
 
 ## Authentification
 
-Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
 
-## Point de terminaison
+## Endpoint
 
 `POST /webhooks/{id}/test`
 
@@ -55,7 +55,7 @@ _Aucun corps application/json pour cette opération._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
 
 ## Exemple
 
@@ -71,4 +71,4 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/test" \
 - **operationId**: `WebhooksController_test`
 - **Operation**: `POST /webhooks/{id}/test`
 
-Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.
+Schémas complets et **Try it** : [référence API](/api).

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -17,10 +25,13 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import { CardChargeResponseDto } from './dto/card-charge-response.dto';
+import { MtnChargeResponseDto } from './dto/mtn-charge-response.dto';
+import { WaveChargeResponseDto } from './dto/wave-charge-response.dto';
+import { normalizeScenarioKey } from './charge-scenario';
+import { environmentFromAuth } from '../common/auth-environment';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @Controller('charge')
 @UseGuards(ApiKeyGuard)
 export class ChargesController {
@@ -30,54 +41,81 @@ export class ChargesController {
   ) {}
 
   @Post('wave')
-  @ApiOperation({ summary: 'Lancer un encaissement direct Wave' })
+  @ApiLomiAccountHeader()
+  @ApiOperation({
+    summary: 'Create direct Wave charge',
+    description:
+      'Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.',
+  })
+  @ApiBody({ type: CreateWaveChargeDto })
   @ApiResponse({
     status: 201,
-    description:
-      'Encaissement initié (corps JSON renvoyé par la fonction edge Wave)',
-    schema: {
-      type: 'object',
-      additionalProperties: true,
-    },
+    description: 'Wave charge initiated',
+    type: WaveChargeResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Entrée invalide ou erreur API Wave',
+    description: 'Invalid input or Wave API error',
   })
   async createWaveCharge(
     @Body() createChargeDto: CreateWaveChargeDto,
     @CurrentUser() user: AuthContext,
+    @Headers('x-scenario-key') scenarioHeader?: string | string[],
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
-    return this.chargesService.createWaveCharge(createChargeDto, user);
+    const scenarioKey =
+      environmentFromAuth(user) === 'test'
+        ? normalizeScenarioKey(scenarioHeader)
+        : undefined;
+    return this.chargesService.createWaveCharge(
+      createChargeDto,
+      user,
+      scenarioKey,
+    );
   }
 
   @Post('mtn')
-  @ApiOperation({ summary: 'Lancer un encaissement direct MTN MoMo' })
+  @ApiLomiAccountHeader()
+  @ApiOperation({
+    summary: 'Create MTN MoMo charge',
+    description:
+      'Initiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.',
+  })
+  @ApiBody({ type: CreateMtnChargeDto })
   @ApiResponse({
     status: 201,
-    description: 'Encaissement MTN initié (RequestToPay)',
-    schema: { type: 'object', additionalProperties: true },
+    description: 'MTN charge initiated',
+    type: MtnChargeResponseDto,
   })
   async createMtnCharge(
     @Body() createChargeDto: CreateMtnChargeDto,
     @CurrentUser() user: AuthContext,
+    @Headers('x-scenario-key') scenarioHeader?: string | string[],
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
-    return this.chargesService.createMtnCharge(createChargeDto, user);
+    const scenarioKey =
+      environmentFromAuth(user) === 'test'
+        ? normalizeScenarioKey(scenarioHeader)
+        : undefined;
+    return this.chargesService.createMtnCharge(
+      createChargeDto,
+      user,
+      scenarioKey,
+    );
   }
 
   @Post('card')
+  @ApiLomiAccountHeader()
   @ApiOperation({
-    summary: 'Créer un encaissement carte (client_secret)',
+    summary: 'Create card charge (client_secret)',
     description:
-      'Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.',
+      'Creates an embedded card charge and returns the client_secret for your payment UI.',
   })
   @ApiResponse({
     status: 201,
-    description: 'Encaissement carte créé',
+    description: 'Card charge created',
     type: CardChargeResponseDto,
   })
   @ApiBody({ type: CreateCardChargeDto })
@@ -89,11 +127,12 @@ export class ChargesController {
   }
 
   @Get('card/:id')
-  @ApiOperation({ summary: 'Obtenir un encaissement carte' })
+  @ApiLomiAccountHeader()
+  @ApiOperation({ summary: 'Retrieve card charge' })
   @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
   @ApiResponse({
     status: 200,
-    description: 'Encaissement carte',
+    description: 'Card charge',
     type: CardChargeResponseDto,
   })
   getCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
@@ -101,9 +140,10 @@ export class ChargesController {
   }
 
   @Post('card/:id/cancel')
-  @ApiOperation({ summary: 'Annuler un encaissement carte' })
+  @ApiLomiAccountHeader()
+  @ApiOperation({ summary: 'Cancel card charge' })
   @ApiParam({ name: 'id', description: 'Card payment id (pi_...)' })
-  @ApiResponse({ status: 200, description: 'Encaissement carte annulé' })
+  @ApiResponse({ status: 200, description: 'Card charge cancelled' })
   cancelCardCharge(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.cardChargeService.cancel(id, user);
   }

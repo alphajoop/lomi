@@ -14,10 +14,17 @@ export const REST_API_SECTION_ORDER = [
   'subscriptions',
   'discount-coupons',
   'balances',
+  'organizations',
+  'merchants',
+  'providers',
   'transactions',
   'refunds',
   'payouts',
+  'settlements',
   'webhooks',
+  'meters',
+  'usage-events',
+  'usage-billing',
 ] as const;
 
 const PUBLIC_REST_API_OPERATIONS = [
@@ -36,12 +43,20 @@ const PUBLIC_REST_API_OPERATIONS = [
   'payment-links',
   'payment-requests',
   'payouts',
+  'settlements',
   'products',
   'refunds',
   'subscriptions',
   'transactions',
   'webhook-delivery-logs',
   'webhooks',
+  'organizations',
+  'merchants',
+  'providers',
+  'meters',
+  'usage-events',
+  'usage-subscriptions',
+  'usage-billing',
 ] as const;
 
 export type RestApiFolder = (typeof REST_API_SECTION_ORDER)[number];
@@ -64,6 +79,7 @@ export function pathToFolder(route: string): string {
   if (first === 'accounts') return 'balances';
   if (first === 'customer-subscriptions') return 'subscriptions';
   if (first === 'webhook-delivery-logs') return 'webhooks';
+  if (first === 'usage-subscriptions') return 'usage-events';
   return first;
 }
 

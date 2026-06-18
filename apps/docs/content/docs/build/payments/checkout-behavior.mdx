@@ -63,10 +63,20 @@ Hosted checkout and storefront resolve the display total from server-side signup
 
 ### Renewals and failures
 
-- **Cards**: renewals charge the saved payment method on `next_billing_date`.
-- **Mobile money**: if no saved method exists, lomi. may email a **manual renewal checkout link**.
+lomi. uses different renewal mechanics by payment rail:
+
+| Rail | Renewal behavior |
+| --- | --- |
+| **Cards** | Off-session charge on the saved Stripe payment method on `next_billing_date`. |
+| **Wave / MTN** | No saved off-session token. Before each cycle, lomi. sends a **manual renewal checkout link** (email/WhatsApp). The customer must approve payment on their phone. |
+
+**Why mobile money is manual:** Wave and MTN require per-payment customer approval. lomi. does not auto-debit wallets for subscription cycles without a card on file.
+
 - Failed renewals may set subscription status to `past_due` or `paused` depending on `failed_payment_action` on the product (`continue`, `pause`, `cancel`).
+- Overdue subscriptions that never receive payment may be failed by scheduled dunning after the grace window.
 - Listen for **`SUBSCRIPTION_RENEWED`** and **`PAYMENT_FAILED`** (renewal transactions), not a separate `subscription.payment_failed` event.
+
+See [Subscriptions — Renewals and failed payments](/build/subscriptions#renewals-and-failed-payments) for the full model.
 
 ### Fixed-term subscriptions
 

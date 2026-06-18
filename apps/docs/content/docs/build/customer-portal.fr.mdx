@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Le portail client lomi. est un espace de compte hébergé sur `customers.lomi.africa` où vos utilisateurs finaux peuvent :
 
-![Portail client à remplacer](/placeholder.webp)
+<DocsScreenshot name="build/customer-portal" alt="Portail client lomi. pour l’historique et les abonnements" />
 
 - Consulter l'historique des paiements et ouvrir les reçus / factures disponibles
 - Voir et gérer leurs abonnements (pause, reprise, annulation en fin de période, annulation de l'annulation)
@@ -39,7 +39,7 @@ Utilisez `POST /customers/{id}/portal-launch-session` :
 - `flow_subscription_id` (optionnel, obligatoire pour `subscription_cancel`)
 - `flow_after_completion_url` (optionnel)
 
-Les détails du point de terminaison et des exemples de charge utile figurent dans [Clients](/api/customers/CustomersController_createPortalLaunchSession).
+Les détails de l’URL et des exemples de corps figurent dans [Clients](/api/customers/CustomersController_createPortalLaunchSession).
 
 ## Modèle d'éligibilité
 

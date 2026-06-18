@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
 import { SupabaseService } from '../utils/supabase/supabase.service';
+import { WebhookSenderService } from './webhook-sender.service';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
 import {
   resolveSafeMerchantWebhookTarget,
@@ -27,6 +28,9 @@ describe('WebhooksService', () => {
     getClient: jest.fn(() => ({ rpc: mockRpc })),
     rpc: mockRpc,
   };
+  const mockWebhookSender = {
+    sendStoredWebhookPayload: jest.fn(),
+  };
 
   const user: AuthContext = {
     merchantId: 'merch-1',
@@ -39,6 +43,7 @@ describe('WebhooksService', () => {
       providers: [
         WebhooksService,
         { provide: SupabaseService, useValue: mockSupabaseService },
+        { provide: WebhookSenderService, useValue: mockWebhookSender },
         {
           provide: ConfigService,
           useValue: { get: jest.fn() },

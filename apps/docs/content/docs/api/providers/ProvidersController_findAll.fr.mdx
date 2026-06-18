@@ -1,0 +1,72 @@
+---
+title: "List payment providers"
+description: "List payment providers"
+full: true
+method: get
+path: /providers
+operationId: ProvidersController_findAll
+---
+
+## Aperçu
+
+List payment providers
+
+Returns connection status for payment providers configured for your organization.
+
+
+### Quand l'utiliser
+
+Utilisez cet endpoint pour `GET /providers` (List payment providers).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /providers`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `provider_code` | query | Non | — | Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay). |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Provider settings |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/providers?provider_code=CARD" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `ProvidersController_findAll`
+- **Operation**: `GET /providers`
+
+Schémas complets et **Try it** : [référence API](/api).

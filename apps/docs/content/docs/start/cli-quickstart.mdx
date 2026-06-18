@@ -1,0 +1,100 @@
+---
+title: 'Get started with the CLI'
+description: 'Install lomi. CLI, log in, run quickstart checks, create a test checkout, and forward webhooks locally.'
+---
+
+The **lomi. CLI** is the fastest way to authenticate, create test checkouts, listen for webhooks without ngrok, and install AI agent rules — all from your terminal.
+
+<Steps>
+
+### Install the CLI
+
+Requires **Node.js 18+** (used only to download the native binary).
+
+```bash filename="Terminal"
+npm install -g lomi.cli
+lomi --version
+```
+
+See [CLI installation](/build/cli/overview) for Homebrew and source builds.
+
+### Log in
+
+```bash filename="Terminal"
+lomi login
+```
+
+This opens a browser device-authorization flow and saves a CLI token globally. See [Authenticate](/build/cli/auth) for profiles and CI tokens.
+
+### Run quickstart
+
+```bash filename="Terminal"
+lomi quickstart
+```
+
+Checks API connectivity, identity, and balance, then prints the recommended next commands. Use `--json` for machine-readable output:
+
+```bash filename="Terminal"
+lomi quickstart --json
+```
+
+### Create a test checkout (headless)
+
+```bash filename="Terminal"
+lomi checkout create \
+  --amount 10000 \
+  --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel \
+  --json
+```
+
+Open the `checkout_url` from the JSON response in your browser and pay with a [sandbox test method](/start/sandbox-payments).
+
+### Forward webhooks locally
+
+In a second terminal:
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+Sandbox-first — no ngrok required. See [Listen for webhooks](/build/cli/listen).
+
+### Install AI agent rules
+
+```bash filename="Terminal"
+lomi install-rules
+```
+
+Installs Cursor, Claude Code, Codex, and `llms.txt` rules so coding agents understand lomi. APIs. See [Install rules](/build/cli/install-rules).
+
+</Steps>
+
+## What to run next
+
+| Goal | Command |
+| --- | --- |
+| Full integration check | `lomi probe` |
+| List recent transactions | `lomi transactions list --json` |
+| Refund a transaction | `lomi refunds create --transaction-id <id> --amount 5000 --json` |
+| Scaffold a project | `lomi init` |
+| Local webhook server | `lomi dev` |
+
+Full reference: [Command reference](/build/cli/commands).
+
+## Two kinds of credentials
+
+<Callout type="info" emoji="💡" title="CLI token vs API key">
+  **`lomi login`** stores a **CLI token** — used by CLI commands like `checkout create`, `listen`, and `quickstart`.
+
+  **`lomi init`** writes your **secret API key** (`LOMI_API_KEY`) into the project `.env` — used by the **SDK in your application code**.
+
+  These are different credentials for different purposes.
+</Callout>
+
+## Next steps
+
+- [Make a test payment](/start/first-payment) — CLI and cURL paths
+- [Initialize a project](/build/cli/init) — SDK scaffolding
+- [Choose an integration](/build/choose-integration) — hosted checkout, links, subscriptions

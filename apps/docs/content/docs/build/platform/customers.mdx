@@ -1,0 +1,396 @@
+---
+title: Customers
+description: Manage customer profiles and track their payment history.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+The Customers API allows you to create, retrieve, update, and manage customer profiles associated with your merchant account.
+
+## Create a customer
+
+Create a new customer profile to track payments and store information.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `string` | **Yes** | Customer full name |
+| `email` | `string` | No | Customer email address |
+| `phone_number` | `string` | No | Phone number (e.g., `+221771234567`) |
+| `whatsapp_number` | `string` | No | WhatsApp number |
+| `country` | `string` | No | Country name |
+| `city` | `string` | No | City name |
+| `address` | `string` | No | Street address |
+| `postal_code` | `string` | No | Postal/ZIP code |
+| `is_business` | `boolean` | No | Whether customer is a business (default: `false`) |
+| `metadata` | `object` | No | Custom key-value pairs |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const customer = await lomi.customers.create({
+  name: 'Amadou Ba',
+  email: 'amadou.ba@example.com',
+  phone_number: '+221771234567',
+  country: 'Senegal',
+  city: 'Dakar',
+  is_business: false,
+  metadata: {
+    internal_id: 'USER_123',
+  },
+});
+
+console.log(`Customer created: ${customer.id}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+customer = client.customers.create({
+    "name": "Amadou Ba",
+    "email": "amadou.ba@example.com",
+    "phone_number": "+221771234567",
+    "country": "Senegal",
+    "city": "Dakar",
+    "is_business": False,
+    "metadata": {"internal_id": "USER_123"}
+})
+
+print(f"Customer created: {customer['id']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/customers" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Amadou Ba",
+    "email": "amadou.ba@example.com",
+    "phone_number": "+221771234567",
+    "country": "Senegal",
+    "city": "Dakar",
+    "is_business": false,
+    "metadata": {"internal_id": "USER_123"}
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## List customers
+
+Retrieve all customers with optional filtering and pagination.
+
+### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `search` | `string` | Search by name or email |
+| `type` | `string` | Filter by type: `business`, `individual`, `all` |
+| `status` | `string` | Filter by activity: `active`, `inactive`, `all` |
+| `page` | `number` | Page number (default: `1`) |
+| `pageSize` | `number` | Items per page (default: `50`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const customers = await lomi.customers.list({
+  search: 'amadou',
+  type: 'individual',
+  status: 'active',
+  page: 1,
+  pageSize: 20,
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+customers = client.customers.list(
+    search="amadou",
+    type="individual",
+    status="active",
+    page=1,
+    pageSize=20
+)
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/customers?search=amadou&type=individual&page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+### Response
+
+```json
+{
+  "customers": [...],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalCount": 150,
+    "totalPages": 8
+  }
+}
+```
+
+---
+
+## Get a customer
+
+Retrieve details of a specific customer.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const customer = await lomi.customers.get('cus_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+customer = client.customers.get('cus_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/customers/cus_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Update a customer
+
+Update an existing customer's details. All fields are optional.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const updated = await lomi.customers.update('cus_abc123...', {
+  email: 'new.email@example.com',
+  metadata: { vip: true },
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+updated = client.customers.update('cus_abc123...', {
+    "email": "new.email@example.com",
+    "metadata": {"vip": True}
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X PATCH "https://api.lomi.africa/customers/cus_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "new.email@example.com"}'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Delete a customer
+
+Removes a customer from active use. They will no longer appear in list or get responses.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+await lomi.customers.delete('cus_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+client.customers.delete('cus_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X DELETE "https://api.lomi.africa/customers/cus_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Get customer transactions
+
+Retrieve all transactions for a specific customer.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const transactions = await lomi.customers.getTransactions('cus_abc123...');
+
+transactions.forEach(tx => {
+  console.log(`${tx.description}: ${tx.gross_amount} ${tx.currency_code}`);
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+transactions = client.customers.get_transactions('cus_abc123...')
+
+for tx in transactions:
+    print(f"{tx['description']}: {tx['gross_amount']} {tx['currency_code']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/customers/cus_abc123.../transactions" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+### Response
+
+```json
+[
+  {
+    "transaction_id": "tx_def456...",
+    "description": "Payment for Product A",
+    "gross_amount": 10000,
+    "currency_code": "XOF",
+    "status": "completed",
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+]
+```
+
+---
+
+## Create customer portal launch session
+
+Generate a one-time hosted customer portal URL for a customer in your organization.
+
+- Endpoint: `POST /customers/{id}/portal-launch-session`
+- Intended caller: merchant backend (API key auth)
+- Output: `launch_url` + `launch_token` + flow metadata
+
+Use this when you need a hosted handoff from your product to the customer portal.
+
+<Tabs items={["TypeScript", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import axios from 'axios';
+
+const { data: launch } = await axios.post(
+  'https://api.lomi.africa/customers/cus_abc123.../portal-launch-session',
+  {
+    return_url: 'https://merchant.example.com/account',
+    flow_type: 'subscription_cancel',
+    flow_subscription_id: 'sub_abc123...',
+    flow_after_completion_url:
+      'https://merchant.example.com/account/subscription-cancelled',
+  },
+  {
+    headers: {
+      'X-API-KEY': process.env.LOMI_API_KEY!,
+      'Content-Type': 'application/json',
+    },
+  },
+);
+
+window.location.href = launch.launch_url;
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-session" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "return_url": "https://merchant.example.com/account",
+    "flow_type": "subscription_cancel",
+    "flow_subscription_id": "sub_abc123...",
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+See full flow and production guidance in [Customer Portal](/build/customer-portal).
+
+---
+
+## Customer Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique customer identifier |
+| `organization_id` | `string` | Organization that owns this customer |
+| `name` | `string` | Customer full name |
+| `email` | `string` | Email address |
+| `phone_number` | `string` | Phone number |
+| `whatsapp_number` | `string` | WhatsApp number |
+| `country` | `string` | Country |
+| `city` | `string` | City |
+| `address` | `string` | Street address |
+| `postal_code` | `string` | Postal code |
+| `is_business` | `boolean` | Business customer flag |
+| `metadata` | `object` | Custom metadata |
+| `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `400` | Invalid input data |
+| `401` | Invalid or missing API key |
+| `404` | Customer not found or access denied |

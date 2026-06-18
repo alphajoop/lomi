@@ -68,7 +68,7 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders:
-      'X-API-KEY,X-Lomi-API-Key,Lomi-Account,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization',
+      'X-API-KEY,X-Lomi-API-Key,Lomi-Account,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization,X-Organization-Id,X-Environment',
     exposedHeaders:
       'X-Request-Id,Retry-After,X-RateLimit-Limit,X-RateLimit-Policy,X-RateLimit-Window-Seconds',
   });

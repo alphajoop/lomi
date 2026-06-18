@@ -34,6 +34,18 @@ Repeated **401 Unauthorized** attempts (often with a body such as `"Authenticati
 
 The subsections below condense how the NestJS **webhook sender** behaves today (`WebhookSenderService` in `apps/api/src/webhooks/webhook-sender.service.ts`). They exist so integrators can reason about **timeouts**, **retries**, and **non-retryable client errors** without reading source code. Product behavior can evolve; when in doubt, rely on delivery logs and on building **idempotent** consumers.
 
+### Single delivery path (outbox + BullMQ)
+
+Merchant webhooks from SQL triggers and the API use one pipeline:
+
+1. **`webhook_events_outbox`** — idempotent event upsert (`idempotency_key`)
+2. **`webhook_delivery_dispatches`** — one row per active endpoint
+3. **NestJS `WebhookQueueProcessor`** — BullMQ `webhooks` queue with exponential backoff
+
+SQL callers use `enqueue_merchant_webhook_outbox`, which notifies the API at `POST /internal/webhooks/process-outbox`. Set **`WEBHOOK_OUTBOX_ENABLED=true`** on Railway (default). Use **`WEBHOOK_OUTBOX_ENABLED=false`** only to fall back to synchronous delivery during an incident.
+
+Legacy Edge functions (`trigger-free-transaction-webhook`, `trigger-subscription-webhook`) are removed; do not configure URLs pointing at them.
+
 ### Per-attempt HTTP timeout
 
 lomi.’s webhook HTTP client waits **approximately 4 seconds** (`timeout: 4000` ms per request) for your server to finish the HTTP response.
@@ -58,9 +70,9 @@ In practice: **fix configuration and auth issues** (which often surface as `4xx`
 Depending on route, merchants may hit **different** dispatcher behavior:
 
 1. **Synchronous batches** (`notifyOrganization` → legacy `sendWebhook` loop): up to **four** outbound HTTP tries on **retryable** failures only, with exponential delay starting at **~3 seconds** between tries.
-2. **Queued jobs** (BullMQ worker + optional outbox / org allowlist env): up to **five** worker **attempts** per job with **exponential** backoff (**initial delay 5 seconds** between job retries).
+2. **Queued jobs** (BullMQ worker + outbox dispatch): up to **five** worker **attempts** per job with **exponential** backoff (**initial delay 5 seconds** between job retries).
 
-Operational flags (`WEBHOOK_OUTBOX_ENABLED`, `WEBHOOK_OUTBOX_CANARY_ORG_IDS`) can shift orgs toward the outbox/dispatch pipeline; both paths honor the **same ~4 s per HTTP POST**.
+All organizations use the outbox path when `WEBHOOK_OUTBOX_ENABLED` is not `false`. Both paths honor the **same ~4 s per HTTP POST**.
 
 You do not need to branch on these paths in your handler — **always** accept deliveries idempotently — but knowing the difference helps when you read logs or estimate how long a transient outage window might last.
 

@@ -29,4 +29,4 @@ Redirect the customer to `session.url` to complete payment.
 ## Sandbox testing
 
 Use a test secret key (`lomi_sk_test_…`) and sandbox API URL.
-See https://docs.lomi.africa/reference/setup/sandbox-payments for test cards and mobile money numbers.
+See https://docs.lomi.africa/start/sandbox-payments for test cards and mobile money numbers.

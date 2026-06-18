@@ -4,6 +4,7 @@ import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
 import {
   isNetworkRequest,
+  resolveNetworkMemberMerchantId,
   upsertNetworkCustomerMetadata,
 } from '../common/network-context';
 import { CreateCustomerDto } from './dto/create-customer.dto';
@@ -157,11 +158,14 @@ export class CustomersService {
    * Uses RPC: create_customer
    */
   async create(createDto: CreateCustomerDto, user: AuthContext) {
+    const ledgerMerchantId = isNetworkRequest(user)
+      ? await resolveNetworkMemberMerchantId(this.supabase, user)
+      : user.merchantId;
+
     const { data, error } = await this.supabase.getClient().rpc(
       'create_customer' as any,
       {
-        p_merchant_id: user.merchantId,
-        ...(isNetworkRequest(user) ? { p_merchant_id: null } : {}),
+        p_merchant_id: ledgerMerchantId,
         p_organization_id: user.organizationId,
         p_name: createDto.name,
         p_email: createDto.email || null,

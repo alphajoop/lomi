@@ -1,31 +1,69 @@
 # lomi. API
 
-RESTful API service for the lomi. payment platform, providing endpoints for payment processing, subscriptions, customers, and more.
+RESTful API service for the lomi. payment platform.
 
 ## Overview
 
-This is the core API service that powers the lomi. platform. It handles payment processing, transaction management, webhook delivery, and provides a unified interface for integrating with π-SPI and other payment providers.
+NestJS API for payments, subscriptions, webhooks, and metering.
 
-## Quick start
+| Environment | Platform | Config |
+|-------------|----------|--------|
+| **Production** | [Railway](https://railway.app) (long-running process) | [`Dockerfile`](Dockerfile), [`railway.json`](railway.json) |
+| **Sandbox** | [Vercel](https://vercel.com) (serverless) | [`vercel.json`](vercel.json) |
 
-For API documentation and integration guides, visit [docs.lomi.africa](https://docs.lomi.africa).
+Production Railway conventions match [`apps/mcp`](../mcp): `/health`, `/ready`.
+
+Frontends (dashboard, checkout, docs, storefront) stay on Vercel.
+
+## Quick start (local)
+
+```bash
+cd apps/api
+pnpm install
+cp .env.example .env.local
+pnpm run start:dev
+```
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /health` | Liveness |
+| `GET /ready` | Readiness (Railway health check) |
+| `GET /health/redis` | Redis + queue snapshot |
+| `GET /api` | Swagger UI |
 
 ## Deployment
 
-### Local development
+### Production (Railway)
 
-For local development:
+| Setting | Value |
+|---------|--------|
+| Root directory | `apps/api` |
+| Build command | `pnpm install --frozen-lockfile && pnpm run build` |
+| Start command | `pnpm run start:prod` |
+| Health check path | `/ready` |
+| Health check timeout | 120s |
+| Node version | 22 |
 
-- File logging is enabled
-- Logs are stored in the `logs/` directory
-- Make sure the `logs` directory exists in your development environment
+Config: [`railway.json`](railway.json). Env vars: [`.env.example`](.env.example).
+
+```bash
+pnpm run smoke:http https://your-service.up.railway.app
+```
+
+### Sandbox (Vercel)
+
+| Setting | Value |
+|---------|--------|
+| Root directory | `apps/api` |
+| Framework | Other (`@vercel/node` via [`vercel.json`](vercel.json)) |
+
+Vercel ignores Railway/Docker files; Railway ignores `vercel.json`.
 
 ## Documentation
 
 - [API reference](https://docs.lomi.africa/api)
-- [Getting started guide](https://docs.lomi.africa/docs/core/fundamentals/)
-- [API authentication](https://docs.lomi.africa/docs/reference/setup/authentication)
+- [Getting started](https://docs.lomi.africa/start/integration-journey)
 
 ## Support
 
-Contact [hello@lomi.africa](mailto:hello@lomi.africa) or visit our [support center](https://docs.lomi.africa/docs/support/contact).
+[hello@lomi.africa](mailto:hello@lomi.africa)

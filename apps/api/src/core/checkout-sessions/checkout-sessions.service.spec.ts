@@ -20,11 +20,28 @@ describe('CheckoutSessionsService', () => {
     environment: 'test-env',
   };
 
+  const networkUser = {
+    ...mockUser,
+    actorOrganizationId: 'operator-org',
+    targetOrganizationId: 'test-org-id',
+    isNetworkRequest: true,
+    networkMembershipId: 'nm-checkout',
+    networkAccountId: 'na-checkout',
+    lomiAccount: 'acct_member',
+    publicAccountId: 'acct_member',
+    networkCapabilityKey: 'payment.create',
+  };
+
   beforeEach(async () => {
     mockSupabaseClient = {
       rpc: jest
         .fn()
         .mockResolvedValue({ data: null, error: { message: 'not found' } }),
+      from: jest.fn(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+      })),
     };
 
     mockSupabaseService = {
@@ -67,7 +84,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual(expectedResponse);
+    expect(result.data).toEqual(expectedResponse);
     expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
       'create_checkout_session',
       expect.objectContaining({
@@ -113,7 +130,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       payment_required: true,
       reason: 'invoice_payment_required',
       blocking_invoice: {
@@ -130,6 +147,40 @@ describe('CheckoutSessionsService', () => {
         p_organization_id: mockUser.organizationId,
         p_customer_id: 'customer-1',
         p_product_id: 'product-1',
+      }),
+    );
+  });
+
+  it('namespaces idempotency keys for Network checkout sessions', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseService.rpc.mockImplementation(async (name: string) => {
+      if (name === 'record_network_transaction_context') {
+        return { data: 'ctx-network', error: null };
+      }
+      if (name === 'calculate_network_operator_fee') {
+        return { data: 0, error: null };
+      }
+      return {
+        data: { checkout_session_id: 'session-network' },
+        error: null,
+      };
+    });
+    mockSupabaseClient.rpc.mockImplementation(mockSupabaseService.rpc);
+
+    await service.create(createDto, networkUser as AuthContext, {
+      key: 'checkout-1',
+      bodyHash: 'body-hash',
+    });
+
+    expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_idempotency_key: expect.stringMatching(/^network:nm-checkout:/),
+        p_idempotency_body_hash: expect.not.stringMatching(/^body-hash$/),
       }),
     );
   });
@@ -155,6 +206,32 @@ describe('CheckoutSessionsService', () => {
       expect.objectContaining({
         p_idempotency_key: 'idem-1',
         p_idempotency_body_hash: 'abc',
+      }),
+    );
+  });
+
+  it('forwards integration_source into checkout session metadata', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+      integration_source: 'woocommerce',
+      metadata: { wc_order_id: '42' },
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseService.rpc.mockResolvedValue({
+      data: { checkout_session_id: 'x' },
+      error: null,
+    });
+
+    await service.create(createDto, mockUser as AuthContext);
+
+    expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_metadata: {
+          wc_order_id: '42',
+          integration_source: 'woocommerce',
+        },
       }),
     );
   });
@@ -239,7 +316,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual(expectedResponse);
+    expect(result.data).toEqual(expectedResponse);
     expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
       'create_checkout_session_with_line_items',
       expect.objectContaining({
@@ -291,8 +368,9 @@ describe('CheckoutSessionsService', () => {
   });
 
   it('should findOne return row when scoped to organization', async () => {
+    const sessionId = '11111111-1111-4111-8111-111111111111';
     const row = {
-      checkout_session_id: 'cs-1',
+      checkout_session_id: sessionId,
       organization_id: mockUser.organizationId,
       amount: 100,
     };
@@ -301,15 +379,31 @@ describe('CheckoutSessionsService', () => {
       error: null,
     });
 
-    const result = await service.findOne('cs-1', mockUser as AuthContext);
+    const result = await service.findOne(sessionId, mockUser as AuthContext);
 
     expect(result).toEqual(row);
     expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
       'get_checkout_session_api',
       {
-        p_checkout_session_id: 'cs-1',
+        p_checkout_session_id: sessionId,
         p_organization_id: mockUser.organizationId,
       },
+    );
+  });
+
+  it('should findOne throw BadRequestException for invalid session id', async () => {
+    await expect(
+      service.findOne('{CHECKOUT_SESSION_ID}', mockUser as AuthContext),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(mockSupabaseClient.rpc).not.toHaveBeenCalled();
+  });
+
+  it('should findOne explain placeholder misuse for success_url template', async () => {
+    await expect(
+      service.findOne('{CHECKOUT_SESSION_ID}', mockUser as AuthContext),
+    ).rejects.toThrow(
+      'Checkout session id must be the UUID returned by POST /checkout-sessions, not the {CHECKOUT_SESSION_ID} success_url placeholder',
     );
   });
 
@@ -320,7 +414,10 @@ describe('CheckoutSessionsService', () => {
     });
 
     await expect(
-      service.findOne('missing', mockUser as AuthContext),
+      service.findOne(
+        '22222222-2222-4222-8222-222222222222',
+        mockUser as AuthContext,
+      ),
     ).rejects.toThrow(NotFoundException);
   });
 });

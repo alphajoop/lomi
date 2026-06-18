@@ -11,11 +11,19 @@ import { CreateMtnChargeDto } from './dto/create-mtn-charge.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
 import {
+  assertNetworkContextRecorded,
   isNetworkRequest,
   recordNetworkContext,
+  resolveNetworkMemberMerchantId,
 } from '../common/network-context';
 import { getMtnCountryConfig } from './mtn-country';
 import { randomUUID } from 'crypto';
+import {
+  attachChargeNextAction,
+  deriveMtnChargeNextAction,
+  deriveWaveChargeNextAction,
+} from './charge-next-action';
+import type { ChargeScenarioKey } from './charge-scenario';
 
 @Injectable()
 export class ChargesService {
@@ -29,6 +37,7 @@ export class ChargesService {
   async createWaveCharge(
     createChargeDto: CreateWaveChargeDto,
     user: AuthContext,
+    scenarioKey?: ChargeScenarioKey,
   ) {
     const {
       amount,
@@ -41,6 +50,10 @@ export class ChargesService {
       errorUrl,
     } = createChargeDto;
     const paymentEnvironment = environmentFromAuth(user);
+    const networkRequest = isNetworkRequest(user);
+    const ledgerMerchantId = networkRequest
+      ? await resolveNetworkMemberMerchantId(this.supabaseService, user)
+      : merchantId;
 
     try {
       this.logger.log(
@@ -51,7 +64,7 @@ export class ChargesService {
       const { data: custId, error: custError } = await this.supabaseService.rpc(
         'create_or_update_customer' as any,
         {
-          p_merchant_id: merchantId,
+          p_merchant_id: ledgerMerchantId,
           p_organization_id: organizationId,
           p_name: customer.name,
           p_email: customer.email,
@@ -75,14 +88,25 @@ export class ChargesService {
 
       const customerId = custId as string;
 
-      // 2. Fetch Wave Aggregated Merchant ID from organization settings using RPC
-      const { data: providerSettings, error: providerError } =
-        await this.supabaseService.rpc('fetch_wave_provider_settings' as any, {
-          p_organization_id: organizationId,
-        });
+      const { data: providerSettings, error: providerError } = networkRequest
+        ? await this.supabaseService.getClient().rpc(
+            'fetch_network_provider_settings_for_api' as never,
+            {
+              p_network_membership_id: user.networkMembershipId,
+              p_provider_code: 'WAVE',
+              p_environment: paymentEnvironment,
+            } as never,
+          )
+        : await this.supabaseService.rpc(
+            'fetch_wave_provider_settings' as any,
+            {
+              p_organization_id: organizationId,
+            },
+          );
 
-      // The RPC returns an array of rows
-      const waveSettings = providerSettings && providerSettings[0];
+      const waveSettings = Array.isArray(providerSettings)
+        ? providerSettings[0]
+        : providerSettings && providerSettings[0];
 
       if (providerError || !waveSettings?.provider_merchant_id) {
         this.logger.error(
@@ -96,6 +120,26 @@ export class ChargesService {
       this.logger.log(
         `Initiating Wave charge for organization ${organizationId} with Aggregated Merchant ID ${waveSettings.provider_merchant_id}`,
       );
+
+      if (paymentEnvironment === 'test' && scenarioKey === 'failed') {
+        throw new BadRequestException('Charge failed (test scenario)');
+      }
+
+      if (paymentEnvironment === 'test' && scenarioKey === 'pending') {
+        const frontendUrl =
+          this.configService.get('FRONTEND_URL') || 'https://lomi.africa';
+        const pendingUrl = `${frontendUrl}/checkout/wave/test-pending`;
+        const payload = {
+          transaction_id: randomUUID(),
+          status: 'PENDING',
+          wave_launch_url: pendingUrl,
+          checkout_url: pendingUrl,
+        };
+        return attachChargeNextAction(
+          payload,
+          deriveWaveChargeNextAction(payload),
+        );
+      }
 
       // Prepare URLs
       const frontendUrl =
@@ -111,7 +155,7 @@ export class ChargesService {
             path: '/create-checkout-session',
             method: 'POST',
             body: {
-              merchantId,
+              merchantId: ledgerMerchantId,
               organizationId,
               customerId,
               amount,
@@ -146,21 +190,31 @@ export class ChargesService {
 
       const transactionId = extractTransactionId(edgeResponse);
       if (transactionId) {
-        await recordNetworkContext(this.supabaseService, user, {
-          transactionId,
-          amount,
-          currencyCode: currency,
-          capabilityKey: 'payment.create',
-          enqueuePaymentCreated: true,
-          paymentEventIdempotencyKey: `network_payment_${transactionId}`,
-          metadata: {
-            provider: 'WAVE',
-            source: 'api_direct_charge',
+        const networkContext = await recordNetworkContext(
+          this.supabaseService,
+          user,
+          {
+            transactionId,
+            amount,
+            currencyCode: currency,
+            capabilityKey: 'payment.create',
+            metadata: {
+              provider: 'WAVE',
+              source: 'api_direct_charge',
+            },
           },
-        });
+        );
+        assertNetworkContextRecorded(user, networkContext, 'wave charge');
       }
 
-      return edgeResponse;
+      const wavePayload =
+        edgeResponse && typeof edgeResponse === 'object'
+          ? (edgeResponse as Record<string, unknown>)
+          : {};
+      return attachChargeNextAction(
+        wavePayload,
+        deriveWaveChargeNextAction(wavePayload),
+      );
     } catch (error) {
       this.logger.error(`Wave charge failed: ${error.message}`);
       throw error;
@@ -170,6 +224,7 @@ export class ChargesService {
   async createMtnCharge(
     createChargeDto: CreateMtnChargeDto,
     user: AuthContext,
+    scenarioKey?: ChargeScenarioKey,
   ) {
     const {
       amount,
@@ -186,9 +241,16 @@ export class ChargesService {
     const paymentEnvironment = environmentFromAuth(user);
     const mtnApiEnvironment =
       paymentEnvironment === 'test' ? 'development' : 'production';
-    const { targetEnvironment } = getMtnCountryConfig(countryCode ?? 'CI');
+    const { targetEnvironment: countryTarget } = getMtnCountryConfig(
+      countryCode ?? 'CI',
+    );
+    const targetEnvironment =
+      mtnApiEnvironment === 'development' ? 'sandbox' : countryTarget;
 
     const networkRequest = isNetworkRequest(user);
+    const ledgerMerchantId = networkRequest
+      ? await resolveNetworkMemberMerchantId(this.supabaseService, user)
+      : merchantId;
     const { data: providers, error: providerError } = networkRequest
       ? await this.supabaseService.getClient().rpc(
           'fetch_network_provider_settings_for_api' as never,
@@ -222,7 +284,7 @@ export class ChargesService {
     const { data: custId, error: custError } = await this.supabaseService.rpc(
       'create_or_update_customer' as never,
       {
-        p_merchant_id: merchantId,
+        p_merchant_id: ledgerMerchantId,
         p_organization_id: organizationId,
         p_name: customer.name,
         p_email: customer.email ?? '',
@@ -246,7 +308,7 @@ export class ChargesService {
       .rpc(
         'create_mtn_transaction' as never,
         {
-          p_merchant_id: merchantId,
+          p_merchant_id: ledgerMerchantId,
           p_organization_id: organizationId,
           p_customer_id: custId,
           p_amount: amount,
@@ -271,6 +333,54 @@ export class ChargesService {
 
     const { transaction_id: transactionId, external_id: externalId } =
       txRow as { transaction_id: string; external_id: string };
+
+    if (paymentEnvironment === 'test') {
+      if (scenarioKey === 'failed') {
+        throw new BadRequestException('Charge failed (test scenario)');
+      }
+
+      if (scenarioKey === 'pending') {
+        const pendingData = {
+          transaction_id: transactionId,
+          external_id: externalId,
+          reference_id: null,
+          status: 'PENDING',
+        };
+        return attachChargeNextAction(
+          { success: true, data: pendingData },
+          deriveMtnChargeNextAction(pendingData),
+        );
+      }
+
+      const networkContext = await recordNetworkContext(
+        this.supabaseService,
+        user,
+        {
+          transactionId,
+          amount: amount * quantity,
+          currencyCode: currency,
+          capabilityKey: 'payment.create',
+          metadata: {
+            provider: 'MTN',
+            external_id: externalId,
+            source: 'api_direct_charge',
+            test_mode: true,
+          },
+        },
+      );
+      assertNetworkContextRecorded(user, networkContext, 'mtn charge');
+
+      const completedData = {
+        transaction_id: transactionId,
+        external_id: externalId,
+        reference_id: null,
+        status: 'completed',
+      };
+      return attachChargeNextAction(
+        { success: true, data: completedData },
+        deriveMtnChargeNextAction(completedData),
+      );
+    }
 
     const totalAmount = amount * quantity;
     const requestBody = {
@@ -317,33 +427,35 @@ export class ChargesService {
       );
     }
 
-    await recordNetworkContext(this.supabaseService, user, {
-      transactionId,
-      amount: totalAmount,
-      currencyCode: currency,
-      capabilityKey: 'payment.create',
-      enqueuePaymentCreated: true,
-      paymentEventIdempotencyKey: referenceId
-        ? `network_payment_mtn_${referenceId}`
-        : `network_payment_${transactionId}`,
-      metadata: {
-        provider: 'MTN',
-        reference_id: referenceId ?? null,
-        external_id: externalId,
-        source: 'api_direct_charge',
+    const networkContext = await recordNetworkContext(
+      this.supabaseService,
+      user,
+      {
+        transactionId,
+        amount: totalAmount,
+        currencyCode: currency,
+        capabilityKey: 'payment.create',
+        metadata: {
+          provider: 'MTN',
+          reference_id: referenceId ?? null,
+          external_id: externalId,
+          source: 'api_direct_charge',
+        },
       },
-    });
+    );
+    assertNetworkContextRecorded(user, networkContext, 'mtn charge');
 
-    return {
-      success: true,
-      data: {
-        transaction_id: transactionId,
-        external_id: externalId,
-        reference_id: referenceId,
-        status: (mtnResponse as { status?: string })?.status ?? 'PENDING',
-        mtn_response: mtnResponse,
-      },
+    const liveData = {
+      transaction_id: transactionId,
+      external_id: externalId,
+      reference_id: referenceId,
+      status: (mtnResponse as { status?: string })?.status ?? 'PENDING',
+      mtn_response: mtnResponse,
     };
+    return attachChargeNextAction(
+      { success: true, data: liveData },
+      deriveMtnChargeNextAction(liveData),
+    );
   }
 }
 

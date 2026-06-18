@@ -1,0 +1,77 @@
+---
+title: "Lister les transactions d’un règlement"
+description: "Lister les transactions d’une règlement"
+full: true
+method: get
+path: /settlements/{id}/transactions
+operationId: SettlementsController_findTransactions
+---
+
+## Aperçu
+
+Lister les transactions d’un règlement
+
+Retourne les transactions complétées dont `available_at` tombe sur la date de règlement pour la devise donnée.
+
+### Quand l'utiliser
+
+Voir le détail d'une règlement pour rapprocher les lignes avec les totaux de [Liste des règlements](/api/settlements/SettlementsController_findAll).
+
+### Voir aussi
+
+[Liste des règlements](/api/settlements/SettlementsController_findAll)
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /settlements/{id}/transactions`
+
+Le segment `id` est le `settlement_id` (`{currency}:{YYYY-MM-DD}`). Encodez les deux-points en URL (`XOF%3A2026-06-01`) si votre client HTTP l’exige.
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `id` | path | Oui | `string` | Identifiant de règlement, ex. `XOF:2026-06-01` |
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `page` | query | Non | `integer` | Numéro de page (défaut `1`) |
+| `pageSize` | query | Non | `integer` | Taille de page (défaut `50`) |
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Transactions du règlement |
+
+## Erreurs
+
+**400** pour un format `settlement_id` invalide. **401** en cas d’échec d’authentification.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements/XOF%3A2026-06-01/transactions?page=1&pageSize=50" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `SettlementsController_findTransactions`
+- **Operation**: `GET /settlements/{id}/transactions`
+
+Schémas complets et **Try it** : [référence API](/api).

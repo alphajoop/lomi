@@ -1,0 +1,75 @@
+---
+title: 'Écouter les webhooks'
+description: 'Utilisez lomi listen pour recevoir les webhooks sandbox via relais cloud sans ngrok.'
+---
+
+`lomi listen` ouvre une connexion Server-Sent Events (SSE) vers l'API lomi. et diffuse les événements webhook vers votre machine. Vous pouvez optionnellement les transférer vers un handler HTTP local.
+
+Nécessite un [`lomi login`](/build/cli/auth) avec un profil **sandbox** (recommandé).
+
+## Usage
+
+```bash filename="Terminal"
+# Afficher les événements dans le terminal
+lomi listen
+
+# Transférer vers votre handler webhook local
+lomi listen http://localhost:3000/api/webhooks
+```
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `FORWARD_URL` | URL optionnelle pour POST des charges webhook signées |
+| `--allow-production` | Écouter sur un profil production (requiert `CLI_LISTEN_ALLOW_PRODUCTION=true` côté API) |
+
+## Parcours
+
+<Steps>
+
+### Se connecter (sandbox)
+
+```bash filename="Terminal"
+lomi login --profile sandbox
+lomi switch sandbox
+```
+
+### Démarrer l'écoute
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+À la connexion, le CLI affiche votre organisation et `LOMI_WEBHOOK_SECRET`. Ajoutez le secret dans `.env` :
+
+```dotenv filename=".env"
+LOMI_WEBHOOK_SECRET=whsec_...
+```
+
+### Déclencher un événement test
+
+```bash filename="Terminal"
+lomi webhooks list
+lomi webhooks test <webhook-id>
+```
+
+Les événements apparaissent dans le terminal et sont transférés vers votre URL locale avec les en-têtes production (`X-Lomi-Signature`, `X-Lomi-Event`).
+
+</Steps>
+
+## Comparaison avec `lomi dev`
+
+| | `lomi listen` | `lomi dev` |
+| --- | --- | --- |
+| Reçoit de vrais événements sandbox | Oui | Seulement si le tableau de bord pointe vers localhost/ngrok |
+| Nécessite ngrok | Non | Souvent oui en E2E |
+| Lance un serveur HTTP local | Non (transfert optionnel) | Oui (`:4242/webhook`) |
+
+Utilisez **`lomi listen`** comme chemin d'intégration principal. **`lomi dev`** quand vous n'avez besoin que d'un récepteur local.
+
+## Suite
+
+- [Serveur de développement local](/build/cli/dev)
+- [Référence webhooks](/build/webhooks)
+- [Initialiser un projet](/build/cli/init)

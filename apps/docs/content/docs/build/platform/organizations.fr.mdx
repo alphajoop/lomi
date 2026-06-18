@@ -1,0 +1,212 @@
+---
+title: Organisations
+description: Consultez le détail et les indicateurs de votre organisation.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+L’API Organizations expose les informations et indicateurs métier de votre organisation.
+
+Pour la plupart des intégrations, l’**organisation** est la portée principale des clés API, soldes et paramètres. L’API [Marchands](/build/platform/merchants) reste utile pour les profils marchands et les chemins qui exposent encore un identifiant marchand.
+
+## Configuration tarifaire
+
+Chaque organisation dispose d’un mode tarifaire qui détermine comment les frais sont calculés :
+
+- `volume_tiered` : tarification dynamique selon paliers de volume traité
+- `fixed` : grille de frais stable
+- `custom` : grille négociée (résolue au niveau organisation)
+
+En pratique :
+
+- les organisations `volume_tiered` utilisent la structure de palier courante pour les catégories prises en charge ;
+- les organisations `fixed` et `custom` s’appuient directement sur la configuration de frais ;
+- des frais additionnels (remboursements, litiges, cartes internationales, options d’abonnement, etc.) peuvent encore s’appliquer selon votre configuration.
+
+Pour les montants en vigueur sur votre compte, consultez le tableau de bord et votre convention commerciale.
+
+## Détail de l’organisation
+
+Récupère le détail de votre organisation authentifiée.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const org = await lomi.organizations.list();
+console.log(`Organization: ${org[0].name}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+orgs = client.organizations.list()
+print(f"Organization: {orgs[0]['name']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/organizations" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir une organisation par ID
+
+Récupère une organisation précise (doit correspondre à l’organisation authentifiée).
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const org = await lomi.organizations.get('org_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+org = client.organizations.get('org_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/organizations/org_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Indicateurs de l’organisation
+
+Indicateurs précalculés : MRR, ARR, chiffre d’affaires, nombre de clients, etc.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const metrics = await lomi.organizations.getMetrics();
+
+console.log(`MRR: ${metrics.mrr} ${metrics.currency_code}`);
+console.log(`ARR: ${metrics.arr} ${metrics.currency_code}`);
+console.log(`Total Revenue: ${metrics.total_revenue}`);
+console.log(`Total Customers: ${metrics.total_customers}`);
+console.log(`Total Transactions: ${metrics.total_transactions}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+metrics = client.organizations.get_metrics()
+
+print(f"MRR: {metrics['mrr']} {metrics['currency_code']}")
+print(f"ARR: {metrics['arr']} {metrics['currency_code']}")
+print(f"Total Revenue: {metrics['total_revenue']}")
+print(f"Total Customers: {metrics['total_customers']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/organizations/metrics" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+### Réponse
+
+```json
+{
+  "mrr": 50000,
+  "arr": 600000,
+  "total_revenue": 250000,
+  "total_transactions": 1234,
+  "total_customers": 567,
+  "currency_code": "XOF",
+  "calculated_at": "2024-01-15T00:00:00Z"
+}
+```
+
+---
+
+## Objet Metrics
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `mrr` | `number` | Revenu récurrent mensuel |
+| `arr` | `number` | Revenu récurrent annuel |
+| `total_revenue` | `number` | Chiffre d’affaires total |
+| `total_transactions` | `number` | Nombre de transactions |
+| `total_customers` | `number` | Nombre de clients |
+| `currency_code` | `string` | Devise des montants |
+| `calculated_at` | `string` | Horodatage du calcul |
+
+---
+
+## Objet Organization
+
+Ces champs correspondent à la ressource **organization** renvoyée par `GET /organizations` (voir [référence API](/api)). Les **modes** tarifaires (`volume_tiered`, `fixed`, `custom`) sont décrits ci-dessus et sous [Tarification](/resources/merchant-of-record/pricing) ; ils n’apparaissent pas forcément comme colonne dédiée dans chaque réponse.
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `organization_id` | `string` | Identifiant unique |
+| `name` | `string` | Nom |
+| `email` | `string` | E-mail de contact |
+| `phone_number` | `string` | Téléphone principal |
+| `verification_status` | `string` | `unverified`, `starter` ou `verified` |
+| `website_url` | `string` \| `null` | Site web |
+| `logo_url` | `string` \| `null` | URL du logo |
+| `status` | `string` | `active`, `inactive` ou `suspended` |
+| `default_currency` | `string` | Devise par défaut (`XOF`, `USD`, `EUR`) |
+| `slug` | `string` \| `null` | Slug URL |
+| `storefront_enabled` | `boolean` | Vitrine activée |
+| `total_revenue` | `number` \| `null` | CA total (si présent) |
+| `total_transactions` | `number` \| `null` | Nombre de transactions |
+| `total_merchants` | `number` \| `null` | Nombre de marchands |
+| `total_customers` | `number` \| `null` | Nombre de clients |
+| `mrr` | `number` | MRR |
+| `arr` | `number` | ARR |
+| `merchant_lifetime_value` | `number` | Valeur vie client moyenne |
+| `employee_number` | `string` \| `null` | Tranche d’effectifs |
+| `industry` | `string` \| `null` | Secteur |
+| `has_payout_pin` | `boolean` | Whether org requires PIN for manual payouts |
+| `is_starter_business` | `boolean` | Entrante / starter |
+| `metadata` | `object` | Métadonnées |
+| `created_at` | `string` | Création |
+| `updated_at` | `string` | Dernière mise à jour |
+| `is_deleted` | `boolean` | Suppression logique |
+| `deleted_at` | `string` \| `null` | Date de suppression |
+
+---
+
+## Réponses d’erreur
+
+| Statut | Description |
+|--------|-------------|
+| `401` | Clé API invalide ou manquante |
+| `404` | Organisation introuvable ou accès refusé |

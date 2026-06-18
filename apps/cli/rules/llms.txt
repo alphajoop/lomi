@@ -10,14 +10,24 @@
 
 ## Integration quickstart
 
+- **Amounts (XOF):** integer **centimes** (minor units) unless a field documents otherwise.
+- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…` — the **API key selects sandbox vs live**, not the hostname alone.
+- **Verify server-side before fulfill:** never trust client-only success; use webhooks + `GET /transactions/{id}`.
+
 1. Create a merchant account and API keys in the [dashboard](https://dashboard.lomi.africa).
 2. Build against **sandbox** first (`https://sandbox.api.lomi.africa`), then switch to **live** (`https://api.lomi.africa`) with live keys.
-3. Follow the [integration overview](https://docs.lomi.africa/reference/setup/integration) for headers, environments, and product choices.
-4. If you have not already, see [Getting started](https://docs.lomi.africa/core/fundamentals/create-account).
+3. **Default integration path:** hosted checkout sessions or payment links before direct `/charge/*` calls unless you need a custom server-initiated flow.
+4. **Environment is determined by the API key**, not the hostname alone—sandbox keys only work against sandbox; live keys only against live.
+5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.
+6. Follow the [integration journey](https://docs.lomi.africa/start/integration-journey) for sandbox → webhooks → go-live.
+- [Verify payments](https://docs.lomi.africa/build/guides/verify-payments) — confirm status before fulfilling.
+- [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle) — merchant-facing lifecycle hub.
+- Supported countries and rails: [Payment methods](https://docs.lomi.africa/build/guides/payment-methods).
+- Test cards and MoMo sandbox behavior: [Sandbox payments](https://docs.lomi.africa/start/sandbox-payments).
 
 ## Authentication and environments
 
-Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**.
+Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live—not the request URL alone.**
 
 - **Sandbox base URL**: `https://sandbox.api.lomi.africa`
 - **Live base URL**: `https://api.lomi.africa`
@@ -30,67 +40,25 @@ For **creates** that must not double-charge (payments, payouts), send an idempot
 
 ## Payment flows (pick one)
 
-Choose the path that matches your UX—not every merchant needs every API.
+Choose the path that matches your UX—not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.
 
 - **Hosted checkout** — buyer completes payment on the hosted experience: [Create checkout session](https://docs.lomi.africa/api/checkout-sessions/CheckoutSessionsController_create).
 - **Shareable payment links** → [Create payment link](https://docs.lomi.africa/api/payment-links/PaymentLinksController_create).
-- **Direct mobile-money charge (server-initiated)** → [Create direct mobile-money charge](https://docs.lomi.africa/api/charge/ChargesController_createWaveCharge) when you are not using hosted checkout.
-- **Embedded card charge** → [Create card charge](https://docs.lomi.africa/api/charge/ChargesController_createCardCharge).
+- **Direct mobile-money charge (server-initiated)** → [Wave charge](https://docs.lomi.africa/api/charge/ChargesController_createWaveCharge) when you are not using hosted checkout.
+- **Embedded card charge** → [Card charge](https://docs.lomi.africa/api/charge/ChargesController_createCardCharge).
 - **Payment request (invoice-style)** → [Create payment request](https://docs.lomi.africa/api/payment-requests/PaymentRequestsController_create).
-- **Subscriptions** → explore [Cancel subscription](https://docs.lomi.africa/api/subscriptions/SubscriptionsController_cancel) (list, cancel, per-customer).
-- **Payouts (self or beneficiary)** → [Create payout](https://docs.lomi.africa/api/payouts/PayoutsUnifiedController_create).
-- **Outbound webhooks (events to your server)** → [List webhooks](https://docs.lomi.africa/api/webhooks/WebhooksController_findAll) and delivery logs under the same API section.
-
-## REST API by domain
-
-Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](https://docs.lomi.africa/api/index).
-
-- **Accounts**: [Check available balance](https://docs.lomi.africa/api/accounts/AccountsController_checkAvailableBalance)
-- **Charge**: [Wave charge](https://docs.lomi.africa/api/charge/ChargesController_createWaveCharge) · [Card charge](https://docs.lomi.africa/api/charge/ChargesController_createCardCharge)
-- **Checkout Sessions**: [Create checkout session](https://docs.lomi.africa/api/checkout-sessions/CheckoutSessionsController_create)
-- **Customers**: [Create a customer](https://docs.lomi.africa/api/customers/CustomersController_create)
-- **Discount Coupons**: [Create discount coupon](https://docs.lomi.africa/api/discount-coupons/DiscountCouponsController_create)
-- **Organizations**: [List organizations](https://docs.lomi.africa/api/organizations/OrganizationsController_findAll)
-- **Payment Links**: [Create payment link](https://docs.lomi.africa/api/payment-links/PaymentLinksController_create)
-- **Payment Requests**: [Create payment request](https://docs.lomi.africa/api/payment-requests/PaymentRequestsController_create)
-- **Payouts**: [Create payout](https://docs.lomi.africa/api/payouts/PayoutsUnifiedController_create) · [List payouts](https://docs.lomi.africa/api/payouts/PayoutsUnifiedController_findAll)
-- **Products**: [Add product price](https://docs.lomi.africa/api/products/ProductsController_addPrice)
-- **Refunds**: [Create refund](https://docs.lomi.africa/api/refunds/RefundsController_create) · [List refunds](https://docs.lomi.africa/api/refunds/RefundsController_findAll)
-- **Subscriptions**: [Cancel subscription](https://docs.lomi.africa/api/subscriptions/SubscriptionsController_cancel)
-- **Transactions**: [List transactions](https://docs.lomi.africa/api/transactions/TransactionsController_findAll)
-- **Webhook Delivery Logs**: [List webhook delivery logs](https://docs.lomi.africa/api/webhook-delivery-logs/WebhookDeliveryLogsController_findAll)
-- **Webhooks**: [List webhooks](https://docs.lomi.africa/api/webhooks/WebhooksController_findAll)
+- **Subscriptions** → explore [Subscriptions API](https://docs.lomi.africa/api/subscriptions).
+- **Payouts (self wallet or third-party beneficiaries)** → [Payouts](https://docs.lomi.africa/api/payouts).
+- **Outbound webhooks (events to your server)** → [Webhooks](https://docs.lomi.africa/api/webhooks).
 
 ## Guides to read next
 
-- [What is lomi.?](https://docs.lomi.africa/core/introduction/what-is-lomi)
-- [Payment state machine](https://docs.lomi.africa/reference/reference/payment-state-machine) — status transitions and balances
-- [MCP integration](https://docs.lomi.africa/reference/integrations/mcp)
-
-## Document map (browse by section)
-
-Prefer section sidebars on the docs site for exhaustive lists. High-level areas:
-
-### core
-- [CI/CD](https://docs.lomi.africa/core/advanced-guides/ci-cd) — This guide covers best practices for integrating lomi. with your CI/CD pipeline, ensuring reliable deployments and automated testing.
-- [Error handling](https://docs.lomi.africa/core/advanced-guides/error-handling) — When integrating with lomi., it's essential to handle errors gracefully to provide a smooth payment experience for your customers.
-- [Handling webhooks](https://docs.lomi.africa/core/advanced-guides/handling-webhooks) — Webhooks provide real-time updates about events in your lomi. account. This guide explains how to securely receive and process these notifications.
-- [Idempotency keys](https://docs.lomi.africa/core/advanced-guides/idempotency-keys) — Idempotency ensures that an API request, if retried due to a network error or timeout, won't accidentally be performed multiple times. This is crucial for operations like creating payments or refunds to prevent duplicate actions. 
-_…and 33 more pages in this section (see docs sidebar)._
-
-### reference
-- [Changelog](https://docs.lomi.africa/reference/changelog/changelog) — This page documents notable changes to the lomi. API and related services.
-- [E‑commerce extensions](https://docs.lomi.africa/reference/integrations) — Official and maintained plugins for hosted checkout with Lomi. WooCommerce, Magento 2, and PrestaShop use the same public API contract; Shopify is documented separately.
-- [Magento 2](https://docs.lomi.africa/reference/integrations/magento) — Lomi_Payments module — hosted checkout via checkout sessions, callback route, signed webhooks, optional REST verify.
-- [MCP integration](https://docs.lomi.africa/reference/integrations/mcp) — Connect your AI client to Lomi with the Model Context Protocol.
-_…and 41 more pages in this section (see docs sidebar)._
-
-### api
-- [Check available balance](https://docs.lomi.africa/api/accounts/AccountsController_checkAvailableBalance) — Check available balance
-- [List accounts](https://docs.lomi.africa/api/accounts/AccountsController_findAll) — List accounts
-- [Retrieve an account](https://docs.lomi.africa/api/accounts/AccountsController_findOne) — Retrieve an account
-- [Account balances](https://docs.lomi.africa/api/accounts/AccountsController_getBalance) — Account balances
-_…and 46 more pages in this section (see docs sidebar)._
+- [What is lomi.?](https://docs.lomi.africa/start/overview)
+- [Integration journey](https://docs.lomi.africa/start/integration-journey)
+- [Verify payments](https://docs.lomi.africa/build/guides/verify-payments)
+- [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle)
+- [Payment methods](https://docs.lomi.africa/build/guides/payment-methods)
+- [Payment state machine](https://docs.lomi.africa/api/payment-state-machine) — status transitions and balances
 
 ## Contact and support
 
@@ -104,4 +72,7 @@ _…and 46 more pages in this section (see docs sidebar)._
 ## Common questions
 
 **Where do schemas live?** Use the [REST API](https://docs.lomi.africa/api/index) explorer and the OpenAPI export at `apps/docs/openapi.json` (generated from `apps/api`).
-**How do I reconcile payments?** Start from [List transactions](https://docs.lomi.africa/api/transactions/TransactionsController_findAll) and tie provider references to your internal order IDs using metadata on creates.
+
+**How do I reconcile payments?** Start from [Transactions](https://docs.lomi.africa/api/transactions) and tie provider references to your internal order IDs using metadata on creates.
+
+**How do I write or update docs?** See [Writing the docs](https://docs.lomi.africa/resources/contributing/writing-for-lomi-docs) and run `lomi docs check` from the monorepo.

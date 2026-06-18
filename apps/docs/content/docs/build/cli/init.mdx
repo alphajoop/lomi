@@ -23,9 +23,9 @@ lomi init
 | `-L, --language` | `ts` or `js` |
 | `--api-key` | Secret API key written to `.env` |
 | `--skip-package-install` | Skip `npm install` of SDK dependencies |
-| `--skip-rules-install` | Skip the agent rules install prompt |
-| `--with-ui <name>` | Install a Lomi UI component after scaffold (headless) |
-| `--skip-ui-install` | Skip the Lomi UI install prompt |
+| `--skip-rules-install` | Skip agent rules install (`--yes` installs Cursor + llms.txt by default) |
+| `--with-ui <name>` | Install a lomi. UI component after scaffold (headless) |
+| `--skip-ui-install` | Skip lomi. UI install prompt |
 | `[path]` | Project directory (default: current directory) |
 
 ### Headless example (CI)
@@ -39,7 +39,7 @@ lomi init --yes \
   --skip-rules-install
 ```
 
-### With Lomi UI (headless)
+### with lomi. UI (headless)
 
 ```bash filename="Terminal"
 lomi init --yes \
@@ -60,7 +60,7 @@ When run interactively, `lomi init` prompts for:
 2. **Language** — TypeScript or JavaScript for generated examples
 3. **API key** — Your secret key from the [Merchant Portal](https://lomi.africa/portal/settings/api-keys)
 
-It may also offer to run [`lomi install-rules`](/build/cli/install-rules) if you haven't installed agent rules yet, and optionally install a [Lomi UI](/build/lomi-ui) checkout component via [`lomi ui`](/build/cli/ui).
+It may also offer to run [`lomi install-rules`](/build/cli/install-rules) if you haven't installed agent rules yet, and optionally install a [lomi. UI](/build/lomi-ui) checkout component via [`lomi ui`](/build/cli/ui).
 
 ## Files created
 

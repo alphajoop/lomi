@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub const DEFAULT_PROFILE: &str = "default";
 
@@ -73,7 +73,7 @@ impl GlobalConfig {
     pub fn profile_mut(&mut self, name: &str) -> &mut ProfileSettings {
         self.profiles
             .entry(name.to_string())
-            .or_insert_with(ProfileSettings::default)
+            .or_default()
     }
 
     pub fn set_token(&mut self, profile: &str, token: String, api_url: String) -> Result<()> {
@@ -99,17 +99,17 @@ impl GlobalConfig {
     }
 }
 
-pub fn config_path() -> Result<PathBuf> {
+pub fn config_dir() -> Result<PathBuf> {
     if let Ok(dir) = std::env::var("LOMI_CONFIG_DIR") {
-        return Ok(PathBuf::from(dir).join("config.json"));
+        return Ok(PathBuf::from(dir));
     }
     let dirs = ProjectDirs::from("", "", "lomi")
         .context("Could not determine config directory for this platform")?;
-    Ok(dirs.config_dir().join("config.json"))
+    Ok(dirs.config_dir().to_path_buf())
 }
 
-pub fn config_dir() -> Result<PathBuf> {
-    Ok(config_path()?.parent().unwrap_or(Path::new(".")).to_path_buf())
+pub fn config_path() -> Result<PathBuf> {
+    Ok(config_dir()?.join("config.json"))
 }
 
 #[cfg(test)]

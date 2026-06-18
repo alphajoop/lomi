@@ -11,7 +11,7 @@
 import { writeFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule, type OpenAPIObject } from '@nestjs/swagger';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { OpenApiExportModule } from '../open-api-export.module';
@@ -32,9 +32,7 @@ const OPENAPI_NOISE_PATHS = new Set([
   '/test/webhook-event',
 ]);
 
-function stripNoiseOpenApiPaths<T extends { paths?: Record<string, unknown> }>(
-  document: T,
-): T {
+function stripNoiseOpenApiPaths(document: OpenAPIObject): OpenAPIObject {
   if (!document.paths) return document;
   const paths = { ...document.paths };
   for (const p of OPENAPI_NOISE_PATHS) {
@@ -43,9 +41,7 @@ function stripNoiseOpenApiPaths<T extends { paths?: Record<string, unknown> }>(
   return { ...document, paths };
 }
 
-function stripNonPublicRestApiPaths<
-  T extends { paths?: Record<string, unknown> },
->(document: T): T {
+function stripNonPublicRestApiPaths(document: OpenAPIObject): OpenAPIObject {
   if (!document.paths) return document;
   const paths: Record<string, unknown> = {};
 
@@ -74,7 +70,7 @@ function stripNonPublicRestApiPaths<
     }
   }
 
-  return { ...document, paths };
+  return { ...document, paths: paths as OpenAPIObject['paths'] };
 }
 
 function collectComponentSchemaRefs(value: unknown, refs: Set<string>): void {
@@ -96,15 +92,9 @@ function collectComponentSchemaRefs(value: unknown, refs: Set<string>): void {
   }
 }
 
-function pruneUnusedOpenApiComponentSchemas<
-  T extends {
-    paths?: Record<string, unknown>;
-    components?: { schemas?: Record<string, unknown> } & Record<
-      string,
-      unknown
-    >;
-  },
->(document: T): T {
+function pruneUnusedOpenApiComponentSchemas(
+  document: OpenAPIObject,
+): OpenAPIObject {
   const schemas = document.components?.schemas;
   if (!schemas) return document;
 
@@ -150,12 +140,18 @@ function getPublicOperationTag(pathKey: string): string | undefined {
   if (pathKey.startsWith('/transactions')) return 'Transactions';
   if (pathKey.startsWith('/webhooks')) return 'Webhooks';
   if (pathKey.startsWith('/webhook-delivery-logs')) return 'Webhooks';
+  if (pathKey.startsWith('/meters')) return 'Meters';
+  if (
+    pathKey.startsWith('/usage-events') ||
+    pathKey.startsWith('/usage-subscriptions')
+  ) {
+    return 'Usage events';
+  }
+  if (pathKey.startsWith('/usage-billing')) return 'Usage billing';
   return undefined;
 }
 
-function normalizePublicOperationTags<
-  T extends { paths?: Record<string, unknown>; tags?: unknown },
->(document: T): T {
+function normalizePublicOperationTags(document: OpenAPIObject): OpenAPIObject {
   if (!document.paths) return document;
   const paths: Record<string, unknown> = {};
   const tagNames = new Set<string>();
@@ -193,7 +189,7 @@ function normalizePublicOperationTags<
 
   return {
     ...document,
-    paths,
+    paths: paths as OpenAPIObject['paths'],
     tags: Array.from(tagNames)
       .sort()
       .map((name) => ({ name })),

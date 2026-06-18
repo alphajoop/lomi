@@ -1,0 +1,55 @@
+---
+title: 'Quickstart command'
+description: 'Run lomi quickstart to verify CLI connectivity and get recommended next steps.'
+---
+
+`lomi quickstart` is a non-destructive golden-path check. It verifies your CLI token and API connectivity, then prints the commands most teams run next.
+
+## Usage
+
+```bash filename="Terminal"
+lomi quickstart
+```
+
+Machine-readable output for scripts and agents:
+
+```bash filename="Terminal"
+lomi quickstart --json
+```
+
+Skip API checks (offline or docs-only):
+
+```bash filename="Terminal"
+lomi quickstart --skip-probe
+```
+
+## What it checks
+
+Unless `--skip-probe` is set, quickstart runs:
+
+1. `GET /` — API connectivity
+2. `GET /me` — identity and environment
+3. `GET /accounts/balance` — authenticated balance read
+
+## JSON response shape
+
+```json
+{
+  "status": "ready",
+  "profile": "default",
+  "organization": "Your Org",
+  "environment": "sandbox",
+  "probe": { "passed": 3, "failed": 0 },
+  "next_steps": [
+    {
+      "command": "lomi checkout create --amount 10000 ...",
+      "description": "Create a sandbox test checkout session"
+    }
+  ]
+}
+```
+
+## Next steps
+
+- [CLI quickstart guide](/start/cli-quickstart) — full install-to-webhook workflow
+- [Command reference](/build/cli/commands) — every CLI command

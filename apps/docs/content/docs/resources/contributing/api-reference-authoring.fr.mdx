@@ -1,0 +1,74 @@
+---
+title: Rédaction de la référence API REST
+description: Comment nous maintenons la section API REST écrite à la main, l'alignons sur OpenAPI et évitons une génération destructive accidentelle.
+---
+
+La référence REST publique vit sous `content/docs/api/` dans l'app docs. **Le texte narratif et les exemples sont rédigés manuellement en MDX** avec une structure de sections fixe — pas de wrappers `<APIPage />` autogénérés. Le `apps/docs/openapi.json` commité est l'**artefact de contrat et de validation** machine, pas la source de vérité du texte.
+
+## Workflow sûr (par défaut)
+
+1. **Build docs normal** (`pnpm run build`) exécute `build:pre`, qui **ne** réexporte **pas** OpenAPI depuis `apps/api` et **ne** réécrit **pas** `openapi.json`. Il utilise ce qui est déjà commité (et construit le registre de recherche).
+
+2. Quand le contrat API change, mettez à jour l'artefact **délibérément** :
+   - Depuis `apps/api` : `pnpm run openapi:export` (écrit `apps/docs/openapi.json`). Le CI doit rester vert : le fichier exporté doit correspondre au dépôt (`verify-openapi` dans GitHub Actions).
+   - Optionnel : depuis `apps/docs`, sync export + normalisation sécurité en une étape : `pnpm run build:pre:sync` (définit `DOCS_SYNC_OPENAPI=1`).
+
+3. **N'exécutez pas** une régénération REST massive sauf si vous avez besoin de mettre à jour le scaffolding. Le mode sûr ne crée que les pages d'opération manquantes :
+
+   ```bash
+   CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference
+   ```
+
+   Alias : `pnpm run api:bootstrap` (même script ; requiert toujours `CONFIRM_BOOTSTRAP=1`).
+   Pour écraser aussi les pages d'opération existantes, optez explicitement :
+
+   ```bash
+   CONFIRM_BOOTSTRAP=1 BOOTSTRAP_OVERWRITE=1 pnpm run api:regenerate-rest-reference
+   ```
+
+   Puis **éditez** les pages pour la clarté : exemples, cas limites, liens vers les guides et formulation.
+
+4. Lancez `pnpm lint` dans `apps/docs` — il vérifie les règles de ton OpenAPI, la **parité REST** (chaque opération marchande publique a une doc), les **titres** requis, les liens internes et la **politique** (pas de chemins ingress prestataire ni d'identifiants internes fournisseur dans la doc publique/OpenAPI).
+
+## Politique : internes prestataire
+
+- Les **webhooks entrants prestataire** (carte / ingress mobile money) ne font **pas** partie de l'API marchande publique. Ils ne doivent pas apparaître dans `openapi.json`, les MDX REST ni les guides de haut niveau. Le lint l'applique.
+- Décrivez uniquement les **webhooks sortants marchands** et **votre** surface d'intégration.
+
+## Frontmatter (requis pour chaque page d'opération)
+
+Chaque fichier doit inclure :
+
+| Champ | Exemple | Notes |
+| --- | --- | --- |
+| `title` | Titre court humain | Reprend initialement le `summary` OpenAPI |
+| `description` | Une ligne | Recherche / meta |
+| `method` | `get` | Verbe HTTP en minuscules |
+| `path` | `/accounts/balance` | Doit correspondre exactement à la clé `path` OpenAPI |
+| `operationId` | `AccountsController_getBalance` | Correspond au `operationId` Nest |
+| `full` | `true` | Conserve la mise en page API large |
+
+## Sections requises (titres)
+
+Le lint impose ces titres :
+
+`## Overview`, `## Authentication`, `## Endpoint`, `## Request`, `## Responses`, `## Errors`, `## Example`, `## OpenAPI`
+
+(Les pages françaises peuvent utiliser l'ensemble de titres localisé ; voir les règles lint.)
+
+## Ce que nous excluons
+
+- Les **routes internes ou de forme admin** ne sont pas listées dans la référence REST publique. Le filtre de routes publiques exclut les routes agent, l'ingress webhook prestataire, metering/factures et liste/détail compte (`GET /accounts`, `GET /accounts/{id}`). Les routes **plateforme en lecture seule** (`organizations`, `merchants`, `providers`) sont incluses dans le contrat public et l'allowlist SDK.
+
+## URLs legacy
+
+Les anciens favoris utilisaient des chemins plats comme `/api/AccountsController_getBalance`. L'app **redirige** vers le chemin groupé canonique `/api/balances/AccountsController_getBalance`.
+
+## Référence des scripts
+
+| Script | Rôle |
+| --- | --- |
+| `lib/scripts/pre-build.ts` | Build registre ; export OpenAPI **optionnel** quand `DOCS_SYNC_OPENAPI=1` (`build:pre:sync`). **Ne** réécrit **pas** les MDX REST. |
+| `lib/scripts/bootstrap-manual-api-reference.ts` | Régénère le scaffolding d'opération + `meta.json` depuis `openapi.json` ; par défaut **manquants seulement** (`CONFIRM_BOOTSTRAP=1`), écrasement complet requiert `BOOTSTRAP_OVERWRITE=1`. |
+| `lib/scripts/manual-api/render-operation-mdx.ts` | Modèle pour une page d'opération |
+| `lib/scripts/manual-api/_expected-public-operations.json` | Liste générée de chaînes `METHOD /path` (sortie bootstrap) |

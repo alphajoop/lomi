@@ -20,6 +20,19 @@ export class SubscriptionsService {
     }
 
     /**
+     * OpenAPI operationId: `SubscriptionsController_changePlan`.
+     * Changer le plan tarifaire
+     */
+    public static async changePlan(id: string, body?: unknown): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/subscriptions/{id}/change-plan',
+            path: { id: id },
+            body,
+        });
+    }
+
+    /**
      * OpenAPI operationId: `SubscriptionsController_findByCustomer`.
      * Abonnements d’un client
      */
@@ -52,6 +65,18 @@ export class SubscriptionsService {
             method: 'GET',
             url: '/subscriptions',
             query: options,
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `SubscriptionsController_uncancel`.
+     * Annuler une résiliation planifiée
+     */
+    public static async uncancel(id: string): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/subscriptions/{id}/uncancel',
+            path: { id: id },
         });
     }
 

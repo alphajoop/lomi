@@ -3,10 +3,12 @@ import { SupabaseService } from '../../../utils/supabase/supabase.service';
 import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
+import { maybeNotifySubscriptionRenewed } from '../../subscription-webhook.helper';
 import { WebhookEvent } from '../../../utils/types/api';
 import Stripe from 'stripe';
 import { constructStripeWebhookEvent } from '../../../utils/stripe/stripe-keys';
 import { StripeClientsService } from '../../../utils/stripe/stripe-clients.service';
+import { normalizePaymentEnvironment } from '../../../utils/payment-environment';
 
 @Injectable()
 export class StripeWebhookService {
@@ -349,19 +351,39 @@ export class StripeWebhookService {
    */
   private async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
     const metadata = paymentIntent.metadata || {};
-    const errorCode = paymentIntent.last_payment_error?.code || 'unknown';
-    const errorMessage =
-      paymentIntent.last_payment_error?.message || 'Payment failed';
+    const lastError = paymentIntent.last_payment_error;
+    const errorCode = lastError?.code || 'unknown';
+    const declineCode = lastError?.decline_code || '';
+    const errorMessage = lastError?.message || 'Payment failed';
+    const resolvedErrorCode = declineCode || errorCode;
 
     const txnData = await this.updateStripeCheckoutStatus(
       paymentIntent.id,
       null,
       'cancelled',
-      errorCode,
+      resolvedErrorCode,
       errorMessage,
     );
 
     if (metadata.organization_id) {
+      this.wideEvent.logEvent({
+        eventName: 'stripe_payment_confirm_failed',
+        organizationId: metadata.organization_id,
+        correlationId: metadata.checkout_session_id,
+        attributes: {
+          'organization.id': metadata.organization_id,
+          'checkout.session_id': metadata.checkout_session_id,
+          'stripe.payment_intent_id': paymentIntent.id,
+          'stripe.error_code': errorCode,
+          'stripe.decline_code': declineCode,
+          'stripe.resolved_error_code': resolvedErrorCode,
+          'stripe.error': errorMessage,
+          'payment.amount': paymentIntent.amount,
+          'payment.currency': paymentIntent.currency,
+          'telemetry.source_layer': 'api:webhook',
+        },
+      });
+
       await this.triggerMerchantWebhook(
         paymentIntent.id,
         metadata.organization_id,
@@ -389,23 +411,100 @@ export class StripeWebhookService {
   }
 
   /**
-   * Handle setup_intent.succeeded — trial subscription card save (no charge).
+   * Handle setup_intent.succeeded — trial or deferred subscription card save (no charge).
    */
   private async handleSetupIntentSucceeded(setupIntent: Stripe.SetupIntent) {
     const metadata = setupIntent.metadata || {};
+    const paymentFlow = metadata.payment_flow;
 
-    if (metadata.payment_flow !== 'subscription_trial_setup') {
+    const paymentMethodId =
+      typeof setupIntent.payment_method === 'string'
+        ? setupIntent.payment_method
+        : setupIntent.payment_method?.id || null;
+
+    if (paymentFlow === 'customer_portal_update') {
+      if (
+        !paymentMethodId ||
+        !metadata.internal_customer_id ||
+        !metadata.organization_id
+      ) {
+        this.logger.warn({
+          message: 'setup_intent_succeeded_missing_metadata',
+          setup_intent_id: setupIntent.id,
+          payment_flow: paymentFlow,
+        });
+        return {
+          eventType: 'setup_intent.succeeded',
+          setup_intent_id: setupIntent.id,
+          error: 'missing_metadata',
+        };
+      }
+
+      let cardDetails: Record<string, unknown> = {};
+      try {
+        const env = normalizePaymentEnvironment(metadata.environment);
+        const stripe = this.stripeClients.getClient(env);
+        const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+        const card = pm.card;
+        cardDetails = {
+          type: pm.type ?? 'card',
+          brand: card?.brand ?? null,
+          last4: card?.last4 ?? null,
+          exp_month: card?.exp_month ?? null,
+          exp_year: card?.exp_year ?? null,
+          country: card?.country ?? null,
+          fingerprint: card?.fingerprint ?? null,
+          is_international: card?.country != null && card.country !== 'CI',
+        };
+      } catch (retrieveError) {
+        this.logger.warn({
+          message: 'customer_portal_pm_retrieve_failed',
+          setup_intent_id: setupIntent.id,
+          error:
+            retrieveError instanceof Error
+              ? retrieveError.message
+              : String(retrieveError),
+        });
+      }
+
+      const { error } = await (this.supabase.getClient() as any).rpc(
+        'complete_customer_portal_payment_method_setup',
+        {
+          p_organization_id: metadata.organization_id,
+          p_customer_id: metadata.internal_customer_id,
+          p_stripe_payment_method_id: paymentMethodId,
+          p_card_details: cardDetails,
+        },
+      );
+
+      if (error) {
+        this.logger.error({
+          message: 'complete_customer_portal_payment_method_setup_failed',
+          setup_intent_id: setupIntent.id,
+          error: error.message,
+        });
+        throw new Error(
+          'Failed to complete customer portal payment method setup',
+        );
+      }
+
+      return {
+        eventType: 'setup_intent.succeeded',
+        setup_intent_id: setupIntent.id,
+        payment_flow: paymentFlow,
+      };
+    }
+
+    if (
+      paymentFlow !== 'subscription_trial_setup' &&
+      paymentFlow !== 'subscription_deferred_setup'
+    ) {
       return {
         eventType: 'setup_intent.succeeded',
         setup_intent_id: setupIntent.id,
         skipped: true,
       };
     }
-
-    const paymentMethodId =
-      typeof setupIntent.payment_method === 'string'
-        ? setupIntent.payment_method
-        : setupIntent.payment_method?.id || null;
 
     if (
       !paymentMethodId ||
@@ -415,8 +514,9 @@ export class StripeWebhookService {
       !metadata.merchant_id
     ) {
       this.logger.warn({
-        message: 'setup_intent_succeeded_missing_trial_metadata',
+        message: 'setup_intent_succeeded_missing_metadata',
         setup_intent_id: setupIntent.id,
+        payment_flow: paymentFlow,
       });
       return {
         eventType: 'setup_intent.succeeded',
@@ -425,32 +525,34 @@ export class StripeWebhookService {
       };
     }
 
-    const { error } = await (this.supabase.getClient() as any).rpc(
-      'complete_stripe_trial_setup',
-      {
-        p_merchant_id: metadata.merchant_id,
-        p_organization_id: metadata.organization_id,
-        p_customer_id: metadata.internal_customer_id,
-        p_product_id: metadata.product_id,
-        p_price_id: metadata.price_id || null,
-        p_checkout_session_id: metadata.checkoutSessionId || null,
-        p_stripe_payment_method_id: paymentMethodId,
-      },
-    );
+    const rpcName =
+      paymentFlow === 'subscription_deferred_setup'
+        ? 'complete_stripe_deferred_subscription_setup'
+        : 'complete_stripe_trial_setup';
+
+    const { error } = await (this.supabase.getClient() as any).rpc(rpcName, {
+      p_merchant_id: metadata.merchant_id,
+      p_organization_id: metadata.organization_id,
+      p_customer_id: metadata.internal_customer_id,
+      p_product_id: metadata.product_id,
+      p_price_id: metadata.price_id || null,
+      p_checkout_session_id: metadata.checkoutSessionId || null,
+      p_stripe_payment_method_id: paymentMethodId,
+    });
 
     if (error) {
       this.logger.error({
-        message: 'complete_stripe_trial_setup_failed',
+        message: `${rpcName}_failed`,
         setup_intent_id: setupIntent.id,
         error: error.message,
       });
-      throw new Error('Failed to complete Stripe trial setup');
+      throw new Error(`Failed to complete Stripe setup (${paymentFlow})`);
     }
 
     return {
       eventType: 'setup_intent.succeeded',
       setup_intent_id: setupIntent.id,
-      payment_flow: metadata.payment_flow,
+      payment_flow: paymentFlow,
     };
   }
 
@@ -705,7 +807,24 @@ export class StripeWebhookService {
   ) {
     if (!txnData) return;
 
+    // Sandbox card payments are delivered by DB trigger (trigger_sandbox_stripe_payment_webhook).
+    if (
+      event === 'PAYMENT_SUCCEEDED' &&
+      normalizePaymentEnvironment(txnData.environment) === 'test'
+    ) {
+      return;
+    }
+
     try {
+      await maybeNotifySubscriptionRenewed(
+        this.supabase,
+        this.webhookSender,
+        organizationId,
+        txnData as Record<string, unknown>,
+        event,
+        this.logger,
+      );
+
       sanitizeMerchantWebhookTransactionPayload(txnData);
 
       await this.webhookSender.notifyOrganization(

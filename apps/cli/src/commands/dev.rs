@@ -169,8 +169,8 @@ async fn handle_webhook(
         "Webhook".yellow(),
         "received".bright_black()
     );
-    println!("  {} {}", "Method:".blue(), "POST");
-    println!("  {} {}", "Path:".blue(), "/webhook");
+    println!("  {} POST", "Method:".blue());
+    println!("  {} /webhook", "Path:".blue());
 
     for (key, value) in headers.iter() {
         if let Ok(value) = value.to_str() {

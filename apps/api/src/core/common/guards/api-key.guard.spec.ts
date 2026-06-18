@@ -179,6 +179,43 @@ describe('ApiKeyGuard', () => {
     });
   });
 
+  it('authorizes Network customer writes with customer.write', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm_operator',
+          actor_organization_id: 'org_operator',
+          target_organization_id: 'org_member',
+          organization_id: 'org_member',
+          environment: 'live',
+          is_network_request: true,
+          network_account_id: 'net_acct_1',
+          network_membership_id: 'net_mem_1',
+          public_account_id: 'acct_123',
+          network_capability_key: 'customer.write',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_live_network', 'lomi-account': 'acct_123' },
+      url: '/customers',
+      method: 'POST',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'verify_api_key_context',
+      expect.objectContaining({
+        p_lomi_account: 'acct_123',
+        p_required_capability: 'customer.write',
+      }),
+    );
+  });
+
   it('authorizes Network customer reads with customer.read', async () => {
     supabase.rpc.mockResolvedValue({
       data: [
@@ -215,6 +252,42 @@ describe('ApiKeyGuard', () => {
       }),
     );
     expect(req.user.networkCapabilityKey).toBe('customer.read');
+  });
+
+  it('authorizes Network card charge polling with transaction.read_own', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm_operator',
+          actor_organization_id: 'org_operator',
+          target_organization_id: 'org_member',
+          organization_id: 'org_member',
+          environment: 'live',
+          is_network_request: true,
+          network_account_id: 'net_acct_1',
+          network_membership_id: 'net_mem_1',
+          public_account_id: 'acct_123',
+          network_capability_key: 'transaction.read_own',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_live_network', 'lomi-account': 'acct_123' },
+      url: '/charge/card/pi_123',
+      method: 'GET',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'verify_api_key_context',
+      expect.objectContaining({
+        p_required_capability: 'transaction.read_own',
+      }),
+    );
   });
 
   it('rejects Network checkout-session reads until Network-aware read RPCs exist', async () => {

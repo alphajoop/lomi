@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Utilisez **`POST /payouts`** pour tous les virements sortants.
 
-![Tableau de bord reversements à remplacer](/placeholder.webp)
+<DocsScreenshot name="build/payouts" alt="Paramètres de reversements dans le tableau de bord lomi." />
 
 - **`destination: "self"`** — retrait vers un **moyen de paiement enregistré** (`payout_method_id` requis). Rails : `bank`, `spi`, `wave`.
 - **`destination: "beneficiary"`** — paiement à un tiers sur **mobile money** (`wave` aujourd’hui). `recipient.name` et `recipient.phone` requis (numéro libre ; **sans** lien avec `payout_method_id`).

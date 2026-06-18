@@ -1,0 +1,44 @@
+---
+title: Carte récapitulatif checkout
+description: Un récapitulatif checkout sombre inspiré du checkout hébergé lomi.
+---
+
+import { CheckoutSummaryCardDemo } from '@/components/lomi-ui/demo';
+
+# Carte récapitulatif checkout
+
+Utilisez-la à côté d'un formulaire de paiement ou au-dessus sur mobile pour afficher ce que le client paie.
+
+## Aperçu
+
+<CheckoutSummaryCardDemo />
+
+## Installation
+
+<Installation name="checkout-summary-card" />
+
+## Utilisation
+
+```tsx
+import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
+
+<CheckoutSummaryCard
+  merchantName="Keur Studio"
+  currency="XOF"
+  items={[{ name: 'Design workshop', quantity: 1, amount: 10000 }]}
+  subtotal={10000}
+  total={10000}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `merchantName` | `string` | Nom du marchand affiché dans le récapitulatif. |
+| `items` | `{ name: string; quantity?: number; amount: number }[]` | Lignes du checkout. |
+| `subtotal` | `number` | Montant avant frais et remises. |
+| `fees` | `number` | Frais optionnels. |
+| `discount` | `number` | Montant de remise optionnel. |
+| `total` | `number` | Montant final dû. |
+| `currency` | `string` | Code devise ISO. |

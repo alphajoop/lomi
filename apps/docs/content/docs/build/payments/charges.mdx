@@ -180,6 +180,14 @@ curl -X POST "https://api.lomi.africa/charge/card" \
   }'
 ```
 
+## Reference implementation
+
+Minimal runnable demo (Wave, MTN, card via `@lomi./sdk` Payment Elements) lives in the monorepo:
+
+- [`apps/plugins/direct-charge-integration-reference`](https://github.com/lomiafrica/plugins/tree/main/direct-charge-integration-reference) — server proxy, Payment Element UI, and cURL scripts
+
+For hosted checkout sessions instead, see [`payment-integration-reference`](https://github.com/lomiafrica/plugins/tree/main/payment-integration-reference).
+
 ## MTN direct charge
 
 `POST /charge/mtn` — same pattern as Wave; see [Create MTN charge](/api/charge/ChargesController_createMtnCharge).

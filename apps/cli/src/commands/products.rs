@@ -25,11 +25,20 @@ pub async fn run(common: &CommonOptions, args: ProductsArgs) -> Result<()> {
 }
 
 async fn list_products(common: &CommonOptions) -> Result<()> {
-    cli::banner::print_intro("Products");
+    let json = cli::output::should_use_json(common);
+    if !json {
+        cli::banner::print_intro("Products");
+    }
+
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
     let rows: Vec<serde_json::Value> = client.get("/products").await?;
+
+    if json {
+        return cli::output::print_json(&rows);
+    }
+
     if rows.is_empty() {
         println!("{} No products found.", "○".bright_black());
         return Ok(());

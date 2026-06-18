@@ -8,8 +8,9 @@ pub const PRODUCTION_API_URL: &str = "https://api.lomi.africa";
 pub const SANDBOX_API_URL: &str = "https://sandbox.api.lomi.africa";
 pub const LOCAL_API_URL: &str = "http://localhost:4242";
 pub const SUPABASE_URL: &str = "https://mdswvokxrnfggrujsfjd.supabase.co";
-pub const CLI_AUTH_BASE: &str =
-    "https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1/cli-auth";
+pub fn cli_auth_base() -> String {
+    format!("{SUPABASE_URL}/functions/v1/cli-auth")
+}
 /// Public Supabase anon key (same as dashboard client). Override via LOMI_SUPABASE_ANON_KEY.
 pub const SUPABASE_ANON_KEY: &str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kc3d2b2t4cm5mZ2dydWpzZmpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MTA0NTIsImV4cCI6MjA4NTg3MDQ1Mn0.vWQoCk2mBTUPWVpzcu3WmKv9xwXoj0bv8SCRrEdJxpM";
 pub const DOCS_URL: &str = "https://docs.lomi.africa";
@@ -22,10 +23,7 @@ pub fn lomi_ui_registry_url() -> String {
 }
 
 pub fn lomi_ui_index_url() -> String {
-    std::env::var("LOMI_UI_INDEX_URL").unwrap_or_else(|_| {
-        lomi_ui_registry_url()
-            .replace("/registry.json", "/index.json")
-    })
+    std::env::var("LOMI_UI_INDEX_URL").unwrap_or_else(|_| LOMI_UI_INDEX_URL.to_string())
 }
 
 pub fn lomi_ui_item_url(name: &str) -> String {
@@ -53,6 +51,16 @@ pub struct CommonOptions {
     /// Opt-out of sending telemetry
     #[arg(long, global = true)]
     pub skip_telemetry: bool,
+
+    /// Emit machine-readable JSON to stdout (suppresses banners and spinners)
+    #[arg(long, global = true)]
+    pub json: bool,
+}
+
+impl CommonOptions {
+    pub fn use_json(&self) -> bool {
+        self.json || !output::is_tty()
+    }
 }
 
 impl CommonOptions {

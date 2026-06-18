@@ -6,7 +6,11 @@ description: Refund completed transactions (`POST /refunds`).
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Use **`POST /refunds`** to refund a **completed** transaction. Supported payment types are **card** and **mobile money** (same flows as the dashboard). Your **balance is updated immediately**; customer credit timing depends on the payment type.
+Use **`POST /refunds`** to refund a **completed** transaction. Supported providers are **card**, **Wave**, and **MTN MoMo** (same flows as the dashboard). Your **balance is updated immediately**; customer credit timing depends on the payment type.
+
+<Callout type="info">
+  **MTN MoMo (live):** the original payment must have a provider reference (`provider_checkout_id` from RequestToPay). Refunds use the MTN Disbursement refund API and are asynchronous on MTN's side; lomi. polls until completion. **Test mode** refunds are ledger-only (no MTN API call).
+</Callout>
 
 List and retrieve refunds with **`GET /refunds`** and **`GET /refunds/{id}`**.
 

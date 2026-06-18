@@ -31,11 +31,20 @@ pub async fn run(common: &CommonOptions, args: WebhooksArgs) -> Result<()> {
 }
 
 async fn list_webhooks(common: &CommonOptions) -> Result<()> {
-    cli::banner::print_intro("Webhook endpoints");
+    let json = cli::output::should_use_json(common);
+    if !json {
+        cli::banner::print_intro("Webhook endpoints");
+    }
+
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
     let rows: Vec<serde_json::Value> = client.get("/webhooks").await?;
+
+    if json {
+        return cli::output::print_json(&rows);
+    }
+
     if rows.is_empty() {
         println!("{} No webhooks configured.", "○".bright_black());
         return Ok(());
@@ -53,20 +62,32 @@ async fn list_webhooks(common: &CommonOptions) -> Result<()> {
             .or_else(|| row.get("is_active"))
             .and_then(|v| v.as_bool())
             .unwrap_or(false);
-        let status = if active { "active".green() } else { "inactive".bright_black() };
-        println!("{} {} {} {}", id.cyan(), url.bright_blue(), status, "");
+        let status = if active {
+            "active".green()
+        } else {
+            "inactive".bright_black()
+        };
+        println!("{} {} {}", id.cyan(), url.bright_blue(), status);
     }
     Ok(())
 }
 
 async fn test_webhook(common: &CommonOptions, id: &str) -> Result<()> {
-    cli::banner::print_intro("Send test webhook");
+    let json = cli::output::should_use_json(common);
+    if !json {
+        cli::banner::print_intro("Send test webhook");
+    }
+
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
     let response: serde_json::Value = client
         .post(&format!("/webhooks/{id}/test"), &serde_json::json!({}))
         .await?;
+
+    if json {
+        return cli::output::print_json(&response);
+    }
 
     cli::output::print_success("Test webhook sent");
     if !response.is_null() {

@@ -1,10 +1,8 @@
 {
   "title": "Balances",
-  "description": "Balance reads and availability checks for reconciliation and payout readiness.",
   "pages": [
-    "index",
+    "AccountsController_checkAvailableBalance",
     "AccountsController_getBalance",
-    "AccountsController_getBalanceBreakdown",
-    "AccountsController_checkAvailableBalance"
+    "AccountsController_getBalanceBreakdown"
   ]
 }

@@ -138,6 +138,7 @@ export class ProductsService {
         p_trial_period_days: createProductDto.trial_period_days || null,
         p_usage_aggregation: createProductDto.usage_aggregation || null,
         p_usage_unit: createProductDto.usage_unit || null,
+        p_meter_code: createProductDto.meter_code || null,
       } as any,
     );
 

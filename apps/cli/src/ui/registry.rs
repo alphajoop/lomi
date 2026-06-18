@@ -67,7 +67,7 @@ pub async fn fetch_index() -> Result<RegistryIndex> {
     Ok(RegistryIndex {
         name: registry.name,
         version: registry.version,
-        homepage: None,
+        homepage: registry.homepage,
         registry_url: Some(registry_url),
         items: registry.items,
     })

@@ -1,0 +1,52 @@
+---
+title: 'Quels moyens de paiement lomi. prend-il en charge ?'
+description: 'Matrice pays, devises et canaux pour checkout hébergé et charges directes en Afrique de l’Ouest francophone et marchés MTN.'
+docType: explanation
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Confirmez les rails et devises avant de choisir une intégration. Pour chaque canal, voir les [guides par canal](/build/payment-methods/wave).
+
+<Callout type="info">
+  La disponibilité exacte dépend des prestataires activés pour votre organisation dans le tableau de bord.
+</Callout>
+
+## Chemin recommandé par canal
+
+| Canal | Checkout hébergé / liens | API directe | Guide |
+| --- | --- | --- | --- |
+| Cartes | Oui | `POST /charge/card` | [Cartes](/build/payment-methods/cards) |
+| Wave | Oui | `POST /charge/wave` | [Wave](/build/payment-methods/wave) |
+| MTN MoMo | Oui | `POST /charge/mtn` | [MTN MoMo](/build/payment-methods/mtn-momo) |
+| Orange Money, SPI | Oui (hébergé) | Préférer l’hébergé | [Orange Money](/build/payment-methods/orange-money), [SPI](/build/payment-methods/spi) |
+
+## Marchés et devises
+
+| Région | Devises | Mobile money | Cartes |
+| --- | --- | --- | --- |
+| UEMOA (Wave) | `XOF` | Wave | Oui |
+| Pays MTN MoMo | `XOF`, `XAF`, `GHS`, … | MTN MoMo | Oui (si activé) |
+| Cartes internationales | `USD`, `EUR` | — | Oui |
+
+## MTN MoMo — pays pris en charge
+
+Voir le tableau complet dans la [version anglaise](/build/guides/payment-methods) (mêmes codes pays et environnements MTN).
+
+## Test vs live
+
+| | Test | Live |
+| --- | --- | --- |
+| Base API | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
+| Charge MTN directe | Souvent `completed` immédiatement | `PENDING` jusqu’à approbation client |
+| Webhooks | `environment: "test"` | `environment: "live"` |
+
+## Voir aussi
+
+- [Quelle intégration choisir ?](/build/choose-integration)
+- [Mobile money](/build/mobile-money)
+- [Charges directes](/build/direct-charges)
+- [Paiements en bac à sable](/start/sandbox-payments)

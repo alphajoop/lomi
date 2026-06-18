@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils/cn';
 
@@ -134,10 +134,12 @@ export function TryItOpenApiPanel() {
           )}
 
           <div className="flex items-center gap-2">
-            <Switch
+            <Checkbox
               id="tryit-inject"
               checked={ctx.useTestKey}
-              onCheckedChange={(c) => onSwitchChange(c)}
+              onCheckedChange={(checked: boolean | 'indeterminate') =>
+                onSwitchChange(checked === true)
+              }
               disabled={injectSwitchDisabled}
             />
             <Label htmlFor="tryit-inject" className="cursor-pointer">

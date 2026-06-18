@@ -1,0 +1,37 @@
+---
+title: Démarrage rapide
+description: Ajoutez le premier composant checkout lomi. UI à votre application.
+---
+
+# Démarrage rapide
+
+Installez un composant avec le CLI shadcn :
+
+```bash
+npx shadcn@latest add https://docs.lomi.africa/r/mobile-money-checkout-card.json
+```
+
+Puis affichez-le avec des props simples :
+
+```tsx
+import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
+
+export function Checkout() {
+  return (
+    <MobileMoneyCheckoutCard
+      amount={12500}
+      currency="XOF"
+      merchantName="Keur Studio"
+      selectedProvider="wave"
+      phoneNumber="+225 07 00 00 00 00"
+      onSubmit={() => console.log('Create a Lomi checkout session')}
+    />
+  );
+}
+```
+
+Les composants n'appellent pas l'API lomi. directement. Utilisez votre backend ou l'intégration SDK pour créer des sessions de checkout, des demandes de paiement et la gestion des webhooks.
+
+## Chemins des assets
+
+Les icônes de fournisseur sont installées dans `public/payment_channels`, afin que les composants puissent les référencer comme `/payment_channels/wave.webp`, `/payment_channels/mtn.webp` et d'autres URLs publiques similaires.

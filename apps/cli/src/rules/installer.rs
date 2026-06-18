@@ -100,16 +100,16 @@ fn install_for_target(target: InstallTarget, option: &RuleOption) -> Result<Path
         InstallTarget::ClaudeCode => {
             let path = PathBuf::from("CLAUDE.md");
             let section = format!(
-                "<!-- LOMI. {} START -->\n{}\n<!-- LOMI. {} END -->",
-                option.name, option.contents, option.name
+                "<!-- LOMI. {} ({}) START -->\n{}\n<!-- LOMI. {} ({}) END -->",
+                option.title, option.name, option.contents, option.title, option.name
             );
             merge_replace_section(&path, &option.name, &section)
         }
         InstallTarget::Codex => {
             let path = PathBuf::from("AGENTS.md");
             let section = format!(
-                "<!-- LOMI. {} START -->\n{}\n<!-- LOMI. {} END -->",
-                option.name, option.contents, option.name
+                "<!-- LOMI. {} ({}) START -->\n{}\n<!-- LOMI. {} ({}) END -->",
+                option.title, option.name, option.contents, option.title, option.name
             );
             merge_replace_section(&path, &option.name, &section)
         }
@@ -117,8 +117,8 @@ fn install_for_target(target: InstallTarget, option: &RuleOption) -> Result<Path
             let path = PathBuf::from(".github/instructions")
                 .join(format!("lomi-{}.instructions.md", option.name));
             let contents = format!(
-                "---\napplyTo: {}\n---\n\n{}",
-                option.apply_to, option.contents
+                "---\ntitle: {}\napplyTo: {}\n---\n\n{}",
+                option.title, option.apply_to, option.contents
             );
             write_file(&path, &contents)
         }

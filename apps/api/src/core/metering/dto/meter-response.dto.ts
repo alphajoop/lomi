@@ -1,56 +1,56 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class MeterResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   meter_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   organization_id: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String, nullable: true })
   product_id?: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'object', additionalProperties: true })
   filter: Record<string, unknown>;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'object', additionalProperties: true })
   aggregation: Record<string, unknown>;
 
-  @ApiProperty()
+  @ApiProperty({ type: Boolean })
   is_active: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   created_at: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   updated_at: string;
 }
 
 export class MeterBalanceResponseDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   balance_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   meter_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   customer_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   consumed_units: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   credited_units: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   balance: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String, nullable: true })
   last_event_id?: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   updated_at: string;
 }

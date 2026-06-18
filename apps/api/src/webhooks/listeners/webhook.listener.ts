@@ -75,6 +75,18 @@ export class WebhookListener {
     );
   }
 
+  @OnEvent('SUBSCRIPTION_UPDATED')
+  async handleSubscriptionUpdated(payload: any) {
+    this.logger.log(
+      `Handling SUBSCRIPTION_UPDATED event for subscription ${payload.id}`,
+    );
+    await this.queueWebhook(
+      payload.organization_id,
+      'SUBSCRIPTION_UPDATED',
+      payload,
+    );
+  }
+
   @OnEvent('SUBSCRIPTION_RENEWED')
   async handleSubscriptionRenewed(payload: any) {
     this.logger.log(

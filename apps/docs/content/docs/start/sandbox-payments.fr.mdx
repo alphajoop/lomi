@@ -1,57 +1,346 @@
 ---
 title: 'Comment tester en sécurité dans la sandbox ?'
-description: 'Utilisez les clés de test, moyens de paiement de test, soldes de test et webhooks avant de passer en live.'
+description: 'Utilisez les clés de test, les moyens de paiement de test, les soldes de test et la vérification webhook avant le passage en production.'
 ---
 
-La sandbox permet d’exécuter des flux de paiement réalistes sans déplacer d’argent réel. Utilisez-la pour tester le checkout, les webhooks, les échecs et la répétition du passage en production.
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
 
-![Résultat de paiement sandbox à remplacer](/placeholder.webp)
+L’**environnement de test** lomi. vous permet d’exécuter des parcours de paiement complets—checkout hébergé, formulaire carte intégré et mobile money—sans mouvement de fonds réels ni impact sur les soldes live. Cette page est la référence unique pour **simuler les paiements** : quels numéros de carte utiliser, le comportement de Wave et MTN MoMo en test, et ce que vous devez observer dans le tableau de bord et via les webhooks.
 
-## Test et live en un coup d’œil
+Pour les clés API, les URL de base et les limites, voir **[Authentification](/start/api-keys)**. Pour votre première requête authentifiée, voir **[Intégration API](/start/first-payment)**.
 
-| Zone | Test | Live |
+<Callout type="warn">
+  Les transactions de test n’affectent jamais les soldes live, la trésorerie plateforme ni les virements sortants. Les e-mails et messages WhatsApp clients ne sont pas envoyés en mode test.
+</Callout>
+
+## Environnement de test en bref
+
+| | Test | Live |
 | --- | --- | --- |
-| URL de base | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
-| Clé secrète | `lomi_sk_test_...` | `lomi_sk_live_...` |
-| Clé publiable | `lomi_pk_test_...` | `lomi_pk_live_...` |
-| Mouvement d’argent | Soldes de test uniquement | Soldes et reversements réels |
-| Notifications client | Généralement supprimées ou simulées | Communication réelle au client |
+| **URL API** | `https://sandbox.api.lomi.africa` | `https://api.lomi.africa` |
+| **Clé secrète** | `lomi_sk_test_…` | `lomi_sk_live_…` |
+| **Clé publiable** | `lomi_pk_test_…` | `lomi_pk_live_…` |
+| **Soldes** | **Solde de test** du tableau de bord uniquement | Solde marchand réel |
+| **Réponses** | `"environment": "test"` sur les ressources | `"environment": "live"` |
 
-## Que tester ?
+L’environnement est déterminé par votre **clé API**, pas par le nom d’hôte : une clé de test crée et lit toujours des données de test.
 
-Avant le live, testez au minimum :
+## Checkout hébergé — démarrage rapide
 
-- Un paiement réussi via checkout hébergé.
-- Un paiement carte refusé ou échoué.
-- L’initiation et la complétion d’un paiement mobile money.
-- L’annulation côté client depuis le checkout.
-- La livraison webhook, la vérification de signature et le traitement idempotent.
-- La réconciliation entre transaction, paiement et solde dans le dashboard.
+Paiement carte bac à sable en cinq étapes (recettes complètes dans [Recettes API et checkout hébergé](#recettes-api-et-checkout-hébergé)) :
 
-## Cartes de test courantes
+1. **Créer une session** — `POST https://sandbox.api.lomi.africa/checkout-sessions` avec `lomi_sk_test_…` (`amount`, `currency_code`, `success_url`, `cancel_url` minimum). Voir [API sessions checkout](/api/checkout-sessions/CheckoutSessionsController_create).
+2. **Ouvrir l’URL** — la réponse contient `checkout_url`.
+3. **Payer avec une carte test** — **Carte**, `4242 4242 4242 4242`, expiration `12/34`, CVC `123` ([liste complète](#aide-mémoire--numéros-les-plus-utiles)).
+4. **Finaliser** — transaction `completed` ; le **solde test** augmente.
+5. **Vérifier** — mode **Test** du tableau de bord et webhooks (`"environment": "test"`).
 
-| Scénario | Numéro de carte |
+```text
+POST /checkout-sessions  →  { "checkout_url": "https://…" }  →  paiement client  →  webhook + solde test
+```
+
+## Comment le mode test est choisi
+
+| Ce qui fixe l’environnement | Conséquence |
 | --- | --- |
-| Paiement réussi | `4242 4242 4242 4242` |
-| Refus générique | `4000 0000 0000 0002` |
-| Fonds insuffisants | `4000 0000 0000 9995` |
-| Challenge 3D Secure | `4000 0025 0000 3155` |
-| CVC incorrect | `4000 0000 0000 0127` |
+| **Clé API test ou live** | Les ressources portent `"environment": "test"` ou `"live"` |
+| **Lien de paiement ou session checkout** | Le checkout hébergé suit l’environnement de ce lien ou de cette session |
+| **Même environnement partout** | **Solde test** vs comptes live ; paiements **carte**, **Wave** ou **MTN MoMo** dans cet environnement |
 
-Utilisez une date d’expiration future et un CVC valide, sauf si le scénario teste précisément le CVC.
+**API REST**
+
+Toute requête authentifiée avec une clé secrète de test s’exécute en mode test. Les sessions checkout, payment intents, liens de paiement et transactions créés portent `"environment": "test"`.
+
+**Checkout hébergé**
+
+L’environnement du **lien de paiement** ou de la **session checkout** pilote le grand livre et le mode formulaire carte. Créez liens et sessions en mode **Test** dans le [portail](https://lomi.africa/portal).
+
+**Tableau de bord**
+
+Basculez **Test / Live** dans le portail. Les liens, QR codes et articles créés en test n’apparaissent que dans les rapports et soldes de test.
+
+## Soldes de test et effets de bord
+
+Lorsqu’une transaction de test passe à **`completed`** :
+
+- Votre **solde de test** augmente (grand livre interne de test), pas votre solde retirable live.
+- La trésorerie plateforme et les flux live ne sont **pas** mis à jour.
+- Les métadonnées de transaction peuvent indiquer un crédit sur le grand livre de test.
+
+Les **e-mails** et **WhatsApp** clients sont ignorés en mode test.
+
+Pour le fonctionnement des soldes live après complétion, voir **[Soldes et règlement](/build/balance-and-settlement)**.
+
+## Tester les paiements par carte
+
+En bac à sable, les paiements carte s’appuient sur des **numéros de carte de test** qui reproduisent le comportement des émetteurs—approbation, refus et authentification forte—sans débiter quiconque. Utilisez-les uniquement avec des clés API de test et des sessions checkout en mode test.
+
+<Callout type="info">
+  N’utilisez jamais de vraies cartes en test, ni des numéros de test en production. Les vraies cartes en test sont interdites ; les numéros de test en live ne fonctionnent pas.
+</Callout>
+
+### Comment un paiement carte se termine en test
+
+| Parcours | Ce que vous faites | Ce que fait lomi. |
+| --- | --- | --- |
+| **Checkout hébergé** | URL de test → **Carte** → saisie d’un numéro de test | Transaction **en attente**, puis **completed** et crédit du solde de test après confirmation réussie |
+| **API encaissement carte** | `POST /charge/card` avec `lomi_sk_test_…` → confirmation avec `lomi_pk_test_…` côté client | Même logique : en attente jusqu'à confirmation, puis completed et solde de test crédité |
+
+Le formulaire carte du checkout hébergé suit toujours l’environnement du lien de paiement ou de la session (test ou live).
+
+### Saisir une carte de test
+
+Dans le navigateur ou dans votre formulaire carte :
+
+- **Numéro :** une valeur des tableaux ci-dessous (les espaces sont optionnels ; `4242 4242 4242 4242` et `4242424242424242` sont équivalents).
+- **Expiration :** toute date **future**, par exemple `12/34`.
+- **CVC :** trois chiffres pour la plupart des marques ; **quatre chiffres** pour les numéros de test American Express.
+- **Titulaire et facturation :** toute valeur acceptée par votre formulaire.
+
+Pour tester un **échec de validation du CVC**, vous devez saisir un CVC. Si le champ est vide, le contrôle peut être ignoré et une carte « CVC incorrect » ne se comportera pas comme prévu.
+
+### Paiements réussis par marque
+
+Ces numéros aboutissent à un débit standard en test lorsque la confirmation réussit.
+
+| Marque | Numéro de carte |
+| --- | --- |
+| Visa | `4242 4242 4242 4242` |
+| Visa (débit) | `4000 0566 5556 5556` |
+| Mastercard | `5555 5555 5555 4444` |
+| Mastercard (série 2) | `2223 0031 2200 3222` |
+| Mastercard (débit) | `5200 8282 8282 8210` |
+| Mastercard (prépayée) | `5105 1051 0510 5100` |
+| American Express | `3782 822463 10005` |
+| Discover | `6011 1111 1111 1117` |
+| Diners Club | `3056 930009 02004` |
+| JCB | `3566 0020 2036 0505` |
+| UnionPay | `6200 0000 0000 0005` |
+
+Pour la QA quotidienne, **`4242 4242 4242 4242`** (Visa) est le choix par défaut.
+
+### Paiements refusés ou en échec
+
+Servez-vous de ces numéros pour vérifier les messages d’erreur, les échecs de checkout et les webhooks `PAYMENT_FAILED`. La transaction ne doit **pas** passer en `completed` et le **solde de test ne doit pas** augmenter.
+
+| Scénario | Numéro de carte | Résultat typique |
+| --- | --- | --- |
+| Refus générique | `4000 0000 0000 0002` | Carte refusée |
+| Fonds insuffisants | `4000 0000 0000 9995` | Fonds insuffisants |
+| Carte perdue | `4000 0000 0000 9987` | Carte perdue |
+| Carte volée | `4000 0000 0000 9979` | Carte volée |
+| Carte expirée | `4000 0000 0000 0069` | Carte expirée |
+| CVC incorrect | `4000 0000 0000 0127` | CVC incorrect (saisir un CVC à 3 chiffres) |
+| Numéro de carte invalide | `4242 4242 4242 4241` | Numéro invalide |
+| Erreur de traitement | `4000 0000 0000 0119` | Erreur de traitement |
+| Plafond de vélocité dépassé | `4000 0000 0000 6975` | Limite de vélocité |
+| Refus après enregistrement de la carte | `4000 0000 0000 0341` | Enregistrement OK ; débits ultérieurs refusés |
+
+Voir **[Erreurs](/api/errors)** pour la forme des échecs dans les réponses API.
+
+### Authentification forte (3D Secure)
+
+Certains numéros déclenchent une **étape d’authentification** (redirection ou fenêtre modale) avant la réussite du paiement. Utilisez-les pour les cartes enregistrées, les abonnements et les parcours où il faut gérer « authentifier » ou « paiement refusé ».
+
+| Scénario | Numéro de carte | Comportement attendu |
+| --- | --- | --- |
+| Authentification requise (paiement présent) | `4000 0025 0000 3155` | Le client doit s’authentifier ; succès après le défi |
+| Authentification toujours requise | `4000 0027 6000 3184` | Authentification à chaque paiement |
+| Déjà configurée pour hors session | `4000 0038 0000 0446` | En session, auth possible ; hors session peut réussir sans nouvelle invite |
+| Auth OK puis fonds insuffisants | `4000 0082 6000 3178` | Auth possible ; le débit échoue malgré tout pour fonds insuffisants |
+| 3D Secure obligatoire (succès) | `4000 0000 0000 3220` | Auth obligatoire ; paiement réussi après complétion |
+| 3D Secure obligatoire (refus après auth) | `4000 0084 0000 1629` | Auth obligatoire ; paiement refusé après auth |
+| 3D Secure optionnel (succès) | `4000 0000 0000 3055` | Auth possible ; paiement peut réussir sans défi |
+| 3D Secure frictionless | `4000 0000 0322 0000` | Auth avec succès frictionless |
+| Non inscrit au 3D Secure | `4242 4242 4242 4242` | Pas de défi ; Visa réussie classique |
+| 3D Secure non pris en charge (Amex) | `3782 822463 10005` | Paiement sans 3D Secure sur cette marque |
+
+Testez l’authentification sur votre **checkout hébergé** ou **formulaire carte intégré**, pas seulement via l’API, afin de reproduire l’expérience client de production.
+
+### Aide-mémoire — numéros les plus utiles
+
+| Objectif | Numéro |
+| --- | --- |
+| Parcours nominal | `4242 4242 4242 4242` |
+| Refus net | `4000 0000 0000 0002` |
+| Défi 3D Secure | `4000 0025 0000 3155` |
+| CVC incorrect | `4000 0000 0000 0127` |
+| Fonds insuffisants | `4000 0000 0000 9995` |
+
+### Formulaires carte intégrés
+
+Avec **[lomi Payment Elements](/build/payments/lomi-payment-elements)** ou l’API Payment Intents : créez un payment intent avec **`lomi_sk_test_…`**, montez l’UI carte avec **`lomi_pk_test_…`**, puis confirmez avec le **`client_secret`** retourné. Utilisez les numéros de test ci-dessus dans le champ carte.
 
 ## Tester le mobile money
 
-En sandbox, les flux mobile money simulent le comportement fournisseur. Utilisez des formats de téléphone réalistes pour le marché testé, puis vérifiez la transaction dashboard et l’événement webhook.
+### Wave
 
-## Quand passer en live ?
+En mode test, lomi. crée une transaction **completed** et crédite votre **solde de test** dès l’enregistrement du checkout Wave. Le client peut encore voir l’interface Wave, mais le solde de test du tableau de bord se met à jour sans attendre un débit réel du portefeuille.
 
-Passez aux clés live seulement quand :
+**Comment tester :**
 
-- Votre serveur n’expose jamais les clés secrètes.
-- Vos URLs de succès et d’annulation sont des URLs de production.
-- Les signatures webhook sont vérifiées avec le corps brut de la requête.
-- La création de paiement est idempotente lorsque des retries sont possibles.
-- Votre équipe sait réconcilier transactions et reversements dans le dashboard.
+1. Créer un lien ou une session checkout en **test** avec Wave activé.
+2. Ouvrir le checkout et choisir **Wave**.
+3. Saisir un numéro valide au format **E.164** (par ex. `+225 07 00 00 00 00` pour la Côte d’Ivoire).
+4. Compléter ou annuler sur l’écran Wave ; vérifier transaction et solde de test.
 
-Ensuite : [checklist de passage en production](/start/go-live).
+### MTN MoMo
+
+En mode test, la transaction est aussi **completed** et le solde de test est crédité à l’initiation du paiement MTN. Les mises à jour de statut en test sont traitées comme réussies pour le grand livre. Le checkout utilise le **bac à sable MTN** lorsque la session est en test.
+
+**Comment tester :**
+
+1. Lien ou session en **test** avec MTN activé.
+2. Saisir un numéro de téléphone valide pour le pays (format international).
+3. Vérifier la transaction completed dans la vue test du tableau de bord.
+
+Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur MTN MoMo](https://momodeveloper.mtn.com/).
+
+**Pays pris en charge (checkout hébergé)**
+
+| Pays | Indicatif | Environnement cible MTN |
+| --- | --- | --- |
+| Côte d’Ivoire (CI) | `+225` | `mtnivorycoast` |
+| Cameroun (CM) | `+237` | `mtncameroon` |
+| Ghana (GH) | `+233` | `mtnghana` |
+| Ouganda (UG) | `+256` | `mtnuganda` |
+| Zambie (ZM) | `+260` | `mtnzambia` |
+| Bénin (BJ) | `+229` | `mtnbenin` |
+| Congo (CG) | `+242` | `mtncongo` |
+| Eswatini (SZ) | `+268` | `mtnswaziland` |
+| Guinée (GN) | `+224` | `mtnguineaconakry` |
+| Afrique du Sud (ZA) | `+27` | `mtnsouthafrica` |
+| Liberia (LR) | `+231` | `mtnliberia` |
+| Nigeria (NG) | `+234` | `mtnnigeria` |
+
+### Carte vs mobile money en test
+
+| Moyen | Crédit du solde de test | Argent réel |
+| --- | --- | --- |
+| **Cartes** | Après confirmation carte réussie | Jamais |
+| **Wave** | À la création de la transaction de test | Jamais |
+| **MTN MoMo** | À la création de la transaction de test | Jamais |
+
+## Virements en mode test
+
+Avec une **clé API test**, `POST /payouts` se comporte ainsi :
+
+| `rail` | `destination` | Clé test |
+| --- | --- | --- |
+| `wave` | `self` ou `beneficiary` | **`400`** — virements Wave réservés au live ; aucun appel Wave |
+| `bank`, `spi` | `self` | Retraits test selon les enregistrements applicables |
+| `spi` | `beneficiary` | Peut créer des bénéficiaires en attente (pas de Wave live) |
+
+Les virements **Wave** vers un tiers exigent `recipient.name` et `recipient.phone` avec une **clé live**. Le numéro n’a pas besoin de correspondre à un `payout_method_id`. Voir **[Virements](/build/payouts)**.
+
+`GET /payouts` avec une clé test ne liste que les **retraits test** ; les virements bénéficiaires live sont exclus.
+
+## Recettes API et checkout hébergé
+
+<Tabs items={['Test fumée', 'Session checkout', 'Payment intent', 'Lien de paiement']}>
+
+<Tab value="Test fumée">
+
+```bash
+curl -sS \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  "https://sandbox.api.lomi.africa/accounts"
+```
+
+</Tab>
+
+<Tab value="Session checkout">
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency_code": "XOF",
+    "title": "Test bac à sable",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel"
+  }'
+```
+
+Ouvrez le `checkout_url` retourné et payez avec une carte de test ou le mobile money.
+
+</Tab>
+
+<Tab value="Payment intent">
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/card" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency_code": "XOF",
+    "customer_email": "test@example.com",
+    "customer_name": "Utilisateur test"
+  }'
+```
+
+Utilisez le `client_secret` avec **`lomi_pk_test_…`** côté client. Voir **[Encaissements directs](/build/payments/charges)** et **[lomi Payment Elements](/build/payments/lomi-payment-elements)**.
+
+</Tab>
+
+<Tab value="Lien de paiement">
+
+Créez des liens en mode **Test** dans le tableau de bord, ou via l’API avec votre clé de test pour `environment: test`. Voir **[Liens de paiement](/build/payment-links)**.
+
+</Tab>
+
+</Tabs>
+
+## Tester les abonnements
+
+Utilisez des clés API **test** et les flux de [Paiements en bac à sable](/start/sandbox-payments).
+
+1. **Créez un produit récurrent** avec `trial_enabled: true` ou `first_payment_type: non_initial` (voir [Produits](/build/products)).
+2. **Lien de paiement ou session** — ouvrez le tunnel hébergé ou l’URL S’abonner de la vitrine avec le `product_id` récurrent.
+3. **Essai + carte** — utilisez `4242 4242 4242 4242` ; le tunnel enregistre la carte via SetupIntent avec **0** dû aujourd’hui. Attendez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription.
+4. **Essai + Wave / MTN** — complétez les coordonnées ; l’inscription doit réussir **sans prélèvement** en mode test.
+5. **Inscription payante** — `first_payment_type: initial` et paiement test normal ; vérifiez `status: active` et une transaction `instalment`.
+6. **Webhooks** — abonnez-vous à `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED` et `PAYMENT_FAILED` pour les échecs de renouvellement.
+
+Les renouvellements planifiés en test utilisent des dates futures ; inspectez `next_billing_date` via le tableau de bord ou l’API.
+
+## Webhooks en test
+
+1. Dans le tableau de bord (**Developers → Webhooks**), ajoutez une URL en mode **Test**.
+2. Utilisez le **secret de signature** de cette URL pour vérifier la signature sur le **corps brut** de la requête.
+3. Les paiements de test réussis émettent des événements comme **`PAYMENT_SUCCEEDED`** avec `"environment": "test"` le cas échéant.
+4. Utilisez **Test webhook** pour envoyer un exemple `PAYMENT_SUCCEEDED` sans paiement réel.
+
+Voir **[Webhooks](/build/webhooks)**. Pour l’automatisation, voir le **[Guide de tests](/build/advanced-guides/testing)**.
+
+## Dépannage
+
+| Symptôme | Cause probable | Action |
+| --- | --- | --- |
+| Données live dans les réponses API | Utilisation de `lomi_sk_live_…` | Passer à `lomi_sk_test_…` et `https://sandbox.api.lomi.africa` |
+| Échec carte immédiat | Numéro de refus ou règle CVC | Utiliser `4242…`, expiration future, CVC à 3 chiffres |
+| Carte OK mais pas de solde de test | Webhook absent ; mauvais environnement sur la session | Lien/session en test ; statut transaction dans le tableau de bord |
+| Clé de test mais checkout « live » | Lien créé en mode **Live** | Recréer le lien en mode **Test** (tableau de bord ou clé API de test) |
+| Wave/MTN OK, solde inchangé | Consultation du solde **live** au lieu du **test** | Basculer le tableau de bord en Test |
+| Erreurs bac à sable MTN | numéro de téléphone ou identifiants invalides | Numéros documentés par MTN pour votre pays |
+| Pas d’e-mail client | Normal en test | Notifications désactivées en test |
+
+## Documentation associée
+
+- **[Authentification](/start/api-keys)** — clés, environnements, sécurité
+- **[Intégration API](/start/first-payment)** — première requête et index API
+- **[Sessions checkout](/build/checkout)** — API checkout hébergé
+- **[Encaissements directs](/build/payments/charges)** — Wave, MTN et carte (`POST /charge/card`)
+- **[Liens de paiement](/build/payment-links)** — liens réutilisables
+- **[lomi Payment Elements](/build/payments/lomi-payment-elements)** — UI carte côté client
+- **[Webhooks](/build/webhooks)** — abonnements aux événements
+- **[Soldes et règlement](/build/balance-and-settlement)** — règles des soldes live
+- **[Guide de tests](/build/advanced-guides/testing)** — automatisation, CI, écouteurs webhook
+
+## Passer en production
+
+Passez aux clés live uniquement quand votre intégration est validée de bout en bout. Voir la [checklist de mise en production](/start/go-live).

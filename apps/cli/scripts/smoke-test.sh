@@ -47,11 +47,16 @@ cargo build --release -q
 LOMI="$ROOT/target/release/lomi"
 
 log "1. Version and help"
-assert_contains "3.1.0" "$LOMI" --version
+assert_contains "3.101.1" "$LOMI" --version
 assert_contains "checkout" "$LOMI" --help
 assert_contains "listen" "$LOMI" --help
 assert_contains "probe" "$LOMI" --help
+assert_contains "quickstart" "$LOMI" --help
+assert_contains "refunds" "$LOMI" --help
 assert_contains "install-rules" "$LOMI" --help
+assert_contains "get" "$LOMI" transactions --help
+assert_contains "create" "$LOMI" refunds --help
+assert_contains "json" "$LOMI" --help
 assert_contains "ui" "$LOMI" --help
 assert_contains "list" "$LOMI" ui --help
 assert_contains "add" "$LOMI" ui --help

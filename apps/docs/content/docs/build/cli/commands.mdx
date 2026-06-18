@@ -81,7 +81,7 @@ lomi update
 
 ### `lomi ui`
 
-Install and update [Lomi UI](/build/lomi-ui) checkout components from the live docs registry. See [Lomi UI commands](/build/cli/ui).
+Install and update [lomi. UI](/build/lomi-ui) checkout components from the live docs registry. See [lomi. UI commands](/build/cli/ui).
 
 ```bash
 lomi ui list
@@ -112,6 +112,16 @@ No authentication required. Requires Node.js, `npx`, and a shadcn project (`comp
 ---
 
 ## Development
+
+### `lomi quickstart`
+
+Golden-path connectivity check and recommended next steps. See [Quickstart command](/build/cli/quickstart).
+
+```bash
+lomi quickstart
+lomi quickstart --json
+lomi quickstart --skip-probe
+```
 
 ### `lomi listen`
 
@@ -193,6 +203,58 @@ List recent transactions.
 
 ```bash
 lomi transactions list
+lomi transactions list --limit 25 --json
+```
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--limit` | `10` | Maximum transactions to return |
+
+### `lomi transactions get <id>`
+
+Get a transaction by ID (`GET /transactions/{id}`).
+
+```bash
+lomi transactions get 123e4567-e89b-12d3-a456-426614174000
+lomi transactions get 123e4567-e89b-12d3-a456-426614174000 --json
+```
+
+### `lomi refunds create`
+
+Create a refund for a completed transaction (`POST /refunds`).
+
+```bash
+lomi refunds create
+lomi refunds create \
+  --transaction-id 123e4567-e89b-12d3-a456-426614174000 \
+  --amount 5000 \
+  --reason duplicate_charge \
+  --refund-type partial \
+  --json
+```
+
+| Flag | Description |
+| --- | --- |
+| `--transaction-id` | Transaction UUID to refund |
+| `--amount` | Refund amount (same currency as transaction) |
+| `--reason` | Optional reason |
+| `--refund-type` | `full` or `partial` |
+
+### `lomi refunds list`
+
+List refunds.
+
+```bash
+lomi refunds list
+lomi refunds list --status completed --limit 20 --json
+```
+
+### `lomi refunds get <id>`
+
+Get a refund by ID.
+
+```bash
+lomi refunds get ref_xxxxxxxx --json
 ```
 
 ---
@@ -207,9 +269,17 @@ Create a hosted checkout session via `POST /checkout-sessions`.
 
 ```bash
 lomi checkout create
+lomi checkout create \
+  --amount 10000 \
+  --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel \
+  --json
 ```
 
-Prompts for: price ID or amount, currency, success/cancel URLs, optional customer email.
+Interactive mode prompts for: price ID or amount, currency, success/cancel URLs, optional customer email.
+
+Headless mode requires `--currency`, `--success-url`, `--cancel-url`, and either `--amount` or `--price-id`.
 
 After creation, prints the checkout URL and a ready-to-paste HTML embed snippet using `@lomi./embed`:
 
@@ -236,9 +306,10 @@ Create a payment link via the payment links API.
 
 ```bash
 lomi payments create
+lomi payments create --title "Invoice #42" --amount 5000 --currency XOF --json
 ```
 
-Prompts for: title, amount, currency.
+Interactive mode prompts for: title, amount, currency. Headless mode requires all three flags.
 
 ---
 
@@ -271,9 +342,9 @@ lomi install-rules --force
 ```bash
 npm install -g lomi.cli
 lomi login
+lomi quickstart
 mkdir my-store && cd my-store
 lomi init
-lomi install-rules --target cursor
 lomi listen http://localhost:3000/webhooks
 ```
 

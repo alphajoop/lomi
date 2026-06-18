@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
+import { ChangePlanSubscriptionDto } from './dto/change-plan-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { SubscriptionResponseDto } from './dto/subscription-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
@@ -155,11 +156,53 @@ export class SubscriptionsController {
     return this.subscriptionsService.update(id, updateDto, user);
   }
 
+  @Post(':id/uncancel')
+  @ApiOperation({
+    summary: 'Annuler une résiliation planifiée',
+    description:
+      'Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).',
+  })
+  @ApiParam({ name: 'id', description: 'UUID de l’abonnement', type: String })
+  @ApiResponse({ status: 200, type: SubscriptionResponseDto })
+  uncancel(@Param('id') id: string, @CurrentUser() user: AuthContext) {
+    return this.subscriptionsService.uncancel(id, user);
+  }
+
+  @Post(':id/change-plan')
+  @ApiOperation({
+    summary: 'Changer le plan tarifaire',
+    description: 'Met à jour le price_id d’un abonnement actif.',
+  })
+  @ApiParam({ name: 'id', description: 'UUID de l’abonnement', type: String })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['price_id'],
+      properties: {
+        price_id: { type: 'string', format: 'uuid' },
+      },
+    },
+    examples: {
+      upgrade: {
+        summary: 'Passer à un autre tarif',
+        value: { price_id: '3fa85f64-5717-4562-b3fc-2c963f66afa6' },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, type: SubscriptionResponseDto })
+  changePlan(
+    @Param('id') id: string,
+    @Body() body: ChangePlanSubscriptionDto,
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.subscriptionsService.changePlan(id, body.price_id, user);
+  }
+
   @Post(':id/cancel')
   @ApiOperation({
     summary: 'Résilier un abonnement',
     description:
-      "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
+      'Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).',
   })
   @ApiParam({
     name: 'id',
@@ -183,13 +226,19 @@ export class SubscriptionsController {
     schema: {
       type: 'object',
       properties: {
+        cancel_at_period_end: { type: 'boolean' },
         cancellation_reason: { type: 'string' },
       },
     },
     examples: {
-      withReason: {
-        summary: 'Résiliation avec motif',
+      immediate: {
+        summary: 'Résiliation immédiate',
+        value: { cancellation_reason: 'Demande du client' },
+      },
+      atPeriodEnd: {
+        summary: 'Résiliation en fin de période',
         value: {
+          cancel_at_period_end: true,
           cancellation_reason: 'Demande du client',
         },
       },

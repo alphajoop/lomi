@@ -30,3 +30,6 @@
 [submodule "apps/customers"]
 	path = apps/customers
 	url = https://github.com/lomiafrica/customers.git
+[submodule "apps/design"]
+	path = apps/design
+	url = https://github.com/lomiafrica/design.git

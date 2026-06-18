@@ -1,6 +1,6 @@
 ---
 title: 'Traiter les webhooks'
-description: 'Les webhooks fournissent des mises à jour en temps réel sur les événements de votre compte lomi.. Ce guide explique comment recevoir et traiter ces notifications en toute sécurité.'
+description: 'Les webhooks fournissent des mises à jour en temps réel sur les événements de votre compte lomi. Ce guide explique comment recevoir et traiter ces notifications en toute sécurité.'
 ---
 
 Pour une introduction générale et la configuration, voir [Configurer les webhooks](/build/webhooks).
@@ -9,7 +9,7 @@ Comportement opérationnel (nouvelles tentatives, doublons, journaux de livraiso
 
 ## Liste de contrôle
 
-- [ ] Point de terminaison HTTPS acceptant `POST` avec corps JSON
+- [ ] URL HTTPS acceptant `POST` avec corps JSON
 - [ ] **Secret de signature** webhook (`whsec_…`) du tableau de bord — `LOMI_WEBHOOK_SECRET`, non envoyé par lomi. à la livraison
 - [ ] Middleware conservant le **corps brut** pour le HMAC (voir ci-dessous)
 - [ ] Vérifier `X-Lomi-Signature` **avant** de parser le JSON ou d’appliquer l’auth REST de votre API
@@ -25,14 +25,14 @@ Comportement opérationnel (nouvelles tentatives, doublons, journaux de livraiso
 </Callout>
 
 <Callout type="info" title="Secret de signature ≠ clé API">
-  Les POST webhook utilisent **`X-Lomi-Signature`** (HMAC du corps brut avec le `whsec_…` du point de terminaison). lomi. n’envoie **pas** `X-API-Key` ni `Authorization: Bearer`. Un **401** dans les journaux vient souvent de votre middleware — voir [Secret de signature vs Authorization](#webhook-signing-vs-authorization).
+  Les POST webhook utilisent **`X-Lomi-Signature`** (HMAC du corps brut avec le `whsec_…` de l’URL). lomi. n’envoie **pas** `X-API-Key` ni `Authorization: Bearer`. Un **401** dans les journaux vient souvent de votre middleware — voir [Secret de signature vs Authorization](#webhook-signing-vs-authorization).
 </Callout>
 
 ## Résumé de la configuration
 
-### Configurer votre point de terminaison
+### Configurer votre URL
 
-Préparez un point de terminaison HTTPS dédié pour recevoir des requêtes POST avec un corps JSON.
+Préparez une URL HTTPS dédiée pour recevoir des requêtes POST avec un corps JSON.
 
 ```typescript filename="Configuration Express de base pour les webhooks"
 import express from 'express';
@@ -139,9 +139,9 @@ Pour les requêtes **sortantes** (lomi. → votre serveur), attendez-vous surtou
 | En-tête | Rôle |
 | ------- | ---- |
 | `Content-Type` | `application/json` |
-| `X-Lomi-Signature` | HMAC-SHA256 (**hexadécimal**) du corps JSON **brut**, avec le secret de signature du point de terminaison |
+| `X-Lomi-Signature` | HMAC-SHA256 (**hexadécimal**) du corps JSON **brut**, avec le secret de signature de l’URL |
 | `X-Lomi-Event` | Même valeur que la propriété `"event"` à la racine du JSON |
-| `User-Agent` | `Lomi-Webhook/1.0` |
+| `User-Agent` | `lomi.-Webhook/1.0` |
 
 Le secret **`whsec_…`** sert à **vérifier** `X-Lomi-Signature` sur le corps brut — ce n’est **pas** un jeton que lomi. place dans `Authorization`.
 
@@ -149,7 +149,7 @@ Si les journaux de livraison indiquent un **HTTP 401**, ou un corps du type « A
 
 **À faire côté intégration :** exposer une **route dédiée** au webhook (chemin ou sous-domaine) **sans** middleware global exigeant clé API ou Bearer ; vérifier d’abord `X-Lomi-Signature`, puis répondre `2xx`. Vos autres routes peuvent garder Bearer / clés API comme d’habitude.
 
-Voir aussi [Webhooks](/api/webhooks) : lomi. enregistre le code HTTP et le corps renvoyé par **votre** point de terminaison.
+Voir aussi [Webhooks](/api/webhooks) : lomi. enregistre le code HTTP et le corps renvoyé par **votre** URL.
 
 ## Traiter les événements
 
@@ -235,7 +235,7 @@ async function markEventAsProcessed(eventId: string): Promise<void> {
 
 ### Répondre rapidement
 
-**Accusé‑réception d’abord :** voyez le `` `POST` `` webhook comme un transport minimal. Validez `` `X-Lomi-Signature` ``, conservez ou enfilez l’essentiel pour ne pas perdre la charge utile, puis renvoyez tout de suite un **`200`** / **`204`** à lomi. Tout ce qui touche à des tiers, à une base lourde ou à des sagas multi‑étapes doit s’exécuter **après** que la boucle HTTP a réussi aux yeux de lomi.
+**Accusé‑réception d’abord :** voyez le `` `POST` `` webhook comme un transport minimal. Validez `` `X-Lomi-Signature` ``, conservez ou enfilez l’essentiel pour ne pas perdre le message, puis renvoyez tout de suite un **`200`** / **`204`** à lomi. Tout ce qui touche à des tiers, à une base lourde ou à des sagas multi‑étapes doit s’exécuter **après** que la boucle HTTP a réussi aux yeux de lomi.
 
 Répondez en **quelques secondes tout au plus** dans les cas extrêmes, mais visez **sous une seconde** en usage courant : chaque envoi HTTP sortant côté lomi est cadencé par un timeout de lecture **d’environ quatre secondes** ; le dépasser fait échouer la tentative et peut consommer une partie de vos relances automatiques ([matrice détaillée](/build/advanced-guides/webhook-reliability)). Le travail lourd passe ensuite dans **votre** file interne.
 
@@ -259,7 +259,7 @@ async function handleWebhook(req: express.Request, res: express.Response) {
 
 Les problèmes réseau, les relances automatiques, les **rejeux manuels** depuis le tableau de bord et les garde‑fous d’idempotence côté plateforme font qu’il faut **attendre plusieurs POST** dans le temps pour un même événement logique : c’est le fonctionnement normal — intégrez la déduplication dès la conception de votre schéma, pas comme bug rare.
 
-- **Vérifier l’identifiant de charge :** conservez le champ racine `` `id` `` (UUID). Si déjà traité, faites un no-op.
+- **Vérifier l’identifiant d’événement :** conservez le champ racine `` `id` `` (UUID). Si déjà traité, ignorez-le.
 - **Contraintes en base :** utilisez des contraintes d’unicité lorsque c’est pertinent (par ex. sur une mise à jour de commande liée à l’ID de transaction) pour éviter les doublons au niveau données.
 
 ```typescript filename="Exemple de vérification d’idempotence"
@@ -282,7 +282,7 @@ Mettez en place une gestion d’erreurs robuste dans `processWebhookEvent`.
 
 - **Journaliser :** tracez les erreurs détaillées pendant le traitement.
 - **Nouvelle tentative interne :** pour les erreurs transitoires (par ex. indisponibilité temporaire de la base), envisagez des réessais dans le worker de la file.
-- **Surveillance :** surveillez les échecs sur le point de terminaison webhook et dans la file de traitement.
+- **Surveillance :** surveillez les échecs sur l’URL webhook et dans la file de traitement.
 - **Ne pas faire échouer la réponse `200 OK` :** même si le traitement interne échoue ensuite, lomi. doit déjà avoir reçu `200 OK`. Ce qui compte pour lomi., c’est l’accusé de livraison réussi.
 
 ### Journalisation
@@ -314,11 +314,11 @@ async function handleWebhook(req: express.Request, res: express.Response) {
 
 ## Tester les webhooks
 
-Voir le [guide des tests](/build/advanced-guides/testing) pour utiliser le Dashboard lomi. ou le CLI et envoyer des événements de test vers votre point de terminaison local.
+Voir le [guide des tests](/build/advanced-guides/testing) pour utiliser le Dashboard lomi. ou le CLI et envoyer des événements de test vers votre URL local.
 
 ## Surveillance
 
-Utilisez le Dashboard lomi. (**Developers → Webhooks**) pour suivre les tentatives de livraison, consulter les événements récents, vérifier les codes de réponse de votre point de terminaison et relancer manuellement les livraisons en échec.
+Utilisez le Dashboard lomi. (**Developers → Webhooks**) pour suivre les tentatives de livraison, consulter les événements récents, vérifier les codes de réponse de votre URL et relancer manuellement les livraisons en échec.
 
 ## Étapes suivantes
 

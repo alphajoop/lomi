@@ -1,13 +1,13 @@
 ---
 title: WooCommerce
 description:
-  Install and configure the lomi. WooCommerce gateway — hosted checkout
+  Install and configure lomi. WooCommerce gateway — hosted checkout
   sessions, return handler, and signed webhooks.
 ---
 
 # WooCommerce
 
-WordPress plugin that redirects shoppers to **Lomi hosted checkout** and confirms payment via the WooCommerce REST listener plus merchant webhooks.
+WordPress plugin that redirects shoppers to **lomi. hosted checkout** and confirms payment via the WooCommerce REST listener plus merchant webhooks.
 
 ## Requirements
 
@@ -18,29 +18,56 @@ WordPress plugin that redirects shoppers to **Lomi hosted checkout** and confirm
 
 Source: [plugin header / readme](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/woo-lomi.php)
 
+## Install
+
+Download the latest plugin zip from GitHub Releases:
+
+[Download woo-lomi.zip](https://github.com/lomiafrica/lomi./releases/latest/download/woo-lomi.zip)
+
+1. **WordPress Admin → Plugins → Add New → Upload Plugin** — choose `woo-lomi.zip` and activate.
+2. Releases are published on `woo-v*` tags (for example `woo-v1.002.0`). The asset name is always **`woo-lomi.zip`** so the `latest/download` URL stays stable.
+
+To build locally from the monorepo: `cd apps/plugins/woo && npm run release`.
+
 ## Setup checklist
 
-1. Install **lomi. WooCommerce Payment Gateway** and activate WooCommerce.
+1. Install **lomi. for WooCommerce** and activate WooCommerce.
 2. Go to **WooCommerce → Settings → Payments → lomi.** (or **Set up**).
-3. Enable the gateway; choose **Test mode** while integrating.
-4. Paste **Test/Live secret API keys** and matching **webhook signing secrets** from [dashboard.lomi.africa](https://dashboard.lomi.africa).
-5. Copy the **webhook URL** shown in red at the top of the settings page into **Dashboard → Developer / Webhooks** (same signing secret as configured in Woo).
+3. Review the **Setup health** panel (API key, currency, webhook secret, HTTPS, test mode, `GET /me`).
+4. Enable the gateway; choose **Test mode** while integrating.
+5. Paste **Test/Live secret API keys** and matching **webhook signing secrets** from [dashboard.lomi.africa](https://dashboard.lomi.africa).
+6. Copy the **webhook URL** shown at the top of the settings page into **Dashboard → Webhooks** (same signing secret as configured in Woo).
+7. Enable webhook events **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**.
 
 ## Payment flow
 
 1. Customer selects **lomi.** and places the order.
 2. Plugin calls `POST /v1/checkout-sessions` with success/cancel URLs and metadata (`wc_order_id`, etc.).
-3. Customer completes payment on Lomi Checkout.
+3. Customer completes payment on lomi. Checkout.
 4. **Return URL** hits the WooCommerce API listener (`WC_Gateway_Lomi`), which loads `GET /v1/checkout-sessions/{id}` and completes the order when status is `completed`.
 5. **Webhook** `PAYMENT_SUCCEEDED` can finalize the order if the return URL is delayed; signature verified with `X-Lomi-Signature` over the raw body.
+6. On success the plugin stores **`_lomi_transaction_id`**, **`_lomi_subscription_id`** (subscriptions), and **`_lomi_price_id`** on the Woo order.
 
 Implementation reference: [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/includes/class-wc-gateway-lomi.php)
+
+## Refunds
+
+- **From WooCommerce:** order screen → Refund when `_lomi_transaction_id` is present → `POST /refunds`.
+- **From dashboard:** payouts, balance, and fallback refunds stay in [dashboard.lomi.africa](https://dashboard.lomi.africa).
+- **`REFUND_COMPLETED` webhook:** adds an order note when a refund was initiated outside Woo (no double refund).
+
+## WooCommerce Subscriptions
+
+1. On each subscription product (or variation), set **lomi price ID** in the product editor **lomi.** tab (`_lomi_price_id`).
+2. Checkout is **blocked** if a subscription line has no mapping.
+3. First payment sends `price_id` / `product_id` to `POST /checkout-sessions` so lomi creates a subscription.
+4. **Renewals** are billed by lomi. subscription engine — WooCommerce does not auto-charge renewals with hosted checkout.
 
 ## Webhooks
 
 | Header | Role |
 | --- | --- |
-| `X-Lomi-Event` | Must be `PAYMENT_SUCCEEDED` for capture logic |
+| `X-Lomi-Event` | `PAYMENT_SUCCEEDED` completes orders; `REFUND_COMPLETED` adds refund notes |
 | `X-Lomi-Signature` | HMAC-SHA256 hex of raw body, secret = dashboard webhook secret |
 
 Always verify on the **exact raw bytes** received — do not re-stringify JSON.

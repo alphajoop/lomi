@@ -1,0 +1,60 @@
+name: Woo Plugin Release
+
+on:
+  push:
+    tags:
+      - 'woo-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: apps/plugins/woo
+        run: npm ci
+
+      - name: Build plugin assets
+        working-directory: apps/plugins/woo
+        run: |
+          npm run build
+          npm run i18n
+
+      - name: Package release zip
+        working-directory: apps/plugins/woo
+        run: |
+          chmod +x scripts/release.sh
+          ./scripts/release.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: woo-lomi
+          path: apps/plugins/woo/dist/woo-lomi.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always() && !cancelled() && (startsWith(github.ref, 'refs/tags/woo-v') || github.event_name == 'workflow_dispatch')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: woo-lomi
+          path: dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/woo-lomi.zip
+          generate_release_notes: true

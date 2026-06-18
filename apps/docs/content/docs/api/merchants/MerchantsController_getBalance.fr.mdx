@@ -1,0 +1,71 @@
+---
+title: "Get merchant account balance for a currency"
+description: "Get merchant account balance for a currency"
+full: true
+method: get
+path: /merchants/{id}/balance
+operationId: MerchantsController_getBalance
+---
+
+## Aperçu
+
+Get merchant account balance for a currency
+
+### Quand l'utiliser
+
+Utilisez cet endpoint pour `GET /merchants/&#123;id&#125;/balance` (Get merchant account balance for a currency).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /merchants/{id}/balance`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | Merchant UUID |
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `currency_code` | query | Oui | — |  |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | — |
+| `400` | Missing currency_code |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/merchants/value/balance?currency_code=XOF" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `MerchantsController_getBalance`
+- **Operation**: `GET /merchants/{id}/balance`
+
+Schémas complets et **Try it** : [référence API](/api).

@@ -25,11 +25,9 @@ export const DEFAULT_ALLOWLIST_PATH = join(
 /** @type {Record<string, string>} */
 export const METHOD_NAME_BY_OP = {
   'DELETE /customers/{id}': 'delete',
-  'GET /accounts': 'list',
   'GET /accounts/balance': 'getBalance',
   'GET /accounts/balance/breakdown': 'getBalanceBreakdown',
   'GET /accounts/balance/check/{currency}': 'checkBalance',
-  'GET /accounts/{id}': 'get',
   'GET /checkout-sessions': 'list',
   'GET /checkout-sessions/{id}': 'get',
   'GET /customers': 'list',
@@ -94,6 +92,8 @@ export const METHOD_NAME_BY_OP = {
   'GET /refunds': 'list',
   'GET /refunds/{id}': 'get',
   'POST /subscriptions/{id}/cancel': 'cancel',
+  'POST /subscriptions/{id}/uncancel': 'uncancel',
+  'POST /subscriptions/{id}/change-plan': 'changePlan',
 };
 
 export const HTTP_WITH_BODY = new Set(['post', 'patch', 'put']);

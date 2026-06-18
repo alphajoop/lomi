@@ -1,6 +1,6 @@
 ---
-title: "Lancer un encaissement direct MTN MoMo"
-description: "Lancer un encaissement direct MTN MoMo"
+title: "Create MTN MoMo charge"
+description: "Create MTN MoMo charge"
 full: true
 method: post
 path: /charge/mtn
@@ -9,11 +9,22 @@ operationId: ChargesController_createMtnCharge
 
 ## Overview
 
-Lancer un encaissement direct MTN MoMo
+Create MTN MoMo charge
+
+Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /charge/mtn` (Lancer un encaissement direct MTN MoMo).
+Use for server-initiated MTN collection when you are **not** using a hosted checkout session.
+
+### Good to know
+
+Live charges require MTN connected for your organization and a valid MSISDN. Refunds on live MTN payments use the Disbursement refund API via [Create refund](/api/refunds/RefundsController_create).
+
+### See also
+
+[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication
@@ -43,18 +54,78 @@ _No query parameters._
 
 ### Request body
 
-_No application/json body for this operation._
+JSON request payload.
+
+Schema: `CreateMtnChargeDto`
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Yes | `number` | Charge amount (minimum 1) |
+| `currency` | Yes | `string` | Currency code (e.g. `XOF`) |
+| `customer` | Yes | `object` | Payer details (`name`, `phoneNumber`, optional `email`) |
+| `description` | No | `string` | Payment description |
+| `countryCode` | No | `string` | ISO 3166-1 alpha-2 country (default `CI`) |
+| `productId` | No | `string` (uuid) | Optional product link |
+| `subscriptionId` | No | `string` (uuid) | Optional subscription link |
+| `quantity` | No | `number` | Quantity (default `1`) |
+
+Example body:
+
+```json
+{
+  "amount": 1000,
+  "currency": "XOF",
+  "countryCode": "CI",
+  "description": "Invoice #42",
+  "customer": {
+    "name": "Jane Doe",
+    "phoneNumber": "+2250707070707",
+    "email": "jane@example.com"
+  }
+}
+```
 
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `201` | Encaissement MTN initié (RequestToPay) |
+| `201` | MTN charge initiated — test keys return `completed` immediately; live returns `PENDING` |
+| `400` | Invalid input or MTN API error |
+
+**Test key** example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "transaction_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "external_id": "ext_abc123",
+    "reference_id": null,
+    "status": "completed"
+  }
+}
+```
+
+**Live key** example (customer must approve on device):
+
+```json
+{
+  "success": true,
+  "data": {
+    "transaction_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "external_id": "ext_abc123",
+    "reference_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "status": "PENDING"
+  }
+}
+```
+
+See [Mobile money](/build/mobile-money) for verification and webhooks.
 
 ## Errors
 
-Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting.
 
 ## Example
 
@@ -62,7 +133,15 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "amount": 1000,
+    "currency": "XOF",
+    "countryCode": "CI",
+    "customer": {
+      "name": "Jane Doe",
+      "phoneNumber": "+2250707070707"
+    }
+  }'
 ```
 
 ## OpenAPI
@@ -70,4 +149,4 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
 - **operationId**: `ChargesController_createMtnCharge`
 - **Operation**: `POST /charge/mtn`
 
-Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

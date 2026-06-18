@@ -114,27 +114,69 @@ export class SubscriptionsService {
     cancelDto: CancelSubscriptionDto,
     user: AuthContext,
   ) {
-    // First verify ownership
     await this.findOne(id, user);
 
-    // Log cancellation reason if provided
-    if (cancelDto.cancellation_reason) {
-      console.log(
-        `Cancelling subscription ${id}: ${cancelDto.cancellation_reason}`,
-      );
-    }
-
     const { error } = await this.supabase.getClient().rpc(
-      'cancel_customer_subscription' as any,
+      'cancel_customer_subscription' as never,
       {
         p_subscription_id: id,
         p_merchant_id: user.merchantId,
-      } as any,
+        p_cancel_at_period_end: cancelDto.cancel_at_period_end ?? false,
+        p_cancellation_reason: cancelDto.cancellation_reason ?? null,
+      } as never,
     );
 
     if (error) throw new Error(error.message);
 
-    // Return the updated subscription
+    return this.findOne(id, user);
+  }
+
+  async uncancel(id: string, user: AuthContext) {
+    await this.findOne(id, user);
+
+    const { data, error } = await this.supabase.getClient().rpc(
+      'manage_subscription' as never,
+      {
+        p_subscription_id: id,
+        p_action: 'uncancel',
+        p_actor: 'merchant',
+        p_source: 'merchant_api',
+        p_merchant_id: user.merchantId,
+      } as never,
+    );
+
+    if (error) throw new BadRequestException(error.message);
+
+    const result = data as { ok?: boolean };
+    if (!result?.ok) {
+      throw new BadRequestException('Failed to uncancel subscription');
+    }
+
+    return this.findOne(id, user);
+  }
+
+  async changePlan(id: string, priceId: string, user: AuthContext) {
+    await this.findOne(id, user);
+
+    const { data, error } = await this.supabase.getClient().rpc(
+      'manage_subscription' as never,
+      {
+        p_subscription_id: id,
+        p_action: 'change_plan',
+        p_actor: 'merchant',
+        p_source: 'merchant_api',
+        p_merchant_id: user.merchantId,
+        p_new_price_id: priceId,
+      } as never,
+    );
+
+    if (error) throw new BadRequestException(error.message);
+
+    const result = data as { ok?: boolean };
+    if (!result?.ok) {
+      throw new BadRequestException('Failed to change subscription plan');
+    }
+
     return this.findOne(id, user);
   }
 

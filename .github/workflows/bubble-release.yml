@@ -1,0 +1,59 @@
+name: Bubble Plugin Release
+
+on:
+  push:
+    tags:
+      - "bubble-v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Run plugin parity checks
+        run: apps/plugins/scripts/verify-lomi-plugins.sh
+
+      - name: Validate Bubble plugin JSON
+        run: |
+          find apps/plugins/bubble -name '*.json' -print0 | xargs -0 -I{} node -e "JSON.parse(require('fs').readFileSync('{}','utf8'))"
+
+      - name: Build embed asset
+        run: |
+          cd apps/sdks/embed
+          npm ci
+          npm run build:iife
+          node ../../plugins/bubble/scripts/build-assets.mjs
+
+      - name: Smoke test (optional)
+        env:
+          LOMI_API_KEY: ${{ secrets.LOMI_API_KEY }}
+        run: |
+          if [ -z "$LOMI_API_KEY" ]; then
+            echo "LOMI_API_KEY not set — skipping API smoke test"
+            exit 0
+          fi
+          node apps/plugins/bubble/scripts/smoke-test.mjs
+
+  release:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/bubble-v') || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            Bubble plugin release. Sync this tag in the Bubble Plugin Editor (Version → Synchronize with GitHub).
+
+            No zip artifact — Bubble pulls plugin files from the `lomiafrica/bubble` repository.

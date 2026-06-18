@@ -1,8 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Optional } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 
 @Injectable()
 export class BillingService {
@@ -75,6 +77,45 @@ export class BillingService {
     );
 
     if (error) throw new Error(error.message);
+    return data;
+  }
+
+  async listBillingPeriods(
+    user: AuthContext,
+    subscriptionId?: string,
+    page = 1,
+    pageSize = 50,
+  ) {
+    const offset = (page - 1) * pageSize;
+    const { data, error } = await this.supabase.getClient().rpc(
+      'list_billing_periods_api' as never,
+      {
+        p_organization_id: user.organizationId,
+        p_subscription_id: subscriptionId ?? null,
+        p_limit: pageSize,
+        p_offset: offset,
+        p_environment: environmentFromAuth(user),
+      } as never,
+    );
+
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  }
+
+  async getSubscriptionUsage(subscriptionId: string, user: AuthContext) {
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_subscription_usage_api' as never,
+      {
+        p_subscription_id: subscriptionId,
+        p_organization_id: user.organizationId,
+      } as never,
+    );
+
+    if (error) throw new Error(error.message);
+    if (!data) {
+      throw new NotFoundException('Subscription usage not found');
+    }
+
     return data;
   }
 }

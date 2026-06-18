@@ -1,0 +1,70 @@
+---
+title: Tableau de tarification
+description: Un tableau de tarification responsive pour les niveaux d'abonnement avec bascule mensuel/annuel.
+---
+
+Le `PricingTable` est un composant UI autonome, prêt à copier-coller, construit avec des éléments HTML standard et des classes utilitaires sémantiques Tailwind CSS. Il s'adapte automatiquement à votre thème sans nécessiter de primitives Shadcn supplémentaires.
+
+## Aperçu
+
+<Tabs items={['Aperçu', 'Code']}>
+  <Tab value="Aperçu" className="p-0 mt-4 border-none bg-transparent">
+    <ComponentPreview>
+      <PricingTable 
+        plans={[
+          { 
+            id: 'starter', 
+            name: 'Starter', 
+            description: 'Idéal pour les petits projets personnels.', 
+            monthlyPrice: 0, 
+            yearlyPrice: 0,
+            currency: 'XOF', 
+            features: ['API Access', '100 requests / day', 'Community Support'] 
+          },
+          { 
+            id: 'pro', 
+            name: 'Pro', 
+            description: 'Pour les entreprises en croissance et les applications en production.', 
+            monthlyPrice: 15000, 
+            yearlyPrice: 150000,
+            currency: 'XOF', 
+            features: ['Unlimited API Access', 'Priority Support', 'Custom Webhooks'],
+            highlighted: true 
+          }
+        ]} 
+      />
+    </ComponentPreview>
+  </Tab>
+
+  <Tab value="Code" className="mt-4">
+    ```tsx
+    import { PricingTable } from '@/components/lomi-ui/pricing-table';
+
+    export default function Demo() {
+      return (
+        <PricingTable 
+          plans={[
+            { 
+              id: 'starter', 
+              name: 'Starter', 
+              description: 'Idéal pour les petits projets personnels.', 
+              monthlyPrice: 0, 
+              currency: 'XOF', 
+              features: ['API Access', '100 requests / day'] 
+            },
+            { 
+              id: 'pro', 
+              name: 'Pro', 
+              description: 'Pour les entreprises en croissance et les applications en production.', 
+              monthlyPrice: 15000, 
+              currency: 'XOF', 
+              features: ['Unlimited API Access', 'Priority Support'],
+              highlighted: true 
+            }
+          ]} 
+        />
+      );
+    }
+    ```
+  </Tab>
+</Tabs>

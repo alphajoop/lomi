@@ -1,0 +1,25 @@
+name: Plugins Verify
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/plugins/**"
+      - ".github/workflows/plugins-verify.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/plugins/**"
+      - ".github/workflows/plugins-verify.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Run plugin parity checks
+        run: apps/plugins/scripts/verify-lomi-plugins.sh

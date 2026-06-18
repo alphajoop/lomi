@@ -875,6 +875,11 @@ article .mt-auto {
   align-self: flex-start;
 }
 
+/* Docs: tighter title-to-body spacing in fumadocs callouts */
+.prose div.flex.flex-col.gap-2.min-w-0.flex-1 {
+  gap: 0.125rem;
+}
+
 /*
 @import 'tailwindcss' source(none);
 @import 'fumadocs-ui/css/neutral.css';

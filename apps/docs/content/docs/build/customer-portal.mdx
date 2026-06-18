@@ -6,12 +6,14 @@ description: Build a hosted customer portal flow with launch sessions, OTP/magic
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The lomi. customer portal provides a hosted customer account area at `customers.lomi.africa` where end-users can:
+lomi. customer portal provides a hosted customer account area at `customers.lomi.africa` where end-users can:
 
-![Placeholder customer portal](/placeholder.webp)
+<DocsScreenshot name="build/customer-portal" alt="lomi. customer portal for payment history and subscriptions" />
 
 - View payment history and open invoice receipts when available
 - View and manage subscriptions (pause, resume, cancel at period end, uncancel)
+- Add, remove, and set default saved cards (when enabled in portal policy)
+- Retry failed subscription payments in-portal before checkout fallback
 - Download digital purchases from the library
 
 This guide describes the recommended production integration.
@@ -146,8 +148,29 @@ For custom portal UIs, use the portal session bearer token from a trusted launch
 - `GET /customer-portal/transactions`
 - `GET /customer-portal/subscriptions`
 - `POST /customer-portal/subscriptions/{id}/actions`
+- `GET /customer-portal/payment-methods`
+- `POST /customer-portal/payment-methods/setup-intent`
+- `POST /customer-portal/payment-methods/{id}/default`
+- `DELETE /customer-portal/payment-methods/{id}`
+- `POST /customer-portal/subscriptions/{id}/retry-payment`
 
 Pass `Authorization: Bearer <portal_session_token>`.
+
+### Payment methods
+
+When `allow_payment_method_update` is enabled in portal policy (default: on), customers can:
+
+1. Create a card setup intent via `POST /customer-portal/payment-methods/setup-intent`
+2. Confirm the setup intent client-side with your card payment SDK
+3. Persist the card with your attach flow (hosted portal calls the attach edge function after confirmation)
+
+Use `POST /customer-portal/payment-methods/{id}/default` to set the default card and sync active subscriptions. Use `DELETE /customer-portal/payment-methods/{id}` to remove a card (blocked when it is the sole card on a billable subscription).
+
+### Failed payment recovery
+
+For `past_due` card subscriptions, `POST /customer-portal/subscriptions/{id}/retry-payment` attempts an off-session charge with the default saved card. On success, renewal is recorded and dunning is cleared. On failure, the response may include a `checkout_url` fallback (same path as automated renewal dunning).
+
+The hosted portal also exposes **Retry payment** alongside **Pay now** on subscription actions.
 
 ## Dashboard integration
 
@@ -155,6 +178,7 @@ From **Settings → Checkout → Storefront**, configure the customer portal:
 
 - Allow pause / resume / cancel
 - Email magic link and SMS OTP sign-in
+- **Payment method updates** — allow customers to add, remove, and set default cards
 - **Return URL allowlist** — required when using `return_url` or `flow_after_completion_url` from your backend
 
 From **Customers**, open a customer with billing history and click **Open customer portal** to launch the hosted flow in a new tab (same as the API launch session).

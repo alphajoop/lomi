@@ -1,0 +1,48 @@
+---
+title: Sélecteur de fournisseur de paiement
+description: Sélectionnez Wave, MTN, Orange Money, SPI ou les rails de paiement par carte.
+---
+
+import { PaymentProviderSelectorDemo } from '@/components/lomi-ui/demo';
+
+# Sélecteur de fournisseur de paiement
+
+Utilisez-le quand un client doit choisir comment il souhaite payer.
+
+## Aperçu
+
+<PaymentProviderSelectorDemo />
+
+## Installation
+
+<Installation name="payment-provider-selector" />
+
+## Utilisation
+
+```tsx
+import {
+  PaymentProviderSelector,
+  type ProviderId,
+} from '@/components/lomi-ui/payment-provider-selector';
+
+function Example() {
+  const [provider, setProvider] = React.useState<ProviderId>('wave');
+
+  return (
+    <PaymentProviderSelector
+      selectedProvider={provider}
+      onProviderChange={setProvider}
+    />
+  );
+}
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `providers` | `ProviderId[]` | Identifiants de fournisseur à afficher. Par défaut Wave, MTN, Orange, SPI et carte. |
+| `selectedProvider` | `ProviderId` | Fournisseur sélectionné contrôlé. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Déclenché quand le client choisit un fournisseur. |
+| `disabledProviders` | `ProviderId[]` | Fournisseurs à afficher en état désactivé. |
+| `variant` | `'grid' \| 'rail'` | Style de mise en page. Par défaut `rail`. |

@@ -1,4 +1,9 @@
-import { Injectable, Logger, Optional } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Queue } from 'bullmq';
@@ -8,6 +13,7 @@ import { environmentFromAuth } from '../common/auth-environment';
 import { Json } from '../../utils/types/api';
 import { CreateUsageEventDto } from './dto/create-usage-event.dto';
 import { CreateUsageSubscriptionDto } from './dto/create-usage-subscription.dto';
+import { ListUsageEventsQueryDto } from './dto/list-usage-events-query.dto';
 
 @Injectable()
 export class UsageEventsService {
@@ -121,5 +127,44 @@ export class UsageEventsService {
     if (error) throw new Error(error.message);
 
     return { subscription_id: data as string };
+  }
+
+  async findAll(user: AuthContext, query: ListUsageEventsQueryDto) {
+    const page = query.page ?? 1;
+    const pageSize = query.page_size ?? 50;
+    const offset = (page - 1) * pageSize;
+
+    const { data, error } = await this.supabase.getClient().rpc(
+      'list_usage_events_api' as never,
+      {
+        p_organization_id: user.organizationId,
+        p_limit: pageSize,
+        p_offset: offset,
+        p_customer_id: query.customer_id ?? null,
+        p_code: query.code ?? null,
+        p_status: query.status ?? null,
+        p_environment: environmentFromAuth(user),
+      } as never,
+    );
+
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  }
+
+  async findOne(eventId: string, user: AuthContext) {
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_usage_event_api' as never,
+      {
+        p_event_id: eventId,
+        p_organization_id: user.organizationId,
+      } as never,
+    );
+
+    if (error) throw new Error(error.message);
+    if (!data) {
+      throw new NotFoundException(`Usage event ${eventId} not found`);
+    }
+
+    return data;
   }
 }

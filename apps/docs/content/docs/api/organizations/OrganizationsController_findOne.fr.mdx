@@ -1,0 +1,72 @@
+---
+title: "Organisation par ID"
+description: "Organisation par ID"
+full: true
+method: get
+path: /organizations/{id}
+operationId: OrganizationsController_findOne
+---
+
+## Aperçu
+
+Organisation par ID
+
+Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)
+
+
+### Quand l'utiliser
+
+Utilisez cet endpoint pour `GET /organizations/&#123;id&#125;` (Organisation par ID).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /organizations/{id}`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | L'organisation |
+| `404` | Organisation introuvable ou accès refusé |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/organizations/id_value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `OrganizationsController_findOne`
+- **Operation**: `GET /organizations/{id}`
+
+Schémas complets et **Try it** : [référence API](/api).

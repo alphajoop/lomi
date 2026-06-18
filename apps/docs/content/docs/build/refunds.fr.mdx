@@ -6,7 +6,11 @@ description: Rembourser des transactions terminées (`POST /refunds`).
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Utilisez **`POST /refunds`** pour rembourser une transaction **terminée**. Les types de paiement pris en charge sont **carte** et **mobile money** (mêmes flux que le tableau de bord). Votre **solde est mis à jour immédiatement** ; le crédit client dépend du type de paiement.
+Utilisez **`POST /refunds`** pour rembourser une transaction **terminée**. Les prestataires pris en charge sont **carte bancaire**, **Wave** et **MTN MoMo** (mêmes flux que le tableau de bord). Votre **solde est mis à jour immédiatement** ; le crédit client dépend du type de paiement.
+
+<Callout type="info">
+  **MTN MoMo (live) :** le paiement d'origine doit avoir une référence prestataire (`provider_checkout_id` issu du RequestToPay). Les remboursements passent par l'API Disbursement MTN (asynchrone côté MTN ; lomi. interroge le statut jusqu'à complétion). En **mode test**, le remboursement est uniquement comptable (pas d'appel MTN).
+</Callout>
 
 Listez et consultez les remboursements avec **`GET /refunds`** et **`GET /refunds/{id}`**.
 

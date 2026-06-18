@@ -1,0 +1,59 @@
+---
+title: 'How do I accept Wave payments?'
+description: 'Wave mobile money via hosted checkout or POST /charge/wave—with async live behavior and XOF requirements.'
+docType: how-to
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Wave is the primary mobile-money rail for **UEMOA (XOF)** merchants. Most teams should use [hosted checkout](/build/checkout) or [payment links](/build/payment-links) first.
+
+## Hosted checkout (recommended)
+
+1. Create a checkout session with `currency_code: "XOF"`.
+2. Customer selects **Wave** on the hosted page.
+3. Customer approves in the Wave app.
+4. Confirm with webhooks or `GET /transactions/{id}` before fulfilling.
+
+## Direct charge
+
+`POST /charge/wave` requires **XOF**. The response includes `wave_launch_url` or `checkout_url`—redirect or deep-link the customer.
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency_code": "XOF",
+    "customer_email": "customer@example.com",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel"
+  }'
+```
+
+See [Charges API](/api/charge/ChargesController_createWaveCharge) and [Direct charges](/build/direct-charges).
+
+## Test vs live
+
+| | Test | Live |
+| --- | --- | --- |
+| Balance credit | Often when session/charge is created | After customer approves in Wave |
+| Status | Usually `completed` quickly | Starts `pending` |
+
+<Callout type="info">
+  In live mode, never fulfill on redirect alone. See [Verify payments](/build/guides/verify-payments).
+</Callout>
+
+## Payouts
+
+Wave **beneficiary** payouts require a live key and valid recipient phone. Wave self-withdrawals are **live-only**—test keys return `400` for Wave payout rails. See [Sandbox payouts](/start/sandbox-payments#payouts-in-test-mode).
+
+## Related
+
+- [Payment methods hub](/build/guides/payment-methods)
+- [Mobile money](/build/mobile-money)
+- [Sandbox payments](/start/sandbox-payments)

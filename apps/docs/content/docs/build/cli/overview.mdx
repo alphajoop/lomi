@@ -1,6 +1,6 @@
 ---
 title: 'Getting started'
-description: 'Install the lomi. CLI, verify your setup, and run your first commands.'
+description: 'Install lomi. CLI, verify your setup, and run your first commands.'
 ---
 
 The **lomi. CLI** is distributed via **npm** as `lomi.cli`. It helps you authenticate with lomi., scaffold SDK projects, test webhooks locally, create checkout sessions and payment links, and install AI agent rules.
@@ -94,7 +94,7 @@ Opens a browser device-authorization flow and saves a CLI token globally. See [A
 lomi status
 ```
 
-Verifies your stored token and connectivity to the lomi. API.
+Verifies your stored token and connectivity to lomi.. API.
 
 ### Scaffold a project
 
@@ -140,6 +140,7 @@ Starts a webhook receiver on `http://localhost:4242/webhook`. See [Local develop
 | `lomi whoami` | Show current profile |
 | `lomi status` | Check login and API connectivity |
 | `lomi init` | Scaffold SDK project files |
+| `lomi quickstart` | Golden-path checks and next steps |
 | `lomi listen` | Cloud webhook relay (sandbox-first) |
 | `lomi dev` | Local webhook development server |
 | `lomi probe` | Integration health checks |
@@ -147,6 +148,9 @@ Starts a webhook receiver on `http://localhost:4242/webhook`. See [Local develop
 | `lomi webhooks test` | Send a test webhook event |
 | `lomi products list` | List products and prices |
 | `lomi transactions list` | List recent transactions |
+| `lomi transactions get` | Get a transaction by ID |
+| `lomi refunds create` | Refund a completed transaction |
+| `lomi refunds list` / `refunds get` | List or retrieve refunds |
 | `lomi checkout create` | Create a hosted checkout session |
 | `lomi payments create` | Create a payment link |
 | `lomi install-rules` | Install AI agent documentation |
@@ -166,6 +170,7 @@ These flags work with any command:
 | `-a, --api-url <url>` | Override API base URL |
 | `-l, --log-level <level>` | `debug`, `info`, `warn`, `error` |
 | `--skip-telemetry` | Opt out of telemetry |
+| `--json` | Emit machine-readable JSON (also default when stdout is not a TTY) |
 | `-h, --help` | Help for the CLI or a subcommand |
 | `--version` | Print version |
 

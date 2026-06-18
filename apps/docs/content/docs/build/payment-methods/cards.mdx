@@ -1,0 +1,46 @@
+---
+title: 'How do I accept card payments?'
+description: 'Hosted checkout cards and embedded Payment Elements via POST /charge/card.'
+docType: how-to
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsScreenshot } from '@/components/docs/docs-screenshot';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment Elements](/build/payments/lomi-payment-elements) and `POST /charge/card`.
+
+<DocsScreenshot name="build/cards" alt="Card payment form on lomi. hosted checkout" />
+
+## Hosted checkout (recommended)
+
+1. Create a checkout session.
+2. Customer selects **Card** and enters details on lomi.. page.
+3. Handle 3D Secure when the test card or issuer requires authentication.
+4. Verify with webhooks before fulfilling.
+
+## Embedded card charge
+
+1. `POST /charge/card` → receive `client_secret`.
+2. Confirm with Payment Elements on your site.
+3. Poll or webhook for final `transaction_status`.
+
+See [Cards guide](/build/cards), [Charges API](/api/charge/ChargesController_createCardCharge), and the [direct charge reference app](/build/direct-charges#reference-implementation).
+
+## Sandbox test cards
+
+| PAN | Behavior |
+| --- | --- |
+| `4242 4242 4242 4242` | Success |
+| Decline / auth test numbers | See [Sandbox payments](/start/sandbox-payments#testing-card-payments) |
+
+<Callout type="warn">
+  Never use real card numbers in test mode or test numbers in live mode.
+</Callout>
+
+## Related
+
+- [Verify payments](/build/guides/verify-payments)
+- [Simulate errors](/build/guides/simulate-errors)

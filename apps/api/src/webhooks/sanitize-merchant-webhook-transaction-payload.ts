@@ -20,7 +20,6 @@ export function sanitizeMerchantWebhookTransactionPayload(
       'conversion_rate',
       'original_fee_amount',
       'base_amount_xof',
-      'payment_flow',
       // Wave internal fields
       'emails_sent',
       'emails_sent_at',

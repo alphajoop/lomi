@@ -14,16 +14,16 @@ Créer une session de lancement du portail client
 Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.
 
 
-### Quand utiliser cet endpoint
+### Quand l'utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /customers/&#123;id&#125;/portal-launch-session` (Créer une session de lancement du portail client).
+Utilisez cet endpoint pour `POST /customers/&#123;id&#125;/portal-launch-session` (Créer une session de lancement du portail client).
 
 
 ## Authentification
 
-Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
 
-## Point de terminaison
+## Endpoint
 
 `POST /customers/{id}/portal-launch-session`
 
@@ -47,7 +47,7 @@ _Aucun paramètre de requête._
 
 ### Corps de la requête
 
-Charge utile JSON.
+Corps JSON.
 
 Schéma: `object`
 
@@ -79,7 +79,7 @@ Exemple de corps :
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
 
 ## Exemple
 
@@ -95,4 +95,4 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/customers/value/portal-launch-
 - **operationId**: `CustomersController_createPortalLaunchSession`
 - **Operation**: `POST /customers/{id}/portal-launch-session`
 
-Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.
+Schémas complets et **Try it** : [référence API](/api).

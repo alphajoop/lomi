@@ -1,0 +1,72 @@
+---
+title: "List payment providers"
+description: "List payment providers"
+full: true
+method: get
+path: /providers
+operationId: ProvidersController_findAll
+---
+
+## Overview
+
+List payment providers
+
+Returns connection status for payment providers configured for your organization.
+
+
+### When to use this
+
+Use this endpoint when your flow needs `GET /providers` (List payment providers).
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /providers`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `provider_code` | query | No | — | Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay). |
+
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `200` | Provider settings |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/providers?provider_code=CARD" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `ProvidersController_findAll`
+- **Operation**: `GET /providers`
+
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

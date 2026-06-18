@@ -28,24 +28,6 @@ func (s *AccountsService) CheckBalance(currency string) (interface{}, error) {
 	}
 
 
-func (s *AccountsService) Get(id string) (interface{}, error) {
-		path := "/accounts/{id}"
-		path = strings.ReplaceAll(path, "{id}", id)
-		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
 func (s *AccountsService) GetBalance(params map[string]string) (interface{}, error) {
 		path := "/accounts/balance"
 		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
@@ -66,23 +48,6 @@ func (s *AccountsService) GetBalance(params map[string]string) (interface{}, err
 func (s *AccountsService) GetBalanceBreakdown(params map[string]string) (interface{}, error) {
 		path := "/accounts/balance/breakdown"
 		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *AccountsService) List() (interface{}, error) {
-		path := "/accounts"
-		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
 		if err != nil {
 			return nil, err
 		}

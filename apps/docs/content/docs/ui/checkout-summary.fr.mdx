@@ -1,0 +1,44 @@
+---
+title: Carte récapitulative de checkout
+description: Un composant affichant le récapitulatif d'une commande de checkout, incluant les lignes, le sous-total et le total.
+---
+
+Le `CheckoutSummaryCard` est un composant UI autonome, prêt à copier-coller, construit avec des éléments HTML standard et des classes utilitaires sémantiques Tailwind CSS. Il s'adapte automatiquement à votre thème sans nécessiter de primitives Shadcn supplémentaires.
+
+## Aperçu
+
+<Tabs items={['Aperçu', 'Code']}>
+  <Tab value="Aperçu" className="p-0 mt-4 border-none bg-transparent">
+    <ComponentPreview>
+      <CheckoutSummaryCard 
+        subtotal={4900} 
+        tax={0} 
+        total={4900} 
+        currency="XOF" 
+        items={[
+          { name: 'lomi. Pro Plan (Monthly)', quantity: 1, price: 4900 }
+        ]} 
+      />
+    </ComponentPreview>
+  </Tab>
+
+  <Tab value="Code" className="mt-4">
+    ```tsx
+    import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
+
+    export default function Demo() {
+      return (
+        <CheckoutSummaryCard 
+          subtotal={4900} 
+          tax={0} 
+          total={4900} 
+          currency="XOF" 
+          items={[
+            { name: 'Lomi Pro Plan (Monthly)', quantity: 1, price: 4900 }
+          ]} 
+        />
+      );
+    }
+    ```
+  </Tab>
+</Tabs>

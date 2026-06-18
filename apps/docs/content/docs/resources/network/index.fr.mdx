@@ -1,0 +1,94 @@
+---
+title: 'lomi. Network'
+description: 'Créez paiements, sessions checkout, remboursements et lectures de transactions pour des comptes membres connectés.'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+lomi. Network permet à une organisation **Opérateur** approuvée d'agir au nom de **comptes membres** connectés. Un compte membre est une organisation lomi. réelle avec un identifiant public tel que `acct_123...`.
+
+<Callout type="info">
+  Les requêtes Network utilisent une clé API secrète Opérateur active plus `Lomi-Account: acct_...`. Sans `Lomi-Account`, chaque endpoint se comporte comme l'API marchande normale.
+</Callout>
+
+## Concepts
+
+| Terme | Signification |
+| --- | --- |
+| Opérateur | L'organisation propriétaire de la clé API qui initie les requêtes déléguées. |
+| Compte membre | L'organisation connectée qui reçoit le paiement, la session checkout, la transaction ou le remboursement. |
+| `acct_...` | Identifiant public Network du compte membre. L'Opérateur l'envoie dans l'en-tête `Lomi-Account`. |
+| Adhésion | Relation active entre un Opérateur et un compte membre. |
+| Capacité | Permission accordée par adhésion et environnement, ex. `payment.create` ou `refund.create`. |
+| Frais opérateur | Règle de frais optionnelle enregistrée pour le reporting et le règlement ultérieur. |
+
+## En-têtes
+
+```http
+POST /charge/card HTTP/1.1
+Host: api.lomi.africa
+X-API-KEY: lomi_sk_live_operator_...
+Lomi-Account: acct_1234567890
+Content-Type: application/json
+```
+
+L'environnement de la clé API contrôle l'environnement de la requête. Une clé test exige des capacités en mode test ; une clé live exige des capacités en mode live.
+
+## Endpoints supportés
+
+| Endpoint | Capacité |
+| --- | --- |
+| `POST /charge/card` | `payment.create` |
+| `POST /charge/wave` | `payment.create` |
+| `POST /charge/mtn` | `payment.create` |
+| `POST /checkout-sessions` | `payment.create` |
+| `GET /transactions`, `GET /transactions/{id}` | `transaction.read_own` ou `transaction.read` |
+| `GET /charge/card/{id}` | `transaction.read_own` ou `transaction.read` |
+| `GET /customers`, `GET /customers/{id}` | `customer.read` |
+| `POST /customers`, `PATCH /customers/{id}` | `customer.write` |
+| `GET /customers/{id}/transactions` | `customer.read` |
+| `POST /refunds` | `refund.create` |
+| `GET /refunds`, `GET /refunds/{id}` | `transaction.read_own` ou `transaction.read` |
+
+Si `Lomi-Account` est envoyé vers un autre endpoint, l'API rejette la requête au lieu de changer silencieusement le périmètre organisation.
+
+## Exemple
+
+```bash
+curl -X POST "https://api.lomi.africa/checkout-sessions" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Commande #12345",
+    "success_url": "https://example.com/success"
+  }'
+```
+
+La session checkout appartient au compte membre. La page checkout hébergée affiche la marque et les moyens de paiement du membre. Le contexte Network est enregistré séparément pour que l'Opérateur consulte les performances déléguées dans le tableau de bord Network.
+
+## Clients
+
+Les appels API clients Network créent et mettent à jour des clients sous l'organisation du compte membre. lomi. enregistre les métadonnées Network sur les clients créés par un Opérateur ; les listes incluent les clients créés par cet Opérateur ou rattachés à des transactions Network déléguées.
+
+## Idempotence
+
+Pour les endpoints qui supportent `Idempotency-Key`, les Opérateurs envoient une clé d'idempotence normale. lomi. lie la clé interne par adhésion Network et inclut `Lomi-Account` dans l'signature de requête — deux Opérateurs ciblant le même membre ne entrent pas en collision.
+
+## Erreurs d'autorisation courantes
+
+| Message | Signification |
+| --- | --- |
+| `network_account_not_found` | L'id `acct_...` n'existe pas. |
+| `network_account_not_active` | Le compte membre n'est pas actif pour Network. |
+| `operator_not_active` | L'organisation de la clé API n'est pas un Opérateur actif. |
+| `Network requests require a secret API key` | Les clés publiques ne peuvent pas servir aux requêtes Network déléguées. |
+| `network_membership_not_found` | L'Opérateur n'est pas connecté à ce compte membre. |
+| `network_membership_not_active` | La connexion existe mais n'est pas active. |
+| `network_capability_missing` | L'adhésion n'a pas la capacité requise pour cet environnement. |
+
+## Reporting
+
+Le reporting Opérateur est disponible dans le panneau Network du tableau de bord. Les pages Transactions normales et les API transactions restent limitées à l'organisation courante sauf si `Lomi-Account` est fourni.

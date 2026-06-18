@@ -1,0 +1,47 @@
+name: PrestaShop Plugin Release
+
+on:
+  push:
+    tags:
+      - "prestashop-v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Run plugin parity checks
+        run: apps/plugins/scripts/verify-lomi-plugins.sh
+
+      - name: Package PrestaShop module zip
+        run: |
+          cd apps/plugins/prestashop
+          zip -r "../../dist/prestashop-lomi.zip" lomi \
+            -x "*.git*" -x ".DS_Store"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prestashop-lomi
+          path: dist/prestashop-lomi.zip
+
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    if: always() && !cancelled() && (startsWith(github.ref, 'refs/tags/prestashop-v') || github.event_name == 'workflow_dispatch')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: prestashop-lomi
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/prestashop-lomi.zip
+          generate_release_notes: true

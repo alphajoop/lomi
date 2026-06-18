@@ -1,0 +1,43 @@
+---
+title: Carte échec de paiement
+description: Aidez les clients à réessayer ou à récupérer après un paiement échoué.
+---
+
+import { PaymentFailureCardDemo } from '@/components/lomi-ui/demo';
+
+# Carte échec de paiement
+
+Utilisez-la après une tentative de paiement échouée ou un délai d'attente du fournisseur.
+
+## Aperçu
+
+<PaymentFailureCardDemo />
+
+## Installation
+
+<Installation name="payment-failure-card" />
+
+## Utilisation
+
+```tsx
+import { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';
+
+<PaymentFailureCard
+  amount={12500}
+  currency="XOF"
+  provider="MTN Mobile Money"
+  supportHref="/resources/support"
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `title` | `string` | Titre optionnel. |
+| `message` | `string` | Texte de récupération. |
+| `amount` | `number` | Montant échoué optionnel. |
+| `currency` | `string` | Code devise ISO. |
+| `provider` | `string` | Libellé du fournisseur. |
+| `onRetry` | `() => void` | Action de nouvelle tentative. |
+| `supportHref` | `string` | Lien de support optionnel. |

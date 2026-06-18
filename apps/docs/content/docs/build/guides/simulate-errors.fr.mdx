@@ -1,0 +1,41 @@
+---
+title: 'Comment simuler erreurs et cas limites ?'
+description: 'Testez refus, authentification 3DS, mobile money asynchrone et échecs webhook avant la mise en production.'
+docType: how-to
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Utilisez cet index en **bac à sable**. Les numéros de carte et le comportement MoMo détaillés sont dans **[Paiements en bac à sable](/start/sandbox-payments)**.
+
+<Callout type="warn">
+  Exécutez ces scénarios uniquement avec des **clés test** (`lomi_sk_test_...`).
+</Callout>
+
+## Matrice de scénarios
+
+| Scénario | Déclencheur | Résultat attendu | Détail |
+| --- | --- | --- | --- |
+| Carte acceptée | `4242 4242 4242 4242` | `completed` | [Bac à sable — cartes](/start/sandbox-payments#testing-card-payments) |
+| Carte refusée | PAN de refus du tableau test | `failed` | Idem |
+| 3D Secure | Cartes test auth | `requires_action` | [Bac à sable](/start/sandbox-payments) |
+| Wave (test) | Wave sur checkout test | Souvent `completed` immédiat | [Wave](/build/payment-methods/wave) |
+| MTN (test) | `POST /charge/mtn` | `completed` immédiat | [MTN MoMo](/build/payment-methods/mtn-momo) |
+| MTN (live) | numéro de téléphone réel, clé live | `PENDING` | [Vérifier les paiements](/build/guides/verify-payments) |
+| Expiration | Dépassement TTL session/transaction | `expired` / `failed` | [Machine à états](/api/payment-state-machine) |
+| Signature webhook invalide | POST sans `X-Lomi-Signature` | 4xx + retries lomi. | [Gestion webhooks](/build/advanced-guides/handling-webhooks) |
+| Webhook dupliqué | Rejouer le même `id` | Déduplication côté vous | [Fiabilité webhooks](/build/advanced-guides/webhook-reliability) |
+| Reversement solde insuffisant | Règles test payout | `400` / `failed` | [Reversements test](/start/sandbox-payments#payouts-in-test-mode) |
+| Clé API invalide | Mauvais `X-API-Key` | `401` | [Authentification](/api/authentication) |
+
+## Automatisation
+
+Voir [Guide de tests](/build/advanced-guides/testing) et les recettes `curl` du bac à sable.
+
+## Voir aussi
+
+- [Parcours d’intégration](/start/integration-journey)
+- [Passer en production](/start/go-live)

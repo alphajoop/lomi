@@ -14,12 +14,15 @@ import {
   resolveSafeMerchantWebhookTarget,
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
+import { WebhookEvent } from '../utils/types/api';
+import { WebhookSenderService, type Webhook } from './webhook-sender.service';
 
 @Injectable()
 export class WebhooksService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly configService: ConfigService,
+    private readonly webhookSender: WebhookSenderService,
   ) {}
 
   private normalizeEvents(
@@ -233,24 +236,73 @@ export class WebhooksService {
   }
 
   async retryDelivery(webhookId: string, logId: string, user: AuthContext) {
-    await this.findOne(webhookId, user);
+    const webhookRow = (await this.findOne(webhookId, user)) as Record<
+      string,
+      unknown
+    >;
 
-    const { data, error } = await this.supabase.getClient().rpc(
-      'retry_webhook_delivery' as never,
+    const { data: logs, error: logError } = await this.supabase.rpc(
+      'get_webhook_delivery_log',
       {
-        p_webhook_id: webhookId,
         p_log_id: logId,
         p_merchant_id: user.merchantId,
-      } as never,
+      },
     );
 
-    if (error) {
-      throw new BadRequestException(error.message);
+    if (logError) {
+      throw new BadRequestException(logError.message);
     }
-    if (!data) {
+
+    const log = (logs as Record<string, unknown>[] | null)?.[0];
+    if (!log || String(log.webhook_id) !== webhookId) {
       throw new NotFoundException('Delivery log not found or retry failed');
     }
 
-    return { queued: true };
+    const storedPayload = log.payload as {
+      id?: string;
+      event: WebhookEvent;
+      timestamp?: string;
+      data: Record<string, unknown>;
+      lomi_environment?: string;
+    };
+
+    if (!storedPayload?.event || !storedPayload?.data) {
+      throw new BadRequestException('Delivery log payload is invalid');
+    }
+
+    const webhook: Webhook = {
+      id: String(webhookRow.webhook_id ?? webhookId),
+      url: String(webhookRow.url),
+      events: (webhookRow.authorized_events ?? []) as WebhookEvent[],
+      secret: String(webhookRow.verification_token),
+      active: Boolean(webhookRow.is_active ?? true),
+      organization_id: String(webhookRow.organization_id),
+    };
+
+    const attemptNumber =
+      typeof log.attempt_number === 'number' ? log.attempt_number + 1 : 1;
+
+    const result = await this.webhookSender.sendStoredWebhookPayload(
+      webhook,
+      storedPayload,
+      {
+        attemptNumber,
+        merchantId: user.merchantId,
+      },
+    );
+
+    if (!result.success) {
+      throw new BadRequestException(
+        typeof result.lastResponseBody === 'string'
+          ? result.lastResponseBody
+          : `Webhook retry failed (${result.lastResponseStatus ?? 0})`,
+      );
+    }
+
+    return {
+      delivered: true,
+      response_status: result.lastResponseStatus,
+      event_id: storedPayload.id,
+    };
   }
 }

@@ -117,6 +117,271 @@
         "tags": ["Balances"]
       }
     },
+    "/organizations": {
+      "get": {
+        "description": "Renvoie les informations de l'organisation du marchand authentifié",
+        "operationId": "OrganizationsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Détails de l'organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Détails de l'organisation",
+        "tags": ["Organisations"]
+      }
+    },
+    "/organizations/metrics": {
+      "get": {
+        "description": "Renvoie le MRR, l'ARR, la LTV, le chiffre d'affaires et le nombre de clients pour votre organisation.",
+        "operationId": "OrganizationsController_getMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Indicateurs de l'organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMetricsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Indicateurs de l'organisation",
+        "tags": ["Organisations"]
+      }
+    },
+    "/organizations/{id}": {
+      "get": {
+        "description": "Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)",
+        "operationId": "OrganizationsController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "L'organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organisation introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Organisation par ID",
+        "tags": ["Organisations"]
+      }
+    },
+    "/merchants/{id}": {
+      "get": {
+        "description": "Returns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.",
+        "operationId": "MerchantsController_getDetails",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Merchant ID mismatch"
+          },
+          "404": {
+            "description": "Merchant not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant details",
+        "tags": ["Merchants"]
+      }
+    },
+    "/merchants/{id}/mrr": {
+      "get": {
+        "operationId": "MerchantsController_getMrr",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantMrrResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant MRR",
+        "tags": ["Merchants"]
+      }
+    },
+    "/merchants/{id}/arr": {
+      "get": {
+        "operationId": "MerchantsController_getArr",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantArrResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant ARR",
+        "tags": ["Merchants"]
+      }
+    },
+    "/merchants/{id}/balance": {
+      "get": {
+        "operationId": "MerchantsController_getBalance",
+        "parameters": [
+          {
+            "name": "currency_code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": ["XOF", "USD", "EUR"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Merchant UUID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantBalanceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing currency_code"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get merchant account balance for a currency",
+        "tags": ["Merchants"]
+      }
+    },
+    "/providers": {
+      "get": {
+        "description": "Returns connection status for payment providers configured for your organization.",
+        "operationId": "ProvidersController_findAll",
+        "parameters": [
+          {
+            "name": "provider_code",
+            "required": false,
+            "in": "query",
+            "description": "Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay).",
+            "schema": {
+              "enum": ["CARD", "WAVE", "MTN", "SPI"],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Provider settings"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List payment providers",
+        "tags": ["Providers"]
+      }
+    },
     "/customer-subscriptions": {
       "get": {
         "operationId": "CustomerSubscriptionsController_findAll",
@@ -394,9 +659,106 @@
         "tags": ["Subscriptions"]
       }
     },
+    "/subscriptions/{id}/uncancel": {
+      "post": {
+        "description": "Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).",
+        "operationId": "SubscriptionsController_uncancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Annuler une résiliation planifiée",
+        "tags": ["Subscriptions"]
+      }
+    },
+    "/subscriptions/{id}/change-plan": {
+      "post": {
+        "description": "Met à jour le price_id d’un abonnement actif.",
+        "operationId": "SubscriptionsController_changePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["price_id"],
+                "properties": {
+                  "price_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "examples": {
+                "upgrade": {
+                  "summary": "Passer à un autre tarif",
+                  "value": {
+                    "price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Changer le plan tarifaire",
+        "tags": ["Subscriptions"]
+      }
+    },
     "/subscriptions/{id}/cancel": {
       "post": {
-        "description": "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
+        "description": "Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).",
         "operationId": "SubscriptionsController_cancel",
         "parameters": [
           {
@@ -416,15 +778,25 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "cancel_at_period_end": {
+                    "type": "boolean"
+                  },
                   "cancellation_reason": {
                     "type": "string"
                   }
                 }
               },
               "examples": {
-                "withReason": {
-                  "summary": "Résiliation avec motif",
+                "immediate": {
+                  "summary": "Résiliation immédiate",
                   "value": {
+                    "cancellation_reason": "Demande du client"
+                  }
+                },
+                "atPeriodEnd": {
+                  "summary": "Résiliation en fin de période",
+                  "value": {
+                    "cancel_at_period_end": true,
                     "cancellation_reason": "Demande du client"
                   }
                 }
@@ -464,16 +836,6 @@
         "description": "Renvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.",
         "operationId": "TransactionsController_findAll",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "isPos",
             "required": false,
@@ -573,6 +935,16 @@
               "example": "WAVE",
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
           }
         ],
         "responses": {
@@ -608,6 +980,15 @@
         "operationId": "TransactionsController_findOne",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de la transaction",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -615,15 +996,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de la transaction",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -659,16 +1031,6 @@
         "description": "Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.",
         "operationId": "CustomersController_findAll",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "pageSize",
             "required": false,
@@ -716,6 +1078,16 @@
             "description": "Recherche par nom ou e-mail",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
             }
           }
         ],
@@ -873,6 +1245,15 @@
         "operationId": "CustomersController_findOne",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -880,15 +1261,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -923,6 +1295,15 @@
         "operationId": "CustomersController_update",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -930,15 +1311,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1020,16 +1392,6 @@
         "operationId": "CustomersController_remove",
         "parameters": [
           {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
-          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -1076,16 +1438,6 @@
         "description": "Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.",
         "operationId": "CustomersController_getPortalAudit",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "eventType",
             "required": false,
@@ -1143,6 +1495,15 @@
         "operationId": "CustomersController_getTransactions",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -1150,15 +1511,6 @@
             "schema": {
               "type": "string",
               "example": "acct_1234567890"
-            }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
             }
           }
         ],
@@ -1197,16 +1549,6 @@
         "description": "Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.",
         "operationId": "CustomersController_createPortalLaunchSession",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1486,7 +1828,7 @@
     },
     "/refunds": {
       "post": {
-        "description": "Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.",
+        "description": "Refunds a completed transaction (card, Wave, or MTN MoMo). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN MoMo requires a RequestToPay reference on the original transaction.",
         "operationId": "RefundsController_create",
         "parameters": [
           {
@@ -1500,6 +1842,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRefundDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Remboursement enregistré",
@@ -1526,16 +1878,6 @@
       "get": {
         "operationId": "RefundsController_findAll",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "offset",
             "required": false,
@@ -1575,6 +1917,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
           }
         ],
         "responses": {
@@ -1596,6 +1948,13 @@
         "operationId": "RefundsController_findOne",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Refund ID",
+            "schema": {}
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -1604,13 +1963,6 @@
               "type": "string",
               "example": "acct_1234567890"
             }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Refund ID",
-            "schema": {}
           }
         ],
         "responses": {
@@ -2213,16 +2565,6 @@
         "operationId": "CheckoutSessionsController_findAll",
         "parameters": [
           {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
-          {
             "name": "offset",
             "required": false,
             "in": "query",
@@ -2285,16 +2627,6 @@
         "description": "Renvoie le détail d’une session (statut, client et produits associés).",
         "operationId": "CheckoutSessionsController_findOne",
         "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2685,6 +3017,111 @@
         "tags": ["Payouts"]
       }
     },
+    "/settlements": {
+      "get": {
+        "description": "Returns completed payment totals grouped by availability date and currency. Each settlement_id is {currency}:{YYYY-MM-DD} (UTC date of available_at).",
+        "operationId": "SettlementsController_findAll",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settlement periods"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List settlement periods",
+        "tags": ["Settlements"]
+      }
+    },
+    "/settlements/{id}/transactions": {
+      "get": {
+        "description": "Returns completed transactions whose available_at falls on the settlement date for the given currency.",
+        "operationId": "SettlementsController_findTransactions",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Settlement id, format {currency}:{YYYY-MM-DD}",
+            "schema": {
+              "example": "XOF:2026-06-01"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transactions in settlement"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List transactions in a settlement period",
+        "tags": ["Settlements"]
+      }
+    },
     "/webhook-delivery-logs": {
       "get": {
         "description": "Renvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.",
@@ -3015,6 +3452,7 @@
     },
     "/charge/wave": {
       "post": {
+        "description": "Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.",
         "operationId": "ChargesController_createWaveCharge",
         "parameters": [
           {
@@ -3028,20 +3466,29 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWaveChargeDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Encaissement initié (corps JSON renvoyé par la fonction edge Wave)",
+            "description": "Wave charge initiated",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/WaveChargeResponseDto"
                 }
               }
             }
           },
           "400": {
-            "description": "Entrée invalide ou erreur API Wave"
+            "description": "Invalid input or Wave API error"
           }
         },
         "security": [
@@ -3049,12 +3496,13 @@
             "api-key": []
           }
         ],
-        "summary": "Lancer un encaissement direct Wave",
+        "summary": "Create direct Wave charge",
         "tags": ["Advanced Direct Charges"]
       }
     },
     "/charge/mtn": {
       "post": {
+        "description": "Initiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.",
         "operationId": "ChargesController_createMtnCharge",
         "parameters": [
           {
@@ -3068,14 +3516,23 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMtnChargeDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Encaissement MTN initié (RequestToPay)",
+            "description": "MTN charge initiated",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/MtnChargeResponseDto"
                 }
               }
             }
@@ -3086,13 +3543,13 @@
             "api-key": []
           }
         ],
-        "summary": "Lancer un encaissement direct MTN MoMo",
+        "summary": "Create MTN MoMo charge",
         "tags": ["Advanced Direct Charges"]
       }
     },
     "/charge/card": {
       "post": {
-        "description": "Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.",
+        "description": "Creates an embedded card charge and returns the client_secret for your payment UI.",
         "operationId": "ChargesController_createCardCharge",
         "parameters": [
           {
@@ -3118,7 +3575,7 @@
         },
         "responses": {
           "201": {
-            "description": "Encaissement carte créé",
+            "description": "Card charge created",
             "content": {
               "application/json": {
                 "schema": {
@@ -3133,7 +3590,7 @@
             "api-key": []
           }
         ],
-        "summary": "Créer un encaissement carte (client_secret)",
+        "summary": "Create card charge (client_secret)",
         "tags": ["Advanced Direct Charges"]
       }
     },
@@ -3142,6 +3599,13 @@
         "operationId": "ChargesController_getCardCharge",
         "parameters": [
           {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Card payment id (pi_...)",
+            "schema": {}
+          },
+          {
             "name": "Lomi-Account",
             "in": "header",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
@@ -3150,18 +3614,11 @@
               "type": "string",
               "example": "acct_1234567890"
             }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Card payment id (pi_...)",
-            "schema": {}
           }
         ],
         "responses": {
           "200": {
-            "description": "Encaissement carte",
+            "description": "Card charge",
             "content": {
               "application/json": {
                 "schema": {
@@ -3176,7 +3633,7 @@
             "api-key": []
           }
         ],
-        "summary": "Obtenir un encaissement carte",
+        "summary": "Retrieve card charge",
         "tags": ["Advanced Direct Charges"]
       }
     },
@@ -3184,6 +3641,13 @@
       "post": {
         "operationId": "ChargesController_cancelCardCharge",
         "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Card payment id (pi_...)",
+            "schema": {}
+          },
           {
             "name": "Lomi-Account",
             "in": "header",
@@ -3193,18 +3657,11 @@
               "type": "string",
               "example": "acct_1234567890"
             }
-          },
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Card payment id (pi_...)",
-            "schema": {}
           }
         ],
         "responses": {
           "200": {
-            "description": "Encaissement carte annulé"
+            "description": "Card charge cancelled"
           }
         },
         "security": [
@@ -3212,8 +3669,458 @@
             "api-key": []
           }
         ],
-        "summary": "Annuler un encaissement carte",
+        "summary": "Cancel card charge",
         "tags": ["Advanced Direct Charges"]
+      }
+    },
+    "/meters": {
+      "post": {
+        "description": "Defines a billable metric for usage-based products. Events with matching code update meter balances.",
+        "operationId": "MetersController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeterResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a meter",
+        "tags": ["Meters"]
+      },
+      "get": {
+        "operationId": "MetersController_findAll",
+        "parameters": [
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "productId",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MeterResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List meters",
+        "tags": ["Meters"]
+      }
+    },
+    "/meters/{id}": {
+      "patch": {
+        "operationId": "MetersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Meter ID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeterResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Update a meter",
+        "tags": ["Meters"]
+      },
+      "get": {
+        "operationId": "MetersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Meter ID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeterResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a meter",
+        "tags": ["Meters"]
+      }
+    },
+    "/meters/{id}/balances/{customerId}": {
+      "get": {
+        "description": "Returns aggregated consumed units for the meter and customer.",
+        "operationId": "MetersController_getBalance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeterBalanceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get meter balance for a customer",
+        "tags": ["Meters"]
+      }
+    },
+    "/usage-events": {
+      "get": {
+        "operationId": "UsageEventsController_findAll",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["pending", "processed", "failed"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "customer_id",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsageEventListItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List usage events",
+        "tags": ["Usage events"]
+      },
+      "post": {
+        "description": "Idempotent usage ingest. Events are processed asynchronously and update meter balances.",
+        "operationId": "UsageEventsController_ingest",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageEventResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Record a usage event",
+        "tags": ["Usage events"]
+      }
+    },
+    "/usage-events/{id}": {
+      "get": {
+        "operationId": "UsageEventsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Event ID",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageEventListItemDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a usage event",
+        "tags": ["Usage events"]
+      }
+    },
+    "/usage-subscriptions": {
+      "post": {
+        "description": "Enrolls a customer on a usage_based product without an upfront charge. Required before billing metered usage.",
+        "operationId": "UsageEventsController_createUsageSubscription",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageSubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a usage subscription",
+        "tags": ["Usage events"]
+      }
+    },
+    "/usage-billing/periods": {
+      "get": {
+        "operationId": "UsageBillingController_listPeriods",
+        "parameters": [
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "subscription_id",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List usage billing periods",
+        "tags": ["Usage billing"]
+      }
+    },
+    "/usage-billing/subscriptions/{subscriptionId}/usage": {
+      "get": {
+        "operationId": "UsageBillingController_getSubscriptionUsage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get meter usage for a subscription",
+        "tags": ["Usage billing"]
+      }
+    },
+    "/usage-billing/revenue": {
+      "get": {
+        "operationId": "UsageBillingController_getRevenue",
+        "parameters": [
+          {
+            "name": "end_date",
+            "required": true,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "start_date",
+            "required": true,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Combined MRR + usage + one-time revenue metrics",
+        "tags": ["Usage billing"]
+      }
+    },
+    "/usage-billing/credits": {
+      "post": {
+        "operationId": "UsageBillingController_creditWallet",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Credit prepaid usage units to a customer meter wallet",
+        "tags": ["Usage billing"]
+      }
+    },
+    "/usage-billing/entitlements": {
+      "post": {
+        "operationId": "UsageBillingController_createEntitlement",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create or update a plan entitlement feature",
+        "tags": ["Usage billing"]
+      }
+    },
+    "/usage-billing/entitlements/check": {
+      "get": {
+        "operationId": "UsageBillingController_checkEntitlement",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Check if a customer has an active entitlement",
+        "tags": ["Usage billing"]
       }
     }
   },
@@ -3240,6 +4147,9 @@
       "name": "Discount Coupons"
     },
     {
+      "name": "Meters"
+    },
+    {
       "name": "Payment Links"
     },
     {
@@ -3259,6 +4169,12 @@
     },
     {
       "name": "Transactions"
+    },
+    {
+      "name": "Usage billing"
+    },
+    {
+      "name": "Usage events"
     },
     {
       "name": "Webhooks"
@@ -3355,6 +4271,342 @@
           "total_balance",
           "target_currency"
         ]
+      },
+      "OrganizationResponseDto": {
+        "type": "object",
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique organization identifier"
+          },
+          "name": {
+            "type": "string",
+            "example": "Acme Inc",
+            "description": "Organization name"
+          },
+          "email": {
+            "type": "string",
+            "example": "contact@acme.com",
+            "description": "Organization email"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+221771234567",
+            "description": "Organization phone number"
+          },
+          "verification_status": {
+            "type": "string",
+            "example": "verified",
+            "enum": ["unverified", "starter", "verified"],
+            "description": "KYC verification status"
+          },
+          "website_url": {
+            "type": "string",
+            "example": "https://acme.com",
+            "description": "Organization website"
+          },
+          "logo_url": {
+            "type": "string",
+            "example": "https://cdn.lomi.africa/logos/acme.png",
+            "description": "Organization logo URL"
+          },
+          "status": {
+            "type": "string",
+            "example": "active",
+            "enum": ["active", "inactive", "suspended"],
+            "description": "Organization status"
+          },
+          "default_currency": {
+            "type": "string",
+            "example": "XOF",
+            "enum": ["XOF", "USD", "EUR"],
+            "description": "Default currency"
+          },
+          "slug": {
+            "type": "string",
+            "example": "acme-inc",
+            "description": "URL-friendly slug"
+          },
+          "storefront_enabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether storefront is enabled"
+          },
+          "total_revenue": {
+            "type": "number",
+            "example": 250000,
+            "description": "Total revenue generated"
+          },
+          "total_transactions": {
+            "type": "number",
+            "example": 1234,
+            "description": "Total transaction count"
+          },
+          "total_merchants": {
+            "type": "number",
+            "example": 5,
+            "description": "Total merchant count"
+          },
+          "total_customers": {
+            "type": "number",
+            "example": 567,
+            "description": "Total customer count"
+          },
+          "mrr": {
+            "type": "number",
+            "example": 50000,
+            "description": "Monthly Recurring Revenue"
+          },
+          "arr": {
+            "type": "number",
+            "example": 600000,
+            "description": "Annual Recurring Revenue"
+          },
+          "merchant_lifetime_value": {
+            "type": "number",
+            "example": 150000,
+            "description": "Average Customer Lifetime Value"
+          },
+          "employee_number": {
+            "type": "string",
+            "example": "10-50",
+            "description": "Number of employees"
+          },
+          "industry": {
+            "type": "string",
+            "example": "Technology",
+            "description": "Industry sector"
+          },
+          "has_payout_pin": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether a payout PIN is configured (not the PIN value)"
+          },
+          "is_starter_business": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this is a starter business"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "custom_field": "value"
+            },
+            "description": "Additional metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Organization creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Last update timestamp"
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether organization is soft-deleted"
+          },
+          "deleted_at": {
+            "type": "string",
+            "example": null,
+            "description": "Deletion timestamp if deleted"
+          }
+        },
+        "required": [
+          "organization_id",
+          "name",
+          "email",
+          "phone_number",
+          "verification_status",
+          "status",
+          "default_currency",
+          "storefront_enabled",
+          "total_revenue",
+          "total_transactions",
+          "total_merchants",
+          "total_customers",
+          "mrr",
+          "arr",
+          "merchant_lifetime_value",
+          "is_starter_business",
+          "created_at",
+          "updated_at",
+          "is_deleted"
+        ]
+      },
+      "OrganizationMetricsResponseDto": {
+        "type": "object",
+        "properties": {
+          "mrr": {
+            "type": "number",
+            "example": 50000,
+            "description": "Monthly Recurring Revenue in default currency"
+          },
+          "arr": {
+            "type": "number",
+            "example": 600000,
+            "description": "Annual Recurring Revenue in default currency"
+          },
+          "total_revenue": {
+            "type": "number",
+            "example": 250000,
+            "description": "Total revenue generated"
+          },
+          "total_transactions": {
+            "type": "number",
+            "example": 1234,
+            "description": "Total number of transactions"
+          },
+          "total_customers": {
+            "type": "number",
+            "example": 567,
+            "description": "Total number of customers"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code for all monetary values"
+          },
+          "calculated_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "When these metrics were calculated"
+          }
+        },
+        "required": [
+          "mrr",
+          "arr",
+          "total_revenue",
+          "total_transactions",
+          "total_customers",
+          "currency_code",
+          "calculated_at"
+        ]
+      },
+      "MerchantResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string",
+            "example": "904d003c-3736-41d4-90a5-9de74d404fd7"
+          },
+          "name": {
+            "type": "string",
+            "example": "Test Merchant"
+          },
+          "email": {
+            "type": "string",
+            "example": "merchant@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+123456789"
+          },
+          "country": {
+            "type": "string",
+            "example": "SN"
+          },
+          "mrr": {
+            "type": "number",
+            "example": 50000
+          },
+          "arr": {
+            "type": "number",
+            "example": 600000
+          },
+          "merchant_lifetime_value": {
+            "type": "number",
+            "example": 1200000
+          },
+          "retry_payment_every": {
+            "type": "number",
+            "example": 3
+          },
+          "total_retries": {
+            "type": "number",
+            "example": 5
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "merchant_id",
+          "name",
+          "email",
+          "mrr",
+          "arr",
+          "merchant_lifetime_value",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "MerchantMrrResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string"
+          },
+          "mrr": {
+            "type": "number"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        },
+        "required": ["merchant_id", "mrr", "currency_code", "as_of_date"]
+      },
+      "MerchantArrResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string"
+          },
+          "arr": {
+            "type": "number"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        },
+        "required": ["merchant_id", "arr", "currency_code", "as_of_date"]
+      },
+      "MerchantBalanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "as_of_date": {
+            "type": "string"
+          }
+        },
+        "required": ["merchant_id", "currency_code", "balance", "as_of_date"]
       },
       "SubscriptionResponseDto": {
         "type": "object",
@@ -4000,6 +5252,56 @@
           "updated_at"
         ]
       },
+      "CreateRefundDto": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "description": "UUID of a completed transaction (card, Wave, or MTN MoMo)",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Amount to refund (same currency as the transaction)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for the refund"
+          },
+          "refund_type": {
+            "type": "string",
+            "description": "Full or partial refund. If omitted, full when amount equals transaction gross amount.",
+            "enum": ["full", "partial"]
+          },
+          "subscription_action": {
+            "type": "string",
+            "description": "Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none.",
+            "enum": ["default", "cancel", "pause", "none"]
+          }
+        },
+        "required": ["transaction_id", "amount"]
+      },
+      "RefundSubscriptionActionDto": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "type": "boolean"
+          },
+          "action": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "previous_status": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
       "CreateRefundResponseDto": {
         "type": "object",
         "properties": {
@@ -4026,6 +5328,19 @@
           "message": {
             "type": "string",
             "example": "Refund recorded. Customer credit is processed by our team."
+          },
+          "subscription_action": {
+            "description": "Subscription side-effect applied after refund (if transaction was linked to a subscription).",
+            "example": {
+              "applied": true,
+              "action": "cancel",
+              "subscription_id": "sub-uuid"
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RefundSubscriptionActionDto"
+              }
+            ]
           }
         },
         "required": [
@@ -5059,6 +6374,211 @@
           "webhook_id"
         ]
       },
+      "CustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "jane@example.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "+2250707070707",
+            "description": "E.164 phone number required for mobile-money rails"
+          }
+        },
+        "required": ["name", "phoneNumber"]
+      },
+      "CreateWaveChargeDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 1000,
+            "description": "Amount in XOF (minimum 100)"
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Must be XOF for Wave"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerDto"
+          },
+          "description": {
+            "type": "string",
+            "example": "Payment for Service"
+          },
+          "successUrl": {
+            "type": "string",
+            "example": "https://your-site.com/success"
+          },
+          "errorUrl": {
+            "type": "string",
+            "example": "https://your-site.com/error"
+          },
+          "environment": {
+            "type": "string",
+            "enum": ["live", "test"]
+          }
+        },
+        "required": ["amount", "currency", "customer"]
+      },
+      "ChargeNextActionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["redirect", "await_webhook", "client_secret"],
+            "description": "How the client should proceed: open a URL, wait for webhook/status, or confirm with client_secret."
+          },
+          "url": {
+            "type": "string",
+            "description": "Present when type is redirect."
+          },
+          "status": {
+            "type": "string",
+            "description": "Present when type is await_webhook (e.g. PENDING, completed)."
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "Present when type is client_secret."
+          }
+        },
+        "required": ["type"]
+      },
+      "WaveChargeResponseDto": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "wave_launch_url": {
+            "type": "string",
+            "example": "https://pay.wave.com/c/abc123",
+            "description": "URL to open Wave so the customer can approve the payment."
+          },
+          "checkout_url": {
+            "type": "string",
+            "example": "https://checkout.lomi.africa/checkout/wave/abc123"
+          },
+          "status": {
+            "type": "string",
+            "example": "pending"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Nested session data when returned by the edge function."
+          },
+          "next_action": {
+            "$ref": "#/components/schemas/ChargeNextActionDto"
+          }
+        }
+      },
+      "CreateMtnChargeDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 1000
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "merchantId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerDto"
+          },
+          "description": {
+            "type": "string",
+            "example": "Payment for Service"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "CI"
+          },
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1,
+            "default": 1
+          }
+        },
+        "required": ["amount", "currency", "customer"]
+      },
+      "MtnChargeDataDto": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "external_id": {
+            "type": "string",
+            "example": "ext_abc123"
+          },
+          "reference_id": {
+            "type": "string",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING",
+            "description": "Test keys return `completed` immediately; live returns `PENDING` until the customer approves."
+          }
+        },
+        "required": ["transaction_id", "external_id", "status"]
+      },
+      "MtnChargeResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/MtnChargeDataDto"
+          },
+          "next_action": {
+            "$ref": "#/components/schemas/ChargeNextActionDto"
+          }
+        },
+        "required": ["success", "data"]
+      },
       "CreateCardChargeDto": {
         "type": "object",
         "properties": {
@@ -5224,9 +6744,182 @@
           },
           "data": {
             "$ref": "#/components/schemas/CardChargeDataDto"
+          },
+          "next_action": {
+            "$ref": "#/components/schemas/ChargeNextActionDto"
           }
         },
         "required": ["success", "data"]
+      },
+      "MeterResponseDto": {
+        "type": "object",
+        "properties": {
+          "meter_id": {
+            "type": "string"
+          },
+          "organization_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "filter": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "aggregation": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "meter_id",
+          "organization_id",
+          "name",
+          "filter",
+          "aggregation",
+          "is_active",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "MeterBalanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "balance_id": {
+            "type": "string"
+          },
+          "meter_id": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "consumed_units": {
+            "type": "number"
+          },
+          "credited_units": {
+            "type": "number"
+          },
+          "balance": {
+            "type": "number"
+          },
+          "last_event_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "updated_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "balance_id",
+          "meter_id",
+          "customer_id",
+          "consumed_units",
+          "credited_units",
+          "balance",
+          "updated_at"
+        ]
+      },
+      "UsageEventListItemDto": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string"
+          },
+          "transaction_id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "meter_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "processing_status": {
+            "type": "string",
+            "enum": ["pending", "processed", "failed"]
+          },
+          "error_message": {
+            "type": "string",
+            "nullable": true
+          },
+          "occurred_at": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "total_count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "event_id",
+          "transaction_id",
+          "code",
+          "customer_id",
+          "quantity",
+          "processing_status",
+          "occurred_at",
+          "created_at"
+        ]
+      },
+      "UsageEventResponseDto": {
+        "type": "object",
+        "properties": {
+          "event_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processed", "failed"]
+          },
+          "meter_id": {
+            "type": "string"
+          },
+          "subscription_id": {
+            "type": "string"
+          },
+          "quantity_applied": {
+            "type": "number"
+          }
+        },
+        "required": ["event_id", "status"]
+      },
+      "UsageSubscriptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string"
+          }
+        },
+        "required": ["subscription_id"]
       }
     }
   }

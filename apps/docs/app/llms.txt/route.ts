@@ -6,6 +6,16 @@ import { source } from '@/lib/utils/source';
 
 export const revalidate = false;
 
+/** Slugs referenced in llms.txt output (validated by `pnpm docs:drift`). */
+const LLMS_CURATED_SLUGS = [
+  'start/integration-journey',
+  'build/guides/verify-payments',
+  'build/guides/payment-lifecycle',
+  'build/guides/payment-methods',
+  'api/payment-state-machine',
+] as const;
+void LLMS_CURATED_SLUGS;
+
 function sectionTitleFromFolder(folder: string): string {
   return folder
     .replace(/[-_]+/g, ' ')
@@ -50,14 +60,24 @@ export async function GET() {
     '1. Read **Authentication** and **Integration quickstart** below.',
   );
   lines.push(
-    '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, or payouts).',
+    '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, usage billing, or payouts).',
   );
   lines.push(
-    `3. Use the [REST API hub](${docsOrigin}/api/index) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
+    `3. Use the [REST API hub](${docsOrigin}/api) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
   );
   lines.push('');
 
   lines.push('## Integration quickstart');
+  lines.push('');
+  lines.push(
+    '- **Amounts (XOF):** integer **centimes** (minor units) unless a field documents otherwise.',
+  );
+  lines.push(
+    '- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…` — the **API key selects sandbox vs live**, not the hostname alone.',
+  );
+  lines.push(
+    '- **Verify server-side before fulfill:** never trust client-only success; use webhooks + `GET /transactions/{id}`.',
+  );
   lines.push('');
   lines.push(
     '1. Create a merchant account and API keys in the [dashboard](https://dashboard.lomi.africa).',
@@ -65,19 +85,49 @@ export async function GET() {
   lines.push(
     '2. Build against **sandbox** first (`https://sandbox.api.lomi.africa`), then switch to **live** (`https://api.lomi.africa`) with live keys.',
   );
-  const integrationPage = pageBySlugPath(pages, 'reference/setup/integration');
-  const createAccountPage = pageBySlugPath(
-    pages,
-    'core/fundamentals/create-account',
+  lines.push(
+    '3. **Default integration path:** hosted checkout sessions or payment links before direct `/charge/*` calls unless you need a custom server-initiated flow.',
   );
-  if (integrationPage) {
+  lines.push(
+    '4. **Environment is determined by the API key**, not the hostname alone—sandbox keys only work against sandbox; live keys only against live.',
+  );
+  lines.push(
+    '5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.',
+  );
+  const integrationJourney = pageBySlugPath(pages, 'start/integration-journey');
+  const paymentMethodsHub = pageBySlugPath(
+    pages,
+    'build/guides/payment-methods',
+  );
+  const verifyPayments = pageBySlugPath(pages, 'build/guides/verify-payments');
+  const paymentLifecycle = pageBySlugPath(
+    pages,
+    'build/guides/payment-lifecycle',
+  );
+  const sandboxPayments = pageBySlugPath(pages, 'start/sandbox-payments');
+  if (integrationJourney) {
     lines.push(
-      `3. Follow the [integration overview](${docsOrigin}${integrationPage.url}) for headers, environments, and product choices.`,
+      `6. Follow the [integration journey](${docsOrigin}${integrationJourney.url}) for sandbox → webhooks → go-live.`,
     );
   }
-  if (createAccountPage) {
+  if (verifyPayments) {
     lines.push(
-      `4. If you have not already, see [${createAccountPage.data.title ?? 'Create account'}](${docsOrigin}${createAccountPage.url}).`,
+      `- [${verifyPayments.data.title ?? 'Verify payments'}](${docsOrigin}${verifyPayments.url}) — confirm status before fulfilling.`,
+    );
+  }
+  if (paymentLifecycle) {
+    lines.push(
+      `- [${paymentLifecycle.data.title ?? 'Payment lifecycle'}](${docsOrigin}${paymentLifecycle.url}) — merchant-facing lifecycle hub.`,
+    );
+  }
+  if (paymentMethodsHub) {
+    lines.push(
+      `- Supported countries and rails: [${paymentMethodsHub.data.title ?? 'Payment methods'}](${docsOrigin}${paymentMethodsHub.url}).`,
+    );
+  }
+  if (sandboxPayments) {
+    lines.push(
+      `- Test cards and MoMo sandbox behavior: [${sandboxPayments.data.title ?? 'Sandbox payments'}](${docsOrigin}${sandboxPayments.url}).`,
     );
   }
   lines.push('');
@@ -85,7 +135,7 @@ export async function GET() {
   lines.push('## Authentication and environments');
   lines.push('');
   lines.push(
-    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**.',
+    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live—not the request URL alone.**',
   );
   lines.push('');
   lines.push('- **Sandbox base URL**: `https://sandbox.api.lomi.africa`');
@@ -108,7 +158,7 @@ export async function GET() {
   lines.push('## Payment flows (pick one)');
   lines.push('');
   lines.push(
-    'Choose the path that matches your UX—not every merchant needs every API.',
+    'Choose the path that matches your UX—not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.',
   );
   lines.push('');
   const hostedCheckout = pages.find(
@@ -157,6 +207,15 @@ export async function GET() {
       `- **Subscriptions** → explore [${subList.data.title ?? 'Subscriptions'}](${docsOrigin}${subList.url}) (list, cancel, per-customer).`,
     );
   }
+  const usageBillingGuide = pageBySlugPath(pages, 'build/usage-billing');
+  const metersCreate = pages.find(
+    (p) => p.slugs[2] === 'MetersController_create',
+  );
+  if (usageBillingGuide && metersCreate) {
+    lines.push(
+      `- **Usage billing (metered products)** → [${usageBillingGuide.data.title ?? 'Usage billing'}](${docsOrigin}${usageBillingGuide.url}) — meters, usage events, billing periods ([Create meter](${docsOrigin}${metersCreate.url})).`,
+    );
+  }
   const payouts = firstApiPageInFolder(pages, 'payouts');
   if (payouts) {
     lines.push(
@@ -174,7 +233,7 @@ export async function GET() {
   lines.push('## REST API by domain');
   lines.push('');
   lines.push(
-    `Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](${docsOrigin}/api/index).`,
+    `Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](${docsOrigin}/api).`,
   );
   lines.push('');
   for (const folder of REST_API_SECTION_ORDER) {
@@ -189,23 +248,43 @@ export async function GET() {
 
   lines.push('## Guides to read next');
   lines.push('');
-  const whatIs = pageBySlugPath(pages, 'core/introduction/what-is-lomi');
+  const whatIs = pageBySlugPath(pages, 'start/overview');
   if (whatIs) {
     lines.push(
       `- [${whatIs.data.title ?? 'What is lomi.?'}](${docsOrigin}${whatIs.url})`,
     );
   }
-  const psm = pages.find(
-    (p) =>
-      p.url.includes('payment-state-machine') ||
-      p.slugs.join('/').includes('payment-state-machine'),
-  );
+  if (integrationJourney) {
+    lines.push(
+      `- [${integrationJourney.data.title ?? 'Integration journey'}](${docsOrigin}${integrationJourney.url})`,
+    );
+  }
+  if (verifyPayments) {
+    lines.push(
+      `- [${verifyPayments.data.title ?? 'Verify payments'}](${docsOrigin}${verifyPayments.url})`,
+    );
+  }
+  if (paymentLifecycle) {
+    lines.push(
+      `- [${paymentLifecycle.data.title ?? 'Payment lifecycle'}](${docsOrigin}${paymentLifecycle.url})`,
+    );
+  }
+  if (paymentMethodsHub) {
+    lines.push(
+      `- [${paymentMethodsHub.data.title ?? 'Payment methods'}](${docsOrigin}${paymentMethodsHub.url})`,
+    );
+  }
+  const psm = pageBySlugPath(pages, 'api/payment-state-machine');
   if (psm) {
     lines.push(
       `- [${psm.data.title ?? 'Payment state machine'}](${docsOrigin}${psm.url}) — status transitions and balances`,
     );
+  } else {
+    lines.push(
+      `- [Payment state machine](${docsOrigin}/api/payment-state-machine) — status transitions and balances`,
+    );
   }
-  const mcp = pageBySlugPath(pages, 'reference/integrations/mcp');
+  const mcp = pageBySlugPath(pages, 'build/ecommerce-extensions/mcp');
   if (mcp) {
     lines.push(`- [${mcp.data.title ?? 'MCP'}](${docsOrigin}${mcp.url})`);
   }
@@ -217,7 +296,7 @@ export async function GET() {
     'Prefer section sidebars on the docs site for exhaustive lists. High-level areas:',
   );
   lines.push('');
-  const catOrder = ['core', 'reference', 'api', 'openapi'];
+  const catOrder = ['start', 'build', 'api', 'resources'];
   const byCat = new Map<
     string,
     { title: string; url: string; description?: string }[]
@@ -279,7 +358,7 @@ export async function GET() {
   lines.push('## Common questions');
   lines.push('');
   lines.push(
-    `**Where do schemas live?** Use the [REST API](${docsOrigin}/api/index) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
+    `**Where do schemas live?** Use the [REST API](${docsOrigin}/api) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
   );
   const txHub = firstApiPageInFolder(pages, 'transactions');
   if (txHub) {

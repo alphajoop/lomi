@@ -116,6 +116,9 @@ async fn run_list(args: ListArgs) -> Result<()> {
     }
 
     println!();
+    if let Some(name) = &index.name {
+        cli::output::print_dim(&format!("Registry: {name}"));
+    }
     if let Some(version) = &index.version {
         cli::output::print_dim(&format!("Registry version: {version}"));
     }

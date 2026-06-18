@@ -8,6 +8,7 @@ import { SupabaseService } from '../../../utils/supabase/supabase.service';
 import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
+import { maybeNotifySubscriptionRenewed } from '../../subscription-webhook.helper';
 import { WebhookEvent } from '../../../utils/types/api';
 import * as crypto from 'crypto';
 
@@ -872,7 +873,16 @@ export class WaveWebhookService {
         return;
       }
 
-      const transactionData = txnData as any;
+      const transactionData = txnData as Record<string, unknown>;
+
+      await maybeNotifySubscriptionRenewed(
+        this.supabase,
+        this.webhookSender,
+        organizationId,
+        transactionData,
+        event,
+        this.logger,
+      );
 
       sanitizeMerchantWebhookTransactionPayload(transactionData);
 

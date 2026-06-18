@@ -7,7 +7,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Balances are updated when a transaction reaches **`completed`**. This page describes the model implemented in balance update logic (including XOF normalization for treasury).
 
-![Placeholder balance dashboard](/placeholder.webp)
+<DocsScreenshot name="build/balance" alt="Merchant balance and settlement overview in the dashboard" />
 
 <Callout type="info">
   In the **test** environment, completed payments credit your **dashboard test balance** only—they do not update live withdrawable balances or platform treasury. See **[Sandbox payments](/start/sandbox-payments)**.
@@ -37,6 +37,17 @@ Internal treasury tracking often **normalizes amounts to XOF** for consistency:
 
 Exact API fields for “available” vs “pending” balances are exposed in [Balances](/api/balances).
 
+## Settlement periods (API)
+
+Funds become withdrawable when `available_at` passes. For accounting, group completed payments by **availability date** and currency:
+
+- **`GET /settlements`** — list periods with gross, fee, and net totals per `{currency}:{YYYY-MM-DD}` (UTC date of `available_at`).
+- **`GET /settlements/{id}/transactions`** — line items for one period; sums should match the period totals.
+
+`status` on each period is `available` when all underlying transactions are past `available_at`, otherwise `pending`. This is org-scoped reconciliation—not the same as provider payout batches from Paystack or Flutterwave.
+
+See [List settlement periods](/api/settlements/SettlementsController_findAll) and [List settlement transactions](/api/settlements/SettlementsController_findTransactions).
+
 ## Coupons and completion
 
 Coupon redemption counts typically advance when the transaction completes, not when the coupon is merely typed at checkout.
@@ -44,5 +55,6 @@ Coupon redemption counts typically advance when the transaction completes, not w
 ## Related pages
 
 - [Payment state machine](/api/payment-state-machine)
+- [List settlement periods](/api/settlements/SettlementsController_findAll)
 - [Payout lifecycle](/build/payments/payout-lifecycle)
 - [Discount Coupons](/build/discount-coupons)

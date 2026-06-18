@@ -58,8 +58,8 @@ const lomi = new LomiSDK({
 
 async function main() {
   try {
-    const accounts = await lomi.accounts.list();
-    console.log('Comptes :', accounts);
+    const balance = await lomi.accounts.getBalance();
+    console.log('Solde :', balance);
   } catch (error) {
     if (error instanceof LomiError) {
       console.error(`Erreur API [${error.status}] : ${error.message}`);

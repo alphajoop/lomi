@@ -1,0 +1,82 @@
+---
+title: Writing the docs
+description: Editorial contract for hand-authored guides, API pages, and agent-oriented documentation on docs.lomi.africa.
+docType: explanation
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+This page is the **canonical writing contract** for lomi. developer documentation. It merges the API style contract, Diátaxis doc types, and brand rules used across the monorepo.
+
+<Callout type="info">
+  Agents: install the condensed rule with `lomi install-rules --target cursor` (includes **Docs writing**). Always read [llms.txt](https://docs.lomi.africa/llms.txt) before integrating.
+</Callout>
+
+## Brand and naming
+
+| Context | Form |
+| --- | --- |
+| Product in prose | **lomi.** (with trailing dot) |
+| npm package | `@lomi./sdk` |
+| Hostnames | `lomi.africa`, `docs.lomi.africa`, `api.lomi.africa` (no trailing dot) |
+
+## Diátaxis doc types
+
+Set `docType` in frontmatter on new guide pages:
+
+| Type | Use for | Examples |
+| --- | --- | --- |
+| `tutorial` | Linear learning path | [Integration journey](/start/integration-journey) |
+| `how-to` | Task-focused steps | [Verify payments](/build/guides/verify-payments) |
+| `explanation` | Concepts and trade-offs | [Choose integration](/build/choose-integration), [Payment state machine](/api/payment-state-machine) |
+| `reference` | Schemas and endpoints | REST API operation pages |
+
+## Voice and structure
+
+- **Direct and confident** — "Creates…", "Returns…", not "This endpoint allows you to…".
+- **Merchant-centric** — status codes, idempotency, async mobile money, webhook requirements.
+- **Question-led titles** for Build guides when possible.
+- **No filler** — avoid "seamless", "robust", "powerful" without a concrete behavior.
+
+Hand-authored guides should link to canonical references instead of duplicating tables (e.g. point to [Sandbox payments](/start/sandbox-payments) for test cards).
+
+## Integration truths (repeat in guides)
+
+- Amounts in **XOF** use **centimes** (integer minor units) unless a specific API field documents otherwise.
+- **API key determines environment** — `lomi_sk_test_…` vs `lomi_sk_live_…`; wrong key against an environment returns **401**.
+- **Live mobile money is asynchronous** — confirm with webhooks and `GET /transactions/{id}` before fulfilling orders.
+- **Never trust client-only success** — see [Verify payments](/build/guides/verify-payments).
+
+## Bilingual policy
+
+Every English page under `content/docs/` (`.mdx` without a locale suffix) requires a **French** sibling (`.fr.mdx`). Spanish (`.es.mdx`) and Chinese (`.zh.mdx`) pages are optional locale variants. `pnpm docs:drift` enforces EN/FR parity.
+
+## Generated REST pages
+
+See [API reference authoring](/resources/contributing/api-reference-authoring) and `apps/docs/lib/scripts/manual-api/DOC-STYLE-CONTRACT.md` for operation page structure, banned OpenAPI phrasing, and `EN_OPERATION_COPY` maintenance.
+
+## Anchor pages to imitate
+
+- [Sandbox payments](/start/sandbox-payments)
+- [Choose integration](/build/choose-integration)
+- [Handling webhooks](/build/advanced-guides/handling-webhooks)
+- [Payment state machine](/api/payment-state-machine)
+
+## Drift checks
+
+Before merging docs changes:
+
+```bash
+cd apps/docs && pnpm lint && pnpm docs:drift
+```
+
+From the monorepo root:
+
+```bash
+lomi docs check
+```
+
+## Related
+
+- [CORE-38 design brief](https://github.com/lomiafrica/lomi.) — `apps/design/docs/note.md` in the monorepo
+- [Install agent rules](/build/cli/install-rules)

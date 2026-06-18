@@ -1,0 +1,9 @@
+{
+  "title": "Platform",
+  "description": "Manage customers, merchants, and organizations with the lomi. API.",
+  "pages": [
+    "customers",
+    "merchants",
+    "organizations"
+  ]
+}

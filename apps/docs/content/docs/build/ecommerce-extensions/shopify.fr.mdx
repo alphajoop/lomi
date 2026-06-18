@@ -1,42 +1,63 @@
 ---
 title: Shopify
 description:
-  Application Shopify basée sur le modèle Remix — en cours. Contrat différent
-  des plugins WooCommerce / Magento / PrestaShop (sessions checkout uniquement).
+  Installer l’app lomi. Shopify (installation personnalisée), activer le paiement
+  panier et accepter mobile money et cartes via sessions checkout et webhooks signés.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
 # Shopify
 
-<Callout type="warn">
-  **En cours.** La documentation marchande pour Lomi sur Shopify n’est pas terminée. Le dépôt repose sur le **Shopify App Template (Remix)** officiel, avec stockage de session Supabase et configuration Lomi — le comportement et les consignes d’exploitation peuvent encore évoluer.
+L’app lomi. pour Shopify permet aux marchands d’accepter **Wave, mobile money, cartes et plus** depuis la **page panier** via le checkout hébergé lomi. Les commandes Shopify sont créées en **brouillon avant la redirection** et finalisées au succès du paiement.
+
+<Callout type="info">
+  Il s’agit d’une intégration **contournement panier**, distribuée en **installation personnalisée**. Ce n’est pas un moyen de paiement natif au checkout Shopify et ce n’est pas une app de paiement sur l’App Store.
 </Callout>
 
-## Périmètre actuel
+## Prérequis
 
-L’application dans [`apps/plugins/shopify`](https://github.com/lomiafrica/lomi./tree/master/apps/plugins/shopify) couvre notamment :
+- Boutique Shopify avec l’app lomi. installée (lien d’installation personnalisé)
+- Compte marchand lomi. avec **clé secrète API** et **secret de signature webhook**
+- Devise boutique prise en charge par lomi. (ex. **XOF**, **USD**, **EUR**)
 
-- **OAuth Shopify** et admin embarqué via `@shopify/shopify-app-remix`
-- **Supabase** pour les sessions Shopify et les réglages marchands Lomi (voir README **Application Storage**)
-- Développement local **Shopify CLI / Remix** et déploiement
+## Installation
 
-Elle ne reproduit pas encore le même récit **session de checkout hébergée + webhook tableau de bord** que WooCommerce, Magento et PrestaShop décrit dans le [contrat d’intégration des plugins](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_CONTRACT.md).
+### Depuis le tableau de bord lomi. (recommandé)
 
-## Où regarder aujourd’hui
+1. [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Paramètres → Canaux de paiement → Intégrations**.
+2. Activez **Shopify**, saisissez votre domaine (`ma-boutique.myshopify.com`).
+3. Cliquez **Installer sur Shopify** pour lancer OAuth.
+4. Après installation, ouvrez l’app → **Settings** → clés API lomi.
 
-- README du dépôt (démarrage rapide, variables d’environnement, pièges webhooks) : [shopify/README.md](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/shopify/README.md)
-- Modèle de gestion des webhooks obligatoires (template) : `app/routes/webhooks` (liens dans le README)
+URL d’installation : `https://connect.lomi.africa/install?shop={boutique}.myshopify.com`
 
-## Documentation prévue (en cours)
+## Checklist de configuration
 
-Quand cette page ne sera plus « en cours », elle devrait couvrir :
+1. Collez la **clé secrète** et le **secret webhook** dans les réglages de l’app.
+2. Dans [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Webhooks**, créez un endpoint :
+   - URL : `{hôte_app}/api/webhooks/lomi/payment-success`
+   - Événement : **`PAYMENT_SUCCEEDED`**
+3. Choisissez le **mode de livraison** : sous-total seul ou sous-total + **frais de port fixes**.
+4. Dans **Boutique en ligne → Thèmes → Personnaliser → Panier**, ajoutez le bloc **Pay with lomi.** et enregistrez.
+5. Testez avec un panier contenant plusieurs articles.
 
-- Onboarding marchand (clés, environnements, APIs Lomi utilisées)
-- Sujets webhook Shopify requis et pièges **HMAC** (création admin vs abonnements gérés par l’app)
-- Correspondance commandes / paiements Shopify avec transactions Lomi et rapprochement
+## Flux de paiement
+
+1. Le client clique **Payer avec lomi.** sur le panier.
+2. Le bloc lit `/cart.js` et appelle **`POST /apps/lomi/cart-pay`** (proxy d’app signé).
+3. L’app crée un **brouillon de commande** Shopify avec toutes les lignes.
+4. L’app crée une **session checkout** lomi. (montant = total du brouillon).
+5. Paiement sur lomi. → webhook **`PAYMENT_SUCCEEDED`** → finalisation du brouillon.
+6. Page **`/shopify/order-complete`** : panier vidé, référence commande affichée.
+
+## Limitations
+
+- Pas de paiement natif au checkout Shopify.
+- Pas de tarifs de livraison dynamiques au panier — sous-total ou **forfait fixe** uniquement.
+- Remboursements via le tableau de bord lomi., pas depuis l’admin Shopify automatiquement.
 
 ## Voir aussi
 
 - [Hub extensions e‑commerce](/build/ecommerce-extensions)
-- [Liste de contrôle QA d’intégration](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_QA_CHECKLIST.md) (orientée Woo / Magento / Presta pour l’instant ; scénarios Shopify à définir)
+- [WooCommerce](/build/ecommerce-extensions/woocommerce)

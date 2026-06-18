@@ -1,0 +1,55 @@
+---
+title: 'Commande quickstart'
+description: 'Exécutez lomi quickstart pour vérifier la connectivité CLI et obtenir les prochaines étapes recommandées.'
+---
+
+`lomi quickstart` est un contrôle de parcours rapide non destructif. Il vérifie votre jeton CLI et la connectivité API, puis affiche les commandes que la plupart des équipes exécutent ensuite.
+
+## Utilisation
+
+```bash filename="Terminal"
+lomi quickstart
+```
+
+Sortie machine pour scripts et agents :
+
+```bash filename="Terminal"
+lomi quickstart --json
+```
+
+Ignorer les contrôles API (hors ligne ou documentation uniquement) :
+
+```bash filename="Terminal"
+lomi quickstart --skip-probe
+```
+
+## Contrôles effectués
+
+Sauf avec `--skip-probe`, quickstart exécute :
+
+1. `GET /` — connectivité API
+2. `GET /me` — identité et environnement
+3. `GET /accounts/balance` — lecture du solde authentifiée
+
+## Forme de la réponse JSON
+
+```json
+{
+  "status": "ready",
+  "profile": "default",
+  "organization": "Votre org",
+  "environment": "sandbox",
+  "probe": { "passed": 3, "failed": 0 },
+  "next_steps": [
+    {
+      "command": "lomi checkout create --amount 10000 ...",
+      "description": "Créer une session checkout de test sandbox"
+    }
+  ]
+}
+```
+
+## Suite
+
+- [Guide CLI quickstart](/start/cli-quickstart) — parcours complet install → webhooks
+- [Référence des commandes](/build/cli/commands) — toutes les commandes CLI

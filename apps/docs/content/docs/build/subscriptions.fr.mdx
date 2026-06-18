@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 L’API Subscriptions permet de lister et récupérer des **instances d’abonnement** (un client sur un plan récurrent). Elles sont en général créées lorsque des clients souscrivent à un produit récurrent via une session ou un lien de paiement.
 
-![Détail d’abonnement à remplacer](/placeholder.webp)
+<DocsScreenshot name="build/subscriptions" alt="Détail d’un abonnement dans le tableau de bord lomi." />
 
 <Callout type="info">
   Les SDK peuvent exposer à la fois des helpers **`/subscriptions`** et des méthodes **`/customer-subscriptions`**. Exemples par route et transitions de statut : **[Abonnements](/api/subscriptions)**. Les champs immuables et les règles d’annulation suivent les descriptions OpenAPI de chaque opération.
@@ -168,16 +168,28 @@ Le **premier paiement** est défini sur le produit via `first_payment_type` :
 
 ---
 
+## Interface de facturation dans votre application
+
+Si vos clients gèrent leurs abonnements dans **votre** application (et non le portail client lomi.) :
+
+1. Appelez les API lomi. lors des annulations, pauses, upgrades ou reprises (`POST /subscriptions/{id}/cancel`, `PATCH /subscriptions/{id}`, etc.).
+2. Écoutez les webhooks **`SUBSCRIPTION_UPDATED`** et **`SUBSCRIPTION_CANCELLED`** (mêmes événements que le changement vienne de votre API, du portail ou d’un cron).
+3. Réconciliez les droits d’accès avec `GET /subscriptions/{id}` lorsque vous avez besoin de l’état de référence.
+
+lomi. est la source de vérité de la facturation ; n’annulez pas uniquement dans votre base sans appeler l’API.
+
+---
+
 ## Annuler un abonnement
 
-Annule un abonnement actif. C’est la **seule** modification permise.
+Annulation immédiate ou en fin de période.
 
 ### Corps de la requête
 
 | Champ | Type | Obligatoire | Description |
 |-------|------|-------------|-------------|
 | `cancel_at_period_end` | `boolean` | Non | Si `true`, annulation fin de période. Si `false`, annulation immédiate (défaut). |
-| `reason` | `string` | Non | Motif d’annulation |
+| `cancellation_reason` | `string` | Non | Motif d’annulation |
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -187,7 +199,7 @@ const cancelled = await lomi.subscriptions.cancel('sub_abc123...');
 
 const scheduledCancel = await lomi.subscriptions.cancel('sub_abc123...', {
   cancel_at_period_end: true,
-  reason: 'Customer requested cancellation',
+  cancellation_reason: 'Customer requested cancellation',
 });
 
 console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
@@ -200,7 +212,7 @@ cancelled = client.subscriptions.cancel('sub_abc123...')
 
 scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
     "cancel_at_period_end": True,
-    "reason": "Customer requested cancellation"
+    "cancellation_reason": "Customer requested cancellation"
 })
 ```
 </Tab>
@@ -212,12 +224,32 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
   -H "Content-Type: application/json" \
   -d '{
     "cancel_at_period_end": true,
-    "reason": "Customer requested cancellation"
+    "cancellation_reason": "Customer requested cancellation"
   }'
 ```
 </Tab>
 
 </Tabs>
+
+---
+
+## Annuler une résiliation planifiée
+
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+---
+
+## Changer de plan
+
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../change-plan" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
+```
 
 ---
 
@@ -253,8 +285,9 @@ Abonnez-vous à ces événements en **SCREAMING_SNAKE_CASE** (comme sur [Webhook
 | Événement | Description |
 |-----------|-------------|
 | `SUBSCRIPTION_CREATED` | Nouvel abonnement après inscription réussie (y compris essai). |
+| `SUBSCRIPTION_UPDATED` | Abonnement modifié (pause, reprise, changement de plan, annulation planifiée, etc.). Charge utile avec `previous_attributes`. |
 | `SUBSCRIPTION_RENEWED` | Cycle de facturation renouvelé avec succès. |
-| `SUBSCRIPTION_CANCELLED` | Abonnement annulé. |
+| `SUBSCRIPTION_CANCELLED` | Abonnement annulé ou expiré. |
 
 Les **échecs de paiement** au renouvellement n’émettent pas de webhook abonnement dédié. Écoutez **`PAYMENT_FAILED`** sur la transaction du renouvellement et surveillez le `status` (`past_due`, `paused`, etc.) via l’API.
 

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsIn, IsOptional } from 'class-validator';
 
 /**
  * Line item for multi-product checkout
@@ -189,6 +190,33 @@ export class CreateCheckoutSessionDto {
     required: false,
   })
   payment_link_id?: string;
+
+  @ApiProperty({
+    example: 'woocommerce',
+    description:
+      'Sales channel that created this checkout session. Used for revenue attribution.',
+    enum: [
+      'system',
+      'shopify',
+      'woocommerce',
+      'prestashop',
+      'magento',
+      'odoo',
+      'bubble',
+    ],
+    required: false,
+  })
+  @IsOptional()
+  @IsIn([
+    'system',
+    'shopify',
+    'woocommerce',
+    'prestashop',
+    'magento',
+    'odoo',
+    'bubble',
+  ])
+  integration_source?: string;
 
   @ApiProperty({
     example: { custom_field: 'value' },

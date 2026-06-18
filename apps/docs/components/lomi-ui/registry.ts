@@ -56,7 +56,7 @@ export const lomiUiRegistry: {
   dir: docsDir,
   name: 'lomi-ui',
   version: '1.0.0',
-  homepage: 'https://docs.lomi.africa/ui',
+  homepage: 'https://docs.lomi.africa/build/lomi-ui',
   items: [
     {
       name: 'payment-provider-selector',

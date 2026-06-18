@@ -1,12 +1,10 @@
 {
-  "generatedAt": "2026-05-20T10:09:10.959Z",
+  "generatedAt": "2026-06-11T17:32:54.113Z",
   "sdk": {
     "accounts": [
       "checkBalance",
-      "get",
       "getBalance",
-      "getBalanceBreakdown",
-      "list"
+      "getBalanceBreakdown"
     ],
     "charges": [
       "cancelCardCharge",
@@ -85,9 +83,11 @@
     ],
     "subscriptions": [
       "cancel",
+      "changePlan",
       "findByCustomer",
       "get",
       "list",
+      "uncancel",
       "update"
     ],
     "transactions": [

@@ -1,4 +1,4 @@
-# Documentation: https://docs.lomi.africa/docs/cli/install
+# Documentation: https://docs.lomi.africa/build/cli/overview
 
 class Lomi < Formula
   desc "CLI for lomi.'s payment infrastructure"

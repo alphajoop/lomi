@@ -1,0 +1,47 @@
+name: Magento Plugin Release
+
+on:
+  push:
+    tags:
+      - "magento-v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Run plugin parity checks
+        run: apps/plugins/scripts/verify-lomi-plugins.sh
+
+      - name: Package Magento module zip
+        run: |
+          cd apps/plugins/magento
+          zip -r "../../dist/magento-lomi.zip" . \
+            -x "*.git*" -x "dev/*" -x ".DS_Store"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: magento-lomi
+          path: dist/magento-lomi.zip
+
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    if: always() && !cancelled() && (startsWith(github.ref, 'refs/tags/magento-v') || github.event_name == 'workflow_dispatch')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: magento-lomi
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/magento-lomi.zip
+          generate_release_notes: true

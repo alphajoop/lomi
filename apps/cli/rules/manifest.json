@@ -1,7 +1,7 @@
 {
   "name": "lomi-agent-rules",
   "description": "Agent rules for integrating lomi. payments",
-  "current_version": "1.0.0",
+  "current_version": "1.1.0",
   "versions": {
     "1.0.0": {
       "options": [
@@ -53,6 +53,73 @@
           "label": "Condensed lomi. REST API reference",
           "path": "api-reference.md",
           "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "llms-txt",
+          "title": "llms.txt",
+          "label": "Full lomi. llms.txt briefing from docs.lomi.africa",
+          "path": "llms.txt",
+          "applyTo": "**/*"
+        }
+      ]
+    },
+    "1.1.0": {
+      "options": [
+        {
+          "name": "sdk-basics",
+          "title": "SDK Basics",
+          "label": "lomi. SDK setup, authentication, and environments",
+          "path": "sdk-basics.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "checkout-sessions",
+          "title": "Checkout Sessions",
+          "label": "Create and manage lomi. checkout sessions",
+          "path": "checkout-sessions.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "embed-checkout",
+          "title": "Embed Checkout",
+          "label": "Iframe modal and inline checkout with @lomi./embed",
+          "path": "embed-checkout.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx,html}"
+        },
+        {
+          "name": "webhooks",
+          "title": "Webhooks",
+          "label": "Verify and handle lomi. webhook events",
+          "path": "webhooks.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "charges",
+          "title": "Charges",
+          "label": "Wave, MTN MoMo, and embedded card charges",
+          "path": "charges.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "subscriptions",
+          "title": "Subscriptions",
+          "label": "Recurring billing and customer portal",
+          "path": "subscriptions.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "api-reference",
+          "title": "API Reference",
+          "label": "Condensed lomi. REST API reference",
+          "path": "api-reference.md",
+          "applyTo": "**/*.{ts,tsx,js,jsx}"
+        },
+        {
+          "name": "docs-writing",
+          "title": "Docs writing",
+          "label": "Editorial contract for lomi. developer documentation",
+          "path": "docs-writing.md",
+          "applyTo": "**/*.{md,mdx}"
         },
         {
           "name": "llms-txt",

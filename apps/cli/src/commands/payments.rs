@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::{Args, Subcommand};
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
@@ -16,7 +16,22 @@ pub struct PaymentsArgs {
 #[derive(Subcommand, Debug)]
 pub enum PaymentsCommand {
     /// Create a new payment link
-    Create,
+    Create(PaymentsCreateArgs),
+}
+
+#[derive(Args, Debug)]
+pub struct PaymentsCreateArgs {
+    /// Payment link title
+    #[arg(long)]
+    pub title: Option<String>,
+
+    /// Amount
+    #[arg(long)]
+    pub amount: Option<f64>,
+
+    /// Currency code (e.g. XOF, USD, EUR)
+    #[arg(long)]
+    pub currency: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -27,7 +42,7 @@ struct CreatePaymentLinkRequest {
     link_type: &'static str,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct PaymentLinkResponse {
     url: String,
     title: String,
@@ -37,30 +52,47 @@ struct PaymentLinkResponse {
 
 pub async fn run(common: &CommonOptions, args: PaymentsArgs) -> Result<()> {
     match args.command {
-        PaymentsCommand::Create => create_payment_link(common).await,
+        PaymentsCommand::Create(create_args) => create_payment_link(common, create_args).await,
     }
 }
 
-async fn create_payment_link(common: &CommonOptions) -> Result<()> {
-    cli::banner::print_intro("Create a payment link");
+async fn create_payment_link(common: &CommonOptions, args: PaymentsCreateArgs) -> Result<()> {
+    let json = cli::output::should_use_json(common);
+    if !json {
+        cli::banner::print_intro("Create a payment link");
+    }
 
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let title = cli::prompts::text("Enter payment link title:")?;
-    let amount_text = cli::prompts::text("Enter amount:")?;
-    let amount: f64 = amount_text
-        .parse()
-        .map_err(|_| anyhow::anyhow!("Amount must be a number"))?;
-    let currency = cli::prompts::select(
-        "Select currency:",
-        vec!["XOF".to_string(), "USD".to_string(), "EUR".to_string()],
-        "XOF".to_string(),
-    )?;
+    let (title, amount, currency) = if let (Some(title), Some(amount), Some(currency)) =
+        (&args.title, args.amount, &args.currency)
+    {
+        (title.clone(), amount, currency.clone())
+    } else if args.title.is_some() || args.amount.is_some() || args.currency.is_some() {
+        bail!("Headless mode requires --title, --amount, and --currency");
+    } else {
+        let title = cli::prompts::text("Enter payment link title:")?;
+        let amount_text = cli::prompts::text("Enter amount:")?;
+        let amount: f64 = amount_text
+            .parse()
+            .map_err(|_| anyhow::anyhow!("Amount must be a number"))?;
+        let currency = cli::prompts::select(
+            "Select currency:",
+            vec!["XOF".to_string(), "USD".to_string(), "EUR".to_string()],
+            "XOF".to_string(),
+        )?;
+        (title, amount, currency)
+    };
 
-    let spinner = indicatif::ProgressBar::new_spinner();
-    spinner.set_message("Creating payment link...");
-    spinner.enable_steady_tick(std::time::Duration::from_millis(100));
+    let spinner = if json {
+        None
+    } else {
+        let spinner = indicatif::ProgressBar::new_spinner();
+        spinner.set_message("Creating payment link...");
+        spinner.enable_steady_tick(std::time::Duration::from_millis(100));
+        Some(spinner)
+    };
 
     let response: PaymentLinkResponse = client
         .post(
@@ -74,7 +106,14 @@ async fn create_payment_link(common: &CommonOptions) -> Result<()> {
         )
         .await?;
 
-    spinner.finish_and_clear();
+    if let Some(spinner) = spinner {
+        spinner.finish_and_clear();
+    }
+
+    if json {
+        return cli::output::print_json(&response);
+    }
+
     cli::output::print_success("Payment link created successfully!");
 
     println!();

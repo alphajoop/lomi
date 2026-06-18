@@ -3,9 +3,22 @@ title: 'How do I use hosted checkout?'
 description: 'Create a checkout session, redirect the customer to lomi., then confirm the result with redirects, dashboard records, and webhooks.'
 ---
 
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
 Hosted checkout is the recommended first integration for most teams. Your server creates a session, your customer pays on a lomi.-hosted page, and your system confirms the result.
 
-![Placeholder hosted checkout](/placeholder.webp)
+<Callout type="info">
+  For cross-cutting rules (coupons, line items, currency, links to payment state), see **[Checkout behavior](/build/payments/checkout-behavior)**.
+</Callout>
+
+<Callout type="info">
+  Checkout sessions expire after **60 minutes** by default.
+</Callout>
+
+<Callout type="info">
+  Sessions created with a **test** API key (or linked to a test payment link) run in test mode. For manual QA—test cards, Wave, MTN MoMo—see **[Sandbox payments](/start/sandbox-payments)**.
+</Callout>
 
 ## When to use hosted checkout
 
@@ -19,23 +32,199 @@ Use hosted checkout when you want:
 
 ## Create a checkout session
 
+Creates a new checkout session and returns a URL to redirect your customer to.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `amount` | `number` | No* | Product subtotal (unit × quantity, excluding fees). For standard prices: must match catalog price. For PWYW: unit amount must be within `[minimum_amount, maximum_amount]` |
+| `currency_code` | `string` | **Yes** | Currency code (`XOF`, `USD`, `EUR`) |
+| `title` | `string` | No | Title shown on checkout page |
+| `description` | `string` | No | Description of the purchase |
+| `customer_id` | `string` | No | Existing customer ID |
+| `customer_email` | `string` | No | Customer email (pre-fills form) |
+| `customer_name` | `string` | No | Customer name (pre-fills form) |
+| `customer_phone` | `string` | No | Customer phone (pre-fills form) |
+| `product_id` | `string` | No | Product ID (amount calculated from product price; PWYW bounds enforced when amount is provided) |
+| `price_id` | `string` | No | Specific price ID if product has multiple prices (PWYW validation uses this price row) |
+| `subscription_id` | `string` | No | Subscription ID for renewals/modifications |
+| `quantity` | `number` | No | Quantity (default: `1`) |
+| `allow_quantity` | `boolean` | No | Allow customer to change quantity |
+| `success_url` | `string` | No | Redirect URL on successful payment |
+| `cancel_url` | `string` | No | Redirect URL if payment cancelled |
+| `allow_coupon_code` | `boolean` | No | Allow discount codes (default: `false`) |
+| `require_billing_address` | `boolean` | No | Require billing address (default: `true`) |
+| `payment_link_id` | `string` | No | Associated payment link ID |
+| `metadata` | `object` | No | Custom key-value pairs |
+
+*`amount` is required unless `product_id` is provided.
+
+### Pay what you want products
+
+When `product_id` or `price_id` points to a price with `pricing_model: pay_what_you_want`:
+
+- **Omit `amount`** — the session uses the suggested unit price (`amount` on the price row) × `quantity`.
+- **Pass `amount`** — must be a valid subtotal: unit price within `[minimum_amount, maximum_amount]` × `quantity`. The server rejects out-of-range values.
+- **Hosted checkout** — the buyer can change the unit price before paying; validation runs client-side and server-side.
+- **Programmatic flows** — set `amount` at session creation when you already know the chosen total.
+
+### Multi-item checkout (`line_items`)
+
+When you pass **`line_items`**, each row must reference a **one-time** price with **standard** (fixed) pricing. The API returns **400** with one of:
+
+| Code | Meaning |
+|------|---------|
+| `line_items_pwyw_not_supported` | A line uses `pay_what_you_want` pricing — use a single-product session instead |
+| `line_items_recurring_not_supported` | A line references a recurring product |
+| `line_items_usage_based_not_supported` | Usage-based pricing (not yet supported in carts) |
+| `line_items_mixed_product_types` | Mixed one-time and recurring products in one cart |
+
+### Recurring (subscription) products
+
+When `product_id` refers to a **recurring** product:
+
+- **Omit `amount`** — the session uses the catalog price for the selected `price_id` (quantity is not multiplied for subscriptions).
+- **Pass `amount`** — must match the catalog recurring price for validation (unless using prorated first charge at payment time; see [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)).
+- **Trial or `non_initial` signup** — the customer may pay **$0** at checkout, but the session record often still stores the **catalog price** so `create_checkout_session` satisfies `amount > 0`. Do not pass `amount: 0` unless you omit it and rely on product-derived pricing.
+- Completing checkout creates a **subscription** (`SUBSCRIPTION_CREATED` webhook), not a one-time `payment` transaction only.
+
+Example:
+
+```typescript
+const subscriptionSession = await lomi.checkoutSessions.create({
+  product_id: 'prod_recurring_abc...',
+  price_id: 'price_monthly_xyz...',
+  currency_code: 'XOF',
+  customer_email: 'customer@example.com',
+  success_url: 'https://your-site.com/welcome',
+  allow_coupon_code: true,
+});
+```
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+// Simple checkout with amount
+const session = await lomi.checkoutSessions.create({
+  amount: 10000,
+  currency_code: 'XOF',
+  title: 'Order #12345',
+  description: 'Payment for items in cart',
+  customer_email: 'customer@example.com',
+  success_url: 'https://your-site.com/success',
+  cancel_url: 'https://your-site.com/cancel',
+  metadata: {
+    order_id: 'ORD-12345',
+  },
+});
+
+// Product-based checkout
+const productSession = await lomi.checkoutSessions.create({
+  product_id: 'prod_abc123...',
+  currency_code: 'XOF',
+  quantity: 2,
+  allow_coupon_code: true,
+  success_url: 'https://your-site.com/success',
+});
+
+// PWYW product with custom amount and quantity
+const pwywSession = await lomi.checkoutSessions.create({
+  product_id: 'prod_tip_jar...',
+  currency_code: 'XOF',
+  amount: 1500,
+  quantity: 2,
+  success_url: 'https://your-site.com/success',
+});
+
+console.log(`Redirect to: ${session.checkout_url}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+# Simple checkout with amount
+session = client.checkout_sessions.create({
+    "amount": 10000,
+    "currency_code": "XOF",
+    "title": "Order #12345",
+    "description": "Payment for items in cart",
+    "customer_email": "customer@example.com",
+    "success_url": "https://your-site.com/success",
+    "cancel_url": "https://your-site.com/cancel",
+    "metadata": {
+        "order_id": "ORD-12345"
+    }
+})
+
+# PWYW product with custom amount and quantity
+pwyw_session = client.checkout_sessions.create({
+    "product_id": "prod_tip_jar...",
+    "currency_code": "XOF",
+    "amount": 1500,
+    "quantity": 2,
+    "success_url": "https://your-site.com/success"
+})
+
+print(f"Redirect to: {session['checkout_url']}")
+```
+</Tab>
+
+<Tab value="cURL">
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
-  -H "X-API-Key: $LOMI_SECRET_KEY" \
+curl -X POST "https://api.lomi.africa/checkout-sessions" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 10000,
     "currency_code": "XOF",
     "title": "Order #12345",
-    "success_url": "https://example.com/success",
-    "cancel_url": "https://example.com/cancel",
+    "description": "Payment for items in cart",
+    "customer_email": "customer@example.com",
+    "success_url": "https://your-site.com/success",
+    "cancel_url": "https://your-site.com/cancel",
     "metadata": {
       "order_id": "ORD-12345"
     }
   }'
 ```
+</Tab>
 
-Redirect the customer to the `checkout_url` returned by the API.
+</Tabs>
+
+### Response
+
+```json
+{
+  "id": "cs_abc123...",
+  "checkout_url": "https://checkout.lomi.africa/cs_abc123...",
+  "status": "open",
+  "amount": 10000,
+  "currency_code": "XOF",
+  "title": "Order #12345",
+  "customer_email": "customer@example.com",
+  "expires_at": "2024-01-15T11:30:00Z",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+---
 
 ## Embed instead of redirect
 
@@ -74,8 +263,32 @@ Confirm:
 | Coupon-enabled checkout | You allow discount codes |
 | Test checkout | You are validating with `lomi_sk_test_...` |
 
+## List and retrieve sessions
+
+Use the API reference to list or fetch sessions by ID:
+
+- [List checkout sessions](/api/checkout-sessions/CheckoutSessionsController_findAll)
+- [Get checkout session](/api/checkout-sessions/CheckoutSessionsController_findOne)
+
+## Webhooks
+
+Merchant webhook subscriptions (lomi. calls **your** URL) are configured with the Postgres enum **`webhook_event`**, the same set documented in [Webhooks](/build/webhooks). The HTTP body field `` `event` `` and the `` `X-Lomi-Event` `` header use those values (for example `` `PAYMENT_SUCCEEDED` ``), as built in `` `WebhookSenderService.prepareWebhookPayload` `` in `` `apps/api` ``.
+
+For checkout outcomes on **your** server, subscribe at minimum to:
+
+| `authorized_events` value | When it fires |
+| ------------------------- | ------------- |
+| `` `PAYMENT_SUCCEEDED` `` | Payment completed; payload `` `data` `` follows the transaction shape (see [Webhooks](/build/webhooks)). |
+| `` `PAYMENT_FAILED` `` | Payment attempt failed (including some provider failure paths). |
+
+There is **no** separate `` `checkout.session.*` `` value in the `` `webhook_event` `` enum (`apps/api/src/utils/types/api.ts` mirrors the database type). Session expiry without a successful charge is reflected on the **session** and **transaction** records (e.g. status `` `expired` ``); use `` `GET /checkout-sessions/{id}` `` or list with `` `status=expired` `` / `` `completed` `` rather than expecting a merchant webhook named like `checkout.session.expired`.
+
+---
+
 ## Related API
 
 - [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create)
+- [List checkout sessions](/api/checkout-sessions/CheckoutSessionsController_findAll)
+- [Get checkout session](/api/checkout-sessions/CheckoutSessionsController_findOne)
 - [Checkout behavior](/build/payments/checkout-behavior)
 - [Webhooks](/build/webhooks)

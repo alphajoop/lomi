@@ -3,6 +3,7 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { Json } from '../../utils/types/api';
 import { CreateMeterDto } from './dto/create-meter.dto';
+import { UpdateMeterDto } from './dto/update-meter.dto';
 
 @Injectable()
 export class MetersService {
@@ -84,5 +85,24 @@ export class MetersService {
     }
 
     return row;
+  }
+
+  async update(id: string, dto: UpdateMeterDto, user: AuthContext) {
+    await this.findOne(id, user);
+
+    const { error } = await this.supabase.getClient().rpc(
+      'update_meter_api' as never,
+      {
+        p_meter_id: id,
+        p_organization_id: user.organizationId,
+        p_filter: dto.filter !== undefined ? (dto.filter as Json) : null,
+        p_aggregation:
+          dto.aggregation !== undefined ? (dto.aggregation as Json) : null,
+        p_is_active: dto.is_active ?? null,
+      } as never,
+    );
+
+    if (error) throw new Error(error.message);
+    return this.findOne(id, user);
   }
 }

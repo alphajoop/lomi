@@ -147,17 +147,13 @@ function generateServiceContent(
   const hasCreatedBy = 'created_by' in properties; // Sometimes used as merchant_id
   const hasTenancy = hasOrganizationId || hasMerchantId || hasCreatedBy;
 
-  let tenancyFilter = '';
   let insertAugmentation = '';
 
   if (hasOrganizationId) {
-    tenancyFilter = `.eq('organization_id', user.organizationId)`;
     insertAugmentation = `organization_id: user.organizationId,`;
   } else if (hasMerchantId) {
-    tenancyFilter = `.eq('merchant_id', user.merchantId)`;
     insertAugmentation = `merchant_id: user.merchantId,`;
   } else if (hasCreatedBy) {
-    tenancyFilter = `.eq('created_by', user.merchantId)`;
     insertAugmentation = `created_by: user.merchantId,`;
   }
 

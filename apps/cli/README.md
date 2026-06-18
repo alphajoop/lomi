@@ -31,6 +31,10 @@ cargo install --path .
 ## Quick start
 
 ```bash
+# lomi quickstart — verify CLI and get next steps
+lomi quickstart
+lomi quickstart --json
+
 # Authenticate (browser device flow)
 lomi login
 
@@ -53,8 +57,16 @@ lomi dev
 # Integration health check
 lomi probe
 
-# Create a checkout session
+# Create a checkout session (interactive or headless)
 lomi checkout create
+lomi checkout create --amount 10000 --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel --json
+
+# Refunds and transactions
+lomi transactions list --json
+lomi transactions get <transaction-id> --json
+lomi refunds create --transaction-id <id> --amount 5000 --json
 
 # Create a payment link
 lomi payments create
@@ -74,12 +86,14 @@ lomi ui update
 | `whoami` | Show current account and profile |
 | `status` | Verify login and API connectivity |
 | `init` | Initialize project with SDK, examples, and `.env` |
+| `quickstart` | Golden-path checks and next steps |
 | `listen` | Cloud webhook relay (sandbox-first) |
 | `probe` | Integration health checks |
 | `webhooks list` / `webhooks test` | Manage and test webhook endpoints |
 | `products list` | List products and prices |
-| `transactions list` | List recent transactions |
-| `checkout create` | Create a hosted checkout session interactively |
+| `transactions list` / `transactions get` | List or retrieve transactions |
+| `refunds create` / `list` / `get` | Create, list, or retrieve refunds |
+| `checkout create` | Create a hosted checkout session (interactive or headless) |
 | `dev` | Local webhook receiver for development |
 | `install-rules` | AI setup wizard: Cursor, Claude Code, Codex, llms.txt |
 | `payments create` | Create a payment link interactively |
@@ -110,6 +124,7 @@ lomi init --yes \
   --environment sandbox \
   --language ts \
   --api-key lomi_sk_test_xxx
+# Installs Cursor + llms.txt agent rules by default (use --skip-rules-install to opt out)
 
 lomi login --no-browser
 lomi install-rules --target cursor

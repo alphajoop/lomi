@@ -1,13 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+const CHECKOUT_SESSION_ID_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const CHECKOUT_SESSION_ID_PLACEHOLDER =
+  /(\{\{CHECKOUT_SESSION_ID\}\}|\{CHECKOUT_SESSION_ID\})/i;
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import {
+  assertNetworkContextRecorded,
   namespaceNetworkIdempotency,
   recordNetworkContext,
 } from '../common/network-context';
 import type { CurrencyCode, Json } from '../../utils/types/api';
 import { throwMappedSupabaseRpcError } from '../../utils/supabase-rpc-errors';
+import {
+  lookupIdempotencyCache,
+  type IdempotentCreateResult,
+} from '../../utils/idempotency-cache';
 
 export type CheckoutIdempotencyContext = {
   key: string;
@@ -27,10 +40,23 @@ export class CheckoutSessionsService {
     createDto: CreateCheckoutSessionDto,
     user: AuthContext,
     idempotency?: CheckoutIdempotencyContext,
-  ) {
+  ): Promise<IdempotentCreateResult<unknown>> {
     const scopedIdempotency = namespaceNetworkIdempotency(user, idempotency);
 
     if (createDto.line_items && createDto.line_items.length > 0) {
+      if (scopedIdempotency) {
+        const cached = await lookupIdempotencyCache(this.supabase, {
+          organizationId: user.organizationId,
+          environment: user.environment,
+          endpointRoute: 'POST:/checkout-sessions:line_items',
+          key: scopedIdempotency.key,
+          bodyHash: scopedIdempotency.bodyHash,
+        });
+        if (cached.kind === 'hit') {
+          return { data: cached.payload, idempotencyCacheHit: true };
+        }
+      }
+
       const rpcArgs = {
         p_organization_id: user.organizationId,
         p_created_by: user.merchantId,
@@ -38,7 +64,10 @@ export class CheckoutSessionsService {
         p_line_items: createDto.line_items as unknown as Json,
         p_environment: user.environment,
         p_customer_id: createDto.customer_id || null,
-        p_metadata: createDto.metadata || null,
+        p_metadata: mergeCheckoutMetadata(
+          createDto.metadata,
+          createDto.integration_source,
+        ),
         p_title: createDto.title || null,
         p_description: createDto.description || null,
         p_success_url: createDto.success_url || null,
@@ -76,7 +105,7 @@ export class CheckoutSessionsService {
 
       if (error) throwMappedSupabaseRpcError(error.message);
       await this.recordNetworkCheckoutSession(data, user);
-      return data;
+      return { data };
     }
 
     const blockingInvoice = await this.findBlockingInvoice(createDto, user);
@@ -100,19 +129,34 @@ export class CheckoutSessionsService {
           : {};
 
       return {
-        payment_required: true,
-        reason: 'invoice_payment_required',
-        blocking_invoice: {
-          invoice_id: blockingInvoice.invoice_id,
-          invoice_number: blockingInvoice.invoice_number,
-          amount_remaining: blockingInvoice.amount_remaining,
-          currency_code: blockingInvoice.currency_code,
-          checkout_url:
-            checkoutPayload.checkout_url ??
-            blockingInvoice.checkout_url ??
-            blockingInvoice.payment_url,
+        data: {
+          payment_required: true,
+          reason: 'invoice_payment_required',
+          blocking_invoice: {
+            invoice_id: blockingInvoice.invoice_id,
+            invoice_number: blockingInvoice.invoice_number,
+            amount_remaining: blockingInvoice.amount_remaining,
+            currency_code: blockingInvoice.currency_code,
+            checkout_url:
+              checkoutPayload.checkout_url ??
+              blockingInvoice.checkout_url ??
+              blockingInvoice.payment_url,
+          },
         },
       };
+    }
+
+    if (scopedIdempotency) {
+      const cached = await lookupIdempotencyCache(this.supabase, {
+        organizationId: user.organizationId,
+        environment: user.environment,
+        endpointRoute: 'POST:/checkout-sessions:single',
+        key: scopedIdempotency.key,
+        bodyHash: scopedIdempotency.bodyHash,
+      });
+      if (cached.kind === 'hit') {
+        return { data: cached.payload, idempotencyCacheHit: true };
+      }
     }
 
     const rpcArgs = {
@@ -122,7 +166,10 @@ export class CheckoutSessionsService {
       p_amount: (createDto.amount ?? null) as unknown as number,
       p_currency_code: createDto.currency_code as CurrencyCode,
       p_customer_id: createDto.customer_id || null,
-      p_metadata: createDto.metadata || null,
+      p_metadata: mergeCheckoutMetadata(
+        createDto.metadata,
+        createDto.integration_source,
+      ),
       p_title: createDto.title || null,
       p_description: createDto.description || null,
       p_product_id: createDto.product_id || null,
@@ -161,7 +208,7 @@ export class CheckoutSessionsService {
 
     if (error) throwMappedSupabaseRpcError(error.message);
     await this.recordNetworkCheckoutSession(data, user);
-    return data;
+    return { data };
   }
 
   async findAll(
@@ -182,10 +229,25 @@ export class CheckoutSessionsService {
   }
 
   async findOne(id: string, user: AuthContext) {
+    const sessionId = id?.trim();
+    if (!sessionId) {
+      throw new BadRequestException('Checkout session id must be a UUID');
+    }
+
+    if (CHECKOUT_SESSION_ID_PLACEHOLDER.test(sessionId)) {
+      throw new BadRequestException(
+        'Checkout session id must be the UUID returned by POST /checkout-sessions, not the {CHECKOUT_SESSION_ID} success_url placeholder',
+      );
+    }
+
+    if (!CHECKOUT_SESSION_ID_UUID.test(sessionId)) {
+      throw new BadRequestException('Checkout session id must be a UUID');
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'get_checkout_session_api' as any,
       {
-        p_checkout_session_id: id,
+        p_checkout_session_id: sessionId,
         p_organization_id: user.organizationId,
       } as any,
     );
@@ -195,7 +257,7 @@ export class CheckoutSessionsService {
 
     if (error || !session) {
       throw new NotFoundException(
-        `Checkout session with ID ${id} not found or access denied`,
+        `Checkout session with ID ${sessionId} not found or access denied`,
       );
     }
 
@@ -211,13 +273,14 @@ export class CheckoutSessionsService {
       return;
     }
 
-    await recordNetworkContext(this.supabase, user, {
+    const networkContext = await recordNetworkContext(this.supabase, user, {
       checkoutSessionId,
       capabilityKey: 'payment.create',
       metadata: {
         source: 'api_checkout_session',
       },
     });
+    assertNetworkContextRecorded(user, networkContext, 'checkout session');
   }
 
   private async findBlockingInvoice(
@@ -276,4 +339,17 @@ function extractCheckoutSessionId(data: unknown): string | null {
 
   const value = (row as Record<string, unknown>).checkout_session_id;
   return typeof value === 'string' ? value : null;
+}
+
+function mergeCheckoutMetadata(
+  metadata: Record<string, unknown> | undefined,
+  integrationSource?: string,
+): Json | null {
+  const merged: Record<string, unknown> = { ...(metadata ?? {}) };
+
+  if (integrationSource) {
+    merged.integration_source = integrationSource;
+  }
+
+  return Object.keys(merged).length > 0 ? (merged as Json) : null;
 }

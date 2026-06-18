@@ -89,4 +89,19 @@ Base URLs:
 - `POST /webhooks/{id}/test` — Envoyer un événement test au webhook
 - `POST /webhooks/{webhookId}/logs/{logId}/retry` — Relancer une livraison webhook
 
-Full docs: https://docs.lomi.africa/docs/api
+Full docs: https://docs.lomi.africa/api
+
+## CLI examples
+
+```bash
+# Headless checkout
+lomi checkout create --amount 10000 --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel --json
+
+# Refund
+lomi refunds create --transaction-id <uuid> --amount 5000 --json
+
+# List transactions
+lomi transactions list --limit 10 --json
+```
