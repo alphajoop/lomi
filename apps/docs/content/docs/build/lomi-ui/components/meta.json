@@ -4,9 +4,13 @@
   "pages": [
     "index",
     "payment-provider-selector",
+    "customer-information-section",
+    "checkout-submit-button",
     "mobile-money-checkout-card",
     "checkout-summary-card",
+    "price-selector",
     "payment-status-card",
+    "checkout-footer",
     "pricing-table",
     "invoice-history",
     "subscription-management-card",

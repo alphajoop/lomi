@@ -1,0 +1,30 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkout-submit-button",
+  "type": "registry:block",
+  "title": "Checkout Submit Button",
+  "description": "Hosted checkout pay button with processing and outcome states.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "components/lomi-ui/checkout-submit-button.tsx",
+      "target": "components/lomi-ui/checkout-submit-button.tsx",
+      "type": "registry:component",
+      "content": "'use client';\n\nimport * as React from 'react';\nimport { CheckCircle, XCircle } from 'lucide-react';\nimport { getPayButtonForeground } from './lib/pay-button-contrast';\n\nexport type CheckoutPaymentStatus = 'idle' | 'processing' | 'success' | 'error';\n\nexport interface CheckoutSubmitButtonProps {\n  label?: string;\n  subscribeLabel?: string;\n  isSubscription?: boolean;\n  payButtonBgColor?: string;\n  paymentStatus?: CheckoutPaymentStatus;\n  disabled?: boolean;\n  type?: 'button' | 'submit';\n  onClick?: () => void;\n  className?: string;\n}\n\nfunction cn(...classes: Array<string | false | null | undefined>) {\n  return classes.filter(Boolean).join(' ');\n}\n\nfunction CheckoutSpinner({\n  color,\n  className,\n}: {\n  color: string;\n  className?: string;\n}) {\n  return (\n    <span\n      className={cn(\n        'inline-block h-5 w-5 animate-spin rounded-full border-2 border-t-transparent',\n        className,\n      )}\n      style={{ borderColor: color, borderTopColor: 'transparent' }}\n      aria-hidden=\"true\"\n    />\n  );\n}\n\nexport function CheckoutSubmitButton({\n  label = 'Pay',\n  subscribeLabel = 'Subscribe',\n  isSubscription = false,\n  payButtonBgColor = '#121317',\n  paymentStatus = 'idle',\n  disabled = false,\n  type = 'button',\n  onClick,\n  className,\n}: CheckoutSubmitButtonProps) {\n  const payButtonForeground = getPayButtonForeground(payButtonBgColor);\n  const buttonLabel = isSubscription ? subscribeLabel : label;\n\n  return (\n    <div className={cn('flex flex-col items-center pt-1', className)}>\n      <button\n        type={type}\n        onClick={onClick}\n        disabled={disabled || paymentStatus === 'processing'}\n        className={cn(\n          'relative w-full rounded-sm pr-8 text-lg font-semibold transition-colors duration-200 outline-none',\n          paymentStatus === 'success' && '!bg-green-700 hover:!bg-green-800',\n          paymentStatus === 'error' && '!bg-red-800 hover:!bg-red-900',\n          paymentStatus === 'processing' && 'disabled:opacity-100',\n        )}\n        style={{\n          height: '3.05rem',\n          ...(paymentStatus === 'success' || paymentStatus === 'error'\n            ? { color: '#ffffff' }\n            : {\n                backgroundColor: payButtonBgColor,\n                color: payButtonForeground,\n              }),\n        }}\n      >\n        {paymentStatus === 'processing' ? (\n          <span className=\"absolute right-4 top-1/2 flex -translate-y-1/2 items-center\">\n            <CheckoutSpinner color={payButtonForeground} />\n          </span>\n        ) : paymentStatus === 'success' ? (\n          <CheckCircle className=\"mx-auto h-5 w-5 text-green-200\" />\n        ) : paymentStatus === 'error' ? (\n          <XCircle className=\"mx-auto h-5 w-5 text-red-300\" />\n        ) : (\n          buttonLabel\n        )}\n      </button>\n    </div>\n  );\n}\n"
+    },
+    {
+      "path": "components/lomi-ui/lib/pay-button-contrast.ts",
+      "target": "components/lomi-ui/lib/pay-button-contrast.ts",
+      "type": "registry:component",
+      "content": "const DARK_FOREGROUND = '#121317';\nconst LIGHT_FOREGROUND = '#ffffff';\n\nfunction parseHexColor(\n  hex: string,\n): { r: number; g: number; b: number } | null {\n  const normalized = hex.trim().replace(/^#/, '');\n  if (normalized.length === 3) {\n    const r = Number.parseInt(normalized[0]! + normalized[0]!, 16);\n    const g = Number.parseInt(normalized[1]! + normalized[1]!, 16);\n    const b = Number.parseInt(normalized[2]! + normalized[2]!, 16);\n    return { r, g, b };\n  }\n  if (normalized.length === 6) {\n    const r = Number.parseInt(normalized.slice(0, 2), 16);\n    const g = Number.parseInt(normalized.slice(2, 4), 16);\n    const b = Number.parseInt(normalized.slice(4, 6), 16);\n    if ([r, g, b].some((channel) => Number.isNaN(channel))) return null;\n    return { r, g, b };\n  }\n  return null;\n}\n\nfunction relativeLuminance(r: number, g: number, b: number): number {\n  const [rs, gs, bs] = [r, g, b].map((channel) => {\n    const srgb = channel / 255;\n    return srgb <= 0.03928 ? srgb / 12.92 : ((srgb + 0.055) / 1.055) ** 2.4;\n  });\n  return 0.2126 * rs! + 0.7152 * gs! + 0.0722 * bs!;\n}\n\nexport function getPayButtonForeground(\n  backgroundColor: string,\n): typeof DARK_FOREGROUND | typeof LIGHT_FOREGROUND {\n  const rgb = parseHexColor(backgroundColor);\n  if (!rgb) return LIGHT_FOREGROUND;\n  return relativeLuminance(rgb.r, rgb.g, rgb.b) > 0.55\n    ? DARK_FOREGROUND\n    : LIGHT_FOREGROUND;\n}\n"
+    },
+    {
+      "path": "components/lomi-ui/demo/checkout-submit-button-demo.tsx",
+      "target": "components/lomi-ui/demo/checkout-submit-button-demo.tsx",
+      "type": "registry:component",
+      "content": "'use client';\n\nimport * as React from 'react';\nimport { CheckoutSubmitButton } from '@/components/lomi-ui/checkout-submit-button';\n\nexport function CheckoutSubmitButtonDemo() {\n  const [status, setStatus] = React.useState<\n    'idle' | 'processing' | 'success' | 'error'\n  >('idle');\n\n  return (\n    <div className=\"not-prose max-w-md rounded-sm border bg-white p-4\">\n      <CheckoutSubmitButton\n        paymentStatus={status}\n        onClick={() => {\n          setStatus('processing');\n          window.setTimeout(() => setStatus('success'), 900);\n          window.setTimeout(() => setStatus('idle'), 2200);\n        }}\n      />\n      <p className=\"mt-3 text-sm text-fd-muted-foreground\">\n        Click to preview processing → success states.\n      </p>\n    </div>\n  );\n}\n"
+    }
+  ]
+}

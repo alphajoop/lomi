@@ -1,19 +1,18 @@
 ---
 title: Payment Status Card
-description: A component to communicate the status of a payment (processing, success, failed, etc).
+description: Hosted checkout success outcome card.
 ---
 
-The `PaymentStatusCard` is a standalone, copy-pasteable UI component built with standard HTML elements and Tailwind CSS semantic utility classes. It adapts automatically to your theme without requiring additional Shadcn primitives.
+The `PaymentStatusCard` matches the success card in hosted checkout `post/success.tsx`.
 
 ## Preview
 
 <Tabs items={['Preview', 'Code']}>
   <Tab value="Preview" className="p-0 mt-4 border-none bg-transparent">
     <ComponentPreview>
-      <PaymentStatusCard 
-        status="processing" 
-        amount={4900} 
-        currency="XOF" 
+      <PaymentStatusCard
+        organizationName="Keur Studio"
+        primaryAction={{ label: 'Continue', href: '#' }}
       />
     </ComponentPreview>
   </Tab>
@@ -24,10 +23,9 @@ The `PaymentStatusCard` is a standalone, copy-pasteable UI component built with 
 
     export default function Demo() {
       return (
-        <PaymentStatusCard 
-          status="processing" 
-          amount={4900} 
-          currency="XOF" 
+        <PaymentStatusCard
+          organizationName="Keur Studio"
+          primaryAction={{ label: 'Continue', href: '/orders' }}
         />
       );
     }

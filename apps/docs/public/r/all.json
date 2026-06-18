@@ -6,14 +6,18 @@
   "description": "All Lomi UI checkout components.",
   "registryDependencies": [
     "/r/payment-provider-selector.json",
+    "/r/customer-information-section.json",
+    "/r/checkout-submit-button.json",
     "/r/mobile-money-checkout-card.json",
     "/r/checkout-summary-card.json",
     "/r/payment-status-card.json",
+    "/r/price-selector.json",
     "/r/pricing-table.json",
     "/r/invoice-history.json",
     "/r/subscription-management-card.json",
     "/r/usage-meter.json",
-    "/r/payment-failure-card.json"
+    "/r/payment-failure-card.json",
+    "/r/checkout-footer.json"
   ],
   "files": []
 }

@@ -65,6 +65,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-force-graph-2d": "^1.29.1",
+    "react-phone-number-input": "^3.4.17",
     "rehype-katex": "^7.0.1",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",

@@ -3,8 +3,10 @@
   "name": "pricing-table",
   "type": "registry:block",
   "title": "Pricing Table",
-  "description": "A Lomi-styled plan selector for checkout, subscription, and pricing pages.",
-  "dependencies": ["lucide-react"],
+  "description": "Standalone marketing plan cards. Not the hosted checkout price selector.",
+  "dependencies": [
+    "lucide-react"
+  ],
   "files": [
     {
       "path": "components/lomi-ui/pricing-table.tsx",

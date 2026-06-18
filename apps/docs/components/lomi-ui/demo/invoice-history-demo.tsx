@@ -1,3 +1,5 @@
+'use client';
+
 import { InvoiceHistory } from '@/components/lomi-ui/invoice-history';
 
 export function InvoiceHistoryDemo() {

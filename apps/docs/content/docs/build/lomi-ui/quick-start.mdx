@@ -19,11 +19,11 @@ import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-check
 export function Checkout() {
   return (
     <MobileMoneyCheckoutCard
-      amount={12500}
-      currency="XOF"
-      merchantName="Keur Studio"
-      selectedProvider="wave"
-      phoneNumber="+225 07 00 00 00 00"
+      selectedProvider="WAVE"
+      fullName="Aya Konan"
+      email="aya@example.com"
+      phoneNumber="+2250700000000"
+      payButtonBgColor="#121317"
       onSubmit={() => console.log('Create a Lomi checkout session')}
     />
   );
@@ -34,4 +34,18 @@ The components do not call lomi. API directly. Use your backend or SDK integrati
 
 ## Asset paths
 
-Provider icons are installed into `public/payment_channels`, so the components can reference them as `/payment_channels/wave.webp`, `/payment_channels/mtn.webp`, and similar public URLs.
+Copy hosted checkout assets into your app public folder:
+
+- `/payment_channels/wave.webp`
+- `/payment_channels/mtn.webp`
+- `/payment_channels/pi_spi.webp`
+- `/placeholder/card.webp`
+- `/placeholder/bnpl.webp`
+
+## Dependencies
+
+Customer form components require:
+
+```bash
+npm install react-phone-number-input lucide-react
+```

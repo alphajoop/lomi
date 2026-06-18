@@ -1,49 +1,81 @@
 {
   "name": "lomi-ui",
   "version": "1.0.0",
-  "homepage": "https://docs.lomi.africa/build/lomi-ui",
+  "homepage": "https://docs.lomi.africa/ui",
   "registry_url": "https://docs.lomi.africa/r/registry.json",
   "items": [
     {
       "name": "payment-provider-selector",
       "title": "Payment Provider Selector",
-      "description": "Select Wave, MTN, Orange Money, SPI, or card payment rails.",
-      "dependencies": ["lucide-react"]
+      "description": "Hosted-checkout payment method carousel for Wave, MTN, cards, SPI, and BNPL."
+    },
+    {
+      "name": "customer-information-section",
+      "title": "Customer Information Section",
+      "description": "Hosted checkout personal information form from customer-information-section.tsx.",
+      "dependencies": [
+        "lucide-react",
+        "react-phone-number-input"
+      ]
+    },
+    {
+      "name": "checkout-submit-button",
+      "title": "Checkout Submit Button",
+      "description": "Hosted checkout pay button with processing and outcome states.",
+      "dependencies": [
+        "lucide-react"
+      ]
     },
     {
       "name": "mobile-money-checkout-card",
       "title": "Mobile Money Checkout Card",
-      "description": "A focused checkout card for Wave, MTN, Orange Money, and SPI.",
-      "dependencies": ["lucide-react"]
+      "description": "Provider selection, customer form, and pay button aligned with hosted checkout.",
+      "dependencies": [
+        "lucide-react",
+        "react-phone-number-input"
+      ]
     },
     {
       "name": "checkout-summary-card",
       "title": "Checkout Summary Card",
-      "description": "A dark checkout summary inspired by Lomi hosted checkout."
+      "description": "Dark hosted-checkout product summary panel from the left checkout column."
     },
     {
       "name": "payment-status-card",
       "title": "Payment Status Card",
-      "description": "Show success, failed, and pending checkout outcomes.",
-      "dependencies": ["lucide-react"]
+      "description": "Hosted checkout success outcome card from post/success.tsx.",
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "price-selector",
+      "title": "Price Selector",
+      "description": "Hosted checkout billing cycle selector for the dark product panel."
     },
     {
       "name": "pricing-table",
       "title": "Pricing Table",
-      "description": "A Lomi-styled plan selector for checkout, subscription, and pricing pages.",
-      "dependencies": ["lucide-react"]
+      "description": "Standalone marketing plan cards. Not the hosted checkout price selector.",
+      "dependencies": [
+        "lucide-react"
+      ]
     },
     {
       "name": "invoice-history",
       "title": "Invoice History",
       "description": "A compact invoice and receipt table for customer billing surfaces.",
-      "dependencies": ["lucide-react"]
+      "dependencies": [
+        "lucide-react"
+      ]
     },
     {
       "name": "subscription-management-card",
       "title": "Subscription Management Card",
       "description": "Show and manage a customer's current subscription.",
-      "dependencies": ["lucide-react"]
+      "dependencies": [
+        "lucide-react"
+      ]
     },
     {
       "name": "usage-meter",
@@ -53,8 +85,15 @@
     {
       "name": "payment-failure-card",
       "title": "Payment Failure Card",
-      "description": "Help customers retry or recover from a failed payment.",
-      "dependencies": ["lucide-react"]
+      "description": "Hosted checkout error outcome card from post/error.tsx.",
+      "dependencies": [
+        "lucide-react"
+      ]
+    },
+    {
+      "name": "checkout-footer",
+      "title": "Checkout Footer",
+      "description": "Hosted checkout footer with lomi branding and legal links."
     }
   ]
 }
