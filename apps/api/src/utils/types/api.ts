@@ -3719,7 +3719,10 @@ export type Database = {
         | 'USAGE_INVOICE_CREATED'
         | 'USAGE_INVOICE_PAID'
         | 'USAGE_INVOICE_OVERDUE'
-        | 'SUBSCRIPTION_USAGE_PERIOD_CLOSED';
+        | 'SUBSCRIPTION_USAGE_PERIOD_CLOSED'
+        | 'DISPUTE_CREATED'
+        | 'DISPUTE_UPDATED'
+        | 'DISPUTE_CLOSED';
     };
   };
 };

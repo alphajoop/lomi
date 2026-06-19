@@ -28,12 +28,6 @@ export class PayoutsService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(dto: CreatePayoutDto, user: AuthContext) {
-    if (dto.rail === 'mtn') {
-      throw new BadRequestException(
-        'MTN payouts are not supported via the API yet',
-      );
-    }
-
     if (dto.destination === 'beneficiary') {
       if (dto.rail === 'bank') {
         throw new BadRequestException(
@@ -205,6 +199,19 @@ export class PayoutsService {
           );
         }
         return this.selfWaveWithdrawal(dto, user, method);
+      case 'mtn':
+        this.assertMtnPayoutAllowedInEnvironment(user);
+        if (method.payout_method_type !== 'mobile_money') {
+          throw new BadRequestException(
+            'payout_method_id must be a registered mobile money payout method',
+          );
+        }
+        if (method.auto_withdrawal_mobile_provider !== 'MTN') {
+          throw new BadRequestException(
+            'payout_method_id must be an MTN mobile money method',
+          );
+        }
+        return this.selfMtnWithdrawal(dto, user, method);
       default:
         throw new BadRequestException('Invalid rail for self payout');
     }
@@ -218,11 +225,27 @@ export class PayoutsService {
     }
   }
 
+  private assertMtnPayoutAllowedInEnvironment(user: AuthContext): void {
+    if (environmentFromAuth(user) === 'test') {
+      throw new BadRequestException(
+        'MTN payouts are not available in test mode. Use a live API key.',
+      );
+    }
+  }
+
   private async createBeneficiaryPayout(
     dto: CreatePayoutDto,
     user: AuthContext,
   ) {
     switch (dto.rail) {
+      case 'mtn':
+        this.assertMtnPayoutAllowedInEnvironment(user);
+        if (!dto.recipient?.phone || !dto.recipient?.name) {
+          throw new BadRequestException(
+            'recipient.name and recipient.phone are required for beneficiary payouts',
+          );
+        }
+        return this.beneficiaryMtnPayout(dto, user);
       case 'wave':
         this.assertWavePayoutAllowedInEnvironment(user);
         if (!dto.recipient?.phone || !dto.recipient?.name) {
@@ -480,6 +503,92 @@ export class PayoutsService {
       status: row.status ?? 'pending',
       message: row.message ?? 'Beneficiary payout created',
     };
+  }
+
+  private async selfMtnWithdrawal(
+    dto: CreatePayoutDto,
+    user: AuthContext,
+    method: PayoutMethodRow,
+  ) {
+    const destinationPhone = method.account_number;
+    const result = await this.invokeMtnEdge('/merchant-withdrawal', {
+      merchantId: user.merchantId,
+      organizationId: user.organizationId,
+      amount: dto.amount,
+      currency: dto.currency_code,
+      reason: dto.reason ?? 'Merchant withdrawal',
+      metadata: {
+        payoutMethodId: dto.payout_method_id,
+        mobilePhoneNumber: destinationPhone,
+        ...(dto.metadata ?? {}),
+      },
+    });
+
+    const payload = result as {
+      payoutId?: string;
+      status?: string;
+      message?: string;
+    };
+
+    return {
+      success: true,
+      payout_id: payload.payoutId,
+      kind: 'withdrawal' as const,
+      status: payload.status ?? 'processing',
+      message: payload.message ?? 'MTN withdrawal initiated',
+      data: result,
+    };
+  }
+
+  private async beneficiaryMtnPayout(dto: CreatePayoutDto, user: AuthContext) {
+    const result = await this.invokeMtnEdge('/beneficiary-payout', {
+      merchantId: user.merchantId,
+      organizationId: user.organizationId,
+      amount: dto.amount,
+      currency: dto.currency_code,
+      recipientName: dto.recipient!.name,
+      recipientPhone: dto.recipient!.phone,
+      description: dto.reason ?? 'Beneficiary payout',
+      metadata: dto.metadata ?? {},
+    });
+
+    const payload = result as {
+      payoutId?: string;
+      status?: string;
+      message?: string;
+    };
+
+    return {
+      success: true,
+      payout_id: payload.payoutId,
+      kind: 'beneficiary' as const,
+      status: payload.status ?? 'processing',
+      message: payload.message ?? 'Beneficiary payout initiated',
+      data: result,
+    };
+  }
+
+  private async invokeMtnEdge(
+    path: string,
+    body: Record<string, unknown>,
+  ): Promise<unknown> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .functions.invoke('mtn', {
+        body: { path, method: 'POST', body },
+      });
+
+    if (error) {
+      this.logger.error(`MTN edge ${path} failed: ${error.message}`);
+      throw new InternalServerErrorException(`Payout failed: ${error.message}`);
+    }
+
+    const response = data as { error?: string } | null;
+    if (response?.error) {
+      throw new BadRequestException(response.error);
+    }
+
+    return data;
   }
 
   private async invokeWaveEdge(

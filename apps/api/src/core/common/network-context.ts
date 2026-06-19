@@ -126,53 +126,20 @@ export async function resolveNetworkMemberMerchantId(
     return user.merchantId;
   }
 
-  const { data, error } = await supabase
-    .getClient()
-    .from('network_memberships' as never)
-    .select('accepted_by_merchant_id, member_organization_id' as never)
-    .eq('network_membership_id' as never, user.networkMembershipId as never)
-    .maybeSingle();
+  const { data, error } = await (supabase.getClient() as any).rpc(
+    'resolve_network_member_merchant_id',
+    { p_network_membership_id: user.networkMembershipId },
+  );
 
   if (error) {
     throw new BadRequestException(error.message);
   }
 
-  const row = data as {
-    accepted_by_merchant_id?: string | null;
-    member_organization_id?: string | null;
-  } | null;
-
-  if (row?.accepted_by_merchant_id) {
-    return row.accepted_by_merchant_id;
-  }
-
-  if (!row?.member_organization_id) {
+  if (typeof data !== 'string' || !data) {
     throw new BadRequestException('Network membership not found');
   }
 
-  const { data: linkData, error: linkError } = await supabase
-    .getClient()
-    .from('merchant_organization_links' as never)
-    .select('merchant_id' as never)
-    .eq('organization_id' as never, row.member_organization_id as never)
-    .eq('team_status' as never, 'active' as never)
-    .limit(1)
-    .maybeSingle();
-
-  if (linkError) {
-    throw new BadRequestException(linkError.message);
-  }
-
-  const fallback = (linkData as { merchant_id?: string | null } | null)
-    ?.merchant_id;
-
-  if (!fallback) {
-    throw new BadRequestException(
-      'Network member organization has no merchant available for ledger attribution',
-    );
-  }
-
-  return fallback;
+  return data;
 }
 
 export async function recordNetworkContext(
@@ -380,11 +347,11 @@ export async function recordNetworkOperatorFeeReversal(
 
   const reversalEntryId = typeof data === 'string' ? data : null;
   if (reversalEntryId) {
-    const { data: feeRow } = await (supabase.getClient() as any)
-      .from('network_operator_fee_entries')
-      .select('amount, currency_code')
-      .eq('operator_fee_entry_id', reversalEntryId)
-      .maybeSingle();
+    const { data: feeRows } = await (supabase.getClient() as any).rpc(
+      'get_network_operator_fee_entry_summary',
+      { p_operator_fee_entry_id: reversalEntryId },
+    );
+    const feeRow = Array.isArray(feeRows) ? feeRows[0] : feeRows;
 
     await enqueueNetworkWebhook(
       supabase,
@@ -415,11 +382,10 @@ async function fetchOperatorFeeRuleId(
   supabase: SupabaseService,
   membershipId: string,
 ): Promise<string | null> {
-  const { data, error } = await (supabase.getClient() as any)
-    .from('network_memberships')
-    .select('operator_fee_rule_id')
-    .eq('network_membership_id', membershipId)
-    .maybeSingle();
+  const { data, error } = await (supabase.getClient() as any).rpc(
+    'get_network_membership_operator_fee_rule_id',
+    { p_network_membership_id: membershipId },
+  );
 
   if (error) {
     networkLogger.error(
@@ -428,9 +394,7 @@ async function fetchOperatorFeeRuleId(
     return null;
   }
 
-  return typeof data?.operator_fee_rule_id === 'string'
-    ? data.operator_fee_rule_id
-    : null;
+  return typeof data === 'string' ? data : null;
 }
 
 async function calculateOperatorFee(
@@ -511,28 +475,23 @@ async function fetchNetworkWebhookEnrichment(
   const memberOrganizationId =
     user.targetOrganizationId ?? user.organizationId ?? null;
 
-  const [orgResult, txResult] = await Promise.all([
-    memberOrganizationId
-      ? (supabase.getClient() as any)
-          .from('organizations')
-          .select('name')
-          .eq('organization_id', memberOrganizationId)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    (supabase.getClient() as any)
-      .from('transactions')
-      .select('customer_id')
-      .eq('transaction_id', transactionId)
-      .maybeSingle(),
-  ]);
+  const { data } = await (supabase.getClient() as any).rpc(
+    'get_network_webhook_enrichment',
+    {
+      p_member_organization_id: memberOrganizationId,
+      p_transaction_id: transactionId,
+    },
+  );
+
+  const row = Array.isArray(data) ? data[0] : data;
 
   return {
     memberOrganizationName:
-      typeof orgResult.data?.name === 'string' ? orgResult.data.name : null,
-    customerId:
-      typeof txResult.data?.customer_id === 'string'
-        ? txResult.data.customer_id
+      typeof row?.member_organization_name === 'string'
+        ? row.member_organization_name
         : null,
+    customerId:
+      typeof row?.customer_id === 'string' ? row.customer_id : null,
   };
 }
 

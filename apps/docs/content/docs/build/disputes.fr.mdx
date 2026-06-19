@@ -1,0 +1,26 @@
+---
+title: Litiges
+description: Consulter les litiges carte (`GET /disputes`).
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Les litiges sont créés automatiquement lorsque Stripe envoie des événements `charge.dispute.*` pour les paiements carte. Utilisez l'API en lecture pour lister et inspecter les litiges de votre organisation.
+
+<Callout type="info">
+  La v1 couvre l'**accès en lecture** et les webhooks marchands (`DISPUTE_CREATED`, `DISPUTE_UPDATED`, `DISPUTE_CLOSED`). La soumission de preuves et les litiges MoMo ne sont pas encore pris en charge.
+</Callout>
+
+## Lister les litiges
+
+```bash
+curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## Obtenir un litige
+
+```bash
+curl "https://api.lomi.africa/disputes/{dispute_id}" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```

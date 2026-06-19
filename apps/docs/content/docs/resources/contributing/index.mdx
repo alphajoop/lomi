@@ -3,3 +3,14 @@ title: Contributing
 description: Learn how to contribute to lomi. through code contributions, documentation improvements, and community engagement.
 index: true
 ---
+
+## Roles: developer vs contributor vs operator
+
+| Role | Who | CLI / MCP |
+| --- | --- | --- |
+| **Developer (integrator)** | Engineer at a merchant building on lomi. | **Yes** — primary audience for [CLI](/build/cli) and [MCP](/build/mcp) |
+| **Merchant (non-technical)** | Dashboard-only user | **No** — use the web dashboard |
+| **Contributor** | Open-source contributor to the monorepo | **Sometimes** — dogfood integration flows; maintain packages via [Maintaining CLI and MCP](/resources/contributing/maintaining-cli-mcp) |
+| **Platform admin** | Internal `apps/admin` operators | **No** |
+
+**Rule:** CLI and MCP help you **integrate** with the hosted merchant API. They do not operate lomi.’s platform, admin stack, or payment infrastructure.

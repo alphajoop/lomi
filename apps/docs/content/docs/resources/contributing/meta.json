@@ -2,12 +2,13 @@
   "pages": [
     "index",
     "writing-for-lomi-docs",
+    "maintaining-cli-mcp",
     "api-reference-authoring",
     "best-practices",
     "branching-strategy",
     "code-of-conduct",
     "code-reviews",
-    "using-cli",
+    "using-git",
     "versioning"
   ]
 }

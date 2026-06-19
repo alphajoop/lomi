@@ -66,22 +66,13 @@ describe('network-context', () => {
       .fn()
       .mockResolvedValueOnce({ data: 'fee-reversal-1', error: null })
       .mockResolvedValueOnce({
-        data: { amount: 25, currency_code: 'XOF' },
+        data: [{ amount: 25, currency_code: 'XOF' }],
         error: null,
       })
       .mockResolvedValueOnce({ data: null, error: null });
 
-    const from = jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      maybeSingle: jest.fn().mockResolvedValue({
-        data: { amount: 25, currency_code: 'XOF' },
-        error: null,
-      }),
-    }));
-
     const supabase = {
-      getClient: () => ({ rpc, from }),
+      getClient: () => ({ rpc }),
     } as unknown as SupabaseService;
 
     const result = await recordNetworkOperatorFeeReversal(
@@ -109,11 +100,25 @@ describe('network-context', () => {
       if (name === 'record_network_transaction_context') {
         return { data: 'ctx-1', error: null };
       }
+      if (name === 'get_network_membership_operator_fee_rule_id') {
+        return { data: 'rule-1', error: null };
+      }
       if (name === 'calculate_network_operator_fee') {
         return { data: 50, error: null };
       }
       if (name === 'record_network_operator_fee_entry') {
         return { data: 'fee-entry-1', error: null };
+      }
+      if (name === 'get_network_webhook_enrichment') {
+        return {
+          data: [
+            {
+              member_organization_name: 'Member Org',
+              customer_id: 'cust-1',
+            },
+          ],
+          error: null,
+        };
       }
       if (name === 'enqueue_network_webhook_event') {
         return { data: null, error: null };
@@ -121,46 +126,8 @@ describe('network-context', () => {
       return { data: null, error: null };
     });
 
-    const from = jest.fn((table: string) => {
-      if (table === 'network_memberships') {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { operator_fee_rule_id: 'rule-1' },
-            error: null,
-          }),
-        };
-      }
-      if (table === 'organizations') {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { name: 'Member Org' },
-            error: null,
-          }),
-        };
-      }
-      if (table === 'transactions') {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { customer_id: 'cust-1' },
-            error: null,
-          }),
-        };
-      }
-      return {
-        select: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
-      };
-    });
-
     const supabase = {
-      getClient: () => ({ rpc, from }),
+      getClient: () => ({ rpc }),
     } as unknown as SupabaseService;
 
     const result = await recordNetworkContext(supabase, networkUser(), {

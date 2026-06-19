@@ -3,7 +3,15 @@ title: 'Premiers pas'
 description: 'Installez le CLI lomi., vérifiez votre installation et lancez vos premières commandes.'
 ---
 
+import { Callout } from '@/components/docs/docs-callout';
+
 La **CLI lomi.** est distribuée via **npm** sous le nom `lomi.cli`. Elle sert à s’authentifier, générer des projets SDK, tester les webhooks en local, créer des sessions de checkout et des liens de paiement, et installer des règles pour les assistants IA.
+
+<Callout type="info" title="Pour qui">
+  La CLI lomi. s’adresse aux **développeurs qui intègrent** l’API marchande hébergée depuis le terminal — authentification, génération de projets SDK, tests de webhooks et checkouts sandbox.
+
+  Elle **ne sert pas** à exploiter la plateforme interne de lomi., le tableau de bord admin ni l’auto-hébergement du traitement des paiements. Les marchands qui n’utilisent que le tableau de bord web n’ont pas besoin de la CLI.
+</Callout>
 
 Les commandes `lomi` et `lomi.` fonctionnent toutes les deux après installation.
 

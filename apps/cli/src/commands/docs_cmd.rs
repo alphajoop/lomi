@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use clap::Args;
 use colored::Colorize;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::cli::{self, CommonOptions};
@@ -35,7 +35,7 @@ fn find_monorepo_root() -> Result<PathBuf> {
     }
 }
 
-fn run_pnpm_in_docs(root: &PathBuf, script: &str) -> Result<()> {
+fn run_pnpm_in_docs(root: &Path, script: &str) -> Result<()> {
     let docs_dir = root.join("apps/docs");
     let status = Command::new("pnpm")
         .arg(script)

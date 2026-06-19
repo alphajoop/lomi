@@ -1,0 +1,48 @@
+---
+title: 'Maintaining CLI and MCP'
+description: 'Guide for lomi. contributors and operators who develop or deploy apps/cli and apps/mcp — not for merchant integrators.'
+---
+
+The **lomi. CLI** and **MCP server** are **integrator tools**: they help developers build on the hosted merchant API. This page is for people who **maintain those packages** in the monorepo or deploy the hosted MCP server.
+
+If you are integrating lomi. into your product, use [CLI](/build/cli) and [MCP](/build/mcp) instead.
+
+## Who should read this
+
+| Role | Use CLI/MCP to… | Use this page for… |
+| --- | --- | --- |
+| **Merchant developer** | Integrate checkout, webhooks, SDK | No — use Build docs |
+| **Contributor** | Dogfood integration flows while building features | Yes — when changing `apps/cli` or `apps/mcp` |
+| **Operator** | — | Yes — deploy MCP, regenerate tools, release CLI |
+
+CLI/MCP are **not** for operating `apps/admin`, self-hosting payment processing, or general monorepo maintenance (migrations, API deploy, etc.).
+
+## CLI (`apps/cli`)
+
+Maintainer docs: [`apps/cli/CONTRIBUTING.md`](https://github.com/lomiafrica/lomi./blob/master/apps/cli/CONTRIBUTING.md)
+
+| Task | Command / location |
+| --- | --- |
+| Local dev | `cd apps/cli && cargo build && cargo test` |
+| Docs drift | `lomi docs check` (from monorepo root) |
+| Agent rules | `./apps/cli/scripts/generate-rules.sh` |
+| Release | Tag `cli-v*` — see CONTRIBUTING.md |
+
+## MCP (`apps/mcp`)
+
+Maintainer docs: [`apps/mcp/CONTRIBUTING.md`](https://github.com/lomiafrica/lomi./blob/master/apps/mcp/CONTRIBUTING.md)
+
+| Task | Command / location |
+| --- | --- |
+| Local HTTP server | `cd apps/mcp && pnpm run start:http` |
+| Regenerate tools | `pnpm run generate` → commit `src/generated/tools-manifest.json` |
+| Deploy | `.env.example`, `railway.json` |
+| Tests | `pnpm test` |
+
+Integrators should use `https://mcp.lomi.africa` or `npx @lomi./mcp` — not a self-deployed instance unless they work on lomi. engineering.
+
+## Related
+
+- [Contributing overview](/resources/contributing/overview)
+- [Writing for lomi. docs](/resources/contributing/writing-for-lomi-docs)
+- [Codebase](/resources/open-source/codebase)

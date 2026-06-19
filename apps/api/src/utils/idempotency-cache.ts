@@ -18,29 +18,30 @@ export async function lookupIdempotencyCache(
   supabase: SupabaseService,
   lookup: IdempotencyCacheLookup,
 ): Promise<IdempotencyCacheLookupResult> {
-  const { data, error } = await supabase
-    .getClient()
-    .from('api_idempotency_records')
-    .select('request_fingerprint, response_payload')
-    .eq('organization_id', lookup.organizationId)
-    .eq('environment', lookup.environment)
-    .eq('endpoint_route', lookup.endpointRoute)
-    .eq('idempotency_key', lookup.key.trim())
-    .maybeSingle();
+  const { data, error } = await (supabase.getClient() as any).rpc(
+    'lookup_api_idempotency_record',
+    {
+      p_organization_id: lookup.organizationId,
+      p_environment: lookup.environment,
+      p_endpoint_route: lookup.endpointRoute,
+      p_idempotency_key: lookup.key.trim(),
+    },
+  );
 
-  if (error || !data) {
+  const row = Array.isArray(data) ? data[0] : data;
+  if (error || !row) {
     return { kind: 'miss' };
   }
 
   const fingerprint =
-    typeof data.request_fingerprint === 'string'
-      ? data.request_fingerprint.trim()
+    typeof row.request_fingerprint === 'string'
+      ? row.request_fingerprint.trim()
       : '';
   if (fingerprint !== lookup.bodyHash.trim()) {
     throw new ConflictException('idempotency_key_conflict');
   }
 
-  return { kind: 'hit', payload: data.response_payload };
+  return { kind: 'hit', payload: row.response_payload };
 }
 
 export type IdempotentCreateResult<T> = {

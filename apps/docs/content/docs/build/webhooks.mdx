@@ -70,6 +70,9 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 | `` `REFUND_COMPLETED` ``        | A refund is successfully processed.         | `` `Refund` ``          |
 | `` `REFUND_FAILED` ``           | A refund attempt failed.                    | `` `Refund` ``          |
 | `` `REFUND_CREATED` ``         | A refund attempt was created.               | `` `Refund` ``          |
+| `` `DISPUTE_CREATED` ``        | A card dispute was opened.                  | `` `Dispute` ``         |
+| `` `DISPUTE_UPDATED` ``        | Dispute status or evidence changed.         | `` `Dispute` ``         |
+| `` `DISPUTE_CLOSED` ``         | A dispute reached a terminal state.         | `` `Dispute` ``         |
 | `` `test.webhook` ``            | A test event generated via the API.         | `` `TestPayload` ``     |
 
 <Callout type="info">

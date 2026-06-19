@@ -9,6 +9,12 @@ import { Callout } from '@/components/docs/docs-callout';
 
 The **Model Context Protocol (MCP)** lets AI assistants (Cursor, Claude Desktop, custom agents) call the **lomi. merchant API** for you—create checkouts, list payments, debug webhooks—without writing every HTTP request by hand.
 
+<Callout type="info" title="Who this is for">
+  MCP connects **your IDE or AI assistant** to **your organization’s merchant API** (same scopes as your API key). Use it while building integrations.
+
+  It is **not** for lomi. staff admin tools or running your own payment stack. Most teams should use the hosted server at `https://mcp.lomi.africa` or local stdio with `npx @lomi./mcp`.
+</Callout>
+
 <Callout type="info" title="Fastest path">
   In the [dashboard](https://dashboard.lomi.africa): **Settings → Integrations → MCP** (quick start) or **Developers → API keys → Connect MCP** (full setup with Cursor, Claude, and stdio snippets). Copy a config snippet, paste your keys, and restart your MCP client.
 </Callout>
@@ -96,6 +102,6 @@ For HTTP MCP, tool calls use whichever API environment your merchant key belongs
 - **Resources** — `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
 - **Prompts** — `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
 
-## Self-hosting the MCP server
+## Deploying your own MCP server
 
-Most developers use `https://mcp.lomi.africa` or local stdio. If you deploy your own instance, see [`apps/mcp`](https://github.com/lomiafrica/lomi./tree/master/apps/mcp) and `.env.example` for operator settings (`LOMI_MCP_BEARER_TOKEN`, `LOMI_API_BASE_URL`, etc.).
+Most integrators use `https://mcp.lomi.africa` or local stdio. Deploying a separate MCP instance is for **lomi. engineering and operators** only. See [Maintaining CLI and MCP](/resources/contributing/maintaining-cli-mcp).

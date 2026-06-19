@@ -15,7 +15,7 @@ use cli::CommonOptions;
 #[command(
     name = "lomi.",
     bin_name = "lomi",
-    about = "CLI for lomi.'s payment infrastructure",
+    about = "Developer CLI for integrating with the hosted lomi. merchant API",
     version
 )]
 struct Cli {
@@ -56,6 +56,12 @@ enum Commands {
     Transactions(commands::transactions::TransactionsArgs),
     /// Manage refunds
     Refunds(commands::refunds::RefundsArgs),
+    /// Manage payouts
+    Payouts(commands::payouts::PayoutsArgs),
+    /// List card disputes
+    Disputes(commands::disputes::DisputesArgs),
+    /// Fraud alerts
+    Fraud(commands::fraud::FraudArgs),
     /// Golden-path setup checks and next steps
     Quickstart(commands::quickstart::QuickstartArgs),
     /// Install lomi. agent rules for Cursor, Claude, and other AI tools
@@ -65,6 +71,7 @@ enum Commands {
     /// Install and update lomi. UI checkout components
     Ui(commands::ui::UiArgs),
     /// Documentation lint and drift checks (monorepo apps/docs)
+    #[command(hide = true)]
     Docs(commands::docs_cmd::DocsArgs),
     /// List all CLI profiles
     ListProfiles(commands::list_profiles::ListProfilesArgs),
@@ -94,6 +101,9 @@ async fn main() -> Result<()> {
         Commands::Products(args) => commands::products::run(&cli.common, args).await,
         Commands::Transactions(args) => commands::transactions::run(&cli.common, args).await,
         Commands::Refunds(args) => commands::refunds::run(&cli.common, args).await,
+        Commands::Payouts(args) => commands::payouts::run(&cli.common, args).await,
+        Commands::Disputes(args) => commands::disputes::run(&cli.common, args).await,
+        Commands::Fraud(args) => commands::fraud::run(&cli.common, args).await,
         Commands::Quickstart(args) => commands::quickstart::run(&cli.common, args).await,
         Commands::InstallRules(args) => commands::install_rules::run(&cli.common, args).await,
         Commands::Update(args) => commands::update::run(&cli.common, args).await,

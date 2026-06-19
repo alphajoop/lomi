@@ -607,20 +607,18 @@ export class RefundsService {
       );
     }
 
-    const { data: providerRows } = await this.supabaseService
-      .getClient()
-      .from('providers_transactions' as never)
-      .select('provider_transaction_id' as never)
-      .eq('transaction_id' as never, transactionId as never)
-      .eq('provider_code' as never, 'STRIPE' as never)
-      .limit(1);
-
-    const providerChargeId = (
-      providerRows as { provider_transaction_id?: string }[] | null
-    )?.[0]?.provider_transaction_id;
+    const { data: providerChargeId } = await (
+      this.supabaseService.getClient() as any
+    ).rpc('get_stripe_provider_charge_id', {
+      p_transaction_id: transactionId,
+    });
 
     const metadata = (tx.metadata ?? {}) as Record<string, unknown>;
-    if (!metadata.stripe_charge_id && providerChargeId) {
+    if (
+      !metadata.stripe_charge_id &&
+      typeof providerChargeId === 'string' &&
+      providerChargeId
+    ) {
       metadata.stripe_charge_id = providerChargeId;
     }
     tx.metadata = metadata;
@@ -636,18 +634,13 @@ export class RefundsService {
       return metadata.stripe_charge_id;
     }
 
-    const { data } = await this.supabaseService
-      .getClient()
-      .from('providers_transactions' as never)
-      .select('provider_transaction_id' as never)
-      .eq('transaction_id' as never, tx.transaction_id as never)
-      .eq('provider_code' as never, 'STRIPE' as never)
-      .limit(1)
-      .maybeSingle();
+    const { data: chargeId } = await (
+      this.supabaseService.getClient() as any
+    ).rpc('get_stripe_provider_charge_id', {
+      p_transaction_id: tx.transaction_id,
+    });
 
-    const chargeId = (data as { provider_transaction_id?: string } | null)
-      ?.provider_transaction_id;
-    return chargeId ?? null;
+    return typeof chargeId === 'string' && chargeId ? chargeId : null;
   }
 
   private computeStripeRefundCents(

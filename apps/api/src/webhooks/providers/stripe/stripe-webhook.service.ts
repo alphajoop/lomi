@@ -606,7 +606,7 @@ export class StripeWebhookService {
       const charge = await stripe.charges.retrieve(dispute.charge as string);
       const paymentIntentId = charge.payment_intent as string;
 
-      const { error } = await (this.supabase.getClient() as any).rpc(
+      const { data: rpcResult, error } = await (this.supabase.getClient() as any).rpc(
         'handle_stripe_dispute_created',
         {
           p_stripe_dispute_id: dispute.id,
@@ -626,6 +626,11 @@ export class StripeWebhookService {
 
       if (error) {
         throw new Error('Failed to create dispute record');
+      }
+
+      const disputeId = (rpcResult as { dispute_id?: string })?.dispute_id;
+      if (disputeId && rpcResult?.idempotent !== true) {
+        await this.notifyDisputeWebhook(disputeId, 'DISPUTE_CREATED');
       }
     } catch {
       throw new Error('Failed to create dispute record');
@@ -658,6 +663,20 @@ export class StripeWebhookService {
       if (error) {
         throw new Error('Failed to update dispute record');
       }
+
+      const { data: disputeRow, error: lookupError } = await this.supabase.rpc(
+        'get_dispute_by_stripe_id' as never,
+        { p_stripe_dispute_id: dispute.id } as never,
+      );
+
+      if (!lookupError) {
+        const row = Array.isArray(disputeRow) ? disputeRow[0] : disputeRow;
+        const disputeId = (row as unknown as { dispute_id?: string } | undefined)
+          ?.dispute_id;
+        if (disputeId) {
+          await this.notifyDisputeWebhook(disputeId, 'DISPUTE_UPDATED');
+        }
+      }
     } catch {
       throw new Error('Failed to update dispute record');
     }
@@ -673,6 +692,20 @@ export class StripeWebhookService {
    */
   private async handleDisputeClosed(dispute: Stripe.Dispute) {
     await this.handleDisputeUpdated(dispute);
+
+    try {
+      const { data: disputeRow } = await this.supabase.rpc(
+        'get_dispute_by_stripe_id' as never,
+        { p_stripe_dispute_id: dispute.id } as never,
+      );
+      const row = Array.isArray(disputeRow) ? disputeRow[0] : disputeRow;
+      const disputeId = (row as unknown as { dispute_id?: string } | undefined)?.dispute_id;
+      if (disputeId) {
+        await this.notifyDisputeWebhook(disputeId, 'DISPUTE_CLOSED');
+      }
+    } catch {
+      // non-fatal for closed notification
+    }
 
     return {
       eventType: 'charge.dispute.closed',
@@ -799,6 +832,34 @@ export class StripeWebhookService {
   /**
    * Trigger merchant webhook notification
    */
+  private async notifyDisputeWebhook(
+    disputeId: string,
+    event: 'DISPUTE_CREATED' | 'DISPUTE_UPDATED' | 'DISPUTE_CLOSED',
+  ) {
+    try {
+      const { data: payload, error } = await this.supabase.rpc(
+        'get_dispute_webhook_payload' as never,
+        { p_dispute_id: disputeId } as never,
+      );
+
+      if (error || !payload || typeof payload !== 'object') {
+        return;
+      }
+
+      const row = payload as Record<string, unknown>;
+      const organizationId = row.organization_id as string | undefined;
+      if (!organizationId) return;
+
+      await this.webhookSender.notifyOrganization(
+        organizationId,
+        event as WebhookEvent,
+        row,
+      );
+    } catch {
+      // Don't throw - webhook failures shouldn't fail the Stripe webhook
+    }
+  }
+
   private async triggerMerchantWebhook(
     paymentIntentId: string,
     organizationId: string,

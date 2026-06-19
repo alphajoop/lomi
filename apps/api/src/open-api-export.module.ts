@@ -27,6 +27,8 @@ import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
+import { DisputesModule } from './core/disputes/disputes.module';
+import { FraudModule } from './core/fraud/fraud.module';
 import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
@@ -64,6 +66,8 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     CheckoutSessionsModule,
     PaymentLinksModule,
     PayoutsModule,
+    DisputesModule,
+    FraudModule,
     SettlementsModule,
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
