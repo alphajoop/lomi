@@ -26,6 +26,7 @@ import {
   assertOptionalUuid,
   assertCardChargeReconciliationInput,
 } from './dto/assert-card-charge-reconciliation';
+import { RadarService } from '../radar/radar.service';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
@@ -55,6 +56,7 @@ export class CardChargeService {
   constructor(
     private readonly supabase: SupabaseService,
     private readonly stripeClients: StripeClientsService,
+    private readonly radarService: RadarService,
   ) {}
 
   async create(createDto: CreateCardChargeDto, user: AuthContext) {
@@ -120,6 +122,18 @@ export class CardChargeService {
       user,
       ledgerMerchantId,
     );
+
+    await this.radarService.assertChargeAllowed(user, {
+      amount,
+      currencyCode: sourceCurrency,
+      rail: 'card',
+      customerId: resolvedCustomerId,
+      metadata: {
+        ...(createDto.metadata ?? {}),
+        country: createDto.metadata?.country,
+        source: 'api_charge_card',
+      },
+    });
 
     const { data: conversionData, error: conversionError } = await (
       this.supabase.getClient() as any

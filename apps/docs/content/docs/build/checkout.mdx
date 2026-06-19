@@ -17,7 +17,7 @@ Hosted checkout is the recommended first integration for most teams. Your server
 </Callout>
 
 <Callout type="info">
-  Sessions created with a **test** API key (or linked to a test payment link) run in test mode. For manual QA—test cards, Wave, MTN MoMo—see **[Sandbox payments](/start/sandbox-payments)**.
+  Sessions created with a **test** API key (or linked to a test payment link) run in test mode. For manual QA-test cards, Wave, MTN MoMo, see **[Sandbox payments](/start/sandbox-payments)**.
 </Callout>
 
 ## When to use hosted checkout
@@ -64,10 +64,10 @@ Creates a new checkout session and returns a URL to redirect your customer to.
 
 When `product_id` or `price_id` points to a price with `pricing_model: pay_what_you_want`:
 
-- **Omit `amount`** — the session uses the suggested unit price (`amount` on the price row) × `quantity`.
-- **Pass `amount`** — must be a valid subtotal: unit price within `[minimum_amount, maximum_amount]` × `quantity`. The server rejects out-of-range values.
-- **Hosted checkout** — the buyer can change the unit price before paying; validation runs client-side and server-side.
-- **Programmatic flows** — set `amount` at session creation when you already know the chosen total.
+- **Omit `amount`**: the session uses the suggested unit price (`amount` on the price row) × `quantity`.
+- **Pass `amount`**: must be a valid subtotal: unit price within `[minimum_amount, maximum_amount]` × `quantity`. The server rejects out-of-range values.
+- **Hosted checkout**: the buyer can change the unit price before paying; validation runs client-side and server-side.
+- **Programmatic flows**: set `amount` at session creation when you already know the chosen total.
 
 ### Multi-item checkout (`line_items`)
 
@@ -75,7 +75,7 @@ When you pass **`line_items`**, each row must reference a **one-time** price wit
 
 | Code | Meaning |
 |------|---------|
-| `line_items_pwyw_not_supported` | A line uses `pay_what_you_want` pricing — use a single-product session instead |
+| `line_items_pwyw_not_supported` | A line uses `pay_what_you_want` pricing, use a single-product session instead |
 | `line_items_recurring_not_supported` | A line references a recurring product |
 | `line_items_usage_based_not_supported` | Usage-based pricing (not yet supported in carts) |
 | `line_items_mixed_product_types` | Mixed one-time and recurring products in one cart |
@@ -84,9 +84,9 @@ When you pass **`line_items`**, each row must reference a **one-time** price wit
 
 When `product_id` refers to a **recurring** product:
 
-- **Omit `amount`** — the session uses the catalog price for the selected `price_id` (quantity is not multiplied for subscriptions).
-- **Pass `amount`** — must match the catalog recurring price for validation (unless using prorated first charge at payment time; see [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)).
-- **Trial or `non_initial` signup** — the customer may pay **$0** at checkout, but the session record often still stores the **catalog price** so `create_checkout_session` satisfies `amount > 0`. Do not pass `amount: 0` unless you omit it and rely on product-derived pricing.
+- **Omit `amount`**: the session uses the catalog price for the selected `price_id` (quantity is not multiplied for subscriptions).
+- **Pass `amount`**: must match the catalog recurring price for validation (unless using prorated first charge at payment time; see [Checkout behavior: Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)).
+- **Trial or `non_initial` signup**: the customer may pay **$0** at checkout, but the session record often still stores the **catalog price** so `create_checkout_session` satisfies `amount > 0`. Do not pass `amount: 0` unless you omit it and rely on product-derived pricing.
 - Completing checkout creates a **subscription** (`SUBSCRIPTION_CREATED` webhook), not a one-time `payment` transaction only.
 
 Example:

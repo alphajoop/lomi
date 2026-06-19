@@ -20,11 +20,11 @@ WooCommerce, Magento 2 et PrestaShop n’utilent que l’**API REST publique** 
 | Point | Contrat |
 | --- | --- |
 | URL de base | `https://api.lomi.africa` (production) ou `https://sandbox.api.lomi.africa` (test) |
-| Auth | `X-API-Key` — clé **secrète** marchande depuis le tableau de bord |
+| Auth | `X-API-Key`, clé **secrète** marchande depuis le tableau de bord |
 | Créer une session | `POST /checkout-sessions` |
 | Lire une session | `GET /checkout-sessions/{id}` |
 | Paiement validé | `status` **`completed`**, avec contrôle montant / devise par rapport au panier / commande |
-| Webhooks | `X-Lomi-Event` (ex. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature` — **HMAC-SHA256 hex** sur le corps JSON **brut** |
+| Webhooks | `X-Lomi-Event` (ex. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature`, **HMAC-SHA256 hex** sur le corps JSON **brut** |
 
 Formulation canonique à côté du code :
 
@@ -43,7 +43,7 @@ Avant la mise en production : [Intégration API](/start/first-payment), [Authen
   />
   <Card
     title="Magento 2"
-    description="Module Lomi_Payments — checkout hébergé"
+    description="Module Lomi_Payments, checkout hébergé"
     href="/build/ecommerce-extensions/magento"
   />
   <Card
@@ -53,7 +53,7 @@ Avant la mise en production : [Intégration API](/start/first-payment), [Authen
   />
   <Card
     title="Shopify"
-    description="App personnalisée — paiement panier mobile money et cartes"
+    description="App personnalisée, paiement panier mobile money et cartes"
     href="/build/ecommerce-extensions/shopify"
   />
 </Cards>

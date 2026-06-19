@@ -20,11 +20,11 @@ WooCommerce, Magento 2, and PrestaShop talk only to lomi.’s **public REST API*
 | Concern | Contract |
 | --- | --- |
 | Base URL | `https://api.lomi.africa` (live) or `https://sandbox.api.lomi.africa` (test) |
-| Auth | `X-API-Key` — merchant **secret** key from the dashboard |
+| Auth | `X-API-Key`, merchant **secret** key from the dashboard |
 | Create session | `POST /checkout-sessions` |
 | Confirm session | `GET /checkout-sessions/{id}` |
 | Paid state | Session `status` **`completed`**, with amount/currency checked against the cart/order |
-| Webhooks | `X-Lomi-Event` (e.g. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature` — **HMAC-SHA256 hex** over the **raw** JSON body |
+| Webhooks | `X-Lomi-Event` (e.g. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature`, **HMAC-SHA256 hex** over the **raw** JSON body |
 
 For the canonical wording maintained next to source code, see the repo docs:
 
@@ -53,7 +53,7 @@ Before going live, also read [API integration](/start/first-payment), [Authentic
   />
   <Card
     title="Shopify"
-    description="Custom app — cart pay with mobile money and cards"
+    description="Custom app, cart pay with mobile money and cards"
     href="/build/ecommerce-extensions/shopify"
   />
 </Cards>

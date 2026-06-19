@@ -10,11 +10,11 @@ Utilisez **`POST /payouts`** pour tous les virements sortants.
 
 <DocsScreenshot name="build/payouts" alt="Paramètres de reversements dans le tableau de bord lomi." />
 
-- **`destination: "self"`** — retrait vers un **moyen de paiement enregistré** (`payout_method_id` requis). Rails : `bank`, `spi`, `wave`.
-- **`destination: "beneficiary"`** — paiement à un tiers sur **mobile money** (`wave` aujourd’hui). `recipient.name` et `recipient.phone` requis (numéro libre ; **sans** lien avec `payout_method_id`).
+- **`destination: "self"`**: retrait vers un **moyen de paiement enregistré** (`payout_method_id` requis). Rails : `bank`, `spi`, `wave`.
+- **`destination: "beneficiary"`**: paiement à un tiers sur **mobile money** (`wave` aujourd’hui). `recipient.name` et `recipient.phone` requis (numéro libre ; **sans** lien avec `payout_method_id`).
 
 <Callout type="warn">
-  **Les virements Wave (`rail: "wave"`) exigent une clé API live** (`lomi_sk_live_…`). Les clés test renvoient `400` pour les virements self et beneficiary Wave — aucun appel Wave réel.
+  **Les virements Wave (`rail: "wave"`) exigent une clé API live** (`lomi_sk_live_…`). Les clés test renvoient `400` pour les virements self et beneficiary Wave, aucun appel Wave réel.
 </Callout>
 
 <Callout type="info">
@@ -50,5 +50,13 @@ curl -X POST "https://api.lomi.africa/payouts" \
 
 ## Lister et obtenir
 
-- `GET /payouts` — retraits et virements bénéficiaires (`kind`). Les clés test ne listent que les retraits test ; les bénéficiaires live sont exclus.
-- `GET /payouts/{id}` — retrait marchand ou bénéficiaire, limité à l’organisation de la clé.
+- `GET /payouts`, retraits et virements bénéficiaires (`kind`). Les clés test ne listent que les retraits test ; les bénéficiaires live sont exclus.
+- `GET /payouts/{id}`, retrait marchand ou bénéficiaire, limité à l’organisation de la clé.
+
+## Retrait bloqué par les contrôles de risque plateforme
+
+Les retraits importants ou très fréquents peuvent être retenus automatiquement. En cas d’erreur liée au risque sur `POST /payouts`, réessayez plus tard ou [contactez le support](/resources/support).
+
+<Callout type="info">
+  Pour l’analyse des risques sur les **paiements entrants** (carte et mobile money), voir [lomi. Radar](/build/radar).
+</Callout>

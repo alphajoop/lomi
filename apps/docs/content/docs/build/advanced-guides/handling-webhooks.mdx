@@ -10,7 +10,7 @@ Operational behavior (retries, duplicate events, delivery logs): [Webhook reliab
 ## Setup checklist
 
 - [ ] HTTPS endpoint that accepts `POST` with a JSON body
-- [ ] Webhook **signing secret** (`whsec_…`) from the dashboard — stored as `LOMI_WEBHOOK_SECRET`, not sent by lomi. on delivery
+- [ ] Webhook **signing secret** (`whsec_…`) from the dashboard, stored as `LOMI_WEBHOOK_SECRET`, not sent by lomi. on delivery
 - [ ] Middleware that preserves the **raw request body** for HMAC (see below)
 - [ ] Verify `X-Lomi-Signature` **before** parsing JSON or running auth middleware meant for your REST API
 - [ ] Return **`200`** / **`204`** within a few seconds, then process the event asynchronously
@@ -25,7 +25,7 @@ Operational behavior (retries, duplicate events, delivery logs): [Webhook reliab
 </Callout>
 
 <Callout type="info" title="Signing secret ≠ API key">
-  Outbound webhook POSTs use **`X-Lomi-Signature`** (HMAC of the raw body with your endpoint’s `whsec_…` secret). lomi. does **not** send `X-API-Key` or `Authorization: Bearer` on delivery. If you see **401** in delivery logs, disable global API-key middleware on the webhook route — see [Signing secret vs Authorization](#webhook-signing-vs-authorization).
+  Outbound webhook POSTs use **`X-Lomi-Signature`** (HMAC of the raw body with your endpoint’s `whsec_…` secret). lomi. does **not** send `X-API-Key` or `Authorization: Bearer` on delivery. If you see **401** in delivery logs, disable global API-key middleware on the webhook route, see [Signing secret vs Authorization](#webhook-signing-vs-authorization).
 </Callout>
 
 ## Setup summary
@@ -132,7 +132,7 @@ function verifySignature(
 
 <h2 id="webhook-signing-vs-authorization">Signing secret vs Authorization headers (avoid 401 failures)</h2>
 
-Managing webhooks uses your **merchant API key** (`X-API-Key`) — but **lomi. does not send that key (or `Authorization: Bearer …`) when delivering events to your URL.**
+Managing webhooks uses your **merchant API key** (`X-API-Key`), but **lomi. does not send that key (or `Authorization: Bearer …`) when delivering events to your URL.**
 
 For **outbound** webhook HTTP requests, expect only:
 
@@ -143,7 +143,7 @@ For **outbound** webhook HTTP requests, expect only:
 | `X-Lomi-Event` | Same value as top-level `"event"` in the JSON body |
 | `User-Agent` | `lomi.-Webhook/1.0` |
 
-The **`whsec_…` signing secret** is for **you** to verify `X-Lomi-Signature` on the raw body — not a token lomi. places in `Authorization`.
+The **`whsec_…` signing secret** is for **you** to verify `X-Lomi-Signature` on the raw body, not a token lomi. places in `Authorization`.
 
 **If delivery logs show HTTP 401**, or a response body like `Authentication required`, that answer almost always comes **from your own server or proxy** (framework auth middleware, API gateway, Cloudflare Access, a catch-all Bearer rule, etc.) **before** your webhook handler runs. lomi. cannot satisfy a custom Bearer or API-key gate on POST.
 
@@ -157,11 +157,11 @@ Once the signature is verified, you can safely process the event payload.
 
 ```typescript filename="Processing webhook events"
 interface LomiWebhookEvent {
-  id: string; // UUID — use for idempotency/dedupe
+  id: string; // UUID: use for idempotency/dedupe
   event: string; // e.g., 'PAYMENT_SUCCEEDED'
   timestamp: string;
   data: unknown; // Structure depends on the event type
-  /** Mirrors API host `NODE_ENV` (e.g. `production`, `development`) — not a checkout sandbox discriminator */
+  /** Mirrors API host `NODE_ENV` (e.g. `production`, `development`), not a checkout sandbox discriminator */
   lomi_environment: string;
 }
 
@@ -237,7 +237,7 @@ async function markEventAsProcessed(eventId: string): Promise<void> {
 
 **Acknowledgment-first design:** Treat the webhook `POST` as a transport shim. Validate `X-Lomi-Signature`, persist or enqueue whatever you absolutely need so you cannot lose track of the envelope, then **`200`** / **`204`** back to lomi. immediately. Anything that touches external vendors, heavyweight SQL, or multi-step saga logic should execute **after** the HTTP lifecycle completes successfully from lomi.’s standpoint.
 
-Acknowledge webhook receipt by returning a `2xx` status code (e.g., `200`) **within a small number of seconds in the worst case** — but **aim for sub-second latency** routinely. Reason: each outbound POST from lomi. is guarded by **about a four-second** client read timeout; blowing that budget marks the delivery as failed for that round and may consume one of your limited automatic retries ([full matrix](/build/advanced-guides/webhook-reliability)). Defer heavy work to **your own** queue afterward.
+Acknowledge webhook receipt by returning a `2xx` status code (e.g., `200`) **within a small number of seconds in the worst case**: but **aim for sub-second latency** routinely. Reason: each outbound POST from lomi. is guarded by **about a four-second** client read timeout; blowing that budget marks the delivery as failed for that round and may consume one of your limited automatic retries ([full matrix](/build/advanced-guides/webhook-reliability)). Defer heavy work to **your own** queue afterward.
 
 ```typescript filename="Responding quickly and processing asynchronously"
 async function handleWebhook(req: express.Request, res: express.Response) {
@@ -257,7 +257,7 @@ async function handleWebhook(req: express.Request, res: express.Response) {
 
 ### Handle duplicates (idempotency)
 
-Network issues, automatic retries, manual replays from the dashboard, and idempotency safeguards on lomi.’s side all mean you should expect **duplicate POSTs over time**. That is normal rather than exceptional — bake deduplication into your schema and workflows from day one rather than treating it as a rare bug.
+Network issues, automatic retries, manual replays from the dashboard, and idempotency safeguards on lomi.’s side all mean you should expect **duplicate POSTs over time**. That is normal rather than exceptional, bake deduplication into your schema and workflows from day one rather than treating it as a rare bug.
 
 - **Check payload `id`:** Store the top-level `id` (UUID) of processed deliveries. Skip if already handled.
 - **Database Constraints:** Use unique constraints in your database where appropriate (e.g., on an order update based on the transaction ID) to prevent duplicate operations at the data layer.

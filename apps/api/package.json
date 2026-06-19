@@ -29,6 +29,8 @@
     "fix:specs": "pnpx tsx src/utils/scripts/fix-specs.ts",
     "knip": "pnpm dlx knip",
     "openapi:export": "pnpx tsx src/scripts/export-openapi.ts",
+    "openapi:export:agent": "pnpx tsx src/scripts/export-agent-openapi.ts",
+    "openapi:export:all": "pnpm run openapi:export && pnpm run openapi:export:agent",
     "setup:whatsapp-webhooks": "pnpx tsx src/utils/scripts/setup-kapso-platform-webhook.ts --apply-secrets --project-ref mdswvokxrnfggrujsfjd"
   },
   "keywords": [

@@ -158,12 +158,12 @@ lomi dev --env-file .env.local
 | `-p, --port` | `4242` | HTTP port |
 | `--env-file` | `.env` | Path to dotenv file |
 | `--verify-signature` | auto | Verify `X-Lomi-Signature` header |
-| `--skip-rules-install` | — | Skip agent rules prompt |
+| `--skip-rules-install` | - | Skip agent rules prompt |
 
 **Endpoints:**
 
-- `POST /webhook` — receive webhook events
-- `GET /health` — health check
+- `POST /webhook`, receive webhook events
+- `GET /health`, health check
 
 ---
 
@@ -379,7 +379,7 @@ lomi install-rules --help
 
 ## Maintainers
 
-The `lomi docs` command is hidden from default `--help`. It is for **lomi. contributors** working on documentation in the monorepo — not for merchant integrators.
+The `lomi docs` command is hidden from default `--help`. It is for **lomi. contributors** working on documentation in the monorepo, not for merchant integrators.
 
 ### `lomi docs check`
 

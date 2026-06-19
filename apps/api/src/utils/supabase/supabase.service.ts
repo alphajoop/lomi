@@ -43,6 +43,29 @@ export class SupabaseService implements OnModuleInit {
     return this.client;
   }
 
+  /** User-scoped client for dashboard RPCs that rely on auth.uid(). */
+  getUserClient(accessToken: string): SupabaseClient<Database> {
+    const supabaseUrl =
+      this.configService.get<string>('SUPABASE_URL') ||
+      process.env.SUPABASE_URL;
+    const publishableKey =
+      this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY') ||
+      process.env.SUPABASE_PUBLISHABLE_KEY;
+
+    if (!supabaseUrl || !publishableKey) {
+      throw new Error('Supabase publishable key is missing for user client');
+    }
+
+    return createClient<Database>(supabaseUrl, publishableKey, {
+      auth: { persistSession: false },
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
+  }
+
   /**
    * Typed RPC helper method that properly infers function arguments and return types
    */

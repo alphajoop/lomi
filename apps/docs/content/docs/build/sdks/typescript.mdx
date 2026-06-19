@@ -42,7 +42,7 @@ import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
   apiKey: process.env.LOMI_SECRET_KEY!,
-  environment: 'test', // sandbox — use 'live' only in production
+  environment: 'test', // sandbox: use 'live' only in production
 });
 ```
 
@@ -336,7 +336,7 @@ import type { Database } from '@lomi./sdk';
 type Customer = Database['public']['Tables']['customers']['Row'];
 ```
 
-For request bodies, infer from examples or introspect payloads at runtime—the public SDK methods use `unknown` placeholders on purpose until stricter codegen lands.
+For request bodies, infer from examples or introspect payloads at runtime, the public SDK methods use `unknown` placeholders on purpose until stricter codegen lands.
 
 ---
 

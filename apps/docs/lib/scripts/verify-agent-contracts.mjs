@@ -13,7 +13,8 @@ const monorepoRoot = join(__dirname, '..', '..', '..', '..');
 
 const paths = {
   agentCard: join(monorepoRoot, 'apps/website/public/.well-known/agent.json'),
-  openApi: join(docsRoot, 'openapi.json'),
+  merchantOpenApi: join(docsRoot, 'openapi.json'),
+  agentOpenApi: join(docsRoot, 'agent-openapi.json'),
 };
 
 function mustParseJson(label, filePath) {
@@ -29,9 +30,26 @@ if (typeof agent.name !== 'string' || !agent.endpoints?.openapi) {
   throw new Error('agent.json: expected name and endpoints.openapi');
 }
 
-const spec = mustParseJson('OpenAPI', paths.openApi);
-if (!spec.openapi || !spec.paths || typeof spec.paths !== 'object') {
+if (!agent.endpoints.agent_openapi) {
+  throw new Error(
+    'agent.json: expected endpoints.agent_openapi (re-run agent OpenAPI export)',
+  );
+}
+
+const merchantSpec = mustParseJson('merchant OpenAPI', paths.merchantOpenApi);
+if (
+  !merchantSpec.openapi ||
+  !merchantSpec.paths ||
+  typeof merchantSpec.paths !== 'object'
+) {
   throw new Error('openapi.json: invalid OpenAPI document');
+}
+
+const agentSpec = mustParseJson('agent OpenAPI', paths.agentOpenApi);
+if (!agentSpec.openapi || !agentSpec.paths || typeof agentSpec.paths !== 'object') {
+  throw new Error(
+    'agent-openapi.json: invalid OpenAPI document (run apps/api: pnpm run openapi:export:agent)',
+  );
 }
 
 const requiredPaths = [
@@ -41,10 +59,16 @@ const requiredPaths = [
   '/agent/workflows',
   '/agent/handoff',
 ];
+
 for (const p of requiredPaths) {
-  if (!spec.paths[p]) {
+  if (!agentSpec.paths[p]) {
     throw new Error(
-      `OpenAPI must include path ${p} (re-run apps/api: pnpm run openapi:export)`,
+      `agent-openapi.json must include path ${p} (re-run apps/api: pnpm run openapi:export:agent)`,
+    );
+  }
+  if (merchantSpec.paths[p]) {
+    throw new Error(
+      `Merchant openapi.json must not include agent path ${p} (agent routes belong in agent-openapi.json)`,
     );
   }
 }

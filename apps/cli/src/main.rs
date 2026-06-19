@@ -42,6 +42,10 @@ enum Commands {
     Dev(commands::dev::DevArgs),
     /// Listen for cloud webhook events (sandbox-first)
     Listen(commands::listen::ListenArgs),
+    /// Emit a synthetic webhook event (sandbox)
+    Trigger(commands::trigger::TriggerArgs),
+    /// Print MCP HTTP client configuration
+    Mcp(commands::mcp_config::McpArgs),
     /// Run integration health checks
     Probe(commands::probe::ProbeArgs),
     /// Manage checkout sessions
@@ -60,8 +64,8 @@ enum Commands {
     Payouts(commands::payouts::PayoutsArgs),
     /// List card disputes
     Disputes(commands::disputes::DisputesArgs),
-    /// Fraud alerts
-    Fraud(commands::fraud::FraudArgs),
+    /// Payment risk (Radar) assessments
+    Radar(commands::radar::RadarArgs),
     /// Golden-path setup checks and next steps
     Quickstart(commands::quickstart::QuickstartArgs),
     /// Install lomi. agent rules for Cursor, Claude, and other AI tools
@@ -94,6 +98,8 @@ async fn main() -> Result<()> {
         Commands::Init(args) => commands::init::run(&cli.common, args).await,
         Commands::Dev(args) => commands::dev::run(&cli.common, args).await,
         Commands::Listen(args) => commands::listen::run(&cli.common, args).await,
+        Commands::Trigger(args) => commands::trigger::run(&cli.common, args).await,
+        Commands::Mcp(args) => commands::mcp_config::run(&cli.common, args).await,
         Commands::Probe(args) => commands::probe::run(&cli.common, args).await,
         Commands::Checkout(args) => commands::checkout::run(&cli.common, args).await,
         Commands::Payments(args) => commands::payments::run(&cli.common, args).await,
@@ -103,7 +109,7 @@ async fn main() -> Result<()> {
         Commands::Refunds(args) => commands::refunds::run(&cli.common, args).await,
         Commands::Payouts(args) => commands::payouts::run(&cli.common, args).await,
         Commands::Disputes(args) => commands::disputes::run(&cli.common, args).await,
-        Commands::Fraud(args) => commands::fraud::run(&cli.common, args).await,
+        Commands::Radar(args) => commands::radar::run(&cli.common, args).await,
         Commands::Quickstart(args) => commands::quickstart::run(&cli.common, args).await,
         Commands::InstallRules(args) => commands::install_rules::run(&cli.common, args).await,
         Commands::Update(args) => commands::update::run(&cli.common, args).await,

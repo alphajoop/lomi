@@ -19,6 +19,7 @@ export class AgentCapabilitiesController {
         version: '1.1.0',
         base_url: 'https://api.lomi.africa',
         open_api: 'https://lomi.africa/openapi.json',
+        agent_open_api: 'https://lomi.africa/agent-openapi.json',
         site: 'https://lomi.africa',
         agent_card: 'https://lomi.africa/.well-known/agent.json',
       },

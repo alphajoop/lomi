@@ -1,0 +1,63 @@
+---
+title: lomi. Radar
+description: Analysez les encaissements carte et mobile money avec évaluations de risque, webhooks et facturation à l'usage.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+**lomi. Radar** évalue les **encaissements entrants** (carte, MTN, Wave) avant leur finalisation. C'est distinct des [Litiges](/build/disputes) (chargebacks Stripe a posteriori) et des contrôles de retrait plateforme décrits dans [Payouts](/build/payouts).
+
+<Callout type="info">
+  Radar est **opt-in** par organisation. Activez-le via `PATCH /organization/radar-settings` (`enabled: true`). Désactivé par défaut.
+</Callout>
+
+## Activer Radar
+
+```bash
+curl -X PATCH "https://api.lomi.africa/organization/radar-settings" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "enabled": true, "mode": "block" }'
+```
+
+| Champ | Valeurs | Effet |
+| --- | --- | --- |
+| `enabled` | `true` / `false` | Active ou désactive le screening |
+| `mode` | `monitor` | Signale sans bloquer |
+| `mode` | `block` | Refuse les encaissements selon les règles block |
+| `stripe_radar_passthrough` | `true` (défaut) | Enrichit avec Stripe Radar après capture carte |
+
+## Règles intégrées (v1)
+
+| Règle | Rails | Action par défaut |
+| --- | --- | --- |
+| `high_value_charge` | carte, MTN, Wave | Flag ≥ 500 000 XOF |
+| `velocity_charges_1h` | tous | Block > 20 encaissements / client / heure |
+| `repeat_phone_24h` | MTN, Wave | Flag même téléphone sur plusieurs clients |
+| `card_country_mismatch` | carte | Flag pays hors UEMOA |
+
+## Lister les évaluations
+
+```bash
+curl "https://api.lomi.africa/risk-assessments?decision=flag" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+Filtres : `decision`, `rail`, `startDate`, `endDate`.
+
+## Webhooks
+
+- `PAYMENT_RISK_FLAGGED`
+- `PAYMENT_RISK_BLOCKED`
+
+## Litiges vs Radar vs retraits
+
+| | **Litiges** | **Radar** | **Contrôles retrait** |
+| --- | --- | --- | --- |
+| Moment | Après chargeback | Avant/pendant encaissement | Au retrait |
+| API | `GET /disputes` | `GET /risk-assessments` | Aucune (interne) |
+| Dashboard | Paramètres → Support → Litiges | Badge risque sur transactions | Message d'erreur retrait |
+
+## Facturation à l'usage
+
+Chaque screening peut émettre un événement `radar_screen` via [Facturation à l'usage](/build/usage-billing).

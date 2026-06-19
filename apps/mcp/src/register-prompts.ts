@@ -102,4 +102,34 @@ export function registerLomiPrompts(
       ],
     }),
   );
+
+  server.registerPrompt(
+    'setup_network_operator',
+    {
+      title: 'Set up a Network operator flow',
+      description:
+        'Operator checklist: invite a member, activate membership, run delegated checkout.',
+    },
+    async () => ({
+      messages: [
+        {
+          role: 'user',
+          content: {
+            type: 'text',
+            text: [
+              'Help me operate lomi. Network as an approved operator:',
+              '1. Confirm operator status in the dashboard Network panel (Members, Enrollments).',
+              `2. Create an enrollment invite (dashboard or assistant create_network_enrollment_invite).`,
+              '3. Share the enrollment link: https://dashboard.lomi.africa/network/enroll/{token}',
+              '4. After the member completes enrollment, activate the membership (pending_review → active).',
+              '5. Capabilities auto-grant on activation from requested_capabilities.',
+              `6. ${createCheckout} — first delegated payment with header Lomi-Account: acct_...`,
+              '',
+              'Use sandbox keys first. Document each step outcome.',
+            ].join('\n'),
+          },
+        },
+      ],
+    }),
+  );
 }

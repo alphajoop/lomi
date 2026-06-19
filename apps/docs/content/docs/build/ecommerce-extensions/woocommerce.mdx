@@ -1,7 +1,7 @@
 ---
 title: WooCommerce
 description:
-  Install and configure lomi. WooCommerce gateway — hosted checkout
+  Install and configure lomi. WooCommerce gateway, hosted checkout
   sessions, return handler, and signed webhooks.
 ---
 
@@ -24,7 +24,7 @@ Download the latest plugin zip from GitHub Releases:
 
 [Download woo-lomi.zip](https://github.com/lomiafrica/lomi./releases/latest/download/woo-lomi.zip)
 
-1. **WordPress Admin → Plugins → Add New → Upload Plugin** — choose `woo-lomi.zip` and activate.
+1. **WordPress Admin → Plugins → Add New → Upload Plugin**: choose `woo-lomi.zip` and activate.
 2. Releases are published on `woo-v*` tags (for example `woo-v1.002.0`). The asset name is always **`woo-lomi.zip`** so the `latest/download` URL stays stable.
 
 To build locally from the monorepo: `cd apps/plugins/woo && npm run release`.
@@ -61,7 +61,7 @@ Implementation reference: [`class-wc-gateway-lomi.php`](https://github.com/lomia
 1. On each subscription product (or variation), set **lomi price ID** in the product editor **lomi.** tab (`_lomi_price_id`).
 2. Checkout is **blocked** if a subscription line has no mapping.
 3. First payment sends `price_id` / `product_id` to `POST /checkout-sessions` so lomi creates a subscription.
-4. **Renewals** are billed by lomi. subscription engine — WooCommerce does not auto-charge renewals with hosted checkout.
+4. **Renewals** are billed by lomi. subscription engine, WooCommerce does not auto-charge renewals with hosted checkout.
 
 ## Webhooks
 
@@ -70,7 +70,7 @@ Implementation reference: [`class-wc-gateway-lomi.php`](https://github.com/lomia
 | `X-Lomi-Event` | `PAYMENT_SUCCEEDED` completes orders; `REFUND_COMPLETED` adds refund notes |
 | `X-Lomi-Signature` | HMAC-SHA256 hex of raw body, secret = dashboard webhook secret |
 
-Always verify on the **exact raw bytes** received — do not re-stringify JSON.
+Always verify on the **exact raw bytes** received, do not re-stringify JSON.
 
 ## Go-live and QA
 

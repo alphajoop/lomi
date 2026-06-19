@@ -93,7 +93,7 @@ The JSON payload will have the following structure. The `data` object typically 
 }
 ```
 
-The top-level `id` is a UUID for idempotency (not an `evt_` prefix). **`lomi_environment`** mirrors how the sending API sees its host environment (`production`, `development`, etc.) — treat it as diagnostic, not a substitute for sandbox vs production credentials on your side.
+The top-level `id` is a UUID for idempotency (not an `evt_` prefix). **`lomi_environment`** mirrors how the sending API sees its host environment (`production`, `development`, etc.), treat it as diagnostic, not a substitute for sandbox vs production credentials on your side.
 
 ## 4. Verifying signatures
 
@@ -221,18 +221,18 @@ Your endpoint MUST respond to the webhook request quickly with an HTTP status co
 
 **Why respond first?** Until lomi. receives a **`2xx`**, your integration is assumed not to have accepted the webhook. Sending the acknowledgment straight after signature verification is the contract: you promise “I received this delivery safely”; everything else belongs in **your** workers or databases afterward.
 
-Each delivery attempt uses a bounded HTTP read timeout (**about four seconds**) on lomi.’s outbound client. Waiting until that limit means the attempt is recorded as unsuccessful for that round. You should comfortably stay inside that bound by answering with **`200`** or **`204`** in normal conditions (typically well under **one second**), then enqueue any heavy lifting. Operational numbers, backoff, and when lomi retries are spelled out under [Webhook reliability — Timeouts and retries](/build/advanced-guides/webhook-reliability).
+Each delivery attempt uses a bounded HTTP read timeout (**about four seconds**) on lomi.’s outbound client. Waiting until that limit means the attempt is recorded as unsuccessful for that round. You should comfortably stay inside that bound by answering with **`200`** or **`204`** in normal conditions (typically well under **one second**), then enqueue any heavy lifting. Operational numbers, backoff, and when lomi retries are spelled out under [Webhook reliability: Timeouts and retries](/build/advanced-guides/webhook-reliability).
 
 ## 6. Retries
 
-If lomi. does not receive an acceptable HTTP response (“success” meaning **`2xx`** in this context) — or hits the outbound timeout described above — the attempt is counted as unsuccessful. Depending on circumstances, later attempts may arrive at **your endpoint** so the event ultimately reaches your systems:
+If lomi. does not receive an acceptable HTTP response (“success” meaning **`2xx`** in this context), or hits the outbound timeout described above, the attempt is counted as unsuccessful. Depending on circumstances, later attempts may arrive at **your endpoint** so the event ultimately reaches your systems:
 
 - Retryable failures (for example **5xx**, certain network outages, or time-outs on lomi.’s side for that attempt) can be retried with **exponential backoff** and a **finite** number of attempts; the exact ceiling depends on whether the event was sent on the **synchronous** path or **queued** path (see the reliability guide).
 - **Client errors in the 4xx range** are usually treated as **non-retryable** for that delivery: if your server returns **401**, **404**, or **400** because of application logic, lomi. will not keep hammering the same broken configuration. Fix the route, then use the dashboard or API to **retry** from a log entry if needed.
 
 **Idempotency still matters:** between legitimate retries, duplicate jobs, and your own replays, you may see the **same logical event** more than once. Design handlers so that processing the same payload twice is safe: record the envelope’s top-level **`id`** (UUID) along with business keys like **`transaction_id`** or your own **`metadata`**, use unique constraints where appropriate, and prefer “already applied → no-op” over failing hard.
 
-For tables, environment flags, and implementation-oriented detail, read **[Webhook reliability — Timeouts and retries](/build/advanced-guides/webhook-reliability)** — that page is the canonical reference for how the API service behaves today.
+For tables, environment flags, and implementation-oriented detail, read **[Webhook reliability: Timeouts and retries](/build/advanced-guides/webhook-reliability)**: that page is the canonical reference for how the API service behaves today.
 
 ## 7. Testing webhooks
 
@@ -241,7 +241,7 @@ You can test your endpoint integration using the "Test Webhook" feature in lomi.
 ## 8. Best practices summary
 
 - **Verify Signatures:** Always verify the `X-Lomi-Signature` using your signing secret and a timing-safe comparison.
-- **Respond Quickly:** Send a `200 OK` (or other `2xx`) as soon as the signature checks out — well **before** lomi’s outbound **~4 second** read timer becomes a factor for that attempt ([why](/build/advanced-guides/webhook-reliability)).
+- **Respond Quickly:** Send a `200 OK` (or other `2xx`) as soon as the signature checks out, well **before** lomi’s outbound **~4 second** read timer becomes a factor for that attempt ([why](/build/advanced-guides/webhook-reliability)).
 - **Process Asynchronously:** Defer complex logic to background jobs.
 - **Handle Duplicates (Idempotency):** Design your system to gracefully handle receiving the same event multiple times. Check the event `id`.
 - **Use HTTPS:** Ensure your endpoint uses HTTPS for secure communication.
@@ -250,7 +250,7 @@ You can test your endpoint integration using the "Test Webhook" feature in lomi.
 ## 9. Troubleshooting
 
 - **Check Delivery Logs:** lomi. Dashboard (**Developers -> Webhooks -> Select Endpoint -> Logs**) shows the history of delivery attempts for your endpoint, including success/failure status codes and response bodies captured by lomi. This is useful for diagnosing issues.
-- **401 Unauthorized / `"Authentication required"` in the response body:** That message is normally **from your endpoint or reverse proxy**, not from lomi. Outbound webhook POSTs include `X-Lomi-Signature` for verification only — **not** `Authorization: Bearer` or `X-API-Key`. Exclude your webhook route from blanket API authentication and verify the HMAC ; see [Signing secret vs Authorization headers](/build/advanced-guides/handling-webhooks).
+- **401 Unauthorized / `"Authentication required"` in the response body:** That message is normally **from your endpoint or reverse proxy**, not from lomi. Outbound webhook POSTs include `X-Lomi-Signature` for verification only, **not** `Authorization: Bearer` or `X-API-Key`. Exclude your webhook route from blanket API authentication and verify the HMAC ; see [Signing secret vs Authorization headers](/build/advanced-guides/handling-webhooks).
 - **Signature Mismatches:** Usually caused by using the wrong secret, modifying the payload before verification, or not using the raw request body.
-- **Timeouts:** lomi waits only **about four seconds per HTTP attempt** for your handler to finish. If you still time out after optimizing, inspect everything that executes **before** the `2xx` — most integrations only need a tiny JSON acknowledgement on the wire; heavier jobs belong strictly in **your** queue afterward.
+- **Timeouts:** lomi waits only **about four seconds per HTTP attempt** for your handler to finish. If you still time out after optimizing, inspect everything that executes **before** the `2xx`, most integrations only need a tiny JSON acknowledgement on the wire; heavier jobs belong strictly in **your** queue afterward.
 - **Firewall/Network Issues:** Ensure your server/firewall allows incoming POST requests from lomi.'s IP addresses (if IP filtering is used).

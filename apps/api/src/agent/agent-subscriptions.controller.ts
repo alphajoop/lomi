@@ -40,14 +40,14 @@ export class AgentSubscriptionsController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @ApiOperation({
     summary:
-      "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
+      "S'inscrire aux notifications adaptées à l'agent (persistant + relais SSE Redis)",
   })
   @ApiResponse({ status: 201, description: 'Créé' })
-  create(
+  async create(
     @CurrentUser() user: AuthContext,
     @Body() body: CreateSubscriptionDto,
   ) {
-    const rec = this.store.create(user.organizationId, {
+    const rec = await this.store.create(user.organizationId, {
       topics: body.topics,
       channel: body.channel,
       webhook_url: body.webhook_url,
@@ -61,8 +61,8 @@ export class AgentSubscriptionsController {
 
   @Get('subscriptions')
   @ApiOperation({ summary: "Lister les abonnements de l'agent" })
-  list(@CurrentUser() user: AuthContext) {
-    return { data: this.store.list(user.organizationId) };
+  async list(@CurrentUser() user: AuthContext) {
+    return { data: await this.store.list(user.organizationId) };
   }
 
   @Delete('subscriptions/:id')
@@ -70,8 +70,8 @@ export class AgentSubscriptionsController {
   @ApiOperation({ summary: 'Supprimer un abonnement' })
   @ApiResponse({ status: 200, description: 'Supprimé' })
   @ApiResponse({ status: 404, description: 'Introuvable' })
-  remove(@CurrentUser() user: AuthContext, @Param('id') id: string) {
-    const ok = this.store.delete(user.organizationId, id);
+  async remove(@CurrentUser() user: AuthContext, @Param('id') id: string) {
+    const ok = await this.store.delete(user.organizationId, id);
     if (!ok) {
       throw new NotFoundException('Subscription not found');
     }

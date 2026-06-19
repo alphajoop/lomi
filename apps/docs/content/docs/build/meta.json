@@ -30,6 +30,8 @@
     "discount-coupons",
     "transactions",
     "refunds",
+    "disputes",
+    "radar",
     "payouts",
     "balance-and-settlement",
     "---Platform---",

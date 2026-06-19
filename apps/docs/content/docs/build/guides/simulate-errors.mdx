@@ -9,7 +9,7 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-Use this index to exercise failure paths in **sandbox**. Full test card numbers and MoMo behavior live in **[Sandbox payments](/start/sandbox-payments)**—this page routes you to the right scenario.
+Use this index to exercise failure paths in **sandbox**. Full test card numbers and MoMo behavior live in **[Sandbox payments](/start/sandbox-payments)**-this page routes you to the right scenario.
 
 <Callout type="warn">
   Run these scenarios only with **test API keys** (`lomi_sk_test_...`). Never use test card numbers in live mode.
@@ -19,12 +19,12 @@ Use this index to exercise failure paths in **sandbox**. Full test card numbers 
 
 | Scenario | How to trigger | Expected outcome | Learn more |
 | --- | --- | --- | --- |
-| Card approved | `4242 4242 4242 4242` on hosted checkout | `completed`, test balance credit | [Sandbox payments — cards](/start/sandbox-payments#testing-card-payments) |
+| Card approved | `4242 4242 4242 4242` on hosted checkout | `completed`, test balance credit | [Sandbox payments: cards](/start/sandbox-payments#testing-card-payments) |
 | Card declined | Decline test PANs in sandbox table | `failed` | Same section |
 | 3D Secure / authentication | Auth-required test cards | `requires_action` or challenge UI | [Sandbox payments](/start/sandbox-payments) |
 | Wave (test) | Select Wave on sandbox checkout | Often immediate `completed` | [Wave](/build/payment-methods/wave) |
 | MTN MoMo (test) | `POST /charge/mtn` with test MSISDN | Immediate `completed` on test key | [MTN MoMo](/build/payment-methods/mtn-momo) |
-| Direct MoMo `pending` (test) | `X-Scenario-Key: pending` on `POST /charge/mtn` or `/charge/wave` | Charge stays `PENDING`; no auto-complete | [Sandbox payments — scenarios](/start/sandbox-payments#testing-mobile-money) |
+| Direct MoMo `pending` (test) | `X-Scenario-Key: pending` on `POST /charge/mtn` or `/charge/wave` | Charge stays `PENDING`; no auto-complete | [Sandbox payments: scenarios](/start/sandbox-payments#testing-mobile-money) |
 | Direct MoMo `failed` (test) | `X-Scenario-Key: failed` on `POST /charge/mtn` or `/charge/wave` | `400` error response | Same section |
 | MTN MoMo (live) | Real MSISDN, live key | Starts `PENDING` | [Verify payments](/build/guides/verify-payments) |
 | Pending expiration | Wait beyond session/transaction TTL | `expired` or `failed` | [Payment state machine](/api/payment-state-machine) |
@@ -36,7 +36,7 @@ Use this index to exercise failure paths in **sandbox**. Full test card numbers 
 
 ## Direct charge scenarios (test key only)
 
-On **`POST /charge/mtn`** and **`POST /charge/wave`**, send `X-Scenario-Key` to override default test behavior. This applies to **direct charges only**—hosted checkout and card charges do not read this header yet.
+On **`POST /charge/mtn`** and **`POST /charge/wave`**, send `X-Scenario-Key` to override default test behavior. This applies to **direct charges only**-hosted checkout and card charges do not read this header yet.
 
 | Header value | Behavior |
 | --- | --- |

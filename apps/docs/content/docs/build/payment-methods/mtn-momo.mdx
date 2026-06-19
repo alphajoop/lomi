@@ -1,6 +1,6 @@
 ---
 title: 'How do I accept MTN MoMo payments?'
-description: 'MTN Mobile Money across CI and regional markets—hosted checkout, POST /charge/mtn, and country codes.'
+description: 'MTN Mobile Money across CI and regional markets, hosted checkout, POST /charge/mtn, and country codes.'
 docType: how-to
 ---
 
@@ -14,17 +14,17 @@ MTN MoMo supports multiple countries beyond UEMOA. Use [hosted checkout](/build/
 ## Direct charge essentials
 
 - Pass `phone_number` in E.164 format (e.g. `+2250700000000`).
-- Pass `countryCode` (ISO 3166-1 alpha-2) when the payer is outside CI—default is `CI`.
+- Pass `countryCode` (ISO 3166-1 alpha-2) when the payer is outside CI-default is `CI`.
 - **Live:** response status is `PENDING` until the customer approves on their phone.
 - **Test:** with a test API key, status may be `completed` immediately.
 
-See [Charges API — MTN](/api/charge/ChargesController_createMtnCharge).
+See [Charges API: MTN](/api/charge/ChargesController_createMtnCharge).
 
 ## Supported countries
 
 Full dial-prefix and MTN environment table: [Payment methods hub](/build/guides/payment-methods#mtn-momo--supported-countries).
 
-Sandbox MSISDN patterns and test behavior: [Sandbox payments — MTN](/start/sandbox-payments).
+Sandbox MSISDN patterns and test behavior: [Sandbox payments: MTN](/start/sandbox-payments).
 
 ## Verify before fulfill
 

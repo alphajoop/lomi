@@ -22,11 +22,11 @@ Checkout combines **checkout sessions**, **payment links**, **products/prices**,
 
 Flexible pricing is available for **one-time** products only (`pricing_model: pay_what_you_want` on a price row):
 
-- **Per-unit pricing** — the customer chooses a unit price; total = unit × `quantity`.
-- **`amount` on the price** — suggested unit price pre-filled at checkout (defaults to `minimum_amount` if omitted when creating the product).
-- **Bounds** — `minimum_amount` (required) and optional `maximum_amount` cap what the customer may pay per unit. The API and database **reject** prices where suggested `amount` is outside `[minimum_amount, maximum_amount]`.
-- **Payment links** — product links pre-fill the suggested amount from the linked `price_id` (or default price); the hosted checkout page lets the buyer adjust within bounds before paying.
-- **API sessions** — when creating a checkout session with `product_id`/`price_id`, pass `amount` as the product subtotal or omit it to use the suggested price × quantity. See [Checkout sessions](/build/checkout) and [Products](/build/products).
+- **Per-unit pricing**: the customer chooses a unit price; total = unit × `quantity`.
+- **`amount` on the price**: suggested unit price pre-filled at checkout (defaults to `minimum_amount` if omitted when creating the product).
+- **Bounds**: `minimum_amount` (required) and optional `maximum_amount` cap what the customer may pay per unit. The API and database **reject** prices where suggested `amount` is outside `[minimum_amount, maximum_amount]`.
+- **Payment links**: product links pre-fill the suggested amount from the linked `price_id` (or default price); the hosted checkout page lets the buyer adjust within bounds before paying.
+- **API sessions**: when creating a checkout session with `product_id`/`price_id`, pass `amount` as the product subtotal or omit it to use the suggested price × quantity. See [Checkout sessions](/build/checkout) and [Products](/build/products).
 
 <Callout type="warning">
   **Do not include pay-what-you-want prices in multi-item checkout.** Use a dedicated single-product payment link or checkout session for donations and flexible pricing. Cart APIs return `line_items_pwyw_not_supported`.
@@ -76,7 +76,7 @@ lomi. uses different renewal mechanics by payment rail:
 - Overdue subscriptions that never receive payment may be failed by scheduled dunning after the grace window.
 - Listen for **`SUBSCRIPTION_RENEWED`** and **`PAYMENT_FAILED`** (renewal transactions), not a separate `subscription.payment_failed` event.
 
-See [Subscriptions — Renewals and failed payments](/build/subscriptions#renewals-and-failed-payments) for the full model.
+See [Subscriptions: Renewals and failed payments](/build/subscriptions#renewals-and-failed-payments) for the full model.
 
 ### Fixed-term subscriptions
 
@@ -92,7 +92,7 @@ See [Subscriptions](/build/subscriptions) for lifecycle and webhook details.
 ## Coupons
 
 - Validation enforces **dates**, **usage limits**, **customer type** (new vs returning), **scope** (org-wide vs specific products), and **quantity** caps.
-- Multiple coupons (when supported) apply **sequentially** to a running amount — see [Discount coupons](/build/discount-coupons) and [Coupon logic examples](/build/payments/coupon-logic-examples).
+- Multiple coupons (when supported) apply **sequentially** to a running amount, see [Discount coupons](/build/discount-coupons) and [Coupon logic examples](/build/payments/coupon-logic-examples).
 
 ## Cross-currency
 

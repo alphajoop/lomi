@@ -1,6 +1,6 @@
 ---
 title: 'Configurer les webhooks'
-description: 'Les webhooks permettent à votre application de recevoir des notifications en temps réel sur les événements de votre compte lomi. — paiements réussis, nouveaux abonnements, transactions échouées, etc.'
+description: 'Les webhooks permettent à votre application de recevoir des notifications en temps réel sur les événements de votre compte lomi., paiements réussis, nouveaux abonnements, transactions échouées, etc.'
 ---
 
 import { Callout } from '@/components/docs/docs-callout';
@@ -221,7 +221,7 @@ Votre URL DOIT répondre rapidement à la requête webhook avec un code HTTP dan
 
 **Pourquoi répondre d’abord ?** Tant que lomi ne reçoit pas un **`2xx`**, la livraison n’est pas considérée comme acceptée par votre système. L’usage attendu après vérification de la signature est d’accuser réception (« j’ai reçu cet envoi sans altération ») ; tout le traitement métier lourd passe ensuite dans **vos** workers ou votre base.
 
-Chaque tentative côté lomi utilise un délai d’expiration HTTP **borné** (**environ quatre secondes**). Si votre serveur ne termine pas la réponse HTTP dans cette fenêtre, la tentative échoue pour ce tour. Dans des conditions normales, renvoyer **`200`** ou **`204`** prend typiquement **bien moins d’une seconde** ; après cela vous pouvez enfiler le travail long dans vos files internes. Chiffres, backoff et exceptions détaillés : [Fiabilité des webhooks — Délais et tentatives](/build/advanced-guides/webhook-reliability).
+Chaque tentative côté lomi utilise un délai d’expiration HTTP **borné** (**environ quatre secondes**). Si votre serveur ne termine pas la réponse HTTP dans cette fenêtre, la tentative échoue pour ce tour. Dans des conditions normales, renvoyer **`200`** ou **`204`** prend typiquement **bien moins d’une seconde** ; après cela vous pouvez enfiler le travail long dans vos files internes. Chiffres, backoff et exceptions détaillés : [Fiabilité des webhooks: Délais et tentatives](/build/advanced-guides/webhook-reliability).
 
 ## 6. Nouvelles tentatives
 
@@ -232,7 +232,7 @@ Sans réponse **`2xx`** exploitable ou en cas de **timeout** pour une tentative 
 
 **L’idempotence reste indispensable :** retries légitimes, doublons de job, ou **rejeu manuel** peuvent faire arriver **plusieurs fois** le même événement logique. Concevez vos handlers pour qu’un second traitement soit inoffensif : conservez le champ `` `id` `` à la racine (**UUID**) avec vos clés métier (par ex. `` `transaction_id` `` ou vos propres métadonnées), utilisez des contraintes d’unicité quand c’est pertinent, et préférez « déjà traité → ignorer » à une erreur bloquante.
 
-Pour tableaux, variables d’environnement et détail d’implémentation, la référence canonique est **[Fiabilité des webhooks — Délais et tentatives](/build/advanced-guides/webhook-reliability)**.
+Pour tableaux, variables d’environnement et détail d’implémentation, la référence canonique est **[Fiabilité des webhooks: Délais et tentatives](/build/advanced-guides/webhook-reliability)**.
 
 ## 7. Tester les webhooks
 
@@ -241,7 +241,7 @@ Vous pouvez tester votre intégration avec la fonction « Test Webhook » du tab
 ## 8. Synthèse des bonnes pratiques
 
 - **Vérifier les signatures :** vérifiez toujours `X-Lomi-Signature` avec votre secret de signature et une comparaison à temps constant.
-- **Répondre vite :** renvoyez un `` `200 OK` `` ou autre **`2xx`** dès que la signature est valide — bien **avant** le délai de lecture sortant (**environ quatre secondes**) décrit dans le guide fiabilité.
+- **Répondre vite :** renvoyez un `` `200 OK` `` ou autre **`2xx`** dès que la signature est valide, bien **avant** le délai de lecture sortant (**environ quatre secondes**) décrit dans le guide fiabilité.
 - **Traiter en asynchrone :** reportez la logique complexe vers des jobs en arrière-plan.
 - **Gérer les doublons (idempotence) :** prévoyez de recevoir le même événement plusieurs fois. Vérifiez l’`id` de l’événement.
 - **Utiliser HTTPS :** assurez-vous que votre URL utilise HTTPS.
@@ -250,7 +250,7 @@ Vous pouvez tester votre intégration avec la fonction « Test Webhook » du tab
 ## 9. Dépannage
 
 - **Consulter les journaux de livraison :** le tableau de bord lomi. (**Developers → Webhooks → sélectionner l’URL → Logs**) affiche l’historique des tentatives de livraison, les codes succès/échec et les corps de réponse capturés par lomi.. Utile pour diagnostiquer les problèmes.
-- **401 Unauthorized / corps « Authentication required » :** en principe **votre** serveur ou proxy répond ainsi, pas lomi. Les POST sortants de lomi. incluent uniquement `` `X-Lomi-Signature` `` pour contrôle — **pas** `` `Authorization: Bearer` `` ni `` `X-API-Key` ``. Excluez la route webhook de l’authentification globale puis vérifiez le HMAC ; voir [Secret de signature et Authorization](/build/advanced-guides/handling-webhooks).
+- **401 Unauthorized / corps « Authentication required » :** en principe **votre** serveur ou proxy répond ainsi, pas lomi. Les POST sortants de lomi. incluent uniquement `` `X-Lomi-Signature` `` pour contrôle, **pas** `` `Authorization: Bearer` `` ni `` `X-API-Key` ``. Excluez la route webhook de l’authentification globale puis vérifiez le HMAC ; voir [Secret de signature et Authorization](/build/advanced-guides/handling-webhooks).
 - **Écarts de signature :** souvent dus à un mauvais secret, à une modification de la charge avant vérification, ou à l’absence d’utilisation du corps brut de la requête.
-- **Dépassements de délai :** lomi n’attend **qu’environ quatre secondes** par tentative HTTP. Si vous voyez encore des timeouts, profilez tout ce qui s’exécute **avant** l’envoi du **`2xx`** — en pratique une réponse JSON minimale suffit dans la quasi-totalité des intégrations, le reste allant dans **votre** file.
+- **Dépassements de délai :** lomi n’attend **qu’environ quatre secondes** par tentative HTTP. Si vous voyez encore des timeouts, profilez tout ce qui s’exécute **avant** l’envoi du **`2xx`**: en pratique une réponse JSON minimale suffit dans la quasi-totalité des intégrations, le reste allant dans **votre** file.
 - **Pare-feu / réseau :** vérifiez que votre serveur ou pare-feu autorise les requêtes POST entrantes depuis les adresses IP de lomi. (si filtrage par IP utilisé).

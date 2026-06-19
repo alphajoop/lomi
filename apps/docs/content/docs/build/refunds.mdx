@@ -97,7 +97,7 @@ curl -X POST "https://api.lomi.africa/refunds" \
 | `transaction_id` | `string` (UUID) | **Yes** |
 | `amount` | `number` | **Yes** |
 | `reason` | `string` | No |
-| `refund_type` | `'full'` \| `'partial'` | No — inferred from `amount` vs transaction gross if omitted |
+| `refund_type` | `'full'` \| `'partial'` | No, inferred from `amount` vs transaction gross if omitted |
 
 ## List refunds
 

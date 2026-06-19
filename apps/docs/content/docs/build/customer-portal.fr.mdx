@@ -102,7 +102,7 @@ Depuis **Paramètres → Checkout → Storefront**, configurez le portail client
 
 - Autoriser pause / reprise / annulation
 - Lien magique e-mail et OTP SMS
-- **Liste blanche des URL de retour** — requise pour `return_url` et `flow_after_completion_url` depuis votre backend
+- **Liste blanche des URL de retour**: requise pour `return_url` et `flow_after_completion_url` depuis votre backend
 
 Depuis **Clients**, ouvrez un client avec historique de facturation et cliquez sur **Ouvrir le portail client** pour lancer le flux hébergé dans un nouvel onglet.
 
@@ -125,12 +125,12 @@ Planifiez `finalize_cancel_at_period_end_subscriptions()` quotidiennement (cron 
 
 **Obligatoire** pour l'app portail hébergée (`apps/customers`) :
 
-- `CUSTOMER_PORTAL_COOKIE_SECRET` — scelle les cookies de handoff et de flux (16 caractères minimum)
-- `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SECRET_KEY` — accès RPC et e-mail lien magique
+- `CUSTOMER_PORTAL_COOKIE_SECRET`, scelle les cookies de handoff et de flux (16 caractères minimum)
+- `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SECRET_KEY`, accès RPC et e-mail lien magique
 
 **Optionnel** :
 
-- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL` — POST `{ to, body }` vers votre passerelle SMS. Sans cela, les OTP ne sont journalisés qu'en non-production.
+- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL`, POST `{ to, body }` vers votre passerelle SMS. Sans cela, les OTP ne sont journalisés qu'en non-production.
 
 Les URL de lancement et les liens magiques utilisent par défaut `https://customers.lomi.africa` et l'origine de la requête. Aucune variable d'environnement d'URL de base supplémentaire n'est requise en production.
 

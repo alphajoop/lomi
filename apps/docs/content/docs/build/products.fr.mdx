@@ -55,7 +55,7 @@ Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
 | `currency_code` | `string` | **Oui** | `XOF`, `USD`, `EUR` |
 | `billing_interval` | `string` | Non | `day`, `week`, `month`, `year` (requis pour récurrent) |
 | `pricing_model` | `string` | Non | `standard` (défaut), `pay_what_you_want` ou `tiered` |
-| `minimum_amount` | `number` | PWYW | Requis si `pricing_model` est `pay_what_you_want` — prix unitaire minimum |
+| `minimum_amount` | `number` | PWYW | Requis si `pricing_model` est `pay_what_you_want`, prix unitaire minimum |
 | `maximum_amount` | `number` | Non | Plafond unitaire optionnel pour `pay_what_you_want` |
 | `is_default` | `boolean` | Non | Tarif par défaut |
 | `metadata` | `object` | Non | Métadonnées sur le tarif |
@@ -292,7 +292,7 @@ curl -X GET "https://api.lomi.africa/products/prod_abc123..." \
 Ajoute une nouvelle option de tarif à un produit existant.
 
 <Callout type="warning">
-  Un produit peut compter au maximum **3 tarifs actifs**. Les tarifs existants ne se modifient pas — créez-en un nouveau.
+  Un produit peut compter au maximum **3 tarifs actifs**. Les tarifs existants ne se modifient pas, créez-en un nouveau.
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>

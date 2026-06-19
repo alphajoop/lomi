@@ -30,7 +30,7 @@ Source: [`apps/plugins/shopify`](https://github.com/lomiafrica/lomi./tree/master
 
 1. Go to [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Settings → Payment channels → Integrations**.
 2. Toggle **Shopify** on and enter your store domain (e.g. `my-store.myshopify.com`).
-3. Click **Install on Shopify** — you are redirected to Shopify OAuth to authorize the app.
+3. Click **Install on Shopify**: you are redirected to Shopify OAuth to authorize the app.
 4. After install, open the embedded app → **Settings** → paste your lomi. **secret key** and **webhook secret**.
 
 Install URL pattern (also works without the dashboard):
@@ -51,8 +51,8 @@ Copy the install link from the dashboard modal and send it to a teammate, or ope
    - Event: **`PAYMENT_SUCCEEDED`**
    - Signing secret: same value as in the Shopify app Settings
 3. Choose **shipping mode**:
-   - **Subtotal only** — charge cart line items only
-   - **Subtotal + flat shipping fee** — add a fixed shipping amount to the draft order
+   - **Subtotal only**: charge cart line items only
+   - **Subtotal + flat shipping fee**: add a fixed shipping amount to the draft order
 4. In **Online Store → Themes → Customize → Cart**, add the **Pay with lomi.** app block and save.
 5. Test with a cart containing one or more items.
 
@@ -83,7 +83,7 @@ Metadata used for reconciliation:
 ## Limitations
 
 - Not a **Payments Partner** / native checkout payment method (no Shop Pay, no checkout UI gateway).
-- **Shipping and tax** from Shopify checkout are not available on the cart page — use subtotal only or a **flat shipping fee** in app settings.
+- **Shipping and tax** from Shopify checkout are not available on the cart page, use subtotal only or a **flat shipping fee** in app settings.
 - **Refunds** are handled in lomi. dashboard, not automatically from Shopify Admin.
 - Do **not** submit this cart-bypass flow to the public Shopify App Store (Shopify policy on bypassing checkout).
 
@@ -102,5 +102,5 @@ Metadata used for reconciliation:
 ## Related
 
 - [E‑commerce hub](/build/ecommerce-extensions)
-- [WooCommerce](/build/ecommerce-extensions/woocommerce) — reference for hosted checkout + webhook contract
+- [WooCommerce](/build/ecommerce-extensions/woocommerce): reference for hosted checkout + webhook contract
 - [Webhooks](/build/webhooks)

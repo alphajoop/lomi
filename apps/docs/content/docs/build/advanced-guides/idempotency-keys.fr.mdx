@@ -1,6 +1,6 @@
 ---
 title: "Clés d’idempotence"
-description: "L’idempotence garantit qu’une requête API, en cas de nouvel essai après erreur réseau ou délai dépassé, ne soit pas appliquée plusieurs fois par inadvertance — essentiel pour les paiements ou remboursements afin d’éviter les doublons.
+description: "L’idempotence garantit qu’une requête API, en cas de nouvel essai après erreur réseau ou délai dépassé, ne soit pas appliquée plusieurs fois par inadvertance, essentiel pour les paiements ou remboursements afin d’éviter les doublons.
 "
 ---
 
@@ -8,7 +8,7 @@ description: "L’idempotence garantit qu’une requête API, en cas de nouvel e
 
 Pour une requête potentiellement mutante (`POST`, `PATCH`, `DELETE`), vous pouvez fournir une `Idempotency-Key` unique dans l’en-tête.
 
-1.  **Clé unique :** générez une chaîne distincte (ex. UUID) pour chaque opération — elle représente l’_intention_ d’agir.
+1.  **Clé unique :** générez une chaîne distincte (ex. UUID) pour chaque opération, elle représente l’_intention_ d’agir.
 2.  **En-tête :** envoyez-la dans `Idempotency-Key`.
 3.  **Première requête :** lomi. traite la requête et enregistre le résultat lié à la clé.
 4.  **Requêtes suivantes (même clé) :** avec la **même clé** dans les 24 h, lomi. **ne retravaille pas** l’opération et renvoie la **même réponse** (succès ou erreur) qu’à l’origine.
@@ -103,12 +103,12 @@ createSessionDirectly();
 
 Chaque opération distincte doit avoir une clé propre.
 
-- **UUID** : méthode recommandée — UUID v4 par tentative.
+- **UUID** : méthode recommandée, UUID v4 par tentative.
   ```typescript
   import { v4 as uuidv4 } from 'uuid';
   const key = uuidv4();
   ```
-- **Clés déterministes** : dérivées de l’opération (ex. utilisateur + commande + horodatage) — veillez à l’unicité réelle et aux collisions.
+- **Clés déterministes** : dérivées de l’opération (ex. utilisateur + commande + horodatage), veillez à l’unicité réelle et aux collisions.
 
 ## Cycle de vie
 
@@ -131,7 +131,7 @@ Erreurs liées à l’idempotence (rares avec des UUID corrects) :
 1.  **Requêtes mutantes :** utilisez surtout des clés pour `POST`, `PATCH`, `DELETE` lorsque les doublons posent problème.
 2.  **Unicité :** privilégiez UUID v4 ou équivalent robuste.
 3.  **Réessais réseau :** en cas d’échec réseau ou timeout sans réponse claire de lomi., réessayez avec la **même clé d’idempotence**.
-4.  **Pas de réessai client sans changement :** pour un `4xx` (sauf éventuellement `429`), ne réutilisez pas la même clé — corrigez la requête et générez une **nouvelle** clé.
+4.  **Pas de réessai client sans changement :** pour un `4xx` (sauf éventuellement `429`), ne réutilisez pas la même clé, corrigez la requête et générez une **nouvelle** clé.
 5.  **Journalisation (optionnel) :** stockez la clé avec votre enregistrement métier (ex. commande) pour suivre les réessais.
 
 ## Cas courants

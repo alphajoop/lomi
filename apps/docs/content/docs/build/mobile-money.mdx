@@ -17,8 +17,8 @@ Mobile money lets you accept payments from customers using their mobile wallets.
 
 Before integrating mobile money payments:
 
-1. A lomi. account with **test** or **live** API keys — see [API keys](/start/api-keys).
-2. An HTTPS **webhook** endpoint for final payment status in live mode — see [Webhooks](/build/webhooks).
+1. A lomi. account with **test** or **live** API keys, see [API keys](/start/api-keys).
+2. An HTTPS **webhook** endpoint for final payment status in live mode, see [Webhooks](/build/webhooks).
 3. Customer **phone number** in E.164 format (for example `+2250707070707`).
 
 ## How mobile money payments work
@@ -47,9 +47,9 @@ Mobile money is **asynchronous in live mode**. Always show a pending state in yo
 
 Most merchants should use **hosted checkout** or **payment links** first.
 
-## Direct API — Wave
+## Direct API: Wave
 
-`POST /charge/wave` with XOF amount and customer details. Redirect the customer to `wave_launch_url` or `checkout_url` in the response—or read the normalized **`next_action`** field (`type: redirect` with `url`).
+`POST /charge/wave` with XOF amount and customer details. Redirect the customer to `wave_launch_url` or `checkout_url` in the response, or read the normalized **`next_action`** field (`type: redirect` with `url`).
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
@@ -69,7 +69,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
   }'
 ```
 
-## Direct API — MTN MoMo
+## Direct API: MTN MoMo
 
 `POST /charge/mtn` with amount, currency, `countryCode`, and customer MSISDN. The response includes **`next_action`** (`type: await_webhook` with `status`) alongside `data.status`.
 
@@ -92,8 +92,8 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
 
 Before you provide value to the customer, confirm the transaction's final status and amount:
 
-- **Webhooks** — register your endpoint and handle `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. See [Handling webhooks](/build/advanced-guides/handling-webhooks).
-- **Retrieve transaction** — `GET /transactions/{id}` using the `transaction_id` from the charge response.
+- **Webhooks**: register your endpoint and handle `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. See [Handling webhooks](/build/advanced-guides/handling-webhooks).
+- **Retrieve transaction**: `GET /transactions/{id}` using the `transaction_id` from the charge response.
 
 ## Test vs live
 
@@ -103,7 +103,7 @@ Before you provide value to the customer, confirm the transaction's final status
 | Wave | Test balance may credit when session is created | Wait for webhook or transaction poll |
 | Real wallet debited | Never | Yes |
 
-Full test instructions: [Sandbox payments — mobile money](/start/sandbox-payments#testing-mobile-money).
+Full test instructions: [Sandbox payments: mobile money](/start/sandbox-payments#testing-mobile-money).
 
 ## Next steps
 

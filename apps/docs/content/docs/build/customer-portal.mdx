@@ -178,8 +178,8 @@ From **Settings → Checkout → Storefront**, configure the customer portal:
 
 - Allow pause / resume / cancel
 - Email magic link and SMS OTP sign-in
-- **Payment method updates** — allow customers to add, remove, and set default cards
-- **Return URL allowlist** — required when using `return_url` or `flow_after_completion_url` from your backend
+- **Payment method updates**: allow customers to add, remove, and set default cards
+- **Return URL allowlist**: required when using `return_url` or `flow_after_completion_url` from your backend
 
 From **Customers**, open a customer with billing history and click **Open customer portal** to launch the hosted flow in a new tab (same as the API launch session).
 
@@ -202,12 +202,12 @@ Schedule `finalize_cancel_at_period_end_subscriptions()` daily (e.g. pg_cron) so
 
 **Required** for the hosted portal app (`apps/customers`):
 
-- `CUSTOMER_PORTAL_COOKIE_SECRET` — seals handoff and flow cookies (min 16 characters)
-- `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SECRET_KEY` — RPC access and magic-link email
+- `CUSTOMER_PORTAL_COOKIE_SECRET`, seals handoff and flow cookies (min 16 characters)
+- `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SECRET_KEY`, RPC access and magic-link email
 
 **Optional**:
 
-- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL` — POST `{ to, body }` to your SMS gateway. Without it, OTPs are only logged in non-production.
+- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL`, POST `{ to, body }` to your SMS gateway. Without it, OTPs are only logged in non-production.
 
 Launch URLs and magic links default to `https://customers.lomi.africa` and the request origin respectively. No extra base-URL env vars are required for production.
 

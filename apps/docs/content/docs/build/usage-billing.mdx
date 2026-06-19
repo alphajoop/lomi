@@ -8,14 +8,14 @@ import { Callout } from '@/components/docs/docs-callout';
 Usage billing lets you charge customers based on **metered consumption** (API calls, seats, credits, etc.) on top of `usage_based` products. The flow is contract-first: every step below maps to a public REST endpoint in [openapi.json](https://github.com/lomiafrica/lomi./blob/main/apps/docs/openapi.json).
 
 <Callout type="info">
-  For product setup (`product_type: usage_based`, prices, aggregation), see **[Products](/build/products)**. Usage subscriptions are separate from recurring checkout subscriptions—use **`POST /usage-subscriptions`** to enroll customers on usage-based plans.
+  For product setup (`product_type: usage_based`, prices, aggregation), see **[Products](/build/products)**. Usage subscriptions are separate from recurring checkout subscriptions, use **`POST /usage-subscriptions`** to enroll customers on usage-based plans.
 </Callout>
 
 ## Golden path
 
 ### 1. Create a usage-based product
 
-Create a product with `product_type: usage_based` and a recurring price. See [Products — Usage-Based Product Fields](/build/products#request-body).
+Create a product with `product_type: usage_based` and a recurring price. See [Products: Usage-Based Product Fields](/build/products#request-body).
 
 ### 2. Create a meter
 
@@ -87,8 +87,33 @@ Returns **202 Accepted**; processing is asynchronous.
 - **List or get usage events** when webhooks are delayed: [List usage events](/api/usage-events/UsageEventsController_findAll), [Get usage event](/api/usage-events/UsageEventsController_findOne).
 - **Revenue reporting** across MRR + usage + one-time: [Combined revenue metrics](/api/usage-billing/UsageBillingController_getRevenue).
 
+## Reference: lomi. Radar metering
+
+[lomi. Radar](/build/radar) bills per screened charge when enabled on your organization. Each evaluation calls `enqueue_usage_event` with meter code **`radar_screen`** (aggregation: `count`).
+
+1. Enable Radar via [PATCH /organization/radar-settings](/api/radar/RadarController_updateSettings) (`enabled: true`). A `radar_screen` meter is created automatically when a matching usage-based product exists.
+2. Every screened charge (card, MTN, Wave) records one usage unit while Radar is on.
+3. Read balances and periods with the same endpoints as other usage meters ([Get meter balance](/api/meters/MetersController_getBalance), [List billing periods](/api/usage-billing/UsageBillingController_listPeriods)).
+
+```bash
+curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
+  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaction_id": "radar_screen_evt_123",
+    "code": "radar_screen",
+    "customer_id": "cus_...",
+    "quantity": 1,
+    "properties": { "assessment_id": "ra_...", "rail": "card" }
+  }'
+```
+
+Platform ingestion is automatic when Radar runs; the example shows the event shape for reconciliation.
+
 ## Related
 
-- [Subscriptions](/build/subscriptions) — recurring checkout subscriptions (distinct from usage subscriptions)
-- [Products](/build/products) — catalog and `usage_based` configuration
-- [Verify payments](/build/guides/verify-payments) — confirm transaction status before fulfilling access
+- [Radar](/build/radar): transaction screening product
+
+- [Subscriptions](/build/subscriptions): recurring checkout subscriptions (distinct from usage subscriptions)
+- [Products](/build/products): catalog and `usage_based` configuration
+- [Verify payments](/build/guides/verify-payments): confirm transaction status before fulfilling access

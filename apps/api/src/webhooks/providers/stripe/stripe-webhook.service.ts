@@ -312,6 +312,10 @@ export class StripeWebhookService {
       }
     }
 
+    if (txnData) {
+      await this.mergeStripeRadarSignals(paymentIntent, chargeId);
+    }
+
     if (txnData && metadata.organization_id) {
       this.wideEvent.logEvent({
         eventName: 'stripe_payment_confirmed',
@@ -827,6 +831,43 @@ export class StripeWebhookService {
     }
 
     return data;
+  }
+
+  /**
+   * Enrich risk assessments with Stripe Radar outcome when available.
+   */
+  private async mergeStripeRadarSignals(
+    paymentIntent: Stripe.PaymentIntent,
+    chargeId: string | null,
+  ) {
+    if (!chargeId) return;
+
+    try {
+      const stripe = this.stripeClients.getClientForStripeLivemode(
+        paymentIntent.livemode,
+      );
+      if (!stripe) return;
+
+      const charge = await stripe.charges.retrieve(chargeId);
+      const outcome = charge.outcome;
+      if (!outcome?.risk_level && outcome?.risk_score == null) return;
+
+      const { data: txnData } = await (this.supabase.getClient() as any).rpc(
+        'get_transaction_by_stripe_intent',
+        { p_payment_intent_id: paymentIntent.id },
+      );
+      const transactionId =
+        txnData?.transaction_id ?? txnData?.[0]?.transaction_id;
+      if (!transactionId) return;
+
+      await this.supabase.rpc('merge_stripe_radar_signals' as never, {
+        p_transaction_id: transactionId,
+        p_stripe_risk_level: outcome.risk_level ?? null,
+        p_stripe_risk_score: outcome.risk_score ?? null,
+      } as never);
+    } catch {
+      // Non-blocking enrichment
+    }
   }
 
   /**

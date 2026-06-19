@@ -24,6 +24,7 @@ import {
   deriveWaveChargeNextAction,
 } from './charge-next-action';
 import type { ChargeScenarioKey } from './charge-scenario';
+import { RadarService } from '../radar/radar.service';
 
 @Injectable()
 export class ChargesService {
@@ -32,6 +33,7 @@ export class ChargesService {
   constructor(
     private readonly configService: ConfigService,
     private readonly supabaseService: SupabaseService,
+    private readonly radarService: RadarService,
   ) {}
 
   async createWaveCharge(
@@ -87,6 +89,18 @@ export class ChargesService {
       }
 
       const customerId = custId as string;
+
+      await this.radarService.assertChargeAllowed(user, {
+        amount,
+        currencyCode: currency,
+        rail: 'wave',
+        customerId,
+        metadata: {
+          phone: customer.phoneNumber,
+          customer_phone: customer.phoneNumber,
+          source: 'api_direct_charge',
+        },
+      });
 
       const { data: providerSettings, error: providerError } = networkRequest
         ? await this.supabaseService.getClient().rpc(
@@ -302,6 +316,18 @@ export class ChargesService {
         'Failed to process customer details',
       );
     }
+
+    await this.radarService.assertChargeAllowed(user, {
+      amount,
+      currencyCode: currency,
+      rail: 'mtn',
+      customerId: custId as string,
+      metadata: {
+        phone: customer.phoneNumber,
+        customer_phone: customer.phoneNumber,
+        source: 'api_direct_charge',
+      },
+    });
 
     const { data: txRows, error: txError } = await this.supabaseService
       .getClient()

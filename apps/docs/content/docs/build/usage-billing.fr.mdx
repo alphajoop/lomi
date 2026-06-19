@@ -8,14 +8,14 @@ import { Callout } from '@/components/docs/docs-callout';
 La facturation à l'usage permet de facturer selon une **consommation mesurée** (appels API, sièges, crédits, etc.) sur des produits `usage_based`. Chaque étape ci-dessous correspond à un endpoint REST public dans [openapi.json](https://github.com/lomiafrica/lomi./blob/main/apps/docs/openapi.json).
 
 <Callout type="info">
-  Pour la configuration produit (`product_type: usage_based`, tarifs, agrégation), voir **[Produits](/build/products)**. Les abonnements à l'usage sont distincts des abonnements checkout récurrents — utilisez **`POST /usage-subscriptions`** pour inscrire un client sur un plan à l'usage.
+  Pour la configuration produit (`product_type: usage_based`, tarifs, agrégation), voir **[Produits](/build/products)**. Les abonnements à l'usage sont distincts des abonnements checkout récurrents, utilisez **`POST /usage-subscriptions`** pour inscrire un client sur un plan à l'usage.
 </Callout>
 
 ## Étapes
 
 ### 1. Créer un produit à l'usage
 
-Créez un produit avec `product_type: usage_based` et un prix récurrent. Voir [Produits — champs produit à l'usage](/build/products#request-body).
+Créez un produit avec `product_type: usage_based` et un prix récurrent. Voir [Produits: champs produit à l'usage](/build/products#request-body).
 
 ### 2. Créer un compteur (meter)
 
@@ -87,8 +87,18 @@ Retourne **202 Accepted** ; le traitement est asynchrone.
 - **Lister ou récupérer les événements d'usage** si les webhooks sont en retard : [Lister](/api/usage-events/UsageEventsController_findAll), [Récupérer](/api/usage-events/UsageEventsController_findOne).
 - **Reporting revenus** MRR + usage + ponctuel : [Métriques revenus combinées](/api/usage-billing/UsageBillingController_getRevenue).
 
+## Référence : facturation lomi. Radar
+
+[lomi. Radar](/build/radar) facture chaque paiement filtré lorsque le produit est activé sur votre organisation. Chaque évaluation appelle `enqueue_usage_event` avec le code compteur **`radar_screen`** (agrégation : `count`).
+
+1. Activez Radar via [PATCH /organization/radar-settings](/api/radar/RadarController_updateSettings) (`enabled: true`). Un compteur `radar_screen` est créé automatiquement si un produit à l'usage correspondant existe.
+2. Chaque paiement filtré (carte, MTN, Wave) enregistre une unité d'usage tant que Radar est actif.
+3. Consultez soldes et périodes comme pour les autres compteurs ([Solde compteur](/api/meters/MetersController_getBalance), [Périodes](/api/usage-billing/UsageBillingController_listPeriods)).
+
 ## Voir aussi
 
-- [Abonnements](/build/subscriptions) — abonnements checkout récurrents (distincts des abonnements à l'usage)
-- [Produits](/build/products) — catalogue et configuration `usage_based`
-- [Vérifier les paiements](/build/guides/verify-payments) — confirmer le statut avant d'accorder l'accès
+- [Radar](/build/radar): produit de filtrage des transactions
+
+- [Abonnements](/build/subscriptions): abonnements checkout récurrents (distincts des abonnements à l'usage)
+- [Produits](/build/products): catalogue et configuration `usage_based`
+- [Vérifier les paiements](/build/guides/verify-payments): confirmer le statut avant d'accorder l'accès

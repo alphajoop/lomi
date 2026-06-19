@@ -1,6 +1,6 @@
 ---
 title: 'Maintenir la CLI et le MCP'
-description: 'Guide pour les contributeurs et opérateurs lomi. qui développent ou déploient apps/cli et apps/mcp — pas pour les intégrateurs marchands.'
+description: 'Guide pour les contributeurs et opérateurs lomi. qui développent ou déploient apps/cli et apps/mcp, pas pour les intégrateurs marchands.'
 ---
 
 La **CLI lomi.** et le **serveur MCP** sont des **outils d’intégration** : ils aident les développeurs à s’appuyer sur l’API marchande hébergée. Cette page s’adresse à ceux qui **maintiennent ces packages** dans le monorepo ou déploient le serveur MCP hébergé.
@@ -11,9 +11,9 @@ Si vous intégrez lomi. dans votre produit, utilisez plutôt [CLI](/build/cli) e
 
 | Rôle | Utiliser CLI/MCP pour… | Cette page pour… |
 | --- | --- | --- |
-| **Développeur marchand** | Intégrer checkout, webhooks, SDK | Non — voir Build |
-| **Contributeur** | Tester les flux d’intégration en développant | Oui — en modifiant `apps/cli` ou `apps/mcp` |
-| **Opérateur** | — | Oui — déployer MCP, régénérer les outils, publier la CLI |
+| **Développeur marchand** | Intégrer checkout, webhooks, SDK | Non, voir Build |
+| **Contributeur** | Tester les flux d’intégration en développant | Oui, en modifiant `apps/cli` ou `apps/mcp` |
+| **Opérateur** | - | Oui, déployer MCP, régénérer les outils, publier la CLI |
 
 CLI/MCP ne servent **pas** à exploiter `apps/admin`, à auto-héberger le traitement des paiements ni à la maintenance générale du monorepo (migrations, déploiement API, etc.).
 
@@ -26,7 +26,7 @@ Documentation mainteneur : [`apps/cli/CONTRIBUTING.md`](https://github.com/lomia
 | Dev local | `cd apps/cli && cargo build && cargo test` |
 | Dérive docs | `lomi docs check` (depuis la racine du monorepo) |
 | Règles agent | `./apps/cli/scripts/generate-rules.sh` |
-| Release | Tag `cli-v*` — voir CONTRIBUTING.md |
+| Release | Tag `cli-v*`, voir CONTRIBUTING.md |
 
 ## MCP (`apps/mcp`)
 
@@ -39,7 +39,7 @@ Documentation mainteneur : [`apps/mcp/CONTRIBUTING.md`](https://github.com/lomia
 | Déploiement | `.env.example`, `railway.json` |
 | Tests | `pnpm test` |
 
-Les intégrateurs doivent utiliser `https://mcp.lomi.africa` ou `npx @lomi./mcp` — pas une instance auto-déployée, sauf ingénierie lomi.
+Les intégrateurs doivent utiliser `https://mcp.lomi.africa` ou `npx @lomi./mcp`, pas une instance auto-déployée, sauf ingénierie lomi.
 
 ## Voir aussi
 

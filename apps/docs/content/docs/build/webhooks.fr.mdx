@@ -50,7 +50,7 @@ Pour garantir l’authenticité et l’intégrité des événements, lomi. signe
 2.  **Secret webhook :** à la création d’un webhook via l’API, un `` `secret` `` (préfixe `` `whsec_` ``) est renvoyé. **Conservez ce secret en lieu sûr : il ne sera plus affiché.**
 3.  **Vérification :** votre URL doit recalculer un hachage `` `HMAC-SHA256` `` du corps brut de la requête avec ce secret et le comparer à la valeur de l’en-tête.
 
-**Livraison sortante :** les requêtes de **lomi. vers votre URL** ne s’authentifient pas avec `` `Authorization` `` / `` `X-API-Key` `` — seule la signature compte. Un middleware qui impose Bearer ou clé API sur **tous** les POST renverra souvent `` `401` `` ([détails](/build/advanced-guides/handling-webhooks#verify-signatures)).
+**Livraison sortante :** les requêtes de **lomi. vers votre URL** ne s’authentifient pas avec `` `Authorization` `` / `` `X-API-Key` ``, seule la signature compte. Un middleware qui impose Bearer ou clé API sur **tous** les POST renverra souvent `` `401` `` ([détails](/build/advanced-guides/handling-webhooks#verify-signatures)).
 
 Voir le guide [Vérification de signature des webhooks](/build/advanced-guides/handling-webhooks) pour des exemples d’implémentation.
 
@@ -73,7 +73,7 @@ Lors de la création ou de la mise à jour d’un webhook, vous souscrivez à de
 | `` `test.webhook` ``            | Événement de test envoyé via l’API.         | `` `TestPayload` ``     |
 
 <Callout type="info">
-  Les **échecs de paiement au renouvellement** émettent **`PAYMENT_FAILED`** sur la transaction concernée. Il n’existe pas de webhook dédié « échec abonnement ». Utilisez **`SUBSCRIPTION_RENEWED`** pour les cycles réussis. Voir [Abonnements](/build/subscriptions) et [Comportement du tunnel — Abonnements](/build/payments/checkout-behavior#subscription-checkout).
+  Les **échecs de paiement au renouvellement** émettent **`PAYMENT_FAILED`** sur la transaction concernée. Il n’existe pas de webhook dédié « échec abonnement ». Utilisez **`SUBSCRIPTION_RENEWED`** pour les cycles réussis. Voir [Abonnements](/build/subscriptions) et [Comportement du tunnel: Abonnements](/build/payments/checkout-behavior#subscription-checkout).
 </Callout>
 
 ### Charge utile `SUBSCRIPTION_UPDATED`
@@ -108,9 +108,9 @@ Les changements non terminaux utilisent une enveloppe d’événement structuré
 
 Réconciliez les droits d’accès à partir de `data.object`. Utilisez `previous_attributes` pour distinguer pause, changement de plan, etc. `context.source` vaut `merchant_api`, `customer_portal` ou `cron`.
 
-_(Les autres charges sont documentées sur les ressources API concernées — Transactions, Abonnements, etc.)_
+_(Les autres charges sont documentées sur les ressources API concernées, Transactions, Abonnements, etc.)_
 
-Les abonnements et les corps JSON utilisent des noms d’événement en **SCREAMING_SNAKE_CASE** (par ex. `PAYMENT_SUCCEEDED`). Certains outils peuvent afficher des alias avec **points** (par ex. `payment.succeeded`) — utilisez les valeurs ci-dessus pour configurer vos URLs et comparer le champ `event`.
+Les abonnements et les corps JSON utilisent des noms d’événement en **SCREAMING_SNAKE_CASE** (par ex. `PAYMENT_SUCCEEDED`). Certains outils peuvent afficher des alias avec **points** (par ex. `payment.succeeded`), utilisez les valeurs ci-dessus pour configurer vos URLs et comparer le champ `event`.
 
 Pour le comportement opérationnel (nouvelles tentatives, idempotence, journaux), voir [Fiabilité des webhooks](/build/advanced-guides/webhook-reliability).
 
@@ -167,13 +167,13 @@ lomi. journalise chaque tentative et expose des endpoints pour consulter les jou
 
 **Nouvelles tentatives automatiques :** lorsque votre URL rejette une livraison (réponse **non‑`2xx`**), franchit le délai d’expiration côté lomi ou subit une panne transitoire, la plateforme enregistre l’échec et peut planifier **d’autres essais**, selon la sémantique HTTP et le chemin technique. Ces relances sont **bornées** : elles suivent des politiques de **backoff exponentiel** sur l’infrastructure webhook, pas une boucle infinie.
 
-En général les **erreurs client `4xx`** sont **terminales** pour la séquence automatique (corriger la configuration côté destinataire), tandis que les **erreurs transitoires** (**`5xx`**, timeouts, défauts réseau ponctuels) peuvent être rejouées jusqu’à un nombre borné de tentatives avec backoff exponentiel. Voir **[Fiabilité des webhooks — Délais et tentatives](/build/advanced-guides/webhook-reliability#when-lomi-retries-and-when-it-does-not)** pour le timeout HTTP **≈ quatre secondes**, jusqu’à **quatre** tentatives sur certains chemins, **cinq** lorsque la livraison est mise en file, et le sens de **`lomi_environment`**.
+En général les **erreurs client `4xx`** sont **terminales** pour la séquence automatique (corriger la configuration côté destinataire), tandis que les **erreurs transitoires** (**`5xx`**, timeouts, défauts réseau ponctuels) peuvent être rejouées jusqu’à un nombre borné de tentatives avec backoff exponentiel. Voir **[Fiabilité des webhooks: Délais et tentatives](/build/advanced-guides/webhook-reliability#when-lomi-retries-and-when-it-does-not)** pour le timeout HTTP **≈ quatre secondes**, jusqu’à **quatre** tentatives sur certains chemins, **cinq** lorsque la livraison est mise en file, et le sens de **`lomi_environment`**.
 
 ## Bonnes pratiques
 
 - **Route sans auth API globale :** vérifiez `` `X-Lomi-Signature` `` sur un chemin webhook dédié ; n’imposez pas `` `Authorization` `` / `` `X-API-Key` `` sur le même POST ([pourquoi](/build/advanced-guides/handling-webhooks#verify-signatures)).
 - **Vérifier les signatures :** vérifiez toujours `` `X-Lomi-Signature``.
-- **Répondre vite :** renvoyez `` `2xx` `` sans attendre — lomi n’attend **qu’environ 4 secondes** par tentative de POST avant timeout ; déportez le travail long en arrière-plan.
+- **Répondre vite :** renvoyez `` `2xx` `` sans attendre, lomi n’attend **qu’environ 4 secondes** par tentative de POST avant timeout ; déportez le travail long en arrière-plan.
 - **Anticiper les relances :** lomi peut renvoyer un événement si votre endpoint échoue ou dépasse le délai.
 - **Idempotence :** le traitement doit tolérer les doublons.
 - **Protéger le secret :** stockez-le via variables d’environnement ou gestionnaire de secrets.

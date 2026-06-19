@@ -1,5 +1,6 @@
 /* @proprietary license */
 
+import { execSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { glob } from 'tinyglobby';
@@ -135,6 +136,58 @@ async function checkInternalLinks(
   }
 }
 
+async function checkAgentContracts(errors: string[]): Promise<void> {
+  const scriptPath = path.join(
+    DOCS_ROOT,
+    'lib/scripts/verify-agent-contracts.mjs',
+  );
+  try {
+    execSync(`node "${scriptPath}"`, { stdio: 'pipe', cwd: DOCS_ROOT });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'verify-agent-contracts failed';
+    errors.push(`Agent contract check failed: ${message}`);
+  }
+}
+
+async function checkMcpManifestParity(errors: string[]): Promise<void> {
+  const expectedPath = path.join(
+    DOCS_ROOT,
+    'lib/scripts/manual-api/_expected-public-operations.json',
+  );
+  const manifestPath = path.resolve(
+    DOCS_ROOT,
+    '..',
+    'mcp',
+    'src/generated/tools-manifest.json',
+  );
+
+  const expectedRaw = await fs.readFile(expectedPath, 'utf-8');
+  const expected = JSON.parse(expectedRaw) as string[];
+
+  const manifestRaw = await fs.readFile(manifestPath, 'utf-8');
+  const manifest = JSON.parse(manifestRaw) as { tools?: unknown[] };
+  const toolCount = manifest.tools?.length ?? 0;
+
+  if (expected.length !== toolCount) {
+    errors.push(
+      `MCP manifest tool count (${toolCount}) does not match _expected-public-operations.json (${expected.length}). Run apps/mcp: pnpm run generate`,
+    );
+  }
+
+  const mcpRoot = path.resolve(DOCS_ROOT, '..', 'mcp');
+  try {
+    execSync('pnpm run generate:check', {
+      cwd: mcpRoot,
+      stdio: 'pipe',
+    });
+  } catch {
+    errors.push(
+      'MCP tools manifest is out of date. Run `cd apps/mcp && pnpm run generate` and commit src/generated/tools-manifest.json',
+    );
+  }
+}
+
 async function checkLlmsTxtRoute(errors: string[]): Promise<void> {
   const routePath = path.join(DOCS_ROOT, 'app/llms.txt/route.ts');
   const source = await fs.readFile(routePath, 'utf-8');
@@ -151,6 +204,8 @@ async function main(): Promise<void> {
   const validSlugs = await collectValidSlugs();
 
   await checkOpenApiParity(errors);
+  await checkAgentContracts(errors);
+  await checkMcpManifestParity(errors);
   await checkAllFrenchSiblings(errors);
   await checkInternalLinks(errors, validSlugs);
   await checkLlmsTxtRoute(errors);

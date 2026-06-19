@@ -1,6 +1,6 @@
 ---
 title: 'How do I accept Wave payments?'
-description: 'Wave mobile money via hosted checkout or POST /charge/wave—with async live behavior and XOF requirements.'
+description: 'Wave mobile money via hosted checkout or POST /charge/wave, with async live behavior and XOF requirements.'
 docType: how-to
 ---
 
@@ -20,7 +20,7 @@ Wave is the primary mobile-money rail for **UEMOA (XOF)** merchants. Most teams 
 
 ## Direct charge
 
-`POST /charge/wave` requires **XOF**. The response includes `wave_launch_url` or `checkout_url`—redirect or deep-link the customer.
+`POST /charge/wave` requires **XOF**. The response includes `wave_launch_url` or `checkout_url`, redirect or deep-link the customer.
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
@@ -50,7 +50,7 @@ See [Charges API](/api/charge/ChargesController_createWaveCharge) and [Direct ch
 
 ## Payouts
 
-Wave **beneficiary** payouts require a live key and valid recipient phone. Wave self-withdrawals are **live-only**—test keys return `400` for Wave payout rails. See [Sandbox payouts](/start/sandbox-payments#payouts-in-test-mode).
+Wave **beneficiary** payouts require a live key and valid recipient phone. Wave self-withdrawals are **live-only**-test keys return `400` for Wave payout rails. See [Sandbox payouts](/start/sandbox-payments#payouts-in-test-mode).
 
 ## Related
 

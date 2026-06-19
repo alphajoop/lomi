@@ -24,7 +24,7 @@ import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessio
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
 import { DisputesModule } from './core/disputes/disputes.module';
-import { FraudModule } from './core/fraud/fraud.module';
+import { RadarModule } from './core/radar/radar.module';
 import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
@@ -141,7 +141,7 @@ const logger = new Logger('RedisConfig');
     PaymentLinksModule,
     PayoutsModule,
     DisputesModule,
-    FraudModule,
+    RadarModule,
     SettlementsModule,
     WebhookDeliveryLogsModule,
     WebhooksModule,

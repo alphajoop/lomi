@@ -33,26 +33,27 @@ Définissez `docType` dans le frontmatter des nouveaux guides :
 
 ## Voix et structure
 
-- **Directe et assurée** — « Crée… », « Renvoie… », pas « Cet endpoint vous permet de… ».
-- **Pensée pour les marchands** — codes statut, idempotence, mobile money asynchrone, webhooks.
+- **Directe et assurée**: « Crée… », « Renvoie… », pas « Cet endpoint vous permet de… ».
+- **Pensée pour les marchands**: codes statut, idempotence, mobile money asynchrone, webhooks.
 - **Titres orientés question** pour les guides Build quand c'est possible.
-- **Pas de remplissage** — évitez « fluide », « robuste », « puissant » sans comportement concret.
-- **Français naturel** — pas de calques littéraux de l'anglais. Préférez des mots simples :
-  - ✅ « Statuts des paiements » — ❌ « Machine d'état des paiements »
-  - ✅ « URL webhook » — ❌ « point de terminaison »
-  - ✅ « Quand l'utiliser » — ❌ « Quand utiliser cet endpoint »
-  - ✅ « Étapes » — ❌ « Parcours type » / « golden path »
+- **Pas de remplissage**: évitez « fluide », « robuste », « puissant » sans comportement concret.
+- **Pas de tirets cadratins** dans le texte: utilisez des virgules, deux-points ou points (les cellules vides de tableau peuvent utiliser `-`).
+- **Français naturel**: pas de calques littéraux de l'anglais. Préférez des mots simples :
+  - ✅ « Statuts des paiements », ❌ « Machine d'état des paiements »
+  - ✅ « URL webhook », ❌ « point de terminaison »
+  - ✅ « Quand l'utiliser », ❌ « Quand utiliser cet endpoint »
+  - ✅ « Étapes », ❌ « Parcours type » / « golden path »
   - Gardez les termes techniques usuels en dev (`webhook`, `checkout`, `endpoint`, `sandbox`) quand tout le monde les utilise ainsi.
-  - **Pas de remplacement automatique en masse** — relisez chaque page à la main ; un script ne connaît pas le contexte (genre, accord, sens).
+  - **Pas de remplacement automatique en masse**: relisez chaque page à la main ; un script ne connaît pas le contexte (genre, accord, sens).
 
 Les guides rédigés à la main doivent lier vers les références canoniques au lieu de dupliquer les tableaux (ex. pointer vers [Paiements sandbox](/start/sandbox-payments) pour les cartes test).
 
 ## Vérités d'intégration (à répéter dans les guides)
 
 - Les montants en **XOF** utilisent les **centimes** (unités mineures entières) sauf documentation contraire d'un champ API.
-- **L'environnement suit la clé API** — `lomi_sk_test_…` vs `lomi_sk_live_…` ; une mauvaise clé contre un environnement renvoie **401**.
-- Le **mobile money live est asynchrone** — confirmez avec les webhooks et `GET /transactions/{id}` avant de livrer les commandes.
-- **Ne jamais faire confiance au seul succès côté client** — voir [Vérifier les paiements](/build/guides/verify-payments).
+- **L'environnement suit la clé API**: `lomi_sk_test_…` vs `lomi_sk_live_…` ; une mauvaise clé contre un environnement renvoie **401**.
+- Le **mobile money live est asynchrone**: confirmez avec les webhooks et `GET /transactions/{id}` avant de livrer les commandes.
+- **Ne jamais faire confiance au seul succès côté client**: voir [Vérifier les paiements](/build/guides/verify-payments).
 
 ## Politique bilingue
 
@@ -85,5 +86,5 @@ lomi docs check
 
 ## Voir aussi
 
-- [Brief design CORE-38](https://github.com/lomiafrica/lomi.) — `apps/design/docs/note.md` dans le monorepo
+- [Brief design CORE-38](https://github.com/lomiafrica/lomi.): `apps/design/docs/note.md` dans le monorepo
 - [Installer les règles agent](/build/cli/install-rules)

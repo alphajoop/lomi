@@ -1,7 +1,7 @@
 ---
 title: WooCommerce
 description:
-  Installer et configurer la passerelle lomi. pour WooCommerce — sessions de
+  Installer et configurer la passerelle lomi. pour WooCommerce, sessions de
   paiement hébergées, retour HTTP et webhooks signés.
 ---
 
@@ -43,7 +43,7 @@ Référence code : [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/
 | `X-Lomi-Event` | Doit être `PAYMENT_SUCCEEDED` pour la logique de capture |
 | `X-Lomi-Signature` | HMAC-SHA256 hex du corps brut, secret = secret webhook du tableau de bord |
 
-Vérifier toujours les **octets bruts** reçus — ne pas re-sérialiser le JSON.
+Vérifier toujours les **octets bruts** reçus, ne pas re-sérialiser le JSON.
 
 ## Mise en production et QA
 

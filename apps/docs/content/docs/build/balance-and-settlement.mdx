@@ -10,7 +10,7 @@ Balances are updated when a transaction reaches **`completed`**. This page expla
 <DocsScreenshot name="build/balance" alt="Merchant balance and settlement overview in the dashboard" />
 
 <Callout type="info">
-  In the **test** environment, completed payments credit your **dashboard test balance** only—they do not update your live withdrawable balance. See **[Sandbox payments](/start/sandbox-payments)**.
+  In the **test** environment, completed payments credit your **dashboard test balance** only, they do not update your live withdrawable balance. See **[Sandbox payments](/start/sandbox-payments)**.
 </Callout>
 
 ## When balances change
@@ -38,10 +38,10 @@ Exact API fields for “available” vs “pending” balances are exposed in [B
 
 Funds become withdrawable when `available_at` passes. For accounting, group completed payments by **availability date** and currency:
 
-- **`GET /settlements`** — list periods with gross, fee, and net totals per `{currency}:{YYYY-MM-DD}` (UTC date of `available_at`).
-- **`GET /settlements/{id}/transactions`** — line items for one period; sums should match the period totals.
+- **`GET /settlements`**: list periods with gross, fee, and net totals per `{currency}:{YYYY-MM-DD}` (UTC date of `available_at`).
+- **`GET /settlements/{id}/transactions`**: line items for one period; sums should match the period totals.
 
-`status` on each period is `available` when all underlying transactions are past `available_at`, otherwise `pending`. This is org-scoped reconciliation—not the same as provider payout batches from Paystack or Flutterwave.
+`status` on each period is `available` when all underlying transactions are past `available_at`, otherwise `pending`. This is org-scoped reconciliation, not the same as provider payout batches from Paystack or Flutterwave.
 
 See [List settlement periods](/api/settlements/SettlementsController_findAll) and [List settlement transactions](/api/settlements/SettlementsController_findTransactions).
 

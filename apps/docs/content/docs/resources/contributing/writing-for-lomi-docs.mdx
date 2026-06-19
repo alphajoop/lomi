@@ -33,19 +33,20 @@ Set `docType` in frontmatter on new guide pages:
 
 ## Voice and structure
 
-- **Direct and confident** — "Creates…", "Returns…", not "This endpoint allows you to…".
-- **Merchant-centric** — status codes, idempotency, async mobile money, webhook requirements.
+- **Direct and confident**: "Creates…", "Returns…", not "This endpoint allows you to…".
+- **Merchant-centric**: status codes, idempotency, async mobile money, webhook requirements.
 - **Question-led titles** for Build guides when possible.
-- **No filler** — avoid "seamless", "robust", "powerful" without a concrete behavior.
+- **No filler**: avoid "seamless", "robust", "powerful" without a concrete behavior.
+- **No em dashes** in prose: use commas, colons, or periods instead (table empty cells may use `-`).
 
 Hand-authored guides should link to canonical references instead of duplicating tables (e.g. point to [Sandbox payments](/start/sandbox-payments) for test cards).
 
 ## Integration truths (repeat in guides)
 
 - Amounts in **XOF** use **centimes** (integer minor units) unless a specific API field documents otherwise.
-- **API key determines environment** — `lomi_sk_test_…` vs `lomi_sk_live_…`; wrong key against an environment returns **401**.
-- **Live mobile money is asynchronous** — confirm with webhooks and `GET /transactions/{id}` before fulfilling orders.
-- **Never trust client-only success** — see [Verify payments](/build/guides/verify-payments).
+- **API key determines environment**: `lomi_sk_test_…` vs `lomi_sk_live_…`; wrong key against an environment returns **401**.
+- **Live mobile money is asynchronous**: confirm with webhooks and `GET /transactions/{id}` before fulfilling orders.
+- **Never trust client-only success**: see [Verify payments](/build/guides/verify-payments).
 
 ## Bilingual policy
 
@@ -78,5 +79,5 @@ lomi docs check
 
 ## Related
 
-- [CORE-38 design brief](https://github.com/lomiafrica/lomi.) — `apps/design/docs/note.md` in the monorepo
+- [CORE-38 design brief](https://github.com/lomiafrica/lomi.): `apps/design/docs/note.md` in the monorepo
 - [Install agent rules](/build/cli/install-rules)

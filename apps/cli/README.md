@@ -51,12 +51,17 @@ lomi checkout create --amount 10000 --currency XOF \
 | `status` | Verify login and API connectivity |
 | `init` | Initialize project with SDK, examples, and `.env` |
 | `quickstart` | Golden-path checks and next steps |
-| `listen` | Cloud webhook relay (sandbox-first) |
+| `listen` | Cloud webhook relay (sandbox-first); prints signing secret on connect |
+| `trigger <event>` | Emit synthetic sandbox webhook event |
 | `probe` | Integration health checks |
-| `webhooks list` / `webhooks test` | Manage and test webhook endpoints |
+| `webhooks list` / `webhooks test` / `webhooks resend` | Manage, test, and replay webhook deliveries |
+| `mcp config` | Print HTTP MCP config for Cursor or Claude |
 | `products list` | List products and prices |
 | `transactions list` / `transactions get` | List or retrieve transactions |
 | `refunds create` / `list` / `get` | Create, list, or retrieve refunds |
+| `payouts list` / `get` / `create` | Manage payouts |
+| `disputes list` / `get` | List card disputes |
+| `fraud alerts` | List fraud alerts |
 | `checkout create` | Create a hosted checkout session |
 | `dev` | Local webhook receiver for development |
 | `install-rules` | AI setup wizard: Cursor, Claude Code, Codex, llms.txt |

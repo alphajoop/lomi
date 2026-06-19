@@ -1765,7 +1765,7 @@
                   "value": {
                     "amount": 25000,
                     "currency_code": "XOF",
-                    "description": "Honoraires conseil — mars",
+                    "description": "Honoraires conseil, mars",
                     "expiry_date": "2026-12-31T23:59:59.000Z",
                     "payment_reference": "INV-2026-042"
                   }
@@ -3306,88 +3306,9 @@
         ]
       }
     },
-    "/fraud-rules": {
+    "/risk-assessments": {
       "get": {
-        "operationId": "FraudController_listRules",
-        "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Règles de fraude"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Lister les règles de fraude",
-        "tags": [
-          "Fraude"
-        ]
-      }
-    },
-    "/fraud-rules/{ruleId}": {
-      "patch": {
-        "operationId": "FraudController_updateRule",
-        "parameters": [
-          {
-            "name": "ruleId",
-            "required": true,
-            "in": "path",
-            "description": "Fraud rule ID",
-            "schema": {}
-          },
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateFraudRuleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Mettre à jour une règle de fraude",
-        "tags": [
-          "Fraude"
-        ]
-      }
-    },
-    "/fraud-alerts": {
-      "get": {
-        "operationId": "FraudController_listAlerts",
+        "operationId": "RadarController_listAssessments",
         "parameters": [
           {
             "name": "pageSize",
@@ -3406,10 +3327,44 @@
             }
           },
           {
-            "name": "status",
+            "name": "endDate",
             "required": false,
             "in": "query",
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rail",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "card",
+                "mtn",
+                "wave"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "decision",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "allow",
+                "flag",
+                "block"
+              ],
               "type": "string"
             }
           },
@@ -3426,6 +3381,44 @@
         ],
         "responses": {
           "200": {
+            "description": "Risk assessments"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List payment risk assessments",
+        "tags": [
+          "Radar"
+        ]
+      }
+    },
+    "/risk-assessments/{id}": {
+      "get": {
+        "operationId": "RadarController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Risk assessment ID",
+            "schema": {}
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "description": ""
           }
         },
@@ -3434,23 +3427,45 @@
             "api-key": []
           }
         ],
-        "summary": "Lister les alertes de fraude",
+        "summary": "Get a risk assessment",
         "tags": [
-          "Fraude"
+          "Radar"
         ]
       }
     },
-    "/fraud-alerts/{id}": {
-      "patch": {
-        "operationId": "FraudController_updateAlert",
+    "/organization/radar-settings": {
+      "get": {
+        "operationId": "RadarController_getSettings",
         "parameters": [
           {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Fraud alert ID",
-            "schema": {}
-          },
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get Radar settings for the organization",
+        "tags": [
+          "Radar"
+        ]
+      },
+      "patch": {
+        "operationId": "RadarController_updateSettings",
+        "parameters": [
           {
             "name": "Lomi-Account",
             "in": "header",
@@ -3467,7 +3482,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateFraudAlertDto"
+                "$ref": "#/components/schemas/UpdateRadarSettingsDto"
               }
             }
           }
@@ -3482,9 +3497,9 @@
             "api-key": []
           }
         ],
-        "summary": "Résoudre ou rejeter une alerte",
+        "summary": "Update Radar settings",
         "tags": [
-          "Fraude"
+          "Radar"
         ]
       }
     },
@@ -6784,38 +6799,23 @@
           "success"
         ]
       },
-      "UpdateFraudRuleDto": {
+      "UpdateRadarSettingsDto": {
         "type": "object",
         "properties": {
-          "is_enabled": {
+          "enabled": {
             "type": "boolean"
           },
-          "custom_threshold": {
-            "type": "number"
-          },
-          "custom_action": {
+          "mode": {
             "type": "string",
             "enum": [
-              "flag",
+              "monitor",
               "block"
             ]
+          },
+          "stripe_radar_passthrough": {
+            "type": "boolean"
           }
         }
-      },
-      "UpdateFraudAlertDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "resolved",
-              "dismissed"
-            ]
-          }
-        },
-        "required": [
-          "status"
-        ]
       },
       "WebhookDeliveryLogResponseDto": {
         "type": "object",
@@ -7324,12 +7324,12 @@
           "customer_email": {
             "type": "string",
             "example": "john@example.com",
-            "description": "Customer email — required together with customer_name when customer_id is omitted."
+            "description": "Customer email, required together with customer_name when customer_id is omitted."
           },
           "customer_name": {
             "type": "string",
             "example": "John Doe",
-            "description": "Customer display name — required together with customer_email when customer_id is omitted."
+            "description": "Customer display name, required together with customer_email when customer_id is omitted."
           },
           "customer_phone": {
             "type": "string",

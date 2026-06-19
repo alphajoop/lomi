@@ -9,7 +9,7 @@ Les intégrations de production doivent supposer une livraison **au moins une fo
 
 Les webhooks sont de simples requêtes HTTP `` `POST` ``. Dans le réponse HTTP, votre handler a un rôle étroit : **vérifier la charge** (signature), **enregistrer ou mettre en file le minimum** pour ne rien perdre, puis **répondre un succès HTTP à lomi.** tout de suite.
 
-Renvoyez un **2xx** promptement après vérification de la signature et persistance suffisante pour accuser réception. Le travail lourd passe par **votre** file d'attente. Si vous bloquez sur des API tierces, de grosses transactions SQL ou des règles séquentielles **avant** de répondre, vous risquez de dépasser le délai de lecture HTTP sortant de lomi. (**environ quatre secondes par tentative** — voir [délais et relances](#timeouts-retries-and-client-errors)). Viser une réponse HTTP courante **nettement sous une seconde** laisse une marge pour les pics et les démarrages à froid.
+Renvoyez un **2xx** promptement après vérification de la signature et persistance suffisante pour accuser réception. Le travail lourd passe par **votre** file d'attente. Si vous bloquez sur des API tierces, de grosses transactions SQL ou des règles séquentielles **avant** de répondre, vous risquez de dépasser le délai de lecture HTTP sortant de lomi. (**environ quatre secondes par tentative**: voir [délais et relances](#timeouts-retries-and-client-errors)). Viser une réponse HTTP courante **nettement sous une seconde** laisse une marge pour les pics et les démarrages à froid.
 
 ## Traitement idempotent
 
@@ -28,7 +28,7 @@ Pour le débogage opérationnel, on commence presque toujours par ce que lomi. a
 - analyser latence et taille du corps
 - déboguer signature ou parsing
 
-Des tentatives répétées en **401 Unauthorized** (corps du type « Authentication required ») signifient souvent que **votre serveur ou CDN a refusé le POST** avant le code webhook — les livraisons sortantes n'incluent pas d'auth Bearer / clé API ; voir [Secret de signature et Authorization](/build/advanced-guides/handling-webhooks).
+Des tentatives répétées en **401 Unauthorized** (corps du type « Authentication required ») signifient souvent que **votre serveur ou CDN a refusé le POST** avant le code webhook, les livraisons sortantes n'incluent pas d'auth Bearer / clé API ; voir [Secret de signature et Authorization](/build/advanced-guides/handling-webhooks).
 
 <h2 id="timeouts-retries-and-client-errors">Délais, nouvelles tentatives et erreurs client</h2>
 
@@ -47,21 +47,21 @@ Le client HTTP webhook de lomi. attend **environ 4 secondes** (`` `timeout: 4000
 
 | Résultat | Relances ? |
 |---------|----------|
-| **2xx** | Non — livré |
+| **2xx** | Non, livré |
 | **Erreurs client 4xx** (`` `400`–`499` ``, incl. **`401 Unauthorized`**) | **Pas d'autres tentatives** pour cette livraison (« erreur client non renouvelable ») |
-| **5xx** et erreurs transitoires / réseau | **Oui** — sous plafonds et backoff |
+| **5xx** et erreurs transitoires / réseau | **Oui**: sous plafonds et backoff |
 
-En pratique : corrigez **configuration et auth** (souvent visibles en **`4xx`**) avant d'attendre une guérison automatique — lomi. ne relance pas indéfiniment une URL mal configurée.
+En pratique : corrigez **configuration et auth** (souvent visibles en **`4xx`**) avant d'attendre une guérison automatique, lomi. ne relance pas indéfiniment une URL mal configurée.
 
 ### Plafonds de tentatives
 
 Pour les échecs **réessayables** (timeouts, **`5xx`**, pannes réseau transitoires), lomi. peut tenter la livraison jusqu'à **quatre** fois sur certains chemins, ou jusqu'à **cinq** fois lorsque la livraison est mise en file, avec **backoff exponentiel** (délai initial d'environ **3 à 5 secondes** entre tentatives).
 
-Vous n'avez pas à distinguer les chemins de livraison dans votre handler — traitez toujours les événements **sans doublon** — mais ces plafonds aident à lire les journaux après une panne.
+Vous n'avez pas à distinguer les chemins de livraison dans votre handler, traitez toujours les événements **sans doublon**: mais ces plafonds aident à lire les journaux après une panne.
 
 ### Enveloppe JSON (`` `lomi_environment` ``)
 
-Le champ **`lomi_environment`** reflète l'environnement de déploiement (`` `production` ``, `` `development` ``, etc.). Ce n'est **pas** un substitut pour distinguer trafic **live** et **test** — utilisez l'environnement de votre clé API et la configuration de vos endpoints webhook.
+Le champ **`lomi_environment`** reflète l'environnement de déploiement (`` `production` ``, `` `development` ``, etc.). Ce n'est **pas** un substitut pour distinguer trafic **live** et **test**: utilisez l'environnement de votre clé API et la configuration de vos endpoints webhook.
 
 ## Vérification de signature
 

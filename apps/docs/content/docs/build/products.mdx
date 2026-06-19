@@ -55,7 +55,7 @@ Create a new product with one or more prices. At least one price is required.
 | `currency_code` | `string` | **Yes** | `XOF`, `USD`, `EUR` |
 | `billing_interval` | `string` | No | `day`, `week`, `month`, `year` (required for recurring products) |
 | `pricing_model` | `string` | No | `standard` (default), `pay_what_you_want`, or `tiered` |
-| `minimum_amount` | `number` | PWYW | Required when `pricing_model` is `pay_what_you_want` — lowest unit price the customer may pay |
+| `minimum_amount` | `number` | PWYW | Required when `pricing_model` is `pay_what_you_want`, lowest unit price the customer may pay |
 | `maximum_amount` | `number` | No | Optional upper bound on unit price for `pay_what_you_want` |
 | `is_default` | `boolean` | No | Set as default price |
 | `metadata` | `object` | No | Optional metadata on the price |
@@ -292,7 +292,7 @@ curl -X GET "https://api.lomi.africa/products/prod_abc123..." \
 Add a new price option to an existing product.
 
 <Callout type="warning">
-  Products can have a maximum of **3 active prices**. You cannot modify existing prices—create a new one instead.
+  Products can have a maximum of **3 active prices**. You cannot modify existing prices, create a new one instead.
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>

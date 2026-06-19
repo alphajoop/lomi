@@ -1,6 +1,6 @@
 ---
 title: 'How do I verify a payment before fulfilling?'
-description: 'Confirm payment status server-side with the API and webhooks—never trust the browser redirect alone.'
+description: 'Confirm payment status server-side with the API and webhooks, never trust the browser redirect alone.'
 docType: how-to
 ---
 
@@ -9,7 +9,7 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-A customer may close the browser, lose network connectivity, or return to your `success_url` before lomi. has finished processing—especially with **mobile money** and **3D Secure** cards. Treat the redirect as a UX hint, not proof of payment.
+A customer may close the browser, lose network connectivity, or return to your `success_url` before lomi. has finished processing, especially with **mobile money** and **3D Secure** cards. Treat the redirect as a UX hint, not proof of payment.
 
 <Callout type="warn" title="Never fulfill on redirect alone">
   Do not ship goods, unlock content, or mark an invoice paid based only on `success_url` query parameters or client-side JavaScript. Always verify on your server.
@@ -17,16 +17,16 @@ A customer may close the browser, lose network connectivity, or return to your `
 
 ## Recommended verification order
 
-1. **Webhook** — lomi. POSTs to your HTTPS endpoint when the transaction reaches a final state (preferred for async rails).
-2. **API read** — `GET /transactions/{id}` or list with filters when you have the transaction ID from the checkout session or charge response.
-3. **Dashboard** — manual ops and support; not for production fulfillment automation.
+1. **Webhook**: lomi. POSTs to your HTTPS endpoint when the transaction reaches a final state (preferred for async rails).
+2. **API read**: `GET /transactions/{id}` or list with filters when you have the transaction ID from the checkout session or charge response.
+3. **Dashboard**: manual ops and support; not for production fulfillment automation.
 
 ## Hosted checkout
 
 After the customer pays:
 
 1. Store your internal `order_id` in checkout session `metadata` when you create the session.
-2. On `success_url`, show a “processing” state—not “paid”—until your backend confirms.
+2. On `success_url`, show a “processing” state, not “paid”-until your backend confirms.
 3. When you receive `transaction.completed` (or your configured event type), match `metadata.order_id` and fulfill.
 
 See [Payment state machine](/api/payment-state-machine) for status meanings and [Handling webhooks](/build/advanced-guides/handling-webhooks) for signature verification.
@@ -35,7 +35,7 @@ See [Payment state machine](/api/payment-state-machine) for status meanings and 
 
 | Rail | When to verify |
 | --- | --- |
-| **Wave (live)** | After customer approves in the Wave app—webhook or poll transaction |
+| **Wave (live)** | After customer approves in the Wave app, webhook or poll transaction |
 | **MTN MoMo (live)** | Starts `PENDING`; verify before fulfill |
 | **MTN / Wave (test)** | May complete immediately; still verify server-side in integration tests |
 | **Card** | After `client_secret` confirmation; watch for `requires_action` |

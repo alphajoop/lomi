@@ -792,79 +792,6 @@
       "searchHint": "disputes get id litiges"
     },
     {
-      "name": "lomi_get_fraud_alerts",
-      "operationKey": "GET /fraud-alerts",
-      "method": "get",
-      "pathTemplate": "/fraud-alerts",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "pageSize",
-        "page",
-        "status"
-      ],
-      "title": "Get Fraude",
-      "description": "Get Fraude via the lomi. merchant REST API.\n\nREST: GET /fraud-alerts",
-      "tags": [
-        "Fraude"
-      ],
-      "operationId": "FraudController_listAlerts",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "page": {
-            "type": "number"
-          },
-          "pageSize": {
-            "type": "number"
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "alerts fraud fraude get"
-    },
-    {
-      "name": "lomi_get_fraud_rules",
-      "operationKey": "GET /fraud-rules",
-      "method": "get",
-      "pathTemplate": "/fraud-rules",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Get Fraude",
-      "description": "Get Fraude via the lomi. merchant REST API.\n\nREST: GET /fraud-rules",
-      "tags": [
-        "Fraude"
-      ],
-      "operationId": "FraudController_listRules",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "fraud fraude get rules"
-    },
-    {
       "name": "lomi_get_merchants_id",
       "operationKey": "GET /merchants/{id}",
       "method": "get",
@@ -1111,6 +1038,36 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "balances customerId get id meters"
+    },
+    {
+      "name": "lomi_get_organization_radar_settings",
+      "operationKey": "GET /organization/radar-settings",
+      "method": "get",
+      "pathTemplate": "/organization/radar-settings",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Get Radar",
+      "description": "Get Radar settings for the organization\n\nREST: GET /organization/radar-settings",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_getSettings",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get organization radar settings"
     },
     {
       "name": "lomi_get_organizations",
@@ -1649,6 +1606,109 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "get id refunds"
+    },
+    {
+      "name": "lomi_get_risk_assessments",
+      "operationKey": "GET /risk-assessments",
+      "method": "get",
+      "pathTemplate": "/risk-assessments",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "endDate",
+        "startDate",
+        "rail",
+        "decision"
+      ],
+      "title": "Get Radar",
+      "description": "List payment risk assessments\n\nREST: GET /risk-assessments",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_listAssessments",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "enum": [
+              "allow",
+              "flag",
+              "block"
+            ],
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "rail": {
+            "enum": [
+              "card",
+              "mtn",
+              "wave"
+            ],
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "assessments get radar risk"
+    },
+    {
+      "name": "lomi_get_risk_assessments_id",
+      "operationKey": "GET /risk-assessments/{id}",
+      "method": "get",
+      "pathTemplate": "/risk-assessments/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Radar",
+      "description": "Get a risk assessment\n\nREST: GET /risk-assessments/{id}",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "description": "Risk assessment ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "assessments get id radar risk"
     },
     {
       "name": "lomi_get_subscriptions",
@@ -2365,127 +2425,6 @@
       "searchHint": "customers id patch"
     },
     {
-      "name": "lomi_patch_fraud_alerts_id",
-      "operationKey": "PATCH /fraud-alerts/{id}",
-      "method": "patch",
-      "pathTemplate": "/fraud-alerts/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Update Fraude",
-      "description": "Update Fraude via the lomi. merchant REST API.\n\nREST: PATCH /fraud-alerts/{id}",
-      "tags": [
-        "Fraude"
-      ],
-      "operationId": "FraudController_updateAlert",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": [
-                  "resolved",
-                  "dismissed"
-                ]
-              }
-            },
-            "required": [
-              "status"
-            ],
-            "description": "JSON request body for this operation."
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "description": "Fraud alert ID"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "body",
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "alerts fraud fraude id patch"
-    },
-    {
-      "name": "lomi_patch_fraud_rules_ruleId",
-      "operationKey": "PATCH /fraud-rules/{ruleId}",
-      "method": "patch",
-      "pathTemplate": "/fraud-rules/{ruleId}",
-      "pathParamNames": [
-        "ruleId"
-      ],
-      "queryParamNames": [],
-      "title": "Update Fraude",
-      "description": "Update Fraude via the lomi. merchant REST API.\n\nREST: PATCH /fraud-rules/{ruleId}",
-      "tags": [
-        "Fraude"
-      ],
-      "operationId": "FraudController_updateRule",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "custom_action": {
-                "type": "string",
-                "enum": [
-                  "flag",
-                  "block"
-                ]
-              },
-              "custom_threshold": {
-                "type": "number"
-              },
-              "is_enabled": {
-                "type": "boolean"
-              }
-            },
-            "description": "JSON request body for this operation."
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "ruleId": {
-            "description": "Fraud rule ID"
-          }
-        },
-        "required": [
-          "body",
-          "ruleId"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "fraud fraude patch ruleId rules"
-    },
-    {
       "name": "lomi_patch_meters_id",
       "operationKey": "PATCH /meters/{id}",
       "method": "patch",
@@ -2521,6 +2460,62 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "id meters patch"
+    },
+    {
+      "name": "lomi_patch_organization_radar_settings",
+      "operationKey": "PATCH /organization/radar-settings",
+      "method": "patch",
+      "pathTemplate": "/organization/radar-settings",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Update Radar",
+      "description": "Update Radar settings\n\nREST: PATCH /organization/radar-settings",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_updateSettings",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "monitor",
+                  "block"
+                ]
+              },
+              "stripe_radar_passthrough": {
+                "type": "boolean"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "organization patch radar settings"
     },
     {
       "name": "lomi_patch_subscriptions_id",

@@ -6,7 +6,7 @@ description: 'Utilisez les clés de test, les moyens de paiement de test, les so
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from '@/components/docs/docs-callout';
 
-L’**environnement de test** lomi. vous permet d’exécuter des parcours de paiement complets—checkout hébergé, formulaire carte intégré et mobile money—sans mouvement de fonds réels ni impact sur les soldes live. Cette page est la référence unique pour **simuler les paiements** : quels numéros de carte utiliser, le comportement de Wave et MTN MoMo en test, et ce que vous devez observer dans le tableau de bord et via les webhooks.
+L’**environnement de test** lomi. vous permet d’exécuter des parcours de paiement complets, checkout hébergé, formulaire carte intégré et mobile money, sans mouvement de fonds réels ni impact sur les soldes live. Cette page est la référence unique pour **simuler les paiements** : quels numéros de carte utiliser, le comportement de Wave et MTN MoMo en test, et ce que vous devez observer dans le tableau de bord et via les webhooks.
 
 Pour les clés API, les URL de base et les limites, voir **[Authentification](/start/api-keys)**. Pour votre première requête authentifiée, voir **[Intégration API](/start/first-payment)**.
 
@@ -26,15 +26,15 @@ Pour les clés API, les URL de base et les limites, voir **[Authentification](/s
 
 L’environnement est déterminé par votre **clé API**, pas par le nom d’hôte : une clé de test crée et lit toujours des données de test.
 
-## Checkout hébergé — démarrage rapide
+## Checkout hébergé: démarrage rapide
 
 Paiement carte bac à sable en cinq étapes (recettes complètes dans [Recettes API et checkout hébergé](#recettes-api-et-checkout-hébergé)) :
 
-1. **Créer une session** — `POST https://sandbox.api.lomi.africa/checkout-sessions` avec `lomi_sk_test_…` (`amount`, `currency_code`, `success_url`, `cancel_url` minimum). Voir [API sessions checkout](/api/checkout-sessions/CheckoutSessionsController_create).
-2. **Ouvrir l’URL** — la réponse contient `checkout_url`.
-3. **Payer avec une carte test** — **Carte**, `4242 4242 4242 4242`, expiration `12/34`, CVC `123` ([liste complète](#aide-mémoire--numéros-les-plus-utiles)).
-4. **Finaliser** — transaction `completed` ; le **solde test** augmente.
-5. **Vérifier** — mode **Test** du tableau de bord et webhooks (`"environment": "test"`).
+1. **Créer une session**: `POST https://sandbox.api.lomi.africa/checkout-sessions` avec `lomi_sk_test_…` (`amount`, `currency_code`, `success_url`, `cancel_url` minimum). Voir [API sessions checkout](/api/checkout-sessions/CheckoutSessionsController_create).
+2. **Ouvrir l’URL**: la réponse contient `checkout_url`.
+3. **Payer avec une carte test**: **Carte**, `4242 4242 4242 4242`, expiration `12/34`, CVC `123` ([liste complète](#aide-mémoire--numéros-les-plus-utiles)).
+4. **Finaliser**: transaction `completed` ; le **solde test** augmente.
+5. **Vérifier**: mode **Test** du tableau de bord et webhooks (`"environment": "test"`).
 
 ```text
 POST /checkout-sessions  →  { "checkout_url": "https://…" }  →  paiement client  →  webhook + solde test
@@ -74,7 +74,7 @@ Pour le fonctionnement des soldes live après complétion, voir **[Soldes et rè
 
 ## Tester les paiements par carte
 
-En bac à sable, les paiements carte s’appuient sur des **numéros de carte de test** qui reproduisent le comportement des émetteurs—approbation, refus et authentification forte—sans débiter quiconque. Utilisez-les uniquement avec des clés API de test et des sessions checkout en mode test.
+En bac à sable, les paiements carte s’appuient sur des **numéros de carte de test** qui reproduisent le comportement des émetteurs, approbation, refus et authentification forte, sans débiter quiconque. Utilisez-les uniquement avec des clés API de test et des sessions checkout en mode test.
 
 <Callout type="info">
   N’utilisez jamais de vraies cartes en test, ni des numéros de test en production. Les vraies cartes en test sont interdites ; les numéros de test en live ne fonctionnent pas.
@@ -158,7 +158,7 @@ Certains numéros déclenchent une **étape d’authentification** (redirection 
 
 Testez l’authentification sur votre **checkout hébergé** ou **formulaire carte intégré**, pas seulement via l’API, afin de reproduire l’expérience client de production.
 
-### Aide-mémoire — numéros les plus utiles
+### Aide-mémoire: numéros les plus utiles
 
 | Objectif | Numéro |
 | --- | --- |
@@ -228,7 +228,7 @@ Avec une **clé API test**, `POST /payouts` se comporte ainsi :
 
 | `rail` | `destination` | Clé test |
 | --- | --- | --- |
-| `wave` | `self` ou `beneficiary` | **`400`** — virements Wave réservés au live ; aucun appel Wave |
+| `wave` | `self` ou `beneficiary` | **`400`**: virements Wave réservés au live ; aucun appel Wave |
 | `bank`, `spi` | `self` | Retraits test selon les enregistrements applicables |
 | `spi` | `beneficiary` | Peut créer des bénéficiaires en attente (pas de Wave live) |
 
@@ -300,11 +300,11 @@ Créez des liens en mode **Test** dans le tableau de bord, ou via l’API avec v
 Utilisez des clés API **test** et les flux de [Paiements en bac à sable](/start/sandbox-payments).
 
 1. **Créez un produit récurrent** avec `trial_enabled: true` ou `first_payment_type: non_initial` (voir [Produits](/build/products)).
-2. **Lien de paiement ou session** — ouvrez le tunnel hébergé ou l’URL S’abonner de la vitrine avec le `product_id` récurrent.
-3. **Essai + carte** — utilisez `4242 4242 4242 4242` ; le tunnel enregistre la carte via SetupIntent avec **0** dû aujourd’hui. Attendez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription.
-4. **Essai + Wave / MTN** — complétez les coordonnées ; l’inscription doit réussir **sans prélèvement** en mode test.
-5. **Inscription payante** — `first_payment_type: initial` et paiement test normal ; vérifiez `status: active` et une transaction `instalment`.
-6. **Webhooks** — abonnez-vous à `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED` et `PAYMENT_FAILED` pour les échecs de renouvellement.
+2. **Lien de paiement ou session**: ouvrez le tunnel hébergé ou l’URL S’abonner de la vitrine avec le `product_id` récurrent.
+3. **Essai + carte**: utilisez `4242 4242 4242 4242` ; le tunnel enregistre la carte via SetupIntent avec **0** dû aujourd’hui. Attendez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription.
+4. **Essai + Wave / MTN**: complétez les coordonnées ; l’inscription doit réussir **sans prélèvement** en mode test.
+5. **Inscription payante**: `first_payment_type: initial` et paiement test normal ; vérifiez `status: active` et une transaction `instalment`.
+6. **Webhooks**: abonnez-vous à `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED` et `PAYMENT_FAILED` pour les échecs de renouvellement.
 
 Les renouvellements planifiés en test utilisent des dates futures ; inspectez `next_billing_date` via le tableau de bord ou l’API.
 
@@ -331,15 +331,15 @@ Voir **[Webhooks](/build/webhooks)**. Pour l’automatisation, voir le **[Guide 
 
 ## Documentation associée
 
-- **[Authentification](/start/api-keys)** — clés, environnements, sécurité
-- **[Intégration API](/start/first-payment)** — première requête et index API
-- **[Sessions checkout](/build/checkout)** — API checkout hébergé
-- **[Encaissements directs](/build/payments/charges)** — Wave, MTN et carte (`POST /charge/card`)
-- **[Liens de paiement](/build/payment-links)** — liens réutilisables
-- **[lomi Payment Elements](/build/payments/lomi-payment-elements)** — UI carte côté client
-- **[Webhooks](/build/webhooks)** — abonnements aux événements
-- **[Soldes et règlement](/build/balance-and-settlement)** — règles des soldes live
-- **[Guide de tests](/build/advanced-guides/testing)** — automatisation, CI, écouteurs webhook
+- **[Authentification](/start/api-keys)**: clés, environnements, sécurité
+- **[Intégration API](/start/first-payment)**: première requête et index API
+- **[Sessions checkout](/build/checkout)**: API checkout hébergé
+- **[Encaissements directs](/build/payments/charges)**: Wave, MTN et carte (`POST /charge/card`)
+- **[Liens de paiement](/build/payment-links)**: liens réutilisables
+- **[lomi Payment Elements](/build/payments/lomi-payment-elements)**: UI carte côté client
+- **[Webhooks](/build/webhooks)**: abonnements aux événements
+- **[Soldes et règlement](/build/balance-and-settlement)**: règles des soldes live
+- **[Guide de tests](/build/advanced-guides/testing)**: automatisation, CI, écouteurs webhook
 
 ## Passer en production
 

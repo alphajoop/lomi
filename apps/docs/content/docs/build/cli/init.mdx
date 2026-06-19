@@ -56,9 +56,9 @@ Requires Node.js and shadcn in the target project (or pass `--yes` so shadcn ini
 
 When run interactively, `lomi init` prompts for:
 
-1. **Environment** — Production or Sandbox (sets `LOMI_API_URL`)
-2. **Language** — TypeScript or JavaScript for generated examples
-3. **API key** — Your secret key from the [Merchant Portal](https://lomi.africa/portal/settings/api-keys)
+1. **Environment**: Production or Sandbox (sets `LOMI_API_URL`)
+2. **Language**: TypeScript or JavaScript for generated examples
+3. **API key**: Your secret key from the [Merchant Portal](https://lomi.africa/portal/settings/api-keys)
 
 It may also offer to run [`lomi install-rules`](/build/cli/install-rules) if you haven't installed agent rules yet, and optionally install a [lomi. UI](/build/lomi-ui) checkout component via [`lomi ui`](/build/cli/ui).
 
@@ -70,7 +70,7 @@ It may also offer to run [`lomi install-rules`](/build/cli/install-rules) if you
 | `lib/lomi./client.{ts\|js}` | Initialized SDK client loading from `.env` |
 | `examples/create-checkout-session.{ts\|js}` | Checkout session creation example |
 | `examples/webhook-handler.{ts\|js}` | Basic webhook handler example |
-| `examples/embed-checkout.html` | Modal embed example — replace `CHECKOUT_URL` after `lomi checkout create` |
+| `examples/embed-checkout.html` | Modal embed example, replace `CHECKOUT_URL` after `lomi checkout create` |
 | `lomi.config.ts` | Project-level lomi. configuration |
 
 Example `.env`:

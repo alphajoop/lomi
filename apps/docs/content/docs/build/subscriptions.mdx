@@ -15,7 +15,7 @@ The Subscriptions API lists and retrieves **subscription instances** (a customer
 </Callout>
 
 <Callout type="info">
-  For signup flows (trials, first payment types, checkout session amounts), see **[Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)**.
+  For signup flows (trials, first payment types, checkout session amounts), see **[Checkout behavior: Subscription checkout](/build/payments/checkout-behavior#subscription-checkout)**.
 </Callout>
 
 ## How subscriptions are created
@@ -25,9 +25,9 @@ Subscription instances are created when a customer buys a **recurring product** 
 - [Hosted checkout](/build/checkout) or [payment links](/build/payment-links) with a recurring `product_id`
 - Your storefront subscribe flow
 
-There is no standalone "create subscription" API for signup—the checkout or link flow creates the instance after the first successful payment (or trial rules on the product).
+There is no standalone "create subscription" API for signup, the checkout or link flow creates the instance after the first successful payment (or trial rules on the product).
 
-Monitor **webhook events** to track payment confirmations for each billing cycle. Listen for `SUBSCRIPTION_RENEWED` and renewal-related `PAYMENT_FAILED` events—see [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
+Monitor **webhook events** to track payment confirmations for each billing cycle. Listen for `SUBSCRIPTION_RENEWED` and renewal-related `PAYMENT_FAILED` events, see [Checkout behavior: Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
 
 ## Renewals and failed payments
 
@@ -48,7 +48,7 @@ Mobile money does not expose a saved off-session token like cards. When no Strip
 2. The customer pays on that link; webhooks confirm the cycle.
 3. If the customer does not pay in time, **overdue processing** may set the subscription to `past_due`, `paused`, or `cancelled` per the product's `failed_payment_action`.
 
-This matches how async mobile-money rails work in production (PIN approval, no standing mandate). It is intentional—not a missing card feature.
+This matches how async mobile-money rails work in production (PIN approval, no standing mandate). It is intentional, not a missing card feature.
 
 <Callout type="info">
   **Support shortcut:** "Why didn't my Wave subscription auto-charge?" → Mobile money renewals require the customer to open the renewal checkout link and approve payment. Cards renew automatically when a payment method was saved at signup.
@@ -56,13 +56,13 @@ This matches how async mobile-money rails work in production (PIN approval, no s
 
 Your integration should:
 
-1. **Listen for `SUBSCRIPTION_RENEWED`** — successful billing cycle; extend access or send a receipt.
-2. **Listen for `PAYMENT_FAILED`** on renewal transactions — customer may need to pay the renewal checkout link or update a card in the [customer portal](/build/customer-portal).
-3. **Poll or list subscriptions** via `GET /subscriptions` or `GET /customer-subscriptions` when webhooks are delayed—use `status` and `next_billing_date` from the API response only.
+1. **Listen for `SUBSCRIPTION_RENEWED`**: successful billing cycle; extend access or send a receipt.
+2. **Listen for `PAYMENT_FAILED`** on renewal transactions, customer may need to pay the renewal checkout link or update a card in the [customer portal](/build/customer-portal).
+3. **Poll or list subscriptions** via `GET /subscriptions` or `GET /customer-subscriptions` when webhooks are delayed, use `status` and `next_billing_date` from the API response only.
 
 Cancel or pause via `POST /subscriptions/{id}/cancel` or `PATCH /subscriptions/{id}` as documented in the [Subscriptions API](/api/subscriptions).
 
-For **metered / usage-based** products (API calls, credits, seats), see **[Usage billing](/build/usage-billing)**—usage subscriptions and meters are separate from recurring checkout subscriptions.
+For **metered / usage-based** products (API calls, credits, seats), see **[Usage billing](/build/usage-billing)**-usage subscriptions and meters are separate from recurring checkout subscriptions.
 
 ## List subscriptions
 

@@ -175,7 +175,7 @@ function collectForbiddenProviderIngressOpenApiPaths(
   }
 }
 
-/** After stripping fenced code blocks — narrative and tables, not examples. */
+/** After stripping fenced code blocks: narrative and tables, not examples. */
 const DOCS_FORBIDDEN_INGRESS_SNIPPETS: readonly string[] = [
   '/webhooks/stripe',
   '/webhooks/wave',
@@ -196,7 +196,7 @@ const DOCS_FORBIDDEN_PROSE: { re: RegExp; hint: string }[] = [
   },
   {
     re: /stripe\|night/i,
-    hint: 'Use lomi theme names (`light`, `dark`, `flat`) only — not legacy processor theme aliases.',
+    hint: 'Use lomi theme names (`light`, `dark`, `flat`) only, not legacy processor theme aliases.',
   },
 ];
 
@@ -272,7 +272,7 @@ async function checkPublicDocsProviderIngressPolicy(): Promise<void> {
     for (const token of ['StripeWebhook', 'WaveWebhook'] as const) {
       if (text.includes(token)) {
         errors.push(
-          `${file}: contains internal controller identifier "${token}" — remove from public docs.`,
+          `${file}: contains internal controller identifier "${token}"; remove from public docs.`,
         );
       }
     }
@@ -406,7 +406,7 @@ async function checkRestApiManualPages(): Promise<void> {
     for (const alts of REST_API_HEADING_ALTERNATIVES) {
       if (!hasAnyHeading(parsed.content, alts)) {
         errors.push(
-          `${file}: missing required heading(s) — need one of: ${alts.join(' | ')}`,
+          `${file}: missing required heading(s); need one of: ${alts.join(' | ')}`,
         );
       }
     }

@@ -17,8 +17,8 @@ Le mobile money permet d'accepter des paiements depuis les portefeuilles mobiles
 
 Avant d'intégrer le mobile money :
 
-1. Un compte lomi. avec des clés API **test** ou **live** — voir [Clés API](/start/api-keys).
-2. Un URL **webhook** HTTPS pour le statut final en mode live — voir [Webhooks](/build/webhooks).
+1. Un compte lomi. avec des clés API **test** ou **live**: voir [Clés API](/start/api-keys).
+2. Un URL **webhook** HTTPS pour le statut final en mode live, voir [Webhooks](/build/webhooks).
 3. **Numéro de téléphone** client au format E.164 (par exemple `+2250707070707`).
 
 ## Fonctionnement des paiements mobile money
@@ -47,9 +47,9 @@ Le mobile money est **asynchrone en mode live**. Affichez toujours un état en a
 
 La plupart des marchands devraient commencer par le **checkout hébergé** ou les **liens de paiement**.
 
-## API directe — Wave
+## API directe: Wave
 
-`POST /charge/wave` avec montant XOF et détails client. Redirigez vers `wave_launch_url` ou `checkout_url` dans la réponse — ou lisez le champ normalisé **`next_action`** (`type: redirect` avec `url`).
+`POST /charge/wave` avec montant XOF et détails client. Redirigez vers `wave_launch_url` ou `checkout_url` dans la réponse, ou lisez le champ normalisé **`next_action`** (`type: redirect` avec `url`).
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
@@ -69,7 +69,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
   }'
 ```
 
-## API directe — MTN MoMo
+## API directe: MTN MoMo
 
 `POST /charge/mtn` avec montant, devise, `countryCode` et numéro de téléphone client. La réponse inclut **`next_action`** (`type: await_webhook` avec `status`) ainsi que `data.status`.
 
@@ -92,8 +92,8 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
 
 Avant de fournir la valeur au client, confirmez le statut final et le montant :
 
-- **Webhooks** — enregistrez votre endpoint et traitez `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. Voir [Recevoir les webhooks](/build/advanced-guides/handling-webhooks).
-- **Récupérer la transaction** — `GET /transactions/{id}` avec le `transaction_id` de la réponse charge.
+- **Webhooks**: enregistrez votre endpoint et traitez `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. Voir [Recevoir les webhooks](/build/advanced-guides/handling-webhooks).
+- **Récupérer la transaction**: `GET /transactions/{id}` avec le `transaction_id` de la réponse charge.
 
 ## Test vs live
 
@@ -103,7 +103,7 @@ Avant de fournir la valeur au client, confirmez le statut final et le montant :
 | Wave | Le solde test peut être crédité à la création de session | Attendre webhook ou poll transaction |
 | Vrai portefeuille débité | Jamais | Oui |
 
-Instructions complètes : [Paiements sandbox — mobile money](/start/sandbox-payments#testing-mobile-money).
+Instructions complètes : [Paiements sandbox: mobile money](/start/sandbox-payments#testing-mobile-money).
 
 ## Suite
 

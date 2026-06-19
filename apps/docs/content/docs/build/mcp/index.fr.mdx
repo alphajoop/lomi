@@ -7,7 +7,7 @@ import { Callout } from '@/components/docs/docs-callout';
 
 # MCP pour clients IA
 
-Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude Desktop, agents maison) d’appeler **l’API marchande lomi.** — créer des checkouts, lister des paiements, déboguer des webhooks — sans écrire chaque requête HTTP à la main.
+Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude Desktop, agents maison) d’appeler **l’API marchande lomi.**: créer des checkouts, lister des paiements, déboguer des webhooks, sans écrire chaque requête HTTP à la main.
 
 <Callout type="info" title="Pour qui">
   MCP connecte **votre IDE ou assistant IA** à **l’API marchande de votre organisation** (mêmes périmètres que votre clé API). Utilisez-le pendant l’intégration.
@@ -23,12 +23,12 @@ Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude 
 
 | Valeur | En-tête | Où l’obtenir |
 | --- | --- | --- |
-| **Clé API marchande** | `x-lomi-api-key` | [Tableau de bord](https://dashboard.lomi.africa) → **Développeurs → Clés API** — toute clé **secrète** (`lomi_sk_…`) ou clé MCP (`lomi_mcp_…`) depuis **Connecter MCP** |
-| **Jeton de transport** (serveur hébergé uniquement) | `Authorization: Bearer …` | Valeur fournie par lomi. pour accéder au serveur MCP partagé `https://mcp.lomi.africa` — remplacez `YOUR_TRANSPORT_SECRET` dans l’extrait |
+| **Clé API marchande** | `x-lomi-api-key` | [Tableau de bord](https://dashboard.lomi.africa) → **Développeurs → Clés API**: toute clé **secrète** (`lomi_sk_…`) ou clé MCP (`lomi_mcp_…`) depuis **Connecter MCP** |
+| **Jeton de transport** (serveur hébergé uniquement) | `Authorization: Bearer …` | Valeur fournie par lomi. pour accéder au serveur MCP partagé `https://mcp.lomi.africa`, remplacez `YOUR_TRANSPORT_SECRET` dans l’extrait |
 
 Votre **clé marchande** identifie votre organisation et limite chaque appel d’outil.
 
-Le **jeton de transport** ne fait qu’ouvrir l’accès au point de terminaison MCP hébergé par lomi. Ce n’est **pas** votre clé marchande — ne mettez pas votre clé API dans `Authorization` quand un jeton de transport est requis.
+Le **jeton de transport** ne fait qu’ouvrir l’accès au point de terminaison MCP hébergé par lomi. Ce n’est **pas** votre clé marchande, ne mettez pas votre clé API dans `Authorization` quand un jeton de transport est requis.
 
 ## Connexion HTTP (Cursor, Claude Desktop)
 
@@ -62,7 +62,7 @@ Modèles supplémentaires dans le dépôt : [`apps/mcp/examples/`](https://githu
 
 ## Connexion stdio (local)
 
-Lance le serveur MCP sur votre machine — pas de jeton de transport. Idéal pour le développement local.
+Lance le serveur MCP sur votre machine, pas de jeton de transport. Idéal pour le développement local.
 
 ```json
 {
@@ -98,9 +98,9 @@ En HTTP MCP, les appels utilisent l’environnement API associé à votre clé m
 
 ## Outils, ressources et prompts
 
-- **`lomi_search_tools`** — recherche dans le catalogue d’outils quand le client charge les outils à la demande.
-- **Ressources** — `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
-- **Prompts** — `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
+- **`lomi_search_tools`**: recherche dans le catalogue d’outils quand le client charge les outils à la demande.
+- **Ressources**: `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
+- **Prompts**: `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
 
 ## Déployer votre propre serveur MCP
 

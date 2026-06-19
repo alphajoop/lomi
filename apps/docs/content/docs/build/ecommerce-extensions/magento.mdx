@@ -1,7 +1,7 @@
 ---
 title: Magento 2
 description:
-  Lomi_Payments module — hosted checkout via checkout sessions, callback route,
+  Lomi_Payments module, hosted checkout via checkout sessions, callback route,
   signed webhooks, optional REST verify.
 ---
 
@@ -42,13 +42,13 @@ Full instructions: [Magento plugin README](https://github.com/lomiafrica/lomi./b
 
 1. Customer selects **lomi.** and places the order.
 2. Magento creates a checkout session and redirects to lomi. Checkout.
-3. Return URL: **`lomi/payment/callback`** — verifies session vs order.
+3. Return URL: **`lomi/payment/callback`**: verifies session vs order.
 4. Webhook **`PAYMENT_SUCCEEDED`** with **`X-Lomi-Signature`** / **`X-Lomi-Event`**.  
    If `metadata.magento_increment_id` is missing, the module can still resolve the order using **`checkout_session_id`** and the stored payment field **`lomi_checkout_session_id`**.
 
 ## Optional REST verification
 
-`GET /rest/V1/lomi/verify/{checkoutSessionId}` — verifies the checkout session for the checkout session’s **last real order**; path segment must match **`lomi_checkout_session_id`** on that order.
+`GET /rest/V1/lomi/verify/{checkoutSessionId}`, verifies the checkout session for the checkout session’s **last real order**; path segment must match **`lomi_checkout_session_id`** on that order.
 
 Defined in [`etc/webapi.xml`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/magento/etc/webapi.xml).
 

@@ -71,6 +71,7 @@ export class OrganizationContextGuard implements CanActivate {
       merchantId,
       organizationId,
       environment,
+      accessToken: request.supabaseAccessToken as string,
     };
 
     request.dashboardUser = dashboardUser;

@@ -212,7 +212,7 @@ Un script E2E fait typiquement :
 2.  Déclencher la création d’une session de paiement lomi. via votre backend ;
 3.  **Point délicat :** interagir avec la page checkout bac à sable lomi. Souvent instable en E2E. Pistes :
     - Utiliser les [numéros de carte de test et règles mobile money](/start/sandbox-payments) pour des flux manuels ou semi-automatisés ;
-    - Exposer une URL dans votre **environnement de test** qui simule le webhook qu’envoierait lomi. à la fin (contourner l’UI bac à sable) — souvent plus fiable pour l’automatisation ;
+    - Exposer une URL dans votre **environnement de test** qui simule le webhook qu’envoierait lomi. à la fin (contourner l’UI bac à sable), souvent plus fiable pour l’automatisation ;
 4.  Attendre et vérifier la réception du webhook attendu (`PAYMENT_SUCCEEDED`) ;
 5.  Vérifier que l’état applicatif est correct (commande payée, service provisionné, etc.).
 
@@ -263,7 +263,7 @@ export class TestWebhookListener {
     this.app.use(express.raw({ type: 'application/json' }));
     this.app.post('/test-webhook', (req, res) => {
       try {
-        // Validation basique — en PRODUCTION, vérification complète de signature !
+        // Validation basique: en PRODUCTION, vérification complète de signature !
         const payload = JSON.parse(req.body.toString());
         console.log(`Test listener received event: ${payload.event}`);
         this.receivedEvents.push({

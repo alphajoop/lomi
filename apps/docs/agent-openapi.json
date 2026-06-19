@@ -1,0 +1,310 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/agent/capabilities": {
+      "get": {
+        "operationId": "AgentCapabilitiesController_getCapabilities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/events": {
+      "get": {
+        "operationId": "AgentStreamController_stream",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/subscriptions": {
+      "post": {
+        "operationId": "AgentSubscriptionsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Créé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
+        "tags": [
+          "Agent"
+        ]
+      },
+      "get": {
+        "operationId": "AgentSubscriptionsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lister les abonnements de l'agent",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/subscriptions/{id}": {
+      "delete": {
+        "operationId": "AgentSubscriptionsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Subscription id",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supprimé"
+          },
+          "404": {
+            "description": "Introuvable"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Supprimer un abonnement",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/workflows": {
+      "post": {
+        "operationId": "AgentWorkflowsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exécution créée"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/workflows/{runId}": {
+      "get": {
+        "operationId": "AgentWorkflowsController_get",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Obtenir l'état d'une exécution de workflow",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/workflows/{runId}/steps/{stepId}": {
+      "patch": {
+        "operationId": "AgentWorkflowsController_patchStep",
+        "parameters": [
+          {
+            "name": "stepId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          },
+          {
+            "name": "runId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkflowStepDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mis à jour"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Faire avancer une étape du workflow (primitive d'orchestration)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/handoff": {
+      "post": {
+        "operationId": "AgentHandoffController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHandoffDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transfert enregistré"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Transfert inter-services / inter-agents (contexte + enveloppe de tâche)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/handoff/{id}": {
+      "get": {
+        "operationId": "AgentHandoffController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Récupérer un enregistrement de transfert",
+        "tags": [
+          "Agent"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API lomi.",
+    "description": "API de traitement des paiements pour les entreprises d'Afrique de l'Ouest francophone.",
+    "version": "1.1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Agent"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api.lomi.africa",
+      "description": "Live"
+    },
+    {
+      "url": "https://sandbox.api.lomi.africa",
+      "description": "Test"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    },
+    "schemas": {
+      "CreateWorkflowDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateWorkflowStepDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateHandoffDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

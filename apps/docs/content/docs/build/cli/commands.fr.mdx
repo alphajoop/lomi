@@ -158,12 +158,12 @@ lomi dev --env-file .env.local
 | `-p, --port` | `4242` | Port HTTP |
 | `--env-file` | `.env` | Chemin du fichier dotenv |
 | `--verify-signature` | auto | Vérifier l'en-tête `X-Lomi-Signature` |
-| `--skip-rules-install` | — | Ignorer l'invite règles agent |
+| `--skip-rules-install` | - | Ignorer l'invite règles agent |
 
 **Endpoints :**
 
-- `POST /webhook` — recevoir les événements webhook
-- `GET /health` — contrôle de santé
+- `POST /webhook`, recevoir les événements webhook
+- `GET /health`, contrôle de santé
 
 ---
 
@@ -379,7 +379,7 @@ lomi install-rules --help
 
 ## Mainteneurs
 
-La commande `lomi docs` est masquée dans l’aide par défaut. Elle s’adresse aux **contributeurs lomi.** qui travaillent sur la documentation dans le monorepo — pas aux intégrateurs marchands.
+La commande `lomi docs` est masquée dans l’aide par défaut. Elle s’adresse aux **contributeurs lomi.** qui travaillent sur la documentation dans le monorepo, pas aux intégrateurs marchands.
 
 ### `lomi docs check`
 

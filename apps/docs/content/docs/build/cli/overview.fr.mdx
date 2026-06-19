@@ -8,7 +8,7 @@ import { Callout } from '@/components/docs/docs-callout';
 La **CLI lomi.** est distribuée via **npm** sous le nom `lomi.cli`. Elle sert à s’authentifier, générer des projets SDK, tester les webhooks en local, créer des sessions de checkout et des liens de paiement, et installer des règles pour les assistants IA.
 
 <Callout type="info" title="Pour qui">
-  La CLI lomi. s’adresse aux **développeurs qui intègrent** l’API marchande hébergée depuis le terminal — authentification, génération de projets SDK, tests de webhooks et checkouts sandbox.
+  La CLI lomi. s’adresse aux **développeurs qui intègrent** l’API marchande hébergée depuis le terminal, authentification, génération de projets SDK, tests de webhooks et checkouts sandbox.
 
   Elle **ne sert pas** à exploiter la plateforme interne de lomi., le tableau de bord admin ni l’auto-hébergement du traitement des paiements. Les marchands qui n’utilisent que le tableau de bord web n’ont pas besoin de la CLI.
 </Callout>
@@ -154,9 +154,9 @@ Référence complète : [Commandes](/build/cli/commands).
 ## Deux types d’identifiants
 
 <Callout type="info" emoji="💡" title="Jeton CLI vs clé API">
-  **`lomi login`** enregistre un **jeton CLI** global — utilisé par les commandes CLI.
+  **`lomi login`** enregistre un **jeton CLI** global, utilisé par les commandes CLI.
 
-  **`lomi init`** écrit la **clé API secrète** (`LOMI_API_KEY`) dans le `.env` du projet — utilisée par le **SDK dans votre code applicatif**.
+  **`lomi init`** écrit la **clé API secrète** (`LOMI_API_KEY`) dans le `.env` du projet, utilisée par le **SDK dans votre code applicatif**.
 </Callout>
 
 ## Suite

@@ -1,6 +1,6 @@
 ---
 title: 'Comment accepter MTN MoMo ?'
-description: 'MTN Mobile Money en CI et région—checkout hébergé, POST /charge/mtn et codes pays.'
+description: 'MTN Mobile Money en CI et région, checkout hébergé, POST /charge/mtn et codes pays.'
 docType: how-to
 ---
 
@@ -14,17 +14,17 @@ MTN MoMo couvre plusieurs pays. Utilisez le [checkout hébergé](/build/checkout
 ## Charge directe
 
 - `phone_number` au format E.164.
-- `countryCode` (ISO alpha-2) si le payeur est hors CI—défaut `CI`.
+- `countryCode` (ISO alpha-2) si le payeur est hors CI-défaut `CI`.
 - **Live :** statut `PENDING` jusqu’à approbation sur le téléphone.
 - **Test :** peut passer à `completed` immédiatement.
 
-Voir [API Charges — MTN](/api/charge/ChargesController_createMtnCharge).
+Voir [API Charges: MTN](/api/charge/ChargesController_createMtnCharge).
 
 ## Pays pris en charge
 
 Tableau complet : [Hub moyens de paiement](/build/guides/payment-methods#mtn-momo--supported-countries).
 
-Bac à sable : [Paiements en bac à sable — MTN](/start/sandbox-payments).
+Bac à sable : [Paiements en bac à sable: MTN](/start/sandbox-payments).
 
 <Callout type="warn">
   En live, les flux MTN sont **asynchrones**. Voir [Vérifier les paiements](/build/guides/verify-payments).

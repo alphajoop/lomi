@@ -3,7 +3,7 @@ title: Rédaction de la référence API REST
 description: Comment nous maintenons la section API REST écrite à la main, l'alignons sur OpenAPI et évitons une génération destructive accidentelle.
 ---
 
-La référence REST publique vit sous `content/docs/api/` dans l'app docs. **Le texte narratif et les exemples sont rédigés manuellement en MDX** avec une structure de sections fixe — pas de wrappers `<APIPage />` autogénérés. Le `apps/docs/openapi.json` commité est l'**artefact de contrat et de validation** machine, pas la source de vérité du texte.
+La référence REST publique vit sous `content/docs/api/` dans l'app docs. **Le texte narratif et les exemples sont rédigés manuellement en MDX** avec une structure de sections fixe, pas de wrappers `<APIPage />` autogénérés. Le `apps/docs/openapi.json` commité est l'**artefact de contrat et de validation** machine, pas la source de vérité du texte.
 
 ## Workflow sûr (par défaut)
 
@@ -28,7 +28,7 @@ La référence REST publique vit sous `content/docs/api/` dans l'app docs. **Le 
 
    Puis **éditez** les pages pour la clarté : exemples, cas limites, liens vers les guides et formulation.
 
-4. Lancez `pnpm lint` dans `apps/docs` — il vérifie les règles de ton OpenAPI, la **parité REST** (chaque opération marchande publique a une doc), les **titres** requis, les liens internes et la **politique** (pas de chemins ingress prestataire ni d'identifiants internes fournisseur dans la doc publique/OpenAPI).
+4. Lancez `pnpm lint` dans `apps/docs`, il vérifie les règles de ton OpenAPI, la **parité REST** (chaque opération marchande publique a une doc), les **titres** requis, les liens internes et la **politique** (pas de chemins ingress prestataire ni d'identifiants internes fournisseur dans la doc publique/OpenAPI).
 
 ## Politique : internes prestataire
 
