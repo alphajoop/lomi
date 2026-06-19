@@ -37,18 +37,22 @@
 
 ## About lomi.
 
-lomi. is an open-source payment processing platform that integrates multiple payment service providers and provides a seamless experience for merchants and their customers across West Africa and beyond. Our platform simplifies product, services, usage, and subscription billing while ensuring the highest levels of security, reliability, and compliance.
+lomi. is a **hosted** payment platform that integrates multiple payment service providers and provides a seamless experience for merchants and their customers across West Africa and beyond. We publish integrator tooling (API, SDKs, CLI, plugins) as open source; **production payment processing is not self-hostable today** — merchants use [lomi.africa](https://lomi.africa/sign-up).
+
+Our platform simplifies product, services, usage, and subscription billing while ensuring the highest levels of security, reliability, and compliance.
 
 ## Roadmap
 
-We are progressively open-sourcing the entire project:
+We are progressively open-sourcing the monorepo toward **eventual self-hosting** for operators with their own provider and compliance setup. That is not available in production today. See [docs.lomi.africa/resources/open-source/codebase](https://docs.lomi.africa/resources/open-source/codebase) for the current public tree.
 
 - **Currently open-source**:
-  - Website and documentation: **[apps/docs](./apps/docs)**
+  - Documentation website: **[apps/docs](./apps/docs)**
   - CLI: **[apps/cli](./apps/cli)**
-  - APIs: **[apps/api](./apps/api)**
+  - API service: **[apps/api](./apps/api)**
   - SDKs: **[apps/sdks](./apps/sdks)**
-  - Boilerplate (Next.js x Sanity): **[apps/events](https://github.com/lomiafrica/events/)**
+  - E-commerce plugins: **[apps/plugins](./apps/plugins)**
+  - MCP server: **[apps/mcp](./apps/mcp)**
+  - Events boilerplate (separate repo): **[lomiafrica/events](https://github.com/lomiafrica/events/)**
 
 - **Opening soon**:
   - Merchant dashboard: **[apps/dashboard](./apps/dashboard)**
@@ -87,7 +91,7 @@ We welcome contributions to lomi.! This document outlines how to submit changes 
 
 ### Prerequisites
 
-You should be familiar with GitHub issues and pull requests, have read our [documentation](https://docs.lomi.africa), and have already set up your local instance with `git clone https://github.com/lomiafrica/lomi./` or via `npx install lomi.cli`.
+You should be familiar with GitHub issues and pull requests, have read our [documentation](https://docs.lomi.africa), and have cloned the monorepo for local development (`git clone https://github.com/lomiafrica/lomi./`) or installed the CLI via `npm install -g lomi.cli`. Local setup is for **contributors** — not for running your own payment processor.
 
 ### Contribution process
 

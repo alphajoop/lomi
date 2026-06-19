@@ -103,7 +103,8 @@ cp .env.example .env
 ### Commandes de développement locales
 
 ```bash filename="Terminal"
-# Serveur de dev (voir le package.json de l’app concernée)
+# Depuis la racine du monorepo — lance uniquement le dashboard (contributeurs).
+# Pour une autre app : cd apps/<app> et utilisez les scripts de son package.json.
 bun run dev
 
 # Documentation en local
@@ -135,7 +136,7 @@ git checkout -b <BRANCH_TYPE>/<SHORT_DESCRIPTION>
 Travaillez dans le bon dossier sous `packages/` ou `apps/`.
 
 - **Code** : respectez nos [Standards de code](/resources/contributing/best-practices#code-standards) et [Bonnes pratiques](/resources/contributing/best-practices).
-- **Documentation** : mettez à jour `apps/developers/src/pages/docs/` ou l’emplacement doc prévu au format Markdown (`.mdx`).
+- **Documentation** : mettez à jour `apps/docs/content/docs/` au format Markdown (`.mdx`).
 
 **Maintenez la branche à jour** avec `upstream/develop` :
 

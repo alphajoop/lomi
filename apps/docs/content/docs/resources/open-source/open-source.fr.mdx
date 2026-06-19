@@ -1,15 +1,17 @@
 ---
 title: 'Open source'
-description: 'Nous voulons rendre les paiements rapides, adaptés et accessibles à tous. Notre technologie est entièrement publique et disponible en ligne.'
+description: 'lomi. publie des outils d’intégration et la documentation en open source. Le traitement des paiements passe par notre plateforme hébergée — pas en auto-hébergement aujourd’hui.'
 ---
 
-Nous proposons à la fois une offre open source et une plateforme hébergée pour répondre aux besoins variés des marchands. Dans un souci de transparence et de collaboration communautaire, nous appliquons une **double licence**.
+lomi. suit un modèle **hébergé d’abord**. Les marchands s’intègrent via notre API cloud, le tableau de bord et le checkout. Nous **ne proposons pas** l’auto-hébergement du traitement des paiements à ce stade.
+
+Notre **direction à long terme** est d’ouvrir progressivement le monorepo — davantage d’apps, davantage de code source, et à terme un chemin supporté pour les opérateurs qui s’auto-hébergent avec leurs propres accords prestataires et leur conformité. Ce n’est pas disponible aujourd’hui ; voir la [feuille de route](/resources/open-source/codebase#roadmap) pour ce qui est public maintenant.
+
+Nous publions tout de même du code source pour la transparence et les outils d’intégration (SDK, CLI, plugins, docs). Dans cette logique, nous appliquons une **double licence**.
 
 Le projet est principalement sous **GNU Affero General Public License (AGPL)** : la communauté peut utiliser, modifier et redistribuer le logiciel librement. L’AGPL impose toutefois que toute utilisation en service (SaaS notamment) **publie également le code source**. Si vous souhaitez utiliser **lomi.** sans publier vos modifications (intégration à un produit propriétaire) ou l’exploiter commercialement pour des offres similaires, **une licence commerciale est requise**.
 
 Certains composants relèvent exclusivement de notre **licence commerciale**, pour les entreprises ayant besoin de fonctionnalités additionnelles ou d’une plus grande flexibilité. Ce **double modèle** nous permet de servir à la fois la communauté open source et les partenaires enterprise.
-
-Voici un aperçu des options de déploiement et comment démarrer.
 
 &nbsp;
 
@@ -17,58 +19,40 @@ Voici un aperçu des options de déploiement et comment démarrer.
   *Voir le fichier [LICENSE](https://github.com/lomiafrica/lomi.?tab=License-1-ov-file) du monorepo pour les textes complets des deux licences.*
 </Callout>
 
-## Auto-hébergement
+## Qu’est-ce qui est open source aujourd’hui ?
 
-Pour héberger la plateforme vous-même sans payer nos frais technologiques, clonez le dépôt principal sur GitHub : vous accédez à la dernière version et pouvez l’adapter. Vous devrez toutefois obtenir directement auprès des prestataires de paiement les accords commerciaux et clés API nécessaires au plein usage en libre-service.
+| Domaine | Disponibilité |
+| :--- | :--- |
+| Plateforme hébergée (API, tableau de bord, checkout, MoR) | ✅ Production — [créer un compte](https://lomi.africa/sign-up) |
+| API REST et webhooks | ✅ Hébergé uniquement |
+| SDK et CLI | ✅ Open source et packages publiés |
+| Site de documentation | ✅ Open source (`apps/docs`) |
+| Plugins e-commerce | ✅ Open source (`apps/plugins`) |
+| Serveur MCP | ✅ Hébergé sur `mcp.lomi.africa` ; code dans `apps/mcp` |
+| Tableau de bord marchand, checkout, storefront | 🔒 Produit hébergé (ouverture progressive du code) |
+| Admin | 🔒 Propriétaire |
 
-Pour l’organisation du code, voir la page [Codebase](/resources/open-source/codebase).
+Pour l’organisation du dépôt et la feuille de route, voir la page [Codebase](/resources/open-source/codebase).
 
-Les marchands qui veulent simplement accepter des paiements peuvent utiliser lomi. sur notre site sans contrainte majeure ni configuration spéciale. L’auto-hébergement est possible mais rarement recommandé pour la plupart des marchands : vous perdez alors les avantages du **Merchant of Record** dédié ainsi que la rapidité et la simplicité que lomi. apporte à votre activité.
-
-## Documentation et auto-hébergement
-
-Documentation complète et informations d’auto-hébergement : [github.com/lomiafrica/lomi.](https://github.com/lomiafrica/lomi./).
-
-### Démarrage rapide
-
-```bash copy filename="Terminal"
-# Clone the repository
-git clone https://github.com/lomi-africa/lomi./
-cd lomi.
-
-# Install dependencies
-bun install
-
-# Set up environment
-cp .env.example .env
-
-# Set up database
-supabase link
-
-# Apply database migrations
-supabase db push
-
-# Start development server
-bun run dev
-```
+<Callout type="warn">
+  **Pas d’auto-hébergement aujourd’hui.** Le traitement des paiements repose sur l’infrastructure hébergée de lomi. — Merchant of Record, accords prestataires, conformité et stack opérationnelle. Un clone local sert au **développement et à la contribution**, pas à exploiter votre propre processeur de paiement.
+</Callout>
 
 ## Plateforme hébergée
 
-Pour une solution entièrement managée, nous proposons une plateforme sur notre site : fonctionnalités supplémentaires, support dédié et avantages adaptés aux entreprises en croissance.
-
-Créez un compte sur [lomi.africa](https://lomi.africa/sign-up) et suivez la configuration. Notre équipe peut vous accompagner et conseiller sur l’optimisation du traitement des paiements.
+Pour les paiements en production, utilisez la plateforme sur [lomi.africa](https://lomi.africa/sign-up) : canaux de paiement intégrés, couverture Merchant of Record, mises à jour automatiques et support dédié.
 
 ### Comparaison rapide
 
-| Fonctionnalité            | Open source | Plateforme hébergée |
-| :------------------------ | :---------: | :-----------------: |
-| Traitement paiement cœur   |      ✓      |         ✓           |
-| Canaux de paiement intégrés |     -      |         ✓           |
-| Analytics avancées        |      ✓      |         ✓           |
-| Auto-hébergement          |      ✓      |         -           |
-| Déploiement personnalisé  |      ✓      |         -           |
-| Mises à jour automatiques |      -      |         ✓           |
-| Support dédié             |      -      |         ✓           |
+| Fonctionnalité | Outils open source | Plateforme hébergée |
+| :------------- | :----------------: | :-----------------: |
+| API REST et webhooks | Intégration sur l’API hébergée | ✅ |
+| Canaux de paiement intégrés | — | ✅ |
+| Tableau de bord et checkout | — | ✅ |
+| SDK, CLI, plugins | ✅ Code + packages | ✅ |
+| Auto-hébergement du stack paiement | À la feuille de route | — |
+| Mises à jour automatiques | — | ✅ |
+| Support dédié | Communauté | ✅ |
 
 ### Options de support
 
@@ -80,14 +64,15 @@ La plateforme hébergée inclut notamment :
 
 ### Ressources
 
-- [Monorepo et dépôt principal GitHub](https://github.com/lomiafrica/)
+- [Monorepo sur GitHub](https://github.com/lomiafrica/lomi.)
+- [Contribuer](/resources/contributing/overview)
 - [Page de statut](https://status.lomi.africa)
 
 ## Besoin d’aide pour choisir ?
 
-Pour toute question sur l’open source et la version hébergée de lomi., ou pour choisir la meilleure option : [hello@lomi.africa](mailto:hello@lomi.africa).
+Pour toute question sur l’open source et la plateforme hébergée : [hello@lomi.africa](mailto:hello@lomi.africa).
 
-Pour notre vision et les raisons de l’open source : [blog](https://lomi.africa/blog).
+Pour notre vision : [blog](https://lomi.africa/blog).
 
 Vous pouvez aussi :
 
