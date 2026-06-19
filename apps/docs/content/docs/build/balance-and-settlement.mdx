@@ -5,12 +5,12 @@ description: How merchant balances, fees, and availability work after a successf
 
 import { Callout } from '@/components/docs/docs-callout';
 
-Balances are updated when a transaction reaches **`completed`**. This page describes the model implemented in balance update logic (including XOF normalization for treasury).
+Balances are updated when a transaction reaches **`completed`**. This page explains how balances, fees, and fund availability work after a successful payment.
 
 <DocsScreenshot name="build/balance" alt="Merchant balance and settlement overview in the dashboard" />
 
 <Callout type="info">
-  In the **test** environment, completed payments credit your **dashboard test balance** only—they do not update live withdrawable balances or platform treasury. See **[Sandbox payments](/start/sandbox-payments)**.
+  In the **test** environment, completed payments credit your **dashboard test balance** only—they do not update your live withdrawable balance. See **[Sandbox payments](/start/sandbox-payments)**.
 </Callout>
 
 ## When balances change
@@ -28,12 +28,9 @@ Each transaction stores an **`available_at`** timestamp computed from organizati
 
 The dashboard may show **available** vs **pending/settling** based on this and related rules.
 
-## Currency and XOF treasury
+## Multi-currency settlement
 
-Internal treasury tracking often **normalizes amounts to XOF** for consistency:
-
-- Gross and fee amounts may be converted for channel and platform accounting.
-- Merchant account credits may still be applied in the organization’s settlement currency depending on product settings; the important point is that **fee and float tracking** share a consistent basis.
+When you accept payments in multiple currencies, lomi. may convert amounts for fee and settlement accounting. Your dashboard balance is credited in your organization's settlement currency according to your product settings.
 
 Exact API fields for “available” vs “pending” balances are exposed in [Balances](/api/balances).
 

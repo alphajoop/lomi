@@ -32,19 +32,7 @@ Repeated **401 Unauthorized** attempts (often with a body such as `"Authenticati
 
 <h2 id="timeouts-retries-and-client-errors">Timeouts, retries, and client errors</h2>
 
-The subsections below condense how the NestJS **webhook sender** behaves today (`WebhookSenderService` in `apps/api/src/webhooks/webhook-sender.service.ts`). They exist so integrators can reason about **timeouts**, **retries**, and **non-retryable client errors** without reading source code. Product behavior can evolve; when in doubt, rely on delivery logs and on building **idempotent** consumers.
-
-### Single delivery path (outbox + BullMQ)
-
-Merchant webhooks from SQL triggers and the API use one pipeline:
-
-1. **`webhook_events_outbox`** — idempotent event upsert (`idempotency_key`)
-2. **`webhook_delivery_dispatches`** — one row per active endpoint
-3. **NestJS `WebhookQueueProcessor`** — BullMQ `webhooks` queue with exponential backoff
-
-SQL callers use `enqueue_merchant_webhook_outbox`, which notifies the API at `POST /internal/webhooks/process-outbox`. Set **`WEBHOOK_OUTBOX_ENABLED=true`** on Railway (default). Use **`WEBHOOK_OUTBOX_ENABLED=false`** only to fall back to synchronous delivery during an incident.
-
-Legacy Edge functions (`trigger-free-transaction-webhook`, `trigger-subscription-webhook`) are removed; do not configure URLs pointing at them.
+The sections below describe how lomi. delivers webhooks today so you can plan for **timeouts**, **retries**, and **non-retryable client errors**. Product behavior can evolve; when in doubt, rely on delivery logs and **idempotent** handlers.
 
 ### Per-attempt HTTP timeout
 
@@ -55,30 +43,25 @@ lomi.’s webhook HTTP client waits **approximately 4 seconds** (`timeout: 4000`
 
 ### When lomi retries (and when it does not)
 
-On **each failed attempt**, lomi. checks HTTP status roughly as follows (`sendWebhookWithContext` in the API repo):
+On **each failed attempt**, lomi. classifies the HTTP response as follows:
 
 | Outcome | Retries? |
 |---------|----------|
 | **2xx** | No — delivered |
-| **4xx client errors** (`400`–`499`, incl. **`401 Unauthorized`**) | **No further attempts** for that delivery path (“non-retryable client error”) |
+| **4xx client errors** (`400`–`499`, incl. **`401 Unauthorized`**) | **No further attempts** for that delivery (“non-retryable client error”) |
 | **5xx** and transient/network errors | **Yes** — subject to backoff and attempt caps |
 
-In practice: **fix configuration and auth issues** (which often surface as `4xx`) before expecting automatic healing — lomi. will not brute-force a misconfigured URL.
+In practice: **fix configuration and auth issues** (which often surface as `4xx`) before expecting automatic healing — lomi. will not keep retrying a misconfigured URL.
 
-### Two delivery paths → different ceilings
+### Retry attempt limits
 
-Depending on route, merchants may hit **different** dispatcher behavior:
+For **retryable** failures (timeouts, `5xx`, transient network faults), lomi. may attempt delivery up to **four** times on some paths, or up to **five** times when delivery is queued, with **exponential backoff** (initial delay about **3–5 seconds** between attempts).
 
-1. **Synchronous batches** (`notifyOrganization` → legacy `sendWebhook` loop): up to **four** outbound HTTP tries on **retryable** failures only, with exponential delay starting at **~3 seconds** between tries.
-2. **Queued jobs** (BullMQ worker + outbox dispatch): up to **five** worker **attempts** per job with **exponential** backoff (**initial delay 5 seconds** between job retries).
-
-All organizations use the outbox path when `WEBHOOK_OUTBOX_ENABLED` is not `false`. Both paths honor the **same ~4 s per HTTP POST**.
-
-You do not need to branch on these paths in your handler — **always** accept deliveries idempotently — but knowing the difference helps when you read logs or estimate how long a transient outage window might last.
+You do not need to distinguish delivery paths in your handler — **always** process events idempotently — but attempt counts help when you read delivery logs after an outage.
 
 ### Payload envelope (`lomi_environment`)
 
-The JSON field **`lomi_environment`** is set from the sender’s **`NODE_ENV`** (`production`, `development`, etc.), **not** a dedicated `live` vs `sandbox` product flag.
+The JSON field **`lomi_environment`** reflects the deployment environment (`production`, `development`, etc.). It is **not** a substitute for distinguishing **live** vs **test** traffic — use your API key environment and webhook endpoint configuration for that.
 
 ## Signature verification
 

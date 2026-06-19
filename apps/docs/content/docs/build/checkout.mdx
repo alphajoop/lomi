@@ -272,7 +272,7 @@ Use the API reference to list or fetch sessions by ID:
 
 ## Webhooks
 
-Merchant webhook subscriptions (lomi. calls **your** URL) are configured with the Postgres enum **`webhook_event`**, the same set documented in [Webhooks](/build/webhooks). The HTTP body field `` `event` `` and the `` `X-Lomi-Event` `` header use those values (for example `` `PAYMENT_SUCCEEDED` ``), as built in `` `WebhookSenderService.prepareWebhookPayload` `` in `` `apps/api` ``.
+Merchant webhook subscriptions (lomi. calls **your** URL) use the **`webhook_event`** enum documented in [Webhooks](/build/webhooks). The HTTP body field `` `event` `` and the `` `X-Lomi-Event` `` header use those values (for example `` `PAYMENT_SUCCEEDED` ``).
 
 For checkout outcomes on **your** server, subscribe at minimum to:
 
@@ -281,7 +281,7 @@ For checkout outcomes on **your** server, subscribe at minimum to:
 | `` `PAYMENT_SUCCEEDED` `` | Payment completed; payload `` `data` `` follows the transaction shape (see [Webhooks](/build/webhooks)). |
 | `` `PAYMENT_FAILED` `` | Payment attempt failed (including some provider failure paths). |
 
-There is **no** separate `` `checkout.session.*` `` value in the `` `webhook_event` `` enum (`apps/api/src/utils/types/api.ts` mirrors the database type). Session expiry without a successful charge is reflected on the **session** and **transaction** records (e.g. status `` `expired` ``); use `` `GET /checkout-sessions/{id}` `` or list with `` `status=expired` `` / `` `completed` `` rather than expecting a merchant webhook named like `checkout.session.expired`.
+There is **no** separate `` `checkout.session.*` `` event in the `` `webhook_event` `` enum. Session expiry without a successful charge is reflected on the **session** and **transaction** records (e.g. status `` `expired` ``); use `` `GET /checkout-sessions/{id}` `` or list with `` `status=expired` `` / `` `completed` `` rather than expecting a merchant webhook named like `checkout.session.expired`.
 
 ---
 

@@ -9,7 +9,7 @@ L’API Discount coupons assure une validation serveur stricte et un suivi d’u
 
 Exemples : **[Exemples de logique des coupons](/build/payments/coupon-logic-examples)**.
 
-Cette page décrit le comportement des migrations logique promo :
+Cette page décrit les règles de validation et d’application des coupons utilisées au tunnel et par l’API, notamment :
 
 - validation à la création ;
 - validation au tunnel (client, périmètre, quantité, fréquence) ;
@@ -20,14 +20,14 @@ Cette page décrit le comportement des migrations logique promo :
 
 En résumé :
 
-1. Création du coupon (`create_discount_coupon`).
-2. Validation au tunnel (`validate_coupon_for_checkout` / `validate_coupon_for_frontend`).
-3. Calcul (`calculate_coupon_discount`) et application (`apply_coupon`), ou plusieurs coupons (`calculate_multi_coupon_discount`, `apply_coupons_to_checkout`).
-4. Réservation d’usage liée à la session dans `coupon_usage`.
-5. Liaison à la transaction (`link_or_insert_coupon_usage_for_transaction`).
-6. Incrément des compteurs à transaction complétée (`increment_coupon_usage_for_completed_transaction`).
+1. Création via **`POST /discount-coupons`** avec vos contraintes.
+2. Validation au tunnel (règles serveur : client, périmètre, quantité, fréquence).
+3. Calcul et application de la remise sur la session checkout, y compris cumul lorsque autorisé.
+4. Réservation d’usage liée à la session jusqu’au paiement.
+5. Liaison de la réservation à la transaction finale en cas de succès.
+6. Incrément des compteurs d’usage lorsque la transaction passe en **`completed`**.
 
-Le comportement reste ainsi déterministe entre l’aperçu front et l’enregistrement final.
+Cela aligne l’aperçu tableau de bord, le tunnel hébergé et les intégrations API.
 
 ## Créer un coupon de réduction
 

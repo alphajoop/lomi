@@ -342,7 +342,7 @@ Subscribe to these **SCREAMING_SNAKE_CASE** events (same as [Webhooks](/build/we
 
 Renewal **payment failures** do not emit a separate subscription webhook. Listen for **`PAYMENT_FAILED`** on the failed renewal transaction, and monitor subscription `status` (`past_due`, `paused`, etc.) via the API.
 
-Trial card setup (`setup_intent.succeeded`) is handled internally; **`SUBSCRIPTION_CREATED`** fires when signup completes, not when the card form first loads.
+lomi. does not emit a webhook for trial card setup (`setup_intent.succeeded`). Listen for **`SUBSCRIPTION_CREATED`** when signup completes, not when the card form first loads.
 
 **Customer notifications:** Trial and $0 signups (no completed payment transaction) trigger a **subscription signup confirmation** email when `customer_notifications.subscription_signups.email` is enabled (default: on). Paid initial signups receive the standard transaction receipt instead.
 

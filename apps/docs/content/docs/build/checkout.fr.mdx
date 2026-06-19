@@ -271,7 +271,7 @@ Utilisez la référence API pour lister ou récupérer une session par ID :
 
 ## Webhooks
 
-Les **webhooks sortants marchands** (lomi. appelle **votre** URL) utilisent l’énumération Postgres **`webhook_event`**, le même jeu que dans [Webhooks](/build/webhooks). Le champ HTTP `` `event` `` et l’en-tête `` `X-Lomi-Event` `` reprennent ces valeurs (par ex. `` `PAYMENT_SUCCEEDED` ``), comme dans `` `WebhookSenderService.prepareWebhookPayload` `` dans `` `apps/api` ``.
+Les **webhooks sortants marchands** (lomi. appelle **votre** URL) utilisent l’énumération **`webhook_event`** documentée dans [Webhooks](/build/webhooks). Le champ HTTP `` `event` `` et l’en-tête `` `X-Lomi-Event` `` reprennent ces valeurs (par ex. `` `PAYMENT_SUCCEEDED` ``).
 
 Pour les résultats de tunnel **côté votre serveur**, souscrivez au minimum à :
 
@@ -280,7 +280,7 @@ Pour les résultats de tunnel **côté votre serveur**, souscrivez au minimum à
 | `` `PAYMENT_SUCCEEDED` `` | Paiement terminé ; le corps `` `data` `` suit la forme transaction (voir [Webhooks](/build/webhooks)). |
 | `` `PAYMENT_FAILED` `` | Tentative échouée (y compris certains chemins d’échec prestataire). |
 
-Il **n’existe pas** de valeur séparée `` `checkout.session.*` `` dans l’énumération `` `webhook_event` `` (`apps/api/src/utils/types/api.ts` reflète le type base). L’expiration de session sans paiement réussi se voit sur les **enregistrements session** et **transaction** (statut `` `expired` `` par ex.) ; utilisez `` `GET /checkout-sessions/{id}` `` ou une liste avec `` `status=expired` `` / `` `completed` `` plutôt qu’un webhook marchand nommé comme `checkout.session.expired`.
+Il **n’existe pas** de valeur séparée `` `checkout.session.*` `` dans l’énumération `` `webhook_event` ``. L’expiration de session sans paiement réussi se voit sur les **enregistrements session** et **transaction** (statut `` `expired` `` par ex.) ; utilisez `` `GET /checkout-sessions/{id}` `` ou une liste avec `` `status=expired` `` / `` `completed` `` plutôt qu’un webhook marchand nommé comme `checkout.session.expired`.
 
 ---
 
