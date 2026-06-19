@@ -1,0 +1,80 @@
+---
+title: "List payment risk assessments"
+description: "List payment risk assessments"
+full: true
+method: get
+path: /risk-assessments
+operationId: RadarController_listAssessments
+---
+
+## Aperçu
+
+List payment risk assessments
+
+### Quand l’utiliser
+
+Utilisez cet endpoint quand vous devez exécuter `GET /risk-assessments` (List payment risk assessments).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /risk-assessments`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+_Pas d’autre paramètre dans l’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `pageSize` | query | Non | — |  |
+| `page` | query | Non | — |  |
+| `endDate` | query | Non | — |  |
+| `startDate` | query | Non | — |  |
+| `rail` | query | Non | — |  |
+| `decision` | query | Non | — |  |
+
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Risk assessments |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/risk-assessments?pageSize=1&page=1" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `RadarController_listAssessments`
+- **Operation**: `GET /risk-assessments`
+
+Schémas complets et **Try it** : [référence API](/api).

@@ -15,6 +15,7 @@ describe('DashboardProductsController', () => {
     merchantId: 'merchant-1',
     organizationId: 'org-1',
     environment: 'live',
+    accessToken: 'test-access-token',
   };
 
   beforeEach(async () => {

@@ -67,7 +67,7 @@ lomi. uses different renewal mechanics by payment rail:
 
 | Rail | Renewal behavior |
 | --- | --- |
-| **Cards** | Off-session charge on the saved Stripe payment method on `next_billing_date`. |
+| **Cards** | Off-session charge on the saved card payment method on `next_billing_date`. |
 | **Wave / MTN** | No saved off-session token. Before each cycle, lomi. sends a **manual renewal checkout link** (email/WhatsApp). The customer must approve payment on their phone. |
 
 **Why mobile money is manual:** Wave and MTN require per-payment customer approval. lomi. does not auto-debit wallets for subscription cycles without a card on file.

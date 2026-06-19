@@ -37,6 +37,10 @@ import { InternalJobsService } from './internal-jobs.service';
     OrganizationContextGuard,
     InternalApiKeyGuard,
   ],
-  exports: [DashboardProductsService, DashboardCustomersService, DashboardNetworkService],
+  exports: [
+    DashboardProductsService,
+    DashboardCustomersService,
+    DashboardNetworkService,
+  ],
 })
 export class DashboardModule {}

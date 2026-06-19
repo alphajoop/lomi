@@ -46,7 +46,11 @@ if (
 }
 
 const agentSpec = mustParseJson('agent OpenAPI', paths.agentOpenApi);
-if (!agentSpec.openapi || !agentSpec.paths || typeof agentSpec.paths !== 'object') {
+if (
+  !agentSpec.openapi ||
+  !agentSpec.paths ||
+  typeof agentSpec.paths !== 'object'
+) {
   throw new Error(
     'agent-openapi.json: invalid OpenAPI document (run apps/api: pnpm run openapi:export:agent)',
   );

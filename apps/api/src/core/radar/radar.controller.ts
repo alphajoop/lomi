@@ -37,7 +37,11 @@ export class RadarController {
   @Get('risk-assessments')
   @ApiLomiAccountHeader()
   @ApiOperation({ summary: 'List payment risk assessments' })
-  @ApiQuery({ name: 'decision', required: false, enum: ['allow', 'flag', 'block'] })
+  @ApiQuery({
+    name: 'decision',
+    required: false,
+    enum: ['allow', 'flag', 'block'],
+  })
   @ApiQuery({ name: 'rail', required: false, enum: ['card', 'mtn', 'wave'] })
   @ApiQuery({ name: 'startDate', required: false, type: String })
   @ApiQuery({ name: 'endDate', required: false, type: String })

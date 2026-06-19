@@ -490,8 +490,7 @@ async function fetchNetworkWebhookEnrichment(
       typeof row?.member_organization_name === 'string'
         ? row.member_organization_name
         : null,
-    customerId:
-      typeof row?.customer_id === 'string' ? row.customer_id : null,
+    customerId: typeof row?.customer_id === 'string' ? row.customer_id : null,
   };
 }
 

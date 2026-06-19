@@ -44,7 +44,10 @@ export class AgentHandoffController {
       'Transfert inter-services / inter-agents (contexte + enveloppe de tâche)',
   })
   @ApiResponse({ status: 201, description: 'Transfert enregistré' })
-  async create(@CurrentUser() user: AuthContext, @Body() body: CreateHandoffDto) {
+  async create(
+    @CurrentUser() user: AuthContext,
+    @Body() body: CreateHandoffDto,
+  ) {
     const h = await this.handoffs.create(user.organizationId, {
       to: body.to,
       task: body.task,

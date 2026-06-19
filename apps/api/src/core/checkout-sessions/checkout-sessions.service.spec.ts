@@ -12,7 +12,7 @@ import { AuthContext } from '../common/decorators/current-user.decorator';
 describe('CheckoutSessionsService', () => {
   let service: CheckoutSessionsService;
   let mockSupabaseService: { getClient: jest.Mock; rpc: jest.Mock };
-  let mockSupabaseClient: { rpc: jest.Mock };
+  let mockSupabaseClient: { rpc: jest.Mock; from: jest.Mock };
 
   const mockUser = {
     merchantId: 'test-merchant-id',

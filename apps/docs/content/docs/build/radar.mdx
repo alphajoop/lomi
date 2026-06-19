@@ -5,7 +5,7 @@ description: Screen incoming card and mobile-money charges with risk assessments
 
 import { Callout } from '@/components/docs/docs-callout';
 
-**lomi. Radar** evaluates **incoming** charges (card, MTN, Wave) before they complete. It is separate from [Disputes](/build/disputes) (Stripe chargebacks after the fact) and from platform payout controls described in [Payouts](/build/payouts).
+**lomi. Radar** evaluates **incoming** charges (card, MTN, Wave) before they complete. It is separate from [Disputes](/build/disputes) (card chargebacks after the fact) and from platform payout controls described in [Payouts](/build/payouts).
 
 <Callout type="info">
   Radar is **opt-in** per organization. Enable it with `PATCH /organization/radar-settings` (`enabled: true`). Default is off for existing merchants.
@@ -25,7 +25,7 @@ curl -X PATCH "https://api.lomi.africa/organization/radar-settings" \
 | `enabled` | `true` / `false` | Turn screening on or off |
 | `mode` | `monitor` | Flag risky charges but allow them |
 | `mode` | `block` | Reject charges that trigger block rules |
-| `stripe_radar_passthrough` | `true` (default) | Merge Stripe Radar signals after card capture |
+| `stripe_radar_passthrough` | `true` (default) | Merge card-network risk signals after card capture |
 
 ## Built-in rules (v1)
 

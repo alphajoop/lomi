@@ -1,5 +1,5 @@
 {
-  "title": "Checkout sessions",
+  "title": "Checkout Sessions",
   "pages": [
     "CheckoutSessionsController_create",
     "CheckoutSessionsController_findAll",

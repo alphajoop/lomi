@@ -11,9 +11,7 @@
           }
         },
         "summary": "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/events": {
@@ -31,9 +29,7 @@
           }
         ],
         "summary": "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/subscriptions": {
@@ -51,9 +47,7 @@
           }
         ],
         "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       },
       "get": {
         "operationId": "AgentSubscriptionsController_list",
@@ -69,9 +63,7 @@
           }
         ],
         "summary": "Lister les abonnements de l'agent",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/subscriptions/{id}": {
@@ -100,9 +92,7 @@
           }
         ],
         "summary": "Supprimer un abonnement",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/workflows": {
@@ -130,9 +120,7 @@
           }
         ],
         "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/workflows/{runId}": {
@@ -157,9 +145,7 @@
           }
         ],
         "summary": "Obtenir l'état d'une exécution de workflow",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/workflows/{runId}/steps/{stepId}": {
@@ -200,9 +186,7 @@
           }
         ],
         "summary": "Faire avancer une étape du workflow (primitive d'orchestration)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/handoff": {
@@ -230,9 +214,7 @@
           }
         ],
         "summary": "Transfert inter-services / inter-agents (contexte + enveloppe de tâche)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/handoff/{id}": {
@@ -257,9 +239,7 @@
           }
         ],
         "summary": "Récupérer un enregistrement de transfert",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     }
   },

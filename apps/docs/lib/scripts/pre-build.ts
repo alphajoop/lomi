@@ -39,7 +39,10 @@ function exportOpenApiFromNest(): void {
 
   try {
     execSync('pnpm run openapi:export', { cwd: apiRoot, stdio: 'inherit' });
-    execSync('pnpm run openapi:export:agent', { cwd: apiRoot, stdio: 'inherit' });
+    execSync('pnpm run openapi:export:agent', {
+      cwd: apiRoot,
+      stdio: 'inherit',
+    });
   } catch (error) {
     console.warn(
       'OpenAPI export from apps/api failed; continuing with checked-in apps/docs/openapi.json:',

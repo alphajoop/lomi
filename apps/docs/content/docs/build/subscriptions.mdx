@@ -35,14 +35,14 @@ lomi. uses **two renewal paths**, depending on how the customer pays:
 
 ### Card subscriptions (automatic)
 
-When signup saved a Stripe payment method (`provider_customer_id` + `provider_payment_method_id`), renewals run **off-session** on `next_billing_date`. A daily job charges the saved card and records the renewal transaction.
+When signup saved a card payment method (`provider_customer_id` + `provider_payment_method_id`), renewals run **off-session** on `next_billing_date`. A daily job charges the saved card and records the renewal transaction.
 
 - Webhook: **`SUBSCRIPTION_RENEWED`** on success
-- Webhook: **`PAYMENT_FAILED`** on renewal failure (with Stripe retry/dunning where configured)
+- Webhook: **`PAYMENT_FAILED`** on renewal failure (with processor retry/dunning where configured)
 
 ### Wave / MTN subscriptions (manual renewal checkout)
 
-Mobile money does not expose a saved off-session token like cards. When no Stripe payment method exists, lomi. **does not auto-debit** the wallet. Instead:
+Mobile money does not expose a saved off-session token like cards. When no card payment method exists, lomi. **does not auto-debit** the wallet. Instead:
 
 1. **Notification crons** email or message a **hosted renewal checkout link** before `next_billing_date`.
 2. The customer pays on that link; webhooks confirm the cycle.

@@ -43,7 +43,7 @@ export class AgentWorkflowsController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @ApiOperation({
     summary:
-      "Démarrer un workflow multi-étapes (idempotence sur idempotency_key, persistant)",
+      'Démarrer un workflow multi-étapes (idempotence sur idempotency_key, persistant)',
   })
   @ApiResponse({ status: 201, description: 'Exécution créée' })
   @ApiBody({ type: CreateWorkflowDto })

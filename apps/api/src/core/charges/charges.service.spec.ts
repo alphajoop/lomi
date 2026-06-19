@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChargesService } from './charges.service';
+import { RadarService } from '../radar/radar.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 
@@ -48,6 +49,9 @@ describe('ChargesService (network)', () => {
         get: jest.fn().mockReturnValue('https://lomi.africa'),
       } as unknown as ConfigService,
       supabase,
+      {
+        evaluateCharge: jest.fn().mockResolvedValue({ action: 'allow' }),
+      } as unknown as RadarService,
     );
   });
 

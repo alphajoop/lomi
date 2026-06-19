@@ -202,6 +202,22 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     related:
       '[Retrieve coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
   },
+  DisputesController_findAll: {
+    summary: 'List disputes',
+    body: 'Returns card payment disputes for your organization with optional status and date filters.',
+    whenToUse:
+      'Use for support queues, reconciliation, and automation on `DISPUTE_*` webhooks.',
+    related:
+      '[Get dispute](/api/disputes/DisputesController_findOne) · [Disputes guide](/build/disputes)',
+  },
+  DisputesController_findOne: {
+    summary: 'Get dispute',
+    body: 'Returns a single dispute by ID, including linked transaction and customer snapshot fields.',
+    whenToUse:
+      'Use after `DISPUTE_CREATED` or when drilling into a row from the disputes list.',
+    related:
+      '[List disputes](/api/disputes/DisputesController_findAll) · [Disputes guide](/build/disputes)',
+  },
   ChargesController_createCardCharge: {
     summary: 'Create embedded card charge',
     body: 'Creates a card charge for embedded checkout and returns `client_secret` for client-side confirmation.',
@@ -340,6 +356,56 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use after create or from webhook-driven flows to confirm refund details.',
     related: '[Create refund](/api/refunds/RefundsController_create)',
+  },
+  RadarController_getSettings: {
+    summary: 'Get Radar settings',
+    body: 'Returns whether lomi. Radar screening is enabled for the organization, the monitor/block mode, and card-network passthrough preferences.',
+    whenToUse:
+      'Use before toggling Radar in your own settings UI or to confirm org configuration in support tools.',
+    related:
+      '[Update Radar settings](/api/organization/RadarController_updateSettings) · [lomi. Radar guide](/build/radar)',
+  },
+  RadarController_updateSettings: {
+    summary: 'Update Radar settings',
+    body: 'Enables or disables Radar screening and updates monitor/block mode or card-network passthrough for the organization.',
+    whenToUse:
+      'Use when onboarding merchants to fraud screening or changing how risky charges are handled.',
+    caveats:
+      'Radar is opt-in. When `mode` is `block`, charges that hit block rules are rejected before completion.',
+    related:
+      '[Get Radar settings](/api/organization/RadarController_getSettings) · [List risk assessments](/api/risk-assessments/RadarController_listAssessments)',
+  },
+  RadarController_listAssessments: {
+    summary: 'List risk assessments',
+    body: 'Returns Radar screening results for incoming charges with optional filters for decision, rail, and date range.',
+    whenToUse:
+      'Use for fraud review queues, exports, and correlating `PAYMENT_RISK_*` webhook payloads.',
+    related:
+      '[Get risk assessment](/api/risk-assessments/RadarController_findOne) · [lomi. Radar guide](/build/radar)',
+  },
+  RadarController_findOne: {
+    summary: 'Get risk assessment',
+    body: 'Returns one Radar assessment by ID, including decision, score, and triggered rule signals.',
+    whenToUse:
+      'Use when handling `PAYMENT_RISK_FLAGGED` or `PAYMENT_RISK_BLOCKED` webhooks keyed by assessment ID.',
+    related:
+      '[List risk assessments](/api/risk-assessments/RadarController_listAssessments)',
+  },
+  SettlementsController_findAll: {
+    summary: 'List settlement periods',
+    body: 'Returns completed payment totals grouped by availability date (UTC) and currency. Each `settlement_id` uses `{currency}:{YYYY-MM-DD}`.',
+    whenToUse:
+      'Use for accounting reconciliation before requesting payouts or exporting withdrawable totals by day.',
+    related:
+      '[List settlement transactions](/api/settlements/SettlementsController_findTransactions)',
+  },
+  SettlementsController_findTransactions: {
+    summary: 'List settlement transactions',
+    body: 'Returns the transactions that contributed to a settlement period identified by `settlement_id`.',
+    whenToUse:
+      'Use to drill into a settlement row and match ledger movements to individual payments.',
+    related:
+      '[List settlement periods](/api/settlements/SettlementsController_findAll)',
   },
   SubscriptionsController_cancel: {
     summary: 'Cancel subscription',

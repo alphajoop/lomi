@@ -18,6 +18,8 @@
     "providers",
     "transactions",
     "refunds",
+    "disputes",
+    "risk-assessments",
     "payouts",
     "settlements",
     "webhooks",

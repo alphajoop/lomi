@@ -610,23 +610,22 @@ export class StripeWebhookService {
       const charge = await stripe.charges.retrieve(dispute.charge as string);
       const paymentIntentId = charge.payment_intent as string;
 
-      const { data: rpcResult, error } = await (this.supabase.getClient() as any).rpc(
-        'handle_stripe_dispute_created',
-        {
-          p_stripe_dispute_id: dispute.id,
-          p_stripe_charge_id: dispute.charge,
-          p_payment_intent_id: paymentIntentId,
-          p_amount: dispute.amount / 100,
-          p_currency: dispute.currency.toUpperCase(),
-          p_reason: dispute.reason,
-          p_dispute_data: {
-            status: dispute.status,
-            evidence: dispute.evidence,
-            evidence_details: dispute.evidence_details,
-            is_charge_refundable: dispute.is_charge_refundable,
-          },
+      const { data: rpcResult, error } = await (
+        this.supabase.getClient() as any
+      ).rpc('handle_stripe_dispute_created', {
+        p_stripe_dispute_id: dispute.id,
+        p_stripe_charge_id: dispute.charge,
+        p_payment_intent_id: paymentIntentId,
+        p_amount: dispute.amount / 100,
+        p_currency: dispute.currency.toUpperCase(),
+        p_reason: dispute.reason,
+        p_dispute_data: {
+          status: dispute.status,
+          evidence: dispute.evidence,
+          evidence_details: dispute.evidence_details,
+          is_charge_refundable: dispute.is_charge_refundable,
         },
-      );
+      });
 
       if (error) {
         throw new Error('Failed to create dispute record');
@@ -675,8 +674,9 @@ export class StripeWebhookService {
 
       if (!lookupError) {
         const row = Array.isArray(disputeRow) ? disputeRow[0] : disputeRow;
-        const disputeId = (row as unknown as { dispute_id?: string } | undefined)
-          ?.dispute_id;
+        const disputeId = (
+          row as unknown as { dispute_id?: string } | undefined
+        )?.dispute_id;
         if (disputeId) {
           await this.notifyDisputeWebhook(disputeId, 'DISPUTE_UPDATED');
         }
@@ -703,7 +703,8 @@ export class StripeWebhookService {
         { p_stripe_dispute_id: dispute.id } as never,
       );
       const row = Array.isArray(disputeRow) ? disputeRow[0] : disputeRow;
-      const disputeId = (row as unknown as { dispute_id?: string } | undefined)?.dispute_id;
+      const disputeId = (row as unknown as { dispute_id?: string } | undefined)
+        ?.dispute_id;
       if (disputeId) {
         await this.notifyDisputeWebhook(disputeId, 'DISPUTE_CLOSED');
       }
@@ -860,11 +861,14 @@ export class StripeWebhookService {
         txnData?.transaction_id ?? txnData?.[0]?.transaction_id;
       if (!transactionId) return;
 
-      await this.supabase.rpc('merge_stripe_radar_signals' as never, {
-        p_transaction_id: transactionId,
-        p_stripe_risk_level: outcome.risk_level ?? null,
-        p_stripe_risk_score: outcome.risk_score ?? null,
-      } as never);
+      await this.supabase.rpc(
+        'merge_stripe_radar_signals' as never,
+        {
+          p_transaction_id: transactionId,
+          p_stripe_risk_level: outcome.risk_level ?? null,
+          p_stripe_risk_score: outcome.risk_score ?? null,
+        } as never,
+      );
     } catch {
       // Non-blocking enrichment
     }

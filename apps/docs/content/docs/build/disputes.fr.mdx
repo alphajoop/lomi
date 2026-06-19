@@ -5,10 +5,10 @@ description: Consulter les litiges carte (`GET /disputes`) et réagir aux webhoo
 
 import { Callout } from '@/components/docs/docs-callout';
 
-Les litiges sont créés automatiquement lorsque Stripe envoie des événements `charge.dispute.*` pour les paiements **carte**. Utilisez l'API en lecture, les webhooks marchands, ou **Paramètres → Support → Litiges** dans le [tableau de bord](https://dashboard.lomi.africa).
+Les litiges sont créés automatiquement lorsque le réseau carte envoie des événements `charge.dispute.*` pour les paiements **carte**. Utilisez l'API en lecture, les webhooks marchands, ou **Paramètres → Support → Litiges** dans le [tableau de bord](https://dashboard.lomi.africa).
 
 <Callout type="info">
-  La v1 couvre l'**accès en lecture** et les webhooks marchands (`DISPUTE_CREATED`, `DISPUTE_UPDATED`, `DISPUTE_CLOSED`). La soumission de preuves et les litiges MoMo ne sont pas encore pris en charge. Soumettez les preuves dans le [tableau de bord Stripe](https://dashboard.stripe.com/disputes) jusqu'à l'arrivée d'un flux intégré.
+  La v1 couvre l'**accès en lecture** et les webhooks marchands (`DISPUTE_CREATED`, `DISPUTE_UPDATED`, `DISPUTE_CLOSED`). La soumission de preuves et les litiges MoMo ne sont pas encore pris en charge. Soumettez les preuves dans le tableau de bord de votre processeur carte jusqu'à l'arrivée d'un flux intégré.
 </Callout>
 
 ## Quand utiliser cette API
@@ -35,7 +35,7 @@ curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
 | `endDate` | ISO 8601 | Litiges créés jusqu'à cette date |
 
 <Callout type="warn">
-  lomi. stocke un statut simplifié (`pending`, `resolved`, `closed`). Les issues Stripe (`won`, `lost`, etc.) apparaissent dans `resolution_details` tandis que le statut est souvent `resolved`. Les webhooks `DISPUTE_CLOSED` peuvent être envoyés même si le statut stocké est `resolved` plutôt que `closed`.
+  lomi. stocke un statut simplifié (`pending`, `resolved`, `closed`). Les issues réseau carte (`won`, `lost`, etc.) apparaissent dans `resolution_details` tandis que le statut est souvent `resolved`. Les webhooks `DISPUTE_CLOSED` peuvent être envoyés même si le statut stocké est `resolved` plutôt que `closed`.
 </Callout>
 
 ### Champs de réponse (élément de liste)
@@ -47,9 +47,9 @@ curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
 | `customer_id` | Client payeur |
 | `amount`, `currency_code` | Montant contesté |
 | `fee_amount` | Frais de litige débités, le cas échéant |
-| `reason` | Motif Stripe (ex. `fraudulent`, `duplicate`) |
+| `reason` | Motif réseau carte (ex. `fraudulent`, `duplicate`) |
 | `status` | `pending`, `resolved` ou `closed` |
-| `stripe_dispute_id`, `stripe_charge_id` | Références Stripe |
+| `stripe_dispute_id`, `stripe_charge_id` | Références processeur |
 | `resolution_date`, `resolution_details` | Issue une fois résolu |
 | `customer_name`, `customer_email` | Client |
 
@@ -69,8 +69,8 @@ Abonnez-vous aux événements litige lors de la [création d'un webhook](/build/
 | Événement | Déclencheur |
 | --- | --- |
 | `DISPUTE_CREATED` | Le porteur a ouvert un litige |
-| `DISPUTE_UPDATED` | Statut ou preuves modifiés côté Stripe |
-| `DISPUTE_CLOSED` | Stripe a envoyé `charge.dispute.closed` |
+| `DISPUTE_UPDATED` | Statut ou preuves modifiés côté processeur |
+| `DISPUTE_CLOSED` | Le processeur a envoyé `charge.dispute.closed` |
 
 ## Tableau de bord
 

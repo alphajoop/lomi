@@ -54,10 +54,7 @@ export class CliTriggerController {
       'Envoie un payload de test aux webhooks abonnés et au flux `lomi listen`.',
   })
   @ApiBody({ type: CliTriggerBodyDto })
-  trigger(
-    @CurrentUser() user: AuthContext,
-    @Body() body: CliTriggerBodyDto,
-  ) {
+  trigger(@CurrentUser() user: AuthContext, @Body() body: CliTriggerBodyDto) {
     return this.triggerService.trigger(user, body.event, body.webhook_id);
   }
 }

@@ -5,7 +5,7 @@ description: Analysez les encaissements carte et mobile money avec évaluations 
 
 import { Callout } from '@/components/docs/docs-callout';
 
-**lomi. Radar** évalue les **encaissements entrants** (carte, MTN, Wave) avant leur finalisation. C'est distinct des [Litiges](/build/disputes) (chargebacks Stripe a posteriori) et des contrôles de retrait plateforme décrits dans [Payouts](/build/payouts).
+**lomi. Radar** évalue les **encaissements entrants** (carte, MTN, Wave) avant leur finalisation. C'est distinct des [Litiges](/build/disputes) (chargebacks carte a posteriori) et des contrôles de retrait plateforme décrits dans [Payouts](/build/payouts).
 
 <Callout type="info">
   Radar est **opt-in** par organisation. Activez-le via `PATCH /organization/radar-settings` (`enabled: true`). Désactivé par défaut.
@@ -25,7 +25,7 @@ curl -X PATCH "https://api.lomi.africa/organization/radar-settings" \
 | `enabled` | `true` / `false` | Active ou désactive le screening |
 | `mode` | `monitor` | Signale sans bloquer |
 | `mode` | `block` | Refuse les encaissements selon les règles block |
-| `stripe_radar_passthrough` | `true` (défaut) | Enrichit avec Stripe Radar après capture carte |
+| `stripe_radar_passthrough` | `true` (défaut) | Enrichit avec les signaux réseau carte après capture |
 
 ## Règles intégrées (v1)
 
