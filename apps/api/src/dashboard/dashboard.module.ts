@@ -13,18 +13,23 @@ import { DashboardNetworkController } from './dashboard-network.controller';
 import { DashboardNetworkService } from './dashboard-network.service';
 import { InternalJobsController } from './internal-jobs.controller';
 import { InternalJobsService } from './internal-jobs.service';
+import { DashboardPosSpiController } from './dashboard-pos-spi.controller';
+import { DashboardPosSpiService } from './dashboard-pos-spi.service';
+import { SpiModule } from '../core/spi/spi.module';
 
 @Module({
   imports: [
     BullModule.registerQueue({
       name: 'lomi-jobs',
     }),
+    SpiModule,
   ],
   controllers: [
     DashboardMeController,
     DashboardProductsController,
     DashboardCustomersController,
     DashboardNetworkController,
+    DashboardPosSpiController,
     InternalJobsController,
   ],
   providers: [
@@ -32,6 +37,7 @@ import { InternalJobsService } from './internal-jobs.service';
     DashboardProductsService,
     DashboardCustomersService,
     DashboardNetworkService,
+    DashboardPosSpiService,
     InternalJobsService,
     SupabaseSessionGuard,
     OrganizationContextGuard,
