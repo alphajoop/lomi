@@ -38,9 +38,7 @@ export class SpiWebhookController {
       : JSON.stringify(body ?? {});
 
     const parsedBody = (
-      typeof body === 'object' && body !== null
-        ? body
-        : JSON.parse(rawBody)
+      typeof body === 'object' && body !== null ? body : JSON.parse(rawBody)
     ) as Record<string, unknown>;
 
     const result = await this.spiWebhookService.handleWebhook(

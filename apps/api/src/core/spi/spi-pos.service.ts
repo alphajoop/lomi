@@ -66,7 +66,9 @@ export class SpiPosService {
     );
 
     if (prepareError || !prepared) {
-      this.logger.error(`prepare_pos_spi_payment failed: ${prepareError?.message}`);
+      this.logger.error(
+        `prepare_pos_spi_payment failed: ${prepareError?.message}`,
+      );
       throw new BadRequestException(
         prepareError?.message ?? 'Failed to prepare POS SPI payment',
       );
@@ -76,7 +78,9 @@ export class SpiPosService {
     const checkoutSessionId = prep.checkout_session_id;
     const spiTxId = prep.spi_tx_id;
     const countryCode = normalizeUemoaCountryCode(prep.country_code);
-    const dateLimiteReponse = prep.expires_at ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const dateLimiteReponse =
+      prep.expires_at ??
+      new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
     try {
       const sdk = await this.spiClient.getSdk(input.organizationId);
@@ -139,7 +143,9 @@ export class SpiPosService {
       };
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'SPI payment initiation failed';
+        error instanceof Error
+          ? error.message
+          : 'SPI payment initiation failed';
 
       await this.supabase.rpc(
         'finalize_pos_spi_payment_initiated' as never,

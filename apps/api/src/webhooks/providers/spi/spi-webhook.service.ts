@@ -114,7 +114,9 @@ export class SpiWebhookService {
     );
 
     if (completeError) {
-      this.logger.error(`complete_pos_spi_payment failed: ${completeError.message}`);
+      this.logger.error(
+        `complete_pos_spi_payment failed: ${completeError.message}`,
+      );
       throw new BadRequestException(completeError.message);
     }
 
@@ -125,7 +127,10 @@ export class SpiWebhookService {
 
     const merchantEvent = mapSpiWebhookEventToWebhookEvent(eventCode);
 
-    if (merchantEvent === 'PAYMENT_SUCCEEDED' && spiPaymentStatus === 'IRREVOCABLE') {
+    if (
+      merchantEvent === 'PAYMENT_SUCCEEDED' &&
+      spiPaymentStatus === 'IRREVOCABLE'
+    ) {
       this.wideEvent.logEvent({
         eventName: 'spi_pos_payment_completed',
         organizationId: result.organization_id,
