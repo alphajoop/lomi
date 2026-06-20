@@ -10,6 +10,7 @@ import {
 } from './merchant-webhook-url';
 import { CliListenerService } from '../cli/cli-listener.service';
 import { CliStreamService } from '../cli/cli-stream.service';
+import { sanitizeMerchantWebhookTransactionPayload } from './sanitize-merchant-webhook-transaction-payload';
 
 export interface Webhook {
   id: string;
@@ -50,21 +51,25 @@ export class WebhookSenderService {
   ) {}
 
   /**
-   * Feature flag + optional canary list: WEBHOOK_OUTBOX_CANARY_ORG_IDS=uuid1,uuid2
+   * Outbox delivery is on by default. Set WEBHOOK_OUTBOX_ENABLED=false to disable.
+   * WEBHOOK_OUTBOX_CANARY_ORG_IDS limits rollout when WEBHOOK_OUTBOX_ENABLED is not true|false.
    */
   isWebhookOutboxEnabled(organizationId: string): boolean {
+    if (process.env.WEBHOOK_OUTBOX_ENABLED === 'false') {
+      return false;
+    }
     if (process.env.WEBHOOK_OUTBOX_ENABLED === 'true') {
       return true;
     }
     const raw = process.env.WEBHOOK_OUTBOX_CANARY_ORG_IDS;
-    if (!raw?.trim()) {
-      return false;
+    if (raw?.trim()) {
+      const ids = raw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      return ids.includes(organizationId);
     }
-    const ids = raw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    return ids.includes(organizationId);
+    return true;
   }
 
   /**
@@ -475,6 +480,103 @@ export class WebhookSenderService {
     } catch (err: any) {
       this.logger.error(`Failed to log webhook delivery: ${err.message}`);
     }
+  }
+
+  /**
+   * Loads pending dispatches for an outbox row (SQL path) and enqueues BullMQ jobs.
+   */
+  async queuePendingOutboxDispatches(outboxId: string, queue: Queue) {
+    const { data: rows, error } = await this.supabase.rpc(
+      'fetch_pending_webhook_outbox_jobs',
+      { p_outbox_id: outboxId },
+    );
+
+    if (error) {
+      this.logger.error(
+        `queuePendingOutboxDispatches: RPC failed for ${outboxId}: ${error.message}`,
+      );
+      return { queued: 0, error: error.message };
+    }
+
+    const jobs = rows ?? [];
+
+    if (jobs.length === 0) {
+      this.logger.warn(
+        `queuePendingOutboxDispatches: outbox ${outboxId} not found or no pending dispatches`,
+      );
+      return {
+        queued: 0,
+        error: 'outbox not found or no pending dispatches',
+      };
+    }
+
+    const first = jobs[0]!;
+    const event = first.event_type as WebhookEvent;
+    const data = first.payload as Record<string, unknown>;
+    const merchantId = first.merchant_id;
+
+    if (event === 'PAYMENT_SUCCEEDED' || event === 'PAYMENT_FAILED') {
+      sanitizeMerchantWebhookTransactionPayload(data);
+    }
+
+    if (!merchantId) {
+      this.logger.error(
+        `queuePendingOutboxDispatches: no merchant for org ${first.organization_id}`,
+      );
+      return { queued: 0, error: 'no merchant' };
+    }
+
+    let queued = 0;
+
+    for (const row of jobs) {
+      if (!row.is_active) {
+        continue;
+      }
+
+      const webhook: Webhook = {
+        id: row.webhook_id,
+        url: row.url,
+        events: row.authorized_events as WebhookEvent[],
+        secret: row.verification_token,
+        active: row.is_active,
+        organization_id: row.webhook_organization_id,
+      };
+
+      if (!webhook.events.includes(event)) {
+        continue;
+      }
+
+      const jobId = `wh-dispatch:${row.dispatch_id}`;
+
+      try {
+        await queue.add(
+          'send-webhook',
+          {
+            webhook,
+            event,
+            data,
+            dispatchId: row.dispatch_id,
+            outboxId: first.outbox_id,
+            merchantId: row.created_by ?? merchantId,
+          },
+          {
+            jobId,
+            attempts: 5,
+            backoff: { type: 'exponential', delay: 5000 },
+          },
+        );
+        queued += 1;
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : String(e);
+        this.logger.warn(`Queue add skipped for ${jobId}: ${message}`);
+      }
+    }
+
+    this.logger.log(
+      `Queued ${queued} webhook job(s) for outbox ${outboxId} (${event})`,
+    );
+
+    return { queued, outbox_id: first.outbox_id, event };
   }
 
   async queueWebhooksForOrganization(

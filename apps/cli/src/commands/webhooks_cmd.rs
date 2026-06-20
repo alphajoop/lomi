@@ -21,12 +21,23 @@ pub enum WebhooksCommand {
         /// Webhook ID
         id: String,
     },
+    /// Resend a failed webhook delivery log
+    Resend {
+        /// Webhook ID
+        webhook_id: String,
+        /// Delivery log ID
+        delivery_id: String,
+    },
 }
 
 pub async fn run(common: &CommonOptions, args: WebhooksArgs) -> Result<()> {
     match args.command {
         WebhooksCommand::List => list_webhooks(common).await,
         WebhooksCommand::Test { id } => test_webhook(common, &id).await,
+        WebhooksCommand::Resend {
+            webhook_id,
+            delivery_id,
+        } => resend_webhook(common, &webhook_id, &delivery_id).await,
     }
 }
 
@@ -90,6 +101,37 @@ async fn test_webhook(common: &CommonOptions, id: &str) -> Result<()> {
     }
 
     cli::output::print_success("Test webhook sent");
+    if !response.is_null() {
+        println!("{}", serde_json::to_string_pretty(&response).unwrap_or_default());
+    }
+    Ok(())
+}
+
+async fn resend_webhook(
+    common: &CommonOptions,
+    webhook_id: &str,
+    delivery_id: &str,
+) -> Result<()> {
+    let json = cli::output::should_use_json(common);
+    if !json {
+        cli::banner::print_intro("Resend webhook delivery");
+    }
+
+    let auth = ensure_authenticated(common, true, false, false).await?;
+    let client = ApiClient::new(&auth)?;
+
+    let response: serde_json::Value = client
+        .post(
+            &format!("/webhooks/{webhook_id}/logs/{delivery_id}/retry"),
+            &serde_json::json!({}),
+        )
+        .await?;
+
+    if json {
+        return cli::output::print_json(&response);
+    }
+
+    cli::output::print_success("Webhook delivery resent");
     if !response.is_null() {
         println!("{}", serde_json::to_string_pretty(&response).unwrap_or_default());
     }

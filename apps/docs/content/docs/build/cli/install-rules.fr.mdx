@@ -3,7 +3,9 @@ title: 'Installer les règles agent'
 description: 'Utilisez lomi install-rules pour ajouter la documentation SDK et API lomi. à Cursor, Claude Code, Codex, VS Code et llms.txt.'
 ---
 
-La commande `lomi install-rules` installe de la documentation lomi. versionnée dans votre projet pour que les assistants IA comprennent checkout, webhooks, payment intents, abonnements et la référence API.
+La commande `lomi install-rules` installe de la documentation lomi. versionnée dans votre projet pour que les assistants IA comprennent les sessions checkout, webhooks, payment intents, abonnements et la référence API.
+
+Inspiré du modèle agent-rules utilisé par des outils comme Trigger.dev, votre IA lit ces fichiers automatiquement quand vous travaillez dans le dépôt.
 
 ## Usage
 
@@ -11,47 +13,89 @@ La commande `lomi install-rules` installe de la documentation lomi. versionnée 
 lomi install-rules
 ```
 
-Mode interactif : sélection multiple des cibles.
+Le mode interactif affiche un assistant multi-sélection :
+
+- **Cursor**: `.cursor/rules/lomi.*.mdc`
+- **Claude Code**: ajoute à `CLAUDE.md`
+- **OpenAI Codex**: ajoute à `AGENTS.md`
+- **VS Code**: `.github/instructions/lomi-*.instructions.md`
+- **llms.txt**: briefing à la racine synchronisé depuis [docs.lomi.africa/llms.txt](https://docs.lomi.africa/llms.txt)
 
 ### Mode non interactif
 
 ```bash filename="Terminal"
 lomi install-rules --target cursor --target llms.txt
+lomi install-rules --target claude-code --target codex --target vscode
 lomi install-rules --force
 ```
 
 | Option | Description |
 | --- | --- |
-| `--target <nom>` | Répéter pour chaque cible |
-| `--force` | Réinstaller même si à jour |
+| `--target <nom>` | Répéter pour chaque cible (`cursor`, `claude-code`, `codex`, `vscode`, `llms.txt`) |
+| `--force` | Réinstaller même si déjà à jour |
 
-## Cibles
+En CI ou sans TTY, la valeur par défaut est **Cursor + llms.txt** si aucune cible n'est spécifiée.
 
-| Cible | Fichiers |
+## Sujets des règles
+
+Chaque cible reçoit des règles groupées pour :
+
+| Sujet | Couvre |
 | --- | --- |
-| `cursor` | `.cursor/rules/lomi.*.mdc` |
-| `claude-code` | `CLAUDE.md` |
-| `codex` | `AGENTS.md` |
-| `vscode` | `.github/instructions/lomi-*.instructions.md` |
-| `llms.txt` | Briefing à la racine (sync docs.lomi.africa) |
+| Bases SDK | Configuration client, authentification, environnement |
+| Sessions checkout | Flux checkout hébergé |
+| Webhooks | Vérification signature, traitement événements |
+| Payment intents | Flux carte et style Elements |
+| Abonnements | Facturation récurrente |
+| Référence API | Générée depuis OpenAPI |
+| Rédaction docs | Contrat éditorial pour docs.lomi.africa |
 
-## Sujets couverts
+Les règles Cursor incluent du frontmatter YAML (`description`, `globs`, `alwaysApply`) pour une prise en charge automatique.
 
-SDK, checkout sessions, webhooks, payment intents, abonnements, référence API (OpenAPI).
+## Quand c'est proposé
 
-## Quand c’est proposé
-
-- `lomi install-rules` directement
+- Exécution directe de `lomi install-rules`
 - Premier [`lomi init`](/build/cli/init) (sauf `--skip-rules-install`)
 - Premier [`lomi dev`](/build/cli/dev) (sauf `--skip-rules-install`)
 
-## Exemple Cursor
+Le CLI suit la version installée dans votre config globale et peut reproposer quand une nouvelle version sort.
+
+## Exemple : configuration Cursor
 
 ```bash filename="Terminal"
+cd mon-projet
 lomi install-rules --target cursor
 ```
+
+Crée des fichiers comme :
+
+```
+.cursor/rules/
+  lomi.sdk-basics.mdc
+  lomi.checkout-sessions.mdc
+  lomi.webhooks.mdc
+  lomi.charges.mdc
+  lomi.subscriptions.mdc
+  lomi.api-reference.mdc
+```
+
+## Exemple : stack IA complète
+
+```bash filename="Terminal"
+lomi install-rules \
+  --target cursor \
+  --target claude-code \
+  --target codex \
+  --target vscode \
+  --target llms.txt
+```
+
+## Docs associées
+
+Pour une configuration IA manuelle sans CLI, voir [Intégration API: configuration agent](/start/first-payment).
 
 ## Suite
 
 - [Premiers pas](/build/cli/overview)
+- [Initialiser un projet](/build/cli/init)
 - [SDK TypeScript](/build/sdks/typescript)

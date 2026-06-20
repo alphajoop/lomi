@@ -1,7 +1,7 @@
 ---
 title: PrestaShop
 description:
-  Module PrestaShop 1.7+ — sessions de checkout hébergées, contrôleur webhook
+  Module PrestaShop 1.7+, sessions de checkout hébergées, contrôleur webhook
   du module, webhooks signés.
 ---
 
@@ -25,7 +25,7 @@ Détails : [README du module PrestaShop](https://github.com/lomiafrica/lomi./bl
 
 ## URL webhook
 
-Configurer le webhook du tableau de bord Lomi vers :
+Configurer le webhook du tableau de bord lomi. vers :
 
 `https://VOTRE-BOUTIQUE/index.php?fc=module&module=lomi&controller=webhook`
 
@@ -33,7 +33,7 @@ Une **URL simplifiée** peut exposer le même contrôleur frontal du module.
 
 ## Flux de paiement
 
-1. Le client choisit **Payer avec lomi.** → le contrôleur **validation** crée la session et redirige vers Lomi Checkout.
+1. Le client choisit **Payer avec lomi.** → le contrôleur **validation** crée la session et redirige vers lomi. Checkout.
 2. Le contrôleur **callback** vérifie la session (id panier + secure key client), puis valide la commande PrestaShop si le statut est `completed` et que montant / devise correspondent.
 
 Sources : [`validation.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/validation.php), [`callback.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/callback.php), [`webhook.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/webhook.php)

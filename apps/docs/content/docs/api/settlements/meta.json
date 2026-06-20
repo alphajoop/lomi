@@ -1,0 +1,7 @@
+{
+  "title": "Settlements",
+  "pages": [
+    "SettlementsController_findAll",
+    "SettlementsController_findTransactions"
+  ]
+}

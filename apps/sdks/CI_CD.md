@@ -66,7 +66,7 @@ Before using the publish workflow, set these secrets in GitHub repository settin
 
 ### TypeScript SDK
 - **Package:** `@lomi./sdk`
-- **Version:** `1.6.0` ✅
+- **Version:** `1.5.11` ✅
 - **Install:** `npm i @lomi./sdk`
 - **Registry:** https://www.npmjs.com/package/@lomi./sdk
 
@@ -78,7 +78,7 @@ Before using the publish workflow, set these secrets in GitHub repository settin
 
 ### Python SDK
 - **Package:** `lomi-sdk`
-- **Version:** `1.6.0` ✅
+- **Version:** `1.5.11` (publish via workflow when ready)
 - **Install:** `pip install lomi-sdk`
 - **Registry:** https://pypi.org/project/lomi-sdk/
 

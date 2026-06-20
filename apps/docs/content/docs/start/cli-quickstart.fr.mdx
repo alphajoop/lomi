@@ -1,13 +1,13 @@
 ---
-title: 'Démarrer avec la CLI'
-description: 'Installez la CLI lomi., connectez-vous, lancez quickstart, créez un checkout de test et recevez les webhooks en local.'
+title: 'Démarrer avec le CLI'
+description: 'Installez le CLI lomi., connectez-vous, lancez quickstart, créez un checkout de test et recevez les webhooks en local.'
 ---
 
-La **CLI lomi.** est le moyen le plus rapide de s’authentifier, créer des checkouts de test, écouter les webhooks sans ngrok et installer des règles pour agents IA — depuis le terminal.
+Le **CLI lomi.** est le moyen le plus rapide de s’authentifier, créer des checkouts de test, écouter les webhooks sans ngrok et installer des règles pour agents IA, depuis le terminal.
 
 <Steps>
 
-### Installer la CLI
+### Installer le CLI
 
 Nécessite **Node.js 18+** (uniquement pour télécharger le binaire natif).
 
@@ -59,7 +59,7 @@ Dans un second terminal :
 lomi listen http://localhost:3000/webhooks
 ```
 
-Sandbox d’abord — sans ngrok. Voir [Écouter les webhooks](/build/cli/listen).
+Sandbox d’abord, sans ngrok. Voir [Écouter les webhooks](/build/cli/listen).
 
 ### Installer les règles agents IA
 
@@ -67,7 +67,7 @@ Sandbox d’abord — sans ngrok. Voir [Écouter les webhooks](/build/cli/listen
 lomi install-rules
 ```
 
-Installe les règles Cursor, Claude Code, Codex et `llms.txt` pour que les agents comprennent les API lomi.. Voir [Installer les règles](/build/cli/install-rules).
+Installe les règles Cursor, Claude Code, Codex et `llms.txt` pour que les agents comprennent les API lomi. Voir [Installer les règles](/build/cli/install-rules).
 
 </Steps>
 
@@ -86,15 +86,15 @@ Référence complète : [Référence des commandes](/build/cli/commands).
 ## Deux types d’identifiants
 
 <Callout type="info" emoji="💡" title="Jeton CLI vs clé API">
-  **`lomi login`** enregistre un **jeton CLI** — utilisé par `checkout create`, `listen`, `quickstart`, etc.
+  **`lomi login`** enregistre un **jeton CLI**: utilisé par `checkout create`, `listen`, `quickstart`, etc.
 
-  **`lomi init`** écrit votre **clé API secrète** (`LOMI_API_KEY`) dans le `.env` du projet — utilisée par le **SDK dans votre code applicatif**.
+  **`lomi init`** écrit votre **clé API secrète** (`LOMI_API_KEY`) dans le `.env` du projet, utilisée par le **SDK dans votre code applicatif**.
 
   Ce sont des identifiants distincts pour des usages différents.
 </Callout>
 
 ## Suite
 
-- [Faire un paiement de test](/start/first-payment) — CLI et cURL
-- [Initialiser un projet](/build/cli/init) — scaffolding SDK
-- [Choisir une intégration](/build/choose-integration) — checkout, liens, abonnements
+- [Faire un paiement de test](/start/first-payment): CLI et cURL
+- [Initialiser un projet](/build/cli/init): scaffolding SDK
+- [Choisir une intégration](/build/choose-integration): checkout, liens, abonnements

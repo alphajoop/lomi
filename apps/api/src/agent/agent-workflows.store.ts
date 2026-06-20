@@ -1,5 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { SupabaseService } from '../utils/supabase/supabase.service';
 
 export type WorkflowRun = {
   run_id: string;
@@ -12,68 +16,117 @@ export type WorkflowRun = {
   updated_at: string;
 };
 
+type WorkflowRow = {
+  run_id: string;
+  organization_id: string;
+  name: string;
+  status: WorkflowRun['status'];
+  steps: WorkflowRun['steps'];
+  idempotency_key: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 @Injectable()
 export class AgentWorkflowsStore {
-  private readonly byRun = new Map<string, WorkflowRun>();
-  private readonly idempotency = new Map<string, WorkflowRun>();
+  constructor(private readonly supabase: SupabaseService) {}
 
-  create(
+  private mapRow(row: WorkflowRow): WorkflowRun {
+    return {
+      run_id: row.run_id,
+      organization_id: row.organization_id,
+      name: row.name,
+      status: row.status,
+      steps: Array.isArray(row.steps) ? row.steps : [],
+      idempotency_key: row.idempotency_key,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    };
+  }
+
+  private firstRow(data: unknown): WorkflowRow | null {
+    const rows = (data ?? []) as WorkflowRow[];
+    return rows[0] ?? null;
+  }
+
+  async create(
     organizationId: string,
     input: { name: string; steps: { id: string }[]; idempotency_key?: string },
-  ): WorkflowRun {
-    if (input.idempotency_key) {
-      const existing = this.idempotency.get(
-        `${organizationId}:${input.idempotency_key}`,
-      );
-      if (existing) return existing;
+  ): Promise<WorkflowRun> {
+    const { data, error } = await this.supabase.rpc(
+      'create_agent_workflow_run' as never,
+      {
+        p_organization_id: organizationId,
+        p_name: input.name,
+        p_steps: input.steps,
+        p_idempotency_key: input.idempotency_key ?? null,
+      } as never,
+    );
+
+    if (error) {
+      throw new InternalServerErrorException(error.message);
     }
 
-    const run_id = randomUUID();
-    const now = new Date().toISOString();
-    const run: WorkflowRun = {
-      run_id,
-      organization_id: organizationId,
-      name: input.name,
-      status: 'running',
-      steps: input.steps.map((s) => ({ id: s.id, status: 'pending' })),
-      idempotency_key: input.idempotency_key ?? null,
-      created_at: now,
-      updated_at: now,
-    };
-
-    if (input.idempotency_key) {
-      const k = `${organizationId}:${input.idempotency_key}`;
-      this.idempotency.set(k, run);
+    const row = this.firstRow(data);
+    if (!row) {
+      throw new InternalServerErrorException('Failed to create workflow run');
     }
 
-    this.byRun.set(run_id, run);
-    return run;
+    return this.mapRow(row);
   }
 
-  get(organizationId: string, runId: string): WorkflowRun {
-    const r = this.byRun.get(runId);
-    if (!r || r.organization_id !== organizationId) {
+  async get(organizationId: string, runId: string): Promise<WorkflowRun> {
+    const { data, error } = await this.supabase.rpc(
+      'get_agent_workflow_run' as never,
+      {
+        p_organization_id: organizationId,
+        p_run_id: runId,
+      } as never,
+    );
+
+    if (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+
+    const row = this.firstRow(data);
+    if (!row) {
       throw new NotFoundException('Workflow run not found');
     }
-    return r;
+
+    return this.mapRow(row);
   }
 
-  updateStep(
+  async updateStep(
     organizationId: string,
     runId: string,
     stepId: string,
     status: string,
-  ): WorkflowRun {
-    const run = this.get(organizationId, runId);
-    const step = run.steps.find((s) => s.id === stepId);
-    if (!step) {
-      throw new NotFoundException(`Step ${stepId} not found in run`);
+  ): Promise<WorkflowRun> {
+    const { data, error } = await this.supabase.rpc(
+      'update_agent_workflow_run_step' as never,
+      {
+        p_organization_id: organizationId,
+        p_run_id: runId,
+        p_step_id: stepId,
+        p_status: status,
+      } as never,
+    );
+
+    if (error) {
+      if (error.message.includes('workflow_run_not_found')) {
+        throw new NotFoundException('Workflow run not found');
+      }
+      if (error.message.includes('workflow_step_not_found')) {
+        throw new NotFoundException(`Step ${stepId} not found in run`);
+      }
+      throw new InternalServerErrorException(error.message);
     }
-    step.status = status;
-    run.updated_at = new Date().toISOString();
-    if (run.steps.every((s) => s.status === 'completed')) {
-      run.status = 'completed';
+
+    const row = this.firstRow(data);
+    if (!row) {
+      throw new NotFoundException('Workflow run not found');
     }
-    return run;
+
+    return this.mapRow(row);
   }
 }

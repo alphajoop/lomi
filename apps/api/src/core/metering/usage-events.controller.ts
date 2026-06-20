@@ -21,7 +21,6 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
-import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import { UsageEventsService } from './usage-events.service';
 import {
   CreateUsageEventDto,
@@ -36,7 +35,6 @@ import { UsageEventListItemDto } from './dto/usage-event-response.dto';
 
 @ApiTags('Usage events')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller()
 export class UsageEventsController {

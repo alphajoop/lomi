@@ -26,6 +26,11 @@ describe('PaymentRequestsService', () => {
     const mockSupabase = {
       getClient: jest.fn(() => ({
         rpc: mockClientRpc,
+        from: jest.fn(() => ({
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+        })),
       })),
     };
 
@@ -59,7 +64,7 @@ describe('PaymentRequestsService', () => {
 
       const result = await service.create(dto, user);
 
-      expect(result).toEqual(row);
+      expect(result.data).toEqual(row);
       expect(mockClientRpc).toHaveBeenCalledWith(
         'create_payment_request_api',
         expect.objectContaining({

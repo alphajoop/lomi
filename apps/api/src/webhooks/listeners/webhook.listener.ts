@@ -141,6 +141,29 @@ export class WebhookListener {
     );
   }
 
+  @OnEvent('DISPUTE_CREATED')
+  async handleDisputeCreated(payload: any) {
+    await this.queueWebhook(
+      payload.organization_id,
+      'DISPUTE_CREATED',
+      payload,
+    );
+  }
+
+  @OnEvent('DISPUTE_UPDATED')
+  async handleDisputeUpdated(payload: any) {
+    await this.queueWebhook(
+      payload.organization_id,
+      'DISPUTE_UPDATED',
+      payload,
+    );
+  }
+
+  @OnEvent('DISPUTE_CLOSED')
+  async handleDisputeClosed(payload: any) {
+    await this.queueWebhook(payload.organization_id, 'DISPUTE_CLOSED', payload);
+  }
+
   @OnEvent('SUBSCRIPTION_CANCELLED')
   async handleSubscriptionCanceled(payload: any) {
     this.logger.log(

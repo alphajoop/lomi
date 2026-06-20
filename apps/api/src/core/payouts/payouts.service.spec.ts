@@ -60,7 +60,23 @@ describe('PayoutsService', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('rejects MTN payouts', async () => {
+  it('rejects MTN payouts in test mode', async () => {
+    supabaseGetClientRpc.mockResolvedValueOnce({
+      data: [
+        {
+          payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
+          organization_id: 'org-1',
+          account_number: '+2250712345678',
+          account_name: 'Merchant',
+          payout_method_type: 'mobile_money',
+          is_valid: true,
+          is_spi_enabled: false,
+          auto_withdrawal_mobile_provider: 'MTN',
+        },
+      ],
+      error: null,
+    });
+
     await expect(
       service.create(
         {
@@ -70,9 +86,49 @@ describe('PayoutsService', () => {
           currency_code: 'XOF',
           payout_method_id: '550e8400-e29b-41d4-a716-446655440000',
         },
-        liveUser,
+        testUser,
       ),
-    ).rejects.toThrow(/MTN payouts are not supported/);
+    ).rejects.toThrow(/MTN payouts are not available in test mode/);
+
+    expect(functionsInvoke).not.toHaveBeenCalled();
+  });
+
+  it('calls MTN edge for live beneficiary MTN payouts', async () => {
+    functionsInvoke.mockResolvedValueOnce({
+      data: {
+        payoutId: 'payout-mtn-uuid',
+        status: 'completed',
+      },
+      error: null,
+    });
+
+    const result = await service.create(
+      {
+        destination: 'beneficiary',
+        rail: 'mtn',
+        amount: 1000,
+        currency_code: 'XOF',
+        recipient: { name: 'Ada Lovelace', phone: '+2250712345678' },
+      },
+      liveUser,
+    );
+
+    expect(functionsInvoke).toHaveBeenCalledWith('mtn', {
+      body: {
+        path: '/beneficiary-payout',
+        method: 'POST',
+        body: expect.objectContaining({
+          merchantId: 'merchant-1',
+          organizationId: 'org-1',
+          recipientPhone: '+2250712345678',
+        }),
+      },
+    });
+    expect(result).toMatchObject({
+      success: true,
+      kind: 'beneficiary',
+      payout_id: 'payout-mtn-uuid',
+    });
   });
 
   it('requires payout_method_id for self payouts', async () => {

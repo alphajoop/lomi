@@ -1,9 +1,9 @@
 ---
 title: 'Initialiser un projet'
-description: 'Générez une intégration lomi. avec client SDK, exemples checkout/webhook et variables d’environnement.'
+description: "Générez une intégration lomi. avec client SDK, exemples checkout/webhook et variables d'environnement."
 ---
 
-La commande `lomi init` prépare une intégration lomi. dans votre répertoire de projet : client SDK, exemples et fichier `.env`.
+La commande `lomi init` prépare une intégration lomi. dans votre répertoire de projet : client SDK, exemples et fichier `.env` avec vos identifiants API.
 
 Nécessite un [`lomi login`](/build/cli/auth) préalable (ou `LOMI_ACCESS_TOKEN` en CI).
 
@@ -22,8 +22,11 @@ lomi init
 | `-e, --environment` | `production` ou `sandbox` |
 | `-L, --language` | `ts` ou `js` |
 | `--api-key` | Clé secrète écrite dans `.env` |
-| `--skip-package-install` | Ignorer l’installation npm |
-| `--skip-rules-install` | Ignorer l’installation des règles agent (`--yes` installe Cursor + llms.txt par défaut) |
+| `--skip-package-install` | Ignorer l'installation npm |
+| `--skip-rules-install` | Ignorer l'installation des règles agent (`--yes` installe Cursor + llms.txt par défaut) |
+| `--with-ui <name>` | Installer un composant lomi. UI après le scaffold (sans interaction) |
+| `--skip-ui-install` | Ignorer l'invite d'installation lomi. UI |
+| `[path]` | Répertoire projet (défaut : répertoire courant) |
 
 ### Exemple CI
 
@@ -36,29 +39,97 @@ lomi init --yes \
   --skip-rules-install
 ```
 
+### Avec lomi. UI (headless)
+
+```bash filename="Terminal"
+lomi init --yes \
+  --environment sandbox \
+  --language ts \
+  --api-key lomi_sk_test_xxx \
+  --with-ui payment-provider-selector \
+  --skip-package-install
+```
+
+Nécessite Node.js et shadcn dans le projet cible (ou passez `--yes` pour que shadcn init s'exécute en non interactif).
+
+## Flux interactif
+
+En mode interactif, `lomi init` demande :
+
+1. **Environnement**: Production ou Sandbox (définit `LOMI_API_URL`)
+2. **Langage**: TypeScript ou JavaScript pour les exemples générés
+3. **Clé API**: Votre clé secrète depuis le [portail marchand](https://lomi.africa/portal/settings/api-keys)
+
+Il peut aussi proposer [`lomi install-rules`](/build/cli/install-rules) si vous n'avez pas encore installé les règles agent, et optionnellement un composant checkout [lomi. UI](/build/lomi-ui) via [`lomi ui`](/build/cli/ui).
+
 ## Fichiers créés
 
 | Fichier | Rôle |
 | --- | --- |
 | `.env` | `LOMI_API_KEY`, placeholder `LOMI_WEBHOOK_SECRET`, `LOMI_API_URL` |
-| `lib/lomi./client.{ts\|js}` | Client SDK initialisé |
-| `examples/create-checkout-session.{ts\|js}` | Exemple checkout |
-| `examples/webhook-handler.{ts\|js}` | Exemple webhook |
-| `lomi.config.ts` | Configuration projet |
+| `lib/lomi./client.{ts\|js}` | Client SDK initialisé depuis `.env` |
+| `examples/create-checkout-session.{ts\|js}` | Exemple création session checkout |
+| `examples/webhook-handler.{ts\|js}` | Exemple handler webhook basique |
+| `examples/embed-checkout.html` | Exemple embed modal, remplacez `CHECKOUT_URL` après `lomi checkout create` |
+| `lomi.config.ts` | Configuration projet lomi. |
+
+Exemple `.env` :
+
+```dotenv filename=".env"
+LOMI_API_KEY=lomi_sk_test_xxx
+LOMI_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+LOMI_API_URL=https://sandbox.api.lomi.africa
+```
 
 <Callout type="warning" emoji="⚠️" title="Secrets hors git">
-  Ajoutez `.env` à votre `.gitignore`.
+  Ajoutez `.env` à votre `.gitignore`. Ne commitez jamais de clés API secrètes ni de secrets webhook.
 </Callout>
+
+## Dépendances
+
+Si `package.json` existe (ou est créé), `lomi init` installe :
+
+- `@lomi./sdk`
+- `dotenv`
+
+Utilisez `--skip-package-install` pour ignorer cette étape en CI et installer manuellement.
 
 ## Après init
 
+<Steps>
+
+### Relire les exemples générés
+
+Ouvrez `lib/lomi./client.ts` et les fichiers dans `examples/`.
+
+### Ajouter votre secret webhook
+
+Remplacez le placeholder `LOMI_WEBHOOK_SECRET` dans `.env` par le secret de signature du portail marchand.
+
+### Tester les webhooks en local
+
 ```bash filename="Terminal"
-lomi dev      # webhooks en local
-lomi status   # vérifier la CLI
+lomi dev
 ```
+
+Pointez l'URL webhook du tableau de bord vers un tunnel (ex. ngrok) ou utilisez le serveur local en développement. Voir [Serveur de développement local](/build/cli/dev).
+
+### Vérifier l'auth CLI
+
+```bash filename="Terminal"
+lomi status
+```
+
+</Steps>
+
+## Prérequis
+
+- [`lomi login`](/build/cli/auth) effectué (ou `LOMI_ACCESS_TOKEN` défini)
+- Une **clé API secrète** du portail marchand (`lomi_sk_test_…` ou `lomi_sk_live_…`)
 
 ## Suite
 
-- [Serveur de développement](/build/cli/dev)
-- [Webhooks](/build/advanced-guides/handling-webhooks)
+- [Serveur de développement local](/build/cli/dev)
+- [Recevoir les webhooks](/build/advanced-guides/handling-webhooks)
+- [Sessions checkout](/build/checkout)
 - [SDK TypeScript](/build/sdks/typescript)

@@ -22,5 +22,15 @@ Services contain business logic and orchestrate calls to repositories and other 
 - Always offload slow or side-effect operations (e.g., sending emails, generating reports) to background jobs (using BullMQ or similar).
 - Do not block API responses on background tasks.
 
+### Dashboard API layer (`/dashboard/v1`)
+- Dashboard SPA authenticates with **Supabase JWT**, not API keys. See [docs/dashboard-api.md](docs/dashboard-api.md).
+- Do not add new browser-callable `SECURITY DEFINER` RPCs for dashboard features; add dashboard controllers instead.
+- During migration, services may call existing RPCs with the service role after guards verify org access.
+- Atomic writes: still one RPC per transaction boundary, invoked from the API service layer only.
+
+### Internal jobs
+- `POST /internal/jobs` accepts work for `apps/worker` when `x-internal-key` matches `INTERNAL_API_KEY`.
+- Do not add new hardcoded Supabase edge function URLs in SQL migrations.
+
 ## Stripe Integration
 *Note: Stripe is used for payment processing, but we abstract this away internally. Ensure that any Stripe API keys or configuration details remain strictly encapsulated and are NOT exposed in client-facing APIs, logs, or local dev scripts.*

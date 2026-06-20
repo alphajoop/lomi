@@ -10,8 +10,10 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import {
   isNetworkRequest,
+  assertNetworkContextRecorded,
   recordNetworkContext,
   recordNetworkOperatorFeeReversal,
+  resolveNetworkMemberMerchantId,
 } from '../common/network-context';
 import { CreateRefundDto } from './dto/create-refund.dto';
 import {
@@ -24,6 +26,8 @@ import {
   createStripeClient,
   resolveStripeSecretKey,
 } from '../../utils/stripe/stripe-keys';
+import { environmentFromAuth } from '../common/auth-environment';
+import { getMtnCountryConfig } from '../charges/mtn-country';
 
 type TransactionRow = {
   transaction_id: string;
@@ -98,7 +102,10 @@ export class RefundsService {
       dto.amount,
       isFullRefund,
     );
-    const refundMerchantId = await this.resolveRefundMerchantId(user);
+    const refundMerchantId = await resolveNetworkMemberMerchantId(
+      this.supabaseService,
+      user,
+    );
 
     let result: { refund_id?: string; [key: string]: unknown };
 
@@ -126,23 +133,44 @@ export class RefundsService {
             feePercentage,
             refundMerchantId,
           );
+    } else if (tx.provider_code === 'MTN') {
+      result = isFullRefund
+        ? await this.createMtnFullRefund(
+            dto,
+            user,
+            tx,
+            feePercentage,
+            refundMerchantId,
+          )
+        : await this.createMtnPartialRefund(
+            dto,
+            user,
+            tx,
+            feePercentage,
+            refundMerchantId,
+          );
     } else {
       throw new BadRequestException(
         'Refunds are not supported for this transaction type',
       );
     }
 
-    await recordNetworkContext(this.supabaseService, user, {
-      refundId: result.refund_id ?? null,
-      amount: dto.amount,
-      currencyCode: tx.currency_code,
-      capabilityKey: 'refund.create',
-      metadata: {
-        source: 'api_refund',
-        transaction_id: dto.transaction_id,
-        refund_type: dto.refund_type ?? null,
+    const networkContext = await recordNetworkContext(
+      this.supabaseService,
+      user,
+      {
+        refundId: result.refund_id ?? null,
+        amount: dto.amount,
+        currencyCode: tx.currency_code,
+        capabilityKey: 'refund.create',
+        metadata: {
+          source: 'api_refund',
+          transaction_id: dto.transaction_id,
+          refund_type: dto.refund_type ?? null,
+        },
       },
-    });
+    );
+    assertNetworkContextRecorded(user, networkContext, 'refund');
 
     await recordNetworkOperatorFeeReversal(this.supabaseService, user, {
       refundId: result.refund_id ?? null,
@@ -579,20 +607,18 @@ export class RefundsService {
       );
     }
 
-    const { data: providerRows } = await this.supabaseService
-      .getClient()
-      .from('providers_transactions' as never)
-      .select('provider_transaction_id' as never)
-      .eq('transaction_id' as never, transactionId as never)
-      .eq('provider_code' as never, 'STRIPE' as never)
-      .limit(1);
-
-    const providerChargeId = (
-      providerRows as { provider_transaction_id?: string }[] | null
-    )?.[0]?.provider_transaction_id;
+    const { data: providerChargeId } = await (
+      this.supabaseService.getClient() as any
+    ).rpc('get_stripe_provider_charge_id', {
+      p_transaction_id: transactionId,
+    });
 
     const metadata = (tx.metadata ?? {}) as Record<string, unknown>;
-    if (!metadata.stripe_charge_id && providerChargeId) {
+    if (
+      !metadata.stripe_charge_id &&
+      typeof providerChargeId === 'string' &&
+      providerChargeId
+    ) {
       metadata.stripe_charge_id = providerChargeId;
     }
     tx.metadata = metadata;
@@ -608,18 +634,13 @@ export class RefundsService {
       return metadata.stripe_charge_id;
     }
 
-    const { data } = await this.supabaseService
-      .getClient()
-      .from('providers_transactions' as never)
-      .select('provider_transaction_id' as never)
-      .eq('transaction_id' as never, tx.transaction_id as never)
-      .eq('provider_code' as never, 'STRIPE' as never)
-      .limit(1)
-      .maybeSingle();
+    const { data: chargeId } = await (
+      this.supabaseService.getClient() as any
+    ).rpc('get_stripe_provider_charge_id', {
+      p_transaction_id: tx.transaction_id,
+    });
 
-    const chargeId = (data as { provider_transaction_id?: string } | null)
-      ?.provider_transaction_id;
-    return chargeId ?? null;
+    return typeof chargeId === 'string' && chargeId ? chargeId : null;
   }
 
   private computeStripeRefundCents(
@@ -863,6 +884,224 @@ export class RefundsService {
     };
   }
 
+  private async createMtnFullRefund(
+    dto: CreateRefundDto,
+    user: AuthContext,
+    tx: TransactionRow,
+    feePercentage: number,
+    refundMerchantId: string,
+  ) {
+    const { data, error } = await this.supabaseService.getClient().rpc(
+      'create_mtn_refund_request_api' as never,
+      {
+        p_merchant_id: refundMerchantId,
+        p_organization_id: user.organizationId,
+        p_transaction_id: dto.transaction_id,
+        p_refund_amount: dto.amount,
+        p_processing_fee_percentage: feePercentage,
+        p_reason: dto.reason ?? null,
+        p_subscription_action: this.resolveSubscriptionActionParam(dto),
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const ledgerResult = data as RpcRefundResult;
+
+    if (!ledgerResult?.success || !ledgerResult.refund_id) {
+      throw new BadRequestException(
+        ledgerResult?.error ?? 'Failed to create MTN refund request',
+      );
+    }
+
+    const refundId = ledgerResult.refund_id;
+    const subscriptionAction = ledgerResult.subscription_action;
+
+    if (this.shouldSkipMtnProviderRefund(tx)) {
+      return {
+        success: true,
+        refund_id: refundId,
+        transaction_id: dto.transaction_id,
+        refunded_amount: dto.amount,
+        status: 'completed',
+        message: 'Refund initiated and recorded.',
+        subscription_action: subscriptionAction,
+      };
+    }
+
+    try {
+      await this.invokeMtnEdge('/refund', user, {
+        transactionId: dto.transaction_id,
+        amount: String(dto.amount),
+        currency: tx.currency_code,
+        reason: dto.reason,
+        refundId,
+      });
+    } catch (edgeError) {
+      await this.rollbackMtnRefund(refundId, edgeError);
+      throw edgeError;
+    }
+
+    return {
+      success: true,
+      refund_id: refundId,
+      transaction_id: dto.transaction_id,
+      refunded_amount: dto.amount,
+      status: 'completed',
+      message: 'Refund initiated and recorded.',
+      subscription_action: subscriptionAction,
+    };
+  }
+
+  private async createMtnPartialRefund(
+    dto: CreateRefundDto,
+    user: AuthContext,
+    tx: TransactionRow,
+    feePercentage: number,
+    refundMerchantId: string,
+  ) {
+    if (!tx.customer_id) {
+      throw new BadRequestException(
+        'Transaction has no customer; partial refund requires a customer phone number',
+      );
+    }
+
+    const customer = await this.loadCustomer(
+      tx.customer_id,
+      user.organizationId,
+    );
+    const phone = customer.phone_number || customer.whatsapp_number;
+    if (!phone) {
+      throw new BadRequestException(
+        'Customer phone number is required for partial refunds',
+      );
+    }
+
+    const { data, error } = await this.supabaseService.getClient().rpc(
+      'create_mtn_refund_request_api' as never,
+      {
+        p_merchant_id: refundMerchantId,
+        p_organization_id: user.organizationId,
+        p_transaction_id: dto.transaction_id,
+        p_refund_amount: dto.amount,
+        p_processing_fee_percentage: feePercentage,
+        p_reason: dto.reason ?? null,
+        p_subscription_action: 'none',
+      } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const ledgerResult = data as RpcRefundResult;
+
+    if (!ledgerResult?.success || !ledgerResult.refund_id) {
+      throw new BadRequestException(
+        ledgerResult?.error ?? 'Failed to create MTN partial refund request',
+      );
+    }
+
+    const refundId = ledgerResult.refund_id;
+
+    if (!this.shouldSkipMtnProviderRefund(tx)) {
+      try {
+        await this.invokeMtnEdge('/refund', user, {
+          transactionId: dto.transaction_id,
+          amount: String(dto.amount),
+          currency: tx.currency_code,
+          reason: dto.reason,
+          refundId,
+        });
+      } catch (edgeError) {
+        await this.rollbackMtnRefund(refundId, edgeError);
+        throw edgeError;
+      }
+    }
+
+    const { data: chargeRows, error: chargeError } = await this.supabaseService
+      .getClient()
+      .rpc(
+        'apply_mtn_partial_refund_charges' as never,
+        {
+          p_transaction_id: dto.transaction_id,
+          p_refund_id: refundId,
+          p_refund_amount: dto.amount,
+          p_processing_fee_percentage: feePercentage,
+          p_subscription_action: this.resolveSubscriptionActionParam(dto),
+        } as never,
+      );
+
+    if (chargeError) {
+      throw new BadRequestException(chargeError.message);
+    }
+
+    const chargeResult = Array.isArray(chargeRows) ? chargeRows[0] : chargeRows;
+    if ((chargeResult as { success?: boolean })?.success === false) {
+      throw new BadRequestException(
+        (chargeResult as { error_message?: string })?.error_message ??
+          'Failed to apply partial refund charges',
+      );
+    }
+
+    const subscriptionAction = (
+      chargeResult as { subscription_action?: SubscriptionRefundActionResult }
+    )?.subscription_action;
+
+    return {
+      success: true,
+      refund_id: refundId,
+      transaction_id: dto.transaction_id,
+      refunded_amount: dto.amount,
+      status: 'completed',
+      message: 'Partial refund processed and recorded.',
+      subscription_action: subscriptionAction,
+    };
+  }
+
+  private shouldSkipMtnProviderRefund(tx: TransactionRow): boolean {
+    return tx.environment === 'test';
+  }
+
+  private resolveMtnApiEnvironment(
+    user: AuthContext,
+  ): 'development' | 'production' {
+    const paymentEnvironment = environmentFromAuth(user);
+    return paymentEnvironment === 'test' ? 'development' : 'production';
+  }
+
+  private async rollbackMtnRefund(
+    refundId: string,
+    edgeError: unknown,
+  ): Promise<void> {
+    const rollbackMessage =
+      edgeError instanceof Error ? edgeError.message : 'MTN API failed';
+
+    const { data: rollbackData, error: rollbackError } =
+      await this.supabaseService.getClient().rpc(
+        'rollback_mtn_refund' as never,
+        {
+          p_refund_id: refundId,
+          p_reason: rollbackMessage,
+        } as never,
+      );
+
+    if (rollbackError) {
+      this.logger.error(
+        `rollback_mtn_refund failed after MTN error: ${rollbackError.message}`,
+      );
+    } else {
+      const rollbackResult = rollbackData as RpcRefundResult;
+      if (rollbackResult?.success !== true) {
+        this.logger.error(
+          `rollback_mtn_refund returned failure: ${rollbackResult?.error ?? 'unknown'}`,
+        );
+      }
+    }
+  }
+
   private async loadCustomer(customerId: string, organizationId: string) {
     const { data, error } = await this.supabaseService.getClient().rpc(
       'get_customer' as never,
@@ -888,60 +1127,6 @@ export class RefundsService {
     }
 
     return customer;
-  }
-
-  private async resolveRefundMerchantId(user: AuthContext): Promise<string> {
-    if (!isNetworkRequest(user)) {
-      return user.merchantId;
-    }
-
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .from('network_memberships' as never)
-      .select('accepted_by_merchant_id, member_organization_id' as never)
-      .eq('network_membership_id' as never, user.networkMembershipId as never)
-      .maybeSingle();
-
-    if (error) {
-      throw new BadRequestException(error.message);
-    }
-
-    const row = data as {
-      accepted_by_merchant_id?: string | null;
-      member_organization_id?: string | null;
-    } | null;
-
-    if (row?.accepted_by_merchant_id) {
-      return row.accepted_by_merchant_id;
-    }
-
-    if (!row?.member_organization_id) {
-      throw new BadRequestException('Network membership not found');
-    }
-
-    const { data: linkData, error: linkError } = await this.supabaseService
-      .getClient()
-      .from('merchant_organization_links' as never)
-      .select('merchant_id' as never)
-      .eq('organization_id' as never, row.member_organization_id as never)
-      .eq('team_status' as never, 'active' as never)
-      .limit(1)
-      .maybeSingle();
-
-    if (linkError) {
-      throw new BadRequestException(linkError.message);
-    }
-
-    const fallback = (linkData as { merchant_id?: string | null } | null)
-      ?.merchant_id;
-
-    if (!fallback) {
-      throw new BadRequestException(
-        'Network member organization has no merchant available for refund ledger attribution',
-      );
-    }
-
-    return fallback;
   }
 
   /** Records refund row only — balance already handled by beneficiary payout. */
@@ -1011,6 +1196,52 @@ export class RefundsService {
     if (!response.ok) {
       const errorText = await response.text();
       this.logger.error(`Payment edge ${path} failed: ${errorText}`);
+      throw new BadRequestException(`Refund processing failed: ${errorText}`);
+    }
+
+    return response.json();
+  }
+
+  private async invokeMtnEdge(
+    path: string,
+    user: AuthContext,
+    body: Record<string, unknown>,
+  ): Promise<unknown> {
+    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
+    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
+
+    if (!projectRef || !anonKey) {
+      throw new InternalServerErrorException('Payment configuration missing');
+    }
+
+    const mtnApiEnvironment = this.resolveMtnApiEnvironment(user);
+    const countryCode =
+      typeof body.countryCode === 'string' ? body.countryCode : 'CI';
+    const { targetEnvironment: countryTarget } =
+      getMtnCountryConfig(countryCode);
+    const targetEnvironment =
+      mtnApiEnvironment === 'development' ? 'sandbox' : countryTarget;
+
+    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/mtn`;
+
+    const response = await fetch(edgeFunctionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${anonKey}`,
+      },
+      body: JSON.stringify({
+        path,
+        method: 'POST',
+        environment: mtnApiEnvironment,
+        targetEnvironment,
+        body,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      this.logger.error(`MTN edge ${path} failed: ${errorText}`);
       throw new BadRequestException(`Refund processing failed: ${errorText}`);
     }
 

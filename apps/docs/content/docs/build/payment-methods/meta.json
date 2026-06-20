@@ -1,0 +1,5 @@
+{
+  "title": "Payment channels",
+  "description": "Deep dives for Wave, MTN MoMo, SPI, and cards.",
+  "pages": ["wave", "mtn-momo", "spi", "cards"]
+}

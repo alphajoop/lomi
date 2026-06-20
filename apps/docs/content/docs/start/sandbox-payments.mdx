@@ -4,9 +4,9 @@ description: 'Use test keys, test payment methods, test balances, and webhook ve
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
-The lomi. **test environment** lets you run full payment flows—hosted checkout, embedded card forms, and mobile money—without moving real money or touching live balances. This page is the single reference for **simulating payments**: which test card numbers to use, how Wave and MTN MoMo behave in test mode, and what to expect in your dashboard and webhooks.
+lomi. **test environment** lets you run full payment flows, hosted checkout, embedded card forms, and mobile money, without moving real money or touching live balances. This page is the single reference for **simulating payments**: which test card numbers to use, how Wave and MTN MoMo behave in test mode, and what to expect in your dashboard and webhooks.
 
 For API keys, base URLs, and rate limits, see **[Authentication](/start/api-keys)**. For your first authenticated request, see **[API integration](/start/first-payment)**.
 
@@ -30,11 +30,11 @@ Environment is determined by your **API key**, not the hostname: a test key alwa
 
 End-to-end sandbox card payment in five steps (full recipes below in [API and hosted checkout recipes](#api-and-hosted-checkout-recipes)):
 
-1. **Create a session** — `POST https://sandbox.api.lomi.africa/checkout-sessions` with `lomi_sk_test_…` (minimum body: `amount`, `currency_code`, `success_url`, `cancel_url`). See [Checkout sessions API](/api/checkout-sessions/CheckoutSessionsController_create).
-2. **Open the URL** — response includes `checkout_url` (hosted payment page for that session).
-3. **Pay with a test card** — select **Card**, enter `4242 4242 4242 4242`, expiry `12/34`, CVC `123` ([full test card list](#quick-reference--most-used-numbers) below).
-4. **Complete** — transaction moves to `completed`; your **test balance** increases (not live funds).
-5. **Verify** — dashboard **Test** mode and webhooks (`environment: "test"` on payloads).
+1. **Create a session**: `POST https://sandbox.api.lomi.africa/checkout-sessions` with `lomi_sk_test_…` (minimum body: `amount`, `currency_code`, `success_url`, `cancel_url`). See [Checkout sessions API](/api/checkout-sessions/CheckoutSessionsController_create).
+2. **Open the URL**: response includes `checkout_url` (hosted payment page for that session).
+3. **Pay with a test card**: select **Card**, enter `4242 4242 4242 4242`, expiry `12/34`, CVC `123` ([full test card list](#quick-reference--most-used-numbers) below).
+4. **Complete**: transaction moves to `completed`; your **test balance** increases (not live funds).
+5. **Verify**: dashboard **Test** mode and webhooks (`environment: "test"` on payloads).
 
 ```text
 POST /checkout-sessions  →  { "checkout_url": "https://…" }  →  customer pays  →  webhook + test balance
@@ -74,7 +74,7 @@ For how live balances work after completion, see **[Balance and settlement](/bui
 
 ## Testing card payments
 
-Sandbox card payments use **test card numbers** that mimic real issuer behavior—approvals, declines, and authentication challenges—without charging anyone. Use them only with test API keys and test checkout sessions.
+Sandbox card payments use **test card numbers** that mimic real issuer behavior, approvals, declines, and authentication challenges, without charging anyone. Use them only with test API keys and test checkout sessions.
 
 <Callout type="info">
   Never enter real card details in test mode, and never use test numbers in production. Real cards in test are prohibited; test numbers in live will not work.
@@ -158,7 +158,7 @@ Some test cards trigger an **authentication step** (redirect or modal) before th
 
 Test authentication flows on your **hosted checkout** or **embedded card form**, not only via server-side API calls, so customers see the same challenge UI as in production.
 
-### Quick reference — most used numbers
+### Quick reference: most used numbers
 
 | Goal | Use this number |
 | --- | --- |
@@ -187,15 +187,35 @@ In test mode, lomi. creates a **completed** transaction and credits your **test 
 
 ### MTN MoMo
 
-In test mode, lomi. also marks the transaction **completed** and credits your test balance when the MTN payment is initiated. Status updates in test are treated as successful for ledger purposes. Checkout talks to the **MTN sandbox** when the session is in test mode.
+In test mode, lomi. marks the MTN transaction **completed** and credits your **test balance** when the payment is initiated-**without calling the MTN sandbox**. No real MSISDN or sandbox credentials are required for the ledger flow.
 
-**How to test:**
+**Test refunds:** `POST /refunds` (or the dashboard refund dialog) on a completed test MTN transaction updates your test balance immediately. **No MTN Disbursement API call** is made in test mode.
+
+**How to test payments:**
 
 1. Use a **test** payment link or session with MTN enabled.
-2. Enter a valid MSISDN for your country (international format, without spaces in the API path).
+2. Enter any valid MSISDN for your country (international format).
 3. Confirm the transaction appears as completed in the dashboard test view.
 
-For sandbox phone numbers allowed by MTN, see the [MTN MoMo developer portal](https://momodeveloper.mtn.com/).
+**Direct charge scenarios (`X-Scenario-Key`, test key only):** On `POST /charge/mtn` and `POST /charge/wave`, send `X-Scenario-Key: pending` to keep the charge in `PENDING` without auto-completing, or `failed` to simulate a `400` error. Omit the header for default test behavior. Hosted checkout and card charges do not read this header.
+
+```bash
+# MTN: pending (no auto-complete)
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+
+# Wave: simulate failure
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: failed" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
+
+For live MTN integration and sandbox MSISDNs, see the [MTN MoMo developer portal](https://momodeveloper.mtn.com/).
 
 **Supported countries (hosted checkout)**
 
@@ -228,7 +248,7 @@ For sandbox phone numbers allowed by MTN, see the [MTN MoMo developer portal](ht
 
 | `rail` | `destination` | Test key |
 | --- | --- | --- |
-| `wave` | `self` or `beneficiary` | **`400`** — Wave payouts are live-only; no Wave API call |
+| `wave` | `self` or `beneficiary` | **`400`**: Wave payouts are live-only; no Wave API call |
 | `bank`, `spi` | `self` | Follows test withdrawal records where applicable |
 | `spi` | `beneficiary` | May create pending beneficiary records (no live Wave transfer) |
 
@@ -300,11 +320,11 @@ Create payment links in **Test** mode in the dashboard, or via the API with your
 Use **test** API keys and [Sandbox payments](/start/sandbox-payments) patterns below.
 
 1. **Create a recurring product** with `trial_enabled: true` or `first_payment_type: non_initial` (see [Products](/build/products)).
-2. **Payment link or checkout session** — open hosted checkout or your storefront subscribe URL with the recurring `product_id`.
-3. **Trial + card** — use `4242 4242 4242 4242`; checkout collects a card via SetupIntent and shows **$0** due today. Expect **`SUBSCRIPTION_CREATED`** when signup completes (not mid–card entry).
-4. **Trial + Wave / MTN** — complete customer details and confirm; signup should succeed with **no charge** in test mode.
-5. **Paid signup** — use `first_payment_type: initial` and complete a normal test payment; verify subscription `status` is `active` and a transaction of type `instalment` exists.
-6. **Webhooks** — subscribe to `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, and `PAYMENT_FAILED` for renewal failures.
+2. **Payment link or checkout session**: open hosted checkout or your storefront subscribe URL with the recurring `product_id`.
+3. **Trial + card**: use `4242 4242 4242 4242`; checkout collects a card via SetupIntent and shows **$0** due today. Expect **`SUBSCRIPTION_CREATED`** when signup completes (not mid–card entry).
+4. **Trial + Wave / MTN**: complete customer details and confirm; signup should succeed with **no charge** in test mode.
+5. **Paid signup**: use `first_payment_type: initial` and complete a normal test payment; verify subscription `status` is `active` and a transaction of type `instalment` exists.
+6. **Webhooks**: subscribe to `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, and `PAYMENT_FAILED` for renewal failures.
 
 Renewal cron behavior in test may still schedule future billing dates; use the dashboard or API to inspect `next_billing_date` rather than waiting for real time.
 
@@ -326,20 +346,20 @@ See **[Webhooks](/build/webhooks)** for subscription management and verification
 | Card confirms but no test balance | Webhook not reaching your stack; wrong environment on session | Ensure test link/session; check dashboard transaction status |
 | Test key but checkout feels “live” | Payment link created in **Live** mode | Recreate link in **Test** mode (dashboard or with a test API key) |
 | Wave/MTN shows success, balance unchanged | Viewing **live** balance instead of **test** | Toggle dashboard to Test |
-| MTN sandbox errors | Invalid sandbox MSISDN or credentials | Use numbers from MTN developer docs for your country |
+| MTN live charge/refund errors | Missing provider reference or disbursement balance | Ensure payment completed with RequestToPay reference; check MTN disbursement wallet |
 | No customer email | Expected in test | Notifications are disabled for test transactions |
 
 ## Related documentation
 
-- **[Authentication](/start/api-keys)** — keys, environments, security
-- **[API integration](/start/first-payment)** — first request and API index
-- **[Checkout sessions](/build/checkout)** — hosted checkout API
-- **[Direct charges](/build/payments/charges)** — Wave, MTN, and embedded card (`POST /charge/card`)
-- **[Payment links](/build/payment-links)** — reusable pay links
-- **[lomi Payment Elements](/build/payments/lomi-payment-elements)** — client-side card UI
-- **[Webhooks](/build/webhooks)** — event subscriptions
-- **[Balance and settlement](/build/balance-and-settlement)** — live balance rules
-- **[Testing guide](/build/advanced-guides/testing)** — automation, CI, webhook listeners
+- **[Authentication](/start/api-keys)**: keys, environments, security
+- **[API integration](/start/first-payment)**: first request and API index
+- **[Checkout sessions](/build/checkout)**: hosted checkout API
+- **[Direct charges](/build/payments/charges)**: Wave, MTN, and embedded card (`POST /charge/card`)
+- **[Payment links](/build/payment-links)**: reusable pay links
+- **[lomi Payment Elements](/build/payments/lomi-payment-elements)**: client-side card UI
+- **[Webhooks](/build/webhooks)**: event subscriptions
+- **[Balance and settlement](/build/balance-and-settlement)**: live balance rules
+- **[Testing guide](/build/advanced-guides/testing)**: automation, CI, webhook listeners
 
 ## When am I ready for live mode?
 

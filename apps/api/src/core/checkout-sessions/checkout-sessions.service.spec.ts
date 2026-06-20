@@ -12,7 +12,7 @@ import { AuthContext } from '../common/decorators/current-user.decorator';
 describe('CheckoutSessionsService', () => {
   let service: CheckoutSessionsService;
   let mockSupabaseService: { getClient: jest.Mock; rpc: jest.Mock };
-  let mockSupabaseClient: { rpc: jest.Mock };
+  let mockSupabaseClient: { rpc: jest.Mock; from: jest.Mock };
 
   const mockUser = {
     merchantId: 'test-merchant-id',
@@ -20,11 +20,28 @@ describe('CheckoutSessionsService', () => {
     environment: 'test-env',
   };
 
+  const networkUser = {
+    ...mockUser,
+    actorOrganizationId: 'operator-org',
+    targetOrganizationId: 'test-org-id',
+    isNetworkRequest: true,
+    networkMembershipId: 'nm-checkout',
+    networkAccountId: 'na-checkout',
+    lomiAccount: 'acct_member',
+    publicAccountId: 'acct_member',
+    networkCapabilityKey: 'payment.create',
+  };
+
   beforeEach(async () => {
     mockSupabaseClient = {
       rpc: jest
         .fn()
         .mockResolvedValue({ data: null, error: { message: 'not found' } }),
+      from: jest.fn(() => ({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+      })),
     };
 
     mockSupabaseService = {
@@ -67,7 +84,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual(expectedResponse);
+    expect(result.data).toEqual(expectedResponse);
     expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
       'create_checkout_session',
       expect.objectContaining({
@@ -113,7 +130,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual({
+    expect(result.data).toEqual({
       payment_required: true,
       reason: 'invoice_payment_required',
       blocking_invoice: {
@@ -130,6 +147,40 @@ describe('CheckoutSessionsService', () => {
         p_organization_id: mockUser.organizationId,
         p_customer_id: 'customer-1',
         p_product_id: 'product-1',
+      }),
+    );
+  });
+
+  it('namespaces idempotency keys for Network checkout sessions', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseService.rpc.mockImplementation(async (name: string) => {
+      if (name === 'record_network_transaction_context') {
+        return { data: 'ctx-network', error: null };
+      }
+      if (name === 'calculate_network_operator_fee') {
+        return { data: 0, error: null };
+      }
+      return {
+        data: { checkout_session_id: 'session-network' },
+        error: null,
+      };
+    });
+    mockSupabaseClient.rpc.mockImplementation(mockSupabaseService.rpc);
+
+    await service.create(createDto, networkUser as AuthContext, {
+      key: 'checkout-1',
+      bodyHash: 'body-hash',
+    });
+
+    expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_idempotency_key: expect.stringMatching(/^network:nm-checkout:/),
+        p_idempotency_body_hash: expect.not.stringMatching(/^body-hash$/),
       }),
     );
   });
@@ -265,7 +316,7 @@ describe('CheckoutSessionsService', () => {
 
     const result = await service.create(createDto, mockUser as AuthContext);
 
-    expect(result).toEqual(expectedResponse);
+    expect(result.data).toEqual(expectedResponse);
     expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
       'create_checkout_session_with_line_items',
       expect.objectContaining({

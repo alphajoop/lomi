@@ -1,9 +1,9 @@
 ---
 title: 'Get started with the CLI'
-description: 'Install the lomi. CLI, log in, run quickstart checks, create a test checkout, and forward webhooks locally.'
+description: 'Install lomi. CLI, log in, run quickstart checks, create a test checkout, and forward webhooks locally.'
 ---
 
-The **lomi. CLI** is the fastest way to authenticate, create test checkouts, listen for webhooks without ngrok, and install AI agent rules — all from your terminal.
+The **lomi. CLI** is the fastest way to authenticate, create test checkouts, listen for webhooks without ngrok, and install AI agent rules, all from your terminal.
 
 <Steps>
 
@@ -59,7 +59,7 @@ In a second terminal:
 lomi listen http://localhost:3000/webhooks
 ```
 
-Sandbox-first — no ngrok required. See [Listen for webhooks](/build/cli/listen).
+Sandbox-first, no ngrok required. See [Listen for webhooks](/build/cli/listen).
 
 ### Install AI agent rules
 
@@ -86,15 +86,15 @@ Full reference: [Command reference](/build/cli/commands).
 ## Two kinds of credentials
 
 <Callout type="info" emoji="💡" title="CLI token vs API key">
-  **`lomi login`** stores a **CLI token** — used by CLI commands like `checkout create`, `listen`, and `quickstart`.
+  **`lomi login`** stores a **CLI token**: used by CLI commands like `checkout create`, `listen`, and `quickstart`.
 
-  **`lomi init`** writes your **secret API key** (`LOMI_API_KEY`) into the project `.env` — used by the **SDK in your application code**.
+  **`lomi init`** writes your **secret API key** (`LOMI_API_KEY`) into the project `.env`, used by the **SDK in your application code**.
 
   These are different credentials for different purposes.
 </Callout>
 
 ## Next steps
 
-- [Make a test payment](/start/first-payment) — CLI and cURL paths
-- [Initialize a project](/build/cli/init) — SDK scaffolding
-- [Choose an integration](/build/choose-integration) — hosted checkout, links, subscriptions
+- [Make a test payment](/start/first-payment): CLI and cURL paths
+- [Initialize a project](/build/cli/init): SDK scaffolding
+- [Choose an integration](/build/choose-integration): hosted checkout, links, subscriptions

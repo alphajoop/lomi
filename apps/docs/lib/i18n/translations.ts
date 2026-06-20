@@ -25,7 +25,7 @@ const STRINGS: Record<Language, Record<string, string>> = {
     'section.build': 'Build',
     'section.resources': 'Resources',
     'section.firstSteps': 'First steps',
-    'section.apiReference': 'API Reference',
+    'section.apiReference': 'API reference',
     'section.restApi': 'REST API',
     'section.basics': 'Basics',
     'section.implementation': 'Implementation',

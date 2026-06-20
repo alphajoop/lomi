@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { SupabaseModule } from '../utils/supabase/supabase.module';
+import { ApiKeyGuard } from '../core/common/guards/api-key.guard';
 import { AgentCapabilitiesController } from './agent-capabilities.controller';
 import { AgentStreamController } from './agent-stream.controller';
 import { AgentSubscriptionsController } from './agent-subscriptions.controller';
@@ -10,6 +12,7 @@ import { AgentWorkflowsStore } from './agent-workflows.store';
 import { AgentHandoffStore } from './agent-handoff.store';
 
 @Module({
+  imports: [SupabaseModule],
   controllers: [
     AgentCapabilitiesController,
     AgentStreamController,
@@ -18,6 +21,7 @@ import { AgentHandoffStore } from './agent-handoff.store';
     AgentHandoffController,
   ],
   providers: [
+    ApiKeyGuard,
     L5EventBusService,
     AgentSubscriptionsStore,
     AgentWorkflowsStore,

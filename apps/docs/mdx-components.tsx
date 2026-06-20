@@ -7,21 +7,23 @@ import type { MDXComponents } from 'mdx/types';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import * as icons from 'lucide-react';
-import { DocsScreenshot } from '@/components/docs/docs-screenshot';
 import { ComponentPreview } from '@/components/preview/component-preview';
-import { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';
+import { CustomerInformationSection } from '@/components/lomi-ui/customer-information-section';
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
-import { InvoiceHistory } from '@/components/lomi-ui/invoice-history';
 import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
 import { PaymentProviderSelector } from '@/components/lomi-ui/payment-provider-selector';
-import { PaymentStatusCard } from '@/components/lomi-ui/payment-status-card';
-import { PricingTable } from '@/components/lomi-ui/pricing-table';
-import { SubscriptionManagementCard } from '@/components/lomi-ui/subscription-management-card';
+import { PriceSelector } from '@/components/lomi-ui/price-selector';
 import { UsageMeter } from '@/components/lomi-ui/usage-meter';
+import { DocsScreenshot } from '@/components/docs/docs-screenshot';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+import { InlineCommand } from '@/components/docs/inline-command';
+import { Callout } from '@/components/docs/docs-callout';
+
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...(icons as unknown as MDXComponents),
     ...defaultMdxComponents,
+    Callout,
     ...TabsComponents,
     ...FilesComponents,
     Accordion,
@@ -29,16 +31,15 @@ export function getMDXComponents(components?: MDXComponents) {
     Step,
     Steps,
     ComponentPreview,
-    DocsScreenshot,
-    PaymentFailureCard,
+    CustomerInformationSection,
     CheckoutSummaryCard,
-    InvoiceHistory,
     MobileMoneyCheckoutCard,
     PaymentProviderSelector,
-    PaymentStatusCard,
-    PricingTable,
-    SubscriptionManagementCard,
+    PriceSelector,
     UsageMeter,
+    DocsScreenshot,
+    DocsAgentIndex,
+    InlineCommand,
     ...components,
   } satisfies MDXComponents;
 }

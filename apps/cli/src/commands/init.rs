@@ -45,11 +45,11 @@ pub struct InitArgs {
     #[arg(long, default_value = "default")]
     pub template: String,
 
-    /// Install a Lomi UI component after scaffold (skips interactive picker)
+    /// Install a lomi. UI component after scaffold (skips interactive picker)
     #[arg(long)]
     pub with_ui: Option<String>,
 
-    /// Skip Lomi UI install prompt
+    /// Skip lomi. UI install prompt
     #[arg(long)]
     pub skip_ui_install: bool,
 }
@@ -216,12 +216,12 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
 
     if !args.skip_ui_install {
         if let Some(component) = &args.with_ui {
-            cli::output::print_info(&format!("Installing Lomi UI component: {component}"));
+            cli::output::print_info(&format!("Installing lomi. UI component: {component}"));
             ui::install_for_init(&project_dir, component, args.yes, false).await?;
-            cli::output::print_success(&format!("Installed Lomi UI component: {component}"));
+            cli::output::print_success(&format!("Installed lomi. UI component: {component}"));
         } else if !args.yes {
             let install_ui = cli::prompts::confirm(
-                "Install a Lomi UI checkout component?",
+                "Install a lomi. UI checkout component?",
                 false,
             )?;
 
@@ -231,7 +231,7 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
                     index.items.iter().map(|item| item.name.clone()).collect();
 
                 if names.is_empty() {
-                    cli::output::print_dim("No Lomi UI components available in registry.");
+                    cli::output::print_dim("No lomi. UI components available in registry.");
                 } else {
                     let default = names
                         .iter()
@@ -247,7 +247,7 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
                     )?;
 
                     ui::install_for_init(&project_dir, &component, false, false).await?;
-                    cli::output::print_success(&format!("Installed Lomi UI component: {component}"));
+                    cli::output::print_success(&format!("Installed lomi. UI component: {component}"));
                 }
             }
         }

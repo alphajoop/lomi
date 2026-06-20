@@ -22,11 +22,11 @@ Le tunnel combine **sessions de paiement**, **liens de paiement**, **produits / 
 
 La tarification flexible est disponible pour les produits **ponctuels** uniquement (`pricing_model: pay_what_you_want` sur une ligne de tarif) :
 
-- **Prix unitaire** — le client choisit un prix unitaire ; total = unité × `quantity`.
-- **`amount` sur le tarif** — prix unitaire suggéré prérempli au tunnel (par défaut `minimum_amount` si omis à la création du produit).
-- **Bornes** — `minimum_amount` (obligatoire) et `maximum_amount` optionnel plafonnent le prix unitaire. L’API et la base **rejettent** un `amount` suggéré hors de `[minimum_amount, maximum_amount]`.
-- **Liens de paiement** — les liens produit préremplissent le montant suggéré depuis le `price_id` lié (ou le tarif par défaut) ; le tunnel hébergé permet à l’acheteur d’ajuster dans les bornes avant de payer.
-- **Sessions API** — à la création d’une session avec `product_id`/`price_id`, passez `amount` comme sous-total produit ou omettez-le pour utiliser le prix suggéré × quantité. Voir [Sessions de paiement](/build/checkout) et [Produits](/build/products).
+- **Prix unitaire**: le client choisit un prix unitaire ; total = unité × `quantity`.
+- **`amount` sur le tarif**: prix unitaire suggéré prérempli au tunnel (par défaut `minimum_amount` si omis à la création du produit).
+- **Bornes**: `minimum_amount` (obligatoire) et `maximum_amount` optionnel plafonnent le prix unitaire. L’API et la base **rejettent** un `amount` suggéré hors de `[minimum_amount, maximum_amount]`.
+- **Liens de paiement**: les liens produit préremplissent le montant suggéré depuis le `price_id` lié (ou le tarif par défaut) ; le tunnel hébergé permet à l’acheteur d’ajuster dans les bornes avant de payer.
+- **Sessions API**: à la création d’une session avec `product_id`/`price_id`, passez `amount` comme sous-total produit ou omettez-le pour utiliser le prix suggéré × quantité. Voir [Sessions de paiement](/build/checkout) et [Produits](/build/products).
 
 <Callout type="warning">
   **N’incluez pas de tarifs payez ce que vous voulez dans un panier multi-produits.** Utilisez un lien ou une session dédiée pour les dons et tarifs flexibles. Les APIs panier renvoient `line_items_pwyw_not_supported`.
@@ -82,7 +82,7 @@ Voir [Abonnements](/build/subscriptions) pour le cycle de vie et les webhooks.
 ## Codes promo
 
 - La validation applique les **dates**, **plafonds d’usage**, **type de client** (nouveau ou récurrent), **périmètre** (organisation entière ou produits précis) et plafonds de **quantité**.
-- Plusieurs codes (lorsque c’est pris en charge) s’appliquent **séquentiellement** sur un montant courant — voir [Codes de réduction](/build/discount-coupons) et [Exemples de logique des codes](/build/payments/coupon-logic-examples).
+- Plusieurs codes (lorsque c’est pris en charge) s’appliquent **séquentiellement** sur un montant courant, voir [Codes de réduction](/build/discount-coupons) et [Exemples de logique des codes](/build/payments/coupon-logic-examples).
 
 ## Multi-devises
 

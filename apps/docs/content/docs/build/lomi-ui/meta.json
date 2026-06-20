@@ -1,5 +1,14 @@
 {
-  "title": "Lomi UI",
+  "title": "lomi. UI",
   "description": "Copy-paste checkout UI components for Lomi payment flows.",
-  "pages": ["index", "quick-start", "theming", "components"]
+  "icon": "LayoutTemplate",
+  "pages": [
+    "index",
+    "payment-provider-selector",
+    "customer-information-section",
+    "mobile-money-checkout-card",
+    "checkout-summary-card",
+    "price-selector",
+    "usage-meter"
+  ]
 }

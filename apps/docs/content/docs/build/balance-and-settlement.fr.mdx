@@ -3,14 +3,14 @@ title: Solde et règlement
 description: Fonctionnement des soldes marchands, des frais et de la disponibilité des fonds après un paiement réussi.
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
-Les soldes sont mis à jour lorsqu’une transaction passe en **`completed`**. Cette page décrit le modèle implémenté dans la logique de mise à jour des soldes (y compris la normalisation XOF pour la trésorerie).
+Les soldes sont mis à jour lorsqu’une transaction passe en **`completed`**. Cette page explique le fonctionnement des soldes, des frais et de la disponibilité des fonds après un paiement réussi.
 
-<DocsScreenshot name="build/balance" alt="Solde test et historique des transactions sur le dashboard lomi." />
+<DocsScreenshot name="build/balance" alt="Vue d’ensemble du solde marchand dans le tableau de bord" />
 
 <Callout type="info">
-  En environnement **test**, les paiements complétés créditent uniquement votre **solde de test** du tableau de bord—pas le solde retirable live ni la trésorerie plateforme. Voir **[Paiements en bac à sable](/start/sandbox-payments)**.
+  En environnement **test**, les paiements complétés créditent uniquement votre **solde de test** du tableau de bord, pas votre solde retirable en production. Voir **[Paiements en bac à sable](/start/sandbox-payments)**.
 </Callout>
 
 ## Quand les soldes changent
@@ -28,12 +28,9 @@ Chaque transaction enregistre un horodatage **`available_at`** calculé à parti
 
 Le tableau de bord peut distinguer montants **disponibles** et **en attente / en cours de compensation** selon ces règles.
 
-## Devise et trésorerie XOF
+## Règlement multi-devises
 
-La traçabilité interne **normalise souvent les montants en XOF** :
-
-- montants bruts et frais peuvent être convertis pour la comptabilité canal et plateforme ;
-- le crédit sur compte marchand peut rester dans la devise de règlement de l’organisation selon les réglages ; l’important est que **frais et floats** partagent une base cohérente.
+Lorsque vous acceptez des paiements dans plusieurs devises, lomi. peut convertir les montants pour la comptabilisation des frais et du règlement. Votre solde tableau de bord est crédité dans la devise de règlement de votre organisation selon vos réglages produit.
 
 Les champs API « disponible » vs « en attente » figurent dans [Soldes](/api/balances).
 

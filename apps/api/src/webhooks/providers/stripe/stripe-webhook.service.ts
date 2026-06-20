@@ -312,6 +312,10 @@ export class StripeWebhookService {
       }
     }
 
+    if (txnData) {
+      await this.mergeStripeRadarSignals(paymentIntent, chargeId);
+    }
+
     if (txnData && metadata.organization_id) {
       this.wideEvent.logEvent({
         eventName: 'stripe_payment_confirmed',
@@ -606,26 +610,30 @@ export class StripeWebhookService {
       const charge = await stripe.charges.retrieve(dispute.charge as string);
       const paymentIntentId = charge.payment_intent as string;
 
-      const { error } = await (this.supabase.getClient() as any).rpc(
-        'handle_stripe_dispute_created',
-        {
-          p_stripe_dispute_id: dispute.id,
-          p_stripe_charge_id: dispute.charge,
-          p_payment_intent_id: paymentIntentId,
-          p_amount: dispute.amount / 100,
-          p_currency: dispute.currency.toUpperCase(),
-          p_reason: dispute.reason,
-          p_dispute_data: {
-            status: dispute.status,
-            evidence: dispute.evidence,
-            evidence_details: dispute.evidence_details,
-            is_charge_refundable: dispute.is_charge_refundable,
-          },
+      const { data: rpcResult, error } = await (
+        this.supabase.getClient() as any
+      ).rpc('handle_stripe_dispute_created', {
+        p_stripe_dispute_id: dispute.id,
+        p_stripe_charge_id: dispute.charge,
+        p_payment_intent_id: paymentIntentId,
+        p_amount: dispute.amount / 100,
+        p_currency: dispute.currency.toUpperCase(),
+        p_reason: dispute.reason,
+        p_dispute_data: {
+          status: dispute.status,
+          evidence: dispute.evidence,
+          evidence_details: dispute.evidence_details,
+          is_charge_refundable: dispute.is_charge_refundable,
         },
-      );
+      });
 
       if (error) {
         throw new Error('Failed to create dispute record');
+      }
+
+      const disputeId = (rpcResult as { dispute_id?: string })?.dispute_id;
+      if (disputeId && rpcResult?.idempotent !== true) {
+        await this.notifyDisputeWebhook(disputeId, 'DISPUTE_CREATED');
       }
     } catch {
       throw new Error('Failed to create dispute record');
@@ -658,6 +666,21 @@ export class StripeWebhookService {
       if (error) {
         throw new Error('Failed to update dispute record');
       }
+
+      const { data: disputeRow, error: lookupError } = await this.supabase.rpc(
+        'get_dispute_by_stripe_id' as never,
+        { p_stripe_dispute_id: dispute.id } as never,
+      );
+
+      if (!lookupError) {
+        const row = Array.isArray(disputeRow) ? disputeRow[0] : disputeRow;
+        const disputeId = (
+          row as unknown as { dispute_id?: string } | undefined
+        )?.dispute_id;
+        if (disputeId) {
+          await this.notifyDisputeWebhook(disputeId, 'DISPUTE_UPDATED');
+        }
+      }
     } catch {
       throw new Error('Failed to update dispute record');
     }
@@ -673,6 +696,21 @@ export class StripeWebhookService {
    */
   private async handleDisputeClosed(dispute: Stripe.Dispute) {
     await this.handleDisputeUpdated(dispute);
+
+    try {
+      const { data: disputeRow } = await this.supabase.rpc(
+        'get_dispute_by_stripe_id' as never,
+        { p_stripe_dispute_id: dispute.id } as never,
+      );
+      const row = Array.isArray(disputeRow) ? disputeRow[0] : disputeRow;
+      const disputeId = (row as unknown as { dispute_id?: string } | undefined)
+        ?.dispute_id;
+      if (disputeId) {
+        await this.notifyDisputeWebhook(disputeId, 'DISPUTE_CLOSED');
+      }
+    } catch {
+      // non-fatal for closed notification
+    }
 
     return {
       eventType: 'charge.dispute.closed',
@@ -797,8 +835,76 @@ export class StripeWebhookService {
   }
 
   /**
+   * Enrich risk assessments with Stripe Radar outcome when available.
+   */
+  private async mergeStripeRadarSignals(
+    paymentIntent: Stripe.PaymentIntent,
+    chargeId: string | null,
+  ) {
+    if (!chargeId) return;
+
+    try {
+      const stripe = this.stripeClients.getClientForStripeLivemode(
+        paymentIntent.livemode,
+      );
+      if (!stripe) return;
+
+      const charge = await stripe.charges.retrieve(chargeId);
+      const outcome = charge.outcome;
+      if (!outcome?.risk_level && outcome?.risk_score == null) return;
+
+      const { data: txnData } = await (this.supabase.getClient() as any).rpc(
+        'get_transaction_by_stripe_intent',
+        { p_payment_intent_id: paymentIntent.id },
+      );
+      const transactionId =
+        txnData?.transaction_id ?? txnData?.[0]?.transaction_id;
+      if (!transactionId) return;
+
+      await this.supabase.rpc(
+        'merge_stripe_radar_signals' as never,
+        {
+          p_transaction_id: transactionId,
+          p_stripe_risk_level: outcome.risk_level ?? null,
+          p_stripe_risk_score: outcome.risk_score ?? null,
+        } as never,
+      );
+    } catch {
+      // Non-blocking enrichment
+    }
+  }
+
+  /**
    * Trigger merchant webhook notification
    */
+  private async notifyDisputeWebhook(
+    disputeId: string,
+    event: 'DISPUTE_CREATED' | 'DISPUTE_UPDATED' | 'DISPUTE_CLOSED',
+  ) {
+    try {
+      const { data: payload, error } = await this.supabase.rpc(
+        'get_dispute_webhook_payload' as never,
+        { p_dispute_id: disputeId } as never,
+      );
+
+      if (error || !payload || typeof payload !== 'object') {
+        return;
+      }
+
+      const row = payload as Record<string, unknown>;
+      const organizationId = row.organization_id as string | undefined;
+      if (!organizationId) return;
+
+      await this.webhookSender.notifyOrganization(
+        organizationId,
+        event as WebhookEvent,
+        row,
+      );
+    } catch {
+      // Don't throw - webhook failures shouldn't fail the Stripe webhook
+    }
+  }
+
   private async triggerMerchantWebhook(
     paymentIntentId: string,
     organizationId: string,

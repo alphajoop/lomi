@@ -1,15 +1,15 @@
 ---
 title: Shopify
 description:
-  Install the lomi. Shopify app (custom install), enable cart pay, and accept
+  Install lomi. Shopify app (custom install), enable cart pay, and accept
   mobile money and cards via hosted checkout sessions and signed webhooks.
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
 # Shopify
 
-The lomi. Shopify app lets merchants accept **Wave, mobile money, cards, and more** from the **cart page** using lomi. hosted checkout. Customers pay on lomi.; Shopify orders are created as **draft orders before redirect** and completed when payment succeeds.
+lomi. Shopify app lets merchants accept **Wave, mobile money, cards, and more** from the **cart page** using lomi. hosted checkout. Customers pay on lomi.; Shopify orders are created as **draft orders before redirect** and completed when payment succeeds.
 
 <Callout type="info">
   This is a **cart bypass** integration distributed as a **custom install app**. It is not a native Shopify payment method in checkout and is not listed on the Shopify App Store for payments.
@@ -17,7 +17,7 @@ The lomi. Shopify app lets merchants accept **Wave, mobile money, cards, and mor
 
 ## Requirements
 
-- Shopify store with the lomi. app installed (custom install link from lomi.)
+- Shopify store with lomi.. app installed (custom install link from lomi.)
 - lomi. merchant account with **secret API key** and **webhook signing secret**
 - Store currency supported by lomi. (e.g. **XOF**, **USD**, **EUR**)
 - HTTPS on the app host (`connect.lomi.africa` in production)
@@ -26,11 +26,11 @@ Source: [`apps/plugins/shopify`](https://github.com/lomiafrica/lomi./tree/master
 
 ## Install (custom distribution)
 
-### From the lomi. dashboard (recommended)
+### from lomi.. dashboard (recommended)
 
 1. Go to [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Settings → Payment channels → Integrations**.
 2. Toggle **Shopify** on and enter your store domain (e.g. `my-store.myshopify.com`).
-3. Click **Install on Shopify** — you are redirected to Shopify OAuth to authorize the app.
+3. Click **Install on Shopify**: you are redirected to Shopify OAuth to authorize the app.
 4. After install, open the embedded app → **Settings** → paste your lomi. **secret key** and **webhook secret**.
 
 Install URL pattern (also works without the dashboard):
@@ -51,8 +51,8 @@ Copy the install link from the dashboard modal and send it to a teammate, or ope
    - Event: **`PAYMENT_SUCCEEDED`**
    - Signing secret: same value as in the Shopify app Settings
 3. Choose **shipping mode**:
-   - **Subtotal only** — charge cart line items only
-   - **Subtotal + flat shipping fee** — add a fixed shipping amount to the draft order
+   - **Subtotal only**: charge cart line items only
+   - **Subtotal + flat shipping fee**: add a fixed shipping amount to the draft order
 4. In **Online Store → Themes → Customize → Cart**, add the **Pay with lomi.** app block and save.
 5. Test with a cart containing one or more items.
 
@@ -83,8 +83,8 @@ Metadata used for reconciliation:
 ## Limitations
 
 - Not a **Payments Partner** / native checkout payment method (no Shop Pay, no checkout UI gateway).
-- **Shipping and tax** from Shopify checkout are not available on the cart page — use subtotal only or a **flat shipping fee** in app settings.
-- **Refunds** are handled in the lomi. dashboard, not automatically from Shopify Admin.
+- **Shipping and tax** from Shopify checkout are not available on the cart page, use subtotal only or a **flat shipping fee** in app settings.
+- **Refunds** are handled in lomi. dashboard, not automatically from Shopify Admin.
 - Do **not** submit this cart-bypass flow to the public Shopify App Store (Shopify policy on bypassing checkout).
 
 ## Go-live QA
@@ -97,10 +97,10 @@ Metadata used for reconciliation:
 | Flat shipping mode | Draft total = subtotal + configured fee |
 | Successful payment | Draft order completed; cart cleared on success page |
 | Webhook retry | No duplicate Shopify orders |
-| Cancel on lomi | Customer returns to `/cart`; draft stays open |
+| Cancel on lomi. | Customer returns to `/cart`; draft stays open |
 
 ## Related
 
-- [E‑commerce extensions hub](/build/ecommerce-extensions)
-- [WooCommerce](/build/ecommerce-extensions/woocommerce) — reference for hosted checkout + webhook contract
+- [E‑commerce hub](/build/ecommerce-extensions)
+- [WooCommerce](/build/ecommerce-extensions/woocommerce): reference for hosted checkout + webhook contract
 - [Webhooks](/build/webhooks)

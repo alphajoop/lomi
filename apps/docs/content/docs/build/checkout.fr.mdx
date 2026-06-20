@@ -4,7 +4,7 @@ description: 'Créez une session de checkout, redirigez le client vers lomi., pu
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
 Le checkout hébergé est l’intégration recommandée pour la plupart des équipes. Votre serveur crée une session, le client paie sur une page hébergée par lomi., puis votre système confirme le résultat.
 
@@ -17,7 +17,7 @@ Le checkout hébergé est l’intégration recommandée pour la plupart des équ
 </Callout>
 
 <Callout type="info">
-  Les sessions créées avec une clé API **test** (ou liées à un lien de paiement test) s’exécutent en mode test. Pour la QA manuelle—cartes de test, Wave, MTN MoMo—voir **[Paiements en bac à sable](/start/sandbox-payments)**.
+  Les sessions créées avec une clé API **test** (ou liées à un lien de paiement test) s’exécutent en mode test. Pour la QA manuelle, cartes de test, Wave, MTN MoMo, voir **[Paiements en bac à sable](/start/sandbox-payments)**.
 </Callout>
 
 ## Quand utiliser le checkout hébergé ?
@@ -64,10 +64,10 @@ Crée une session et renvoie une URL pour rediriger le client.
 
 Lorsque `product_id` ou `price_id` pointe vers un tarif avec `pricing_model: pay_what_you_want` :
 
-- **Omettre `amount`** — la session utilise le prix unitaire suggéré (`amount` sur le tarif) × `quantity`.
-- **Fournir `amount`** — doit être un sous-total valide : prix unitaire dans `[minimum_amount, maximum_amount]` × `quantity`. Le serveur rejette les valeurs hors bornes.
-- **Tunnel hébergé** — l’acheteur peut modifier le prix unitaire avant de payer ; validation côté client et serveur.
-- **Flux programmatiques** — définissez `amount` à la création de session si le total est déjà connu.
+- **Omettre `amount`**: la session utilise le prix unitaire suggéré (`amount` sur le tarif) × `quantity`.
+- **Fournir `amount`**: doit être un sous-total valide : prix unitaire dans `[minimum_amount, maximum_amount]` × `quantity`. Le serveur rejette les valeurs hors bornes.
+- **Tunnel hébergé**: l’acheteur peut modifier le prix unitaire avant de payer ; validation côté client et serveur.
+- **Flux programmatiques**: définissez `amount` à la création de session si le total est déjà connu.
 
 ### Panier multi-produits (`line_items`)
 
@@ -75,7 +75,7 @@ Avec **`line_items`**, chaque ligne doit référencer un tarif **ponctuel** en t
 
 | Code | Signification |
 |------|----------------|
-| `line_items_pwyw_not_supported` | Une ligne utilise `pay_what_you_want` — utilisez une session mono-produit |
+| `line_items_pwyw_not_supported` | Une ligne utilise `pay_what_you_want`, utilisez une session mono-produit |
 | `line_items_recurring_not_supported` | Une ligne référence un produit récurrent |
 | `line_items_usage_based_not_supported` | Tarification à l’usage (pas encore prise en charge en panier) |
 | `line_items_mixed_product_types` | Mélange ponctuel et récurrent dans un même panier |
@@ -84,9 +84,9 @@ Avec **`line_items`**, chaque ligne doit référencer un tarif **ponctuel** en t
 
 Lorsque `product_id` désigne un produit **récurrent** :
 
-- **Omettre `amount`** — la session utilise le prix catalogue du `price_id` choisi (la quantité n’est pas multipliée pour les abonnements).
-- **Fournir `amount`** — doit correspondre au prix récurrent catalogue pour la validation (sauf prorata au moment du paiement ; voir [Comportement du tunnel — Abonnements](/build/payments/checkout-behavior#subscription-checkout)).
-- **Essai ou inscription `non_initial`** — le client peut payer **0** au tunnel, mais la session enregistre souvent le **prix catalogue** pour que `create_checkout_session` respecte `amount > 0`. N’envoyez pas `amount: 0` sans vous appuyer sur le calcul produit.
+- **Omettre `amount`**: la session utilise le prix catalogue du `price_id` choisi (la quantité n’est pas multipliée pour les abonnements).
+- **Fournir `amount`**: doit correspondre au prix récurrent catalogue pour la validation (sauf prorata au moment du paiement ; voir [Comportement du tunnel: Abonnements](/build/payments/checkout-behavior#subscription-checkout)).
+- **Essai ou inscription `non_initial`**: le client peut payer **0** au tunnel, mais la session enregistre souvent le **prix catalogue** pour que `create_checkout_session` respecte `amount > 0`. N’envoyez pas `amount: 0` sans vous appuyer sur le calcul produit.
 - La finalisation crée un **abonnement** (webhook `SUBSCRIPTION_CREATED`), pas seulement une transaction ponctuelle.
 
 Exemple :
@@ -239,7 +239,7 @@ loadLomiCheckout({
 });
 ```
 
-Voir [Widget checkout intégré](/build/embed-widget) pour modal, inline et self-hosted.
+Voir [Widget de paiement intégré](/build/embed-widget) pour modal, inline et self-hosted.
 
 ## Confirmer le paiement
 
@@ -271,7 +271,7 @@ Utilisez la référence API pour lister ou récupérer une session par ID :
 
 ## Webhooks
 
-Les **webhooks sortants marchands** (lomi. appelle **votre** URL) utilisent l’énumération Postgres **`webhook_event`**, le même jeu que dans [Webhooks](/build/webhooks). Le champ HTTP `` `event` `` et l’en-tête `` `X-Lomi-Event` `` reprennent ces valeurs (par ex. `` `PAYMENT_SUCCEEDED` ``), comme dans `` `WebhookSenderService.prepareWebhookPayload` `` dans `` `apps/api` ``.
+Les **webhooks sortants marchands** (lomi. appelle **votre** URL) utilisent l’énumération **`webhook_event`** documentée dans [Webhooks](/build/webhooks). Le champ HTTP `` `event` `` et l’en-tête `` `X-Lomi-Event` `` reprennent ces valeurs (par ex. `` `PAYMENT_SUCCEEDED` ``).
 
 Pour les résultats de tunnel **côté votre serveur**, souscrivez au minimum à :
 
@@ -280,7 +280,7 @@ Pour les résultats de tunnel **côté votre serveur**, souscrivez au minimum à
 | `` `PAYMENT_SUCCEEDED` `` | Paiement terminé ; le corps `` `data` `` suit la forme transaction (voir [Webhooks](/build/webhooks)). |
 | `` `PAYMENT_FAILED` `` | Tentative échouée (y compris certains chemins d’échec prestataire). |
 
-Il **n’existe pas** de valeur séparée `` `checkout.session.*` `` dans l’énumération `` `webhook_event` `` (`apps/api/src/utils/types/api.ts` reflète le type base). L’expiration de session sans paiement réussi se voit sur les **enregistrements session** et **transaction** (statut `` `expired` `` par ex.) ; utilisez `` `GET /checkout-sessions/{id}` `` ou une liste avec `` `status=expired` `` / `` `completed` `` plutôt qu’un webhook marchand nommé comme `checkout.session.expired`.
+Il **n’existe pas** de valeur séparée `` `checkout.session.*` `` dans l’énumération `` `webhook_event` ``. L’expiration de session sans paiement réussi se voit sur les **enregistrements session** et **transaction** (statut `` `expired` `` par ex.) ; utilisez `` `GET /checkout-sessions/{id}` `` ou une liste avec `` `status=expired` `` / `` `completed` `` plutôt qu’un webhook marchand nommé comme `checkout.session.expired`.
 
 ---
 

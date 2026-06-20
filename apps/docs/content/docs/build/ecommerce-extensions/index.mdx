@@ -1,30 +1,30 @@
 ---
-title: E‑commerce extensions
+title: E‑commerce
 description:
-  Official and maintained plugins for hosted checkout with Lomi. WooCommerce,
+  Official and maintained plugins for hosted checkout with lomi.. WooCommerce,
   Magento 2, PrestaShop, and Shopify use the same public API contract for
   checkout sessions and merchant webhooks.
 ---
 
 import { Cards, Card } from 'fumadocs-ui/components/card';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
-# E‑commerce extensions
+# E‑commerce
 
-Install Lomi on your store without writing checkout plumbing yourself. These modules create **hosted checkout sessions**, redirect shoppers to Lomi Checkout, then confirm payment via **return URLs** and **merchant webhooks**.
+Install lomi. on your store without writing checkout plumbing yourself. These modules create **hosted checkout sessions**, redirect shoppers to lomi. Checkout, then confirm payment via **return URLs** and **merchant webhooks**.
 
 ## Shared technical contract
 
-WooCommerce, Magento 2, and PrestaShop talk only to Lomi’s **public REST API** (`/v1/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
+WooCommerce, Magento 2, and PrestaShop talk only to lomi.’s **public REST API** (`/v1/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
 
 | Concern | Contract |
 | --- | --- |
 | Base URL | `https://api.lomi.africa` (live) or `https://sandbox.api.lomi.africa` (test) |
-| Auth | `X-API-Key` — merchant **secret** key from the dashboard |
+| Auth | `X-API-Key`, merchant **secret** key from the dashboard |
 | Create session | `POST /checkout-sessions` |
 | Confirm session | `GET /checkout-sessions/{id}` |
 | Paid state | Session `status` **`completed`**, with amount/currency checked against the cart/order |
-| Webhooks | `X-Lomi-Event` (e.g. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature` — **HMAC-SHA256 hex** over the **raw** JSON body |
+| Webhooks | `X-Lomi-Event` (e.g. `PAYMENT_SUCCEEDED`), `X-Lomi-Signature`, **HMAC-SHA256 hex** over the **raw** JSON body |
 
 For the canonical wording maintained next to source code, see the repo docs:
 
@@ -36,11 +36,6 @@ Before going live, also read [API integration](/start/first-payment), [Authentic
 ## Choose your platform
 
 <Cards>
-  <Card
-    title="MCP"
-    description="Hosted Model Context Protocol server for AI clients"
-    href="/build/ecommerce-extensions/mcp"
-  />
   <Card
     title="WooCommerce"
     description="WordPress / WooCommerce payment gateway"
@@ -58,7 +53,7 @@ Before going live, also read [API integration](/start/first-payment), [Authentic
   />
   <Card
     title="Shopify"
-    description="Custom app — cart pay with mobile money and cards"
+    description="Custom app, cart pay with mobile money and cards"
     href="/build/ecommerce-extensions/shopify"
   />
 </Cards>

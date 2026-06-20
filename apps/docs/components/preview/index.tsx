@@ -3,7 +3,7 @@
 import { Home } from 'lucide-react';
 import { Heading } from 'fumadocs-ui/components/heading';
 import { Card } from 'fumadocs-ui/components/card';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 // import { RootToggle } from 'fumadocs-ui/components/layout/root-toggle';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';

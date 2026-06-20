@@ -10,7 +10,11 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRefundDto {
-  @ApiProperty({ description: 'Transaction ID to refund', type: String })
+  @ApiProperty({
+    description: 'UUID of a completed transaction (card, Wave, or MTN MoMo)',
+    type: String,
+    format: 'uuid',
+  })
   @IsUUID()
   @IsNotEmpty()
   transaction_id: string;

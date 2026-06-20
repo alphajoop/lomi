@@ -1,12 +1,74 @@
 /* @proprietary license */
 
+'use client';
+
+import { useRef } from 'react';
+import { Check, Clipboard } from 'lucide-react';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from 'fumadocs-ui/components/tabs.unstyled';
-import { CodeBlock } from '@/components/ui/code-block';
+import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
+import { buttonVariants } from 'fumadocs-ui/components/ui/button';
+import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
+import { cn } from '@/lib/utils/cn';
+
+const codeThemes = {
+  light: 'github-light',
+  dark: 'vesper',
+} as const;
+
+function InstallCommand({ code }: { code: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [checked, onCopy] = useCopyButton(() => {
+    const pre = containerRef.current?.querySelector('pre');
+    navigator.clipboard.writeText(pre?.textContent ?? code);
+  });
+
+  return (
+    <div
+      ref={containerRef}
+      className="docs-installation-code relative overflow-x-auto bg-zinc-100 px-4 py-2.5 pr-10 text-[0.8125rem] dark:bg-zinc-800"
+    >
+      <button
+        type="button"
+        data-checked={checked || undefined}
+        aria-label={checked ? 'Copied command' : 'Copy command'}
+        className={cn(
+          buttonVariants({
+            className:
+              'absolute top-1.5 right-2 hover:text-fd-accent-foreground data-checked:text-fd-accent-foreground',
+            size: 'icon-xs',
+          }),
+        )}
+        onClick={onCopy}
+      >
+        {checked ? <Check /> : <Clipboard />}
+      </button>
+      <DynamicCodeBlock
+        lang="bash"
+        code={code}
+        options={{
+          themes: codeThemes,
+          components: {
+            pre: (props) => (
+              <pre
+                {...props}
+                className={cn(
+                  'min-w-full w-max m-0! bg-transparent! p-0!',
+                  '[&_.line]:px-0!',
+                  props.className,
+                )}
+              />
+            ),
+          },
+        }}
+      />
+    </div>
+  );
+}
 
 export function Installation({ name }: { name: string }) {
   const registryUrl = `https://docs.lomi.africa/r/${name}.json`;
@@ -17,9 +79,19 @@ export function Installation({ name }: { name: string }) {
     { name: 'bun', value: 'bun' },
   ];
 
+  const commands: Record<string, string> = {
+    npx: `npx shadcn@latest add ${registryUrl}`,
+    pnpm: `pnpm dlx shadcn@latest add ${registryUrl}`,
+    yarn: `yarn dlx shadcn@latest add ${registryUrl}`,
+    bun: `bunx shadcn@latest add ${registryUrl}`,
+  };
+
   return (
-    <Tabs className="my-6" defaultValue="npx">
-      <TabsList className="flex flex-col gap-3 text-sm items-start p-3 bg-fd-card text-fd-card-foreground rounded-sm border not-prose sm:flex-row">
+    <Tabs
+      className="not-prose my-6 overflow-hidden rounded-sm border border-fd-border bg-fd-card text-fd-card-foreground"
+      defaultValue="npx"
+    >
+      <TabsList className="flex flex-col gap-3 text-sm items-start border-0 bg-transparent p-3 pb-2 not-prose sm:flex-row">
         <div className="me-auto">
           <p className="font-medium">Install to your codebase</p>
           <p className="mt-1 text-fd-muted-foreground">
@@ -37,27 +109,15 @@ export function Installation({ name }: { name: string }) {
         ))}
       </TabsList>
 
-      <TabsContent value="npx">
-        <CodeBlock code={`npx shadcn@latest add ${registryUrl}`} lang="bash" />
-      </TabsContent>
-
-      <TabsContent value="pnpm">
-        <CodeBlock
-          code={`pnpm dlx shadcn@latest add ${registryUrl}`}
-          lang="bash"
-        />
-      </TabsContent>
-
-      <TabsContent value="yarn">
-        <CodeBlock
-          code={`yarn dlx shadcn@latest add ${registryUrl}`}
-          lang="bash"
-        />
-      </TabsContent>
-
-      <TabsContent value="bun">
-        <CodeBlock code={`bunx shadcn@latest add ${registryUrl}`} lang="bash" />
-      </TabsContent>
+      {tabs.map((tab) => (
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className="mt-0 border-t border-fd-border p-0 data-[state=inactive]:hidden"
+        >
+          <InstallCommand code={commands[tab.value] ?? commands.npx} />
+        </TabsContent>
+      ))}
     </Tabs>
   );
 }

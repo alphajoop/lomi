@@ -14,6 +14,20 @@ describe('TransactionsService', () => {
     environment: 'test',
   } as AuthContext;
 
+  const networkUser: AuthContext = {
+    merchantId: 'merch_operator',
+    actorOrganizationId: 'org_operator',
+    targetOrganizationId: 'org_member',
+    organizationId: 'org_member',
+    environment: 'live',
+    isNetworkRequest: true,
+    networkMembershipId: 'nm-1',
+    networkAccountId: 'na-1',
+    lomiAccount: 'acct_member',
+    publicAccountId: 'acct_member',
+    networkCapabilityKey: 'transaction.read_own',
+  };
+
   beforeEach(async () => {
     mockClientRpc = jest.fn();
     const mockSupabase = {
@@ -87,6 +101,48 @@ describe('TransactionsService', () => {
       });
       await expect(service.findAll(user)).rejects.toThrow('nope');
     });
+
+    it('routes Network list requests to fetch_network_transactions_for_api with own scope', async () => {
+      const rows = [{ transaction_id: 't-network' }];
+      mockClientRpc.mockResolvedValue({ data: rows, error: null });
+
+      const result = await service.findAll(
+        networkUser,
+        'WAVE',
+        ['completed'],
+        undefined,
+        ['XOF'],
+        undefined,
+        1,
+        10,
+      );
+
+      expect(result).toEqual(rows);
+      expect(mockClientRpc).toHaveBeenCalledWith(
+        'fetch_network_transactions_for_api',
+        expect.objectContaining({
+          p_network_membership_id: 'nm-1',
+          p_read_scope: 'own',
+          p_environment: 'live',
+        }),
+      );
+    });
+
+    it('uses all read scope when transaction.read capability is granted', async () => {
+      mockClientRpc.mockResolvedValue({ data: [], error: null });
+
+      await service.findAll({
+        ...networkUser,
+        networkCapabilityKey: 'transaction.read',
+      });
+
+      expect(mockClientRpc).toHaveBeenCalledWith(
+        'fetch_network_transactions_for_api',
+        expect.objectContaining({
+          p_read_scope: 'all',
+        }),
+      );
+    });
   });
 
   describe('findOne', () => {
@@ -115,6 +171,23 @@ describe('TransactionsService', () => {
       mockClientRpc.mockResolvedValue({ data: [{ foo: 'bar' }], error: null });
       await expect(service.findOne('t1', user)).rejects.toBeInstanceOf(
         NotFoundException,
+      );
+    });
+
+    it('routes Network get requests to get_network_transaction_for_api', async () => {
+      const row = { transaction_id: 't-network' };
+      mockClientRpc.mockResolvedValue({ data: [row], error: null });
+
+      await expect(service.findOne('t-network', networkUser)).resolves.toEqual(
+        row,
+      );
+      expect(mockClientRpc).toHaveBeenCalledWith(
+        'get_network_transaction_for_api',
+        expect.objectContaining({
+          p_network_membership_id: 'nm-1',
+          p_transaction_id: 't-network',
+          p_read_scope: 'own',
+        }),
       );
     });
   });

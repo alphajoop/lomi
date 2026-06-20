@@ -1,0 +1,10 @@
+{
+  "title": "Meters",
+  "pages": [
+    "MetersController_create",
+    "MetersController_findAll",
+    "MetersController_findOne",
+    "MetersController_getBalance",
+    "MetersController_update"
+  ]
+}

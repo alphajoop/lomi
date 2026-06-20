@@ -6,7 +6,6 @@ import { createGetUrl, getSlugs } from 'fumadocs-core/source';
 import { TOCItemType } from 'fumadocs-core/toc';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import matter from 'gray-matter';
 import { remarkInclude } from 'fumadocs-mdx/config';
 import remarkMdx from 'remark-mdx';
 import { visit } from 'unist-util-visit';
@@ -176,7 +175,7 @@ function collectForbiddenProviderIngressOpenApiPaths(
   }
 }
 
-/** After stripping fenced code blocks — narrative and tables, not examples. */
+/** After stripping fenced code blocks: narrative and tables, not examples. */
 const DOCS_FORBIDDEN_INGRESS_SNIPPETS: readonly string[] = [
   '/webhooks/stripe',
   '/webhooks/wave',
@@ -197,7 +196,7 @@ const DOCS_FORBIDDEN_PROSE: { re: RegExp; hint: string }[] = [
   },
   {
     re: /stripe\|night/i,
-    hint: 'Use lomi theme names (`light`, `dark`, `flat`) only — not legacy processor theme aliases.',
+    hint: 'Use lomi theme names (`light`, `dark`, `flat`) only, not legacy processor theme aliases.',
   },
 ];
 
@@ -273,7 +272,7 @@ async function checkPublicDocsProviderIngressPolicy(): Promise<void> {
     for (const token of ['StripeWebhook', 'WaveWebhook'] as const) {
       if (text.includes(token)) {
         errors.push(
-          `${file}: contains internal controller identifier "${token}" — remove from public docs.`,
+          `${file}: contains internal controller identifier "${token}"; remove from public docs.`,
         );
       }
     }
@@ -348,7 +347,7 @@ function collectOpenApiSecurityErrors(
 const REST_API_HEADING_ALTERNATIVES = [
   ['## Overview', '## Aperçu'],
   ['## Authentication', '## Authentification'],
-  ['## Endpoint', '## Point de terminaison'],
+  ['## Endpoint', '## Endpoint'],
   ['## Request', '## Requête'],
   ['## Responses', '## Réponses'],
   ['## Errors', '## Erreurs'],
@@ -407,7 +406,7 @@ async function checkRestApiManualPages(): Promise<void> {
     for (const alts of REST_API_HEADING_ALTERNATIVES) {
       if (!hasAnyHeading(parsed.content, alts)) {
         errors.push(
-          `${file}: missing required heading(s) — need one of: ${alts.join(' | ')}`,
+          `${file}: missing required heading(s); need one of: ${alts.join(' | ')}`,
         );
       }
     }
@@ -460,11 +459,36 @@ async function checkOpenApiDocs(): Promise<void> {
   console.log('OpenAPI docs checks passed.');
 }
 
+function parseMdxFrontmatter(content: string) {
+  const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/m.exec(content);
+  if (!match) return { data: {}, content };
+  const data: Record<string, unknown> = {};
+  for (const line of match[1].split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const colon = trimmed.indexOf(':');
+    if (colon === -1) continue;
+    const key = trimmed.slice(0, colon).trim();
+    let value: unknown = trimmed.slice(colon + 1).trim();
+    if (value === 'true') value = true;
+    else if (value === 'false') value = false;
+    else if (
+      typeof value === 'string' &&
+      value.startsWith('"') &&
+      value.endsWith('"')
+    ) {
+      value = value.slice(1, -1);
+    }
+    data[key] = value;
+  }
+  return { data, content: match[2] ?? '' };
+}
+
 async function readFromPath(file: string) {
   const content = await fs
     .readFile(path.resolve(file))
     .then((res) => res.toString());
-  const parsed = matter(content);
+  const parsed = parseMdxFrontmatter(content);
 
   return {
     path: file,

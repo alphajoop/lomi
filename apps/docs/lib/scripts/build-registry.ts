@@ -124,8 +124,8 @@ async function buildLomiUiRegistry(): Promise<void> {
         $schema: 'https://ui.shadcn.com/schema/registry-item.json',
         name: 'all',
         type: 'registry:block',
-        title: 'Lomi UI Checkout Kit',
-        description: 'All Lomi UI checkout components.',
+        title: 'lomi. UI Checkout Kit',
+        description: 'All lomi. UI checkout components.',
         registryDependencies: lomiUiRegistry.items.map(
           (item) => `/r/${item.name}.json`,
         ),

@@ -3331,6 +3331,68 @@ export type Database = {
         Args: { p_dispatch_id: string };
         Returns: boolean;
       };
+      fetch_pending_webhook_outbox_jobs: {
+        Args: { p_outbox_id: string };
+        Returns: {
+          outbox_id: string;
+          organization_id: string;
+          event_type: APIEnums['webhook_event'];
+          payload: Json;
+          merchant_id: string | null;
+          dispatch_id: string;
+          webhook_id: string;
+          url: string;
+          authorized_events: APIEnums['webhook_event'][];
+          verification_token: string;
+          is_active: boolean;
+          webhook_organization_id: string;
+          created_by: string | null;
+        }[];
+      };
+      get_active_subscriptions_for_renewal: {
+        Args: { p_due_date: string };
+        Returns: {
+          subscription_id: string;
+          customer_id: string;
+          provider_payment_method_id: string | null;
+          status: APIEnums['subscription_status'];
+          next_billing_date: string;
+          organization_id: string;
+          provider_customer_id: string | null;
+          customer_email: string;
+          customer_name: string;
+          price_amount: number;
+          price_currency_code: string;
+          price_billing_interval: APIEnums['billing_interval'];
+        }[];
+      };
+      subscription_renewal_already_processed: {
+        Args: { p_billing_date: string; p_subscription_id: string };
+        Returns: boolean;
+      };
+      fallback_subscription_renewal_to_manual_checkout: {
+        Args: { p_subscription_id: string };
+        Returns: string;
+      };
+      record_subscription_renewal: {
+        Args: {
+          p_amount_minor_units: number;
+          p_billing_period_end?: string | null;
+          p_currency: string;
+          p_status?: APIEnums['transaction_status'];
+          p_stripe_payment_intent_id: string;
+          p_subscription_id: string;
+        };
+        Returns: string;
+      };
+      handle_subscription_renewal_payment_failure: {
+        Args: { p_error?: string | null; p_subscription_id: string };
+        Returns: Json;
+      };
+      finalize_subscription_renewal_after_retries: {
+        Args: { p_error?: string | null; p_subscription_id: string };
+        Returns: string;
+      };
       record_webhook_delivery_attempt: {
         Args: {
           p_attempt_number: number;
@@ -3657,7 +3719,10 @@ export type Database = {
         | 'USAGE_INVOICE_CREATED'
         | 'USAGE_INVOICE_PAID'
         | 'USAGE_INVOICE_OVERDUE'
-        | 'SUBSCRIPTION_USAGE_PERIOD_CLOSED';
+        | 'SUBSCRIPTION_USAGE_PERIOD_CLOSED'
+        | 'DISPUTE_CREATED'
+        | 'DISPUTE_UPDATED'
+        | 'DISPUTE_CLOSED';
     };
   };
 };

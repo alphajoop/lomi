@@ -3,7 +3,7 @@ title: 'How should I handle webhooks?'
 description: 'Use webhooks to reconcile payment, checkout, refund, subscription, and payout events from your server.'
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
 Webhooks tell your backend when something important happened after a customer or provider action. Use them for reconciliation, fulfillment, emails, subscriptions, and ledger updates.
 
@@ -50,7 +50,7 @@ To ensure the security and integrity of webhook events, lomi. signs each request
 2.  **Webhook Secret:** When you create a webhook endpoint via the API, a `` `secret` `` (prefixed with `` `whsec_` ``) is returned. **Store this secret securely, as it will not be shown again.**
 3.  **Verification:** Your endpoint should verify the signature by computing an `` `HMAC-SHA256` `` hash of the raw request body using the webhook secret and comparing it to the signature provided in the header.
 
-**Outbound delivery:** Requests from lomi. to **your** URL are **not** authenticated with `` `Authorization` `` / `` `X-API-Key` `` — only signature verification applies. Putting the signing secret in an `` `Authorization` `` header on your expectation side will not help; middleware that requires Bearer or API-key auth on **every** POST will typically return `` `401` `` ([details](/build/advanced-guides/handling-webhooks#verify-signatures)).
+**Outbound delivery:** Requests from lomi. to **your** URL are **not** authenticated with `` `Authorization` `` / `` `X-API-Key` ``, only signature verification applies. Putting the signing secret in an `` `Authorization` `` header on your expectation side will not help; middleware that requires Bearer or API-key auth on **every** POST will typically return `` `401` `` ([details](/build/advanced-guides/handling-webhooks#verify-signatures)).
 
 Refer to the [Webhook Signature Verification](/build/advanced-guides/handling-webhooks) guide for detailed implementation examples in various languages.
 
@@ -70,15 +70,18 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 | `` `REFUND_COMPLETED` ``        | A refund is successfully processed.         | `` `Refund` ``          |
 | `` `REFUND_FAILED` ``           | A refund attempt failed.                    | `` `Refund` ``          |
 | `` `REFUND_CREATED` ``         | A refund attempt was created.               | `` `Refund` ``          |
+| `` `DISPUTE_CREATED` ``        | A card dispute was opened.                  | `` `Dispute` ``         |
+| `` `DISPUTE_UPDATED` ``        | Dispute status or evidence changed.         | `` `Dispute` ``         |
+| `` `DISPUTE_CLOSED` ``         | A dispute reached a terminal state.         | `` `Dispute` ``         |
 | `` `test.webhook` ``            | A test event generated via the API.         | `` `TestPayload` ``     |
 
 <Callout type="info">
-  **Renewal payment failures** emit **`PAYMENT_FAILED`** on the failed transaction. There is no separate subscription payment-failed webhook. Use **`SUBSCRIPTION_RENEWED`** for successful billing cycles. See [Subscriptions](/build/subscriptions) and [Checkout behavior — Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
+  **Renewal payment failures** emit **`PAYMENT_FAILED`** on the failed transaction. There is no separate subscription payment-failed webhook. Use **`SUBSCRIPTION_RENEWED`** for successful billing cycles. See [Subscriptions](/build/subscriptions) and [Checkout behavior: Subscription checkout](/build/payments/checkout-behavior#subscription-checkout).
 </Callout>
 
 ### `SUBSCRIPTION_UPDATED` payload
 
-Non-terminal subscription changes use a Stripe-style envelope: current state in `object`, what changed in `previous_attributes`, and optional `context` for debugging.
+Non-terminal subscription changes use a structured event envelope: current state in `object`, what changed in `previous_attributes`, and optional `context` for debugging.
 
 ```json filename="Example webhook payload (SUBSCRIPTION_UPDATED)"
 {
@@ -110,7 +113,7 @@ Reconcile entitlements from `data.object`. Use `previous_attributes` to branch l
 
 _(Other event payloads are documented under their API resources, e.g. Transactions, Subscriptions.)_
 
-Webhook subscriptions and JSON payloads use **SCREAMING_SNAKE_CASE** event names (for example `PAYMENT_SUCCEEDED`). Some docs or OpenAPI tooling may show **dotted** names (for example `payment.succeeded`) as a human-readable alias for the same logical event—use the enum values above when configuring endpoints and when comparing `event` in request bodies.
+Webhook subscriptions and JSON payloads use **SCREAMING_SNAKE_CASE** event names (for example `PAYMENT_SUCCEEDED`). Some docs or OpenAPI tooling may show **dotted** names (for example `payment.succeeded`) as a human-readable alias for the same logical event, use the enum values above when configuring endpoints and when comparing `event` in request bodies.
 
 For operations guidance (retries, idempotency, delivery logs), see [Webhook reliability](/build/advanced-guides/webhook-reliability).
 
@@ -202,9 +205,9 @@ curl -X POST "https://api.lomi.africa/webhooks/YOUR_WEBHOOK_ID/logs/YOUR_LOG_ID/
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
-**Automatic retries:** When your endpoint rejects a delivery (`non-2xx`), times out from lomi.’s viewpoint, or a transient fault occurs mid-flight, the platform records the failure and may schedule additional attempts depending on HTTP semantics and plumbing. **Retries are bounded** — they follow exponential backoff policies on the webhook infrastructure — rather than indefinite “fire until success” loops.
+**Automatic retries:** When your endpoint rejects a delivery (`non-2xx`), times out from lomi.’s viewpoint, or a transient fault occurs mid-flight, the platform records the failure and may schedule additional attempts depending on HTTP semantics and plumbing. **Retries are bounded**: they follow exponential backoff policies on the webhook infrastructure, rather than indefinite “fire until success” loops.
 
-Roughly speaking: **`4xx` client errors are usually terminal** for that automated sequence (misconfiguration should be corrected on your side), while **transient failures** (`5xx`, timeouts, certain network faults) may be retried up to a ceiling that depends on whether the webhook was dispatched **synchronously** or through the **queued** worker/outbox pipeline. Older documentation sometimes overstated calendar duration; treat the authoritative breakdown as **[Webhook reliability — Timeouts and retries](/build/advanced-guides/webhook-reliability#when-lomi-retries-and-when-it-does-not)**, where we document the approximate **~4 second** outbound HTTP timer, **four** synchronous attempts at most on retryable errors, **five** queue attempts where Bull is in play, and the meaning of **`lomi_environment`**.
+Roughly speaking: **`4xx` client errors are usually terminal** for that automated sequence (misconfiguration should be corrected on your side), while **transient failures** (`5xx`, timeouts, certain network faults) may be retried up to a bounded number of attempts with exponential backoff. See **[Webhook reliability: Timeouts and retries](/build/advanced-guides/webhook-reliability#when-lomi-retries-and-when-it-does-not)** for the approximate **~4 second** outbound HTTP timer, up to **four** attempts on some paths, up to **five** when delivery is queued, and the meaning of **`lomi_environment`**.
 
 ## Related API
 

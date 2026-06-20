@@ -11,16 +11,16 @@ operationId: CustomerSubscriptionsController_remove
 
 Cancel customer subscription
 
-### Quand utiliser cet endpoint
+### Quand l'utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `DELETE /customer-subscriptions/&#123;subscription_id&#125;` (Cancel customer subscription).
+Utilisez cet endpoint pour `DELETE /customer-subscriptions/&#123;subscription_id&#125;` (Cancel customer subscription).
 
 
 ## Authentification
 
-Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
 
-## Point de terminaison
+## Endpoint
 
 `DELETE /customer-subscriptions/{subscription_id}`
 
@@ -51,7 +51,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
 
 ## Exemple
 
@@ -65,4 +65,4 @@ curl -sS -X DELETE "https://sandbox.api.lomi.africa/customer-subscriptions/subsc
 - **operationId**: `CustomerSubscriptionsController_remove`
 - **Operation**: `DELETE /customer-subscriptions/{subscription_id}`
 
-Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.
+Schémas complets et **Try it** : [référence API](/api).

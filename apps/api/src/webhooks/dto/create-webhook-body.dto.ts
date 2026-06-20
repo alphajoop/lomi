@@ -8,7 +8,12 @@ export class CreateWebhookBodyDto {
   url: string;
 
   @ApiProperty({
-    example: ['PAYMENT_SUCCEEDED', 'PAYMENT_FAILED'],
+    example: [
+      'PAYMENT_SUCCEEDED',
+      'PAYMENT_FAILED',
+      'DISPUTE_CREATED',
+      'PAYMENT_RISK_FLAGGED',
+    ],
     type: [String],
   })
   authorized_events: string[];

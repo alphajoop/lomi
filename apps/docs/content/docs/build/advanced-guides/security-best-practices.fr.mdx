@@ -1,6 +1,6 @@
 ---
 title: 'Bonnes pratiques de sécurité'
-description: 'Mettre en œuvre une sécurité solide est indispensable lorsque vous traitez des paiements et intégrez des API tierces comme lomi.. Suivez ces recommandations pour une intégration sécurisée.'
+description: 'Mettre en œuvre une sécurité solide est indispensable lorsque vous traitez des paiements et intégrez des API tierces comme lomi. Suivez ces recommandations pour une intégration sécurisée.'
 ---
 
 ## Authentification API
@@ -18,7 +18,7 @@ description: 'Mettre en œuvre une sécurité solide est indispensable lorsque v
     });
     ```
 
-2.  **Rotation des clés :** faites tourner vos clés API régulièrement via le Dashboard lomi.. En cas de compromission, révoquez-la immédiatement et régénérez-en une nouvelle.
+2.  **Rotation des clés :** faites tourner vos clés API régulièrement via le Dashboard lomi. En cas de compromission, révoquez-la immédiatement et régénérez-en une nouvelle.
 
 3.  **Séparation des environnements :** utilisez strictement les clés Test (`lomi_sk_test_...`) pour le développement et les tests, et les clés Live (`lomi_sk_live_...`) uniquement en production.
 
@@ -46,7 +46,7 @@ const apiClient = axios.create({
 
 ### Validation des requêtes
 
-Validez les données côté serveur **avant** de les envoyer à l’API lomi..
+Validez les données côté serveur **avant** de les envoyer à l’API lomi.
 
 1.  **Assainissement des entrées :** nettoyez les entrées utilisateur pour limiter les risques d’injection (lomi. valide aussi côté API ; la défense en profondeur reste recommandée).
 
@@ -89,7 +89,7 @@ Voir [Configurer les webhooks](/build/webhooks) et [Traiter les webhooks](/build
 
 ### Vérification de signature
 
-**Vérifiez toujours** l’en-tête `X-Lomi-Signature` des requêtes entrantes avec le `Signing Secret` (`LOMI_WEBHOOK_SECRET`) propre à votre point de terminaison. Cela empêche l’envoi d’événements malveillants ou falsifiés.
+**Vérifiez toujours** l’en-tête `X-Lomi-Signature` des requêtes entrantes avec le `Signing Secret` (`LOMI_WEBHOOK_SECRET`) propre à votre URL. Cela empêche l’envoi d’événements malveillants ou falsifiés.
 
 ```typescript filename="Vérification de signature webhook (Node.js/Express)"
 import crypto from 'crypto';
@@ -125,19 +125,19 @@ function verifyWebhookSignature(
 }
 ```
 
-### Bonnes pratiques pour le point de terminaison webhook
+### Bonnes pratiques pour l’URL webhook
 
-1.  **HTTPS :** uniquement des points de terminaison HTTPS pour recevoir les webhooks.
+1.  **HTTPS :** uniquement des URLs HTTPS pour recevoir les webhooks.
 2.  **Contrôle d’accès :** si possible, restreignez l’accès (par ex. liste d’IPs ; note : les IPs lomi. peuvent évoluer).
 3.  **Réponse rapide et traitement asynchrone :** répondez tout de suite avec `200 OK` et traitez l’événement en arrière-plan pour éviter les timeouts.
-4.  **Limite de débit :** appliquez du rate limiting sur le point de terminaison webhook.
+4.  **Limite de débit :** appliquez du rate limiting sur l’URL webhook.
 5.  **Gestion d’erreurs :** en cas d’échec interne du traitement, journalisez, mais renvoyez toujours `200 OK` à lomi. si la signature était valide.
 
 ## Sécurité des données
 
 ### Données sensibles
 
-1.  **Minimalisation :** ne collectez et n’envoyez que les données nécessaires via l’API lomi.. Évitez les informations client sensibles superflues.
+1.  **Minimalisation :** ne collectez et n’envoyez que les données nécessaires via l’API lomi. Évitez les informations client sensibles superflues.
 
     ```typescript filename="Réduire les données dans metadata"
     // Recommandé : identifiants internes

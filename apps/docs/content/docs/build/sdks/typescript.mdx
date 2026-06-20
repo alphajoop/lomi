@@ -4,9 +4,9 @@ description: Official TypeScript/JavaScript SDK for lomi. payments API.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
-Official Node.js/TypeScript SDK for the lomi. payments API. Works with Node.js, Deno, Bun, and browser environments.
+Official Node.js/TypeScript SDK for lomi.. payments API. Works with Node.js, Deno, Bun, and browser environments.
 
 ## Installation
 
@@ -35,20 +35,20 @@ Use **`test`** while building. The SDK maps `environment` to the API host automa
 
 You can override the host with `baseUrl` if needed, but matching **key prefix** and **`environment`** is enough for most integrations.
 
-## Quick Start
+## Quick start
 
 ```typescript
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
   apiKey: process.env.LOMI_SECRET_KEY!,
-  environment: 'test', // sandbox — use 'live' only in production
+  environment: 'test', // sandbox: use 'live' only in production
 });
 ```
 
 ## First API call (sandbox)
 
-Copy-paste runnable example: install the SDK, set `LOMI_SECRET_KEY` in `.env`, then list accounts on the sandbox API.
+Copy-paste runnable example: install the SDK, set `LOMI_SECRET_KEY` in `.env`, then fetch your sandbox balance.
 
 ```typescript
 import { LomiSDK, LomiError } from '@lomi./sdk';
@@ -84,7 +84,7 @@ npm install @lomi./sdk
 npx tsx first-call.ts
 ```
 
-Expected: a JSON list of accounts from `GET https://sandbox.api.lomi.africa/accounts`. For raw HTTP without the SDK, see [API integration](/start/first-payment).
+Expected: balance payload from `GET https://sandbox.api.lomi.africa/accounts/balance`. For raw HTTP without the SDK, see [API integration](/start/first-payment).
 
 ---
 
@@ -306,22 +306,23 @@ interface LomiConfig {
 
 | Service | Methods |
 |---------|---------|
-| `accounts` | `list`, `get`, `getBalance`, `getBalanceBreakdown`, `checkBalance` |
-| `charges` | `createWaveCharge` |
+| `accounts` | `getBalance`, `getBalanceBreakdown`, `checkBalance` |
+| `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `getCardCharge`, `cancelCardCharge` |
 | `checkoutSessions` | `list`, `get`, `create` |
-| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions` |
+| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions`, `createPortalLaunchSession`, `getPortalAudit` |
 | `discountCoupons` | `list`, `get`, `create`, `getPerformance` |
+| `merchants` | `get`, `getArr`, `getBalance`, `getMrr` |
 | `organizations` | `list`, `get`, `getMetrics` |
 | `paymentLinks` | `list`, `get`, `create` |
 | `paymentRequests` | `list`, `get`, `create` |
 | `payouts` | `create`, `list`, `get` |
-| `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `getCardCharge`, `cancelCardCharge` |
 | `products` | `list`, `get`, `create`, `addPrice`, `setDefaultPrice` |
+| `providers` | `list` |
 | `refunds` | `create`, `list`, `get` |
-| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel` |
+| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel`, `uncancel`, `changePlan`, `update` |
 | `transactions` | `list`, `get` |
 | `webhookDeliveryLogs` | `list`, `get` |
-| `webhooks` | `list`, `get`, `update` |
+| `webhooks` | `list`, `get`, `create`, `update`, `delete`, `test`, `retryDelivery` |
 
 ---
 
@@ -335,13 +336,13 @@ import type { Database } from '@lomi./sdk';
 type Customer = Database['public']['Tables']['customers']['Row'];
 ```
 
-For request bodies, infer from examples or introspect payloads at runtime—the public SDK methods use `unknown` placeholders on purpose until stricter codegen lands.
+For request bodies, infer from examples or introspect payloads at runtime, the public SDK methods use `unknown` placeholders on purpose until stricter codegen lands.
 
 ---
 
 ## Resources
 
 - [Getting Started](/start/create-account)
-- [API Reference](/api)
+- [API reference](/api)
 - [GitHub](https://github.com/lomiafrica/lomi.)
 - [Discord Community](https://discord.gg/yb4FnBmh)

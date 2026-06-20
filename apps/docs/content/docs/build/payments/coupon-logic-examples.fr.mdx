@@ -125,7 +125,7 @@ Les mêmes deux coupons que l’exemple 6, mais **ordre inverse** :
 
 Affichez toujours l’ordre d’application dans l’interface et conservez ce même ordre côté serveur.
 
-## Exemple 10 : fréquence d’usage — fenêtre glissante vs calendrier
+## Exemple 10 : fréquence d’usage: fenêtre glissante vs calendrier
 
 Selon le chemin de validation, les plafonds peuvent être évalués différemment :
 
@@ -136,7 +136,7 @@ Pour un coupon « une utilisation par jour », un client utilisant à 23 h 59 pe
 
 ## Exemple 11 : réapplication d’un coupon sur la même session
 
-Lorsqu’un coupon est appliqué à une session qui a déjà une ligne `coupon_usage` en attente, le système peut **fusionner** (upsert) cette ligne (mettre à jour remise et horodateurs) au lieu d’insérer des doublons — tant que la transaction n’est pas finalisée.
+Lorsqu’un coupon est appliqué à une session qui a déjà une ligne `coupon_usage` en attente, le système peut **fusionner** (upsert) cette ligne (mettre à jour remise et horodateurs) au lieu d’insérer des doublons, tant que la transaction n’est pas finalisée.
 
 Conséquences :
 
@@ -154,7 +154,7 @@ Les rapports marchands doivent toujours montrer **prix catalogue**, **remise** e
 Votre appli réessaie `POST /checkout-sessions` ou « apply coupon » à cause du réseau :
 
 - utilisez la **même clé d’idempotence** ou le même identifiant de session pour éviter des sessions parallèles ;
-- les webhooks de complétion en double ne devraient pas doubler le comptage si la complétion transaction est idempotente — évitez tout de même les applications **répétées** initiées par le client.
+- les webhooks de complétion en double ne devraient pas doubler le comptage si la complétion transaction est idempotente, évitez tout de même les applications **répétées** initiées par le client.
 
 ## Checklist d’intégration
 

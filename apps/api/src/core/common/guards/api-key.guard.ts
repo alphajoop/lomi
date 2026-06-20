@@ -121,7 +121,7 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     if (upperMethod === 'GET' && /^\/charge\/card\/[^/]+$/.test(path)) {
-      return 'transaction.read';
+      return 'transaction.read_own';
     }
 
     if (upperMethod === 'POST' && path === '/checkout-sessions') {

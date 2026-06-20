@@ -50,7 +50,7 @@ Ouvrez le `checkout_url` de la sortie dans le navigateur.
 lomi listen http://localhost:3000/webhooks
 ```
 
-Voir [Démarrer avec la CLI](/start/cli-quickstart) pour le parcours terminal complet.
+Voir [Démarrer avec le CLI](/start/cli-quickstart) pour le parcours terminal complet.
 
 ## Option B : cURL
 
@@ -71,7 +71,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
 
 La réponse contient une URL de checkout hébergé. Ouvrez-la dans votre navigateur.
 
-<DocsScreenshot name="start/hosted-checkout" alt="Étape de paiement du checkout hébergé lomi. avec montant et bouton Payer" />
+<DocsScreenshot name="start/hosted-checkout" alt="Page de paiement checkout hébergé lomi. en sandbox" />
 
 ## 2. Payer avec un moyen de test
 
@@ -94,7 +94,7 @@ Après le paiement, vérifiez :
 - Votre solde de test évolue si la méthode crée une transaction complétée.
 - Votre endpoint webhook reçoit l’événement si les webhooks sont configurés.
 
-Depuis la CLI :
+Depuis le CLI :
 
 ```bash filename="Terminal"
 lomi transactions list --json

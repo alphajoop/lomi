@@ -20,7 +20,7 @@ const lomi = new LomiSDK({
 
 ### 2. Test webhook secret
 
-When testing webhooks locally or in a staging environment, create a separate webhook endpoint configuration in the lomi. Dashboard pointing to your test URL (e.g., an `ngrok` URL). Use the unique **Signing Secret** (`whsec_...`) generated for _that specific test endpoint_ in your test environment configuration (`LOMI_TEST_WEBHOOK_SECRET`).
+When testing webhooks locally or in a staging environment, create a separate webhook endpoint configuration in lomi. Dashboard pointing to your test URL (e.g., an `ngrok` URL). Use the unique **Signing Secret** (`whsec_...`) generated for _that specific test endpoint_ in your test environment configuration (`LOMI_TEST_WEBHOOK_SECRET`).
 
 ### 3. Test configuration file
 
@@ -43,11 +43,11 @@ For **test card numbers**, **Wave** and **MTN MoMo** sandbox behavior, test bala
 
 ## Integration tests
 
-Write automated tests that interact with the lomi. **sandbox** API.
+Write automated tests that interact with lomi.. **sandbox** API.
 
 ### 1. Payment flow tests
 
-Test creating and retrieving core objects like Checkout Sessions or Payment Links.
+Test creating and retrieving core objects like Checkout sessions or Payment links.
 
 ```typescript filename="Testing checkout session creation (Jest example)"
 import { LomiSDK } from '@lomi./sdk';
@@ -202,7 +202,7 @@ Use tools like Playwright or Cypress along with a testing framework. Your setup 
 
 - Start your application.
 - Start a webhook listener (e.g., using `ngrok` and a simple server, or a dedicated test helper).
-- Ensure necessary test data exists in the lomi. sandbox (e.g., test merchant, products).
+- Ensure necessary test data exists in lomi. sandbox (e.g., test merchant, products).
 
 ### 2. Simulate payment flow
 
@@ -210,7 +210,7 @@ Your E2E test script would typically:
 
 1.  Navigate through your application to initiate a payment.
 2.  Trigger the creation of a lomi. Checkout Session via your backend.
-3.  **(Challenge)** Interact with the lomi. sandbox checkout page. This is often difficult/flaky in automated E2E tests. Consider:
+3.  **(Challenge)** Interact with lomi.. sandbox checkout page. This is often difficult/flaky in automated E2E tests. Consider:
     - Using the [sandbox test card numbers and mobile money rules](/start/sandbox-payments) for manual or semi-automated flows.
     - Having a dedicated API endpoint in your _test environment_ that simulates the webhook callback lomi. would send upon completion (bypassing the actual sandbox UI interaction). This is often more reliable for automation.
 4.  Wait for and verify that your application receives the expected webhook (`PAYMENT_SUCCEEDED`).
@@ -361,4 +361,4 @@ jobs:
 
 - [CI/CD integration](/build/advanced-guides/ci-cd)
 - [Error handling](/build/advanced-guides/error-handling)
-- [API Reference](/api)
+- [API reference](/api)

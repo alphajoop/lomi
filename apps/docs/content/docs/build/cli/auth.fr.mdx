@@ -1,6 +1,6 @@
 ---
 title: 'Authentification'
-description: 'Connectez la CLI lomi. via le flux device dans le navigateur, gérez les profils et utilisez des jetons en CI.'
+description: 'Connectez le CLI lomi. via le flux device dans le navigateur, gérez les profils et utilisez des jetons en CI.'
 ---
 
 La plupart des commandes CLI qui appellent l’API lomi. nécessitent une authentification via un **flux d’autorisation device** (OAuth 2.0 device grant).
@@ -31,15 +31,15 @@ lomi switch sandbox
 
 ### 1. Démarrage device
 
-La CLI contacte la fonction edge Supabase `cli-auth` et reçoit un **code utilisateur** et une **URL de vérification**.
+Le CLI contacte la fonction edge Supabase `cli-auth` et reçoit un **code utilisateur** et une **URL de vérification**.
 
 ### 2. Autorisation dans le navigateur
 
-Connectez-vous à lomi. et approuvez la CLI.
+Connectez-vous à lomi. et approuvez le CLI.
 
 ### 3. Polling et jeton
 
-La CLI interroge le service jusqu’à réception d’une clé API utilisée comme jeton CLI.
+Le CLI interroge le service jusqu’à réception d’une clé API utilisée comme jeton CLI.
 
 ### 4. Stockage global
 

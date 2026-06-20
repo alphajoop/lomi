@@ -1,0 +1,109 @@
+---
+title: Disputes
+description: Read card payment disputes (`GET /disputes`) and react to `DISPUTE_*` webhooks.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Disputes are created automatically when the card network sends `charge.dispute.*` events for **card** payments. Use the read API to list and inspect disputes for your organization, subscribe to merchant webhooks, or open **Settings → Support → Disputes** in the [dashboard](https://dashboard.lomi.africa).
+
+<Callout type="info">
+  v1 covers **read access** and merchant webhooks (`DISPUTE_CREATED`, `DISPUTE_UPDATED`, `DISPUTE_CLOSED`). Evidence submission and MoMo disputes are not supported yet. Submit dispute evidence in your card processor dashboard until an in-product flow ships.
+</Callout>
+
+## When to use this API
+
+- **Ops / support**: list open disputes and link them to customers and transactions.
+- **Automation**: on `DISPUTE_CREATED`, pause fulfillment, notify Slack, or open a ticket.
+- **Reconciliation**: match `stripe_dispute_id` and `transaction_id` to your internal orders.
+
+## List disputes
+
+```bash
+curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+### Query parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `page` | `number` | Page number (default `1`) |
+| `pageSize` | `number` | Page size (default `50`) |
+| `status` | `pending` \| `resolved` \| `closed` | Filter by lomi. dispute status |
+| `startDate` | ISO 8601 | Disputes created on or after this time |
+| `endDate` | ISO 8601 | Disputes created on or before this time |
+
+<Callout type="warn">
+  lomi. stores a simplified status (`pending`, `resolved`, `closed`). Card-network outcomes such as `won` or `lost` are reflected in `resolution_details` while status is often `resolved`. `DISPUTE_CLOSED` webhooks can fire when the network closes a dispute even if the stored status is `resolved`, not `closed`.
+</Callout>
+
+### Response fields (list item)
+
+| Field | Description |
+| --- | --- |
+| `dispute_id` | lomi. dispute ID |
+| `transaction_id` | Linked payment transaction |
+| `customer_id` | Customer who paid |
+| `amount`, `currency_code` | Disputed amount |
+| `fee_amount` | Dispute fee charged to your account, if any |
+| `reason` | Card-network dispute reason (e.g. `fraudulent`, `duplicate`) |
+| `status` | `pending`, `resolved`, or `closed` |
+| `stripe_dispute_id`, `stripe_charge_id` | Processor references |
+| `resolution_date`, `resolution_details` | Outcome when resolved (`won`, `lost`, etc.) |
+| `customer_name`, `customer_email` | Customer snapshot |
+
+## Get a dispute
+
+```bash
+curl "https://api.lomi.africa/disputes/{dispute_id}" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+The single-dispute response includes the same fields plus `evidence_details`, `transaction_gross_amount`, and `transaction_status`.
+
+## Webhooks
+
+Subscribe to dispute events when [creating a webhook](/build/webhooks). Recommended handler pattern:
+
+1. Verify `X-Lomi-Signature` on the raw body.
+2. On `DISPUTE_CREATED`, fetch authoritative state with `GET /disputes/{id}` if needed.
+3. Treat events as idempotent (the card network may retry; lomi. deduplicates dispute creation).
+
+| Event | When it fires |
+| --- | --- |
+| `DISPUTE_CREATED` | Cardholder opened a dispute |
+| `DISPUTE_UPDATED` | Status or evidence changed on the processor |
+| `DISPUTE_CLOSED` | Processor sent `charge.dispute.closed` |
+
+Example payload shape (fields may include additional metadata):
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "event": "DISPUTE_CREATED",
+  "timestamp": "2026-06-19T12:00:00.000Z",
+  "data": {
+    "dispute_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "transaction_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+    "customer_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "amount": 15000,
+    "currency_code": "XOF",
+    "reason": "fraudulent",
+    "status": "pending",
+    "stripe_dispute_id": "dp_123",
+    "stripe_charge_id": "ch_456",
+    "organization_id": "org_789"
+  }
+}
+```
+
+## Dashboard
+
+In the merchant dashboard, go to **Settings → Support → Disputes** to browse chargebacks, open a dispute detail sheet, and jump to the linked transaction. Requires `transaction.read` on your organization role.
+
+## Related
+
+- [Refunds](/build/refunds): voluntary refunds before or after a dispute
+- [Webhooks](/build/webhooks): event types and verification
+- [Cards](/build/cards): card payments that can receive disputes

@@ -1,239 +1,101 @@
 ---
 title: 'Codebase'
-description: 'Vue d’ensemble des répertoires du monorepo lomi principal et de l’application marchande.'
+description: 'Vue d’ensemble du monorepo lomi., de ce qui est open source aujourd’hui, et de la différence entre développement local et plateforme hébergée.'
 ---
+
+## Hébergé vs open source
+
+**Les paiements en production passent uniquement par la plateforme hébergée de lomi.** Le monorepo est un espace de travail local pour l’équipe lomi. Chaque application peut aussi être déployée depuis son propre dépôt GitHub, mais l’arborescence de référence est sur [github.com/lomiafrica/lomi.](https://github.com/lomiafrica/lomi.).
+
+Cloner le dépôt **ne permet pas** d’auto-héberger le traitement des paiements de façon supportée. Utilisez la [plateforme hébergée](https://lomi.africa/sign-up) pour le trafic réel.
 
 ## Feuille de route
 
-Nous ouvrons progressivement l’ensemble du projet lomi. :
+Nous ouvrons progressivement le monorepo. **L’auto-hébergement du stack paiement complet est un objectif à long terme**, pas une offre supportée en production aujourd’hui. La trajectoire : publier plus de code → documenter les prérequis opérateur (prestataires, MoR, conformité) → proposer une option auto-hébergée supportée quand le stack sera complet et sûr sans les services hébergés de lomi.
+
+Ce qui est ouvert aujourd’hui :
 
 - **Déjà en open source** :
-  - Tableau de bord marchand
-  - Site de documentation : **[apps/developers](https://github.com/lomiafrica/lomi./)**
-  - Boilerplate storefront + Medusa : **[apps/store](https://github.com/lomiafrica/store/)**
-  - Boilerplate événements + Sanity : **[apps/events](https://github.com/lomiafrica/events/)**
-  - Boilerplate Vite + Medusa : **[apps/commerce](https://github.com/lomiafrica/commerce/)**
+  - Site de documentation : **`apps/docs`** (ce site)
+  - CLI (**`apps/cli`**), outil d’intégration ; s’appuyer sur l’API hébergée, pas sur l’exploitation plateforme
+  - Service API : **`apps/api`**
+  - SDK : **`apps/sdks`**
+  - Plugins e-commerce : **`apps/plugins`**
+  - Serveur MCP (**`apps/mcp`**), outil d’intégration ; API marchande dans l’IDE, pas l’exploitation plateforme
+  - Boilerplate événements (dépôt séparé) : **[lomiafrica/events](https://github.com/lomiafrica/events/)**
 
 - **Bientôt** :
-  - Service API : **[apps/api](https://github.com/lomiafrica/lomi./)**
-  - Extension Shopify : **[apps/shopify](https://github.com/lomiafrica/shopify/)**
-  - Outil CLI : **[apps/cli](https://github.com/lomiafrica/lomi./)**
+  - Tableau de bord marchand : **`apps/dashboard`**
+  - Extension Shopify : **`apps/shopify`** (à publication)
 
-Les dépôts seront fusionnés dans le monorepo dans les prochaines semaines.
+- **Propriétaire** :
+  - Tableau de bord admin : **`apps/admin`**
 
-## Monorepo
+- **Produit hébergé (code pas entièrement public)** :
+  - Checkout : **`apps/checkout`**
+  - Storefront : **`apps/storefront`**
+  - Portail client : **`apps/customers`**
+  - Site marketing : **`apps/website`**
 
-Dépôt principal regroupant applications et packages partagés.
+De nombreux fichiers, surtout les migrations et la logique paiement cœur, portent la mention `/* @proprietary license */` même dans des apps sous AGPL.
 
-```text filename="Project structure"
+## Organisation du monorepo
+
+```text filename="Structure du projet"
 └── lomi./
     ├── README.md
-    ├── CODE_OF_CONDUCT.md
     ├── CONTRIBUTING.md
     ├── LICENSE
-    ├── SECURITY.md
     └── apps/
-        ├── admin/         # Admin dashboard/portal
-        ├── api/           # Backend API
-        ├── cli/           # Command-line interface tools
-        ├── commerce/      # E-commerce boilerplate
-        ├── developers/    # Developer documentation website (this app)
-        ├── shopify/       # Shopify extension app
-        ├── store/         # E-commerce boilerplate
-        ├── events/        # E-commerce boilerplate
-        ├── jumbo/         # AI-powered online IDE
-        └── website/       # Website and merchant dashboard
+        ├── admin/        # Admin interne (propriétaire)
+        ├── api/          # API paiement NestJS (open source)
+        ├── checkout/     # Checkout hébergé (produit hébergé)
+        ├── cli/          # CLI Rust (outil intégrateur ; open source)
+        ├── customers/    # Portail client (produit hébergé)
+        ├── dashboard/    # Tableau de bord marchand (ouverture prochaine)
+        ├── design/       # Assets design partagés
+        ├── docs/         # Documentation développeur (open source, cette app)
+        ├── jumbo/        # Application marchande MPOS (terminal mobile)
+        ├── mcp/          # Serveur MCP (outil intégrateur ; open source)
+        ├── plugins/      # WooCommerce, Magento, PrestaShop, références
+        ├── sdks/         # SDK TypeScript, Python, PHP, Go (open source)
+        ├── storefront/   # Storefront marchand (produit hébergé)
+        └── website/      # Site marketing (produit hébergé)
 ```
 
-## Tableau de bord marchand
+## Tableau de bord marchand (`apps/dashboard`)
 
-Structure illustrative de l’application cœur avec laquelle les marchands interagissent ou qu’ils peuvent auto-héberger.
+Le tableau de bord est le back-office marchand (transactions, liens de paiement, paramètres, analytics). C’est un **produit hébergé** aujourd’hui ; le code s’ouvre progressivement.
 
-```text filename="Merchant dashboard"
-└── lomi./dashboard/                         # Root directory for the merchant website/
-    ├── README.md                          # Project documentation
-    ├── bunfig.toml                        # Bun configuration file
-    ├── components.json                    # UI component library configuration (e.g., shadcn/ui)
-    ├── index.html                         # Main HTML entry point for Vite
-    ├── package.json                       # Project dependencies and scripts
-    ├── postcss.config.js                  # PostCSS configuration
-    ├── tailwind.config.js                 # Tailwind CSS configuration
-    ├── tsconfig.json                      # TypeScript configuration for the project
-    ├── tsconfig.node.json                 # TypeScript configuration for Node.js specific parts (e.g., Vite config)
-    ├── vercel.json                        # Vercel deployment configuration
-    ├── vite.config.d.ts                   # Vite TypeScript declaration file
-    ├── vite.config.ts                     # Vite build tool configuration
-    ├── .env.example                       # Example environment variables file
-    ├── .eslintrc.cjs                      # ESLint configuration file
-    ├── api/                               # Serverless functions/webhook handlers
-        ....
-    ├── public/                            # Static assets served directly
-    │   ├── manifest.json                  # Web application manifest
-    │   ├── robots.txt                     # Instructions for web crawlers
-    │   ├── sitemap.xml                    # Sitemap for SEO
-    │   ├── assets/                        # General static assets
-    │   │   └── lomi.brand.zip             # Brand assets archive
-    │   ├── company/                       # Company-related images/assets
-            ....
-    │   ├── crypto/                        # Cryptocurrency icons/assets
-            ....
-    │   ├── customers/                     # Customer logos/assets
-            ....
-    │   ├── integrations/                  # Integration partner logos/assets
-            ....
-    │   ├── okra/                          # Okra integration assets (if any)
-    │   ├── payment_channels/              # Payment channel icons/assets
-            ....
-    │   ├── random/                        # Miscellaneous images/assets
-            ....
-    │   └── regulatory/                    # Regulatory compliance logos/assets
-            ....
-    ├── src/                               # Main application source code
-    │   ├── App.tsx                        # Root React application component
-    │   ├── env.d.ts                       # Environment variable type definitions
-    │   ├── i18n.ts                        # Internationalization setup (i18next)
-    │   ├── index.css                      # Global CSS styles or Tailwind base/imports
-    │   ├── main.tsx                       # Main entry point for the React app (renders App.tsx)
-    │   ├── router.tsx                     # Application routing setup (e.g., React Router)
-    │   ├── vite-env.d.ts                  # Vite environment type definitions
-    │   ├── api/                           # Server-side API logic (if running a backend server alongside frontend)
-    │   │   ├── server.js                  # Main server file (if applicable)
-    │   │   ├── ai/                        # AI-related API endpoints/logic
-                ....
-    │   │   └── checkout/                  # Checkout process API logic and associated components
-                ....
-    │   ├── components/                    # Reusable UI components
-    │   │   ├── aceternity/                # Specific UI library components (Aceternity UI)
-                ....
-    │   │   ├── auth/                      # Authentication-related UI components
-                ....
-    │   │   ├── blog/                      # Blog-specific UI components
-                ....
-    │   │   ├── charts/                    # Charting components
-                ....
-    │   │   ├── custom/                    # Custom, non-library base components
-                ....
-    │   │   ├── design/                    # Design system elements, layout, branding
-                ....
-    │   │   ├── icons/                     # Custom icon components
-                ....
-    │   │   ├── landing/                   # Components for the public landing pages
-                ....
-    │   │   ├── metrics/                   # Components for displaying metrics/stats
-                ....
-    │   │   ├── mfa/                       # Multi-Factor Authentication components
-                ....
-    │   │   ├── portal/                    # Components specific to the merchant portal/dashboard
-                ....
-    │   │   │   ├── balance/               # Components for managing balance/payouts
-                    ....
-    │   │   │   ├── customers/             # Components for managing customers
-                    ....
-    │   │   │   ├── logs/                  # Components for viewing logs (API, webhooks, etc.)
-                    ....
-    │   │   │   ├── payment-links/         # Components for managing payment links
-                    ....
-    │   │   │   ├── product/               # Components for managing products/services
-                    ....
-    │   │   │   ├── reporting/             # Components for viewing reports and analytics
-                        ....
-    │   │   │   ├── storefront/            # Components for customizing the hosted storefront/checkout
-                    ....
-    │   │   │   ├── subscription/          # Components for managing subscriptions
-                    ....
-    │   │   │   ├── transactions/          # Components for viewing transactions
-                    ....
-    │   │   │   └── webhooks/              # Components for managing webhook endpoints
-                    ....
-    │   │   ├── tables/                    # Reusable table components & configurations
-                    ....
-    │   │   └── ui/                        # Base UI elements (e.g., shadcn/ui library components)
-                ....
-    │   ├── lib/                           # Utility functions, contexts, hooks, shared logic
-    │   │   ├── formatter.ts               # Formatting utilities (dates, currency, etc.)
-    │   │   ├── actions/                   # Reusable functions (client/server actions, utils)
-                ....
-    │   │   ├── contexts/                  # React context providers/consumers
-                ....
-    │   │   ├── data/                      # Static data, constants, enums
-                ....
-    │   │   ├── hooks/                     # Custom React hooks
-                ....
-    │   │   ├── i18n/                      # Internationalization configuration files
-                ....
-    │   │   ├── locales/                   # Language translation files (JSON)
-                ....
-    │   │   ├── routes/                    # Route definitions or route-related utilities
-                ....
-    │   │   ├── openapi/                   # OpenAPI spec + Fumadocs API reference wiring
-                ....
-    │   │   ├── services/                  # Service integrations or API wrappers
-                ....
-    │   │   ├── tools/                     # Developer tools or specific complex utilities
-                ....
-    │   │   └── types/                     # TypeScript type definitions
-                ....
-    │   ├── pages/                         # Application pages/routes (likely file-based routing)
-    │   │   ├── auth/                      # Authentication flow pages (login, signup, reset)
-                ....
-    │   │   ├── blog/                      # Blog pages
-                ....
-    │   │   ├── checkout/                  # Hosted checkout flow pages
-                ....
-    │   │   ├── errors/                    # Error pages (404, 500, etc.)
-                ....
-    │   │   ├── landing/                   # Public marketing/landing pages
-                ....
-    │   │   └── portal/                    # Merchant portal pages/dashboard sections
-                ....
-    │   │       ├── settings/              # Settings pages within the portal
-                ....
-    │   └── utils/                         # Specific utility integrations (SDKs, clients)
-    │       ├── infobip/                   # Infobip SMS/WhatsApp integration
-            ....
-    │       ├── mixpanel/                  # Mixpanel analytics integration
-            ....
-    │       ├── np/
-            ....
-    │       ├── orange/                    # Orange Money integration
-            ....
-    │       ├── redis/                     # Redis client/utility
-            ....
-    │       ├── resend/                    # Resend email integration
-            ....
-    │       ├── supabase/                  # Supabase client utilities
-            ....
-    │       └── wave/                      # Wave Mobile Money integration
-            ....
-    ├── supabase/                          # Supabase configuration and database migrations
-    │   ├── config.toml                    # Supabase CLI configuration
-    │   ├── seed.sql                       # Database seeding script (optional)
-    │   ├── .gitignore                     # Supabase specific gitignore rules
-    │   └── migrations/                    # Database schema migration files (SQL)
-            ....
-    └── .github/                           # GitHub specific configurations
-        └── workflows/                     # GitHub Actions CI/CD workflows
-            ....
+Structure simplifiée :
+
+```text filename="Tableau de bord (apps/dashboard)"
+└── apps/dashboard/
+    ├── package.json
+    ├── .env.example
+    ├── src/              # Application React (Vite)
+    ├── supabase/         # Migrations DB et edge functions (référence)
+    │   └── migrations/
+    └── public/           # Assets statiques
 ```
 
-## Contribution
+Les migrations sous `supabase/migrations/` font foi pour le schéma plateforme. Ce n’est pas une recette pour exploiter votre propre stack paiement sans les services hébergés de lomi. et les accords prestataires.
 
-Les contributions sont les bienvenues pour améliorer lomi.. Problème ou suggestion : ouvrez une issue ou une pull request sur le [dépôt GitHub](https://github.com/lomiafrica/dashboard).
+## Contribuer
+
+Les contributions sur les zones open source et la documentation sont les bienvenues. Ouvrez une issue ou une pull request sur le [monorepo lomi.](https://github.com/lomiafrica/lomi.).
 
 Avant de contribuer :
 
-1.  Lisez notre [code de conduite](https://github.com/lomiafrica/lomi.?tab=coc-ov-file)
-2.  Consultez la [politique de sécurité](https://github.com/lomiafrica/lomi.?tab=security-ov-file)
-3.  N’altérez pas les fichiers marqués `/* @proprietary license */`
+1. Lisez notre [code de conduite](https://github.com/lomiafrica/lomi.?tab=coc-ov-file)
+2. Consultez la [politique de sécurité](https://github.com/lomiafrica/lomi.?tab=security-ov-file)
+3. N’altérez pas les fichiers marqués `/* @proprietary license */`
 
-Le détail se trouve dans [CONTRIBUTING.md](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md) du monorepo.
-
-Une question sur la façon d’aider ? Écrivez-nous !
+Voir [Contribuer](/resources/contributing/overview) et [CONTRIBUTING.md](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md) du monorepo.
 
 ## Liens utiles
 
 - **Discord** : [communauté Discord](https://discord.gg/yb4FnBmh)
-- **Twitter** : [@lomiafrica](https://twitter.com/lomiafrica)
-- **GitHub** : [issues](https://github.com/lomiafrica/dashboard/issues)
-- **PR** : [pull requests](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md)
-- **E-mail** : [hello@lomi.africa](mailto:hello@lomi.africa)
+- **X** : [@lomiafrica](https://twitter.com/lomiafrica)
+- **GitHub** : [issues](https://github.com/lomiafrica/lomi./issues) et [pull requests](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md)
+- **Email** : [hello@lomi.africa](mailto:hello@lomi.africa)

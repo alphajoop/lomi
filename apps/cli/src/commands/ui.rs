@@ -19,9 +19,9 @@ pub struct UiArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum UiCommands {
-    /// List available Lomi UI components from the live registry
+    /// List available lomi. UI components from the live registry
     List(ListArgs),
-    /// Add one or all Lomi UI components via shadcn
+    /// Add one or all lomi. UI components via shadcn
     Add(AddArgs),
     /// Re-install locked components from the latest registry
     Update(UpdateArgs),
@@ -84,7 +84,7 @@ pub async fn run(_common: &CommonOptions, args: UiArgs) -> Result<()> {
 }
 
 async fn run_list(args: ListArgs) -> Result<()> {
-    cli::banner::print_intro("Lomi UI registry");
+    cli::banner::print_intro("lomi. UI registry");
 
     let spinner = indicatif::ProgressBar::new_spinner();
     spinner.set_message("Fetching registry...");
@@ -139,7 +139,7 @@ async fn run_add(args: AddArgs) -> Result<()> {
         bail!("Component name required (or pass --all)");
     }
 
-    cli::banner::print_intro("Adding Lomi UI component");
+    cli::banner::print_intro("Adding lomi. UI component");
 
     let project_dir = Path::new(&args.path);
     let index = registry::fetch_index().await?;
@@ -185,12 +185,12 @@ async fn run_add(args: AddArgs) -> Result<()> {
         ));
     }
 
-    cli::banner::print_outro("Lomi UI install complete");
+    cli::banner::print_outro("lomi. UI install complete");
     Ok(())
 }
 
 async fn run_update(args: UpdateArgs) -> Result<()> {
-    cli::banner::print_intro("Updating Lomi UI components");
+    cli::banner::print_intro("Updating lomi. UI components");
 
     let project_dir = Path::new(&args.path);
     let existing = lockfile::UiLockfile::load(project_dir)?;
@@ -250,7 +250,7 @@ async fn run_update(args: UpdateArgs) -> Result<()> {
         ));
     }
 
-    cli::banner::print_outro("Lomi UI update complete");
+    cli::banner::print_outro("lomi. UI update complete");
     Ok(())
 }
 

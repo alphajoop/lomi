@@ -17,20 +17,24 @@ import { AccountsModule } from './core/accounts/accounts.module';
 import { OrganizationsModule } from './core/organizations/organizations.module';
 import { MerchantsModule } from './core/merchants/merchants.module';
 import { ProvidersModule } from './core/providers/providers.module';
-import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
+import { CustomerSubscriptionsOpenApiModule } from './core/customer-subscriptions/customer-subscriptions-open-api.module';
 import { CustomersModule } from './core/customers/customers.module';
 import { PaymentRequestsModule } from './core/payment-requests/payment-requests.module';
 import { RefundsModule } from './core/refunds/refunds.module';
 import { ProductsModule } from './core/products/products.module';
-import { SubscriptionsModule } from './core/subscriptions/subscriptions.module';
+import { SubscriptionsOpenApiModule } from './core/subscriptions/subscriptions-open-api.module';
 import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.module';
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
+import { DisputesModule } from './core/disputes/disputes.module';
+import { RadarModule } from './core/radar/radar.module';
+import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
+import { MeteringOpenApiModule } from './core/metering/metering-open-api.module';
 import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
 import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
 @Module({
@@ -51,20 +55,24 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     OrganizationsModule,
     MerchantsModule,
     ProvidersModule,
-    CustomerSubscriptionsModule,
+    CustomerSubscriptionsOpenApiModule,
     TransactionsModule,
     CustomersModule,
     PaymentRequestsModule,
     RefundsModule,
     ProductsModule,
-    SubscriptionsModule,
+    SubscriptionsOpenApiModule,
     DiscountCouponsModule,
     CheckoutSessionsModule,
     PaymentLinksModule,
     PayoutsModule,
+    DisputesModule,
+    RadarModule,
+    SettlementsModule,
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
+    MeteringOpenApiModule,
   ],
   controllers: [AppController],
   providers: [

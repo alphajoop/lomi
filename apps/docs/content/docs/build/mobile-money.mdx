@@ -1,28 +1,113 @@
 ---
 title: 'How do I accept mobile money?'
-description: 'Use hosted checkout, payment links, or direct payment flows to accept Wave, MTN MoMo, Orange Money, SPI, and local payment methods.'
+description: 'Use hosted checkout, payment links, or direct charge APIs to accept Wave, MTN MoMo, SPI, and local payment methods.'
 ---
 
-Mobile money is usually best handled through hosted checkout or payment links first. Those flows let lomi. present the right payment method and customer instructions for the selected market.
+import { Callout } from '@/components/docs/docs-callout';
 
-<DocsScreenshot name="build/mobile-money" alt="Hosted checkout mobile money step with phone number field" />
+Mobile money lets you accept payments from customers using their mobile wallets. It is a fast, secure, and convenient payment method that does not require a bank account.
+
+<DocsScreenshot name="build/mobile-money" alt="Mobile money step on lomi. hosted checkout" />
+
+<Callout type="info">
+  For country and channel coverage, see [Payment channels](/build/payment-channels).
+</Callout>
+
+## Requirements
+
+Before integrating mobile money payments:
+
+1. A lomi. account with **test** or **live** API keys, see [API keys](/start/api-keys).
+2. An HTTPS **webhook** endpoint for final payment status in live mode, see [Webhooks](/build/webhooks).
+3. Customer **phone number** in E.164 format (for example `+2250707070707`).
+
+## How mobile money payments work
+
+When a customer selects mobile money, they typically receive a prompt on their registered device. To complete the transaction, the customer must:
+
+1. Open the notification or payment screen on their mobile device.
+2. Authorize the payment by **entering their PIN** or following the provider's authentication process.
+3. Once authorized, the payment is processed, and both the customer and the merchant receive a confirmation.
+
+After authorization:
+
+- The customer's mobile money wallet is debited.
+- lomi. sends a webhook notification to your server when the transaction reaches a final state.
+
+Mobile money is **asynchronous in live mode**. Always show a pending state in your UI and reconcile with webhooks or `GET /transactions/{id}`.
 
 ## Recommended paths
 
 | Path | Use when |
 | --- | --- |
-| Hosted checkout | Your app creates the order and redirects the customer |
-| Payment links | You want a shareable URL for invoices, services, or informal sales |
-| Payment requests | Your backend creates a payment request for an app-controlled flow |
-| Direct charge APIs | You need lower-level control and understand the provider-specific UX |
+| [Hosted checkout](/build/checkout) | Your app creates the order and redirects the customer |
+| [Payment links](/build/payment-links) | You want a shareable URL for invoices, services, or informal sales |
+| [Payment requests](/build/payment-requests) | Your backend creates a payment request for an app-controlled flow |
+| [Direct charge APIs](/build/direct-charges) | You need lower-level control and understand provider-specific UX |
 
-## What to design for
+Most merchants should use **hosted checkout** or **payment links** first.
 
-Mobile money flows can be asynchronous. Your customer may approve in an app, via USSD, or through provider-specific instructions. Always show a pending state and rely on webhooks or server-side reads for final state.
+## Direct API: Wave
 
-## Related
+`POST /charge/wave` with XOF amount and customer details. Redirect the customer to `wave_launch_url` or `checkout_url` in the response, or read the normalized **`next_action`** field (`type: redirect` with `url`).
 
-- [Hosted checkout](/build/checkout)
-- [Payment links](/build/payment-links)
-- [Payment requests](/build/payment-requests)
-- [Sandbox payments](/start/sandbox-payments)
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency": "XOF",
+    "customer": {
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "phoneNumber": "+2250707070707"
+    },
+    "description": "Invoice #42",
+    "successUrl": "https://example.com/success",
+    "errorUrl": "https://example.com/error"
+  }'
+```
+
+## Direct API: MTN MoMo
+
+`POST /charge/mtn` with amount, currency, `countryCode`, and customer MSISDN. The response includes **`next_action`** (`type: await_webhook` with `status`) alongside `data.status`.
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency": "XOF",
+    "countryCode": "CI",
+    "customer": {
+      "name": "Jane Doe",
+      "phoneNumber": "+2250707070707"
+    }
+  }'
+```
+
+## Verify the payment
+
+Before you provide value to the customer, confirm the transaction's final status and amount:
+
+- **Webhooks**: register your endpoint and handle `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. See [Handling webhooks](/build/advanced-guides/handling-webhooks).
+- **Retrieve transaction**: `GET /transactions/{id}` using the `transaction_id` from the charge response.
+
+## Test vs live
+
+| | Test API key | Live API key |
+| --- | --- | --- |
+| MTN direct charge | `status: completed` immediately; test balance credited | `status: PENDING` until customer approves |
+| Wave | Test balance may credit when session is created | Wait for webhook or transaction poll |
+| Real wallet debited | Never | Yes |
+
+Full test instructions: [Sandbox payments: mobile money](/start/sandbox-payments#testing-mobile-money).
+
+## Next steps
+
+- [Payment channels](/build/payment-channels)
+- [Direct charges](/build/direct-charges)
+- [Balance and settlement](/build/balance-and-settlement)
+- [Refunds](/build/refunds)

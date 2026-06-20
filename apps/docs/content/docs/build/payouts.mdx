@@ -4,21 +4,21 @@ description: Withdraw to your registered accounts or pay beneficiaries (`POST /p
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
 Use **`POST /payouts`** for all outbound money movement.
 
-<DocsScreenshot name="build/payouts" alt="lomi. dashboard withdrawal and payout methods settings" />
+<DocsScreenshot name="build/payouts" alt="Payouts and withdrawals settings in lomi. dashboard" />
 
-- **`destination: "self"`** — withdraw to a **registered** payout method on your organization (`payout_method_id` required). Supports `bank`, `spi`, and `wave` (mobile money).
-- **`destination: "beneficiary"`** — pay a third party on **mobile rails** (`wave` today). Requires `recipient.name` and `recipient.phone` (any E.164 mobile number; **not** tied to `payout_method_id`). Bank payouts to arbitrary accounts are not supported.
+- **`destination: "self"`**: withdraw to a **registered** payout method on your organization (`payout_method_id` required). Supports `bank`, `spi`, `wave`, and `mtn` (mobile money).
+- **`destination: "beneficiary"`**: pay a third party on **mobile rails** (`wave` or `mtn`). Requires `recipient.name` and `recipient.phone` (any E.164 mobile number; **not** tied to `payout_method_id`). Bank payouts to arbitrary accounts are not supported.
 
 <Callout type="warn">
-  **Wave payouts (`rail: "wave"`) require a live API key** (`lomi_sk_live_…`). Test keys return `400` for both self and beneficiary Wave payouts—no real Wave transfer is initiated.
+  **Wave and MTN payouts require a live API key** (`lomi_sk_live_…`). Test keys return `400` for mobile-money payouts, no real provider transfer is initiated.
 </Callout>
 
 <Callout type="info">
-  MTN payouts return `400` until supported. SPI settlement for self payouts continues asynchronously after the RPC succeeds.
+  SPI settlement for self payouts continues asynchronously after the RPC succeeds. SPI beneficiary payouts are ledger-only until SPI execution ships.
 </Callout>
 
 ## Create a payout
@@ -83,5 +83,13 @@ curl -X POST "https://api.lomi.africa/payouts" \
 
 ## List and get
 
-- `GET /payouts` — withdrawals and beneficiary payouts (each row includes `kind`). Test API keys list **test withdrawals only**; live beneficiary payout rows are omitted.
-- `GET /payouts/{id}` — resolves merchant withdrawals and beneficiary payouts by ID (org-scoped).
+- `GET /payouts`, withdrawals and beneficiary payouts (each row includes `kind`). Test API keys list **test withdrawals only**; live beneficiary payout rows are omitted.
+- `GET /payouts/{id}`, resolves merchant withdrawals and beneficiary payouts by ID (org-scoped).
+
+## Payout blocked by platform risk controls
+
+Large or high-velocity withdrawals may be held automatically. If `POST /payouts` fails with a risk-related error, wait and try again later or [contact support](/resources/support).
+
+<Callout type="info">
+  For **incoming payment** risk screening (card and mobile money charges), see [lomi. Radar](/build/radar).
+</Callout>

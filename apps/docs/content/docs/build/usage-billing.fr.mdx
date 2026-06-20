@@ -1,0 +1,104 @@
+---
+title: Facturation à l'usage
+description: Mesurer la consommation, inscrire les clients sur des produits à l'usage et consulter les périodes de facturation.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+La facturation à l'usage permet de facturer selon une **consommation mesurée** (appels API, sièges, crédits, etc.) sur des produits `usage_based`. Chaque étape ci-dessous correspond à un endpoint REST public dans [openapi.json](https://github.com/lomiafrica/lomi./blob/main/apps/docs/openapi.json).
+
+<Callout type="info">
+  Pour la configuration produit (`product_type: usage_based`, tarifs, agrégation), voir **[Produits](/build/products)**. Les abonnements à l'usage sont distincts des abonnements checkout récurrents, utilisez **`POST /usage-subscriptions`** pour inscrire un client sur un plan à l'usage.
+</Callout>
+
+## Étapes
+
+### 1. Créer un produit à l'usage
+
+Créez un produit avec `product_type: usage_based` et un prix récurrent. Voir [Produits: champs produit à l'usage](/build/products#request-body).
+
+### 2. Créer un compteur (meter)
+
+Définissez le code de métrique facturable que votre application enverra à chaque événement d'usage.
+
+```bash
+curl -X POST "https://sandbox.api.lomi.africa/meters" \
+  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "api_calls",
+    "product_id": "prod_...",
+    "filter": { "code": "api_calls" },
+    "aggregation": { "type": "sum", "property": "quantity" }
+  }'
+```
+
+→ [Créer un compteur](/api/meters/MetersController_create)
+
+### 3. Inscrire le client (abonnement à l'usage)
+
+Avant d'ingérer de l'usage pour un client, inscrivez-le sur le produit à l'usage.
+
+```bash
+curl -X POST "https://sandbox.api.lomi.africa/usage-subscriptions" \
+  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": "cus_...",
+    "product_id": "prod_..."
+  }'
+```
+
+→ [Créer un abonnement à l'usage](/api/usage-events/UsageEventsController_createUsageSubscription)
+
+### 4. Enregistrer les événements d'usage
+
+Envoyez l'usage au fil de l'eau. Utilisez un `transaction_id` stable par événement logique pour l'idempotence.
+
+```bash
+curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
+  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaction_id": "evt_unique_123",
+    "code": "api_calls",
+    "customer_id": "cus_...",
+    "subscription_id": "sub_...",
+    "quantity": 1
+  }'
+```
+
+Retourne **202 Accepted** ; le traitement est asynchrone.
+
+→ [Enregistrer un événement d'usage](/api/usage-events/UsageEventsController_ingest)
+
+### 5. Consulter soldes et périodes
+
+| Objectif | Endpoint |
+|----------|----------|
+| Portefeuille compteur client | [Solde compteur](/api/meters/MetersController_getBalance) |
+| Usage de la période en cours | [Usage abonnement](/api/usage-billing/UsageBillingController_getSubscriptionUsage) |
+| Périodes historiques | [Lister les périodes](/api/usage-billing/UsageBillingController_listPeriods) |
+| Crédits prépayés | [Créditer le portefeuille](/api/usage-billing/UsageBillingController_creditWallet) |
+| Contrôle d'accès fonctionnel | [Vérifier une entitlement](/api/usage-billing/UsageBillingController_checkEntitlement) |
+
+## Réconciliation
+
+- **Lister ou récupérer les événements d'usage** si les webhooks sont en retard : [Lister](/api/usage-events/UsageEventsController_findAll), [Récupérer](/api/usage-events/UsageEventsController_findOne).
+- **Reporting revenus** MRR + usage + ponctuel : [Métriques revenus combinées](/api/usage-billing/UsageBillingController_getRevenue).
+
+## Référence : facturation lomi. Radar
+
+[lomi. Radar](/build/radar) facture chaque paiement filtré lorsque le produit est activé sur votre organisation. Chaque évaluation appelle `enqueue_usage_event` avec le code compteur **`radar_screen`** (agrégation : `count`).
+
+1. Activez Radar via [PATCH /organization/radar-settings](/api/radar/RadarController_updateSettings) (`enabled: true`). Un compteur `radar_screen` est créé automatiquement si un produit à l'usage correspondant existe.
+2. Chaque paiement filtré (carte, MTN, Wave) enregistre une unité d'usage tant que Radar est actif.
+3. Consultez soldes et périodes comme pour les autres compteurs ([Solde compteur](/api/meters/MetersController_getBalance), [Périodes](/api/usage-billing/UsageBillingController_listPeriods)).
+
+## Voir aussi
+
+- [Radar](/build/radar): produit de filtrage des transactions
+
+- [Abonnements](/build/subscriptions): abonnements checkout récurrents (distincts des abonnements à l'usage)
+- [Produits](/build/products): catalogue et configuration `usage_based`
+- [Vérifier les paiements](/build/guides/verify-payments): confirmer le statut avant d'accorder l'accès

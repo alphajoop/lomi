@@ -4,14 +4,18 @@ description: Rembourser des transactions terminées (`POST /refunds`).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
-Utilisez **`POST /refunds`** pour rembourser une transaction **terminée**. Les types de paiement pris en charge sont **carte** et **mobile money** (mêmes flux que le tableau de bord). Votre **solde est mis à jour immédiatement** ; le crédit client dépend du type de paiement.
+Utilisez **`POST /refunds`** pour rembourser une transaction **terminée**. Les prestataires pris en charge sont **carte bancaire**, **Wave** et **MTN MoMo** (mêmes flux que le tableau de bord). Votre **solde est mis à jour immédiatement** ; le crédit client dépend du type de paiement.
+
+<Callout type="info">
+  **MTN MoMo (live) :** le paiement d'origine doit avoir une référence prestataire (`provider_checkout_id` issu du RequestToPay). Les remboursements passent par l'API Disbursement MTN (asynchrone côté MTN ; lomi. interroge le statut jusqu'à complétion). En **mode test**, le remboursement est uniquement comptable (pas d'appel MTN).
+</Callout>
 
 Listez et consultez les remboursements avec **`GET /refunds`** et **`GET /refunds/{id}`**.
 
 <Callout type="info">
-  Les remboursements carte sont enregistrés immédiatement sur votre compte. Notre équipe finalise le crédit client sur le réseau carte séparément.
+  Les remboursements carte sont enregistrés immédiatement sur votre compte. Le crédit sur le compte ou la carte du client apparaît en général sous plusieurs jours ouvrés.
 </Callout>
 
 ## Créer un remboursement
@@ -75,7 +79,7 @@ curl -X POST "https://api.lomi.africa/refunds" \
 | `transaction_id` | `string` (UUID) | **Oui** |
 | `amount` | `number` | **Oui** |
 | `reason` | `string` | Non |
-| `refund_type` | `'full'` \| `'partial'` | Non — déduit de `amount` vs montant brut si omis |
+| `refund_type` | `'full'` \| `'partial'` | Non, déduit de `amount` vs montant brut si omis |
 
 ## Lister les remboursements
 

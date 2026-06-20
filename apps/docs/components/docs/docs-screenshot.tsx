@@ -1,46 +1,88 @@
-/* @proprietary license */
+'use client';
 
-import { cn } from '@/lib/utils/cn';
+import { useState } from 'react';
 
 type DocsScreenshotProps = {
-  /** Path under `public/docs/images/` without theme suffix, e.g. `start/create-account`. */
+  /** Path under `/docs/images/` without extension, e.g. `start/create-account` */
   name: string;
   alt: string;
-  className?: string;
 };
 
-const imageClassName =
-  'w-full rounded-lg border border-border/40 object-cover aspect-video';
-
-/**
- * Theme-aware docs screenshot (`{name}-light.webp` / `{name}-dark.webp`).
- * Drop files in `public/docs/images/` — see SCREENSHOT-MANIFEST.md.
- */
-export function DocsScreenshot({ name, alt, className }: DocsScreenshotProps) {
+/** Theme-aware doc screenshot with graceful fallback when WebP assets are not yet captured. */
+export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
   const base = `/docs/images/${name}`;
+  const [missingTheme, setMissingTheme] = useState<
+    'none' | 'light' | 'dark' | 'both'
+  >('none');
+
+  const onLightError = () => {
+    setMissingTheme((prev) => (prev === 'dark' ? 'both' : 'light'));
+  };
+
+  const onDarkError = () => {
+    setMissingTheme((prev) => (prev === 'light' ? 'both' : 'dark'));
+  };
+
+  if (missingTheme === 'both') {
+    return (
+      <figure className="not-prose my-6 flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-fd-muted/30 px-4 text-center text-sm text-fd-muted-foreground">
+        <span className="font-medium text-fd-foreground">{alt}</span>
+        <span>
+          Screenshot pending — add{' '}
+          <code className="text-xs">{name}-light.webp</code> and{' '}
+          <code className="text-xs">{name}-dark.webp</code> per{' '}
+          <code className="text-xs">SCREENSHOT-MANIFEST.md</code>.
+        </span>
+      </figure>
+    );
+  }
 
   return (
-    <span className={cn('not-prose my-6 block overflow-hidden', className)}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`${base}-light.webp`}
-        alt={alt}
-        width={1280}
-        height={720}
-        className={cn(imageClassName, 'dark:hidden')}
-        loading="lazy"
-        decoding="async"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`${base}-dark.webp`}
-        alt={alt}
-        width={1280}
-        height={720}
-        className={cn(imageClassName, 'hidden dark:block')}
-        loading="lazy"
-        decoding="async"
-      />
-    </span>
+    <figure className="not-prose my-6 overflow-hidden rounded-lg border border-border aspect-video w-full">
+      {missingTheme !== 'light' ? (
+        <img
+          src={`${base}-light.webp`}
+          alt={alt}
+          className="block size-full object-cover object-center dark:hidden"
+          loading="lazy"
+          width={1280}
+          height={720}
+          onError={onLightError}
+        />
+      ) : null}
+      {missingTheme !== 'dark' ? (
+        <img
+          src={`${base}-dark.webp`}
+          alt={alt}
+          className="hidden size-full object-cover object-center dark:block"
+          loading="lazy"
+          width={1280}
+          height={720}
+          onError={onDarkError}
+        />
+      ) : null}
+      {missingTheme === 'light' ? (
+        <img
+          src={`${base}-dark.webp`}
+          alt={alt}
+          className="block size-full object-cover object-center dark:hidden"
+          loading="lazy"
+          width={1280}
+          height={720}
+          onError={onDarkError}
+        />
+      ) : null}
+      {missingTheme === 'dark' ? (
+        <img
+          src={`${base}-light.webp`}
+          alt={alt}
+          className="hidden size-full object-cover object-center dark:block"
+          loading="lazy"
+          width={1280}
+          height={720}
+          onError={onLightError}
+        />
+      ) : null}
+    </figure>
   );
 }

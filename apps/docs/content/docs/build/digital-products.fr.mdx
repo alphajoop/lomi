@@ -1,0 +1,38 @@
+---
+title: Produits numériques
+description: Téléversez des fichiers, livrez instantanément après paiement et laissez les clients re-télécharger depuis leur bibliothèque.
+---
+
+# Produits numériques
+
+Vendez des fichiers téléchargeables (PDF, modèles, formations) avec livraison automatique après paiement.
+
+## Configuration
+
+1. Ouvrez **Catalogue** et créez ou modifiez un produit.
+2. Définissez **Livraison** sur **Digital** ou **Hybrid**.
+3. Ouvrez l'onglet **Files** et téléversez les livrables (jusqu'à 500 Mo par fichier).
+4. Partagez via lien de paiement, vitrine ou widget intégré.
+
+## Expérience acheteur
+
+Après un paiement réussi, l'acheteur reçoit :
+
+- Des liens de téléchargement sur la page de succès checkout
+- Un e-mail de livraison avec les liens
+- Une bibliothèque permanente sur [customers.lomi.africa](https://customers.lomi.africa) pour re-télécharger ses achats
+
+## Webhooks
+
+Abonnez-vous à `PURCHASE_FULFILLED` pour déclencher vos automatisations quand les droits numériques sont accordés.
+
+Champs du corps de requête :
+
+- `transaction_id`, paiement complété
+- `customer_id`, acheteur
+- `product_ids`, produits numériques livrés
+- `entitlement_ids`, droits fichier accordés
+
+## Mises à jour de fichiers
+
+Quand vous ajoutez ou retirez des fichiers livrables sur un produit déjà vendu, les acheteurs existants reçoivent des droits mis à jour et un e-mail avec les nouveaux liens de téléchargement.

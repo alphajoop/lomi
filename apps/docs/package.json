@@ -6,10 +6,11 @@
     "overrides": {
       "fast-xml-parser": "^5.3.4",
       "@isaacs/brace-expansion": "^5.0.1",
+      "js-yaml": "^4.2.0",
       "undici": "^5.28.4",
       "lodash": "^4.17.21",
       "postcss": "^8.5.15",
-      "vite": "^7.3.2",
+      "vite": "^7.3.5",
       "yaml": "^2.8.3"
     }
   },
@@ -21,6 +22,7 @@
     "clean": "rimraf .next",
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev --turbo",
     "lint": "fumadocs-mdx && bun ./lib/scripts/lint.ts && bun ./lib/scripts/check-mdx-sdk-snippets.ts && pnpm exec tsx lib/scripts/manual-api/verify-en-operation-overrides.ts && eslint .",
+    "docs:drift": "pnpm exec tsx lib/scripts/docs-drift.ts",
     "api:bootstrap": "pnpm exec tsx lib/scripts/bootstrap-manual-api-reference.ts",
     "api:regenerate-rest-reference": "pnpm exec tsx lib/scripts/bootstrap-manual-api-reference.ts",
     "knip": "knip",
@@ -64,6 +66,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-force-graph-2d": "^1.29.1",
+    "react-phone-number-input": "^3.4.17",
     "rehype-katex": "^7.0.1",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",

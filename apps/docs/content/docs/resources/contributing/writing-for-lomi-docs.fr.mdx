@@ -1,0 +1,90 @@
+---
+title: Contribuer à la documentation
+description: Contrat éditorial pour guides, pages API et documentation orientée agents sur docs.lomi.africa.
+docType: explanation
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Cette page est le **contrat d'écriture canonique** pour la documentation. Elle fusionne le contrat de style API, les types Diátaxis et les règles de marque du monorepo.
+
+<Callout type="info">
+  Agents : installez la règle condensée avec `lomi install-rules --target cursor` (inclut **Docs writing**). Lisez toujours [llms.txt](https://docs.lomi.africa/llms.txt) avant d'intégrer.
+</Callout>
+
+## Marque et nommage
+
+| Contexte | Forme |
+| --- | --- |
+| Produit dans le texte | **lomi.** (avec point final) |
+| Package npm | `@lomi./sdk` |
+| Noms d'hôte | `lomi.africa`, `docs.lomi.africa`, `api.lomi.africa` (sans point final) |
+
+## Types Diátaxis
+
+Définissez `docType` dans le frontmatter des nouveaux guides :
+
+| Type | Usage | Exemples |
+| --- | --- | --- |
+| `tutorial` | Parcours d'apprentissage linéaire | [Parcours d'intégration](/start/integration-journey) |
+| `how-to` | Étapes orientées tâche | [Vérifier les paiements](/build/guides/verify-payments) |
+| `explanation` | Concepts et compromis | [Choisir l'intégration](/build/choose-integration), [Statuts des paiements](/api/payment-state-machine) |
+| `reference` | Schémas et endpoints | Pages d'opération REST API |
+
+## Voix et structure
+
+- **Directe et assurée**: « Crée… », « Renvoie… », pas « Cet endpoint vous permet de… ».
+- **Pensée pour les marchands**: codes statut, idempotence, mobile money asynchrone, webhooks.
+- **Titres orientés question** pour les guides Build quand c'est possible.
+- **Pas de remplissage**: évitez « fluide », « robuste », « puissant » sans comportement concret.
+- **Pas de tirets cadratins** dans le texte: utilisez des virgules, deux-points ou points (les cellules vides de tableau peuvent utiliser `-`).
+- **Français naturel**: pas de calques littéraux de l'anglais. Préférez des mots simples :
+  - ✅ « Statuts des paiements », ❌ « Machine d'état des paiements »
+  - ✅ « URL webhook », ❌ « point de terminaison »
+  - ✅ « Quand l'utiliser », ❌ « Quand utiliser cet endpoint »
+  - ✅ « Étapes », ❌ « Parcours type » / « golden path »
+  - Gardez les termes techniques usuels en dev (`webhook`, `checkout`, `endpoint`, `sandbox`) quand tout le monde les utilise ainsi.
+  - **Pas de remplacement automatique en masse**: relisez chaque page à la main ; un script ne connaît pas le contexte (genre, accord, sens).
+
+Les guides rédigés à la main doivent lier vers les références canoniques au lieu de dupliquer les tableaux (ex. pointer vers [Paiements sandbox](/start/sandbox-payments) pour les cartes test).
+
+## Vérités d'intégration (à répéter dans les guides)
+
+- Les montants en **XOF** utilisent les **centimes** (unités mineures entières) sauf documentation contraire d'un champ API.
+- **L'environnement suit la clé API**: `lomi_sk_test_…` vs `lomi_sk_live_…` ; une mauvaise clé contre un environnement renvoie **401**.
+- Le **mobile money live est asynchrone**: confirmez avec les webhooks et `GET /transactions/{id}` avant de livrer les commandes.
+- **Ne jamais faire confiance au seul succès côté client**: voir [Vérifier les paiements](/build/guides/verify-payments).
+
+## Politique bilingue
+
+Chaque page anglaise sous `content/docs/` (`.mdx` sans suffixe de locale) exige un fichier **français** (`.fr.mdx`). Les pages espagnol (`.es.mdx`) et chinois (`.zh.mdx`) sont des variantes optionnelles. `pnpm docs:drift` impose la parité EN/FR.
+
+## Pages REST générées
+
+Voir [Rédaction référence API](/resources/contributing/api-reference-authoring) et `apps/docs/lib/scripts/manual-api/DOC-STYLE-CONTRACT.md` pour la structure des pages d'opération, les formulations OpenAPI interdites et la maintenance de `EN_OPERATION_COPY`.
+
+## Pages d'ancrage à imiter
+
+- [Paiements sandbox](/start/sandbox-payments)
+- [Choisir l'intégration](/build/choose-integration)
+- [Recevoir les webhooks](/build/advanced-guides/handling-webhooks)
+- [Statuts des paiements](/api/payment-state-machine)
+
+## Contrôles anti-dérive
+
+Avant de merger des changements docs :
+
+```bash
+cd apps/docs && pnpm lint && pnpm docs:drift
+```
+
+Depuis la racine du monorepo :
+
+```bash
+lomi docs check
+```
+
+## Voir aussi
+
+- [Brief design CORE-38](https://github.com/lomiafrica/lomi.): `apps/design/docs/note.md` dans le monorepo
+- [Installer les règles agent](/build/cli/install-rules)

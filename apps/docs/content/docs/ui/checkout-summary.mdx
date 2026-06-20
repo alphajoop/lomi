@@ -1,23 +1,20 @@
 ---
-title: Checkout Summary Card
-description: A component displaying the summary of a checkout order, including line items, subtotal, and total.
+title: Checkout summary card
+description: Dark hosted-checkout product summary panel.
 ---
 
-The `CheckoutSummaryCard` is a standalone, copy-pasteable UI component built with standard HTML elements and Tailwind CSS semantic utility classes. It adapts automatically to your theme without requiring additional Shadcn primitives.
+The `CheckoutSummaryCard` matches the dark left panel in hosted checkout.
 
 ## Preview
 
 <Tabs items={['Preview', 'Code']}>
   <Tab value="Preview" className="p-0 mt-4 border-none bg-transparent">
     <ComponentPreview>
-      <CheckoutSummaryCard 
-        subtotal={4900} 
-        tax={0} 
-        total={4900} 
-        currency="XOF" 
-        items={[
-          { name: 'Lomi Pro Plan (Monthly)', quantity: 1, price: 4900 }
-        ]} 
+      <CheckoutSummaryCard
+        title="Pay for Lomi Pro Plan"
+        subtotal={4900}
+        total={4900}
+        currency="XOF"
       />
     </ComponentPreview>
   </Tab>
@@ -28,14 +25,11 @@ The `CheckoutSummaryCard` is a standalone, copy-pasteable UI component built wit
 
     export default function Demo() {
       return (
-        <CheckoutSummaryCard 
-          subtotal={4900} 
-          tax={0} 
-          total={4900} 
-          currency="XOF" 
-          items={[
-            { name: 'Lomi Pro Plan (Monthly)', quantity: 1, price: 4900 }
-          ]} 
+        <CheckoutSummaryCard
+          title="Pay for Lomi Pro Plan"
+          subtotal={4900}
+          total={4900}
+          currency="XOF"
         />
       );
     }

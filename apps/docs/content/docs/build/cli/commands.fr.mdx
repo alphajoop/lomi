@@ -1,61 +1,343 @@
 ---
 title: 'Référence des commandes'
-description: 'Référence complète de toutes les commandes, sous-commandes et options globales de la CLI lomi.'
+description: 'Référence complète de toutes les commandes, sous-commandes et options globales du CLI lomi.'
 ---
 
-Toutes les commandes acceptent les [options globales](/build/cli/overview#global-options), dont `--json` pour une sortie machine.
+Toutes les commandes acceptent les options globales documentées dans [Premiers pas](/build/cli/overview#global-options).
 
 ## Authentification
 
-| Commande | Description |
-| --- | --- |
-| `lomi login` | Authentification navigateur (`--no-browser`, `--profile`) |
-| `lomi logout` | Supprimer les identifiants |
-| `lomi whoami` | Profil actif |
-| `lomi status` | Vérifier connexion et API |
-| `lomi list-profiles` | Lister les profils |
-| `lomi switch <profil>` | Changer de profil |
+### `lomi login`
 
-## Projet
+Authentification via flux navigateur. Stocke un jeton CLI globalement.
 
-| Commande | Description |
+```bash
+lomi login
+lomi login --no-browser
+lomi login --profile sandbox
+```
+
+### `lomi logout`
+
+Supprime les identifiants stockés pour un profil.
+
+```bash
+lomi logout
+lomi logout --profile sandbox
+```
+
+### `lomi whoami`
+
+Affiche le profil actif et le contexte compte.
+
+```bash
+lomi whoami
+```
+
+### `lomi status`
+
+Vérifie la connexion et l'API (`GET /me` + `GET /accounts/balance`).
+
+```bash
+lomi status
+```
+
+### `lomi list-profiles`
+
+Liste tous les profils d'authentification enregistrés.
+
+```bash
+lomi list-profiles
+```
+
+### `lomi switch <profil>`
+
+Définit le profil actif par défaut.
+
+```bash
+lomi switch sandbox
+```
+
+---
+
+## Configuration projet
+
+### `lomi init`
+
+Génère client SDK, exemples et `.env`. Voir [Initialiser un projet](/build/cli/init).
+
+```bash
+lomi init
+lomi init --yes -e sandbox -L ts --api-key lomi_sk_test_xxx
+```
+
+### `lomi update`
+
+Met à jour `@lomi./sdk` dans le projet courant (via votre gestionnaire de paquets).
+
+```bash
+lomi update
+```
+
+### `lomi ui`
+
+Installe et met à jour les composants checkout [lomi. UI](/build/lomi-ui) depuis le registre docs. Voir [Commandes lomi. UI](/build/cli/ui).
+
+```bash
+lomi ui list
+lomi ui add payment-provider-selector
+lomi ui add --all
+lomi ui update
+lomi ui update --component payment-provider-selector
+```
+
+Aucune authentification requise. Nécessite Node.js, `npx` et un projet shadcn (`components.json`).
+
+| Sous-commande | Description |
 | --- | --- |
-| `lomi init` | Générer SDK, exemples, `.env` — voir [Initialiser](/build/cli/init) |
-| `lomi update` | Mettre à jour `@lomi./sdk` |
+| `list` | Récupère et affiche les composants du registre |
+| `add <name>` | Installe un composant via `npx shadcn@latest add` |
+| `add --all` | Installe chaque entrée du registre |
+| `update` | Réinstalle les composants verrouillés depuis `.lomi/ui-lock.json` |
+
+| Option | S'applique à | Description |
+| --- | --- | --- |
+| `--path` | `add`, `update` | Répertoire projet cible |
+| `--yes` | `add`, `update` | Ignorer l'invite shadcn init |
+| `--dry-run` | `add`, `update` | Afficher les commandes sans les exécuter |
+| `--component` | `update` | Mettre à jour un seul composant verrouillé |
+
+`lomi init --with-ui <name>` installe un composant après le scaffold. Voir [Initialiser un projet](/build/cli/init).
+
+---
 
 ## Développement
 
-| Commande | Description |
-| --- | --- |
-| `lomi quickstart` | Contrôles de parcours rapide et prochaines étapes (`--json`, `--skip-probe`) |
-| `lomi listen` | Relais webhook cloud (sandbox d’abord) |
-| `lomi probe` | Contrôles d’intégration |
-| `lomi dev` | Serveur webhook local — voir [Serveur de développement](/build/cli/dev) |
+### `lomi quickstart`
 
-## Paiements et remboursements
+Contrôle de connectivité du parcours type et prochaines étapes. Voir [Commande quickstart](/build/cli/quickstart).
 
-| Commande | Description |
+```bash
+lomi quickstart
+lomi quickstart --json
+lomi quickstart --skip-probe
+```
+
+### `lomi listen`
+
+Relais webhook cloud (sandbox d'abord). Voir [Écouter les webhooks](/build/cli/listen).
+
+```bash
+lomi listen
+lomi listen http://localhost:3000/webhooks
+lomi listen --allow-production
+```
+
+### `lomi probe`
+
+Exécute des contrôles de santé d'intégration en lecture seule.
+
+```bash
+lomi probe
+lomi probe --send-test-webhook
+```
+
+### `lomi dev`
+
+Démarre un serveur webhook local. Voir [Serveur de développement local](/build/cli/dev).
+
+```bash
+lomi dev
+lomi dev --port 4242
+lomi dev --verify-signature
+lomi dev --env-file .env.local
+```
+
+| Option | Défaut | Description |
+| --- | --- | --- |
+| `-p, --port` | `4242` | Port HTTP |
+| `--env-file` | `.env` | Chemin du fichier dotenv |
+| `--verify-signature` | auto | Vérifier l'en-tête `X-Lomi-Signature` |
+| `--skip-rules-install` | - | Ignorer l'invite règles agent |
+
+**Endpoints :**
+
+- `POST /webhook`, recevoir les événements webhook
+- `GET /health`, contrôle de santé
+
+---
+
+## Webhooks
+
+### `lomi webhooks list`
+
+Liste les URLs webhook configurés.
+
+```bash
+lomi webhooks list
+```
+
+### `lomi webhooks test <id>`
+
+Envoie un événement test vers un endpoint webhook.
+
+```bash
+lomi webhooks test wh_xxxxxxxx
+```
+
+---
+
+## Catalogue et transactions
+
+### `lomi products list`
+
+Liste les produits et tarifs de votre organisation.
+
+```bash
+lomi products list
+```
+
+### `lomi transactions list`
+
+Liste les transactions récentes.
+
+```bash
+lomi transactions list
+lomi transactions list --limit 25 --json
+```
+
+| Option | Défaut | Description |
+| --- | --- | --- |
+| `--limit` | `10` | Nombre maximum de transactions |
+
+### `lomi transactions get <id>`
+
+Récupère une transaction par ID (`GET /transactions/{id}`).
+
+```bash
+lomi transactions get 123e4567-e89b-12d3-a456-426614174000
+lomi transactions get 123e4567-e89b-12d3-a456-426614174000 --json
+```
+
+### `lomi refunds create`
+
+Crée un remboursement pour une transaction complétée (`POST /refunds`).
+
+```bash
+lomi refunds create
+lomi refunds create \
+  --transaction-id 123e4567-e89b-12d3-a456-426614174000 \
+  --amount 5000 \
+  --reason duplicate_charge \
+  --refund-type partial \
+  --json
+```
+
+| Option | Description |
 | --- | --- |
-| `lomi checkout create` | Session checkout (interactive ou `--amount`, `--currency`, URLs) |
-| `lomi payments create` | Lien de paiement (`--title`, `--amount`, `--currency`) |
-| `lomi transactions list` | Lister les transactions (`--limit`, `--json`) |
-| `lomi transactions get <id>` | Détail d’une transaction |
-| `lomi refunds create` | Créer un remboursement (`--transaction-id`, `--amount`) |
-| `lomi refunds list` / `get` | Lister ou récupérer un remboursement |
+| `--transaction-id` | UUID de la transaction à rembourser |
+| `--amount` | Montant du remboursement (même devise que la transaction) |
+| `--reason` | Motif optionnel |
+| `--refund-type` | `full` ou `partial` |
+
+### `lomi refunds list`
+
+Liste les remboursements.
+
+```bash
+lomi refunds list
+lomi refunds list --status completed --limit 20 --json
+```
+
+### `lomi refunds get <id>`
+
+Récupère un remboursement par ID.
+
+```bash
+lomi refunds get ref_xxxxxxxx --json
+```
+
+---
+
+## Paiements
+
+Ces commandes nécessitent une authentification et utilisent votre jeton CLI (pas d'ID marchand manuel).
+
+### `lomi checkout create`
+
+Crée une session checkout hébergée via `POST /checkout-sessions`.
+
+```bash
+lomi checkout create
+lomi checkout create \
+  --amount 10000 \
+  --currency XOF \
+  --success-url https://example.com/success \
+  --cancel-url https://example.com/cancel \
+  --json
+```
+
+Le mode interactif demande : ID tarif ou montant, devise, URLs succès/annulation, e-mail client optionnel.
+
+Le sans interaction exige `--currency`, `--success-url`, `--cancel-url`, et `--amount` ou `--price-id`.
+
+Après création, affiche l'URL checkout et un extrait HTML embed prêt à coller avec `@lomi./embed` :
+
+```html
+<!-- npm install @lomi./embed -->
+<script type="module">
+  import { loadLomiCheckout } from '@lomi./embed';
+  document.getElementById('pay').addEventListener('click', () => {
+    loadLomiCheckout({
+      checkoutUrl: 'https://checkout.lomi.africa/checkout/cs_...',
+      mode: 'modal',
+      onComplete: (p) => console.log(p),
+    });
+  });
+</script>
+<button id="pay">Payer</button>
+```
+
+Voir [Widget de paiement intégré](/build/embed-widget) pour le mode inline et `dist/lomi.js` auto-hébergé.
+
+### `lomi payments create`
+
+Crée un lien de paiement via l'API payment links.
+
+```bash
+lomi payments create
+lomi payments create --title "Facture #42" --amount 5000 --currency XOF --json
+```
+
+Le mode interactif demande : titre, montant, devise. Le sans interaction exige les trois options.
+
+---
 
 ## Règles agent IA
 
 ### `lomi install-rules`
 
-Voir [Installer les règles agent](/build/cli/install-rules).
+Installe la documentation lomi. pour les outils de codage IA. Voir [Installer les règles agent](/build/cli/install-rules).
 
 ```bash
+lomi install-rules
 lomi install-rules --target cursor --target llms.txt
+lomi install-rules --force
 ```
 
-## Parcours types
+| Cible | Sortie |
+| --- | --- |
+| `cursor` | `.cursor/rules/lomi.*.mdc` |
+| `claude-code` | `CLAUDE.md` |
+| `codex` | `AGENTS.md` |
+| `vscode` | `.github/instructions/lomi-*.instructions.md` |
+| `llms.txt` | `llms.txt` à la racine du projet |
 
-### Nouvelle intégration
+---
+
+## Exemples de flux
+
+### Nouvelle intégration depuis zéro
 
 ```bash
 npm install -g lomi.cli
@@ -66,12 +348,45 @@ lomi init
 lomi listen http://localhost:3000/webhooks
 ```
 
+### Profils sandbox vs production
+
+```bash
+lomi login --profile sandbox
+lomi login --profile production
+lomi switch sandbox
+lomi init --profile sandbox
+```
+
+### Pipeline CI
+
+```bash
+export LOMI_ACCESS_TOKEN=$CLI_TOKEN
+lomi status
+lomi init --yes -e sandbox -L ts --api-key $LOMI_API_KEY --skip-package-install --skip-rules-install
+```
+
 ## Aide
 
 ```bash
 lomi --help
-lomi quickstart --help
-lomi refunds --help
+lomi login --help
+lomi init --help
+lomi dev --help
+lomi install-rules --help
 ```
 
-Référence anglaise complète : [Command reference](/build/cli/commands).
+---
+
+## Mainteneurs
+
+La commande `lomi docs` est masquée dans l’aide par défaut. Elle s’adresse aux **contributeurs lomi.** qui travaillent sur la documentation dans le monorepo, pas aux intégrateurs marchands.
+
+### `lomi docs check`
+
+Lance le lint docs et les contrôles de dérive OpenAPI depuis la racine du monorepo :
+
+```bash
+lomi docs check
+```
+
+Équivalent à `cd apps/docs && pnpm lint && pnpm docs:drift`. Voir [Rédiger pour la doc lomi.](/resources/contributing/writing-for-lomi-docs).

@@ -1,30 +1,43 @@
 'use client';
 
 import * as React from 'react';
-import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import type { ProviderId } from '@/components/lomi-ui/payment-provider-selector';
+import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
 
 export function MobileMoneyCheckoutCardDemo() {
-  const [provider, setProvider] = React.useState<ProviderId>('wave');
-  const [phoneNumber, setPhoneNumber] = React.useState('+225 07 00 00 00 00');
-  const [loading, setLoading] = React.useState(false);
+  const [provider, setProvider] = React.useState<ProviderId>('WAVE');
+  const [fullName, setFullName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [phoneNumber, setPhoneNumber] = React.useState('');
+  const [whatsappNumber, setWhatsAppNumber] = React.useState('');
+  const [isDifferentWhatsApp, setIsDifferentWhatsApp] = React.useState(false);
+  const [paymentStatus, setPaymentStatus] = React.useState<
+    'idle' | 'processing' | 'success' | 'error'
+  >('idle');
 
   return (
-    <div className="not-prose flex justify-center rounded-sm border bg-fd-background p-4">
+    <LomiUiPreview variant="checkout" innerClassName="flex justify-center">
       <MobileMoneyCheckoutCard
-        amount={12500}
-        currency="XOF"
-        merchantName="Keur Studio"
         selectedProvider={provider}
+        fullName={fullName}
+        email={email}
         phoneNumber={phoneNumber}
-        loading={loading}
+        whatsappNumber={whatsappNumber}
+        isDifferentWhatsApp={isDifferentWhatsApp}
+        paymentStatus={paymentStatus}
         onProviderChange={setProvider}
-        onPhoneNumberChange={setPhoneNumber}
+        onFullNameChange={setFullName}
+        onEmailChange={setEmail}
+        onPhoneNumberChange={(value) => setPhoneNumber(value ?? '')}
+        onWhatsAppNumberChange={(value) => setWhatsAppNumber(value ?? '')}
+        onDifferentWhatsAppChange={setIsDifferentWhatsApp}
         onSubmit={() => {
-          setLoading(true);
-          window.setTimeout(() => setLoading(false), 900);
+          setPaymentStatus('processing');
+          window.setTimeout(() => setPaymentStatus('success'), 900);
+          window.setTimeout(() => setPaymentStatus('idle'), 2200);
         }}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

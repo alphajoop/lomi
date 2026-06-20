@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 
 pub const MANIFEST_JSON: &str = include_str!("../../rules/manifest.json");
-pub const MANIFEST_VERSION: &str = "1.0.0";
+pub const MANIFEST_VERSION: &str = "1.1.0";
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct RuleOptionMeta {
@@ -70,6 +70,8 @@ fn load_rule_file(relative_path: &str) -> Result<String> {
         "charges.md" => include_str!("../../rules/charges.md"),
         "subscriptions.md" => include_str!("../../rules/subscriptions.md"),
         "api-reference.md" => include_str!("../../rules/api-reference.md"),
+        "embed-checkout.md" => include_str!("../../rules/embed-checkout.md"),
+        "docs-writing.md" => include_str!("../../rules/docs-writing.md"),
         "llms.txt" => include_str!("../../rules/llms.txt"),
         other => anyhow::bail!("Unknown rule file: {other}"),
     };

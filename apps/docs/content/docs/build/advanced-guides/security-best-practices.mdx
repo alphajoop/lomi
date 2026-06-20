@@ -1,6 +1,6 @@
 ---
 title: 'Security best practices'
-description: 'Implementing robust security measures is crucial when handling payments and integrating with third-party APIs like lomi.. Follow these best practices to ensure secure integration.'
+description: 'Implementing robust security measures is crucial when handling payments and integrating with third-party APIs like lomi. Follow these best practices to ensure secure integration.'
 ---
 
 ## API authentication
@@ -18,7 +18,7 @@ description: 'Implementing robust security measures is crucial when handling pay
     });
     ```
 
-2.  **Key Rotation:** Rotate your API keys periodically through the lomi. Dashboard. If a key is compromised, revoke it immediately and generate a new one.
+2.  **Key Rotation:** Rotate your API keys periodically through lomi. Dashboard. If a key is compromised, revoke it immediately and generate a new one.
 
 3.  **Environment Separation:** Strictly use Test keys (`lomi_sk_test_...`) for development and testing environments and Live keys (`lomi_sk_live_...`) only for your production environment.
 
@@ -28,7 +28,7 @@ description: 'Implementing robust security measures is crucial when handling pay
 
 ### TLS requirements
 
-All communication with the lomi. API **must** be over HTTPS (TLS 1.2 or higher) to encrypt data in transit. Ensure your HTTP clients enforce TLS.
+All communication with lomi.. API **must** be over HTTPS (TLS 1.2 or higher) to encrypt data in transit. Ensure your HTTP clients enforce TLS.
 
 ```typescript filename="Ensuring HTTPS base URL"
 import axios from 'axios';
@@ -46,7 +46,7 @@ const apiClient = axios.create({
 
 ### Request validation
 
-Validate data on your server **before** sending it to the lomi. API.
+Validate data on your server **before** sending it to lomi.. API.
 
 1.  **Input Sanitization:** Sanitize user inputs to prevent injection attacks (though lomi. also performs validation, defense-in-depth is recommended).
 
@@ -137,7 +137,7 @@ function verifyWebhookSignature(
 
 ### Sensitive data handling
 
-1.  **Data Minimization:** Only collect and send the data necessary for the transaction via the lomi. API. Avoid sending unnecessary sensitive customer information.
+1.  **Data Minimization:** Only collect and send the data necessary for the transaction via lomi. API. Avoid sending unnecessary sensitive customer information.
 
     ```typescript filename="Minimizing data in metadata"
     // Good: Use internal IDs
@@ -198,7 +198,7 @@ app.use('/api/', apiLimiter);
 
 ### Timeouts
 
-Set reasonable timeouts for requests made to the lomi. API to prevent your application from hanging indefinitely.
+Set reasonable timeouts for requests made to lomi.. API to prevent your application from hanging indefinitely.
 
 ```typescript filename="Setting timeouts with Axios"
 import axios from 'axios';
@@ -250,4 +250,4 @@ const apiClient = axios.create({
 
 - [Error handling](/build/advanced-guides/error-handling)
 - [Idempotency keys](/build/advanced-guides/idempotency-keys)
-- [API Reference](/api)
+- [API reference](/api)

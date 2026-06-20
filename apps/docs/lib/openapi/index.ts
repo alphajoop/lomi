@@ -2,7 +2,11 @@
 
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { createOpenAPI } from 'fumadocs-openapi/server';
+import { createOpenAPI, type OpenAPIOptions } from 'fumadocs-openapi/server';
+
+type FumadocsSchemaMap = Awaited<
+  ReturnType<Extract<NonNullable<OpenAPIOptions['input']>, () => unknown>>
+>;
 import type {
   Document,
   OperationObject,
@@ -101,7 +105,7 @@ export const openapi = createOpenAPI({
       [OPENAPI_DOCUMENT_ID]: normalizeOpenApiSecurity(
         ensurePathParameters(document),
       ),
-    };
+    } as FumadocsSchemaMap;
   },
   proxyUrl: '/api/proxy',
 });

@@ -1,6 +1,6 @@
 ---
 title: 'Contributing'
-description: 'This section provides guidelines and best practices to help you get started with contributing to the lomi. project.'
+description: 'This section provides guidelines and best practices to help you get started with contributing to lomi.. project.'
 ---
 
 We're thrilled you're interested in helping improve lomi. Whether you're fixing bugs, adding new features, improving the documentation, or reporting issues, your contributions are valuable and we are grateful for your help.
@@ -107,8 +107,8 @@ cp .env.example .env
 Here are some common commands you'll use during development:
 
 ```bash filename="Terminal"
-# Start the main development server (specific app may vary)
-# Check the package.json in the specific app/package directory
+# From monorepo root: starts the dashboard dev server only (contributors).
+# For other apps, cd into apps/<app> and use that app's package.json scripts.
 bun run dev
 
 # Build and serve the documentation site locally
@@ -146,7 +146,7 @@ git checkout -b <BRANCH_TYPE>/<SHORT_DESCRIPTION>
 Now you can start making your code or documentation changes within the appropriate package or app in the `packages/` or `apps/` directory.
 
 - **Code changes**: Write your code, ensuring it adheres to our [Code standards](/resources/contributing/best-practices#code-standards) and [Best practices](/resources/contributing/best-practices).
-- **Documentation changes**: Update or add documentation in the relevant `apps/developers/src/pages/docs/` directory. Use Markdown (`.mdx`).
+- **Documentation changes**: Update or add documentation under `apps/docs/content/docs/`. Use Markdown (`.mdx`).
 
 **Keep your branch updated:**
 

@@ -81,7 +81,7 @@ lomi update
 
 ### `lomi ui`
 
-Install and update [Lomi UI](/build/lomi-ui) checkout components from the live docs registry. See [Lomi UI commands](/build/cli/ui).
+Install and update [lomi. UI](/build/lomi-ui) checkout components from the live docs registry. See [lomi. UI commands](/build/cli/ui).
 
 ```bash
 lomi ui list
@@ -158,12 +158,12 @@ lomi dev --env-file .env.local
 | `-p, --port` | `4242` | HTTP port |
 | `--env-file` | `.env` | Path to dotenv file |
 | `--verify-signature` | auto | Verify `X-Lomi-Signature` header |
-| `--skip-rules-install` | — | Skip agent rules prompt |
+| `--skip-rules-install` | - | Skip agent rules prompt |
 
 **Endpoints:**
 
-- `POST /webhook` — receive webhook events
-- `GET /health` — health check
+- `POST /webhook`, receive webhook events
+- `GET /health`, health check
 
 ---
 
@@ -374,3 +374,19 @@ lomi init --help
 lomi dev --help
 lomi install-rules --help
 ```
+
+---
+
+## Maintainers
+
+The `lomi docs` command is hidden from default `--help`. It is for **lomi. contributors** working on documentation in the monorepo, not for merchant integrators.
+
+### `lomi docs check`
+
+Run docs lint and OpenAPI drift checks from the monorepo root:
+
+```bash
+lomi docs check
+```
+
+Equivalent to `cd apps/docs && pnpm lint && pnpm docs:drift`. See [Writing for lomi. docs](/resources/contributing/writing-for-lomi-docs).

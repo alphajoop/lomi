@@ -1,0 +1,63 @@
+---
+title: 'Parcours d’intégration'
+description: 'De la sandbox au live : compte, clés, premier paiement, webhooks et mise en production.'
+docType: tutorial
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Suivez ce guide avant d’écrire du code de production. Chaque étape renvoie vers la page détaillée, cette page est la carte, pas le manuel.
+
+<Callout type="info">
+  Nouveau ? Lisez [Qu’est-ce que lomi. ?](/start/overview), puis revenez ici.
+</Callout>
+
+## Étape 1: Créer un compte développeur
+
+Inscrivez-vous pour accéder à l’**environnement test** et exécuter des flux complets sans argent réel.
+
+En mode test vous pouvez :
+
+1. Accepter des paiements avec cartes test et mobile money simulé.
+2. Créer sessions checkout, liens et charges directes sur l’API sandbox.
+3. Recevoir des webhooks avec `"environment": "test"`.
+
+Voir [Créer votre compte](/start/create-account) et [Clés API](/start/api-keys).
+
+## Étape 2: Choisir votre intégration
+
+| Besoin | Commencez par |
+| --- | --- |
+| Page checkout complète | [Checkout hébergé](/build/checkout) |
+| URL partageable | [Liens de paiement](/build/payment-links) |
+| Mobile money ou cartes côté serveur | [Charges directes](/build/direct-charges) |
+| Facturation récurrente | [Abonnements](/build/subscriptions) |
+
+La plupart des équipes commencent par le **checkout hébergé**. Consultez [Quelle intégration choisir ?](/build/choose-integration) et [Canaux de paiement](/build/payment-channels).
+
+## Étape 3: Tester de bout en bout
+
+1. [Faire un paiement de test](/start/first-payment)
+2. [Paiements sandbox](/start/sandbox-payments): cartes, Wave, MTN
+3. [Gestion des erreurs](/build/advanced-guides/error-handling) et [idempotence](/build/advanced-guides/idempotency-keys)
+
+## Étape 4: Configurer les webhooks
+
+1. Enregistrez une URL HTTPS dans le [portail](https://lomi.africa/portal).
+2. Suivez [Configurer les webhooks](/build/webhooks) et [Traiter les webhooks](/build/advanced-guides/handling-webhooks).
+3. Vérifiez la signature sur le corps brut avant de parser le JSON.
+
+## Étape 5: Passer en live
+
+1. Vérification du compte et configuration des reversements.
+2. Passez à `lomi_sk_live_...` et `https://api.lomi.africa`.
+3. Suivez la [checklist go-live](/start/go-live) et traitez un petit paiement live avec webhook.
+
+## Étapes suivantes
+
+- [Référence API](/api)
+- [Vérifier les paiements](/build/guides/verify-payments)
+- [Machine à états des paiements](/api/payment-state-machine)

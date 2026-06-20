@@ -20,7 +20,7 @@ const lomi = new LomiSDK({
 
 ### 2. Secret webhook de test
 
-Pour tester les webhooks en local ou en préproduction, créez un point de terminaison webhook distinct dans le Dashboard lomi. pointant vers votre URL de test (par ex. une URL `ngrok`). Utilisez le **secret de signature** (`whsec_...`) généré **pour ce point de terminaison de test** dans votre configuration de test (`LOMI_TEST_WEBHOOK_SECRET`).
+Pour tester les webhooks en local ou en préproduction, créez une URL webhook distincte dans le Dashboard lomi. pointant vers votre URL de test (par ex. une URL `ngrok`). Utilisez le **secret de signature** (`whsec_...`) généré **pour cette URL de test** dans votre configuration de test (`LOMI_TEST_WEBHOOK_SECRET`).
 
 ### 3. Fichier de configuration de test
 
@@ -43,11 +43,11 @@ Pour les **numéros de carte de test**, le comportement **Wave** et **MTN MoMo**
 
 ## Tests d’intégration
 
-Réalisez des tests automatisés contre l’API **bac à sable** lomi..
+Réalisez des tests automatisés contre l’API **bac à sable** lomi.
 
 ### 1. Tests du parcours de paiement
 
-Testez la création et la récupération d’objets centraux comme les sessions de paiement (Checkout Sessions) ou les liens de paiement.
+Testez la création et la récupération d’objets centraux comme les sessions de paiement (Checkout sessions) ou les liens de paiement.
 
 ```typescript filename="Test de création de session de paiement (exemple Jest)"
 import { LomiSDK } from '@lomi./sdk';
@@ -210,9 +210,9 @@ Un script E2E fait typiquement :
 
 1.  Parcourir l’application pour lancer un paiement ;
 2.  Déclencher la création d’une session de paiement lomi. via votre backend ;
-3.  **Point délicat :** interagir avec la page checkout bac à sable lomi.. Souvent instable en E2E. Pistes :
+3.  **Point délicat :** interagir avec la page checkout bac à sable lomi. Souvent instable en E2E. Pistes :
     - Utiliser les [numéros de carte de test et règles mobile money](/start/sandbox-payments) pour des flux manuels ou semi-automatisés ;
-    - Exposer un point de terminaison dans votre **environnement de test** qui simule le webhook qu’envoierait lomi. à la fin (contourner l’UI bac à sable) — souvent plus fiable pour l’automatisation ;
+    - Exposer une URL dans votre **environnement de test** qui simule le webhook qu’envoierait lomi. à la fin (contourner l’UI bac à sable), souvent plus fiable pour l’automatisation ;
 4.  Attendre et vérifier la réception du webhook attendu (`PAYMENT_SUCCEEDED`) ;
 5.  Vérifier que l’état applicatif est correct (commande payée, service provisionné, etc.).
 
@@ -263,7 +263,7 @@ export class TestWebhookListener {
     this.app.use(express.raw({ type: 'application/json' }));
     this.app.post('/test-webhook', (req, res) => {
       try {
-        // Validation basique — en PRODUCTION, vérification complète de signature !
+        // Validation basique: en PRODUCTION, vérification complète de signature !
         const payload = JSON.parse(req.body.toString());
         console.log(`Test listener received event: ${payload.event}`);
         this.receivedEvents.push({

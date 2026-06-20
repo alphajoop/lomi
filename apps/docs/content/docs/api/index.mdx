@@ -1,12 +1,12 @@
 ---
-title: 'API Reference'
+title: 'API reference'
 description: 'Use the public lomi. merchant API to accept payments, manage commerce objects, move money, and handle operational events.'
 index: true
 ---
 
 The API reference documents the public merchant API: the endpoints a developer should use from a server-side integration. It intentionally does not expose internal provider, organization, merchant-admin, or agent services.
 
-If you are choosing an integration path, start with [Which payment integration should I choose?](/build/choose-integration).
+If you are choosing an integration path, start with [Integration journey](/start/integration-journey) or [Which payment integration should I choose?](/build/choose-integration).
 
 ## Base URLs
 
@@ -21,10 +21,10 @@ Send your secret key in the `X-API-Key` header from your server.
 
 | Goal | API |
 | --- | --- |
-| Hosted checkout | [Checkout Sessions](/api/checkout-sessions) |
-| Shareable payment URLs | [Payment Links](/api/payment-links) |
-| Backend-created payment requests | [Payment Requests](/api/payment-requests) |
-| Lower-level Wave, MTN MoMo, and card flows | [Advanced Direct Charges](/api/charge) |
+| Hosted checkout | [Checkout sessions](/api/checkout-sessions) |
+| Shareable payment URLs | [Payment links](/api/payment-links) |
+| Backend-created payment requests | [Payment requests](/api/payment-requests) |
+| Lower-level Wave, MTN MoMo, and card flows | [Advanced direct charges](/api/charge) |
 
 ## Manage commerce
 
@@ -33,7 +33,7 @@ Send your secret key in the `X-API-Key` header from your server.
 | Customer records and portal launch sessions | [Customers](/api/customers) |
 | Products, prices, and catalogs | [Products](/api/products) |
 | Recurring billing and customer subscriptions | [Subscriptions](/api/subscriptions) |
-| Discount codes and coupon performance | [Discount Coupons](/api/discount-coupons) |
+| Discount codes and coupon performance | [Discount coupons](/api/discount-coupons) |
 
 ## Move and reconcile money
 
@@ -56,5 +56,3 @@ Send your secret key in the `X-API-Key` header from your server.
 - API pages describe exact HTTP operations.
 - Direct charges are advanced; hosted checkout remains the default recommendation.
 - Use sandbox for development and live only after your integration passes the [go-live checklist](/start/go-live).
-
-<DocsCategory />

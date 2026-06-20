@@ -23,7 +23,6 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
-import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
 import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
@@ -31,7 +30,6 @@ import { InvoiceResponseDto } from './dto/invoice-response.dto';
 
 @ApiTags('Factures')
 @ApiSecurity('api-key')
-@ApiLomiAccountHeader()
 @UseGuards(ApiKeyGuard)
 @Controller('invoices')
 export class InvoicesController {

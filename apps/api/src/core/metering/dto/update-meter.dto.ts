@@ -1,12 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateMeterDto {
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   filter?: Record<string, unknown>;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   aggregation?: Record<string, unknown>;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: Boolean })
   is_active?: boolean;
 }

@@ -1,11 +1,10 @@
 {
   "title": "Payment details",
-  "description": "Advanced checkout behavior, charge flows, BNPL, payout lifecycle, and Payment Elements.",
+  "description": "Advanced checkout behavior, charge flows, payout lifecycle, and Payment Elements.",
   "pages": [
     "checkout-behavior",
     "charges",
     "payout-lifecycle",
-    "bnpl",
     "coupon-logic-examples",
     "lomi-payment-elements"
   ]

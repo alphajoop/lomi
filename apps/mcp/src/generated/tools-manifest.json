@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 60,
+  "toolCount": 91,
   "tools": [
     {
       "name": "lomi_delete_customer_subscriptions_subscription_id",
@@ -62,11 +62,6 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -238,7 +233,7 @@
       ],
       "queryParamNames": [],
       "title": "Get Advanced Direct Charges",
-      "description": "Get Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: GET /charge/card/{id}",
+      "description": "Retrieve card charge\n\nREST: GET /charge/card/{id}",
       "tags": [
         "Advanced Direct Charges"
       ],
@@ -288,11 +283,6 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
           "limit": {
             "example": 20,
             "type": "number",
@@ -339,11 +329,6 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
           "id": {
             "type": "string",
             "description": "UUID de la session"
@@ -564,11 +549,6 @@
             "type": "string",
             "description": "Filtre sur customer_portal_audit_events.event_type"
           },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -721,6 +701,455 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "coupons discount get id performance"
+    },
+    {
+      "name": "lomi_get_disputes",
+      "operationKey": "GET /disputes",
+      "method": "get",
+      "pathTemplate": "/disputes",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "endDate",
+        "startDate",
+        "status"
+      ],
+      "title": "List Litiges",
+      "description": "List Litiges via the lomi. merchant REST API.\n\nREST: GET /disputes",
+      "tags": [
+        "Litiges"
+      ],
+      "operationId": "DisputesController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endDate": {
+            "type": "string"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "disputes get litiges"
+    },
+    {
+      "name": "lomi_get_disputes_id",
+      "operationKey": "GET /disputes/{id}",
+      "method": "get",
+      "pathTemplate": "/disputes/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Litiges",
+      "description": "Get Litiges via the lomi. merchant REST API.\n\nREST: GET /disputes/{id}",
+      "tags": [
+        "Litiges"
+      ],
+      "operationId": "DisputesController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "description": "Dispute ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "disputes get id litiges"
+    },
+    {
+      "name": "lomi_get_merchants_id",
+      "operationKey": "GET /merchants/{id}",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Merchants",
+      "description": "Get merchant details\n\nReturns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.\n\nREST: GET /merchants/{id}",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getDetails",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id merchants"
+    },
+    {
+      "name": "lomi_get_merchants_id_arr",
+      "operationKey": "GET /merchants/{id}/arr",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/arr",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Merchants",
+      "description": "Get merchant ARR\n\nREST: GET /merchants/{id}/arr",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getArr",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "arr get id merchants"
+    },
+    {
+      "name": "lomi_get_merchants_id_balance",
+      "operationKey": "GET /merchants/{id}/balance",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/balance",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "currency_code"
+      ],
+      "title": "Get Merchants",
+      "description": "Get merchant account balance for a currency\n\nREST: GET /merchants/{id}/balance",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency_code": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "currency_code",
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "balance get id merchants"
+    },
+    {
+      "name": "lomi_get_merchants_id_mrr",
+      "operationKey": "GET /merchants/{id}/mrr",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/mrr",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Merchants",
+      "description": "Get merchant MRR\n\nREST: GET /merchants/{id}/mrr",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getMrr",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id merchants mrr"
+    },
+    {
+      "name": "lomi_get_meters",
+      "operationKey": "GET /meters",
+      "method": "get",
+      "pathTemplate": "/meters",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "isActive",
+        "productId"
+      ],
+      "title": "List Meters",
+      "description": "List meters\n\nREST: GET /meters",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          },
+          "productId": {}
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get meters"
+    },
+    {
+      "name": "lomi_get_meters_id",
+      "operationKey": "GET /meters/{id}",
+      "method": "get",
+      "pathTemplate": "/meters/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Meters",
+      "description": "Get a meter\n\nREST: GET /meters/{id}",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Meter ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id meters"
+    },
+    {
+      "name": "lomi_get_meters_id_balances_customerId",
+      "operationKey": "GET /meters/{id}/balances/{customerId}",
+      "method": "get",
+      "pathTemplate": "/meters/{id}/balances/{customerId}",
+      "pathParamNames": [
+        "id",
+        "customerId"
+      ],
+      "queryParamNames": [],
+      "title": "Get Meters",
+      "description": "Get meter balance for a customer\n\nReturns aggregated consumed units for the meter and customer.\n\nREST: GET /meters/{id}/balances/{customerId}",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Path parameter \"customerId\" for `/meters/{id}/balances/{customerId}`."
+          },
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/meters/{id}/balances/{customerId}`."
+          }
+        },
+        "required": [
+          "customerId",
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "balances customerId get id meters"
+    },
+    {
+      "name": "lomi_get_organization_radar_settings",
+      "operationKey": "GET /organization/radar-settings",
+      "method": "get",
+      "pathTemplate": "/organization/radar-settings",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Get Radar",
+      "description": "Get Radar settings for the organization\n\nREST: GET /organization/radar-settings",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_getSettings",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get organization radar settings"
+    },
+    {
+      "name": "lomi_get_organizations",
+      "operationKey": "GET /organizations",
+      "method": "get",
+      "pathTemplate": "/organizations",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "List Organisations",
+      "description": "List Organisations via the lomi. merchant REST API.\n\nREST: GET /organizations",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get organisations organizations"
+    },
+    {
+      "name": "lomi_get_organizations_id",
+      "operationKey": "GET /organizations/{id}",
+      "method": "get",
+      "pathTemplate": "/organizations/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Organisations",
+      "description": "Get Organisations via the lomi. merchant REST API.\n\nREST: GET /organizations/{id}",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/organizations/{id}`."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id organisations organizations"
+    },
+    {
+      "name": "lomi_get_organizations_metrics",
+      "operationKey": "GET /organizations/metrics",
+      "method": "get",
+      "pathTemplate": "/organizations/metrics",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Get Organisations",
+      "description": "Get Organisations via the lomi. merchant REST API.\n\nREST: GET /organizations/metrics",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_getMetrics",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get metrics organisations organizations"
     },
     {
       "name": "lomi_get_payment_links",
@@ -1053,6 +1482,43 @@
       "searchHint": "get id products"
     },
     {
+      "name": "lomi_get_providers",
+      "operationKey": "GET /providers",
+      "method": "get",
+      "pathTemplate": "/providers",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "provider_code"
+      ],
+      "title": "List Providers",
+      "description": "List payment providers\n\nReturns connection status for payment providers configured for your organization.\n\nREST: GET /providers",
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "ProvidersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "provider_code": {
+            "enum": [
+              "CARD",
+              "WAVE",
+              "MTN",
+              "SPI"
+            ],
+            "type": "string",
+            "description": "Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay)."
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get providers"
+    },
+    {
       "name": "lomi_get_refunds",
       "operationKey": "GET /refunds",
       "method": "get",
@@ -1140,6 +1606,109 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "get id refunds"
+    },
+    {
+      "name": "lomi_get_risk_assessments",
+      "operationKey": "GET /risk-assessments",
+      "method": "get",
+      "pathTemplate": "/risk-assessments",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "endDate",
+        "startDate",
+        "rail",
+        "decision"
+      ],
+      "title": "Get Radar",
+      "description": "List payment risk assessments\n\nREST: GET /risk-assessments",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_listAssessments",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "enum": [
+              "allow",
+              "flag",
+              "block"
+            ],
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "rail": {
+            "enum": [
+              "card",
+              "mtn",
+              "wave"
+            ],
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "assessments get radar risk"
+    },
+    {
+      "name": "lomi_get_risk_assessments_id",
+      "operationKey": "GET /risk-assessments/{id}",
+      "method": "get",
+      "pathTemplate": "/risk-assessments/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Radar",
+      "description": "Get a risk assessment\n\nREST: GET /risk-assessments/{id}",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "description": "Risk assessment ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "assessments get id radar risk"
     },
     {
       "name": "lomi_get_subscriptions",
@@ -1376,6 +1945,214 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "get id transactions"
+    },
+    {
+      "name": "lomi_get_usage_billing_entitlements_check",
+      "operationKey": "GET /usage-billing/entitlements/check",
+      "method": "get",
+      "pathTemplate": "/usage-billing/entitlements/check",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Get Usage billing",
+      "description": "Get Usage billing via the lomi. merchant REST API.\n\nREST: GET /usage-billing/entitlements/check",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_checkEntitlement",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing check entitlements get usage"
+    },
+    {
+      "name": "lomi_get_usage_billing_periods",
+      "operationKey": "GET /usage-billing/periods",
+      "method": "get",
+      "pathTemplate": "/usage-billing/periods",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "page_size",
+        "page",
+        "subscription_id"
+      ],
+      "title": "Get Usage billing",
+      "description": "List usage billing periods\n\nREST: GET /usage-billing/periods",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_listPeriods",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "subscription_id": {}
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing get periods usage"
+    },
+    {
+      "name": "lomi_get_usage_billing_revenue",
+      "operationKey": "GET /usage-billing/revenue",
+      "method": "get",
+      "pathTemplate": "/usage-billing/revenue",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "end_date",
+        "start_date"
+      ],
+      "title": "Get Usage billing",
+      "description": "Get Usage billing via the lomi. merchant REST API.\n\nREST: GET /usage-billing/revenue",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_getRevenue",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "end_date": {},
+          "start_date": {}
+        },
+        "required": [
+          "end_date",
+          "start_date"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing get revenue usage"
+    },
+    {
+      "name": "lomi_get_usage_billing_subscriptions_subscriptionId_usage",
+      "operationKey": "GET /usage-billing/subscriptions/{subscriptionId}/usage",
+      "method": "get",
+      "pathTemplate": "/usage-billing/subscriptions/{subscriptionId}/usage",
+      "pathParamNames": [
+        "subscriptionId"
+      ],
+      "queryParamNames": [],
+      "title": "Get Usage billing",
+      "description": "Get meter usage for a subscription\n\nREST: GET /usage-billing/subscriptions/{subscriptionId}/usage",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_getSubscriptionUsage",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Path parameter \"subscriptionId\" for `/usage-billing/subscriptions/{subscriptionId}/usage`."
+          }
+        },
+        "required": [
+          "subscriptionId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing get subscriptionId subscriptions usage"
+    },
+    {
+      "name": "lomi_get_usage_events",
+      "operationKey": "GET /usage-events",
+      "method": "get",
+      "pathTemplate": "/usage-events",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "status",
+        "code",
+        "customer_id",
+        "page_size",
+        "page"
+      ],
+      "title": "List Usage events",
+      "description": "List usage events\n\nREST: GET /usage-events",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {},
+          "customer_id": {},
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "processed",
+              "failed"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "events get usage"
+    },
+    {
+      "name": "lomi_get_usage_events_id",
+      "operationKey": "GET /usage-events/{id}",
+      "method": "get",
+      "pathTemplate": "/usage-events/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Usage events",
+      "description": "Get a usage event\n\nREST: GET /usage-events/{id}",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Event ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "events get id usage"
     },
     {
       "name": "lomi_get_webhook_delivery_logs",
@@ -1648,6 +2425,99 @@
       "searchHint": "customers id patch"
     },
     {
+      "name": "lomi_patch_meters_id",
+      "operationKey": "PATCH /meters/{id}",
+      "method": "patch",
+      "pathTemplate": "/meters/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Update Meters",
+      "description": "Update a meter\n\nREST: PATCH /meters/{id}",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_update",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Meter ID"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "id meters patch"
+    },
+    {
+      "name": "lomi_patch_organization_radar_settings",
+      "operationKey": "PATCH /organization/radar-settings",
+      "method": "patch",
+      "pathTemplate": "/organization/radar-settings",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Update Radar",
+      "description": "Update Radar settings\n\nREST: PATCH /organization/radar-settings",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_updateSettings",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "monitor",
+                  "block"
+                ]
+              },
+              "stripe_radar_passthrough": {
+                "type": "boolean"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "organization patch radar settings"
+    },
+    {
       "name": "lomi_patch_subscriptions_id",
       "operationKey": "PATCH /subscriptions/{id}",
       "method": "patch",
@@ -1754,7 +2624,7 @@
       "pathParamNames": [],
       "queryParamNames": [],
       "title": "Create Advanced Direct Charges",
-      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/card",
+      "description": "Create card charge (client_secret)\n\nCreates an embedded card charge and returns the client_secret for your payment UI.\n\nREST: POST /charge/card",
       "tags": [
         "Advanced Direct Charges"
       ],
@@ -1905,7 +2775,7 @@
       ],
       "queryParamNames": [],
       "title": "Create Advanced Direct Charges",
-      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/card/{id}/cancel",
+      "description": "Cancel card charge\n\nREST: POST /charge/card/{id}/cancel",
       "tags": [
         "Advanced Direct Charges"
       ],
@@ -1945,16 +2815,86 @@
       "pathParamNames": [],
       "queryParamNames": [],
       "title": "Create Advanced Direct Charges",
-      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/mtn",
+      "description": "Create MTN MoMo charge\n\nInitiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.\n\nREST: POST /charge/mtn",
       "tags": [
         "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_createMtnCharge",
       "write": true,
-      "wantsBody": false,
+      "wantsBody": true,
       "inputSchema": {
         "type": "object",
         "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "example": 1000
+              },
+              "countryCode": {
+                "type": "string",
+                "example": "CI"
+              },
+              "currency": {
+                "type": "string",
+                "example": "XOF"
+              },
+              "customer": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "jane@example.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "example": "+2250707070707",
+                    "description": "E.164 phone number required for mobile-money rails"
+                  }
+                },
+                "required": [
+                  "name",
+                  "phoneNumber"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "example": "Payment for Service"
+              },
+              "merchantId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "organizationId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "productId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "quantity": {
+                "type": "number",
+                "example": 1,
+                "default": 1
+              },
+              "subscriptionId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "amount",
+              "currency",
+              "customer"
+            ],
+            "description": "JSON request body for this operation."
+          },
           "header_Lomi-Account": {
             "type": "string",
             "example": "acct_1234567890",
@@ -1965,7 +2905,9 @@
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
-        "required": []
+        "required": [
+          "body"
+        ]
       },
       "readOnly": false,
       "destructive": false,
@@ -1980,16 +2922,86 @@
       "pathParamNames": [],
       "queryParamNames": [],
       "title": "Create Advanced Direct Charges",
-      "description": "Create Advanced Direct Charges via the lomi. merchant REST API.\n\nREST: POST /charge/wave",
+      "description": "Create direct Wave charge\n\nStarts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.\n\nREST: POST /charge/wave",
       "tags": [
         "Advanced Direct Charges"
       ],
       "operationId": "ChargesController_createWaveCharge",
       "write": true,
-      "wantsBody": false,
+      "wantsBody": true,
       "inputSchema": {
         "type": "object",
         "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "example": 1000,
+                "description": "Amount in XOF (minimum 100)"
+              },
+              "currency": {
+                "type": "string",
+                "example": "XOF",
+                "description": "Must be XOF for Wave"
+              },
+              "customer": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "jane@example.com"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "example": "+2250707070707",
+                    "description": "E.164 phone number required for mobile-money rails"
+                  }
+                },
+                "required": [
+                  "name",
+                  "phoneNumber"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "example": "Payment for Service"
+              },
+              "environment": {
+                "type": "string",
+                "enum": [
+                  "live",
+                  "test"
+                ]
+              },
+              "errorUrl": {
+                "type": "string",
+                "example": "https://your-site.com/error"
+              },
+              "merchantId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "organizationId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "successUrl": {
+                "type": "string",
+                "example": "https://your-site.com/success"
+              }
+            },
+            "required": [
+              "amount",
+              "currency",
+              "customer"
+            ],
+            "description": "JSON request body for this operation."
+          },
           "header_Lomi-Account": {
             "type": "string",
             "example": "acct_1234567890",
@@ -2000,7 +3012,9 @@
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
-        "required": []
+        "required": [
+          "body"
+        ]
       },
       "readOnly": false,
       "destructive": false,
@@ -2285,11 +3299,6 @@
             },
             "description": "JSON request body for this operation."
           },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -2338,6 +3347,36 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "coupons discount post"
+    },
+    {
+      "name": "lomi_post_meters",
+      "operationKey": "POST /meters",
+      "method": "post",
+      "pathTemplate": "/meters",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create Meters",
+      "description": "Create a meter\n\nDefines a billable metric for usage-based products. Events with matching code update meter balances.\n\nREST: POST /meters",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "meters post"
     },
     {
       "name": "lomi_post_payment_links",
@@ -2667,10 +3706,51 @@
       ],
       "operationId": "RefundsController_create",
       "write": true,
-      "wantsBody": false,
+      "wantsBody": true,
       "inputSchema": {
         "type": "object",
         "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "description": "Amount to refund (same currency as the transaction)"
+              },
+              "reason": {
+                "type": "string",
+                "description": "Reason for the refund"
+              },
+              "refund_type": {
+                "type": "string",
+                "description": "Full or partial refund. If omitted, full when amount equals transaction gross amount.",
+                "enum": [
+                  "full",
+                  "partial"
+                ]
+              },
+              "subscription_action": {
+                "type": "string",
+                "description": "Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none.",
+                "enum": [
+                  "default",
+                  "cancel",
+                  "pause",
+                  "none"
+                ]
+              },
+              "transaction_id": {
+                "type": "string",
+                "description": "UUID of a completed transaction (card, Wave, or MTN MoMo)",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "amount",
+              "transaction_id"
+            ],
+            "description": "JSON request body for this operation."
+          },
           "header_Lomi-Account": {
             "type": "string",
             "example": "acct_1234567890",
@@ -2681,7 +3761,9 @@
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
         },
-        "required": []
+        "required": [
+          "body"
+        ]
       },
       "readOnly": false,
       "destructive": false,
@@ -2711,6 +3793,9 @@
           "body": {
             "type": "object",
             "properties": {
+              "cancel_at_period_end": {
+                "type": "boolean"
+              },
               "cancellation_reason": {
                 "type": "string"
               }
@@ -2735,6 +3820,216 @@
       "destructive": true,
       "alwaysLoad": false,
       "searchHint": "cancel id post subscriptions"
+    },
+    {
+      "name": "lomi_post_subscriptions_id_change_plan",
+      "operationKey": "POST /subscriptions/{id}/change-plan",
+      "method": "post",
+      "pathTemplate": "/subscriptions/{id}/change-plan",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Create Subscriptions",
+      "description": "Create Subscriptions via the lomi. merchant REST API.\n\nREST: POST /subscriptions/{id}/change-plan",
+      "tags": [
+        "Subscriptions"
+      ],
+      "operationId": "SubscriptionsController_changePlan",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "required": [
+              "price_id"
+            ],
+            "properties": {
+              "price_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID de l’abonnement"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "change id plan post subscriptions"
+    },
+    {
+      "name": "lomi_post_subscriptions_id_uncancel",
+      "operationKey": "POST /subscriptions/{id}/uncancel",
+      "method": "post",
+      "pathTemplate": "/subscriptions/{id}/uncancel",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Create Subscriptions",
+      "description": "Create Subscriptions via the lomi. merchant REST API.\n\nREST: POST /subscriptions/{id}/uncancel",
+      "tags": [
+        "Subscriptions"
+      ],
+      "operationId": "SubscriptionsController_uncancel",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de l’abonnement"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "id post subscriptions uncancel"
+    },
+    {
+      "name": "lomi_post_usage_billing_credits",
+      "operationKey": "POST /usage-billing/credits",
+      "method": "post",
+      "pathTemplate": "/usage-billing/credits",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create Usage billing",
+      "description": "Create Usage billing via the lomi. merchant REST API.\n\nREST: POST /usage-billing/credits",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_creditWallet",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing credits post usage"
+    },
+    {
+      "name": "lomi_post_usage_billing_entitlements",
+      "operationKey": "POST /usage-billing/entitlements",
+      "method": "post",
+      "pathTemplate": "/usage-billing/entitlements",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create Usage billing",
+      "description": "Create or update a plan entitlement feature\n\nREST: POST /usage-billing/entitlements",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_createEntitlement",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing entitlements post usage"
+    },
+    {
+      "name": "lomi_post_usage_events",
+      "operationKey": "POST /usage-events",
+      "method": "post",
+      "pathTemplate": "/usage-events",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create Usage events",
+      "description": "Record a usage event\n\nIdempotent usage ingest. Events are processed asynchronously and update meter balances.\n\nREST: POST /usage-events",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_ingest",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "events post usage"
+    },
+    {
+      "name": "lomi_post_usage_subscriptions",
+      "operationKey": "POST /usage-subscriptions",
+      "method": "post",
+      "pathTemplate": "/usage-subscriptions",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create Usage events",
+      "description": "Create a usage subscription\n\nEnrolls a customer on a usage_based product without an upfront charge. Required before billing metered usage.\n\nREST: POST /usage-subscriptions",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_createUsageSubscription",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "events post subscriptions usage"
     },
     {
       "name": "lomi_post_webhooks",

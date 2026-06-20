@@ -9,7 +9,7 @@ lomi. est une plateforme de paiement pour les entreprises qui vendent en Afrique
 
 Utilisez lomi. si vous voulez :
 
-- Accepter Wave, MTN MoMo, Orange Money, SPI, les cartes et d’autres moyens de paiement locaux avec une seule intégration.
+- Accepter Wave, MTN MoMo, SPI, les cartes et d’autres moyens de paiement locaux avec une seule intégration.
 - Rediriger vos clients vers un checkout hébergé au lieu de construire toute la collecte de paiement.
 - Créer des liens de paiement pour des factures, services, événements, dons ou produits.
 - Gérer des paiements récurrents et des abonnements clients.
@@ -22,7 +22,7 @@ Le paysage des paiements en Afrique de l’Ouest est fragmenté entre de nombreu
 
 lomi. y répond avec :
 
-- **APIs** : une intégration pour cartes, MTN MoMo, Wave, Orange Money, SPI (64+ opérateurs mobile money et banques), et plus.
+- **APIs** : une intégration pour cartes, MTN MoMo, Wave, SPI (64+ opérateurs mobile money et banques), et plus.
 - **Tableau de bord** : back-office web pour vendre biens, services, abonnements, etc.
 - **Application mobile** : soft-POS pour vendre en mobilité et retirer vos revenus.
 - **Contrôle** : rapprochement, remboursements, reversements, checkout hébergé, liens de paiement, éléments intégrables, API de charges directes et rapports.
@@ -33,7 +33,8 @@ lomi. y répond avec :
 
 lomi. vise la visibilité sur les frais, les flux de transaction et les reversements :
 
-- **Open source** : la majeure partie du code est public — voir la [structure du code](/resources/open-source/codebase).
+- **Plateforme hébergée** : les paiements en production passent par le cloud lomi., [créer un compte](https://lomi.africa/sign-up). Le stack paiement **n’est pas auto-hébergeable aujourd’hui**.
+- **Open source** : outils d’intégration et documentation publiés progressivement, voir la [structure du code](/resources/open-source/codebase).
 - **Gouvernance communautaire** : feuille de route et retours via issues et pull requests GitHub.
 - **Conformité** : agrément BCEAO (en cours), PCI DSS niveau 4, partenaires carte certifiés, RGPD et MACP avec flux hébergés notamment au Cap et à Dublin.
 
@@ -45,7 +46,7 @@ La plupart des équipes commencent par l’un de ces chemins :
 
 | Objectif | Point de départ recommandé |
 | --- | --- |
-| Démarrer depuis le terminal | [Démarrer avec la CLI](/start/cli-quickstart) |
+| Démarrer depuis le terminal | [Démarrer avec le CLI](/start/cli-quickstart) |
 | Accepter un premier paiement en ligne | [Faire un paiement de test](/start/first-payment) |
 | Ajouter un checkout à une app ou boutique | [Checkout hébergé](/build/checkout) |
 | Vendre sans coder un checkout complet | [Liens de paiement](/build/payment-links) |
@@ -57,7 +58,7 @@ La plupart des équipes commencent par l’un de ces chemins :
 Le parcours habituel est simple :
 
 1. Créez un compte et terminez l’onboarding.
-2. Récupérez vos clés API de test dans le tableau de bord (ou `lomi login` pour la CLI).
+2. Récupérez vos clés API de test dans le tableau de bord (ou `lomi login` pour le CLI).
 3. Créez une session de checkout avec `lomi checkout create`, un lien de paiement ou une demande de paiement.
 4. Laissez le client payer avec un moyen disponible.
 5. Confirmez le résultat via l’API, le tableau de bord ou un webhook.

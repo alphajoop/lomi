@@ -18,7 +18,13 @@
     "providers",
     "transactions",
     "refunds",
+    "disputes",
+    "risk-assessments",
     "payouts",
-    "webhooks"
+    "settlements",
+    "webhooks",
+    "meters",
+    "usage-events",
+    "usage-billing"
   ]
 }

@@ -161,7 +161,8 @@ export default async function RootLayout({
   return (
     <html
       lang={htmlLang}
-      className={`${font.variable}`}
+      className={font.className}
+      style={font.style}
       suppressHydrationWarning
     >
       <Body>

@@ -31,13 +31,16 @@ const docsDir = path.join(baseDir, '..', '..');
 const paymentChannelAssets: LomiUiRegistryAsset[] = [
   'wave.webp',
   'mtn.webp',
-  'orange.webp',
-  'spi.webp',
   'pi_spi.webp',
-  'cards.webp',
 ].map((file) => ({
   path: `public/payment_channels/${file}`,
   target: `public/payment_channels/${file}`,
+  type: 'registry:file' as const,
+}));
+
+const placeholderAssets: LomiUiRegistryAsset[] = ['card.webp'].map((file) => ({
+  path: `public/placeholder/${file}`,
+  target: `public/placeholder/${file}`,
   type: 'registry:file' as const,
 }));
 
@@ -51,18 +54,27 @@ export const lomiUiRegistry: {
   dir: docsDir,
   name: 'lomi-ui',
   version: '1.0.0',
-  homepage: 'https://docs.lomi.africa/ui',
+  homepage: 'https://docs.lomi.africa/build/lomi-ui',
   items: [
     {
       name: 'payment-provider-selector',
-      title: 'Payment Provider Selector',
+      title: 'Payment provider selector',
       description:
-        'Select Wave, MTN, Orange Money, SPI, or card payment rails.',
-      dependencies: ['lucide-react'],
+        'Hosted-checkout payment method carousel for Wave, MTN, cards, and SPI.',
       files: [
         {
           path: 'components/lomi-ui/payment-provider-selector.tsx',
           target: 'components/lomi-ui/payment-provider-selector.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-card.tsx',
+          target: 'components/lomi-ui/lib/checkout-card.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-ui.css',
+          target: 'components/lomi-ui/lib/checkout-ui.css',
           type: 'registry:component',
         },
         {
@@ -71,14 +83,64 @@ export const lomiUiRegistry: {
           type: 'registry:component',
         },
       ],
-      assetFiles: paymentChannelAssets,
+      assetFiles: [...paymentChannelAssets, ...placeholderAssets],
+    },
+    {
+      name: 'customer-information-section',
+      title: 'Customer information section',
+      description:
+        'Hosted checkout personal information form from customer-information-section.tsx.',
+      dependencies: ['lucide-react', 'react-phone-number-input'],
+      files: [
+        {
+          path: 'components/lomi-ui/customer-information-section.tsx',
+          target: 'components/lomi-ui/customer-information-section.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-input.tsx',
+          target: 'components/lomi-ui/lib/checkout-input.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-phone-flag.tsx',
+          target: 'components/lomi-ui/lib/checkout-phone-flag.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-country-select.tsx',
+          target: 'components/lomi-ui/lib/checkout-country-select.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-phone-number-input.tsx',
+          target: 'components/lomi-ui/lib/checkout-phone-number-input.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-whatsapp-number-input.tsx',
+          target: 'components/lomi-ui/lib/checkout-whatsapp-number-input.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-ui.css',
+          target: 'components/lomi-ui/lib/checkout-ui.css',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/demo/customer-information-section-demo.tsx',
+          target:
+            'components/lomi-ui/demo/customer-information-section-demo.tsx',
+          type: 'registry:component',
+        },
+      ],
     },
     {
       name: 'mobile-money-checkout-card',
-      title: 'Mobile Money Checkout Card',
+      title: 'Mobile money checkout card',
       description:
-        'A focused checkout card for Wave, MTN, Orange Money, and SPI.',
-      dependencies: ['lucide-react'],
+        'Provider selection, customer form, and pay button aligned with hosted checkout.',
+      dependencies: ['lucide-react', 'react-phone-number-input'],
       files: [
         {
           path: 'components/lomi-ui/mobile-money-checkout-card.tsx',
@@ -91,25 +153,72 @@ export const lomiUiRegistry: {
           type: 'registry:component',
         },
         {
+          path: 'components/lomi-ui/lib/checkout-card.tsx',
+          target: 'components/lomi-ui/lib/checkout-card.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-ui.css',
+          target: 'components/lomi-ui/lib/checkout-ui.css',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/customer-information-section.tsx',
+          target: 'components/lomi-ui/customer-information-section.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-input.tsx',
+          target: 'components/lomi-ui/lib/checkout-input.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-phone-flag.tsx',
+          target: 'components/lomi-ui/lib/checkout-phone-flag.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-country-select.tsx',
+          target: 'components/lomi-ui/lib/checkout-country-select.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-phone-number-input.tsx',
+          target: 'components/lomi-ui/lib/checkout-phone-number-input.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/checkout-whatsapp-number-input.tsx',
+          target: 'components/lomi-ui/lib/checkout-whatsapp-number-input.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/checkout-submit-button.tsx',
+          target: 'components/lomi-ui/checkout-submit-button.tsx',
+          type: 'registry:component',
+        },
+        {
+          path: 'components/lomi-ui/lib/pay-button-contrast.ts',
+          target: 'components/lomi-ui/lib/pay-button-contrast.ts',
+          type: 'registry:component',
+        },
+        {
           path: 'components/lomi-ui/demo/mobile-money-checkout-card-demo.tsx',
           target: 'components/lomi-ui/demo/mobile-money-checkout-card-demo.tsx',
           type: 'registry:component',
         },
       ],
       assetFiles: paymentChannelAssets.filter((asset) =>
-        [
-          'wave.webp',
-          'mtn.webp',
-          'orange.webp',
-          'spi.webp',
-          'pi_spi.webp',
-        ].some((file) => asset.path.endsWith(file)),
+        ['wave.webp', 'mtn.webp', 'pi_spi.webp'].some((file) =>
+          asset.path.endsWith(file),
+        ),
       ),
     },
     {
       name: 'checkout-summary-card',
-      title: 'Checkout Summary Card',
-      description: 'A dark checkout summary inspired by Lomi hosted checkout.',
+      title: 'Checkout summary card',
+      description:
+        'Dark hosted-checkout product summary panel from the left checkout column.',
       files: [
         {
           path: 'components/lomi-ui/checkout-summary-card.tsx',
@@ -124,89 +233,26 @@ export const lomiUiRegistry: {
       ],
     },
     {
-      name: 'payment-status-card',
-      title: 'Payment Status Card',
-      description: 'Show success, failed, and pending checkout outcomes.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/payment-status-card.tsx',
-          target: 'components/lomi-ui/payment-status-card.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/payment-provider-selector.tsx',
-          target: 'components/lomi-ui/payment-provider-selector.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/payment-status-card-demo.tsx',
-          target: 'components/lomi-ui/demo/payment-status-card-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-      assetFiles: paymentChannelAssets,
-    },
-    {
-      name: 'pricing-table',
-      title: 'Pricing Table',
+      name: 'price-selector',
+      title: 'Price selector',
       description:
-        'A Lomi-styled plan selector for checkout, subscription, and pricing pages.',
-      dependencies: ['lucide-react'],
+        'Hosted checkout billing cycle selector for the dark product panel.',
       files: [
         {
-          path: 'components/lomi-ui/pricing-table.tsx',
-          target: 'components/lomi-ui/pricing-table.tsx',
+          path: 'components/lomi-ui/price-selector.tsx',
+          target: 'components/lomi-ui/price-selector.tsx',
           type: 'registry:component',
         },
         {
-          path: 'components/lomi-ui/demo/pricing-table-demo.tsx',
-          target: 'components/lomi-ui/demo/pricing-table-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'invoice-history',
-      title: 'Invoice History',
-      description:
-        'A compact invoice and receipt table for customer billing surfaces.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/invoice-history.tsx',
-          target: 'components/lomi-ui/invoice-history.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/invoice-history-demo.tsx',
-          target: 'components/lomi-ui/demo/invoice-history-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'subscription-management-card',
-      title: 'Subscription Management Card',
-      description: "Show and manage a customer's current subscription.",
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/subscription-management-card.tsx',
-          target: 'components/lomi-ui/subscription-management-card.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/subscription-management-card-demo.tsx',
-          target:
-            'components/lomi-ui/demo/subscription-management-card-demo.tsx',
+          path: 'components/lomi-ui/demo/price-selector-demo.tsx',
+          target: 'components/lomi-ui/demo/price-selector-demo.tsx',
           type: 'registry:component',
         },
       ],
     },
     {
       name: 'usage-meter',
-      title: 'Usage Meter',
+      title: 'Usage meter',
       description:
         'Track usage limits for checkout sessions, webhooks, payouts, or subscriptions.',
       files: [
@@ -218,24 +264,6 @@ export const lomiUiRegistry: {
         {
           path: 'components/lomi-ui/demo/usage-meter-demo.tsx',
           target: 'components/lomi-ui/demo/usage-meter-demo.tsx',
-          type: 'registry:component',
-        },
-      ],
-    },
-    {
-      name: 'payment-failure-card',
-      title: 'Payment Failure Card',
-      description: 'Help customers retry or recover from a failed payment.',
-      dependencies: ['lucide-react'],
-      files: [
-        {
-          path: 'components/lomi-ui/payment-failure-card.tsx',
-          target: 'components/lomi-ui/payment-failure-card.tsx',
-          type: 'registry:component',
-        },
-        {
-          path: 'components/lomi-ui/demo/payment-failure-card-demo.tsx',
-          target: 'components/lomi-ui/demo/payment-failure-card-demo.tsx',
           type: 'registry:component',
         },
       ],

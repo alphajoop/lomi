@@ -1,20 +1,18 @@
+import { LomiUiPreview } from '@/components/preview/lomi-ui-preview';
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
 
 export function CheckoutSummaryCardDemo() {
   return (
-    <div className="not-prose flex justify-center rounded-sm border bg-fd-background p-4">
+    <LomiUiPreview variant="panel">
       <CheckoutSummaryCard
-        merchantName="Keur Studio"
+        title="Pay for Design workshop"
         currency="XOF"
-        items={[
-          { name: 'Design workshop', quantity: 1, amount: 10000 },
-          { name: 'Template pack', quantity: 1, amount: 2500 },
-        ]}
+        description="A full-day workshop covering product design fundamentals."
         subtotal={12500}
-        fees={250}
+        fees={[{ name: 'Processing fee', amount: 250 }]}
         discount={1000}
         total={11750}
       />
-    </div>
+    </LomiUiPreview>
   );
 }

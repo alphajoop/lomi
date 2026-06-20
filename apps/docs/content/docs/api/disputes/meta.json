@@ -1,0 +1,7 @@
+{
+  "title": "Disputes",
+  "pages": [
+    "DisputesController_findAll",
+    "DisputesController_findOne"
+  ]
+}

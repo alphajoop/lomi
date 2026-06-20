@@ -40,7 +40,7 @@ for path, methods in sorted(spec.get("paths", {}).items()):
         lines.append(f"- `{method.upper()} {path}` — {summary}")
 
 lines.append("")
-lines.append("Full docs: https://docs.lomi.africa/docs/api")
+lines.append("Full docs: https://docs.lomi.africa/api")
 lines.append("")
 
 out_path.write_text("\n".join(lines))

@@ -43,7 +43,7 @@ bootstrap().catch(console.error);
 
 All methods map 1:1 to the curated public merchant OpenAPI routes (see docs `openapi.json` + `sdk-public-methods.json` inside `src/generated` after running codegen).
 
-Docs: **[https://docs.lomi.africa](https://docs.lomi.africa)** • Type guide: **[`/reference/sdks/typescript`](https://docs.lomi.africa/reference/sdks/typescript)**
+Docs: **[https://docs.lomi.africa](https://docs.lomi.africa)** • Type guide: **[`/build/sdks/typescript`](https://docs.lomi.africa/build/sdks/typescript)**
 
 ## Generation
 

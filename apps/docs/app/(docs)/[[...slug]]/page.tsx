@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { type ComponentProps, type FC, type ReactNode, type JSX } from 'react';
 import * as Twoslash from 'fumadocs-twoslash/ui';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
@@ -92,16 +92,18 @@ export default async function Page({
         style: 'clerk',
       }}
     >
-      <h1 className="text-[1.75em] font-semibold">{page.data.title}</h1>
-      <p className="text-lg text-fd-muted-foreground">
-        {page.data.description}
-      </p>
-      <div className="flex flex-row gap-2 items-center border-b -translate-y-4 pt-3 pb-6 justify-end">
-        <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-        <ViewOptions
-          markdownUrl={`${page.url}.mdx`}
-          githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
-        />
+      <div className="docs-page-header">
+        <div className="docs-page-header-main">
+          <h1 className="docs-page-title font-semibold">{page.data.title}</h1>
+          <p className="docs-page-description">{page.data.description}</p>
+        </div>
+        <div className="docs-page-actions">
+          <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
+          <ViewOptions
+            markdownUrl={`${page.url}.mdx`}
+            githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
+          />
+        </div>
       </div>
       <div className="prose flex-1 text-fd-foreground/80">
         {preview ? <PreviewRenderer preview={preview} /> : null}
@@ -160,14 +162,18 @@ function DocsCategory({ url, locale }: { url: string; locale: Language }) {
   const peers = getPageTreePeers(source.getPageTree(locale), url);
   const peersArray = Array.isArray(peers) ? peers : [];
 
+  if (peersArray.length === 0) return null;
+
   return (
-    <Cards>
-      {peersArray.map((peer) => (
-        <Card key={peer.url} title={peer.name} href={peer.url}>
-          {peer.description}
-        </Card>
-      ))}
-    </Cards>
+    <div className="not-prose my-5">
+      <Cards className="gap-3">
+        {peersArray.map((peer) => (
+          <Card key={peer.url} title={peer.name} href={peer.url}>
+            {peer.description}
+          </Card>
+        ))}
+      </Cards>
+    </div>
   );
 }
 

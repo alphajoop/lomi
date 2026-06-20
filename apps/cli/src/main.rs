@@ -15,7 +15,7 @@ use cli::CommonOptions;
 #[command(
     name = "lomi.",
     bin_name = "lomi",
-    about = "CLI for lomi.'s payment infrastructure",
+    about = "Developer CLI for integrating with the hosted lomi. merchant API",
     version
 )]
 struct Cli {
@@ -42,6 +42,10 @@ enum Commands {
     Dev(commands::dev::DevArgs),
     /// Listen for cloud webhook events (sandbox-first)
     Listen(commands::listen::ListenArgs),
+    /// Emit a synthetic webhook event (sandbox)
+    Trigger(commands::trigger::TriggerArgs),
+    /// Print MCP HTTP client configuration
+    Mcp(commands::mcp_config::McpArgs),
     /// Run integration health checks
     Probe(commands::probe::ProbeArgs),
     /// Manage checkout sessions
@@ -56,14 +60,23 @@ enum Commands {
     Transactions(commands::transactions::TransactionsArgs),
     /// Manage refunds
     Refunds(commands::refunds::RefundsArgs),
+    /// Manage payouts
+    Payouts(commands::payouts::PayoutsArgs),
+    /// List card disputes
+    Disputes(commands::disputes::DisputesArgs),
+    /// Payment risk (Radar) assessments
+    Radar(commands::radar::RadarArgs),
     /// Golden-path setup checks and next steps
     Quickstart(commands::quickstart::QuickstartArgs),
     /// Install lomi. agent rules for Cursor, Claude, and other AI tools
     InstallRules(commands::install_rules::InstallRulesArgs),
     /// Update @lomi./sdk to the latest version
     Update(commands::update::UpdateArgs),
-    /// Install and update Lomi UI checkout components
+    /// Install and update lomi. UI checkout components
     Ui(commands::ui::UiArgs),
+    /// Documentation lint and drift checks (monorepo apps/docs)
+    #[command(hide = true)]
+    Docs(commands::docs_cmd::DocsArgs),
     /// List all CLI profiles
     ListProfiles(commands::list_profiles::ListProfilesArgs),
     /// Switch the default CLI profile
@@ -85,6 +98,8 @@ async fn main() -> Result<()> {
         Commands::Init(args) => commands::init::run(&cli.common, args).await,
         Commands::Dev(args) => commands::dev::run(&cli.common, args).await,
         Commands::Listen(args) => commands::listen::run(&cli.common, args).await,
+        Commands::Trigger(args) => commands::trigger::run(&cli.common, args).await,
+        Commands::Mcp(args) => commands::mcp_config::run(&cli.common, args).await,
         Commands::Probe(args) => commands::probe::run(&cli.common, args).await,
         Commands::Checkout(args) => commands::checkout::run(&cli.common, args).await,
         Commands::Payments(args) => commands::payments::run(&cli.common, args).await,
@@ -92,10 +107,14 @@ async fn main() -> Result<()> {
         Commands::Products(args) => commands::products::run(&cli.common, args).await,
         Commands::Transactions(args) => commands::transactions::run(&cli.common, args).await,
         Commands::Refunds(args) => commands::refunds::run(&cli.common, args).await,
+        Commands::Payouts(args) => commands::payouts::run(&cli.common, args).await,
+        Commands::Disputes(args) => commands::disputes::run(&cli.common, args).await,
+        Commands::Radar(args) => commands::radar::run(&cli.common, args).await,
         Commands::Quickstart(args) => commands::quickstart::run(&cli.common, args).await,
         Commands::InstallRules(args) => commands::install_rules::run(&cli.common, args).await,
         Commands::Update(args) => commands::update::run(&cli.common, args).await,
         Commands::Ui(args) => commands::ui::run(&cli.common, args).await,
+        Commands::Docs(args) => commands::docs_cmd::run(&cli.common, args).await,
         Commands::ListProfiles(args) => commands::list_profiles::run(&cli.common, args).await,
         Commands::Switch(args) => commands::switch::run(&cli.common, args).await,
     }

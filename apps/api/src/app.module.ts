@@ -23,6 +23,9 @@ import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
+import { DisputesModule } from './core/disputes/disputes.module';
+import { RadarModule } from './core/radar/radar.module';
+import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
@@ -36,6 +39,7 @@ import { MeModule } from './core/me/me.module';
 import { CliModule } from './cli/cli.module';
 import { CustomerPortalModule } from './core/customer-portal/customer-portal.module';
 import { HealthModule } from './health/health.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -136,6 +140,9 @@ const logger = new Logger('RedisConfig');
     CheckoutSessionsModule,
     PaymentLinksModule,
     PayoutsModule,
+    DisputesModule,
+    RadarModule,
+    SettlementsModule,
     WebhookDeliveryLogsModule,
     WebhooksModule,
     ChargesModule,
@@ -149,6 +156,7 @@ const logger = new Logger('RedisConfig');
     CliModule,
     CustomerPortalModule,
     HealthModule,
+    DashboardModule,
   ],
 
   controllers: [AppController],

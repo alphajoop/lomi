@@ -1,0 +1,7 @@
+{
+  "title": "Risk Assessments",
+  "pages": [
+    "RadarController_findOne",
+    "RadarController_listAssessments"
+  ]
+}

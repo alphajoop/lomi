@@ -1,6 +1,7 @@
 {
   "title": "CLI",
   "description": "Install and use the lomi. command-line tool for auth, project setup, webhooks, and payments.",
+  "icon": "Terminal",
   "pages": [
     "overview",
     "auth",

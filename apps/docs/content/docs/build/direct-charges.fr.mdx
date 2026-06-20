@@ -1,0 +1,68 @@
+---
+title: 'Comment utiliser les charges directes ?'
+description: 'Encaissements Wave, MTN MoMo et carte initiés côté serveur lorsque vous contrôlez l’UI de paiement.'
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Les charges directes permettent d’encaisser via `POST /charge/*` depuis votre serveur. Contrairement aux [sessions checkout](/build/checkout) hébergées, vous construisez le parcours client.
+
+<Callout type="warn">
+  Préférez le [checkout hébergé](/build/checkout) ou les [liens de paiement](/build/payment-links) sauf si vous avez besoin de cartes embarquées ou d’un flux mobile money sur mesure. Les charges directes exigent la gestion des états en attente et des webhooks.
+</Callout>
+
+## Quand utiliser les charges directes
+
+Utilisez-les pour encaisser rapidement sans réutiliser un moyen de paiement enregistré, paiement ponctuel orchestré.
+
+| Rail | Endpoint | Étape client |
+| --- | --- | --- |
+| Wave | `POST /charge/wave` | Ouvrir `wave_launch_url` ou `checkout_url` |
+| MTN MoMo | `POST /charge/mtn` | Approuver sur le téléphone ; en live le statut démarre en `PENDING` |
+| Carte | `POST /charge/card` | Confirmer avec `client_secret` via [Payment Elements](/build/payments/lomi-payment-elements) |
+
+## Implémentation de référence
+
+Exemple exécutable dans le monorepo :
+
+- Chemin : `apps/plugins/direct-charge-integration-reference`
+- Scripts cURL : `curl/create-wave-charge.sh`, `curl/create-mtn-charge.sh`
+
+```bash
+cd apps/plugins/direct-charge-integration-reference
+pnpm install && cp .env.example .env
+pnpm run dev
+```
+
+## Flux carte (résumé)
+
+1. `POST /charge/card` avec montant, devise et `customer_id` ou (`customer_email` + `customer_name`).
+2. Monter Payment Elements avec `lomi_pk_...` et le `client_secret` retourné.
+3. Écouter `PAYMENT_SUCCEEDED` pour la livraison.
+
+## Flux mobile money (résumé)
+
+1. `POST /charge/wave` ou `POST /charge/mtn` avec montant, devise et téléphone E.164.
+2. Rediriger ou guider le client selon la réponse.
+3. Avant de livrer, confirmez le **statut** et le **montant** finaux via webhooks ou `GET /transactions/{id}`.
+
+Voir [Mobile money](/build/mobile-money).
+
+## lomi. Network
+
+Les opérateurs peuvent créer des charges pour les comptes membres :
+
+```http
+POST /charge/wave HTTP/1.1
+X-API-KEY: lomi_sk_live_operator_...
+Lomi-Account: acct_1234567890
+```
+
+Voir [lomi. Network](/resources/network).
+
+## Voir aussi
+
+- [Créer une charge Wave](/api/charge/ChargesController_createWaveCharge)
+- [Créer une charge MTN](/api/charge/ChargesController_createMtnCharge)
+- [Créer une charge carte](/api/charge/ChargesController_createCardCharge)
+- [Traiter les webhooks](/build/advanced-guides/handling-webhooks)

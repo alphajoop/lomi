@@ -1,9 +1,17 @@
 ---
 title: 'Getting started'
-description: 'Install the lomi. CLI, verify your setup, and run your first commands.'
+description: 'Install lomi. CLI, verify your setup, and run your first commands.'
 ---
 
+import { Callout } from '@/components/docs/docs-callout';
+
 The **lomi. CLI** is distributed via **npm** as `lomi.cli`. It helps you authenticate with lomi., scaffold SDK projects, test webhooks locally, create checkout sessions and payment links, and install AI agent rules.
+
+<Callout type="info" title="Who this is for">
+  The lomi. CLI is for **developers integrating** the hosted merchant API from your terminal, authenticate, scaffold SDK projects, test webhooks, and create sandbox checkouts.
+
+  It is **not** for operating lomi.’s internal platform, the admin dashboard, or self-hosting payment processing. Merchants who only use the web dashboard do not need the CLI.
+</Callout>
 
 Both `lomi` and `lomi.` work as command names after install.
 
@@ -94,7 +102,7 @@ Opens a browser device-authorization flow and saves a CLI token globally. See [A
 lomi status
 ```
 
-Verifies your stored token and connectivity to the lomi. API.
+Verifies your stored token and connectivity to lomi.. API.
 
 ### Scaffold a project
 
@@ -119,7 +127,7 @@ Installs Cursor rules, `CLAUDE.md`, `AGENTS.md`, VS Code instructions, and `llms
 lomi listen http://localhost:3000/webhooks
 ```
 
-Receives real sandbox webhooks via cloud relay — no ngrok. See [Listen for webhooks](/build/cli/listen).
+Receives real sandbox webhooks via cloud relay, no ngrok. See [Listen for webhooks](/build/cli/listen).
 
 ### Run local webhook server
 
@@ -177,17 +185,17 @@ These flags work with any command:
 ## Two kinds of credentials
 
 <Callout type="info" emoji="💡" title="CLI token vs API key">
-  **`lomi login`** stores a **CLI token** in your global config — used by CLI commands like `status`, `checkout create`, and `dev`.
+  **`lomi login`** stores a **CLI token** in your global config, used by CLI commands like `status`, `checkout create`, and `dev`.
 
-  **`lomi init`** writes your **secret API key** (`LOMI_API_KEY`) into the project `.env` file — used by the **SDK inside your application code**.
+  **`lomi init`** writes your **secret API key** (`LOMI_API_KEY`) into the project `.env` file, used by the **SDK inside your application code**.
 
   These are different credentials serving different purposes.
 </Callout>
 
 ## Next steps
 
-- [Authenticate](/build/cli/auth) — device flow, profiles, CI
-- [Initialize a project](/build/cli/init) — SDK scaffolding
-- [Command reference](/build/cli/commands) — all commands and flags
-- [Configuration](/build/cli/configuration) — config file paths and environment variables
-- [API integration](/start/first-payment) — HTTP and SDK integration guide
+- [Authenticate](/build/cli/auth): device flow, profiles, CI
+- [Initialize a project](/build/cli/init): SDK scaffolding
+- [Command reference](/build/cli/commands): all commands and flags
+- [Configuration](/build/cli/configuration): config file paths and environment variables
+- [API integration](/start/first-payment): HTTP and SDK integration guide

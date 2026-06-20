@@ -3,7 +3,7 @@ title: Coupon logic examples
 description: Practical examples for customer eligibility, stacking, and retry-safe coupon usage.
 ---
 
-This page complements the [Discount Coupons](/build/discount-coupons) reference with concrete scenarios based on production coupon logic.
+This page complements the [Discount coupons](/build/discount-coupons) reference with concrete scenarios based on production coupon logic.
 
 ## Example 1: New-customer-only coupon
 
@@ -125,7 +125,7 @@ Same two coupons as Example 6, but **reverse the order**:
 
 Always show the applied order in UI and persist the same order server-side.
 
-## Example 10: Usage frequency — sliding window vs calendar
+## Example 10: Usage frequency: sliding window vs calendar
 
 Depending on which validation path runs, usage limits may be evaluated differently:
 
@@ -136,7 +136,7 @@ For a coupon limited to **one use per day**, a customer who redeems at 23:59 may
 
 ## Example 11: Re-applying a coupon on the same checkout session
 
-When a coupon is applied to a session that already has a pending `coupon_usage` row, the system may **upsert** that row (update discount and timestamps) instead of inserting duplicates — as long as the transaction is not finalized yet.
+When a coupon is applied to a session that already has a pending `coupon_usage` row, the system may **upsert** that row (update discount and timestamps) instead of inserting duplicates, as long as the transaction is not finalized yet.
 
 Implications:
 
@@ -154,7 +154,7 @@ Merchant-facing reporting should still show **list price**, **discount**, and **
 Your app retries `POST /checkout-sessions` or `apply coupon` due to a flaky network:
 
 - Use the **same idempotency key** or session id so you do not create parallel sessions.
-- On the server, duplicate completion webhooks should not double-increment usage if transaction completion is idempotent — still avoid duplicate **client-initiated** applies when possible.
+- On the server, duplicate completion webhooks should not double-increment usage if transaction completion is idempotent, still avoid duplicate **client-initiated** applies when possible.
 
 ## Integration checklist
 

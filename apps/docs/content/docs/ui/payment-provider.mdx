@@ -1,23 +1,18 @@
 ---
-title: Payment Provider Selector
-description: A toggleable list of payment providers for the user to choose during checkout.
+title: Payment provider selector
+description: Hosted-checkout payment method carousel for Wave, MTN, cards, and SPI.
 ---
 
-The `PaymentProviderSelector` is a standalone, copy-pasteable UI component built with standard HTML elements and Tailwind CSS semantic utility classes. It adapts automatically to your theme without requiring additional Shadcn primitives.
+The `PaymentProviderSelector` matches the hosted checkout carousel in `payment-provider-selection.tsx`.
 
 ## Preview
 
 <Tabs items={['Preview', 'Code']}>
   <Tab value="Preview" className="p-0 mt-4 border-none bg-transparent">
     <ComponentPreview>
-      <PaymentProviderSelector 
-        providers={[
-          { id: 'wave', name: 'Wave', type: 'mobile_money', logoUrl: 'https://cdn.lomi.africa/logos/wave.png' },
-          { id: 'orange', name: 'Orange Money', type: 'mobile_money', logoUrl: 'https://cdn.lomi.africa/logos/orange.png' },
-          { id: 'card', name: 'Credit Card', type: 'card', logoUrl: 'https://cdn.lomi.africa/logos/card.png' }
-        ]} 
-        selectedId="wave" 
-        onSelect={(id) => alert(`Selected provider: ${id}`)} 
+      <PaymentProviderSelector
+        selectedProvider="WAVE"
+        onProviderChange={() => undefined}
       />
     </ComponentPreview>
   </Tab>
@@ -28,14 +23,9 @@ The `PaymentProviderSelector` is a standalone, copy-pasteable UI component built
 
     export default function Demo() {
       return (
-        <PaymentProviderSelector 
-          providers={[
-            { id: 'wave', name: 'Wave', type: 'mobile_money' },
-            { id: 'orange', name: 'Orange Money', type: 'mobile_money' },
-            { id: 'card', name: 'Credit Card', type: 'card' }
-          ]} 
-          selectedId="wave" 
-          onSelect={(id) => console.log(id)} 
+        <PaymentProviderSelector
+          selectedProvider="WAVE"
+          onProviderChange={(provider) => console.log(provider)}
         />
       );
     }

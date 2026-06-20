@@ -43,23 +43,23 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   ChargesController_createWaveCharge: {
     summary: 'Create direct mobile-money charge',
-    body: 'Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer.',
+    body: 'Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer. Check **`next_action`** (`redirect` with `url`) in addition to `wave_launch_url` / `checkout_url`.',
     whenToUse:
       'Use for server-initiated mobile-money collection when you are **not** using a hosted checkout session.',
     caveats:
       'Follow the provider instructions in the response; UX is rail-specific (USSD, app redirect, etc.).',
     related:
-      '[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   ChargesController_createMtnCharge: {
     summary: 'Create MTN MoMo charge',
-    body: 'Starts a payer-facing MTN Mobile Money charge; the response includes the next step for the customer.',
+    body: 'Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox. Responses include **`next_action`** (`await_webhook` with `status`) alongside `data.status`.',
     whenToUse:
       'Use for server-initiated MTN collection when you are **not** using a hosted checkout session.',
     caveats:
-      'Follow the provider instructions in the response; UX is rail-specific (USSD, app prompt, etc.).',
+      'Live charges require MTN connected for your organization and a valid MSISDN. Refunds on live MTN payments use the Disbursement refund API via [Create refund](/api/refunds/RefundsController_create).',
     related:
-      '[Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
@@ -202,6 +202,22 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     related:
       '[Retrieve coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
   },
+  DisputesController_findAll: {
+    summary: 'List disputes',
+    body: 'Returns card payment disputes for your organization with optional status and date filters.',
+    whenToUse:
+      'Use for support queues, reconciliation, and automation on `DISPUTE_*` webhooks.',
+    related:
+      '[Get dispute](/api/disputes/DisputesController_findOne) · [Disputes guide](/build/disputes)',
+  },
+  DisputesController_findOne: {
+    summary: 'Get dispute',
+    body: 'Returns a single dispute by ID, including linked transaction and customer snapshot fields.',
+    whenToUse:
+      'Use after `DISPUTE_CREATED` or when drilling into a row from the disputes list.',
+    related:
+      '[List disputes](/api/disputes/DisputesController_findAll) · [Disputes guide](/build/disputes)',
+  },
   ChargesController_createCardCharge: {
     summary: 'Create embedded card charge',
     body: 'Creates a card charge for embedded checkout and returns `client_secret` for client-side confirmation.',
@@ -320,13 +336,13 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   RefundsController_create: {
     summary: 'Create refund',
-    body: 'Refunds a completed transaction (card or mobile money). Merchant balance updates immediately.',
+    body: 'Refunds a **completed** transaction on **Stripe (card)**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.',
     whenToUse:
       'Use for buyer reversals on eligible completed transactions; supports full and partial amounts.',
     caveats:
-      'Card customer credit is completed separately by operations. Mobile money partial refunds require a customer phone on file.',
+      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only—no MTN API call. Partial MTN refunds also require a customer phone on file.',
     related:
-      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne)',
+      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/refunds)',
   },
   RefundsController_findAll: {
     summary: 'List refunds',
@@ -341,6 +357,56 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use after create or from webhook-driven flows to confirm refund details.',
     related: '[Create refund](/api/refunds/RefundsController_create)',
   },
+  RadarController_getSettings: {
+    summary: 'Get Radar settings',
+    body: 'Returns whether lomi. Radar screening is enabled for the organization, the monitor/block mode, and card-network passthrough preferences.',
+    whenToUse:
+      'Use before toggling Radar in your own settings UI or to confirm org configuration in support tools.',
+    related:
+      '[Update Radar settings](/api/organization/RadarController_updateSettings) · [lomi. Radar guide](/build/radar)',
+  },
+  RadarController_updateSettings: {
+    summary: 'Update Radar settings',
+    body: 'Enables or disables Radar screening and updates monitor/block mode or card-network passthrough for the organization.',
+    whenToUse:
+      'Use when onboarding merchants to fraud screening or changing how risky charges are handled.',
+    caveats:
+      'Radar is opt-in. When `mode` is `block`, charges that hit block rules are rejected before completion.',
+    related:
+      '[Get Radar settings](/api/organization/RadarController_getSettings) · [List risk assessments](/api/risk-assessments/RadarController_listAssessments)',
+  },
+  RadarController_listAssessments: {
+    summary: 'List risk assessments',
+    body: 'Returns Radar screening results for incoming charges with optional filters for decision, rail, and date range.',
+    whenToUse:
+      'Use for fraud review queues, exports, and correlating `PAYMENT_RISK_*` webhook payloads.',
+    related:
+      '[Get risk assessment](/api/risk-assessments/RadarController_findOne) · [lomi. Radar guide](/build/radar)',
+  },
+  RadarController_findOne: {
+    summary: 'Get risk assessment',
+    body: 'Returns one Radar assessment by ID, including decision, score, and triggered rule signals.',
+    whenToUse:
+      'Use when handling `PAYMENT_RISK_FLAGGED` or `PAYMENT_RISK_BLOCKED` webhooks keyed by assessment ID.',
+    related:
+      '[List risk assessments](/api/risk-assessments/RadarController_listAssessments)',
+  },
+  SettlementsController_findAll: {
+    summary: 'List settlement periods',
+    body: 'Returns completed payment totals grouped by availability date (UTC) and currency. Each `settlement_id` uses `{currency}:{YYYY-MM-DD}`.',
+    whenToUse:
+      'Use for accounting reconciliation before requesting payouts or exporting withdrawable totals by day.',
+    related:
+      '[List settlement transactions](/api/settlements/SettlementsController_findTransactions)',
+  },
+  SettlementsController_findTransactions: {
+    summary: 'List settlement transactions',
+    body: 'Returns the transactions that contributed to a settlement period identified by `settlement_id`.',
+    whenToUse:
+      'Use to drill into a settlement row and match ledger movements to individual payments.',
+    related:
+      '[List settlement periods](/api/settlements/SettlementsController_findAll)',
+  },
   SubscriptionsController_cancel: {
     summary: 'Cancel subscription',
     body: 'Cancels an active subscription; optional reason is stored for analytics and chargeback context.',
@@ -348,6 +414,22 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use when the customer ends service or you enforce policy cancellations.',
     related:
       '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne)',
+  },
+  SubscriptionsController_uncancel: {
+    summary: 'Uncancel subscription',
+    body: 'Removes a scheduled end-of-period cancellation so the subscription keeps renewing.',
+    whenToUse:
+      'Use when a customer reverses a pending cancel-at-period-end before the billing period ends.',
+    related:
+      '[Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)',
+  },
+  SubscriptionsController_changePlan: {
+    summary: 'Change subscription plan',
+    body: 'Updates the `price_id` on an active subscription for upgrades or downgrades.',
+    whenToUse:
+      'Use when moving a customer to a different recurring price on the same product line.',
+    related:
+      '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Update subscription](/api/subscriptions/SubscriptionsController_update)',
   },
   SubscriptionsController_findAll: {
     summary: 'List subscriptions',
@@ -507,6 +589,128 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use when a merchant ID is the scope key for wallet or treasury displays.',
     caveats: 'Requires `currency_code` (XOF, USD, or EUR).',
     related: '[Account balances](/api/balances/AccountsController_getBalance)',
+  },
+  MetersController_create: {
+    summary: 'Create a meter',
+    body: 'Defines a billable metric for usage-based products. Events with a matching `code` update meter balances when processed.',
+    whenToUse:
+      'First step in usage billing: create a meter before ingesting usage events or enrolling customers on usage-based products.',
+    related:
+      '[Usage billing guide](/build/usage-billing) · [Record usage event](/api/usage-events/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)',
+  },
+  MetersController_findAll: {
+    summary: 'List meters',
+    body: 'Returns meters for your organization, optionally filtered by product or active status.',
+    whenToUse:
+      'Use to display configured billable metrics or pick a `meter_id` for balance reads.',
+    related:
+      '[Create meter](/api/meters/MetersController_create) · [Get meter](/api/meters/MetersController_findOne)',
+  },
+  MetersController_findOne: {
+    summary: 'Get a meter',
+    body: 'Returns one meter by ID, including filter and aggregation configuration.',
+    whenToUse:
+      'Use when you store a meter ID and need the latest filter/aggregation rules.',
+    related:
+      '[List meters](/api/meters/MetersController_findAll) · [Meter balance](/api/meters/MetersController_getBalance)',
+  },
+  MetersController_update: {
+    summary: 'Update a meter',
+    body: 'Updates filter, aggregation, or active status on an existing meter.',
+    whenToUse:
+      'Use when billing rules change—deactivate meters instead of deleting when historical usage must remain.',
+    related: '[Get meter](/api/meters/MetersController_findOne)',
+  },
+  MetersController_getBalance: {
+    summary: 'Get meter balance for a customer',
+    body: 'Returns consumed, credited, and net balance units for a customer on a specific meter.',
+    whenToUse:
+      'Use for prepaid wallets, usage dashboards, or entitlement checks before granting access.',
+    related:
+      '[Credit wallet](/api/usage-billing/UsageBillingController_creditWallet) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageEventsController_findAll: {
+    summary: 'List usage events',
+    body: 'Lists ingested usage events with pagination and optional filters for customer, code, and processing status.',
+    whenToUse:
+      'Use for support, reconciliation, or debugging failed usage ingest.',
+    related:
+      '[Record usage event](/api/usage-events/UsageEventsController_ingest) · [Get usage event](/api/usage-events/UsageEventsController_findOne)',
+  },
+  UsageEventsController_findOne: {
+    summary: 'Get a usage event',
+    body: 'Returns one usage event by ID, including processing status and error details when failed.',
+    whenToUse:
+      'Use after ingest to confirm processing or investigate a specific event.',
+    related:
+      '[List usage events](/api/usage-events/UsageEventsController_findAll) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageEventsController_ingest: {
+    summary: 'Record a usage event',
+    body: 'Idempotent usage ingest. Events are processed asynchronously and update meter balances when matched.',
+    whenToUse:
+      'Call from your app whenever billable usage occurs—use a stable `transaction_id` per logical event.',
+    caveats:
+      'Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage-events/{id}`.',
+    related:
+      '[Usage billing guide](/build/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage-events/UsageEventsController_createUsageSubscription)',
+  },
+  UsageEventsController_createUsageSubscription: {
+    summary: 'Create a usage subscription',
+    body: 'Enrolls a customer on a `usage_based` product without an upfront charge. Required before billing metered usage to that customer.',
+    whenToUse:
+      'After creating a usage-based product and meter—enroll each customer before sending usage events tied to a subscription.',
+    related:
+      '[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage)',
+  },
+  UsageBillingController_listPeriods: {
+    summary: 'List usage billing periods',
+    body: 'Returns billing periods for usage subscriptions, optionally filtered by subscription ID.',
+    whenToUse:
+      'Use for invoicing windows, period-close reconciliation, or support lookups.',
+    related:
+      '[Get subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage) · [Usage billing guide](/build/usage-billing)',
+  },
+  UsageBillingController_getSubscriptionUsage: {
+    summary: 'Get meter usage for a subscription',
+    body: 'Returns aggregated meter usage for a usage subscription across its billing period.',
+    whenToUse:
+      'Use on invoices, customer usage dashboards, or before closing a billing period.',
+    related:
+      '[List billing periods](/api/usage-billing/UsageBillingController_listPeriods) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageBillingController_getRevenue: {
+    summary: 'Combined revenue metrics',
+    body: 'Returns MRR, usage revenue, and one-time revenue for a date range.',
+    whenToUse:
+      'Use for finance reporting that combines subscription MRR with metered usage and one-off charges.',
+    caveats: 'Requires `start_date` and `end_date` query parameters.',
+    related:
+      '[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Usage billing guide](/build/usage-billing)',
+  },
+  UsageBillingController_creditWallet: {
+    summary: 'Credit prepaid usage units',
+    body: 'Adds credited units to a customer meter wallet (prepaid or promotional credits).',
+    whenToUse:
+      'Use for prepaid packs, promotions, or manual adjustments before usage draws down balance.',
+    related:
+      '[Get meter balance](/api/meters/MetersController_getBalance) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+  },
+  UsageBillingController_createEntitlement: {
+    summary: 'Create or update an entitlement',
+    body: 'Defines a plan entitlement feature keyed by `feature_key` for usage or access gating.',
+    whenToUse:
+      'Use when feature access is tied to plan entitlements rather than raw meter balance alone.',
+    related:
+      '[Check entitlement](/api/usage-billing/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/usage-billing)',
+  },
+  UsageBillingController_checkEntitlement: {
+    summary: 'Check customer entitlement',
+    body: 'Returns whether a customer has an active entitlement for the given `feature_key`.',
+    whenToUse:
+      'Use at request time to gate features without loading full subscription objects.',
+    related:
+      '[Create entitlement](/api/usage-billing/UsageBillingController_createEntitlement)',
   },
   ProvidersController_findAll: {
     summary: 'List payment providers',

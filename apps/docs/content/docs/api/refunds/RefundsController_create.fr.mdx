@@ -11,21 +11,37 @@ operationId: RefundsController_create
 
 Créer un remboursement
 
-Rembourse une transaction terminée (carte ou mobile money). Le solde marchand est mis à jour immédiatement. Prise en charge des remboursements totaux et partiels.
-
-Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default` (annulation au remboursement total initial, pause au renouvellement), `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
+Rembourse une transaction **terminée** sur **carte bancaire**, **Wave** ou **MTN MoMo**. Le solde marchand est mis à jour dès l’enregistrement du remboursement.
 
 
-### Quand utiliser cet endpoint
+### Quand l'utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /refunds` (Créer un remboursement).
+Pour annuler tout ou partie d’un paiement éligible déjà terminé (remboursement total ou partiel).
+
+### Bon à savoir
+
+**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes.
+
+**Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire).
+
+**MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion.
+
+**MTN MoMo (test) :** uniquement comptable — pas d’appel API MTN.
+
+Les remboursements partiels MTN exigent aussi un téléphone client.
+
+Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
+
+### Voir aussi
+
+[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Guide remboursements](/build/refunds)
 
 
 ## Authentification
 
-Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
 
-## Point de terminaison
+## Endpoint
 
 `POST /refunds`
 
@@ -48,7 +64,28 @@ _Aucun paramètre de requête._
 
 ### Corps de la requête
 
-_Aucun corps application/json pour cette opération._
+Corps JSON.
+
+Schéma : `CreateRefundDto`
+
+| Champ | Requis | Type | Description |
+| --- | --- | --- | --- |
+| `transaction_id` | Oui | `string` (uuid) | Transaction terminée à rembourser (carte bancaire, Wave ou MTN MoMo) |
+| `amount` | Oui | `number` | Montant à rembourser (même devise que la transaction) |
+| `reason` | Non | `string` | Motif du remboursement |
+| `refund_type` | Non | `'full'` \| `'partial'` | Déduit de `amount` vs montant brut si omis |
+| `subscription_action` | Non | `'default'` \| `'cancel'` \| `'pause'` \| `'none'` | Effet sur l’abonnement après un remboursement total |
+
+Exemple :
+
+```json
+{
+  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+  "amount": 5000,
+  "reason": "duplicate_charge",
+  "refund_type": "partial"
+}
+```
 
 
 ## Réponses
@@ -60,7 +97,7 @@ _Aucun corps application/json pour cette opération._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes.
 
 ## Exemple
 
@@ -68,7 +105,11 @@ Les erreurs suivent le format JSON standard (code de statut et message lisible p
 curl -sS -X POST "https://sandbox.api.lomi.africa/refunds" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{
+    "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+    "amount": 5000,
+    "reason": "duplicate_charge"
+  }'
 ```
 
 ## OpenAPI
@@ -76,4 +117,4 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/refunds" \
 - **operationId**: `RefundsController_create`
 - **Operation**: `POST /refunds`
 
-Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.
+Schémas complets et **Try it** : [référence API](/api).

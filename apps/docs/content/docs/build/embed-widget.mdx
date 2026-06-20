@@ -1,16 +1,16 @@
 ---
 title: Embed checkout widget
-description: Embed lomi. hosted checkout on your site with @lomi./embed — modal overlay or inline iframe.
+description: Embed lomi. hosted checkout on your site with @lomi./embed, modal overlay or inline iframe.
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
 # Embed checkout widget
 
 Keep customers on your site while they pay on lomi.'s hosted checkout page inside an iframe. Use **modal** for a pay button overlay, or **inline** to embed checkout in a product page.
 
 <Callout type="info">
-  Embed is best when you want the full lomi. checkout UI (Wave, MTN, cards, coupons) without a redirect. For custom card fields inside your own form, see [Lomi Payment Elements](/build/payments/lomi-payment-elements).
+  Embed is best when you want the full lomi. checkout UI (Wave, MTN, cards, coupons) without a redirect. For custom card fields inside your own form, see [lomi. Payment Elements](/build/payments/lomi-payment-elements).
 </Callout>
 
 ## When to use embed vs redirect vs Payment Elements
@@ -21,7 +21,7 @@ Keep customers on your site while they pay on lomi.'s hosted checkout page insid
 | **Embed** (this guide) | Same checkout UI, stays on your page |
 | **Payment Elements** | You own the UI; collect cards or mobile money in your layout |
 
-## Step 1 — Create a checkout session
+## Step 1: Create a checkout session
 
 Your server creates the session and returns `checkout_url` to the browser.
 
@@ -62,7 +62,7 @@ lomi checkout create
 
 The CLI prints the redirect URL and a ready-to-paste embed snippet.
 
-## Step 2 — Install @lomi./embed
+## Step 2: Install @lomi./embed
 
 ```bash
 npm install @lomi./embed
@@ -87,7 +87,7 @@ npm install @lomi./embed
 </script>
 ```
 
-The SDK adds `embedded=true` and `embed_origin` automatically — do not append them to `checkoutUrl`.
+The SDK adds `embedded=true` and `embed_origin` automatically, do not append them to `checkoutUrl`.
 
 ## Inline example
 
@@ -105,7 +105,7 @@ Declarative attributes:
 
 | Attribute | Description |
 | --- | --- |
-| `data-lomi-checkout-url` | Preferred — full URL from API or payment link |
+| `data-lomi-checkout-url` | Preferred, full URL from API or payment link |
 | `data-lomi-session-id` | Alternative with `data-lomi-checkout-base-url` |
 | `data-lomi-public-key` | Optional when using `checkoutUrl` |
 | `id` | Required container id (e.g. `lomi-checkout`) |
@@ -129,7 +129,7 @@ cp node_modules/@lomi./embed/dist/lomi.js public/assets/lomi.js
 </script>
 ```
 
-Payment links on `checkout.lomi.africa` work the same way — pass the link URL as `checkoutUrl`.
+Payment links on `checkout.lomi.africa` work the same way, pass the link URL as `checkoutUrl`.
 
 ## Callbacks and events
 
@@ -173,7 +173,7 @@ See [Sandbox payments](/start/sandbox-payments) for test payment methods.
 
 ## Related
 
-- [Hosted checkout](/build/checkout) — redirect flow
-- [Payment links](/build/payment-links) — shareable URLs (also work as `checkoutUrl`)
-- [SDKs overview](/build/sdks) — `@lomi./sdk` and `@lomi./embed`
-- Package README — `node_modules/@lomi./embed/README.md`
+- [Hosted checkout](/build/checkout): redirect flow
+- [Payment links](/build/payment-links): shareable URLs (also work as `checkoutUrl`)
+- [SDKs overview](/build/sdks): `@lomi./sdk` and `@lomi./embed`
+- Package README, `node_modules/@lomi./embed/README.md`

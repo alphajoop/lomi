@@ -36,7 +36,7 @@ const SECTION_LABEL_KEYS: Record<string, string> = {
   Build: 'section.build',
   Resources: 'section.resources',
   'First steps': 'section.firstSteps',
-  'API Reference': 'section.apiReference',
+  'API reference': 'section.apiReference',
   'REST API': 'section.restApi',
   Basics: 'section.basics',
   Implementation: 'section.implementation',

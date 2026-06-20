@@ -38,7 +38,7 @@ import { wireMcpServer } from './wire-mcp-server.js';
 type TransportEntry = StreamableHTTPServerTransport;
 
 const MISSING_MERCHANT_KEY_MESSAGE =
-  'Missing merchant API key: send x-lomi-api-key or x-api-key on MCP initialize, or configure server-side LOMI_API_KEY. See https://docs.lomi.africa/build/ecommerce-extensions/mcp';
+  'Missing merchant API key: send x-lomi-api-key or x-api-key on MCP initialize, or configure server-side LOMI_API_KEY. See https://docs.lomi.africa/build/mcp';
 
 /** Rolling 60s window per IP for MCP routes */
 type RateBucket = { count: number; windowStart: number };

@@ -44,8 +44,11 @@ export class AgentHandoffController {
       'Transfert inter-services / inter-agents (contexte + enveloppe de tâche)',
   })
   @ApiResponse({ status: 201, description: 'Transfert enregistré' })
-  create(@CurrentUser() user: AuthContext, @Body() body: CreateHandoffDto) {
-    const h = this.handoffs.create(user.organizationId, {
+  async create(
+    @CurrentUser() user: AuthContext,
+    @Body() body: CreateHandoffDto,
+  ) {
+    const h = await this.handoffs.create(user.organizationId, {
       to: body.to,
       task: body.task,
       context: body.context,
@@ -61,8 +64,8 @@ export class AgentHandoffController {
   @Get('handoff/:id')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Récupérer un enregistrement de transfert' })
-  get(@CurrentUser() user: AuthContext, @Param('id') id: string) {
-    const h = this.handoffs.get(user.organizationId, id);
+  async get(@CurrentUser() user: AuthContext, @Param('id') id: string) {
+    const h = await this.handoffs.get(user.organizationId, id);
     if (!h) {
       throw new NotFoundException('Handoff not found');
     }

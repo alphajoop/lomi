@@ -1,0 +1,74 @@
+---
+title: 'Integration journey'
+description: 'Step-by-step path from sandbox account to live payments: keys, integration choice, testing, webhooks, and go-live.'
+docType: tutorial
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Follow this guide before you write production code. Each step links to the detailed page, this page is the map, not the manual.
+
+<Callout type="info">
+  New here? Start with [What is lomi.?](/start/overview), then return to this journey.
+</Callout>
+
+## Step 1: Create a developer account
+
+Sign up for a lomi. account to access the **test environment**, where you can run full payment flows without moving real money.
+
+In test mode you can:
+
+1. Accept payments using test card numbers and simulated mobile money.
+2. Create checkout sessions, payment links, and direct charges against the sandbox API.
+3. Receive webhooks with `"environment": "test"` on payloads.
+
+See [Create your account](/start/create-account) and [API keys](/start/api-keys).
+
+## Step 2: Choose your integration
+
+lomi. supports multiple integration options depending on your stack:
+
+| If you need | Start with |
+| --- | --- |
+| A complete checkout page | [Hosted checkout](/build/checkout) |
+| A shareable URL | [Payment links](/build/payment-links) |
+| Server-initiated mobile money or embedded cards | [Direct charges](/build/direct-charges) |
+| Recurring billing | [Subscriptions](/build/subscriptions) via checkout or links |
+
+Most teams should start with **hosted checkout**. Use [Which payment integration should I choose?](/build/choose-integration) and the [payment methods hub](/build/guides/payment-methods) to confirm Wave, MTN, and card coverage for your markets.
+
+## Step 3: Test end-to-end
+
+Test your integration thoroughly using sandbox credentials:
+
+1. [Make a test payment](/start/first-payment): CLI or API checkout session.
+2. Use [Sandbox payments](/start/sandbox-payments) for test cards, Wave, and MTN behavior.
+3. Fix issues using [Error handling](/build/advanced-guides/error-handling) and [Idempotency keys](/build/advanced-guides/idempotency-keys).
+
+## Step 4: Configure webhooks
+
+Webhooks are especially useful for payment methods and events that happen outside your application's control, such as mobile money approval and subscription renewals.
+
+1. Register an HTTPS endpoint in the [dashboard](https://lomi.africa/portal).
+2. Follow [Setting up webhooks](/build/webhooks) and [Handling webhooks](/build/advanced-guides/handling-webhooks).
+3. Verify signatures from the raw request body before you parse JSON.
+
+**Subscription renewals:** Card subscriptions renew off-session; listen for `SUBSCRIPTION_RENEWED` and renewal `PAYMENT_FAILED`. **Wave and MTN subscriptions** use a **manual renewal checkout link** sent before each billing date, the customer must pay that link; there is no silent wallet debit. See [Subscriptions: Renewals](/build/subscriptions#renewals-and-failed-payments).
+
+## Step 5: Go live
+
+When sandbox flows pass your checklist:
+
+1. Complete account verification and payout setup.
+2. Switch servers to `lomi_sk_live_...` and `https://api.lomi.africa`.
+3. Run the [go-live checklist](/start/go-live) and process one small live payment with webhook verification.
+
+## Next steps
+
+- [Verify payments](/build/guides/verify-payments)
+- [Payment lifecycle](/build/guides/payment-lifecycle)
+- [CLI quickstart](/start/cli-quickstart)
+- [Payment state machine](/api/payment-state-machine)

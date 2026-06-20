@@ -1,0 +1,71 @@
+---
+title: "Annuler une résiliation planifiée"
+description: "Retire une résiliation planifiée en fin de période"
+full: true
+method: post
+path: /subscriptions/{id}/uncancel
+operationId: SubscriptionsController_uncancel
+---
+
+## Aperçu
+
+Retire une résiliation planifiée en fin de période (`cancel_at_period_end`) pour que l’abonnement continue de se renouveler.
+
+### Quand l'utiliser
+
+Utilisez cet endpoint lorsqu’un client souhaite conserver son abonnement avant la fin de la période en cours.
+
+### Voir aussi
+
+[Résilier un abonnement](/api/subscriptions/SubscriptionsController_cancel)
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`POST /subscriptions/{id}/uncancel`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | `string` (uuid) | UUID de l’abonnement |
+
+### Corps de requête
+
+_Aucun corps de requête._
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Abonnement mis à jour |
+| `401` | Clé API invalide ou manquante |
+| `404` | Abonnement introuvable ou accès refusé |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code HTTP et message d'erreur). Validez les entrées avant l’appel ; **401** indique une clé manquante ou invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/{id}/uncancel" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId** : `SubscriptionsController_uncancel`
+- **Opération** : `POST /subscriptions/{id}/uncancel`
+
+Schémas complets et **Essayer** : [Référence API](/api).

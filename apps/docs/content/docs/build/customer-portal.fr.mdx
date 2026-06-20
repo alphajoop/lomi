@@ -4,11 +4,11 @@ description: Intégrez un portail client hébergé avec sessions de lancement, a
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
 Le portail client lomi. est un espace de compte hébergé sur `customers.lomi.africa` où vos utilisateurs finaux peuvent :
 
-<DocsScreenshot name="build/customer-portal" alt="Portail client lomi. avec liste des paiements ou abonnements" />
+<DocsScreenshot name="build/customer-portal" alt="Portail client lomi. pour l’historique et les abonnements" />
 
 - Consulter l'historique des paiements et ouvrir les reçus / factures disponibles
 - Voir et gérer leurs abonnements (pause, reprise, annulation en fin de période, annulation de l'annulation)
@@ -39,7 +39,7 @@ Utilisez `POST /customers/{id}/portal-launch-session` :
 - `flow_subscription_id` (optionnel, obligatoire pour `subscription_cancel`)
 - `flow_after_completion_url` (optionnel)
 
-Les détails du point de terminaison et des exemples de charge utile figurent dans [Clients](/api/customers/CustomersController_createPortalLaunchSession).
+Les détails de l’URL et des exemples de corps figurent dans [Clients](/api/customers/CustomersController_createPortalLaunchSession).
 
 ## Modèle d'éligibilité
 
@@ -102,7 +102,7 @@ Depuis **Paramètres → Checkout → Storefront**, configurez le portail client
 
 - Autoriser pause / reprise / annulation
 - Lien magique e-mail et OTP SMS
-- **Liste blanche des URL de retour** — requise pour `return_url` et `flow_after_completion_url` depuis votre backend
+- **Liste blanche des URL de retour**: requise pour `return_url` et `flow_after_completion_url` depuis votre backend
 
 Depuis **Clients**, ouvrez un client avec historique de facturation et cliquez sur **Ouvrir le portail client** pour lancer le flux hébergé dans un nouvel onglet.
 
@@ -125,12 +125,12 @@ Planifiez `finalize_cancel_at_period_end_subscriptions()` quotidiennement (cron 
 
 **Obligatoire** pour l'app portail hébergée (`apps/customers`) :
 
-- `CUSTOMER_PORTAL_COOKIE_SECRET` — scelle les cookies de handoff et de flux (16 caractères minimum)
-- `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SECRET_KEY` — accès RPC et e-mail lien magique
+- `CUSTOMER_PORTAL_COOKIE_SECRET`, scelle les cookies de handoff et de flux (16 caractères minimum)
+- `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SECRET_KEY`, accès RPC et e-mail lien magique
 
 **Optionnel** :
 
-- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL` — POST `{ to, body }` vers votre passerelle SMS. Sans cela, les OTP ne sont journalisés qu'en non-production.
+- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL`, POST `{ to, body }` vers votre passerelle SMS. Sans cela, les OTP ne sont journalisés qu'en non-production.
 
 Les URL de lancement et les liens magiques utilisent par défaut `https://customers.lomi.africa` et l'origine de la requête. Aucune variable d'environnement d'URL de base supplémentaire n'est requise en production.
 

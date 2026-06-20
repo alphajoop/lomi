@@ -1,13 +1,13 @@
 ---
 title: WooCommerce
 description:
-  Installer et configurer la passerelle lomi. pour WooCommerce — sessions de
+  Installer et configurer la passerelle lomi. pour WooCommerce, sessions de
   paiement hébergées, retour HTTP et webhooks signés.
 ---
 
 # WooCommerce
 
-Extension WordPress qui envoie les acheteurs vers le **checkout hébergé Lomi** et confirme le paiement via l’écouteur REST WooCommerce et les webhooks marchands.
+Extension WordPress qui envoie les acheteurs vers le **checkout hébergé lomi.** et confirme le paiement via l’écouteur REST WooCommerce et les webhooks marchands.
 
 ## Prérequis
 
@@ -24,13 +24,13 @@ Source : [en-tête du plugin / readme](https://github.com/lomiafrica/lomi./blob
 2. Aller dans **WooCommerce → Réglages → Paiements → lomi.**.
 3. Activer la passerelle ; utiliser le **mode test** pendant l’intégration.
 4. Coller les **clés secrètes** test / production et les **secrets de signature webhook** correspondants depuis [dashboard.lomi.africa](https://dashboard.lomi.africa).
-5. Copier l’**URL webhook** affichée en rouge en haut des réglages dans le tableau de bord Lomi (**Développeur / Webhooks**), avec le même secret que dans Woo.
+5. Copier l’**URL webhook** affichée en rouge en haut des réglages dans le tableau de bord lomi. (**Développeur / Webhooks**), avec le même secret que dans Woo.
 
 ## Flux de paiement
 
 1. Le client choisit **lomi.** et valide la commande.
 2. Le plugin appelle `POST /v1/checkout-sessions` avec les URL de succès / annulation et les métadonnées (`wc_order_id`, etc.).
-3. Le client paie sur la page Lomi Checkout.
+3. Le client paie sur la page lomi. Checkout.
 4. L’**URL de retour** appelle l’écouteur API WooCommerce, qui fait `GET /v1/checkout-sessions/{id}` et finalise la commande si le statut est `completed`.
 5. Le **webhook** `PAYMENT_SUCCEEDED` peut finaliser la commande si le retour navigateur est retardé ; signature vérifiée avec `X-Lomi-Signature` sur le corps brut.
 
@@ -43,7 +43,7 @@ Référence code : [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/
 | `X-Lomi-Event` | Doit être `PAYMENT_SUCCEEDED` pour la logique de capture |
 | `X-Lomi-Signature` | HMAC-SHA256 hex du corps brut, secret = secret webhook du tableau de bord |
 
-Vérifier toujours les **octets bruts** reçus — ne pas re-sérialiser le JSON.
+Vérifier toujours les **octets bruts** reçus, ne pas re-sérialiser le JSON.
 
 ## Mise en production et QA
 

@@ -89,7 +89,7 @@ Base URLs:
 - `POST /webhooks/{id}/test` — Envoyer un événement test au webhook
 - `POST /webhooks/{webhookId}/logs/{logId}/retry` — Relancer une livraison webhook
 
-Full docs: https://docs.lomi.africa/docs/api
+Full docs: https://docs.lomi.africa/api
 
 ## CLI examples
 

@@ -5,10 +5,19 @@
   "icon": "Blocks",
   "pages": [
     "choose-integration",
+    "---Guides---",
+    "guides/verify-payments",
+    "guides/payment-lifecycle",
+    "guides/payment-methods",
+    "guides/simulate-errors",
+    "---Canaux de paiement---",
+    "payment-methods",
     "---Encaisser des paiements---",
     "checkout",
+    "embed-widget",
     "payment-links",
     "payment-requests",
+    "direct-charges",
     "mobile-money",
     "cards",
     "payments",
@@ -27,10 +36,10 @@
     "webhooks",
     "advanced-guides",
     "---Outils---",
-    "sdks",
     "cli",
+    "sdks",
+    "mcp",
     "ecommerce-extensions",
-    "lomi-ui",
-    "fundamentals"
+    "lomi-ui"
   ]
 }

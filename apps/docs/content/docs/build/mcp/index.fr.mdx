@@ -1,0 +1,107 @@
+---
+title: MCP pour clients IA
+description: Connectez Cursor, Claude Desktop ou tout client MCP à l’API marchande lomi..
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+# MCP pour clients IA
+
+Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude Desktop, agents maison) d’appeler **l’API marchande lomi.**: créer des checkouts, lister des paiements, déboguer des webhooks, sans écrire chaque requête HTTP à la main.
+
+<Callout type="info" title="Pour qui">
+  MCP connecte **votre IDE ou assistant IA** à **l’API marchande de votre organisation** (mêmes périmètres que votre clé API). Utilisez-le pendant l’intégration.
+
+  Ce n’est **pas** pour les outils admin internes de lomi. ni pour exploiter votre propre stack paiement. La plupart des équipes utilisent le serveur hébergé `https://mcp.lomi.africa` ou le stdio local avec `npx @lomi./mcp`.
+</Callout>
+
+<Callout type="info" title="Le plus rapide">
+  Dans le [tableau de bord](https://dashboard.lomi.africa) : **Paramètres → Intégrations → MCP** (démarrage rapide) ou **Développeurs → Clés API → Connecter MCP** (configuration complète avec extraits Cursor, Claude et stdio). Copiez l’extrait, collez vos clés, puis redémarrez votre client MCP.
+</Callout>
+
+## Ce dont vous avez besoin (deux valeurs)
+
+| Valeur | En-tête | Où l’obtenir |
+| --- | --- | --- |
+| **Clé API marchande** | `x-lomi-api-key` | [Tableau de bord](https://dashboard.lomi.africa) → **Développeurs → Clés API**: toute clé **secrète** (`lomi_sk_…`) ou clé MCP (`lomi_mcp_…`) depuis **Connecter MCP** |
+| **Jeton de transport** (serveur hébergé uniquement) | `Authorization: Bearer …` | Valeur fournie par lomi. pour accéder au serveur MCP partagé `https://mcp.lomi.africa`, remplacez `YOUR_TRANSPORT_SECRET` dans l’extrait |
+
+Votre **clé marchande** identifie votre organisation et limite chaque appel d’outil.
+
+Le **jeton de transport** ne fait qu’ouvrir l’accès au point de terminaison MCP hébergé par lomi. Ce n’est **pas** votre clé marchande, ne mettez pas votre clé API dans `Authorization` quand un jeton de transport est requis.
+
+## Connexion HTTP (Cursor, Claude Desktop)
+
+Serveur MCP hébergé par lomi. :
+
+| | URL |
+| --- | --- |
+| Point de terminaison MCP | `https://mcp.lomi.africa/mcp` |
+| Santé (optionnel) | `https://mcp.lomi.africa/health` |
+| Prêt (optionnel) | `https://mcp.lomi.africa/ready` |
+
+Exemple de config **Cursor** / **Claude Desktop** :
+
+```json
+{
+  "mcpServers": {
+    "lomi": {
+      "url": "https://mcp.lomi.africa/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
+        "x-lomi-api-key": "YOUR_MERCHANT_API_KEY"
+      }
+    }
+  }
+}
+```
+
+Remplacez les deux placeholders `YOUR_*` par vos vraies valeurs, puis redémarrez votre client MCP.
+
+Modèles supplémentaires dans le dépôt : [`apps/mcp/examples/`](https://github.com/lomiafrica/lomi./tree/master/apps/mcp/examples).
+
+## Connexion stdio (local)
+
+Lance le serveur MCP sur votre machine, pas de jeton de transport. Idéal pour le développement local.
+
+```json
+{
+  "mcpServers": {
+    "lomi": {
+      "command": "npx",
+      "args": ["-y", "@lomi./mcp"],
+      "env": {
+        "LOMI_API_KEY": "YOUR_MERCHANT_API_KEY",
+        "LOMI_API_BASE_URL": "https://api.lomi.africa"
+      }
+    }
+  }
+}
+```
+
+Ou en direct :
+
+```bash
+npx -y @lomi./mcp
+```
+
+Utilisez `https://sandbox.api.lomi.africa` pour des données sandbox.
+
+## Sandbox vs production
+
+| Mode | `LOMI_API_BASE_URL` (stdio) | Clés API |
+| --- | --- | --- |
+| **Production** | `https://api.lomi.africa` | Clés secrètes live du tableau de bord |
+| **Sandbox** | `https://sandbox.api.lomi.africa` | Clés secrètes sandbox du tableau de bord |
+
+En HTTP MCP, les appels utilisent l’environnement API associé à votre clé marchande.
+
+## Outils, ressources et prompts
+
+- **`lomi_search_tools`**: recherche dans le catalogue d’outils quand le client charge les outils à la demande.
+- **Ressources**: `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
+- **Prompts**: `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
+
+## Déployer votre propre serveur MCP
+
+La plupart des intégrateurs utilisent `https://mcp.lomi.africa` ou le stdio local. Déployer une instance MCP séparée est réservé à **l’ingénierie et aux opérateurs lomi.** Voir [Maintenir la CLI et le MCP](/resources/contributing/maintaining-cli-mcp).

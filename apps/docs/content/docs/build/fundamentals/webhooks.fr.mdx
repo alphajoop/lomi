@@ -1,11 +1,11 @@
 ---
 title: 'Configurer les webhooks'
-description: 'Les webhooks permettent à votre application de recevoir des notifications en temps réel sur les événements qui se produisent dans votre compte lomi., comme les paiements réussis, les nouveaux abonnements ou les transactions échouées.'
+description: 'Les webhooks permettent à votre application de recevoir des notifications en temps réel sur les événements de votre compte lomi., paiements réussis, nouveaux abonnements, transactions échouées, etc.'
 ---
 
-import { Callout } from 'fumadocs-ui/components/callout';
+import { Callout } from '@/components/docs/docs-callout';
 
-Au lieu d’interroger constamment l’API pour détecter les changements, vous pouvez configurer lomi. pour qu’elle envoie des requêtes HTTP POST vers un point de terminaison que vous contrôlez dès qu’un événement précis se produit.
+Au lieu d’interroger constamment l’API pour détecter les changements, vous pouvez configurer lomi. pour qu’elle envoie des requêtes HTTP POST vers une URL que vous contrôlez dès qu’un événement précis se produit.
 
 <Callout type="info">
   Pour les tentatives, les doublons de livraison et le débogage des journaux de livraison, voir [Fiabilité des webhooks](/build/advanced-guides/webhook-reliability).
@@ -29,30 +29,30 @@ Vous pouvez vous abonner aux notifications pour les événements suivants :
 - `REFUND_COMPLETED` : un remboursement a été traité avec succès.
 - `REFUND_FAILED` : le processus de remboursement a échoué.
 - `SUBSCRIPTION_CREATED` : un nouvel abonnement a été créé.
-- `SUBSCRIPTION_UPDATED` : un abonnement a changé (pause, reprise, changement de plan, annulation planifiée, etc.). La charge utile inclut `previous_attributes`.
+- `SUBSCRIPTION_UPDATED` : un abonnement a changé (pause, reprise, changement de plan, annulation planifiée, etc.). Le corps inclut `previous_attributes`.
 - `SUBSCRIPTION_RENEWED` : un abonnement a été renouvelé avec succès.
 - `SUBSCRIPTION_CANCELLED` : un abonnement a été annulé ou a expiré.
 
-## 1. Mettre en place votre point de terminaison webhook
+## 1. Mettre en place votre URL webhook
 
-Avant de configurer un webhook dans lomi., vous devez créer un point de terminaison (une URL) sur votre serveur qui :
+Avant de configurer un webhook dans lomi., préparez une URL sur votre serveur qui :
 
 1.  est **accessible publiquement** en HTTPS ;
 2.  peut recevoir des **requêtes HTTP POST** avec un **corps JSON** ;
 3.  est prêt à traiter les données webhook entrantes de lomi..
 
-Pour le développement et les tests locaux, vous pouvez utiliser des outils comme [ngrok](https://ngrok.com/) ou [localtunnel](https://theboroer.github.io/localtunnel-www/) pour exposer votre serveur local sur Internet, ou des services en ligne comme [Webhook.site](https://webhook.site/) ou [Beeceptor](https://beeceptor.com/) pour des points de terminaison temporaires.
+Pour le développement et les tests locaux, vous pouvez utiliser des outils comme [ngrok](https://ngrok.com/) ou [localtunnel](https://theboroer.github.io/localtunnel-www/) pour exposer votre serveur local sur Internet, ou des services en ligne comme [Webhook.site](https://webhook.site/) ou [Beeceptor](https://beeceptor.com/) pour des URLs temporaires.
 
 ## 2. Configurer les webhooks dans lomi.
 
-Une fois votre point de terminaison prêt, configurez-le dans votre tableau de bord marchand lomi. (ou via l’API LOMI) :
+Une fois votre URL prête, configurez-la dans votre tableau de bord marchand lomi. (ou via l’API) :
 
-1.  Allez dans la section **Developers → Webhooks** de votre tableau de bord lomi..
+1.  Allez dans la section **Developers → Webhooks** de votre tableau de bord lomi.
 2.  Cliquez sur « Add Endpoint » ou « Create Webhook ».
-3.  Saisissez l’**URL du point de terminaison** (l’URL HTTPS publiquement accessible que vous avez préparée).
-4.  Sélectionnez les **événements** auxquels vous souhaitez vous abonner pour ce point de terminaison. Vous pouvez en choisir plusieurs.
+3.  Saisissez l’**URL webhook** (l’adresse HTTPS publique que vous avez préparée).
+4.  Sélectionnez les **événements** auxquels vous souhaitez vous abonner pour cette URL. Vous pouvez en choisir plusieurs.
 5.  Cliquez sur « Create Webhook ».
-6.  **Copiez impérativement le `Signing Secret` généré** (il commence par `whsec_`). Ce secret est propre à ce point de terminaison webhook et est indispensable pour vérifier les requêtes entrantes. Stockez-le en lieu sûr sur votre serveur ; vous en aurez besoin pour vérifier les signatures. Voir le guide [Clés d’API](/start/api-keys) pour la gestion des secrets.
+6.  **Copiez impérativement le `Signing Secret` généré** (il commence par `whsec_`). Ce secret est propre à cette URL webhook et est indispensable pour vérifier les requêtes entrantes. Stockez-le en lieu sûr sur votre serveur ; vous en aurez besoin pour vérifier les signatures. Voir le guide [Clés d’API](/start/api-keys) pour la gestion des secrets.
 
 ## 3. Recevoir les webhooks
 
@@ -63,10 +63,10 @@ Lorsqu’un événement auquel vous êtes abonné se produit, lomi. envoie une r
 - **En-têtes :**
   - `X-Lomi-Event` : le type d’événement ayant déclenché le webhook (par ex. `PAYMENT_SUCCEEDED`).
   - `X-Lomi-Signature` : la signature calculée par lomi. pour cette requête. Vous DEVEZ l’utiliser pour vérifier l’authenticité de la requête.
-  - `User-Agent` : `Lomi-Webhook/1.0`
+  - `User-Agent` : `lomi.-Webhook/1.0`
 - **Corps :** un objet JSON contenant les détails de l’événement.
 
-### Structure de la charge utile
+### Structure du message
 
 La charge JSON aura la structure suivante. L’objet `data` contient en général la ressource concernée (par ex. Transaction, Abonnement) avec les champs internes et de rapprochement prestataire retirés lorsque c’est pertinent. **Appuyez-vous sur les identifiants lomi** (par ex. `` `transaction_id` `` et les clés `` `metadata` `` que **vous** définissez au checkout) ; ne supposez pas la présence d’identifiants spécifiques à un processeur dans le JSON webhook.
 
@@ -105,12 +105,12 @@ lomi. calcule la signature à l’aide d’un code d’authentification de messa
 
 1.  **Extraire la signature :** récupérez la valeur de l’en-tête `X-Lomi-Signature` de la requête entrante.
 2.  **Obtenir la charge brute :** vous avez besoin du **corps brut de la requête** sous forme de chaîne, exactement tel qu’il a été reçu, **avant** tout parsing ou modification JSON. L’accès dépend de votre framework web (voir les exemples ci-dessous).
-3.  **Préparer le HMAC :** avec votre `Signing Secret` conservé en sécurité (la chaîne `whsec_…` fournie par lomi. pour ce point de terminaison) comme clé, calculez le hachage HMAC SHA256 de la chaîne du corps brut.
+3.  **Préparer le HMAC :** avec votre `Signing Secret` conservé en sécurité (la chaîne `whsec_…` fournie par lomi. pour cette URL) comme clé, calculez le hachage HMAC SHA256 de la chaîne du corps brut.
 4.  **Comparer :** comparez le hachage que vous calculez (au format hexadécimal) à la signature extraite de l’en-tête. Utilisez une fonction de comparaison **à temps constant** pour prévenir les attaques par timing. S’ils correspondent, la requête est valide.
 
 ### Exemples de code pour la vérification de signature
 
-Remplacez `'your-webhook-signing-secret'` par le secret réel de votre point de terminaison (de préférence récupéré via des variables d’environnement comme `process.env.LOMI_WEBHOOK_SECRET`).
+Remplacez `'your-webhook-signing-secret'` par le secret réel de votre URL (de préférence récupéré via des variables d’environnement comme `process.env.LOMI_WEBHOOK_SECRET`).
 
 **Node.js (avec Express) :**
 
@@ -214,14 +214,14 @@ def webhook_listener():
 
 ## 5. Répondre aux webhooks
 
-Votre point de terminaison DOIT répondre rapidement à la requête webhook avec un code HTTP dans la plage `2xx` (par ex. `200 OK`). Cela accuse réception auprès de lomi..
+Votre URL DOIT répondre rapidement à la requête webhook avec un code HTTP dans la plage `2xx` (par ex. `200 OK`). Cela accuse réception auprès de lomi..
 
 - **Répondre immédiatement :** accusez réception **avant** toute logique complexe ou appels API externes susceptibles de dépasser le délai d’attente.
 - **Reporter le traitement :** si le traitement de l’événement est long, utilisez une file d’attente de tâches en arrière-plan (Redis/Celery, BullMQ, Sidekiq, etc.) pour traiter le travail de façon asynchrone après l’envoi de la réponse `200 OK`.
 
 **Pourquoi répondre d’abord ?** Tant que lomi ne reçoit pas un **`2xx`**, la livraison n’est pas considérée comme acceptée par votre système. L’usage attendu après vérification de la signature est d’accuser réception (« j’ai reçu cet envoi sans altération ») ; tout le traitement métier lourd passe ensuite dans **vos** workers ou votre base.
 
-Chaque tentative côté lomi utilise un délai d’expiration HTTP **borné** (**environ quatre secondes**). Si votre serveur ne termine pas la réponse HTTP dans cette fenêtre, la tentative échoue pour ce tour. Dans des conditions normales, renvoyer **`200`** ou **`204`** prend typiquement **bien moins d’une seconde** ; après cela vous pouvez enfiler le travail long dans vos files internes. Chiffres, backoff et exceptions détaillés : [Fiabilité des webhooks — Délais et tentatives](/build/advanced-guides/webhook-reliability).
+Chaque tentative côté lomi utilise un délai d’expiration HTTP **borné** (**environ quatre secondes**). Si votre serveur ne termine pas la réponse HTTP dans cette fenêtre, la tentative échoue pour ce tour. Dans des conditions normales, renvoyer **`200`** ou **`204`** prend typiquement **bien moins d’une seconde** ; après cela vous pouvez enfiler le travail long dans vos files internes. Chiffres, backoff et exceptions détaillés : [Fiabilité des webhooks: Délais et tentatives](/build/advanced-guides/webhook-reliability).
 
 ## 6. Nouvelles tentatives
 
@@ -230,27 +230,27 @@ Sans réponse **`2xx`** exploitable ou en cas de **timeout** pour une tentative 
 - Pour les problèmes **réessayables** (souvent **5xx**, pannes réseau transitoires, ou timeout côté client HTTP de la tentative précédente), lomi peut appliquer un **recul exponentiel** et rejouer un nombre **limité** d’essais. Le nombre maximal diffère suivant que l’événement part sur le chemin **synchrone** ou **mis en file** (voir le guide détaillé).
 - Les erreurs **client 4xx** (dont **401**, **404**, ou un **400** dû à votre logique applicative) sont en principe **non réessayables** sur le même flux : lomi ne répète pas indéfiniment si la configuration de votre endpoint est en cause. Corrigez la route ou l’auth, puis relancez manuellement depuis le tableau de bord ou l’API si besoin.
 
-**L’idempotence reste indispensable :** retries légitimes, doublons de job, ou **rejeu manuel** peuvent faire arriver **plusieurs fois** le même événement logique. Concevez vos handlers pour qu’un second traitement soit inoffensif : conservez le champ `` `id` `` à la racine (**UUID**) avec vos clés métier (par ex. `` `transaction_id` `` ou vos propres métadonnées), utilisez des contraintes d’unicité quand c’est pertinent, et préférez « déjà traité → no-op » à une erreur bloquante.
+**L’idempotence reste indispensable :** retries légitimes, doublons de job, ou **rejeu manuel** peuvent faire arriver **plusieurs fois** le même événement logique. Concevez vos handlers pour qu’un second traitement soit inoffensif : conservez le champ `` `id` `` à la racine (**UUID**) avec vos clés métier (par ex. `` `transaction_id` `` ou vos propres métadonnées), utilisez des contraintes d’unicité quand c’est pertinent, et préférez « déjà traité → ignorer » à une erreur bloquante.
 
-Pour tableaux, variables d’environnement et détail d’implémentation, la référence canonique est **[Fiabilité des webhooks — Délais et tentatives](/build/advanced-guides/webhook-reliability)**.
+Pour tableaux, variables d’environnement et détail d’implémentation, la référence canonique est **[Fiabilité des webhooks: Délais et tentatives](/build/advanced-guides/webhook-reliability)**.
 
 ## 7. Tester les webhooks
 
-Vous pouvez tester votre intégration avec la fonction « Test Webhook » du tableau de bord lomi. (**Developers → Webhooks → sélectionner le point de terminaison → Test**). Cela envoie une charge de test `PAYMENT_SUCCEEDED` vers votre URL configurée, ce qui permet de vérifier la réception et la vérification de signature sans transaction réelle.
+Vous pouvez tester votre intégration avec la fonction « Test Webhook » du tableau de bord lomi. (**Developers → Webhooks → sélectionner l’URL → Test**). Cela envoie un événement de test `PAYMENT_SUCCEEDED` vers votre URL configurée, ce qui permet de vérifier la réception et la vérification de signature sans transaction réelle.
 
 ## 8. Synthèse des bonnes pratiques
 
 - **Vérifier les signatures :** vérifiez toujours `X-Lomi-Signature` avec votre secret de signature et une comparaison à temps constant.
-- **Répondre vite :** renvoyez un `` `200 OK` `` ou autre **`2xx`** dès que la signature est valide — bien **avant** le délai de lecture sortant (**environ quatre secondes**) décrit dans le guide fiabilité.
+- **Répondre vite :** renvoyez un `` `200 OK` `` ou autre **`2xx`** dès que la signature est valide, bien **avant** le délai de lecture sortant (**environ quatre secondes**) décrit dans le guide fiabilité.
 - **Traiter en asynchrone :** reportez la logique complexe vers des jobs en arrière-plan.
 - **Gérer les doublons (idempotence) :** prévoyez de recevoir le même événement plusieurs fois. Vérifiez l’`id` de l’événement.
-- **Utiliser HTTPS :** assurez-vous que votre point de terminaison utilise HTTPS.
+- **Utiliser HTTPS :** assurez-vous que votre URL utilise HTTPS.
 - **Sécuriser le secret :** gardez le secret de signature webhook confidentiel. Ne le committez pas dans le dépôt. Utilisez des variables d’environnement ou un gestionnaire de secrets (voir le guide [Clés d’API](/start/api-keys)).
 
 ## 9. Dépannage
 
-- **Consulter les journaux de livraison :** le tableau de bord lomi. (**Developers → Webhooks → sélectionner le point de terminaison → Logs**) affiche l’historique des tentatives de livraison, les codes succès/échec et les corps de réponse capturés par lomi.. Utile pour diagnostiquer les problèmes.
-- **401 Unauthorized / corps « Authentication required » :** en principe **votre** serveur ou proxy répond ainsi, pas lomi. Les POST sortants de lomi. incluent uniquement `` `X-Lomi-Signature` `` pour contrôle — **pas** `` `Authorization: Bearer` `` ni `` `X-API-Key` ``. Excluez la route webhook de l’authentification globale puis vérifiez le HMAC ; voir [Secret de signature et Authorization](/build/advanced-guides/handling-webhooks).
+- **Consulter les journaux de livraison :** le tableau de bord lomi. (**Developers → Webhooks → sélectionner l’URL → Logs**) affiche l’historique des tentatives de livraison, les codes succès/échec et les corps de réponse capturés par lomi.. Utile pour diagnostiquer les problèmes.
+- **401 Unauthorized / corps « Authentication required » :** en principe **votre** serveur ou proxy répond ainsi, pas lomi. Les POST sortants de lomi. incluent uniquement `` `X-Lomi-Signature` `` pour contrôle, **pas** `` `Authorization: Bearer` `` ni `` `X-API-Key` ``. Excluez la route webhook de l’authentification globale puis vérifiez le HMAC ; voir [Secret de signature et Authorization](/build/advanced-guides/handling-webhooks).
 - **Écarts de signature :** souvent dus à un mauvais secret, à une modification de la charge avant vérification, ou à l’absence d’utilisation du corps brut de la requête.
-- **Dépassements de délai :** lomi n’attend **qu’environ quatre secondes** par tentative HTTP. Si vous voyez encore des timeouts, profilez tout ce qui s’exécute **avant** l’envoi du **`2xx`** — en pratique une réponse JSON minimale suffit dans la quasi-totalité des intégrations, le reste allant dans **votre** file.
+- **Dépassements de délai :** lomi n’attend **qu’environ quatre secondes** par tentative HTTP. Si vous voyez encore des timeouts, profilez tout ce qui s’exécute **avant** l’envoi du **`2xx`**: en pratique une réponse JSON minimale suffit dans la quasi-totalité des intégrations, le reste allant dans **votre** file.
 - **Pare-feu / réseau :** vérifiez que votre serveur ou pare-feu autorise les requêtes POST entrantes depuis les adresses IP de lomi. (si filtrage par IP utilisé).

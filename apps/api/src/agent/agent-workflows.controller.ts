@@ -43,12 +43,15 @@ export class AgentWorkflowsController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @ApiOperation({
     summary:
-      'Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)',
+      'Démarrer un workflow multi-étapes (idempotence sur idempotency_key, persistant)',
   })
   @ApiResponse({ status: 201, description: 'Exécution créée' })
   @ApiBody({ type: CreateWorkflowDto })
-  create(@CurrentUser() user: AuthContext, @Body() body: CreateWorkflowDto) {
-    const run = this.workflows.create(user.organizationId, {
+  async create(
+    @CurrentUser() user: AuthContext,
+    @Body() body: CreateWorkflowDto,
+  ) {
+    const run = await this.workflows.create(user.organizationId, {
       name: body.name,
       steps: body.steps,
       idempotency_key: body.idempotency_key,
@@ -63,8 +66,8 @@ export class AgentWorkflowsController {
   @Get('workflows/:runId')
   @ApiParam({ name: 'runId' })
   @ApiOperation({ summary: "Obtenir l'état d'une exécution de workflow" })
-  get(@CurrentUser() user: AuthContext, @Param('runId') runId: string) {
-    return { data: this.workflows.get(user.organizationId, runId) };
+  async get(@CurrentUser() user: AuthContext, @Param('runId') runId: string) {
+    return { data: await this.workflows.get(user.organizationId, runId) };
   }
 
   @Patch('workflows/:runId/steps/:stepId')
@@ -76,13 +79,13 @@ export class AgentWorkflowsController {
     summary: "Faire avancer une étape du workflow (primitive d'orchestration)",
   })
   @ApiResponse({ status: 200, description: 'Mis à jour' })
-  patchStep(
+  async patchStep(
     @CurrentUser() user: AuthContext,
     @Param('runId') runId: string,
     @Param('stepId') stepId: string,
     @Body() body: UpdateWorkflowStepDto,
   ) {
-    const run = this.workflows.updateStep(
+    const run = await this.workflows.updateStep(
       user.organizationId,
       runId,
       stepId,

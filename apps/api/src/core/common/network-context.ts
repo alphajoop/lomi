@@ -1,4 +1,8 @@
-import { Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import type { SupabaseService } from '../../utils/supabase/supabase.service';
 import type { AuthContext } from './decorators/current-user.decorator';
@@ -25,6 +29,8 @@ type RecordNetworkContextResult = {
   operatorFeeRuleId: string | null;
   feeEntryId: string | null;
 };
+
+export type { RecordNetworkContextResult };
 
 const networkLogger = new Logger('NetworkContext');
 
@@ -95,6 +101,47 @@ export function namespaceNetworkIdempotency(
   };
 }
 
+export function assertNetworkContextRecorded(
+  user: AuthContext,
+  result: RecordNetworkContextResult | null,
+  operation: string,
+): void {
+  if (!isNetworkRequest(user)) {
+    return;
+  }
+
+  if (!result?.contextId) {
+    throw new InternalServerErrorException(
+      `Network bookkeeping failed during ${operation}`,
+    );
+  }
+}
+
+/** Member merchant for ledger attribution on delegated member-org operations. */
+export async function resolveNetworkMemberMerchantId(
+  supabase: SupabaseService,
+  user: AuthContext,
+): Promise<string> {
+  if (!isNetworkRequest(user)) {
+    return user.merchantId;
+  }
+
+  const { data, error } = await (supabase.getClient() as any).rpc(
+    'resolve_network_member_merchant_id',
+    { p_network_membership_id: user.networkMembershipId },
+  );
+
+  if (error) {
+    throw new BadRequestException(error.message);
+  }
+
+  if (typeof data !== 'string' || !data) {
+    throw new BadRequestException('Network membership not found');
+  }
+
+  return data;
+}
+
 export async function recordNetworkContext(
   supabase: SupabaseService,
   user: AuthContext,
@@ -158,6 +205,11 @@ export async function recordNetworkContext(
     }
 
     if (options.enqueuePaymentCreated && options.transactionId) {
+      const enriched = await fetchNetworkWebhookEnrichment(
+        supabase,
+        user,
+        options.transactionId,
+      );
       await enqueueNetworkWebhook(
         supabase,
         user.actorOrganizationId ?? user.organizationId,
@@ -174,13 +226,16 @@ export async function recordNetworkContext(
             network_membership_id: membershipId,
             member_organization_id:
               user.targetOrganizationId ?? user.organizationId,
+            member_organization_name: enriched.memberOrganizationName,
+            customer_id: enriched.customerId,
             ...(options.metadata ?? {}),
           },
         },
       );
     }
 
-    if (feeEntryId) {
+    if (feeEntryId && !options.transactionId) {
+      const enriched = { memberOrganizationName: null, customerId: null };
       await enqueueNetworkWebhook(
         supabase,
         user.actorOrganizationId ?? user.organizationId,
@@ -195,6 +250,10 @@ export async function recordNetworkContext(
             network_account_id: user.networkAccountId,
             public_account_id: user.publicAccountId ?? user.lomiAccount,
             network_membership_id: membershipId,
+            member_organization_id:
+              user.targetOrganizationId ?? user.organizationId,
+            member_organization_name: enriched.memberOrganizationName,
+            customer_id: enriched.customerId,
           },
         },
       );
@@ -286,18 +345,47 @@ export async function recordNetworkOperatorFeeReversal(
     return null;
   }
 
-  return typeof data === 'string' ? data : null;
+  const reversalEntryId = typeof data === 'string' ? data : null;
+  if (reversalEntryId) {
+    const { data: feeRows } = await (supabase.getClient() as any).rpc(
+      'get_network_operator_fee_entry_summary',
+      { p_operator_fee_entry_id: reversalEntryId },
+    );
+    const feeRow = Array.isArray(feeRows) ? feeRows[0] : feeRows;
+
+    await enqueueNetworkWebhook(
+      supabase,
+      user.actorOrganizationId ?? user.organizationId,
+      {
+        event: 'NETWORK_OPERATOR_FEE_REVERSED',
+        idempotencyKey: `network_operator_fee_reversed_${reversalEntryId}`,
+        payload: {
+          operator_fee_entry_id: reversalEntryId,
+          public_account_id: user.publicAccountId ?? user.lomiAccount,
+          network_membership_id: user.networkMembershipId,
+          member_organization_id:
+            user.targetOrganizationId ?? user.organizationId,
+          transaction_id: params.transactionId,
+          refund_id: params.refundId,
+          operator_fee_amount: Number(feeRow?.amount ?? params.refundAmount),
+          operator_fee_currency:
+            feeRow?.currency_code ?? params.metadata?.currency_code ?? null,
+        },
+      },
+    );
+  }
+
+  return reversalEntryId;
 }
 
 async function fetchOperatorFeeRuleId(
   supabase: SupabaseService,
   membershipId: string,
 ): Promise<string | null> {
-  const { data, error } = await (supabase.getClient() as any)
-    .from('network_memberships')
-    .select('operator_fee_rule_id')
-    .eq('network_membership_id', membershipId)
-    .maybeSingle();
+  const { data, error } = await (supabase.getClient() as any).rpc(
+    'get_network_membership_operator_fee_rule_id',
+    { p_network_membership_id: membershipId },
+  );
 
   if (error) {
     networkLogger.error(
@@ -306,9 +394,7 @@ async function fetchOperatorFeeRuleId(
     return null;
   }
 
-  return typeof data?.operator_fee_rule_id === 'string'
-    ? data.operator_fee_rule_id
-    : null;
+  return typeof data === 'string' ? data : null;
 }
 
 async function calculateOperatorFee(
@@ -376,6 +462,36 @@ async function recordOperatorFeeEntry(
   }
 
   return typeof data === 'string' ? data : null;
+}
+
+async function fetchNetworkWebhookEnrichment(
+  supabase: SupabaseService,
+  user: AuthContext,
+  transactionId: string,
+): Promise<{
+  memberOrganizationName: string | null;
+  customerId: string | null;
+}> {
+  const memberOrganizationId =
+    user.targetOrganizationId ?? user.organizationId ?? null;
+
+  const { data } = await (supabase.getClient() as any).rpc(
+    'get_network_webhook_enrichment',
+    {
+      p_member_organization_id: memberOrganizationId,
+      p_transaction_id: transactionId,
+    },
+  );
+
+  const row = Array.isArray(data) ? data[0] : data;
+
+  return {
+    memberOrganizationName:
+      typeof row?.member_organization_name === 'string'
+        ? row.member_organization_name
+        : null,
+    customerId: typeof row?.customer_id === 'string' ? row.customer_id : null,
+  };
 }
 
 async function enqueueNetworkWebhook(

@@ -1,15 +1,15 @@
 ---
-title: Discount Coupons
+title: Discount coupons
 description: Create, validate, stack, and track coupon discounts with the same rules used in checkout.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 
-The Discount Coupons API supports strict server-side validation and usage tracking for checkout flows.
+The Discount coupons API supports strict server-side validation and usage tracking for checkout flows.
 
 Worked examples (stacking, eligibility edge cases, retries): **[Coupon logic examples](/build/payments/coupon-logic-examples)**.
 
-This page documents the behavior implemented in the discount logic migrations, including:
+This page describes coupon validation and application rules used by checkout and the API, including:
 
 - creation-time validation
 - checkout-time validation (customer, scope, quantity, frequency)
@@ -20,14 +20,14 @@ This page documents the behavior implemented in the discount logic migrations, i
 
 At a high level, coupon handling follows this flow:
 
-1. Create coupon with constraints (`create_discount_coupon`).
-2. Validate at checkout (`validate_coupon_for_checkout` / `validate_coupon_for_frontend`).
-3. Compute discount (`calculate_coupon_discount`) and apply (`apply_coupon`), or apply multiple sequentially (`calculate_multi_coupon_discount`, `apply_coupons_to_checkout`).
-4. Reserve usage against checkout session in `coupon_usage`.
-5. Link reservation to final transaction (`link_or_insert_coupon_usage_for_transaction`).
-6. Increment coupon usage counters when transaction is completed (`increment_coupon_usage_for_completed_transaction`).
+1. Create a coupon via **`POST /discount-coupons`** with your constraints.
+2. Validate at checkout (server-side rules for customer, scope, quantity, and frequency).
+3. Compute and apply the discount on the checkout session, including stacked coupons when allowed.
+4. Reserve usage against the checkout session until payment completes.
+5. Link the reservation to the final transaction when payment succeeds.
+6. Increment usage counters when the transaction reaches **`completed`**.
 
-This keeps coupon behavior deterministic between frontend preview and final transaction recording.
+This keeps coupon behavior deterministic between dashboard preview, hosted checkout, and API integrations.
 
 ## Create a discount coupon
 

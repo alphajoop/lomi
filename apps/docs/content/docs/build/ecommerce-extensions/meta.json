@@ -1,5 +1,6 @@
 {
-  "title": "E‑commerce extensions",
+  "title": "E‑commerce",
   "description": "Hosted checkout plugins for WooCommerce, Magento, PrestaShop, and Shopify.",
-  "pages": ["index", "mcp", "woocommerce", "magento", "prestashop", "shopify"]
+  "icon": "Store",
+  "pages": ["index", "woocommerce", "magento", "prestashop", "shopify"]
 }

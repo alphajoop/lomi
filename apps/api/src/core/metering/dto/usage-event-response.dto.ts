@@ -1,39 +1,39 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UsageEventListItemDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   event_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   transaction_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   code: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   customer_id: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String, nullable: true })
   subscription_id?: string | null;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String, nullable: true })
   meter_id?: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   quantity: number;
 
   @ApiProperty({ enum: ['pending', 'processed', 'failed'] })
   processing_status: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String, nullable: true })
   error_message?: string | null;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   occurred_at: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   created_at: string;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: Number })
   total_count?: number;
 }

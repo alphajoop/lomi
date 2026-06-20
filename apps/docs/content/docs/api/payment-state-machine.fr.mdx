@@ -1,41 +1,45 @@
 ---
-title: Machine d’état des paiements
-description: Transitions entre statuts transaction et prestataire, expiration, impact sur les soldes.
+title: Statuts des paiements
+description: Comment un paiement change de statut, expire, et met à jour votre solde.
+docType: explanation
 ---
 
-Référence canonique du cycle de vie des paiements dans lomi., alignée sur les fonctions serveur (`create_transaction`, `update_transaction_status`, jobs d’expiration, mises à jour de solde).
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
-## Statuts de transaction
+Ce guide décrit le cycle de vie d'un paiement dans lomi., du `pending` au `completed`, en passant par l'échec ou l'expiration. Pour le code côté serveur, voir [Pour les contributeurs](#pour-les-contributeurs).
 
-Valeurs usuelles de `transaction_status` :
+## Parcours d'un paiement
 
-| Statut | Signification |
+```mermaid
+stateDiagram-v2
+  [*] --> pending: paiement en production
+  [*] --> completed: paiement test (sandbox)
+  pending --> completed: confirmé par le prestataire
+  pending --> failed: refus ou échec
+  pending --> expired: délai dépassé
+  completed --> refunded: remboursement
+  failed --> [*]
+  expired --> [*]
+  refunded --> [*]
+```
+
+En **test**, un paiement est souvent `completed` tout de suite. En **production**, il reste en général `pending` jusqu'à ce que le client valide (mobile money, carte, etc.).
+
+## Les statuts
+
+| Statut | Ce que ça veut dire |
 | --- | --- |
-| `pending` | Paiement initié ; résultat final non confirmé (fréquent en **live**). |
-| `completed` | Succès ; solde marchand et frais conformes aux règles plateforme. |
-| `failed` | Échec du paiement (certains chemins d’expiration inclus). |
-| `expired` | Dépassement du délai en attente (alternative à `failed` selon le job). |
-| `refunded` | Remboursement traité sur le paiement d’origine. |
+| `pending` | Paiement lancé, résultat pas encore connu (fréquent en production). |
+| `completed` | Paiement réussi ; le solde est crédité selon les règles lomi. |
+| `failed` | Le paiement n'a pas abouti. |
+| `expired` | Le client n'a pas finalisé à temps. |
+| `refunded` | Remboursement effectué sur ce paiement. |
 
-### Test et live
+## Côté prestataire (Wave, MTN, etc.)
 
-À la création d’une transaction :
+Chaque statut transaction a un équivalent côté prestataire :
 
-- En **test**, le statut peut passer **`completed` immédiatement** (sans confirmation asynchrone prestataire).
-- En **live**, les nouveaux paiements sont en général **`pending`** jusqu’à confirmation prestataire.
-
-## Mises à jour de statut : idempotence et métadonnées
-
-Lorsque le statut passe à `completed` :
-
-- **Les complétions en double sont ignorées** sur le chemin solde : nouvelle tentative de complétion met à jour la ligne avec des métadonnées **fusionnées** (nouveaux identifiants prestataire conservés), sans recréditer le solde.
-- **Les métadonnées sont fusionnées**, pas remplacées, pour sécuriser les réessais webhook.
-
-## Correspondance statut prestataire
-
-Le `transaction_status` plateforme se reflète dans `provider_payment_status`, par exemple :
-
-| Statut transaction | Statut paiement prestataire |
+| Statut transaction | Statut prestataire |
 | --- | --- |
 | `completed` | `succeeded` |
 | `pending` | `processing` |
@@ -43,29 +47,39 @@ Le `transaction_status` plateforme se reflète dans `provider_payment_status`, p
 | `expired` | `expired` |
 | `refunded` | `refunded` |
 
-Les noms exacts dans les réponses suivent OpenAPI / modèles ; voir [Transactions](/build/transactions).
+Voir [Transactions](/build/transactions) pour les champs dans les réponses API.
 
-## Expiration des paiements en attente
+## Quand le statut passe à `completed`
 
-Des jobs planifiés peuvent expirer les transactions en attente :
+- Un **double webhook** ne crédite pas le solde deux fois : lomi. fusionne les métadonnées et ne crédite qu'une fois.
+- Les **métadonnées** s'ajoutent au fil des webhooks, elles ne sont pas écrasées.
 
-- Par **ancienneté** (ex. plus de N heures).
-- Éventuellement selon l’**expiration de session prestataire** (ex. Wave `when_expires`), selon la fonction utilisée.
+## Expiration
 
-Les lignes expirées portent `expiration_info` dans les métadonnées.
+Un paiement `pending` peut expirer automatiquement :
 
-## Conséquences du statut `completed`
+- après un certain **délai** ;
+- ou quand la **session prestataire** expire (ex. Wave).
 
-Dans l’ordre :
+L'info d'expiration est stockée dans `expiration_info` sur la transaction.
 
-1. **Usage de coupon** éventuellement incrémenté.
-2. **Soldes** mis à jour via un chemin idempotent utilisant `metadata.balance_updated` pour éviter le double crédit.
-3. **Abonnements** liés peuvent passer de `pending` à `active` le cas échéant.
+## Effets d'un paiement réussi
 
-Délais de disponibilité : [Solde et règlement](/build/balance-and-settlement).
+1. Le **coupon** utilisé est comptabilisé.
+2. Le **solde** est mis à jour (`metadata.balance_updated` évite un double crédit).
+3. Un **abonnement** lié peut passer de `pending` à `active`.
 
-## Guides associés
+Pour le délai de disponibilité des fonds, voir [Solde et règlement](/build/balance-and-settlement).
 
+## Voir aussi
+
+- [Cycle de vie des paiements](/build/guides/payment-lifecycle)
+- [Vérifier les paiements](/build/guides/verify-payments)
 - [Comportement du checkout](/build/payments/checkout-behavior)
 - [Recevoir les webhooks](/build/advanced-guides/handling-webhooks)
-- [Fiabilité des webhooks](/build/advanced-guides/webhook-reliability)
+
+<Accordions type="single">
+  <Accordion title="Pour les contributeurs" id="pour-les-contributeurs">
+    Côté serveur : `create_transaction`, `update_transaction_status`, jobs d'expiration et soldes dans `apps/api`. Si vous changez un statut, mettez à jour cette page et lancez `pnpm docs:drift`.
+  </Accordion>
+</Accordions>

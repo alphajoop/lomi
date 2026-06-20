@@ -1,15 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreditWalletDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   meter_id: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: String })
   customer_id: string;
 
-  @ApiProperty({ example: 100 })
+  @ApiProperty({ type: Number, example: 100 })
   units: number;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional({ type: String })
   reason?: string;
 }
