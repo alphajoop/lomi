@@ -28,7 +28,8 @@
     "mdx": "pnpm exec fumadocs-mdx",
     "format": "prettier --write .",
     "map": "tsx --env-file=.env lib/scripts/core/generate_sitemap.ts",
-    "test:tryit": "bun test lib/openapi-secure-proxy.allowlist.test.ts"
+    "test:tryit": "bun test lib/openapi-secure-proxy.allowlist.test.ts",
+    "screenshots:verify": "bun ./lib/scripts/verify-docs-screenshots.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.50",

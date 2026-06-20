@@ -7,6 +7,7 @@ import type { MDXComponents } from 'mdx/types';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import * as icons from 'lucide-react';
+import { DocsScreenshot } from '@/components/docs/docs-screenshot';
 import { ComponentPreview } from '@/components/preview/component-preview';
 import { PaymentFailureCard } from '@/components/lomi-ui/payment-failure-card';
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
@@ -28,6 +29,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Step,
     Steps,
     ComponentPreview,
+    DocsScreenshot,
     PaymentFailureCard,
     CheckoutSummaryCard,
     InvoiceHistory,

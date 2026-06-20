@@ -8,7 +8,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Use **`POST /payouts`** for all outbound money movement.
 
-![Placeholder payout dashboard](/placeholder.webp)
+<DocsScreenshot name="build/payouts" alt="lomi. dashboard withdrawal and payout methods settings" />
 
 - **`destination: "self"`** — withdraw to a **registered** payout method on your organization (`payout_method_id` required). Supports `bank`, `spi`, and `wave` (mobile money).
 - **`destination: "beneficiary"`** — pay a third party on **mobile rails** (`wave` today). Requires `recipient.name` and `recipient.phone` (any E.164 mobile number; **not** tied to `payout_method_id`). Bank payouts to arbitrary accounts are not supported.
