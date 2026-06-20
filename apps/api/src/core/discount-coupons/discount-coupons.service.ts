@@ -143,6 +143,7 @@ export class DiscountCouponsService {
         p_expires_at: createDto.expires_at || null,
         p_scope_type: createDto.scope_type || 'organization_wide',
         p_product_ids: createDto.product_ids || null,
+        p_environment: environmentFromAuth(user),
         p_merchant_id: user.merchantId, // Pass merchant_id for API key authentication
       } as any,
     );
