@@ -1,4 +1,7 @@
 # Root
+.doctool/
+.mooncake/
+apps/doctool/
 .cursor/
 .vscode/
 package.json
