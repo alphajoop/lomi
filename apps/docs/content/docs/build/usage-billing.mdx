@@ -91,7 +91,7 @@ Returns **202 Accepted**; processing is asynchronous.
 
 [lomi. Radar](/build/radar) bills per screened charge when enabled on your organization. Each evaluation calls `enqueue_usage_event` with meter code **`radar_screen`** (aggregation: `count`).
 
-1. Enable Radar via [PATCH /organization/radar-settings](/api/radar/RadarController_updateSettings) (`enabled: true`). A `radar_screen` meter is created automatically when a matching usage-based product exists.
+1. Enable Radar via [PATCH /organization/radar-settings](/api/organization/RadarController_updateSettings) (`enabled: true`). A `radar_screen` meter is created automatically when a matching usage-based product exists.
 2. Every screened charge (card, MTN, Wave) records one usage unit while Radar is on.
 3. Read balances and periods with the same endpoints as other usage meters ([Get meter balance](/api/meters/MetersController_getBalance), [List billing periods](/api/usage-billing/UsageBillingController_listPeriods)).
 

@@ -91,7 +91,7 @@ Retourne **202 Accepted** ; le traitement est asynchrone.
 
 [lomi. Radar](/build/radar) facture chaque paiement filtré lorsque le produit est activé sur votre organisation. Chaque évaluation appelle `enqueue_usage_event` avec le code compteur **`radar_screen`** (agrégation : `count`).
 
-1. Activez Radar via [PATCH /organization/radar-settings](/api/radar/RadarController_updateSettings) (`enabled: true`). Un compteur `radar_screen` est créé automatiquement si un produit à l'usage correspondant existe.
+1. Activez Radar via [PATCH /organization/radar-settings](/api/organization/RadarController_updateSettings) (`enabled: true`). Un compteur `radar_screen` est créé automatiquement si un produit à l'usage correspondant existe.
 2. Chaque paiement filtré (carte, MTN, Wave) enregistre une unité d'usage tant que Radar est actif.
 3. Consultez soldes et périodes comme pour les autres compteurs ([Solde compteur](/api/meters/MetersController_getBalance), [Périodes](/api/usage-billing/UsageBillingController_listPeriods)).
 

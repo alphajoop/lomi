@@ -3,6 +3,7 @@ mod auth;
 mod cli;
 mod commands;
 mod config;
+mod monorepo;
 mod rules;
 mod ui;
 mod webhook;

@@ -45,3 +45,5 @@ jobs:
         run: pnpm install
       - name: dt check
         run: ./apps/doctool/target/release/dt check --root .
+      - name: dt sync-i18n check
+        run: ./apps/doctool/target/release/dt sync-i18n --check --root .
