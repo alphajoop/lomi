@@ -57,12 +57,14 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
+| `cancel_at_period_end` | No | `boolean` | — |
 | `cancellation_reason` | No | `string` | — |
 
 Example body:
 
 ```json
 {
+  "cancel_at_period_end": true,
   "cancellation_reason": "string"
 }
 ```
@@ -72,9 +74,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `200` | Abonnement résilié avec succès |
-| `401` | Clé API invalide ou manquante |
-| `404` | Abonnement introuvable ou accès refusé |
+| `200` | Success |
+| `401` | Invalid or missing API key |
+| `404` | Resource not found |
 
 ## Errors
 
@@ -86,7 +88,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/cancel" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"cancellation_reason":"string"}'
+  -d '{"cancel_at_period_end":true,"cancellation_reason":"string"}'
 ```
 
 ## OpenAPI

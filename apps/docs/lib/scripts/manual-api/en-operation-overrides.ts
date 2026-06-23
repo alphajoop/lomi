@@ -17,6 +17,8 @@ export type EnOperationOverride = {
   caveats?: string;
   /** Markdown links to related guides or REST pages (trusted repo content) */
   related?: string;
+  /** English request-body intro when OpenAPI description is French-only */
+  requestBodyIntro?: string;
 };
 
 /** Full coverage for all public merchant operations in `openapi.json` (enforced by verify script). */
@@ -64,6 +66,8 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
     body: 'Creates a hosted checkout session so the buyer completes payment on the hosted checkout experience. Sessions expire—create a fresh session if the link lapses.',
+    requestBodyIntro:
+      'Session payload: provide `amount` (and optional product fields) or `line_items` for a multi-product cart.',
     whenToUse:
       'Use for e-commerce, invoices, or any flow where you want lomi. to host payment collection and return the customer to your site.',
     caveats:

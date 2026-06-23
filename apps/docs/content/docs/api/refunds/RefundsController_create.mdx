@@ -11,7 +11,7 @@ operationId: RefundsController_create
 
 Create refund
 
-Refunds a **completed** transaction on **card**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.
+Refunds a **completed** transaction on **Stripe (card)**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.
 
 
 ### When to use this
@@ -20,17 +20,7 @@ Use for buyer reversals on eligible completed transactions; supports full and pa
 
 ### Good to know
 
-**Card:** customer credit on the card network is completed separately by operations.
-
-**Wave partial:** requires a customer phone on file (beneficiary payout).
-
-**MTN MoMo (live):** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion.
-
-**MTN MoMo (test):** ledger-only—no MTN API call.
-
-Partial MTN refunds also require a customer phone on file.
-
-For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.
+**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only—no MTN API call. Partial MTN refunds also require a customer phone on file.
 
 ### See also
 
@@ -62,6 +52,12 @@ _No path parameters beyond the URL pattern._
 _No query parameters._
 
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Request body
 
 JSON request payload.
@@ -70,20 +66,18 @@ Schema: `CreateRefundDto`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `transaction_id` | Yes | `string` (uuid) | Completed transaction to refund (card payment, Wave, or MTN MoMo) |
+| `transaction_id` | Yes | `string` | UUID of a completed transaction (card, Wave, or MTN MoMo) |
 | `amount` | Yes | `number` | Amount to refund (same currency as the transaction) |
 | `reason` | No | `string` | Reason for the refund |
-| `refund_type` | No | `'full'` \| `'partial'` | Inferred from `amount` vs transaction gross if omitted |
-| `subscription_action` | No | `'default'` \| `'cancel'` \| `'pause'` \| `'none'` | Subscription side-effect after a full refund |
+| `refund_type` | No | `enum ("full", "partial")` | Full or partial refund. If omitted, full when amount equals transaction gross amount. |
+| `subscription_action` | No | `enum ("default", "cancel", "pause", ...)` | Subscription side-effect after a full refund: default (cancel initial payment, pause renewal), cancel, pause, or none. |
 
 Example body:
 
 ```json
 {
-  "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
-  "amount": 5000,
-  "reason": "duplicate_charge",
-  "refund_type": "partial"
+  "transaction_id": "string",
+  "amount": 0
 }
 ```
 
@@ -92,8 +86,8 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Remboursement enregistré |
-| `400` | Entrée invalide ou type non pris en charge |
+| `201` | Created successfully |
+| `400` | Bad request — invalid or missing parameters |
 
 ## Errors
 
@@ -105,11 +99,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X POST "https://sandbox.api.lomi.africa/refunds" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
-    "amount": 5000,
-    "reason": "duplicate_charge"
-  }'
+  -d '{"transaction_id":"string","amount":0}'
 ```
 
 ## OpenAPI

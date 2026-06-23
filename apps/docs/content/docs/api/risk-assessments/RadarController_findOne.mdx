@@ -1,6 +1,6 @@
 ---
-title: "Get a risk assessment"
-description: "Get a risk assessment"
+title: "Get risk assessment"
+description: "Get risk assessment"
 full: true
 method: get
 path: /risk-assessments/{id}
@@ -9,11 +9,18 @@ operationId: RadarController_findOne
 
 ## Overview
 
-Get a risk assessment
+Get risk assessment
+
+Returns one Radar assessment by ID, including decision, score, and triggered rule signals.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /risk-assessments/&#123;id&#125;` (Get a risk assessment).
+Use when handling `PAYMENT_RISK_FLAGGED` or `PAYMENT_RISK_BLOCKED` webhooks keyed by assessment ID.
+
+### See also
+
+[List risk assessments](/api/risk-assessments/RadarController_listAssessments)
 
 
 ## Authentication
@@ -54,7 +61,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

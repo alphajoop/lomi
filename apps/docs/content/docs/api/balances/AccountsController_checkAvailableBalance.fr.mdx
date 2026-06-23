@@ -14,9 +14,9 @@ Vérifier le solde disponible
 Vérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /accounts/balance/check/&#123;currency&#125;` (Vérifier le solde disponible).
+Utilisez cet endpoint quand vous devez exécuter `GET /accounts/balance/check/&#123;currency&#125;` (Vérifier le solde disponible).
 
 
 ## Authentification
@@ -34,9 +34,9 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
@@ -54,7 +54,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

@@ -19,19 +19,19 @@ Choisissez l’intégration la plus simple qui donne au client la bonne expérie
 
 | Si vous avez besoin de | Utilisez | Pourquoi |
 | --- | --- | --- |
-| Une page de checkout complète | [Checkout hébergé](/build/checkout) | Chemin le plus rapide vers la production |
-| Checkout sur votre site (iframe) | [Widget checkout embarqué](/build/embed-widget) | UI lomi. sans quitter votre page |
-| Une URL partageable | [Liens de paiement](/build/payment-links) | Factures, services, événements |
-| Une demande créée par le backend | [Demandes de paiement](/build/payment-requests) | Votre app contrôle le parcours |
-| Mobile money d’abord | [Mobile money](/build/mobile-money) | Wave, MTN, SPI |
-| Cartes embarquées | [Cartes](/build/cards) | Vous contrôlez l’interface |
-| Facturation récurrente | [Abonnements](/build/subscriptions) | SaaS et adhésions |
-| Portail client | [Portail client](/build/customer-portal) | Historique et gestion d’abonnement |
-| Plugin boutique | [Extensions ecommerce](/build/ecommerce-extensions) | WooCommerce, Shopify, etc. |
+| Une page de checkout complète | [Checkout hébergé](/build/checkout) | Chemin le plus rapide vers la production pour apps et boutiques |
+| Checkout sur votre site (iframe) | [Widget checkout embarqué](/build/embed-widget) | UI lomi. complète sans quitter votre page |
+| Une URL partageable | [Liens de paiement](/build/payment-links) | Factures, services, événements, vente no-code |
+| Une demande créée par le backend | [Demandes de paiement](/build/payment-requests) | Votre app contrôle le parcours commande |
+| Mobile money d’abord | [Mobile money](/build/mobile-money) | Flux Wave, MTN MoMo et SPI |
+| Cartes embarquées | [Cartes](/build/cards) | Vous contrôlez l’UI et la saisie carte dans votre app |
+| Facturation récurrente | [Abonnements](/build/subscriptions) | SaaS, adhésions et services récurrents |
+| Portail client (facturation, abonnements) | [Portail client](/build/customer-portal) | Historique, changement de plan et résiliation hébergés |
+| Plugin boutique | [Extensions ecommerce](/build/ecommerce-extensions) | WooCommerce, Magento, PrestaShop, Shopify |
 | Assistant IA / agent MCP | [MCP](/build/mcp) | Cursor, Claude Desktop et clients MCP sur l’API marchande |
-| Composants UI | [lomi. UI](/build/lomi-ui) | Primitives dans votre app |
-| Comparer par pays | [Moyens de paiement](/build/guides/payment-methods) | Wave, MTN, cartes |
-| Wave / MTN / carte côté serveur | [Charges directes](/build/direct-charges) | UI paiement maison |
+| Composants UI copier-coller | [lomi. UI](/build/lomi-ui) | Primitives checkout dans votre app |
+| Comparer par pays | [Canaux de paiement](/build/payment-channels) | Matrice pays × devise × canal |
+| Wave / MTN / carte côté serveur | [Charges directes](/build/direct-charges) | Vous maîtrisez l’UI de paiement de bout en bout |
 
 <DocsScreenshot name="build/choose-integration" alt="Sélection des moyens de paiement sur le checkout hébergé lomi." />
 
@@ -40,26 +40,36 @@ Choisissez l’intégration la plus simple qui donne au client la bonne expérie
 | | Checkout hébergé | Widget iframe | Liens | Demandes | Charges directes | Abonnements | Plugins | lomi. UI |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | **Effort dev** | Faible | Faible | Faible | Moyen | Élevé | Moyen | Faible | Moyen |
-| **Contrôle UI** | lomi. | iframe | lomi. | App + étape pay | Total | Hébergé | Boutique | Primitives |
+| **Contrôle UI** | Hébergé lomi. | iframe sur votre site | Hébergé lomi. | App + étape pay | Total (UI maison) | Inscription hébergée | Natif boutique | Primitives dans votre app |
 | **Time-to-market** | Élevé | Élevé | Élevé | Moyen | Faible | Moyen | Élevé | Moyen |
-| **Mobile money async** | Page hébergée | Comme hébergé | Idem | Idem | UX pending à vous | Hébergé | Plugin | À composer |
+| **Mobile money async** | Géré sur la page hébergée | Comme hébergé | Idem | Idem | UX pending à vous | Flux hébergé | Selon plugin | À composer |
 | **Webhooks** | Recommandés | Recommandés | Recommandés | Recommandés | Requis (live) | Requis | Recommandés | Recommandés |
+| **Dashboard no-code** | Sessions + catalogue | - | Oui | Partiel | - | Plans + liens | Oui | - |
 
 ## Choix recommandé
 
-La plupart des équipes devraient commencer par le checkout hébergé.
+La plupart des équipes devraient commencer par le checkout hébergé. Les flux sensibles restent chez lomi., plusieurs moyens de paiement sont supportés, et vous obtenez un parcours client prêt pour la production sans construire l’UI de paiement.
+
+Utilisez les charges directes ou les éléments embarqués seulement si votre produit exige un contrôle total de l’interface de paiement.
 
 ## Que doit contenir chaque intégration ?
 
-- Séparation test / live
-- Clés secrètes côté serveur uniquement
-- États succès, annulation, attente, échec
-- Webhooks pour la réconciliation
-- Idempotence sur les créations
+Toute intégration sérieuse doit inclure :
+
+- Séparation environnements test et live.
+- Clés secrètes utilisées côté serveur uniquement.
+- États visibles pour le client : succès, annulation, attente et échec.
+- Webhooks pour la réconciliation finale.
+- Idempotence sur les opérations de création lorsque des retries sont possibles.
 
 ## Étapes suivantes
 
 - [Parcours d’intégration](/start/integration-journey)
+- [Canaux de paiement](/build/payment-channels)
+- [Exemple checkout hébergé](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/payment-integration-sdk-reference)
+- [Exemple charge directe](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/direct-charge-integration-reference)
+- [Faire un paiement de test](/start/first-payment)
 - [Vérifier les paiements](/build/guides/verify-payments)
 - [Checkout hébergé](/build/checkout)
+- [Webhooks](/build/webhooks)
 - [Référence API](/api)

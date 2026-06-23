@@ -1,6 +1,6 @@
 ---
-title: "Lancer un encaissement direct MTN MoMo"
-description: "Lancer un encaissement direct MTN MoMo"
+title: "Create MTN MoMo charge"
+description: "Create MTN MoMo charge"
 full: true
 method: post
 path: /charge/mtn
@@ -9,22 +9,14 @@ operationId: ChargesController_createMtnCharge
 
 ## Aperçu
 
-Lancer un encaissement direct MTN MoMo
+Create MTN MoMo charge
 
-Initie un encaissement RequestToPay MTN MoMo. Avec une clé API **test**, la transaction est marquée terminée dans le ledger sans appel au sandbox MTN.
+Initiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Pour un encaissement MTN initié côté serveur lorsque vous n’utilisez **pas** une session checkout hébergée.
-
-### Bon à savoir
-
-Les encaissements live exigent MTN connecté pour votre organisation et un numéro de téléphone valide. Les remboursements MTN live passent par l’API Disbursement via [Créer un remboursement](/api/refunds/RefundsController_create).
-
-### Voir aussi
-
-[Encaissement Wave](/api/charge/ChargesController_createWaveCharge) · [Créer un remboursement](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
+Utilisez cet endpoint quand vous devez exécuter `POST /charge/mtn` (Create MTN MoMo charge).
 
 
 ## Authentification
@@ -42,9 +34,9 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
@@ -52,35 +44,40 @@ _Aucun paramètre de chemin au-delà du motif d’URL._
 _Aucun paramètre de requête._
 
 
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Corps de la requête
 
 Corps JSON.
 
-Schéma : `CreateMtnChargeDto`
+Schéma: `CreateMtnChargeDto`
 
-| Champ | Requis | Type | Description |
+| Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
-| `amount` | Oui | `number` | Montant (minimum 1) |
-| `currency` | Oui | `string` | Code devise (ex. `XOF`) |
-| `customer` | Oui | `object` | Payeur (`name`, `phoneNumber`, `email` optionnel) |
-| `description` | Non | `string` | Description du paiement |
-| `countryCode` | Non | `string` | Pays ISO 3166-1 alpha-2 (défaut `CI`) |
-| `productId` | Non | `string` (uuid) | Produit optionnel |
-| `subscriptionId` | Non | `string` (uuid) | Abonnement optionnel |
-| `quantity` | Non | `number` | Quantité (défaut `1`) |
+| `amount` | Oui | `number` | — |
+| `currency` | Oui | `string` | — |
+| `organizationId` | Non | `string` | — |
+| `merchantId` | Non | `string` | — |
+| `customer` | Oui | `CustomerDto` | — |
+| `description` | Non | `string` | — |
+| `countryCode` | Non | `string` | — |
+| `productId` | Non | `string` | — |
+| `subscriptionId` | Non | `string` | — |
+| `quantity` | Non | `number` | — |
 
-Exemple :
+Exemple de corps :
 
 ```json
 {
   "amount": 1000,
   "currency": "XOF",
-  "countryCode": "CI",
-  "description": "Facture #42",
   "customer": {
-    "name": "Jane Doe",
-    "phoneNumber": "+2250707070707",
-    "email": "jane@example.com"
+    "name": "...",
+    "phoneNumber": "..."
   }
 }
 ```
@@ -90,11 +87,11 @@ Exemple :
 
 | Statut | Description |
 | --- | --- |
-| `201` | Encaissement MTN initié (RequestToPay) |
+| `201` | MTN charge initiated |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard. **401** : clé invalide ; **404** : ressource introuvable ; **429** : limite de requêtes.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
@@ -102,15 +99,7 @@ Les erreurs suivent le format JSON standard. **401** : clé invalide ; **404** :
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "amount": 1000,
-    "currency": "XOF",
-    "countryCode": "CI",
-    "customer": {
-      "name": "Jane Doe",
-      "phoneNumber": "+2250707070707"
-    }
-  }'
+  -d '{"amount":1000,"currency":"XOF","customer":{"name":"...","phoneNumber":"..."}}'
 ```
 
 ## OpenAPI

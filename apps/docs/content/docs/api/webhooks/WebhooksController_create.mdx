@@ -1,6 +1,6 @@
 ---
-title: "Créer un webhook"
-description: "Créer un webhook"
+title: "Create webhook"
+description: "Create webhook"
 full: true
 method: post
 path: /webhooks
@@ -9,11 +9,22 @@ operationId: WebhooksController_create
 
 ## Overview
 
-Créer un webhook
+Create webhook
+
+Registers an outbound HTTPS endpoint and the event types you want delivered.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /webhooks` (Créer un webhook).
+Use once per environment when wiring your server to lomi. event notifications.
+
+### Good to know
+
+Store the signing secret securely; verify signatures on every inbound request.
+
+### See also
+
+[List webhooks](/api/webhooks/WebhooksController_findAll) · [Test webhook](/api/webhooks/WebhooksController_test)
 
 
 ## Authentication
@@ -50,7 +61,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `201` | Webhook créé |
+| `201` | Created successfully |
 
 ## Errors
 

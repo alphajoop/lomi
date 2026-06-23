@@ -1,6 +1,6 @@
 ---
-title: "Détails de l'organisation"
-description: "Détails de l'organisation"
+title: "List organizations"
+description: "List organizations"
 full: true
 method: get
 path: /organizations
@@ -9,14 +9,18 @@ operationId: OrganizationsController_findAll
 
 ## Overview
 
-Détails de l'organisation
+List organizations
 
-Renvoie les informations de l'organisation du marchand authentifié
+Returns organizations visible to the authenticated API key (typically your active organization).
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /organizations` (Détails de l'organisation).
+Use to read organization profile fields, pricing mode, and settings scoped to your integration key.
+
+### See also
+
+[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Organizations guide](/build/platform/organizations)
 
 
 ## Authentication
@@ -50,7 +54,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Détails de l'organisation |
+| `200` | Success |
 
 ## Errors
 

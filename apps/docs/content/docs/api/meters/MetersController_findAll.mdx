@@ -11,9 +11,16 @@ operationId: MetersController_findAll
 
 List meters
 
+Returns meters for your organization, optionally filtered by product or active status.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /meters` (List meters).
+Use to display configured billable metrics or pick a `meter_id` for balance reads.
+
+### See also
+
+[Create meter](/api/meters/MetersController_create) · [Get meter](/api/meters/MetersController_findOne)
 
 
 ## Authentication
@@ -49,7 +56,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

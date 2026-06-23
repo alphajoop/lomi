@@ -11,12 +11,12 @@ operationId: SubscriptionsController_cancel
 
 Résilier un abonnement
 
-Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.
+Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `POST /subscriptions/&#123;id&#125;/cancel` (Résilier un abonnement).
+Utilisez cet endpoint quand vous devez exécuter `POST /subscriptions/&#123;id&#125;/cancel` (Résilier un abonnement).
 
 
 ## Authentification
@@ -34,7 +34,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -53,12 +53,14 @@ Schéma: `object`
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
+| `cancel_at_period_end` | Non | `boolean` | — |
 | `cancellation_reason` | Non | `string` | — |
 
 Exemple de corps :
 
 ```json
 {
+  "cancel_at_period_end": true,
   "cancellation_reason": "string"
 }
 ```
@@ -74,7 +76,7 @@ Exemple de corps :
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
@@ -82,7 +84,7 @@ Les erreurs suivent le format JSON standard (code de statut et message d'erreur)
 curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/cancel" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"cancellation_reason":"string"}'
+  -d '{"cancel_at_period_end":true,"cancellation_reason":"string"}'
 ```
 
 ## OpenAPI

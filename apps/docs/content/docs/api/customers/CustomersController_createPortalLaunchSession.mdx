@@ -1,6 +1,6 @@
 ---
-title: "Créer une session de lancement du portail client"
-description: "Créer une session de lancement du portail client"
+title: "Create customer portal session"
+description: "Create customer portal session"
 full: true
 method: post
 path: /customers/{id}/portal-launch-session
@@ -9,14 +9,18 @@ operationId: CustomersController_createPortalLaunchSession
 
 ## Overview
 
-Créer une session de lancement du portail client
+Create customer portal session
 
-Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.
+Returns a short-lived URL so the customer can manage subscriptions and payment methods in the hosted portal.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /customers/&#123;id&#125;/portal-launch-session` (Créer une session de lancement du portail client).
+Use from your app when a logged-in buyer opens “Manage billing” without building portal UI yourself.
+
+### See also
+
+[Portal audit log](/api/customers/CustomersController_getPortalAudit) · [Customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_findAll)
 
 
 ## Authentication
@@ -73,9 +77,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Session de lancement créée |
-| `401` | Clé API invalide ou manquante |
-| `404` | Client introuvable ou accès refusé |
+| `201` | Created successfully |
+| `401` | Invalid or missing API key |
+| `404` | Resource not found |
 
 ## Errors
 

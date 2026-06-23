@@ -1,6 +1,6 @@
 ---
-title: "Envoyer un événement test au webhook"
-description: "Envoyer un événement test au webhook"
+title: "Test webhook"
+description: "Test webhook"
 full: true
 method: post
 path: /webhooks/{id}/test
@@ -9,11 +9,18 @@ operationId: WebhooksController_test
 
 ## Overview
 
-Envoyer un événement test au webhook
+Test webhook
+
+Sends a sample event to the configured URL so you can validate signature verification and parsing.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /webhooks/&#123;id&#125;/test` (Envoyer un événement test au webhook).
+Use immediately after creating or updating a webhook endpoint.
+
+### See also
+
+[Create webhook](/api/webhooks/WebhooksController_create)
 
 
 ## Authentication
@@ -51,7 +58,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

@@ -1,6 +1,6 @@
 ---
-title: "Organisation par ID"
-description: "Organisation par ID"
+title: "Retrieve organization"
+description: "Retrieve organization"
 full: true
 method: get
 path: /organizations/{id}
@@ -9,14 +9,18 @@ operationId: OrganizationsController_findOne
 
 ## Overview
 
-Organisation par ID
+Retrieve organization
 
-Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)
+Returns one organization by ID. The ID must match the organization tied to your API key.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /organizations/&#123;id&#125;` (Organisation par ID).
+Use when you already store an organization ID and need a fresh profile snapshot.
+
+### See also
+
+[List organizations](/api/organizations/OrganizationsController_findAll)
 
 
 ## Authentication
@@ -51,7 +55,7 @@ _No query parameters._
 | Status | Description |
 | --- | --- |
 | `200` | L'organisation |
-| `404` | Organisation introuvable ou accès refusé |
+| `404` | Resource not found |
 
 ## Errors
 

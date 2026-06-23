@@ -45,6 +45,12 @@ Base URLs:
 _No query parameters._
 
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Request body
 
 JSON request payload.
@@ -79,10 +85,10 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `200` | Client mis à jour avec succès |
-| `400` | Données d'entrée invalides |
-| `401` | Clé API invalide ou manquante |
-| `404` | Client introuvable ou accès refusé |
+| `200` | Success |
+| `400` | Bad request — invalid or missing parameters |
+| `401` | Invalid or missing API key |
+| `404` | Resource not found |
 
 ## Errors
 

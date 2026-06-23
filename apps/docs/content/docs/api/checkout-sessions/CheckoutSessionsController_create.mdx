@@ -20,7 +20,7 @@ Use for e-commerce, invoices, or any flow where you want lomi. to host payment c
 
 ### Good to know
 
-Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods.
+Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods. For pay_what_you_want products, amount must fall within the linked price minimum_amount and maximum_amount bounds (unit × quantity).
 
 ### See also
 
@@ -52,9 +52,15 @@ _No path parameters beyond the URL pattern._
 _No query parameters._
 
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Request body
 
-Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.
+Session payload: provide `amount` (and optional product fields) or `line_items` for a multi-product cart.
 
 Schema: `object`
 
@@ -98,9 +104,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Session de paiement créée avec succès |
-| `400` | Entrée invalide ou erreur de validation |
-| `401` | Clé API invalide ou manquante |
+| `201` | Created successfully |
+| `400` | Bad request — invalid or missing parameters |
+| `401` | Invalid or missing API key |
 
 ## Errors
 

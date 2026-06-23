@@ -1,6 +1,6 @@
 ---
 title: "Changer le plan tarifaire"
-description: "Met à jour le tarif d’un abonnement actif"
+description: "Changer le plan tarifaire"
 full: true
 method: post
 path: /subscriptions/{id}/change-plan
@@ -9,15 +9,15 @@ operationId: SubscriptionsController_changePlan
 
 ## Aperçu
 
-Met à jour le `price_id` d’un abonnement actif (montée ou descente de gamme).
+Changer le plan tarifaire
 
-### Quand l'utiliser
+Met à jour le price_id d’un abonnement actif.
 
-Utilisez cet endpoint lorsqu’un client passe à un autre tarif récurrent.
 
-### Voir aussi
+### Quand l’utiliser
 
-[Mettre à jour un abonnement](/api/subscriptions/SubscriptionsController_update)
+Utilisez cet endpoint quand vous devez exécuter `POST /subscriptions/&#123;id&#125;/change-plan` (Changer le plan tarifaire).
+
 
 ## Authentification
 
@@ -34,52 +34,58 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
-| `id` | Oui | `string` (uuid) | UUID de l’abonnement |
+| `id` | Oui | — | UUID de l’abonnement |
 
-### Corps de requête
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
 
 Corps JSON.
 
+Schéma: `object`
+
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
-| `price_id` | Oui | `string` (uuid) | UUID du tarif cible |
+| `price_id` | Oui | `string` | — |
 
-Exemple :
+Exemple de corps :
 
 ```json
 {
-  "price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  "price_id": "string"
 }
 ```
+
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `200` | Abonnement mis à jour |
-| `401` | Clé API invalide ou manquante |
-| `404` | Abonnement introuvable ou accès refusé |
+| `200` | — |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code HTTP et message d'erreur). Validez les entrées avant l’appel ; **401** indique une clé manquante ou invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/{id}/change-plan" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/change-plan" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"price_id":"3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
+  -d '{"price_id":"string"}'
 ```
 
 ## OpenAPI
 
-- **operationId** : `SubscriptionsController_changePlan`
-- **Opération** : `POST /subscriptions/{id}/change-plan`
+- **operationId**: `SubscriptionsController_changePlan`
+- **Operation**: `POST /subscriptions/{id}/change-plan`
 
-Schémas complets et **Essayer** : [Référence API](/api).
+Schémas complets et **Try it** : [référence API](/api).

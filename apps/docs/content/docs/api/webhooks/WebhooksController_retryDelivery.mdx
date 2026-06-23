@@ -1,6 +1,6 @@
 ---
-title: "Relancer une livraison webhook"
-description: "Relancer une livraison webhook"
+title: "Retry webhook delivery"
+description: "Retry webhook delivery"
 full: true
 method: post
 path: /webhooks/{webhookId}/logs/{logId}/retry
@@ -9,11 +9,18 @@ operationId: WebhooksController_retryDelivery
 
 ## Overview
 
-Relancer une livraison webhook
+Retry webhook delivery
+
+Re-sends a single failed delivery attempt for debugging after you fix your receiver.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /webhooks/&#123;webhookId&#125;/logs/&#123;logId&#125;/retry` (Relancer une livraison webhook).
+Use from support tools—not a substitute for idempotent handling on your server.
+
+### See also
+
+[Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findOne)
 
 
 ## Authentication
@@ -52,7 +59,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

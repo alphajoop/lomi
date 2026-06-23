@@ -53,13 +53,19 @@ _No path parameters beyond the URL pattern._
 | `startDate` | query | No | — |  |
 | `status` | query | No | — |  |
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Liste des remboursements |
+| `200` | Success |
 
 ## Errors
 

@@ -1,6 +1,6 @@
 ---
-title: "Supprimer un webhook"
-description: "Supprimer un webhook"
+title: "Delete webhook"
+description: "Delete webhook"
 full: true
 method: delete
 path: /webhooks/{id}
@@ -9,11 +9,18 @@ operationId: WebhooksController_remove
 
 ## Overview
 
-Supprimer un webhook
+Delete webhook
+
+Removes an outbound webhook subscription; deliveries stop for that endpoint.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `DELETE /webhooks/&#123;id&#125;` (Supprimer un webhook).
+Use when decommissioning an environment or rotating to a new endpoint record.
+
+### See also
+
+[Create webhook](/api/webhooks/WebhooksController_create)
 
 
 ## Authentication
@@ -48,7 +55,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

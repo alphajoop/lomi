@@ -11,9 +11,16 @@ operationId: UsageBillingController_listPeriods
 
 List usage billing periods
 
+Returns billing periods for usage subscriptions, optionally filtered by subscription ID.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /usage-billing/periods` (List usage billing periods).
+Use for invoicing windows, period-close reconciliation, or support lookups.
+
+### See also
+
+[Get subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage) · [Usage billing guide](/build/usage-billing)
 
 
 ## Authentication
@@ -50,7 +57,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

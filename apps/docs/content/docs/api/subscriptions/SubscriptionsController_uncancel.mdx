@@ -1,6 +1,6 @@
 ---
 title: "Uncancel subscription"
-description: "Remove a scheduled end-of-period cancellation"
+description: "Uncancel subscription"
 full: true
 method: post
 path: /subscriptions/{id}/uncancel
@@ -9,15 +9,19 @@ operationId: SubscriptionsController_uncancel
 
 ## Overview
 
-Remove a scheduled end-of-period cancellation (`cancel_at_period_end`) so the subscription continues renewing.
+Uncancel subscription
+
+Removes a scheduled end-of-period cancellation so the subscription keeps renewing.
+
 
 ### When to use this
 
-Use when a customer changes their mind before the current billing period ends.
+Use when a customer reverses a pending cancel-at-period-end before the billing period ends.
 
 ### See also
 
 [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)
+
 
 ## Authentication
 
@@ -38,29 +42,35 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | `string` (uuid) | Subscription UUID |
+| `id` | Yes | — | UUID de l’abonnement |
+
+### Query parameters
+
+_No query parameters._
+
 
 ### Request body
 
-_No request body._
+_No application/json body for this operation._
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Subscription updated |
-| `401` | Invalid or missing API key |
-| `404` | Subscription not found or access denied |
+| `200` | Success |
 
 ## Errors
 
-Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/{id}/uncancel" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/uncancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
 ```
 
 ## OpenAPI

@@ -11,9 +11,9 @@ operationId: RefundsController_findOne
 
 Obtenir un remboursement
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /refunds/&#123;id&#125;` (Obtenir un remboursement).
+Utilisez cet endpoint quand vous devez exécuter `GET /refunds/&#123;id&#125;` (Obtenir un remboursement).
 
 
 ## Authentification
@@ -31,7 +31,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -41,6 +41,12 @@ URLs de base :
 
 _Aucun paramètre de requête._
 
+
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 
 
@@ -52,7 +58,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

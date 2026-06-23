@@ -14,9 +14,9 @@ Transactions du client
 Renvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /customers/&#123;id&#125;/transactions` (Transactions du client).
+Utilisez cet endpoint quand vous devez exécuter `GET /customers/&#123;id&#125;/transactions` (Transactions du client).
 
 
 ## Authentification
@@ -34,7 +34,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -44,6 +44,12 @@ URLs de base :
 
 _Aucun paramètre de requête._
 
+
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 
 
@@ -57,7 +63,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

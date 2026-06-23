@@ -11,7 +11,7 @@ operationId: ProductsController_create
 
 Create product
 
-Creates a catalog product with at least one price in a single request.
+Creates a catalog product with at least one price in a single request. Supports pay_what_you_want via pricing_model and minimum_amount/maximum_amount on nested prices.
 
 
 ### When to use this
@@ -57,9 +57,9 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `201` | Produit créé avec succès |
-| `400` | Entrée invalide ou erreur de validation |
-| `401` | Clé API invalide ou manquante |
+| `201` | Created successfully |
+| `400` | Bad request — invalid or missing parameters |
+| `401` | Invalid or missing API key |
 
 ## Errors
 

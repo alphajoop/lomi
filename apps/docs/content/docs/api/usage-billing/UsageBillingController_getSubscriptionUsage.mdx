@@ -11,9 +11,16 @@ operationId: UsageBillingController_getSubscriptionUsage
 
 Get meter usage for a subscription
 
+Returns aggregated meter usage for a usage subscription across its billing period.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /usage-billing/subscriptions/&#123;subscriptionId&#125;/usage` (Get meter usage for a subscription).
+Use on invoices, customer usage dashboards, or before closing a billing period.
+
+### See also
+
+[List billing periods](/api/usage-billing/UsageBillingController_listPeriods) · [Record usage event](/api/usage-events/UsageEventsController_ingest)
 
 
 ## Authentication
@@ -47,7 +54,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

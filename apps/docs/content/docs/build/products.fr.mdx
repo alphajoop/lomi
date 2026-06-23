@@ -12,56 +12,21 @@ L’API Products permet de gérer votre catalogue. Un produit représente un art
 
 Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
 
-### Corps de la requête
+**Référence API (schéma complet) :** [Créer un produit](/api/products/ProductsController_create)
 
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `name` | `string` | **Oui** | Nom du produit |
-| `description` | `string` | Non | Description du produit |
-| `product_type` | `string` | **Oui** | `one_time`, `recurring` ou `usage_based` |
-| `images` | `array` | Non | URLs d’images |
-| `is_active` | `boolean` | Non | Actif (défaut : `true`) |
-| `display_on_storefront` | `boolean` | Non | Visible sur la vitrine (défaut : `true`) |
-| `prices` | `array` | **Oui** | Tableau d’objets tarif (voir ci-dessous) |
-| `metadata` | `object` | Non | Métadonnées clé-valeur |
-| `fee_type_ids` | `array` | Non | IDs de types de frais à appliquer |
+**L’essentiel :**
 
-**Champs produit récurrent :**
-
-| Champ | Type | Description |
-|-------|------|-------------|
-| `failed_payment_action` | `string` | Action si paiement échoué : `pause`, `cancel`, `continue` |
-| `charge_day` | `number` | Jour du mois de prélèvement (1–31) |
-| `first_payment_type` | `string` | `initial`, `non_initial`, `prorated` |
-| `trial_enabled` | `boolean` | Activer une période d’essai |
-| `trial_period_days` | `number` | Durée de l’essai en jours |
+- `name`, `product_type` (`one_time`, `recurring`, `usage_based`) et un tableau `prices` sont obligatoires.
+- Chaque tarif exige `amount` et `currency_code`. Pour un produit récurrent, ajoutez `billing_interval` sur le tarif.
+- Champs réservés au récurrent : `trial_enabled`, `trial_period_days`, `failed_payment_action`, `charge_day`, `first_payment_type` — voir la page API.
+- Produits à l’usage : `usage_aggregation`, `usage_unit` — voir la page API.
 
 <Callout type="info">
   **Métadonnées optionnelles** pour les produits récurrents (via `metadata` à la création / mise à jour) : `subscription_length` (`"automatic"` par défaut) et `fixed_charges` (nombre entier de cycles avant expiration). Ce ne sont pas des champs API de premier niveau ; stockez-les dans `metadata`.
 </Callout>
 
-**Champs produit à l’usage :**
-
-| Champ | Type | Description |
-|-------|------|-------------|
-| `usage_aggregation` | `string` | `sum`, `max`, `last_during_period`, `last_ever` |
-| `usage_unit` | `string` | Unité de mesure (ex. `api_calls`) |
-
-### Objet tarif
-
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `amount` | `number` | **Oui** | Prix unitaire (plus petite unité monétaire). Pour `standard`/`tiered` : prix fixe. Pour `pay_what_you_want` : prix unitaire **suggéré** prérempli au tunnel |
-| `currency_code` | `string` | **Oui** | `XOF`, `USD`, `EUR` |
-| `billing_interval` | `string` | Non | `day`, `week`, `month`, `year` (requis pour récurrent) |
-| `pricing_model` | `string` | Non | `standard` (défaut), `pay_what_you_want` ou `tiered` |
-| `minimum_amount` | `number` | PWYW | Requis si `pricing_model` est `pay_what_you_want`, prix unitaire minimum |
-| `maximum_amount` | `number` | Non | Plafond unitaire optionnel pour `pay_what_you_want` |
-| `is_default` | `boolean` | Non | Tarif par défaut |
-| `metadata` | `object` | Non | Métadonnées sur le tarif |
-
 <Callout type="info">
-  Pour `pay_what_you_want` : `minimum_amount` est obligatoire ; `amount` est le prix unitaire suggéré (par défaut `minimum_amount` si omis). Vérifiez `amount >= minimum_amount`, et si `maximum_amount` est défini, `amount <= maximum_amount`. Le serveur applique ces règles à la création et à l’ajout de tarif. Pour `standard` et `tiered`, omittez `minimum_amount` et `maximum_amount`.
+  **Payez ce que vous voulez** (`pricing_model: pay_what_you_want`, ponctuel uniquement) : `minimum_amount` est obligatoire ; `amount` est le prix unitaire suggéré. Le serveur impose `amount >= minimum_amount` et le `maximum_amount` optionnel. Champs tarif complets : [Créer un produit](/api/products/ProductsController_create).
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
@@ -219,15 +184,7 @@ curl -X POST "https://api.lomi.africa/products" \
 
 ## Lister les produits
 
-Récupère les produits avec filtrage optionnel.
-
-### Paramètres de requête
-
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `isActive` | `boolean` | Filtrer par statut actif |
-| `limit` | `number` | Résultats par page (défaut : `15`) |
-| `offset` | `number` | Décalage (défaut : `0`) |
+**Référence API :** [Lister les produits](/api/products/ProductsController_findAll) — `isActive`, `limit` et `offset`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -259,7 +216,7 @@ curl -X GET "https://api.lomi.africa/products?isActive=true&limit=20" \
 
 ## Obtenir un produit
 
-Récupère le détail du produit et tous ses tarifs.
+**Référence API :** [Obtenir un produit](/api/products/ProductsController_findOne) — renvoie le produit et tous ses tarifs.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -289,7 +246,7 @@ curl -X GET "https://api.lomi.africa/products/prod_abc123..." \
 
 ## Ajouter un tarif à un produit
 
-Ajoute une nouvelle option de tarif à un produit existant.
+**Référence API :** [Ajouter un tarif](/api/products/ProductsController_addPrice)
 
 <Callout type="warning">
   Un produit peut compter au maximum **3 tarifs actifs**. Les tarifs existants ne se modifient pas, créez-en un nouveau.
@@ -347,7 +304,7 @@ curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices" \
 
 ## Définir le tarif par défaut
 
-Définit un tarif comme tarif par défaut pour un produit.
+**Référence API :** [Définir le tarif par défaut](/api/products/ProductsController_setDefaultPrice)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -374,40 +331,11 @@ curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices/price_def45
 
 ---
 
-## Objet Product
+## API associée
 
-Les champs correspondent à la ressource produit de l’API (voir OpenAPI **Products**). Champs courants :
-
-| Champ | Type | Description |
-|-------|------|-------------|
-| `product_id` | `string` | Identifiant produit |
-| `organization_id` | `string` | Organisation propriétaire |
-| `name` | `string` | Nom |
-| `description` | `string` \| `null` | Description |
-| `product_type` | `string` | `one_time`, `recurring`, `usage_based` |
-| `images` | `array` \| `null` | URLs d’images |
-| `is_active` | `boolean` | Statut actif |
-| `display_on_storefront` | `boolean` | Visibilité vitrine |
-| `prices` | `array` | Objets tarif (`price_id`, `amount`, `currency_code`, `billing_interval`, `pricing_model`, `minimum_amount`, `maximum_amount`, `is_active`, `is_default`, `metadata`, horodatages) |
-| `fees` | `array` | Lignes de frais associées (si présentes) |
-| `environment` | `string` | `test` ou `live` |
-| `failed_payment_action` | `string` \| `null` | Récurrent : `pause`, `cancel`, `continue` |
-| `charge_day` | `number` \| `null` | Jour de prélèvement (1–31) |
-| `first_payment_type` | `string` \| `null` | `initial`, `non_initial`, `prorated` |
-| `trial_enabled` | `boolean` | Essai activé |
-| `trial_period_days` | `number` \| `null` | Durée d’essai |
-| `usage_aggregation` | `string` \| `null` | Produits à l’usage |
-| `usage_unit` | `string` \| `null` | Produits à l’usage |
-| `metadata` | `object` \| `null` | Métadonnées |
-| `created_at` | `string` | Création |
-| `updated_at` | `string` | Dernière mise à jour |
-
----
-
-## Réponses d’erreur
-
-| Statut | Description |
-|--------|-------------|
-| `400` | Entrée invalide ou plafond de tarifs dépassé |
-| `401` | Clé API invalide ou manquante |
-| `404` | Produit ou tarif introuvable |
+- [Créer un produit](/api/products/ProductsController_create)
+- [Lister les produits](/api/products/ProductsController_findAll)
+- [Obtenir un produit](/api/products/ProductsController_findOne)
+- [Ajouter un tarif](/api/products/ProductsController_addPrice)
+- [Définir le tarif par défaut](/api/products/ProductsController_setDefaultPrice)
+- [Checkout avec un produit](/build/checkout)

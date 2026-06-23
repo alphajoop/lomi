@@ -1,6 +1,6 @@
 ---
-title: "Créer un encaissement carte (client_secret)"
-description: "Créer un encaissement carte (client_secret)"
+title: "Create card charge (client_secret)"
+description: "Create card charge (client_secret)"
 full: true
 method: post
 path: /charge/card
@@ -9,14 +9,14 @@ operationId: ChargesController_createCardCharge
 
 ## Aperçu
 
-Créer un encaissement carte (client_secret)
+Create card charge (client_secret)
 
-Crée un encaissement carte embarqué et renvoie le client_secret pour votre interface de paiement.
+Creates an embedded card charge and returns the client_secret for your payment UI.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `POST /charge/card` (Créer un encaissement carte (client_secret)).
+Utilisez cet endpoint quand vous devez exécuter `POST /charge/card` (Create card charge (client_secret)).
 
 
 ## Authentification
@@ -34,15 +34,21 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
 
 _Aucun paramètre de requête._
 
+
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Corps de la requête
 
@@ -56,8 +62,8 @@ Schéma: `CreateCardChargeDto`
 | `currency_code` | Non | `enum ("XOF", "USD", "EUR")` | Currency code |
 | `currency` | Non | `enum ("XOF", "USD", "EUR")` | Backward-compatible alias for currency_code. Use currency_code in new integrations. |
 | `customer_id` | Non | `string` | Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer. |
-| `customer_email` | Non | `string` | Customer email — required together with customer_name when customer_id is omitted. |
-| `customer_name` | Non | `string` | Customer display name — required together with customer_email when customer_id is omitted. |
+| `customer_email` | Non | `string` | Customer email, required together with customer_name when customer_id is omitted. |
+| `customer_name` | Non | `string` | Customer display name, required together with customer_email when customer_id is omitted. |
 | `customer_phone` | Non | `string` | Customer phone number |
 | `description` | Non | `string` | Description shown in payment providers and logs |
 | `payment_reference` | Non | `string` | Reference included in metadata for reconciliation |
@@ -82,13 +88,11 @@ Exemple de corps :
 
 | Statut | Description |
 | --- | --- |
-| `201` | Encaissement carte créé |
-
-Schéma de réponse : `CardChargeResponseDto` — `success` et `data` avec `client_secret`, `id` (ex. `pi_…`), montants, `status`, et `appearance` optionnel pour l’UI Payment Element.
+| `201` | Card charge created |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
