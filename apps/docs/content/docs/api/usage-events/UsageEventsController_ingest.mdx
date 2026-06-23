@@ -11,12 +11,20 @@ operationId: UsageEventsController_ingest
 
 Record a usage event
 
-Idempotent usage ingest. Events are processed asynchronously and update meter balances.
+Idempotent usage ingest. Events are processed asynchronously and update meter balances when matched.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /usage-events` (Record a usage event).
+Call from your app whenever billable usage occurs—use a stable `transaction_id` per logical event.
+
+### Good to know
+
+Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage-events/&#123;id&#125;`.
+
+### See also
+
+[Usage billing guide](/build/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage-events/UsageEventsController_createUsageSubscription)
 
 
 ## Authentication
@@ -53,7 +61,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `202` | — |
+| `202` | Accepted |
 
 ## Errors
 

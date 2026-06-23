@@ -14,9 +14,9 @@ Hosted customer portal audit
 Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /customers/&#123;id&#125;/portal-audit` (Hosted customer portal audit).
+Utilisez cet endpoint quand vous devez exécuter `GET /customers/&#123;id&#125;/portal-audit` (Hosted customer portal audit).
 
 
 ## Authentification
@@ -34,7 +34,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -58,7 +58,7 @@ URLs de base :
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

@@ -17,7 +17,7 @@ Reprend `price-selector.tsx` sur le panneau produit sombre du checkout hébergé
 
 <Installation name="price-selector" />
 
-## Usage
+## Utilisation
 
 ```tsx
 import { PriceSelector } from '@/components/lomi-ui/price-selector';
@@ -48,8 +48,8 @@ Affichez-le dans un panneau `#121317` pour correspondre au checkout hébergé.
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `prices` | `PriceOption[]` | Prix actifs à afficher. Masqué s’il n’y en a qu’un ou moins. |
+| `prices` | `PriceOption[]` | Prix actifs à afficher. Masqué s’il y a un prix ou moins. |
 | `selectedPriceId` | `string \| null` | Identifiant du prix sélectionné. |
-| `onPriceSelect` | `(priceId: string) => void` | Déclenché lors du choix d’un prix. |
-| `currencyCode` | `string` | Code devise ISO. Défaut `XOF`. |
-| `label` | `string` | Libellé de section. Défaut `Choose your billing cycle`. |
+| `onPriceSelect` | `(priceId: string) => void` | Déclenché quand un prix est choisi. |
+| `currencyCode` | `string` | Code devise ISO. Par défaut `XOF`. |
+| `label` | `string` | Libellé de section. Par défaut `Choose your billing cycle`. |

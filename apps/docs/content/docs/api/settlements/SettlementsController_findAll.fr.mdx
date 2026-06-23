@@ -1,6 +1,6 @@
 ---
-title: "Liste des règlements"
-description: "Liste des règlements groupées par date de disponibilité et devise"
+title: "List settlement periods"
+description: "List settlement periods"
 full: true
 method: get
 path: /settlements
@@ -9,17 +9,14 @@ operationId: SettlementsController_findAll
 
 ## Aperçu
 
-Liste des règlements
+List settlement periods
 
-Retourne les totaux des paiements complétés, groupés par date calendaire `available_at` (UTC) et par devise. Chaque `settlement_id` suit le format `{currency}:{YYYY-MM-DD}` (par exemple `XOF:2026-06-01`).
+Returns completed payment totals grouped by availability date and currency. Each settlement_id is &#123;currency&#125;:&#123;YYYY-MM-DD&#125; (UTC date of available_at).
 
-### Quand l'utiliser
 
-Pour la rapprochement comptable : voir ce qui est devenu retirable à chaque date avant de demander des virements.
+### Quand l’utiliser
 
-### Voir aussi
-
-[Lister les transactions d’un règlement](/api/settlements/SettlementsController_findTransactions)
+Utilisez cet endpoint quand vous devez exécuter `GET /settlements` (List settlement periods).
 
 
 ## Authentification
@@ -37,34 +34,37 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
+
 
 ### Paramètres de requête
 
 | Nom | Emplacement | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- | --- |
-| `start_date` | query | Non | `string` (date) | Filtrer les périodes à partir de cette date (`YYYY-MM-DD`) |
-| `end_date` | query | Non | `string` (date) | Filtrer les périodes jusqu’à cette date (`YYYY-MM-DD`) |
-| `currency` | query | Non | `string` | Filtrer par code devise (`XOF`, `USD`, `EUR`) |
-| `page` | query | Non | `integer` | Numéro de page (défaut `1`) |
-| `pageSize` | query | Non | `integer` | Taille de page (défaut `50`) |
+| `pageSize` | query | Non | — |  |
+| `page` | query | Non | — |  |
+| `currency` | query | Non | — |  |
+| `end_date` | query | Non | — |  |
+| `start_date` | query | Non | — |  |
+
+
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `200` | Règlements |
+| `200` | Settlement periods |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard. **401** indique une clé manquante ou invalide ; **400** pour des paramètres de requête invalides.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/settlements?start_date=2026-06-01&end_date=2026-06-30&page=1&pageSize=20" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements?pageSize=1&page=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 

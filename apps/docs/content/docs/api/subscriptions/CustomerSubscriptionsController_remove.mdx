@@ -11,9 +11,16 @@ operationId: CustomerSubscriptionsController_remove
 
 Cancel customer subscription
 
+Ends a customer subscription according to platform cancelation rules.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `DELETE /customer-subscriptions/&#123;subscription_id&#125;` (Cancel customer subscription).
+Use when the buyer cancels via your UI or support cancels on their behalf.
+
+### See also
+
+[Update customer subscription](/api/subscriptions/CustomerSubscriptionsController_update)
 
 
 ## Authentication
@@ -47,7 +54,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

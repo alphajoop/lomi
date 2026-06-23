@@ -66,14 +66,7 @@ Pour les produits **à l’usage / facturation à la consommation** (appels API,
 
 ## Lister les abonnements
 
-Récupère tous les abonnements de votre organisation.
-
-### Paramètres de requête
-
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `page` | `number` | Page (défaut : `1`) |
-| `pageSize` | `number` | Taille de page (défaut : `50`) |
+**Référence API :** [Lister les abonnements](/api/subscriptions/SubscriptionsController_findAll) — `page` et `pageSize`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -127,7 +120,7 @@ curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
 
 ## Abonnements d’un client
 
-Récupère les abonnements d’un client donné.
+**Référence API :** [Abonnements par client](/api/subscriptions/SubscriptionsController_findByCustomer)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -156,7 +149,7 @@ curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
 
 ## Obtenir un abonnement
 
-Récupère le détail d’un abonnement.
+**Référence API :** [Obtenir un abonnement](/api/subscriptions/SubscriptionsController_findOne)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -228,14 +221,9 @@ lomi. est la source de vérité de la facturation ; n’annulez pas uniquement d
 
 ## Annuler un abonnement
 
-Annulation immédiate ou en fin de période.
+**Référence API :** [Annuler un abonnement](/api/subscriptions/SubscriptionsController_cancel)
 
-### Corps de la requête
-
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `cancel_at_period_end` | `boolean` | Non | Si `true`, annulation fin de période. Si `false`, annulation immédiate (défaut). |
-| `cancellation_reason` | `string` | Non | Motif d’annulation |
+Passez `cancel_at_period_end: true` pour annuler en fin de période ; omettez ou mettez `false` pour une annulation immédiate. `cancellation_reason` est optionnel.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -283,6 +271,8 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 
 ## Annuler une résiliation planifiée
 
+**Référence API :** [Annuler la résiliation](/api/subscriptions/SubscriptionsController_uncancel)
+
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
   -H "X-API-KEY: $LOMI_API_KEY"
@@ -292,37 +282,14 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
 
 ## Changer de plan
 
+**Référence API :** [Changer de plan](/api/subscriptions/SubscriptionsController_changePlan)
+
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../change-plan" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
 ```
-
----
-
-## Objet Subscription
-
-| Champ | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Identifiant unique |
-| `customer_id` | `string` | Client |
-| `product_id` | `string` | Produit |
-| `price_id` | `string` | Tarif |
-| `status` | `string` | `pending`, `trial`, `active`, `past_due`, `paused`, `cancelled`, `expired` |
-| `amount` | `number` | Montant récurrent |
-| `currency_code` | `string` | Devise |
-| `billing_interval` | `string` | `day`, `week`, `month`, `year` |
-| `next_billing_date` | `string` | Prochaine date de prélèvement (ISO 8601) |
-| `start_date` | `string` | Début de l’abonnement |
-| `end_date` | `string` | Fin pour durée fixe ou essai (nullable) |
-| `cancel_at_period_end` | `boolean` | Annulation planifiée en fin de période |
-| `cancel_at` | `string` | Date d’annulation planifiée |
-| `cancelled_at` | `string` | Annulation effective |
-| `created_at` | `string` | Création |
-| `updated_at` | `string` | Dernière mise à jour |
-
-Les réponses API peuvent utiliser `subscription_id` plutôt que `id`. Voir **[Abonnements](/api/subscriptions)** pour la forme de liste canonique.
 
 ---
 
@@ -341,13 +308,18 @@ Les **échecs de paiement** au renouvellement n’émettent pas de webhook abonn
 
 lomi. n’émet pas de webhook pour l’enregistrement de carte en essai (`setup_intent.succeeded`). Écoutez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription, pas au chargement du formulaire carte.
 
-**Notifications client :** les inscriptions en essai ou à 0 € (sans transaction de paiement complétée) déclenchent un **e-mail de confirmation d’inscription** si `customer_notifications.subscription_signups.email` est activé (par défaut : oui). Les inscriptions avec premier paiement reçoivent le reçu de transaction standard.
+**Notifications client :** les inscriptions en essai ou à 0 € (sans transaction de paiement complétée) déclenchent un **e-mail de confirmation d’inscription** si `customer_notifications.subscription_signups.email` est activé (par défaut : oui). Les inscriptions avec premier paiement reçoivent le reçu de transaction standard.
 
 ---
 
-## Réponses d’erreur
+## API associée
 
-| Statut | Description |
-|--------|-------------|
-| `401` | Clé API invalide ou manquante |
-| `404` | Abonnement ou client introuvable |
+- [Lister les abonnements](/api/subscriptions/SubscriptionsController_findAll)
+- [Obtenir un abonnement](/api/subscriptions/SubscriptionsController_findOne)
+- [Abonnements par client](/api/subscriptions/SubscriptionsController_findByCustomer)
+- [Annuler un abonnement](/api/subscriptions/SubscriptionsController_cancel)
+- [Annuler la résiliation](/api/subscriptions/SubscriptionsController_uncancel)
+- [Changer de plan](/api/subscriptions/SubscriptionsController_changePlan)
+- [Mettre à jour un abonnement](/api/subscriptions/SubscriptionsController_update)
+- [Comportement du tunnel : abonnements](/build/payments/checkout-behavior#subscription-checkout)
+- [Portail client](/build/customer-portal)

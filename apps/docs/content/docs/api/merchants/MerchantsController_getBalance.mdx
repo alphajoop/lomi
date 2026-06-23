@@ -1,6 +1,6 @@
 ---
-title: "Get merchant account balance for a currency"
-description: "Get merchant account balance for a currency"
+title: "Get merchant balance"
+description: "Get merchant balance"
 full: true
 method: get
 path: /merchants/{id}/balance
@@ -9,11 +9,22 @@ operationId: MerchantsController_getBalance
 
 ## Overview
 
-Get merchant account balance for a currency
+Get merchant balance
+
+Returns account balance for a merchant in the requested currency.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /merchants/&#123;id&#125;/balance` (Get merchant account balance for a currency).
+Use when a merchant ID is the scope key for wallet or treasury displays.
+
+### Good to know
+
+Requires `currency_code` (XOF, USD, or EUR).
+
+### See also
+
+[Account balances](/api/balances/AccountsController_getBalance)
 
 
 ## Authentication
@@ -49,7 +60,7 @@ Base URLs:
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 | `400` | Missing currency_code |
 
 ## Errors

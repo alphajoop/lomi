@@ -11,9 +11,16 @@ operationId: CustomerSubscriptionsController_findAll
 
 List customer subscriptions
 
+Returns subscriptions across customers with filters as exposed by the API.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /customer-subscriptions` (List customer subscriptions).
+Use for billing ops dashboards and exports—not the same as org-level [subscriptions](/api/subscriptions/SubscriptionsController_findAll).
+
+### See also
+
+[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)
 
 
 ## Authentication
@@ -51,7 +58,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

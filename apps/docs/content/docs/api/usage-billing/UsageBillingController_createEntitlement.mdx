@@ -1,6 +1,6 @@
 ---
-title: "Create or update a plan entitlement feature"
-description: "Create or update a plan entitlement feature"
+title: "Create or update an entitlement"
+description: "Create or update an entitlement"
 full: true
 method: post
 path: /usage-billing/entitlements
@@ -9,11 +9,18 @@ operationId: UsageBillingController_createEntitlement
 
 ## Overview
 
-Create or update a plan entitlement feature
+Create or update an entitlement
+
+Defines a plan entitlement feature keyed by `feature_key` for usage or access gating.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /usage-billing/entitlements` (Create or update a plan entitlement feature).
+Use when feature access is tied to plan entitlements rather than raw meter balance alone.
+
+### See also
+
+[Check entitlement](/api/usage-billing/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/usage-billing)
 
 
 ## Authentication
@@ -50,7 +57,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `201` | — |
+| `201` | Created successfully |
 
 ## Errors
 

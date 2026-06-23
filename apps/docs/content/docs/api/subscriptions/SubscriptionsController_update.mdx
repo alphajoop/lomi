@@ -1,6 +1,6 @@
 ---
-title: "Mettre à jour un abonnement"
-description: "Mettre à jour un abonnement"
+title: "Update subscription"
+description: "Update subscription"
 full: true
 method: patch
 path: /subscriptions/{id}
@@ -9,14 +9,18 @@ operationId: SubscriptionsController_update
 
 ## Overview
 
-Mettre à jour un abonnement
+Update subscription
 
-Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.
+Patches an organization subscription (metadata, price, or fields supported by the API).
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `PATCH /subscriptions/&#123;id&#125;` (Mettre à jour un abonnement).
+Use for plan changes initiated from your admin tools—not the customer-portal-scoped [customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_update) API.
+
+### See also
+
+[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)
 
 
 ## Authentication
@@ -54,7 +58,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `200` | Abonnement mis à jour |
+| `200` | Success |
 
 ## Errors
 

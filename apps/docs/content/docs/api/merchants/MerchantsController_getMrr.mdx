@@ -11,9 +11,16 @@ operationId: MerchantsController_getMrr
 
 Get merchant MRR
 
+Returns monthly recurring revenue for the merchant tied to the given ID.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /merchants/&#123;id&#125;/mrr` (Get merchant MRR).
+Use for subscription analytics when operating on a merchant-scoped identifier.
+
+### See also
+
+[Organization metrics](/api/organizations/OrganizationsController_getMetrics)
 
 
 ## Authentication
@@ -48,7 +55,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

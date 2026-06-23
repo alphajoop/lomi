@@ -1,6 +1,6 @@
 ---
-title: "Get Radar settings for the organization"
-description: "Get Radar settings for the organization"
+title: "Get Radar settings"
+description: "Get Radar settings"
 full: true
 method: get
 path: /organization/radar-settings
@@ -9,11 +9,18 @@ operationId: RadarController_getSettings
 
 ## Overview
 
-Get Radar settings for the organization
+Get Radar settings
+
+Returns whether lomi. Radar screening is enabled for the organization, the monitor/block mode, and card-network passthrough preferences.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /organization/radar-settings` (Get Radar settings for the organization).
+Use before toggling Radar in your own settings UI or to confirm org configuration in support tools.
+
+### See also
+
+[Update Radar settings](/api/organization/RadarController_updateSettings) · [lomi. Radar guide](/build/radar)
 
 
 ## Authentication
@@ -53,7 +60,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

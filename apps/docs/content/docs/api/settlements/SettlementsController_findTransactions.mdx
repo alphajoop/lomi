@@ -1,6 +1,6 @@
 ---
 title: "List settlement transactions"
-description: "List transactions in a settlement period"
+description: "List settlement transactions"
 full: true
 method: get
 path: /settlements/{id}/transactions
@@ -11,11 +11,12 @@ operationId: SettlementsController_findTransactions
 
 List settlement transactions
 
-Returns completed transactions whose `available_at` falls on the settlement date for the given currency.
+Returns the transactions that contributed to a settlement period identified by `settlement_id`.
+
 
 ### When to use this
 
-Drill into a settlement period to reconcile line items against the period totals from [List settlement periods](/api/settlements/SettlementsController_findAll).
+Use to drill into a settlement row and match ledger movements to individual payments.
 
 ### See also
 
@@ -30,8 +31,6 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 `GET /settlements/{id}/transactions`
 
-The `id` path segment is the `settlement_id` (`{currency}:{YYYY-MM-DD}`). URL-encode the colon (`XOF%3A2026-06-01`) when required by your HTTP client.
-
 Base URLs:
 
 - `https://sandbox.api.lomi.africa`
@@ -41,16 +40,18 @@ Base URLs:
 
 ### Path parameters
 
-| Name | In | Required | Schema | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | Yes | `string` | Settlement id, e.g. `XOF:2026-06-01` |
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | Settlement id, format &#123;currency&#125;:&#123;YYYY-MM-DD&#125; |
 
 ### Query parameters
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `page` | query | No | `integer` | Page number (default `1`) |
-| `pageSize` | query | No | `integer` | Page size (default `50`) |
+| `pageSize` | query | No | — |  |
+| `page` | query | No | — |  |
+
+
 
 ## Responses
 
@@ -60,12 +61,12 @@ Base URLs:
 
 ## Errors
 
-**400** for an invalid `settlement_id` format. **401** for auth failures.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/settlements/XOF%3A2026-06-01/transactions?page=1&pageSize=50" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements/value/transactions?pageSize=1&page=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 

@@ -1,6 +1,6 @@
 ---
-title: "Hosted customer portal audit"
-description: "Hosted customer portal audit"
+title: "Customer portal audit log"
+description: "Customer portal audit log"
 full: true
 method: get
 path: /customers/{id}/portal-audit
@@ -9,14 +9,18 @@ operationId: CustomersController_getPortalAudit
 
 ## Overview
 
-Hosted customer portal audit
+Customer portal audit log
 
-Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.
+Returns portal activity for a customer (sign-ins, subscription changes, etc.) for support and compliance.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /customers/&#123;id&#125;/portal-audit` (Hosted customer portal audit).
+Use when investigating billing disputes or verifying what the customer changed in the portal.
+
+### See also
+
+[Create portal session](/api/customers/CustomersController_createPortalLaunchSession)
 
 
 ## Authentication
@@ -54,7 +58,7 @@ Base URLs:
 
 | Status | Description |
 | --- | --- |
-| `200` | Chronologie paginée des évènements portal |
+| `200` | Success |
 
 ## Errors
 

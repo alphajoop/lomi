@@ -92,13 +92,28 @@ Les composants s'inspirent du checkout hébergé lomi. : cartes à petit rayon, 
 | Jeton | Valeur production |
 | ----- | ----------------- |
 | Bordure / badge sélectionné | `#56A5F9` |
-| Fond sélectionné (rendu) | Blanc |
+| Fond sélectionné (rendu) | Blanc ; en production `checkout.css` remplace `bg-slate-100/50` sur `.border.bg-card` |
+| Fond sélectionné (classe source) | `bg-slate-100/50` (inclure `checkout-ui.css` ou équivalent pour la parité) |
 | Bordure non sélectionnée | `border-border/40` |
+| Bordure hover non sélectionnée | `border-border/60` |
+| Fond hover non sélectionné | `bg-gray-50/50` |
+| Couleur libellé sur cartes fournisseur | `#000` |
 | Fond bouton payer par défaut | `#121317` |
+| Bordure input | `#d1d5db` (`clamp(1px, 0.12vw, 1.3px)`) |
 | Rayon des cartes | `rounded-sm` |
+| Taille carte fournisseur | `103.25px` mobile / `142px` md, hauteur `70px` |
 
 ### Personnalisation
 
-Comme chaque composant est copié dans votre application, personnalisez les classes directement. Gardez l'état sélectionné `#56A5F9` évident sur les cartes fournisseur.
+Comme chaque composant est copié dans votre application, personnalisez les classes directement :
+
+```tsx
+<PaymentProviderSelector
+  selectedProvider="WAVE"
+  onProviderChange={setProvider}
+/>
+```
+
+Gardez l'état sélectionné `#56A5F9` évident sur les cartes fournisseur pour que le client confirme le rail exact avant de payer.
 
 Chaque composant a sa propre page dans la barre latérale avec aperçu, commande d'installation et props.

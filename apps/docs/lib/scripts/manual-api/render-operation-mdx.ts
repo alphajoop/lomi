@@ -1,6 +1,13 @@
 /* @proprietary license */
 
-import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
+import {
+  EN_OPERATION_COPY,
+  type EnOperationOverride,
+} from '@/lib/scripts/manual-api/en-operation-overrides';
+import {
+  englishRequestBodyIntro,
+  englishResponseDescription,
+} from '@/lib/scripts/manual-api/en-http-fallbacks';
 import { FR_OPERATION_COPY } from '@/lib/scripts/manual-api/fr-operation-overrides';
 
 type ReferenceObject = { $ref: string };
@@ -310,6 +317,7 @@ function parameterSampleValue(p: ParameterObject): string {
 
 function responseRows(
   responses: OperationObject['responses'] | undefined,
+  lang: DocsLanguage,
 ): string[] {
   if (!responses) return [];
   const rows: string[] = [];
@@ -321,7 +329,11 @@ function responseRows(
       res !== null &&
       'description' in res
     ) {
-      desc = escapeMdxText((res as ResponseObject).description ?? '');
+      const openApiDesc = (res as ResponseObject).description ?? '';
+      desc =
+        lang === 'en'
+          ? escapeMdxText(englishResponseDescription(code, openApiDesc))
+          : escapeMdxText(openApiDesc);
     }
     rows.push(`| \`${code}\` | ${desc || '—'} |`);
   }
@@ -332,6 +344,8 @@ function buildRequestBodySection(
   operation: OperationObject,
   components: ComponentsObject | undefined,
   labels: Labels,
+  lang: DocsLanguage,
+  enCopy: EnOperationOverride | undefined,
 ): { section: string; sampleBody: unknown | null } {
   const rb = operation.requestBody;
   if (!rb || isRef(rb)) {
@@ -345,7 +359,15 @@ function buildRequestBodySection(
 
   const desc =
     'description' in rb && typeof rb.description === 'string'
-      ? escapeMdxText(rb.description)
+      ? escapeMdxText(
+          lang === 'en'
+            ? englishRequestBodyIntro(
+                rb.description,
+                enCopy?.requestBodyIntro,
+                labels.jsonPayload,
+              )
+            : rb.description,
+        )
       : '';
   const jsonContent = rb.content?.['application/json'];
   const rawSchema = jsonContent?.schema as
@@ -544,17 +566,17 @@ export function renderOperationPageMdx(input: {
   const shouldHaveBody =
     mLower === 'post' || mLower === 'put' || mLower === 'patch';
   const requestBody = shouldHaveBody
-    ? buildRequestBodySection(operation, components, labels)
+    ? buildRequestBodySection(operation, components, labels, lang, enCopy)
     : { section: '', sampleBody: null };
   const bodySection = requestBody.section;
 
   const responseTable =
-    responseRows(operation.responses).length === 0
+    responseRows(operation.responses, lang).length === 0
       ? labels.responseFallback
       : [
           `| ${labels.status} | ${labels.description} |`,
           '| --- | --- |',
-          ...responseRows(operation.responses),
+          ...responseRows(operation.responses, lang),
         ].join('\n');
 
   const yamlTitle = JSON.stringify(titleSource);

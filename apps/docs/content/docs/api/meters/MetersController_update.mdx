@@ -11,9 +11,16 @@ operationId: MetersController_update
 
 Update a meter
 
+Updates filter, aggregation, or active status on an existing meter.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `PATCH /meters/&#123;id&#125;` (Update a meter).
+Use when billing rules change—deactivate meters instead of deleting when historical usage must remain.
+
+### See also
+
+[Get meter](/api/meters/MetersController_findOne)
 
 
 ## Authentication
@@ -51,7 +58,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

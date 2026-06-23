@@ -1,6 +1,6 @@
 ---
-title: "Check if a customer has an active entitlement"
-description: "Check if a customer has an active entitlement"
+title: "Check customer entitlement"
+description: "Check customer entitlement"
 full: true
 method: get
 path: /usage-billing/entitlements/check
@@ -9,11 +9,18 @@ operationId: UsageBillingController_checkEntitlement
 
 ## Overview
 
-Check if a customer has an active entitlement
+Check customer entitlement
+
+Returns whether a customer has an active entitlement for the given `feature_key`.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /usage-billing/entitlements/check` (Check if a customer has an active entitlement).
+Use at request time to gate features without loading full subscription objects.
+
+### See also
+
+[Create entitlement](/api/usage-billing/UsageBillingController_createEntitlement)
 
 
 ## Authentication
@@ -47,7 +54,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 
