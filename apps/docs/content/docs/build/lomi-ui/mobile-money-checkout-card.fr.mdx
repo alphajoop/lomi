@@ -16,3 +16,31 @@ Combine le carrousel de fournisseurs, le formulaire client et le bouton payer.
 ## Installation
 
 <Installation name="mobile-money-checkout-card" />
+
+## Usage
+
+```tsx
+import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
+
+<MobileMoneyCheckoutCard
+  selectedProvider="WAVE"
+  fullName="Aya Konan"
+  email="aya@example.com"
+  phoneNumber="+2250700000000"
+  payButtonBgColor="#121317"
+  onSubmit={() => createCheckoutSession()}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `selectedProvider` | `ProviderId` | Fournisseur sélectionné. |
+| `fullName` | `string` | Nom complet du client. |
+| `email` | `string` | E-mail du client. |
+| `phoneNumber` | `string` | Numéro de téléphone du client. |
+| `onProviderChange` | `(provider: ProviderId) => void` | Gestionnaire de changement de fournisseur. |
+| `onSubmit` | `() => void` | Gestionnaire du clic sur Payer. |
+| `paymentStatus` | `'idle' \| 'processing' \| 'success' \| 'error'` | État du bouton Payer. |
+| `payButtonBgColor` | `string` | Arrière-plan du bouton Payer. Défaut `#121317`. |

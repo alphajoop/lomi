@@ -16,7 +16,13 @@ Extension WordPress qui envoie les acheteurs vers le **checkout hébergé lomi.*
 - Devise de la boutique **XOF**, **USD** ou **EUR**
 - HTTPS recommandé en production
 
-Source : [en-tête du plugin / readme](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/woo-lomi.php)
+Source : [en-tête du plugin / readme](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/woo-lomi.php)
+
+## Installation
+
+1. Téléchargez ou clonez le plugin depuis [`apps/plugins/woo`](https://github.com/lomiafrica/lomi./tree/master/apps/plugins/woo).
+2. Placez le dossier dans `wp-content/plugins/` et activez **lomi. WooCommerce Payment Gateway** dans WordPress.
+3. Activez **WooCommerce** si ce n’est pas déjà fait.
 
 ## Liste de configuration
 
@@ -34,7 +40,15 @@ Source : [en-tête du plugin / readme](https://github.com/lomiafrica/lomi./blob
 4. L’**URL de retour** appelle l’écouteur API WooCommerce, qui fait `GET /v1/checkout-sessions/{id}` et finalise la commande si le statut est `completed`.
 5. Le **webhook** `PAYMENT_SUCCEEDED` peut finaliser la commande si le retour navigateur est retardé ; signature vérifiée avec `X-Lomi-Signature` sur le corps brut.
 
-Référence code : [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/includes/class-wc-gateway-lomi.php)
+Référence code : [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/includes/class-wc-gateway-lomi.php)
+
+## Remboursements
+
+Les remboursements depuis l’admin WooCommerce appellent l’API lomi. lorsque la commande a été payée via lomi. Voir [Remboursements](/build/refunds) pour le comportement prestataire et test vs live.
+
+## Abonnements WooCommerce
+
+Si vous utilisez **WooCommerce Subscriptions**, les renouvellements et échecs de paiement suivent le contrat d’intégration plugin ; voir le readme du plugin et [Abonnements](/build/subscriptions).
 
 ## Webhooks
 

@@ -16,3 +16,24 @@ Pour les limites de compte, l'utilisation du plan ou le portail client.
 ## Installation
 
 <Installation name="usage-meter" />
+
+## Usage
+
+```tsx
+import { UsageMeter } from '@/components/lomi-ui/usage-meter';
+
+<UsageMeter
+  items={[
+    { label: 'Checkout sessions', used: 820, limit: 1000 },
+    { label: 'Payouts', used: 89, limit: 100 },
+  ]}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `items` | `UsageMeterItem[]` | Lignes d’utilisation. |
+| `title` | `string` | Titre optionnel. |
+| `description` | `string` | Texte d’accompagnement optionnel. |

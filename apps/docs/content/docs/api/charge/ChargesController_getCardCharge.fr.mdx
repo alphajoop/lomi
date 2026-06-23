@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un encaissement carte"
-description: "Obtenir un encaissement carte"
+title: "Retrieve card charge"
+description: "Retrieve card charge"
 full: true
 method: get
 path: /charge/card/{id}
@@ -9,11 +9,15 @@ operationId: ChargesController_getCardCharge
 
 ## Aperçu
 
-Obtenir un encaissement carte
+Retrieve card charge
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /charge/card/&#123;id&#125;` (Obtenir un encaissement carte).
+Utilisez après confirmation client pour interroger le statut.
+
+### Voir aussi
+
+[Créer un encaissement carte](/api/charge/ChargesController_createCardCharge)
 
 
 ## Authentification
@@ -31,7 +35,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -42,19 +46,23 @@ URLs de base :
 _Aucun paramètre de requête._
 
 
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `200` | Encaissement carte |
-
-Schéma de réponse : `CardChargeResponseDto` (même forme qu’à la création).
+| `200` | Card charge |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

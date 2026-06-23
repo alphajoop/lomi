@@ -26,11 +26,18 @@ Tableau complet : [Hub moyens de paiement](/build/guides/payment-methods#mtn-mom
 
 Bac à sable : [Paiements en bac à sable: MTN](/start/sandbox-payments).
 
+## Vérifier avant livraison
+
 <Callout type="warn">
-  En live, les flux MTN sont **asynchrones**. Voir [Vérifier les paiements](/build/guides/verify-payments).
+  En live, les flux MTN sont **asynchrones**. Interrogez `GET /transactions/{id}` ou utilisez les webhooks ; voir [Vérifier les paiements](/build/guides/verify-payments).
 </Callout>
+
+## Remboursements
+
+Les remboursements MTN en live exigent la référence prestataire du paiement d’origine et peuvent utiliser l’API Disbursement de façon asynchrone. Les remboursements test sont uniquement comptables. Voir [Remboursements](/build/refunds).
 
 ## Voir aussi
 
+- [Portail développeur MTN MoMo](https://momodeveloper.mtn.com/)
 - [Mobile money](/build/mobile-money)
 - [Charges directes](/build/direct-charges)

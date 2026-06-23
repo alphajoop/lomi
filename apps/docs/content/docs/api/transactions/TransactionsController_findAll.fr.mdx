@@ -14,9 +14,13 @@ Lister les transactions
 Renvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /transactions` (Lister les transactions).
+Utilisez pour réconciliation, exports et corrélation avec les webhooks de paiement.
+
+### Voir aussi
+
+[Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Transactions](/build/transactions)
 
 
 ## Authentification
@@ -34,9 +38,9 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
@@ -54,6 +58,12 @@ _Aucun paramètre de chemin au-delà du motif d’URL._
 | `status` | query | Non | — | Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs) |
 | `provider` | query | Non | — | Filtrer par code de fournisseur de paiement |
 
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 
 
 ## Réponses
@@ -65,7 +75,7 @@ _Aucun paramètre de chemin au-delà du motif d’URL._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

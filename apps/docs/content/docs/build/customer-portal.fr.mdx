@@ -96,13 +96,88 @@ curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f
 </Tab>
 </Tabs>
 
+## Orienter les clients vers le portail
+
+Trois façons d’y accéder :
+
+### 1. URL organisation par défaut (connexion en libre-service)
+
+```
+https://customers.lomi.africa/o/{votre-slug-org}
+```
+
+Les clients saisissent l’e-mail ou le téléphone utilisé au checkout. Aucun appel API marchand requis. Copiez cette URL depuis **Paramètres → Checkout → Storefront → Portail client**.
+
+### 2. Lancement pré-authentifié (application marchande)
+
+Lorsque le client est déjà identifié dans votre app, créez une session de lancement côté serveur et redirigez vers `launch_url`. Si la session inclut un `customer_id`, le portail **ignore le second OTP** (lancement de confiance).
+
+```typescript
+import { CustomersService } from "@lomi/sdk";
+
+const { launch_url } = await CustomersService.createPortalLaunchSession(customerId, {
+  return_url: "https://your-app.com/account",
+});
+redirect(launch_url);
+```
+
+Exemple Next.js (`app/billing/route.ts`) :
+
+```typescript
+import { redirect } from "next/navigation";
+import { CustomersService } from "@lomi/sdk";
+
+export async function GET() {
+  const customerId = await getLoggedInCustomerId();
+  const { launch_url } = await CustomersService.createPortalLaunchSession(customerId, {});
+  redirect(launch_url);
+}
+```
+
+### 3. E-mails transactionnels
+
+Les reçus client incluent l’URL portail de votre organisation (`customers.lomi.africa/o/{slug}`) pour que les acheteurs reviennent depuis leur boîte mail.
+
+## API headless (optionnel)
+
+Pour des UI portail sur mesure, utilisez le jeton bearer de session portail issu d’un lancement de confiance ou d’un flux OTP :
+
+- `GET /customer-portal/me`
+- `GET /customer-portal/transactions`
+- `GET /customer-portal/subscriptions`
+- `POST /customer-portal/subscriptions/{id}/actions`
+- `GET /customer-portal/payment-methods`
+- `POST /customer-portal/payment-methods/setup-intent`
+- `POST /customer-portal/payment-methods/{id}/default`
+- `DELETE /customer-portal/payment-methods/{id}`
+- `POST /customer-portal/subscriptions/{id}/retry-payment`
+
+Passez `Authorization: Bearer <portal_session_token>`.
+
+### Moyens de paiement
+
+Lorsque `allow_payment_method_update` est activé dans la politique portail (défaut : oui), les clients peuvent :
+
+1. Créer une intention de configuration carte via `POST /customer-portal/payment-methods/setup-intent`
+2. Confirmer l’intention côté client avec votre SDK carte
+3. Persister la carte avec votre flux d’attache (le portail hébergé appelle la edge function attach après confirmation)
+
+Utilisez `POST /customer-portal/payment-methods/{id}/default` pour définir la carte par défaut et synchroniser les abonnements actifs. Utilisez `DELETE /customer-portal/payment-methods/{id}` pour retirer une carte (bloqué si c’est la seule carte d’un abonnement facturable).
+
+### Reprise après paiement échoué
+
+Pour les abonnements carte `past_due`, `POST /customer-portal/subscriptions/{id}/retry-payment` tente un débit hors session avec la carte enregistrée par défaut. En cas de succès, le renouvellement est enregistré et le dunning est levé. En cas d’échec, la réponse peut inclure un repli `checkout_url` (même chemin que le dunning de renouvellement automatisé).
+
+Le portail hébergé expose aussi **Réessayer le paiement** à côté de **Payer maintenant** sur les actions d’abonnement.
+
 ## Intégration dashboard
 
 Depuis **Paramètres → Checkout → Storefront**, configurez le portail client :
 
 - Autoriser pause / reprise / annulation
 - Lien magique e-mail et OTP SMS
-- **Liste blanche des URL de retour**: requise pour `return_url` et `flow_after_completion_url` depuis votre backend
+- **Mise à jour des moyens de paiement** : permettre aux clients d’ajouter, retirer et définir une carte par défaut
+- **Liste blanche des URL de retour** : requise pour `return_url` et `flow_after_completion_url` depuis votre backend
 
 Depuis **Clients**, ouvrez un client avec historique de facturation et cliquez sur **Ouvrir le portail client** pour lancer le flux hébergé dans un nouvel onglet.
 

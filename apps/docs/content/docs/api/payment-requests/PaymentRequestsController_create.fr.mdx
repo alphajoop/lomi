@@ -14,9 +14,13 @@ Créer une demande de paiement
 Crée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `POST /payment-requests` (Créer une demande de paiement).
+Utilisez pour des demandes « payez cette facture » ou POS où le payeur confirme sur son appareil.
+
+### Voir aussi
+
+[Récupérer une demande de paiement](/api/payment-requests/PaymentRequestsController_findOne) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentification
@@ -34,9 +38,9 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
@@ -81,7 +85,7 @@ Exemple de corps :
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

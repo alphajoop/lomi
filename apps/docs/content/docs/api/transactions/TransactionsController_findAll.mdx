@@ -58,6 +58,12 @@ _No path parameters beyond the URL pattern._
 | `status` | query | No | — | Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs) |
 | `provider` | query | No | — | Filtrer par code de fournisseur de paiement |
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 
 
 ## Responses

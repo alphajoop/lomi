@@ -52,6 +52,12 @@ _No path parameters beyond the URL pattern._
 _No query parameters._
 
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Request body
 
 JSON request payload.
@@ -64,8 +70,8 @@ Schema: `CreateCardChargeDto`
 | `currency_code` | No | `enum ("XOF", "USD", "EUR")` | Currency code |
 | `currency` | No | `enum ("XOF", "USD", "EUR")` | Backward-compatible alias for currency_code. Use currency_code in new integrations. |
 | `customer_id` | No | `string` | Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer. |
-| `customer_email` | No | `string` | Customer email — required together with customer_name when customer_id is omitted. |
-| `customer_name` | No | `string` | Customer display name — required together with customer_email when customer_id is omitted. |
+| `customer_email` | No | `string` | Customer email, required together with customer_name when customer_id is omitted. |
+| `customer_name` | No | `string` | Customer display name, required together with customer_email when customer_id is omitted. |
 | `customer_phone` | No | `string` | Customer phone number |
 | `description` | No | `string` | Description shown in payment providers and logs |
 | `payment_reference` | No | `string` | Reference included in metadata for reconciliation |
@@ -91,8 +97,6 @@ Example body:
 | Status | Description |
 | --- | --- |
 | `201` | Card charge created |
-
-Response schema: `CardChargeResponseDto` — `success` and `data` with `client_secret`, `id` (e.g. `pi_…`), charge `amount`/`currency`, `original_amount`/`original_currency`, `status`, and optional `appearance` for Payment Element UI.
 
 ## Errors
 

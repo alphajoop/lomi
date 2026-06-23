@@ -16,3 +16,30 @@ Reprend le panneau gauche sombre du checkout hébergé.
 ## Installation
 
 <Installation name="checkout-summary-card" />
+
+## Usage
+
+```tsx
+import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
+
+<CheckoutSummaryCard
+  title="Pay for Design workshop"
+  currency="XOF"
+  description="A full-day workshop covering product design fundamentals."
+  subtotal={10000}
+  total={10000}
+/>;
+```
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `title` | `string` | Titre du produit ou du lien de paiement. |
+| `items` | `CheckoutSummaryItem[]` | Lignes optionnelles. Plus d’une ligne passe en mode panier. |
+| `subtotal` | `number` | Montant avant frais et remises. |
+| `fees` | `number \| CheckoutSummaryFee[]` | Frais optionnels en total ou lignes nommées. |
+| `discount` | `number` | Montant de remise optionnel. |
+| `total` | `number` | Montant final dû aujourd’hui. |
+| `currency` | `string` | Code devise ISO affiché à côté des montants. |
+| `description` | `string` | Description produit optionnelle sous le prix. |

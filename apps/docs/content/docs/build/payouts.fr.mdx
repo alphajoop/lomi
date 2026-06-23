@@ -48,6 +48,18 @@ curl -X POST "https://api.lomi.africa/payouts" \
 
 </Tabs>
 
+## Référence du corps de requête
+
+| Champ | Type | Requis |
+| --- | --- | --- |
+| `destination` | `'self'` \| `'beneficiary'` | **Oui** |
+| `rail` | `'wave'` \| `'spi'` \| `'bank'` \| `'mtn'` | **Oui** |
+| `amount` | `number` | **Oui** |
+| `currency_code` | `string` | **Oui** |
+| `payout_method_id` | UUID | **Oui** pour `self` ; requis pour beneficiary `spi` |
+| `recipient` | `{ name, phone }` | **Oui** pour beneficiary `wave` |
+| `reason` | `string` | Non |
+
 ## Lister et obtenir
 
 - `GET /payouts`, retraits et virements bénéficiaires (`kind`). Les clés test ne listent que les retraits test ; les bénéficiaires live sont exclus.

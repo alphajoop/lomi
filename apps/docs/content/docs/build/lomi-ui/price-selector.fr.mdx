@@ -17,4 +17,39 @@ Reprend `price-selector.tsx` sur le panneau produit sombre du checkout hébergé
 
 <Installation name="price-selector" />
 
+## Usage
+
+```tsx
+import { PriceSelector } from '@/components/lomi-ui/price-selector';
+
+<PriceSelector
+  currencyCode="XOF"
+  selectedPriceId={selectedPriceId}
+  onPriceSelect={setSelectedPriceId}
+  prices={[
+    {
+      price_id: 'monthly',
+      amount: 25000,
+      billing_interval: 'monthly',
+      is_default: true,
+    },
+    {
+      price_id: 'yearly',
+      amount: 250000,
+      billing_interval: 'yearly',
+    },
+  ]}
+/>;
+```
+
 Affichez-le dans un panneau `#121317` pour correspondre au checkout hébergé.
+
+## Props
+
+| Prop | Type | Description |
+| ---- | ---- | ----------- |
+| `prices` | `PriceOption[]` | Prix actifs à afficher. Masqué s’il n’y en a qu’un ou moins. |
+| `selectedPriceId` | `string \| null` | Identifiant du prix sélectionné. |
+| `onPriceSelect` | `(priceId: string) => void` | Déclenché lors du choix d’un prix. |
+| `currencyCode` | `string` | Code devise ISO. Défaut `XOF`. |
+| `label` | `string` | Libellé de section. Défaut `Choose your billing cycle`. |

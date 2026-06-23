@@ -14,10 +14,13 @@ Supprimer un client
 Retire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `DELETE /customers/&#123;id&#125;` (Supprimer un client).
+Utilisez pour retirer un client du répertoire lorsque la conformité ou le support l’exige.
 
+### À savoir
+
+La suppression peut être soumise à des contraintes de données liées ; vérifiez les réponses d’erreur métier.
 
 ## Authentification
 
@@ -34,7 +37,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -57,7 +60,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

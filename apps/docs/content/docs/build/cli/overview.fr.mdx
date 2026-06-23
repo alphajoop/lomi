@@ -105,15 +105,23 @@ lomi init
 
 ### Règles agent IA (optionnel)
 
+Installe les règles Cursor, `CLAUDE.md`, `AGENTS.md`, instructions VS Code et `llms.txt`. Voir [Installer les règles agent](/build/cli/install-rules).
+
+### Écouter les webhooks (recommandé)
+
 ```bash filename="Terminal"
-lomi install-rules
+lomi listen http://localhost:3000/webhooks
 ```
 
-### Serveur webhook local
+Reçoit de vrais webhooks sandbox via relais cloud, sans ngrok. Voir [Écouter les webhooks](/build/cli/listen).
+
+### Lancer le serveur webhook local
 
 ```bash filename="Terminal"
 lomi dev
 ```
+
+Démarre un récepteur webhook sur `http://localhost:4242/webhook`. Voir [Serveur de développement local](/build/cli/dev).
 
 </Steps>
 
@@ -150,6 +158,8 @@ Référence complète : [Commandes](/build/cli/commands).
 | `-l, --log-level <niveau>` | `debug`, `info`, `warn`, `error` |
 | `--skip-telemetry` | Désactiver la télémétrie |
 | `--json` | Sortie JSON (par défaut si stdout n’est pas un TTY) |
+| `-h, --help` | Aide pour la CLI ou une sous-commande |
+| `--version` | Afficher la version |
 
 ## Deux types d’identifiants
 
@@ -161,7 +171,8 @@ Référence complète : [Commandes](/build/cli/commands).
 
 ## Suite
 
-- [Authentification](/build/cli/auth)
-- [Initialiser un projet](/build/cli/init)
-- [Référence des commandes](/build/cli/commands)
-- [Intégration API](/start/first-payment)
+- [Authentification](/build/cli/auth) : flux device, profils, CI
+- [Initialiser un projet](/build/cli/init) : scaffolding SDK
+- [Référence des commandes](/build/cli/commands) : toutes les commandes et options
+- [Configuration](/build/cli/configuration) : chemins de config et variables d’environnement
+- [Intégration API](/start/first-payment) : guide HTTP et SDK

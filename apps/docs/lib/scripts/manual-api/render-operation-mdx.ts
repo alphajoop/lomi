@@ -1,9 +1,7 @@
 /* @proprietary license */
 
-import {
-  EN_OPERATION_COPY,
-  type EnOperationOverride,
-} from '@/lib/scripts/manual-api/en-operation-overrides';
+import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
+import { FR_OPERATION_COPY } from '@/lib/scripts/manual-api/fr-operation-overrides';
 
 type ReferenceObject = { $ref: string };
 
@@ -403,7 +401,7 @@ function buildRequestBodySection(
 }
 
 function buildOverviewGuidanceBlocks(
-  enCopy: EnOperationOverride | undefined,
+  copy: { whenToUse?: string; caveats?: string; related?: string } | undefined,
   lang: DocsLanguage,
   titleSource: string,
   method: string,
@@ -415,22 +413,19 @@ function buildOverviewGuidanceBlocks(
       ? `Utilisez cet endpoint quand vous devez exécuter \`${method.toUpperCase()} ${path}\` (${escapeMdxText(titleSource)}).`
       : `Use this endpoint when your flow needs \`${method.toUpperCase()} ${path}\` (${escapeMdxText(titleSource)}).`;
   const parts: string[] = [];
-  const whenToUseText =
-    lang === 'en'
-      ? (enCopy?.whenToUse ?? fallbackWhenToUse)
-      : fallbackWhenToUse;
+  const whenToUseText = copy?.whenToUse ?? fallbackWhenToUse;
   if (whenToUseText) {
     parts.push(
       `### ${lb.guidanceWhenToUse}\n\n${escapeMdxText(whenToUseText)}`,
     );
   }
-  if (lang === 'en' && enCopy?.caveats) {
+  if (copy?.caveats) {
     parts.push(
-      `### ${lb.guidanceGoodToKnow}\n\n${escapeMdxText(enCopy.caveats)}`,
+      `### ${lb.guidanceGoodToKnow}\n\n${escapeMdxText(copy.caveats)}`,
     );
   }
-  if (lang === 'en' && enCopy?.related) {
-    parts.push(`### ${lb.guidanceSeeAlso}\n\n${enCopy.related}`);
+  if (copy?.related) {
+    parts.push(`### ${lb.guidanceSeeAlso}\n\n${copy.related}`);
   }
   if (parts.length === 0) return '';
   return `\n\n${parts.join('\n\n')}\n`;
@@ -454,6 +449,10 @@ export function renderOperationPageMdx(input: {
   const labels = labelsForLanguage(lang);
   const mLower = method.toLowerCase();
   const enCopy = lang === 'en' ? EN_OPERATION_COPY[operationId] : undefined;
+  const guidanceCopy =
+    lang === 'en'
+      ? EN_OPERATION_COPY[operationId]
+      : FR_OPERATION_COPY[operationId];
   const titleSource = enCopy?.summary ?? operation.summary ?? operationId;
   const overviewDetail =
     lang === 'en' && enCopy
@@ -463,7 +462,7 @@ export function renderOperationPageMdx(input: {
     ? `\n\n${escapeMdxText(overviewDetail)}\n`
     : '';
   const guidanceBlocks = buildOverviewGuidanceBlocks(
-    enCopy,
+    guidanceCopy,
     lang,
     titleSource,
     method,

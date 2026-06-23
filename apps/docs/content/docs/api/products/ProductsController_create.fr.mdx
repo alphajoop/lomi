@@ -14,9 +14,13 @@ Créer un produit
 Crée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `POST /products` (Créer un produit).
+Utilisez lors de l’onboarding catalogue pour checkout, abonnements ou liens de paiement liés à des SKU.
+
+### Voir aussi
+
+[Lister les produits](/api/products/ProductsController_findAll) · [Liens de paiement](/api/payment-links/PaymentLinksController_create)
 
 
 ## Authentification
@@ -34,9 +38,9 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
@@ -46,7 +50,7 @@ _Aucun paramètre de requête._
 
 ### Corps de la requête
 
-_Aucun corps application/json pour cette opération._
+_Pas de corps JSON pour cette opération._
 
 
 ## Réponses
@@ -59,7 +63,7 @@ _Aucun corps application/json pour cette opération._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

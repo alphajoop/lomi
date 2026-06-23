@@ -1,6 +1,6 @@
 ---
-title: "Lancer un encaissement direct Wave"
-description: "Lancer un encaissement direct Wave"
+title: "Create direct Wave charge"
+description: "Create direct Wave charge"
 full: true
 method: post
 path: /charge/wave
@@ -9,11 +9,22 @@ operationId: ChargesController_createWaveCharge
 
 ## Aperçu
 
-Lancer un encaissement direct Wave
+Create direct Wave charge
 
-### Quand l'utiliser
+Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_launch_url` or `checkout_url` in the response.
 
-Utilisez cet endpoint pour `POST /charge/wave` (Lancer un encaissement direct Wave).
+
+### Quand l’utiliser
+
+Utilisez pour un encaissement mobile money initié serveur lorsque vous n’utilisez **pas** une session checkout hébergée.
+
+### À savoir
+
+Suivez les instructions du fournisseur dans la réponse ; l’UX dépend du rail (USSD, redirection app, etc.).
+
+### Voir aussi
+
+[Mobile money](/build/mobile-money) · [Encaissements directs](/build/direct-charges) · [Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentification
@@ -31,9 +42,9 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-_Aucun paramètre de chemin au-delà du motif d’URL._
+_Pas d’autre paramètre dans l’URL._
 
 
 ### Paramètres de requête
@@ -41,21 +52,54 @@ _Aucun paramètre de chemin au-delà du motif d’URL._
 _Aucun paramètre de requête._
 
 
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Corps de la requête
 
-_Aucun corps application/json pour cette opération._
+Corps JSON.
+
+Schéma: `CreateWaveChargeDto`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Oui | `number` | Amount in XOF (minimum 100) |
+| `currency` | Oui | `string` | Must be XOF for Wave |
+| `organizationId` | Non | `string` | — |
+| `merchantId` | Non | `string` | — |
+| `customer` | Oui | `CustomerDto` | — |
+| `description` | Non | `string` | — |
+| `successUrl` | Non | `string` | — |
+| `errorUrl` | Non | `string` | — |
+| `environment` | Non | `enum ("live", "test")` | — |
+
+Exemple de corps :
+
+```json
+{
+  "amount": 1000,
+  "currency": "XOF",
+  "customer": {
+    "name": "...",
+    "phoneNumber": "..."
+  }
+}
+```
 
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `201` | Encaissement initié (corps JSON renvoyé par la fonction edge Wave) |
-| `400` | Entrée invalide ou erreur API Wave |
+| `201` | Wave charge initiated |
+| `400` | Invalid input or Wave API error |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
@@ -63,7 +107,7 @@ Les erreurs suivent le format JSON standard (code de statut et message d'erreur)
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{"amount":1000,"currency":"XOF","customer":{"name":"...","phoneNumber":"..."}}'
 ```
 
 ## OpenAPI

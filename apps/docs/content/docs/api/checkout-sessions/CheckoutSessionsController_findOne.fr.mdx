@@ -14,9 +14,13 @@ Obtenir une session de paiement par ID
 Renvoie le détail d’une session (statut, client et produits associés).
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /checkout-sessions/&#123;id&#125;` (Obtenir une session de paiement par ID).
+Interrogez ou affichez après redirection checkout, ou lors de notifications asynchrones indexées par ID de session.
+
+### Voir aussi
+
+[Lister les transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentification
@@ -34,7 +38,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -57,7 +61,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

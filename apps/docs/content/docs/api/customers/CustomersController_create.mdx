@@ -48,6 +48,12 @@ _No path parameters beyond the URL pattern._
 _No query parameters._
 
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 ### Request body
 
 JSON request payload.
