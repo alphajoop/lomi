@@ -66,14 +66,7 @@ For **metered / usage-based** products (API calls, credits, seats), see **[Usage
 
 ## List subscriptions
 
-Retrieve all subscriptions for your organization.
-
-### Query Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `page` | `number` | Page number (default: `1`) |
-| `pageSize` | `number` | Items per page (default: `50`) |
+**API reference:** [List subscriptions](/api/subscriptions/SubscriptionsController_findAll) — supports `page` and `pageSize`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -127,7 +120,7 @@ curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
 
 ## Get subscriptions for a customer
 
-Retrieve all subscriptions for a specific customer.
+**API reference:** [Subscriptions by customer](/api/subscriptions/SubscriptionsController_findByCustomer)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -156,7 +149,7 @@ curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
 
 ## Get a subscription
 
-Retrieve details of a specific subscription.
+**API reference:** [Get subscription](/api/subscriptions/SubscriptionsController_findOne)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -229,14 +222,9 @@ lomi. is the billing source of truth; your app should not cancel only in your da
 
 ## Cancel a subscription
 
-Cancel immediately or at period end.
+**API reference:** [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)
 
-### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `cancel_at_period_end` | `boolean` | No | If `true`, cancel at end of billing period. If `false`, cancel immediately (default). |
-| `cancellation_reason` | `string` | No | Cancellation reason |
+Pass `cancel_at_period_end: true` to cancel at the end of the billing period; omit or set `false` to cancel immediately. Optional `cancellation_reason` for your records.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -286,6 +274,8 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 
 ## Uncancel a scheduled cancellation
 
+**API reference:** [Uncancel subscription](/api/subscriptions/SubscriptionsController_uncancel)
+
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
   -H "X-API-KEY: $LOMI_API_KEY"
@@ -295,37 +285,14 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
 
 ## Change plan
 
+**API reference:** [Change subscription plan](/api/subscriptions/SubscriptionsController_changePlan)
+
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../change-plan" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
 ```
-
----
-
-## Subscription Object
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Unique subscription identifier |
-| `customer_id` | `string` | Associated customer |
-| `product_id` | `string` | Associated product |
-| `price_id` | `string` | Associated price |
-| `status` | `string` | `pending`, `trial`, `active`, `past_due`, `paused`, `cancelled`, `expired` |
-| `amount` | `number` | Recurring amount |
-| `currency_code` | `string` | Currency |
-| `billing_interval` | `string` | `day`, `week`, `month`, `year` |
-| `next_billing_date` | `string` | Next charge date (ISO 8601) |
-| `start_date` | `string` | Subscription start |
-| `end_date` | `string` | End date for fixed-term or trial (nullable) |
-| `cancel_at_period_end` | `boolean` | Scheduled for cancellation |
-| `cancel_at` | `string` | Scheduled cancellation date |
-| `cancelled_at` | `string` | Actual cancellation timestamp |
-| `created_at` | `string` | Creation timestamp |
-| `updated_at` | `string` | Last update timestamp |
-
-Field names in API responses may use `subscription_id` instead of `id`. See [Subscriptions](/api/subscriptions) for the canonical list response shape.
 
 ---
 
@@ -348,9 +315,14 @@ lomi. does not emit a webhook for trial card setup (`setup_intent.succeeded`). L
 
 ---
 
-## Error Responses
+## Related API
 
-| Status | Description |
-|--------|-------------|
-| `401` | Invalid or missing API key |
-| `404` | Subscription or customer not found |
+- [List subscriptions](/api/subscriptions/SubscriptionsController_findAll)
+- [Get subscription](/api/subscriptions/SubscriptionsController_findOne)
+- [Subscriptions by customer](/api/subscriptions/SubscriptionsController_findByCustomer)
+- [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)
+- [Uncancel subscription](/api/subscriptions/SubscriptionsController_uncancel)
+- [Change plan](/api/subscriptions/SubscriptionsController_changePlan)
+- [Update subscription](/api/subscriptions/SubscriptionsController_update)
+- [Checkout behavior: subscriptions](/build/payments/checkout-behavior#subscription-checkout)
+- [Customer portal](/build/customer-portal)

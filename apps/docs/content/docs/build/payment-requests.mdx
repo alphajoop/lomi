@@ -9,17 +9,9 @@ The Payment requests API allows you to create timed payment requests for custome
 
 ## Create a payment request
 
-### Request Body
+**API reference (full request schema):** [Create payment request](/api/payment-requests/PaymentRequestsController_create)
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `amount` | `number` | **Yes** | Amount to request |
-| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, etc.) |
-| `expiry_date` | `string` | **Yes** | Expiration date (ISO 8601) |
-| `description` | `string` | No | Payment description |
-| `customer_id` | `string` | No | Existing customer ID |
-| `payment_reference` | `string` | No | Invoice/order reference |
-| `metadata` | `object` | No | Custom key-value pairs |
+**Essentials:** `amount`, `currency_code`, and `expiry_date` (ISO 8601) are required. Optionally pass `customer_id`, `payment_reference`, `description`, and `metadata`. The response includes a `payment_url` for the customer.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -94,16 +86,7 @@ curl -X POST "https://api.lomi.africa/payment-requests" \
 
 ## List payment requests
 
-Retrieve all payment requests with optional filtering.
-
-### Query Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | `string` | Filter by status: `pending`, `completed`, `failed`, `expired` |
-| `customerId` | `string` | Filter by customer ID |
-| `limit` | `number` | Results per page (default: `20`) |
-| `offset` | `number` | Pagination offset (default: `0`) |
+**API reference:** [List payment requests](/api/payment-requests/PaymentRequestsController_findAll) — filter by `status`, `customerId`, `limit`, and `offset`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -135,7 +118,7 @@ curl -X GET "https://api.lomi.africa/payment-requests?status=pending&limit=20" \
 
 ## Get a payment request
 
-Retrieve details of a specific payment request.
+**API reference:** [Get payment request](/api/payment-requests/PaymentRequestsController_findOne)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -163,25 +146,6 @@ curl -X GET "https://api.lomi.africa/payment-requests/pr_abc123..." \
 
 ---
 
-## Payment Request Object
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Unique identifier |
-| `amount` | `number` | Requested amount |
-| `currency_code` | `string` | Currency |
-| `status` | `string` | `pending`, `completed`, `failed`, `expired` |
-| `description` | `string` | Description |
-| `customer_id` | `string` | Associated customer |
-| `payment_reference` | `string` | Reference number |
-| `payment_url` | `string` | URL for customer to pay |
-| `expiry_date` | `string` | Expiration timestamp |
-| `transaction_id` | `string` | Created transaction (when paid) |
-| `metadata` | `object` | Custom metadata |
-| `created_at` | `string` | Creation timestamp |
-
----
-
 ## Webhooks
 
 | Event | Description |
@@ -191,10 +155,9 @@ curl -X GET "https://api.lomi.africa/payment-requests/pr_abc123..." \
 
 ---
 
-## Error Responses
+## Related API
 
-| Status | Description |
-|--------|-------------|
-| `400` | Invalid input |
-| `401` | Invalid or missing API key |
-| `404` | Request not found |
+- [Create payment request](/api/payment-requests/PaymentRequestsController_create)
+- [List payment requests](/api/payment-requests/PaymentRequestsController_findAll)
+- [Get payment request](/api/payment-requests/PaymentRequestsController_findOne)
+- [Webhooks](/build/webhooks)
