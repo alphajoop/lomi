@@ -95,6 +95,8 @@ export const METHOD_NAME_BY_OP = {
   'POST /refunds': 'create',
   'GET /refunds': 'list',
   'GET /refunds/{id}': 'get',
+  'GET /settlements': 'findAll',
+  'GET /settlements/{id}/transactions': 'findTransactions',
   'GET /disputes': 'list',
   'GET /disputes/{id}': 'get',
   'GET /meters': 'list',

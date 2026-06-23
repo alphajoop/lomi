@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 91,
+  "toolCount": 93,
   "tools": [
     {
       "name": "lomi_delete_customer_subscriptions_subscription_id",
@@ -1711,6 +1711,95 @@
       "searchHint": "assessments get id radar risk"
     },
     {
+      "name": "lomi_get_settlements",
+      "operationKey": "GET /settlements",
+      "method": "get",
+      "pathTemplate": "/settlements",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "currency",
+        "end_date",
+        "start_date"
+      ],
+      "title": "Get Settlements",
+      "description": "List settlement periods\n\nReturns completed payment totals grouped by availability date and currency. Each settlement_id is {currency}:{YYYY-MM-DD} (UTC date of available_at).\n\nREST: GET /settlements",
+      "tags": [
+        "Settlements"
+      ],
+      "operationId": "SettlementsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "start_date": {
+            "type": "string"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get settlements"
+    },
+    {
+      "name": "lomi_get_settlements_id_transactions",
+      "operationKey": "GET /settlements/{id}/transactions",
+      "method": "get",
+      "pathTemplate": "/settlements/{id}/transactions",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "pageSize",
+        "page"
+      ],
+      "title": "Get Settlements",
+      "description": "List transactions in a settlement period\n\nReturns completed transactions whose available_at falls on the settlement date for the given currency.\n\nREST: GET /settlements/{id}/transactions",
+      "tags": [
+        "Settlements"
+      ],
+      "operationId": "SettlementsController_findTransactions",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "example": "XOF:2026-06-01",
+            "description": "Settlement id, format {currency}:{YYYY-MM-DD}"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id settlements transactions"
+    },
+    {
       "name": "lomi_get_subscriptions",
       "operationKey": "GET /subscriptions",
       "method": "get",
@@ -2689,7 +2778,7 @@
               "customer_email": {
                 "type": "string",
                 "example": "john@example.com",
-                "description": "Customer email — required together with customer_name when customer_id is omitted."
+                "description": "Customer email, required together with customer_name when customer_id is omitted."
               },
               "customer_id": {
                 "type": "string",
@@ -2699,7 +2788,7 @@
               "customer_name": {
                 "type": "string",
                 "example": "John Doe",
-                "description": "Customer display name — required together with customer_email when customer_id is omitted."
+                "description": "Customer display name, required together with customer_email when customer_id is omitted."
               },
               "customer_phone": {
                 "type": "string",

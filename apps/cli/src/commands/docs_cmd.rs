@@ -68,6 +68,19 @@ pub struct DocsDiffArgs {
 }
 
 #[derive(Args, Debug)]
+pub struct DocsSuggestArgs {
+    /// Skip the TypeScript docs-drift script
+    #[arg(long)]
+    pub skip_ts: bool,
+    /// Deterministic actions only (no LLM narrative)
+    #[arg(long)]
+    pub skip_ai: bool,
+    /// Skip i18n structure/gap checks
+    #[arg(long)]
+    pub no_i18n: bool,
+}
+
+#[derive(Args, Debug)]
 pub struct DocsScaffoldArgs {}
 
 #[derive(Args, Debug)]
@@ -96,6 +109,8 @@ pub enum DocsCommands {
     Improve(DocsImproveArgs),
     /// Unified diff for proposed MDX vs canonical (doctool)
     Diff(DocsDiffArgs),
+    /// Scan codebase + drift, suggest prioritized fixes (doctool)
+    Suggest(DocsSuggestArgs),
 }
 
 use crate::monorepo::find_monorepo_root;
@@ -260,6 +275,23 @@ pub async fn run(common: &CommonOptions, args: DocsArgs) -> Result<()> {
             if let Some(proposed) = args.proposed {
                 dt_args.push("--proposed".to_string());
                 dt_args.push(proposed.to_string_lossy().into_owned());
+            }
+            if common.use_json() {
+                dt_args.push("--json".to_string());
+            }
+            run_dt(&root, &dt_args)
+        }
+        DocsCommands::Suggest(args) => {
+            cli::banner::print_intro("Docs suggest");
+            let mut dt_args = vec!["suggest".to_string()];
+            if args.skip_ts {
+                dt_args.push("--skip-ts".to_string());
+            }
+            if args.skip_ai {
+                dt_args.push("--skip-ai".to_string());
+            }
+            if args.no_i18n {
+                dt_args.push("--no-i18n".to_string());
             }
             if common.use_json() {
                 dt_args.push("--json".to_string());
