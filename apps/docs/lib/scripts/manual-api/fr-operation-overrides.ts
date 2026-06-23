@@ -10,9 +10,7 @@ export type FrOperationGuidance = {
   related?: string;
 };
 
-export const FR_OPERATION_COPY: Partial<
-  Record<string, FrOperationGuidance>
-> = {
+export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
   AccountsController_checkAvailableBalance: {
     whenToUse:
       'Appelez avant un retrait, un paiement bénéficiaire ou tout flux nécessitant un solde disponible garanti.',
@@ -116,7 +114,8 @@ export const FR_OPERATION_COPY: Partial<
       '[Récupérer une demande de paiement](/api/payment-requests/PaymentRequestsController_findOne) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   PayoutsUnifiedController_create: {
-    whenToUse: 'Utilisez pour les mouvements de trésorerie depuis votre solde lomi.',
+    whenToUse:
+      'Utilisez pour les mouvements de trésorerie depuis votre solde lomi.',
     caveats:
       'Les retraits self exigent payout_method_id ; les bénéficiaires Wave exigent recipient.name et recipient.phone (pas payout_method_id). Les rails Wave renvoient 400 avec une clé test — clés live uniquement. MTN renvoie 400 tant que non pris en charge.',
     related:
@@ -124,7 +123,8 @@ export const FR_OPERATION_COPY: Partial<
   },
   PayoutsUnifiedController_findAll: {
     whenToUse: 'Utilisez pour la réconciliation et le support.',
-    related: '[Récupérer un retrait](/api/payouts/PayoutsUnifiedController_findOne)',
+    related:
+      '[Récupérer un retrait](/api/payouts/PayoutsUnifiedController_findOne)',
   },
   PayoutsUnifiedController_findOne: {
     whenToUse: 'Utilisez après création ou depuis les webhooks.',
@@ -144,11 +144,13 @@ export const FR_OPERATION_COPY: Partial<
   ProductsController_setDefaultPrice: {
     whenToUse:
       'Utilisez après avoir ajouté plusieurs prix pour définir le repli checkout et liens.',
-    related: '[Ajouter un prix produit](/api/products/ProductsController_addPrice)',
+    related:
+      '[Ajouter un prix produit](/api/products/ProductsController_addPrice)',
   },
   RefundsController_findAll: {
     whenToUse: 'Utilisez pour réconciliation, support et tableaux de bord.',
-    related: '[Récupérer un remboursement](/api/refunds/RefundsController_findOne)',
+    related:
+      '[Récupérer un remboursement](/api/refunds/RefundsController_findOne)',
   },
   RefundsController_findOne: {
     whenToUse:
