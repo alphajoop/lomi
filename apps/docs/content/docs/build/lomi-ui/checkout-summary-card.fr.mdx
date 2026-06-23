@@ -1,13 +1,13 @@
 ---
 title: Carte récapitulatif checkout
-description: Panneau sombre de récapitulatif produit du checkout hébergé.
+description: Panneau sombre de récapitulatif produit du checkout hébergé (colonne gauche).
 ---
 
 import { CheckoutSummaryCardDemo } from '@/components/lomi-ui/demo';
 
 # Carte récapitulatif checkout
 
-Reprend le panneau gauche sombre du checkout hébergé.
+Reprend le panneau gauche sombre du checkout hébergé (`product-display-section.tsx` et `line-items-display.tsx`).
 
 ## Aperçu
 
@@ -17,7 +17,7 @@ Reprend le panneau gauche sombre du checkout hébergé.
 
 <Installation name="checkout-summary-card" />
 
-## Usage
+## Utilisation
 
 ```tsx
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
@@ -35,10 +35,10 @@ import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card'
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `title` | `string` | Titre du produit ou du lien de paiement. |
-| `items` | `CheckoutSummaryItem[]` | Lignes optionnelles. Plus d’une ligne passe en mode panier. |
+| `title` | `string` | Titre produit ou lien de paiement. |
+| `items` | `CheckoutSummaryItem[]` | Lignes optionnelles. Plus d’une ligne active la vue panier. |
 | `subtotal` | `number` | Montant avant frais et remises. |
-| `fees` | `number \| CheckoutSummaryFee[]` | Frais optionnels en total ou lignes nommées. |
+| `fees` | `number \| CheckoutSummaryFee[]` | Frais en total ou lignes nommées. |
 | `discount` | `number` | Montant de remise optionnel. |
 | `total` | `number` | Montant final dû aujourd’hui. |
 | `currency` | `string` | Code devise ISO affiché à côté des montants. |

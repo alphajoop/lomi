@@ -1,6 +1,6 @@
 ---
-title: "Combined MRR + usage + one-time revenue metrics"
-description: "Combined MRR + usage + one-time revenue metrics"
+title: "Combined revenue metrics"
+description: "Combined revenue metrics"
 full: true
 method: get
 path: /usage-billing/revenue
@@ -9,11 +9,22 @@ operationId: UsageBillingController_getRevenue
 
 ## Overview
 
-Combined MRR + usage + one-time revenue metrics
+Combined revenue metrics
+
+Returns MRR, usage revenue, and one-time revenue for a date range.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /usage-billing/revenue` (Combined MRR + usage + one-time revenue metrics).
+Use for finance reporting that combines subscription MRR with metered usage and one-off charges.
+
+### Good to know
+
+Requires `start_date` and `end_date` query parameters.
+
+### See also
+
+[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Usage billing guide](/build/usage-billing)
 
 
 ## Authentication
@@ -49,7 +60,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

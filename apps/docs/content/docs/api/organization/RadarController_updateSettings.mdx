@@ -11,9 +11,20 @@ operationId: RadarController_updateSettings
 
 Update Radar settings
 
+Enables or disables Radar screening and updates monitor/block mode or card-network passthrough for the organization.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `PATCH /organization/radar-settings` (Update Radar settings).
+Use when onboarding merchants to fraud screening or changing how risky charges are handled.
+
+### Good to know
+
+Radar is opt-in. When `mode` is `block`, charges that hit block rules are rejected before completion.
+
+### See also
+
+[Get Radar settings](/api/organization/RadarController_getSettings) · [List risk assessments](/api/risk-assessments/RadarController_listAssessments)
 
 
 ## Authentication
@@ -74,7 +85,7 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

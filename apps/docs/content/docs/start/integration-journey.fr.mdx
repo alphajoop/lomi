@@ -12,7 +12,7 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 Suivez ce guide avant d’écrire du code de production. Chaque étape renvoie vers la page détaillée, cette page est la carte, pas le manuel.
 
 <Callout type="info">
-  Nouveau ? Lisez [Qu’est-ce que lomi. ?](/start/overview), puis revenez ici.
+  Nouveau ? Lisez [Qu’est-ce que lomi. ?](/start/overview), puis suivez ce parcours étape par étape.
 </Callout>
 
 ## Étape 1: Créer un compte développeur
@@ -46,9 +46,13 @@ La plupart des équipes commencent par le **checkout hébergé**. Consultez [Que
 
 ## Étape 4: Configurer les webhooks
 
+Les webhooks sont essentiels pour les moyens de paiement et les événements hors de votre application, comme l’approbation mobile money et les renouvellements d’abonnement.
+
 1. Enregistrez une URL HTTPS dans le [portail](https://lomi.africa/portal).
 2. Suivez [Configurer les webhooks](/build/webhooks) et [Traiter les webhooks](/build/advanced-guides/handling-webhooks).
 3. Vérifiez la signature sur le corps brut avant de parser le JSON.
+
+**Renouvellements d’abonnement :** les abonnements carte se renouvellent hors session ; écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` de renouvellement. **Wave et MTN** utilisent un **lien checkout de renouvellement manuel** envoyé avant chaque échéance — le client doit payer ce lien ; pas de débit wallet silencieux. Voir [Abonnements : renouvellements](/build/subscriptions#renewals-and-failed-payments).
 
 ## Étape 5: Passer en live
 
@@ -58,6 +62,7 @@ La plupart des équipes commencent par le **checkout hébergé**. Consultez [Que
 
 ## Étapes suivantes
 
-- [Référence API](/api)
 - [Vérifier les paiements](/build/guides/verify-payments)
+- [Cycle de vie des paiements](/build/guides/payment-lifecycle)
+- [Démarrer avec le CLI](/start/cli-quickstart)
 - [Machine à états des paiements](/api/payment-state-machine)

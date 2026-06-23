@@ -11,9 +11,16 @@ operationId: UsageEventsController_findOne
 
 Get a usage event
 
+Returns one usage event by ID, including processing status and error details when failed.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /usage-events/&#123;id&#125;` (Get a usage event).
+Use after ingest to confirm processing or investigate a specific event.
+
+### See also
+
+[List usage events](/api/usage-events/UsageEventsController_findAll) · [Record usage event](/api/usage-events/UsageEventsController_ingest)
 
 
 ## Authentication
@@ -48,7 +55,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

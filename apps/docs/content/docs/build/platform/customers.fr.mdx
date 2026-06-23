@@ -9,22 +9,9 @@ L’API Customers permet de créer, consulter, mettre à jour et gérer les prof
 
 ## Créer un client
 
-Crée un profil client pour suivre les paiements et stocker les informations.
+**Référence API (schéma complet) :** [Créer un client](/api/customers/CustomersController_create)
 
-### Corps de la requête
-
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `name` | `string` | **Oui** | Nom complet |
-| `email` | `string` | Non | Adresse e-mail |
-| `phone_number` | `string` | Non | Téléphone (ex. `+221771234567`) |
-| `whatsapp_number` | `string` | Non | Numéro WhatsApp |
-| `country` | `string` | Non | Pays |
-| `city` | `string` | Non | Ville |
-| `address` | `string` | Non | Adresse |
-| `postal_code` | `string` | Non | Code postal |
-| `is_business` | `boolean` | Non | Client professionnel (défaut : `false`) |
-| `metadata` | `object` | Non | Métadonnées clé-valeur |
+**L’essentiel :** `name` est obligatoire. Passez `email`, `phone_number`, `whatsapp_number`, l’adresse, `is_business` et `metadata` pour le préremplissage checkout et votre CRM.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -100,17 +87,7 @@ curl -X POST "https://api.lomi.africa/customers" \
 
 ## Lister les clients
 
-Récupère les clients avec filtres et pagination optionnels.
-
-### Paramètres de requête
-
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `search` | `string` | Recherche par nom ou e-mail |
-| `type` | `string` | Type : `business`, `individual`, `all` |
-| `status` | `string` | Activité : `active`, `inactive`, `all` |
-| `page` | `number` | Page (défaut : `1`) |
-| `pageSize` | `number` | Taille de page (défaut : `50`) |
+**Référence API :** [Lister les clients](/api/customers/CustomersController_findAll) — `search`, `type`, `status`, `page` et `pageSize`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -165,7 +142,7 @@ curl -X GET "https://api.lomi.africa/customers?search=amadou&type=individual&pag
 
 ## Obtenir un client
 
-Récupère le détail d’un client.
+**Référence API :** [Obtenir un client](/api/customers/CustomersController_findOne)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -194,7 +171,7 @@ curl -X GET "https://api.lomi.africa/customers/cus_abc123..." \
 
 ## Mettre à jour un client
 
-Met à jour un client ; tous les champs sont facultatifs.
+**Référence API :** [Mettre à jour un client](/api/customers/CustomersController_update) — tous les champs du corps sont facultatifs.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -231,7 +208,7 @@ curl -X PATCH "https://api.lomi.africa/customers/cus_abc123..." \
 
 ## Supprimer un client
 
-Retire un client de l’usage actif ; il n’apparaît plus dans les listes ni les lectures.
+**Référence API :** [Supprimer un client](/api/customers/CustomersController_remove)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -260,7 +237,7 @@ curl -X DELETE "https://api.lomi.africa/customers/cus_abc123..." \
 
 ## Transactions d’un client
 
-Récupère les transactions pour un client donné.
+**Référence API :** [Transactions client](/api/customers/CustomersController_getTransactions)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -311,13 +288,9 @@ curl -X GET "https://api.lomi.africa/customers/cus_abc123.../transactions" \
 
 ## Créer une session de lancement portail client
 
-Génère une URL portail client hébergée à usage unique pour un client de votre organisation.
+**Référence API :** [Session de lancement portail](/api/customers/CustomersController_createPortalLaunchSession)
 
-- Endpoint : `POST /customers/{id}/portal-launch-session`
-- Appelant prévu : backend marchand (auth clé API)
-- Sortie : `launch_url` + `launch_token` + métadonnées de flux
-
-Utilisez ceci pour une passation hébergée depuis votre produit vers le portail client.
+Génère une URL portail hébergée à usage unique depuis votre backend. Retourne `launch_url` pour la redirection. Voir [Portail client](/build/customer-portal) pour les flux, la sécurité et la checklist production.
 
 <Tabs items={["TypeScript", "cURL"]}>
 
@@ -362,35 +335,15 @@ curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-sess
 
 </Tabs>
 
-Voir le flux complet et les conseils production dans [Portail client](/build/customer-portal).
-
 ---
 
-## Objet Customer
+## API associée
 
-| Champ | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Identifiant client |
-| `organization_id` | `string` | Organisation propriétaire |
-| `name` | `string` | Nom complet |
-| `email` | `string` | E-mail |
-| `phone_number` | `string` | Téléphone |
-| `whatsapp_number` | `string` | WhatsApp |
-| `country` | `string` | Pays |
-| `city` | `string` | Ville |
-| `address` | `string` | Adresse |
-| `postal_code` | `string` | Code postal |
-| `is_business` | `boolean` | Client professionnel |
-| `metadata` | `object` | Métadonnées |
-| `created_at` | `string` | Création |
-| `updated_at` | `string` | Dernière mise à jour |
-
----
-
-## Réponses d’erreur
-
-| Statut | Description |
-|--------|-------------|
-| `400` | Données invalides |
-| `401` | Clé API invalide ou manquante |
-| `404` | Client introuvable ou accès refusé |
+- [Créer un client](/api/customers/CustomersController_create)
+- [Lister les clients](/api/customers/CustomersController_findAll)
+- [Obtenir un client](/api/customers/CustomersController_findOne)
+- [Mettre à jour un client](/api/customers/CustomersController_update)
+- [Supprimer un client](/api/customers/CustomersController_remove)
+- [Transactions client](/api/customers/CustomersController_getTransactions)
+- [Session de lancement portail](/api/customers/CustomersController_createPortalLaunchSession)
+- [Guide portail client](/build/customer-portal)

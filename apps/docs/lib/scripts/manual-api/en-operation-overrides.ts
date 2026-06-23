@@ -17,6 +17,8 @@ export type EnOperationOverride = {
   caveats?: string;
   /** Markdown links to related guides or REST pages (trusted repo content) */
   related?: string;
+  /** English request-body intro when OpenAPI description is French-only */
+  requestBodyIntro?: string;
 };
 
 /** Full coverage for all public merchant operations in `openapi.json` (enforced by verify script). */
@@ -64,6 +66,8 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
     body: 'Creates a hosted checkout session so the buyer completes payment on the hosted checkout experience. Sessions expire—create a fresh session if the link lapses.',
+    requestBodyIntro:
+      'Session payload: provide `amount` (and optional product fields) or `line_items` for a multi-product cart.',
     whenToUse:
       'Use for e-commerce, invoices, or any flow where you want lomi. to host payment collection and return the customer to your site.',
     caveats:
@@ -336,11 +340,11 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   RefundsController_create: {
     summary: 'Create refund',
-    body: 'Refunds a **completed** transaction on **Stripe (card)**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.',
+    body: 'Refunds a **completed** transaction on **card**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.',
     whenToUse:
       'Use for buyer reversals on eligible completed transactions; supports full and partial amounts.',
     caveats:
-      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only—no MTN API call. Partial MTN refunds also require a customer phone on file.',
+      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only—no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.',
     related:
       '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/refunds)',
   },

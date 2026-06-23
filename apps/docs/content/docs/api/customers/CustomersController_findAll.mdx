@@ -49,14 +49,20 @@ _No path parameters beyond the URL pattern._
 | `type` | query | No | — | Filtrer par type de client |
 | `search` | query | No | — | Recherche par nom ou e-mail |
 
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
 
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Liste paginée de clients |
-| `401` | Clé API invalide ou manquante |
+| `200` | Success |
+| `401` | Invalid or missing API key |
 
 ## Errors
 

@@ -7,7 +7,7 @@ import { PaymentProviderSelectorDemo } from '@/components/lomi-ui/demo';
 
 # Sélecteur de fournisseur de paiement
 
-Reprend le carrousel de méthodes de paiement du checkout hébergé.
+Reprend le carrousel de méthodes de paiement du checkout hébergé (`payment-provider-selection.tsx`).
 
 ## Aperçu
 
@@ -24,14 +24,28 @@ import {
   PaymentProviderSelector,
   type ProviderId,
 } from '@/components/lomi-ui/payment-provider-selector';
+
+function Example() {
+  const [provider, setProvider] = React.useState<ProviderId>('WAVE');
+
+  return (
+    <PaymentProviderSelector
+      selectedProvider={provider}
+      onProviderChange={setProvider}
+    />
+  );
+}
 ```
 
 ## Props
 
 | Prop | Type | Description |
 | ---- | ---- | ----------- |
-| `providers` | `ProviderId[]` | Méthodes affichées. |
-| `selectedProvider` | `ProviderId \| null` | Méthode sélectionnée. |
-| `onProviderChange` | `(provider: ProviderId) => void` | Changement de méthode. |
+| `providers` | `ProviderId[]` | Méthodes affichées. Par défaut `WAVE`, `MTN`, `cards` et `spi`. |
+| `selectedProvider` | `ProviderId \| null` | Méthode sélectionnée (contrôlée). |
+| `onProviderChange` | `(provider: ProviderId) => void` | Déclenché quand le client choisit une méthode. |
+| `disabledProviders` | `ProviderId[]` | Méthodes affichées en désactivé. |
+| `spiOperational` | `boolean` | Si `false`, SPI n’est pas sélectionnable. Par défaut `true`. |
+| `cardLabel` | `string` | Libellé de la méthode carte. Par défaut `Card`. |
 
-Identifiants : `WAVE`, `MTN`, `cards`, `spi`.
+Utilisez les mêmes identifiants que le checkout hébergé : `WAVE`, `MTN`, `cards` et `spi`.

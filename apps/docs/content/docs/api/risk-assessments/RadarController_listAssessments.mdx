@@ -1,6 +1,6 @@
 ---
-title: "List payment risk assessments"
-description: "List payment risk assessments"
+title: "List risk assessments"
+description: "List risk assessments"
 full: true
 method: get
 path: /risk-assessments
@@ -9,11 +9,18 @@ operationId: RadarController_listAssessments
 
 ## Overview
 
-List payment risk assessments
+List risk assessments
+
+Returns Radar screening results for incoming charges with optional filters for decision, rail, and date range.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /risk-assessments` (List payment risk assessments).
+Use for fraud review queues, exports, and correlating `PAYMENT_RISK_*` webhook payloads.
+
+### See also
+
+[Get risk assessment](/api/risk-assessments/RadarController_findOne) · [lomi. Radar guide](/build/radar)
 
 
 ## Authentication

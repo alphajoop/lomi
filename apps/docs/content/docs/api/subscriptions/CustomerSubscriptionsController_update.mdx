@@ -11,9 +11,16 @@ operationId: CustomerSubscriptionsController_update
 
 Update customer subscription
 
+Patches a customer subscription (plan, metadata, or lifecycle fields supported by the API).
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `PATCH /customer-subscriptions/&#123;subscription_id&#125;` (Update customer subscription).
+Use for upgrades, downgrades, or syncing subscription state from your billing system.
+
+### See also
+
+[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)
 
 
 ## Authentication
@@ -50,7 +57,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

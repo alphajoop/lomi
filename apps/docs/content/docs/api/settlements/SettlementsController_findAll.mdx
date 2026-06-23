@@ -1,6 +1,6 @@
 ---
 title: "List settlement periods"
-description: "List settlement periods grouped by availability date and currency"
+description: "List settlement periods"
 full: true
 method: get
 path: /settlements
@@ -11,11 +11,12 @@ operationId: SettlementsController_findAll
 
 List settlement periods
 
-Returns completed payment totals grouped by `available_at` calendar date (UTC) and currency. Each `settlement_id` uses the format `{currency}:{YYYY-MM-DD}` (for example `XOF:2026-06-01`).
+Returns completed payment totals grouped by availability date (UTC) and currency. Each `settlement_id` uses `&#123;currency&#125;:&#123;YYYY-MM-DD&#125;`.
+
 
 ### When to use this
 
-Use for accounting reconciliation: see what became withdrawable on each date before requesting payouts.
+Use for accounting reconciliation before requesting payouts or exporting withdrawable totals by day.
 
 ### See also
 
@@ -41,15 +42,18 @@ Base URLs:
 
 _No path parameters beyond the URL pattern._
 
+
 ### Query parameters
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `start_date` | query | No | `string` (date) | Filter periods on or after this date (`YYYY-MM-DD`) |
-| `end_date` | query | No | `string` (date) | Filter periods on or before this date (`YYYY-MM-DD`) |
-| `currency` | query | No | `string` | Filter by currency code (`XOF`, `USD`, `EUR`) |
-| `page` | query | No | `integer` | Page number (default `1`) |
-| `pageSize` | query | No | `integer` | Page size (default `50`) |
+| `pageSize` | query | No | — |  |
+| `page` | query | No | — |  |
+| `currency` | query | No | — |  |
+| `end_date` | query | No | — |  |
+| `start_date` | query | No | — |  |
+
+
 
 ## Responses
 
@@ -59,12 +63,12 @@ _No path parameters beyond the URL pattern._
 
 ## Errors
 
-Errors follow the standard JSON error format. **401** indicates a missing/invalid key; **400** for invalid query parameters.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/settlements?start_date=2026-06-01&end_date=2026-06-30&page=1&pageSize=20" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements?pageSize=1&page=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 

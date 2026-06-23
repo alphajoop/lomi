@@ -1,6 +1,6 @@
 ---
-title: "Lister les transactions d’un règlement"
-description: "Lister les transactions d’une règlement"
+title: "List transactions in a settlement period"
+description: "List transactions in a settlement period"
 full: true
 method: get
 path: /settlements/{id}/transactions
@@ -9,17 +9,14 @@ operationId: SettlementsController_findTransactions
 
 ## Aperçu
 
-Lister les transactions d’un règlement
+List transactions in a settlement period
 
-Retourne les transactions complétées dont `available_at` tombe sur la date de règlement pour la devise donnée.
+Returns completed transactions whose available_at falls on the settlement date for the given currency.
 
-### Quand l'utiliser
 
-Voir le détail d'une règlement pour rapprocher les lignes avec les totaux de [Liste des règlements](/api/settlements/SettlementsController_findAll).
+### Quand l’utiliser
 
-### Voir aussi
-
-[Liste des règlements](/api/settlements/SettlementsController_findAll)
+Utilisez cet endpoint quand vous devez exécuter `GET /settlements/&#123;id&#125;/transactions` (List transactions in a settlement period).
 
 
 ## Authentification
@@ -30,8 +27,6 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 `GET /settlements/{id}/transactions`
 
-Le segment `id` est le `settlement_id` (`{currency}:{YYYY-MM-DD}`). Encodez les deux-points en URL (`XOF%3A2026-06-01`) si votre client HTTP l’exige.
-
 URLs de base :
 
 - `https://sandbox.api.lomi.africa`
@@ -39,33 +34,35 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
-| Nom | Emplacement | Obligatoire | Schéma | Description |
-| --- | --- | --- | --- | --- |
-| `id` | path | Oui | `string` | Identifiant de règlement, ex. `XOF:2026-06-01` |
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | Settlement id, format &#123;currency&#125;:&#123;YYYY-MM-DD&#125; |
 
 ### Paramètres de requête
 
 | Nom | Emplacement | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- | --- |
-| `page` | query | Non | `integer` | Numéro de page (défaut `1`) |
-| `pageSize` | query | Non | `integer` | Taille de page (défaut `50`) |
+| `pageSize` | query | Non | — |  |
+| `page` | query | Non | — |  |
+
+
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `200` | Transactions du règlement |
+| `200` | Transactions in settlement |
 
 ## Erreurs
 
-**400** pour un format `settlement_id` invalide. **401** en cas d’échec d’authentification.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/settlements/XOF%3A2026-06-01/transactions?page=1&pageSize=50" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements/value/transactions?pageSize=1&page=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
 

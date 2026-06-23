@@ -10,58 +10,23 @@ The Products API allows you to manage your product catalog. Products represent i
 
 ## Create a product
 
-Create a new product with one or more prices. At least one price is required.
+Create a product with one or more prices. At least one price is required.
 
-### Request Body
+**API reference (full request schema):** [Create product](/api/products/ProductsController_create)
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | `string` | **Yes** | Product name |
-| `description` | `string` | No | Product description |
-| `product_type` | `string` | **Yes** | `one_time`, `recurring`, or `usage_based` |
-| `images` | `array` | No | List of product image URLs |
-| `is_active` | `boolean` | No | Active status (default: `true`) |
-| `display_on_storefront` | `boolean` | No | Show on storefront (default: `true`) |
-| `prices` | `array` | **Yes** | Array of price objects (see below) |
-| `metadata` | `object` | No | Custom key-value pairs |
-| `fee_type_ids` | `array` | No | Fee type IDs to apply |
+**Essentials:**
 
-**Recurring Product Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `failed_payment_action` | `string` | Action on failed payment: `pause`, `cancel`, `continue` |
-| `charge_day` | `number` | Day of month to charge (1-31) |
-| `first_payment_type` | `string` | `initial`, `non_initial`, `prorated` |
-| `trial_enabled` | `boolean` | Enable trial period |
-| `trial_period_days` | `number` | Trial length in days |
+- `name`, `product_type` (`one_time`, `recurring`, `usage_based`), and a `prices` array are required.
+- Each price needs `amount` and `currency_code`. Recurring products also need `billing_interval` on the price.
+- Recurring-only fields: `trial_enabled`, `trial_period_days`, `failed_payment_action`, `charge_day`, `first_payment_type` — see the API page.
+- Usage-based products: `usage_aggregation`, `usage_unit` — see the API page.
 
 <Callout type="info">
   **Optional metadata** for recurring products (via `metadata` on create/update): `subscription_length` (`"automatic"` by default) and `fixed_charges` (integer number of billing cycles before expiry). These are not top-level API fields; store them in `metadata`.
 </Callout>
 
-**Usage-Based Product Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `usage_aggregation` | `string` | `sum`, `max`, `last_during_period`, `last_ever` |
-| `usage_unit` | `string` | Unit of measurement (e.g., `api_calls`) |
-
-### Price Object
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `amount` | `number` | **Yes** | Unit price (smallest currency unit). For `standard`/`tiered`: fixed price. For `pay_what_you_want`: **suggested** unit price pre-filled at checkout |
-| `currency_code` | `string` | **Yes** | `XOF`, `USD`, `EUR` |
-| `billing_interval` | `string` | No | `day`, `week`, `month`, `year` (required for recurring products) |
-| `pricing_model` | `string` | No | `standard` (default), `pay_what_you_want`, or `tiered` |
-| `minimum_amount` | `number` | PWYW | Required when `pricing_model` is `pay_what_you_want`, lowest unit price the customer may pay |
-| `maximum_amount` | `number` | No | Optional upper bound on unit price for `pay_what_you_want` |
-| `is_default` | `boolean` | No | Set as default price |
-| `metadata` | `object` | No | Optional metadata on the price |
-
 <Callout type="info">
-  For `pay_what_you_want`: `minimum_amount` is required; `amount` is the suggested unit price (defaults to `minimum_amount` if omitted). Ensure `amount >= minimum_amount`, and when `maximum_amount` is set, `amount <= maximum_amount`. The server enforces these rules on create and add-price. For `standard` and `tiered`, omit `minimum_amount` and `maximum_amount`.
+  **Pay what you want** (`pricing_model: pay_what_you_want`, one-time only): `minimum_amount` is required; `amount` is the suggested unit price. The server enforces `amount >= minimum_amount` and optional `maximum_amount`. Full price fields: [Create product](/api/products/ProductsController_create).
 </Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
@@ -219,15 +184,7 @@ curl -X POST "https://api.lomi.africa/products" \
 
 ## List products
 
-Retrieve all products with optional filtering.
-
-### Query Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `isActive` | `boolean` | Filter by active status |
-| `limit` | `number` | Results per page (default: `15`) |
-| `offset` | `number` | Pagination offset (default: `0`) |
+**API reference:** [List products](/api/products/ProductsController_findAll) — supports `isActive`, `limit`, and `offset`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -259,7 +216,7 @@ curl -X GET "https://api.lomi.africa/products?isActive=true&limit=20" \
 
 ## Get a product
 
-Retrieve product details including all prices.
+**API reference:** [Get product](/api/products/ProductsController_findOne) — returns the product with all prices.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -289,7 +246,7 @@ curl -X GET "https://api.lomi.africa/products/prod_abc123..." \
 
 ## Add a price to a product
 
-Add a new price option to an existing product.
+**API reference:** [Add price](/api/products/ProductsController_addPrice)
 
 <Callout type="warning">
   Products can have a maximum of **3 active prices**. You cannot modify existing prices, create a new one instead.
@@ -347,7 +304,7 @@ curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices" \
 
 ## Set default price
 
-Set a specific price as the default for a product.
+**API reference:** [Set default price](/api/products/ProductsController_setDefaultPrice)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -374,40 +331,11 @@ curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices/price_def45
 
 ---
 
-## Product Object
+## Related API
 
-Returned shapes match the API product resource (see OpenAPI **Products**). Common fields:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `product_id` | `string` | Unique product identifier |
-| `organization_id` | `string` | Owning organization |
-| `name` | `string` | Product name |
-| `description` | `string` \| `null` | Product description |
-| `product_type` | `string` | `one_time`, `recurring`, `usage_based` |
-| `images` | `array` \| `null` | Product image URLs |
-| `is_active` | `boolean` | Active status |
-| `display_on_storefront` | `boolean` | Storefront visibility |
-| `prices` | `array` | Price objects (`price_id`, `amount`, `currency_code`, `billing_interval`, `pricing_model`, `minimum_amount`, `maximum_amount`, `is_active`, `is_default`, `metadata`, timestamps) |
-| `fees` | `array` | Associated fee rows (when present) |
-| `environment` | `string` | `test` or `live` |
-| `failed_payment_action` | `string` \| `null` | Recurring: `pause`, `cancel`, `continue` |
-| `charge_day` | `number` \| `null` | Recurring charge day (1–31) |
-| `first_payment_type` | `string` \| `null` | `initial`, `non_initial`, `prorated` |
-| `trial_enabled` | `boolean` | Trial enabled |
-| `trial_period_days` | `number` \| `null` | Trial length |
-| `usage_aggregation` | `string` \| `null` | Usage-based products |
-| `usage_unit` | `string` \| `null` | Usage-based products |
-| `metadata` | `object` \| `null` | Custom metadata |
-| `created_at` | `string` | Creation timestamp |
-| `updated_at` | `string` | Last update timestamp |
-
----
-
-## Error Responses
-
-| Status | Description |
-|--------|-------------|
-| `400` | Invalid input or max prices exceeded |
-| `401` | Invalid or missing API key |
-| `404` | Product or price not found |
+- [Create product](/api/products/ProductsController_create)
+- [List products](/api/products/ProductsController_findAll)
+- [Get product](/api/products/ProductsController_findOne)
+- [Add price](/api/products/ProductsController_addPrice)
+- [Set default price](/api/products/ProductsController_setDefaultPrice)
+- [Checkout with a product](/build/checkout)

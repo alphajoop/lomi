@@ -9,15 +9,7 @@ import { Callout } from '@/components/docs/docs-callout';
 Hosted checkout is the recommended first integration for most teams. Your server creates a session, your customer pays on a lomi.-hosted page, and your system confirms the result.
 
 <Callout type="info">
-  For cross-cutting rules (coupons, line items, currency, links to payment state), see **[Checkout behavior](/build/payments/checkout-behavior)**.
-</Callout>
-
-<Callout type="info">
-  Checkout sessions expire after **60 minutes** by default.
-</Callout>
-
-<Callout type="info">
-  Sessions created with a **test** API key (or linked to a test payment link) run in test mode. For manual QA-test cards, Wave, MTN MoMo, see **[Sandbox payments](/start/sandbox-payments)**.
+  **Good to know:** Sessions expire after **60 minutes** by default. Test keys run in [sandbox mode](/start/sandbox-payments). Cross-cutting rules (coupons, line items, payment state) live in **[Checkout behavior](/build/payments/checkout-behavior)**.
 </Callout>
 
 ## When to use hosted checkout
@@ -32,33 +24,21 @@ Use hosted checkout when you want:
 
 ## Create a checkout session
 
-Creates a new checkout session and returns a URL to redirect your customer to.
+Your server calls `POST /checkout-sessions` and redirects the customer to `checkout_url`.
 
-### Request Body
+**API reference (full request schema):** [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create)
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `amount` | `number` | No* | Product subtotal (unit × quantity, excluding fees). For standard prices: must match catalog price. For PWYW: unit amount must be within `[minimum_amount, maximum_amount]` |
-| `currency_code` | `string` | **Yes** | Currency code (`XOF`, `USD`, `EUR`) |
-| `title` | `string` | No | Title shown on checkout page |
-| `description` | `string` | No | Description of the purchase |
-| `customer_id` | `string` | No | Existing customer ID |
-| `customer_email` | `string` | No | Customer email (pre-fills form) |
-| `customer_name` | `string` | No | Customer name (pre-fills form) |
-| `customer_phone` | `string` | No | Customer phone (pre-fills form) |
-| `product_id` | `string` | No | Product ID (amount calculated from product price; PWYW bounds enforced when amount is provided) |
-| `price_id` | `string` | No | Specific price ID if product has multiple prices (PWYW validation uses this price row) |
-| `subscription_id` | `string` | No | Subscription ID for renewals/modifications |
-| `quantity` | `number` | No | Quantity (default: `1`) |
-| `allow_quantity` | `boolean` | No | Allow customer to change quantity |
-| `success_url` | `string` | No | Redirect URL on successful payment |
-| `cancel_url` | `string` | No | Redirect URL if payment cancelled |
-| `allow_coupon_code` | `boolean` | No | Allow discount codes (default: `false`) |
-| `require_billing_address` | `boolean` | No | Require billing address (default: `true`) |
-| `payment_link_id` | `string` | No | Associated payment link ID |
-| `metadata` | `object` | No | Custom key-value pairs |
+**Essential fields:**
 
-*`amount` is required unless `product_id` is provided.
+| Field | Notes |
+| --- | --- |
+| `currency_code` | Required — `XOF`, `USD`, or `EUR` |
+| `amount` | Required unless you pass `product_id` or `line_items` |
+| `product_id` / `price_id` | Catalog-backed checkout; amount derived from the price |
+| `success_url` / `cancel_url` | Where to send the customer after pay or cancel |
+| `customer_email` | Optional — pre-fills the hosted form |
+
+Pass `metadata` for your own order IDs. See the API page for every optional field.
 
 ### Pay what you want products
 

@@ -1,6 +1,6 @@
 ---
-title: "Lister les litiges"
-description: "Lister les litiges"
+title: "List disputes"
+description: "List disputes"
 full: true
 method: get
 path: /disputes
@@ -9,11 +9,18 @@ operationId: DisputesController_findAll
 
 ## Overview
 
-Lister les litiges
+List disputes
+
+Returns card payment disputes for your organization with optional status and date filters.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /disputes` (Lister les litiges).
+Use for support queues, reconciliation, and automation on `DISPUTE_*` webhooks.
+
+### See also
+
+[Get dispute](/api/disputes/DisputesController_findOne) · [Disputes guide](/build/disputes)
 
 
 ## Authentication
@@ -58,7 +65,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | Liste des litiges |
+| `200` | Success |
 
 ## Errors
 

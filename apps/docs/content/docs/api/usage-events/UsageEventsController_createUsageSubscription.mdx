@@ -11,12 +11,16 @@ operationId: UsageEventsController_createUsageSubscription
 
 Create a usage subscription
 
-Enrolls a customer on a usage_based product without an upfront charge. Required before billing metered usage.
+Enrolls a customer on a `usage_based` product without an upfront charge. Required before billing metered usage to that customer.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /usage-subscriptions` (Create a usage subscription).
+After creating a usage-based product and meter—enroll each customer before sending usage events tied to a subscription.
+
+### See also
+
+[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage)
 
 
 ## Authentication
@@ -53,7 +57,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `201` | — |
+| `201` | Created successfully |
 
 ## Errors
 

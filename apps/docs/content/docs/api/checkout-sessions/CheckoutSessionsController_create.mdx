@@ -60,7 +60,7 @@ _No query parameters._
 
 ### Request body
 
-Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.
+Session payload: provide `amount` (and optional product fields) or `line_items` for a multi-product cart.
 
 Schema: `object`
 
@@ -104,9 +104,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Session de paiement créée avec succès |
-| `400` | Entrée invalide ou erreur de validation |
-| `401` | Clé API invalide ou manquante |
+| `201` | Created successfully |
+| `400` | Bad request — invalid or missing parameters |
+| `401` | Invalid or missing API key |
 
 ## Errors
 

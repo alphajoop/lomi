@@ -11,9 +11,16 @@ operationId: MerchantsController_getArr
 
 Get merchant ARR
 
+Returns annualized recurring revenue for the merchant tied to the given ID.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /merchants/&#123;id&#125;/arr` (Get merchant ARR).
+Use for annual planning views when you track merchants individually.
+
+### See also
+
+[Merchant MRR](/api/merchants/MerchantsController_getMrr)
 
 
 ## Authentication
@@ -48,7 +55,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

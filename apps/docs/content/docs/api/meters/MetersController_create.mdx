@@ -11,12 +11,16 @@ operationId: MetersController_create
 
 Create a meter
 
-Defines a billable metric for usage-based products. Events with matching code update meter balances.
+Defines a billable metric for usage-based products. Events with a matching `code` update meter balances when processed.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /meters` (Create a meter).
+First step in usage billing: create a meter before ingesting usage events or enrolling customers on usage-based products.
+
+### See also
+
+[Usage billing guide](/build/usage-billing) · [Record usage event](/api/usage-events/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)
 
 
 ## Authentication
@@ -53,7 +57,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `201` | — |
+| `201` | Created successfully |
 
 ## Errors
 

@@ -9,15 +9,7 @@ import { Callout } from '@/components/docs/docs-callout';
 Le checkout hébergé est l’intégration recommandée pour la plupart des équipes. Votre serveur crée une session, le client paie sur une page hébergée par lomi., puis votre système confirme le résultat.
 
 <Callout type="info">
-  Pour les règles transverses (codes promo, lignes, devise, lien avec l’état du paiement), voir **[Comportement du tunnel](/build/payments/checkout-behavior)**.
-</Callout>
-
-<Callout type="info">
-  Les sessions de paiement expirent par défaut après **60 minutes**.
-</Callout>
-
-<Callout type="info">
-  Les sessions créées avec une clé API **test** (ou liées à un lien de paiement test) s’exécutent en mode test. Pour la QA manuelle, cartes de test, Wave, MTN MoMo, voir **[Paiements en bac à sable](/start/sandbox-payments)**.
+  **À savoir :** les sessions expirent par défaut après **60 minutes**. Les clés test s’exécutent en [mode sandbox](/start/sandbox-payments). Règles transverses (codes promo, lignes, état du paiement) : **[Comportement du tunnel](/build/payments/checkout-behavior)**.
 </Callout>
 
 ## Quand utiliser le checkout hébergé ?
@@ -32,33 +24,21 @@ Utilisez-le si vous voulez :
 
 ## Créer une session de paiement
 
-Crée une session et renvoie une URL pour rediriger le client.
+Votre serveur appelle `POST /checkout-sessions` et redirige le client vers `checkout_url`.
 
-### Corps de la requête
+**Référence API (schéma complet) :** [Créer une session de checkout](/api/checkout-sessions/CheckoutSessionsController_create)
 
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `amount` | `number` | Non* | Sous-total produit (unité × quantité, hors frais). Pour tarifs standard : doit correspondre au catalogue. Pour PWYW : le prix unitaire doit être dans `[minimum_amount, maximum_amount]` |
-| `currency_code` | `string` | **Oui** | Code devise (`XOF`, `USD`, `EUR`) |
-| `title` | `string` | Non | Titre affiché sur le tunnel |
-| `description` | `string` | Non | Description de l’achat |
-| `customer_id` | `string` | Non | Identifiant client existant |
-| `customer_email` | `string` | Non | E-mail (préremplit le formulaire) |
-| `customer_name` | `string` | Non | Nom (préremplit le formulaire) |
-| `customer_phone` | `string` | Non | Téléphone (préremplit le formulaire) |
-| `product_id` | `string` | Non | ID produit (montant calculé à partir du tarif ; bornes PWYW appliquées si `amount` est fourni) |
-| `price_id` | `string` | Non | Tarif précis si le produit en a plusieurs (validation PWYW sur cette ligne de tarif) |
-| `subscription_id` | `string` | Non | ID d’abonnement pour renouvellements ou modifications |
-| `quantity` | `number` | Non | Quantité (défaut : `1`) |
-| `allow_quantity` | `boolean` | Non | Autoriser le client à modifier la quantité |
-| `success_url` | `string` | Non | URL de redirection après paiement réussi |
-| `cancel_url` | `string` | Non | URL de redirection si le paiement est annulé |
-| `allow_coupon_code` | `boolean` | Non | Autoriser les codes de réduction (défaut : `false`) |
-| `require_billing_address` | `boolean` | Non | Exiger l’adresse de facturation (défaut : `true`) |
-| `payment_link_id` | `string` | Non | ID du lien de paiement associé |
-| `metadata` | `object` | Non | Paires clé-valeur personnalisées |
+**Champs essentiels :**
 
-*`amount` est requis sauf si `product_id` est fourni.
+| Champ | Notes |
+| --- | --- |
+| `currency_code` | Obligatoire — `XOF`, `USD` ou `EUR` |
+| `amount` | Obligatoire sauf si vous passez `product_id` ou `line_items` |
+| `product_id` / `price_id` | Checkout catalogue ; montant dérivé du tarif |
+| `success_url` / `cancel_url` | Redirection après paiement ou annulation |
+| `customer_email` | Optionnel — préremplit le formulaire hébergé |
+
+Passez `metadata` pour vos propres identifiants de commande. Voir la page API pour tous les champs optionnels.
 
 ### Produits « payez ce que vous voulez »
 

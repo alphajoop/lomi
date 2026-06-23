@@ -11,12 +11,16 @@ operationId: MetersController_getBalance
 
 Get meter balance for a customer
 
-Returns aggregated consumed units for the meter and customer.
+Returns consumed, credited, and net balance units for a customer on a specific meter.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /meters/&#123;id&#125;/balances/&#123;customerId&#125;` (Get meter balance for a customer).
+Use for prepaid wallets, usage dashboards, or entitlement checks before granting access.
+
+### See also
+
+[Credit wallet](/api/usage-billing/UsageBillingController_creditWallet) · [Record usage event](/api/usage-events/UsageEventsController_ingest)
 
 
 ## Authentication
@@ -50,7 +54,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

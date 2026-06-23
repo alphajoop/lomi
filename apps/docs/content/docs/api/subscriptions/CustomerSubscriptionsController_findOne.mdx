@@ -1,6 +1,6 @@
 ---
-title: "Get customer subscription"
-description: "Get customer subscription"
+title: "Retrieve customer subscription"
+description: "Retrieve customer subscription"
 full: true
 method: get
 path: /customer-subscriptions/{subscription_id}
@@ -9,11 +9,14 @@ operationId: CustomerSubscriptionsController_findOne
 
 ## Overview
 
-Get customer subscription
+Retrieve customer subscription
+
+Returns one customer-scoped subscription by ID. Responds with **404** when unknown or inaccessible.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /customer-subscriptions/&#123;subscription_id&#125;` (Get customer subscription).
+Use on portal backends or before patching/canceling a single buyer plan.
 
 
 ## Authentication
@@ -48,7 +51,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

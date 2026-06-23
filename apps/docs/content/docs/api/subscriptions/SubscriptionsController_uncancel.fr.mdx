@@ -1,6 +1,6 @@
 ---
 title: "Annuler une résiliation planifiée"
-description: "Retire une résiliation planifiée en fin de période"
+description: "Annuler une résiliation planifiée"
 full: true
 method: post
 path: /subscriptions/{id}/uncancel
@@ -9,15 +9,15 @@ operationId: SubscriptionsController_uncancel
 
 ## Aperçu
 
-Retire une résiliation planifiée en fin de période (`cancel_at_period_end`) pour que l’abonnement continue de se renouveler.
+Annuler une résiliation planifiée
 
-### Quand l'utiliser
+Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).
 
-Utilisez cet endpoint lorsqu’un client souhaite conserver son abonnement avant la fin de la période en cours.
 
-### Voir aussi
+### Quand l’utiliser
 
-[Résilier un abonnement](/api/subscriptions/SubscriptionsController_cancel)
+Utilisez cet endpoint quand vous devez exécuter `POST /subscriptions/&#123;id&#125;/uncancel` (Annuler une résiliation planifiée).
+
 
 ## Authentification
 
@@ -34,38 +34,44 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
-| `id` | Oui | `string` (uuid) | UUID de l’abonnement |
+| `id` | Oui | — | UUID de l’abonnement |
 
-### Corps de requête
+### Paramètres de requête
 
-_Aucun corps de requête._
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+_Pas de corps JSON pour cette opération._
+
 
 ## Réponses
 
 | Statut | Description |
 | --- | --- |
-| `200` | Abonnement mis à jour |
-| `401` | Clé API invalide ou manquante |
-| `404` | Abonnement introuvable ou accès refusé |
+| `200` | — |
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code HTTP et message d'erreur). Validez les entrées avant l’appel ; **401** indique une clé manquante ou invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/{id}/uncancel" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/uncancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
 ```
 
 ## OpenAPI
 
-- **operationId** : `SubscriptionsController_uncancel`
-- **Opération** : `POST /subscriptions/{id}/uncancel`
+- **operationId**: `SubscriptionsController_uncancel`
+- **Operation**: `POST /subscriptions/{id}/uncancel`
 
-Schémas complets et **Essayer** : [Référence API](/api).
+Schémas complets et **Try it** : [référence API](/api).

@@ -1,6 +1,6 @@
 ---
-title: "Credit prepaid usage units to a customer meter wallet"
-description: "Credit prepaid usage units to a customer meter wallet"
+title: "Credit prepaid usage units"
+description: "Credit prepaid usage units"
 full: true
 method: post
 path: /usage-billing/credits
@@ -9,11 +9,18 @@ operationId: UsageBillingController_creditWallet
 
 ## Overview
 
-Credit prepaid usage units to a customer meter wallet
+Credit prepaid usage units
+
+Adds credited units to a customer meter wallet (prepaid or promotional credits).
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `POST /usage-billing/credits` (Credit prepaid usage units to a customer meter wallet).
+Use for prepaid packs, promotions, or manual adjustments before usage draws down balance.
+
+### See also
+
+[Get meter balance](/api/meters/MetersController_getBalance) · [Record usage event](/api/usage-events/UsageEventsController_ingest)
 
 
 ## Authentication
@@ -50,7 +57,7 @@ _No application/json body for this operation._
 
 | Status | Description |
 | --- | --- |
-| `201` | — |
+| `201` | Created successfully |
 
 ## Errors
 

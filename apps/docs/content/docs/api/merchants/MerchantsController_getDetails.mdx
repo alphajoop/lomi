@@ -11,12 +11,16 @@ operationId: MerchantsController_getDetails
 
 Get merchant details
 
-Returns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.
+Returns merchant profile data and organization-level revenue metrics for the given merchant ID.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /merchants/&#123;id&#125;` (Get merchant details).
+Use when your integration still references a merchant ID or you need legacy merchant-scoped reads.
+
+### See also
+
+[Organizations](/build/platform/organizations) · [Merchant ARR](/api/merchants/MerchantsController_getArr)
 
 
 ## Authentication
@@ -51,7 +55,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 | `403` | Merchant ID mismatch |
 | `404` | Merchant not found |
 

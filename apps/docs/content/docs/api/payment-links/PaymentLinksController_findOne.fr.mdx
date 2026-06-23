@@ -14,9 +14,9 @@ Obtenir un lien de paiement par ID
 Renvoie le détail d’un lien (URL, configuration et statut).
 
 
-### Quand l'utiliser
+### Quand l’utiliser
 
-Utilisez cet endpoint pour `GET /payment-links/&#123;id&#125;` (Obtenir un lien de paiement par ID).
+Utilisez cet endpoint quand vous devez exécuter `GET /payment-links/&#123;id&#125;` (Obtenir un lien de paiement par ID).
 
 
 ## Authentification
@@ -34,7 +34,7 @@ URLs de base :
 
 ## Requête
 
-### Paramètres de chemin
+### Paramètres d’URL
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
@@ -57,7 +57,7 @@ _Aucun paramètre de requête._
 
 ## Erreurs
 
-Les erreurs suivent le format JSON standard (code de statut et message d'erreur). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limite de requêtes. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
 
 ## Exemple
 

@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un litige"
-description: "Obtenir un litige"
+title: "Get dispute"
+description: "Get dispute"
 full: true
 method: get
 path: /disputes/{id}
@@ -9,11 +9,18 @@ operationId: DisputesController_findOne
 
 ## Overview
 
-Obtenir un litige
+Get dispute
+
+Returns a single dispute by ID, including linked transaction and customer snapshot fields.
+
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /disputes/&#123;id&#125;` (Obtenir un litige).
+Use after `DISPUTE_CREATED` or when drilling into a row from the disputes list.
+
+### See also
+
+[List disputes](/api/disputes/DisputesController_findAll) · [Disputes guide](/build/disputes)
 
 
 ## Authentication
@@ -54,7 +61,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Détail du litige |
+| `200` | Success |
 
 ## Errors
 

@@ -11,9 +11,16 @@ operationId: UsageEventsController_findAll
 
 List usage events
 
+Lists ingested usage events with pagination and optional filters for customer, code, and processing status.
+
+
 ### When to use this
 
-Use this endpoint when your flow needs `GET /usage-events` (List usage events).
+Use for support, reconciliation, or debugging failed usage ingest.
+
+### See also
+
+[Record usage event](/api/usage-events/UsageEventsController_ingest) · [Get usage event](/api/usage-events/UsageEventsController_findOne)
 
 
 ## Authentication
@@ -52,7 +59,7 @@ _No path parameters beyond the URL pattern._
 
 | Status | Description |
 | --- | --- |
-| `200` | — |
+| `200` | Success |
 
 ## Errors
 

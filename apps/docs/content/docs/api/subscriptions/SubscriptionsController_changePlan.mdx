@@ -1,6 +1,6 @@
 ---
 title: "Change subscription plan"
-description: "Update the price on an active subscription"
+description: "Change subscription plan"
 full: true
 method: post
 path: /subscriptions/{id}/change-plan
@@ -9,15 +9,19 @@ operationId: SubscriptionsController_changePlan
 
 ## Overview
 
-Updates the `price_id` on an active subscription (upgrade or downgrade).
+Change subscription plan
+
+Updates the `price_id` on an active subscription for upgrades or downgrades.
+
 
 ### When to use this
 
-Use when a customer moves to a different recurring price on the same product line.
+Use when moving a customer to a different recurring price on the same product line.
 
 ### See also
 
-[Update subscription](/api/subscriptions/SubscriptionsController_update)
+[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Update subscription](/api/subscriptions/SubscriptionsController_update)
+
 
 ## Authentication
 
@@ -38,43 +42,49 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | `string` (uuid) | Subscription UUID |
+| `id` | Yes | — | UUID de l’abonnement |
+
+### Query parameters
+
+_No query parameters._
+
 
 ### Request body
 
 JSON request payload.
 
+Schema: `object`
+
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `price_id` | Yes | `string` (uuid) | Target price UUID |
+| `price_id` | Yes | `string` | — |
 
 Example body:
 
 ```json
 {
-  "price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  "price_id": "string"
 }
 ```
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Subscription updated |
-| `401` | Invalid or missing API key |
-| `404` | Subscription not found or access denied |
+| `200` | Success |
 
 ## Errors
 
-Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/{id}/change-plan" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/change-plan" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"price_id":"3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
+  -d '{"price_id":"string"}'
 ```
 
 ## OpenAPI
