@@ -147,6 +147,14 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     related:
       '[Ajouter un prix produit](/api/products/ProductsController_addPrice)',
   },
+  RefundsController_create: {
+    whenToUse:
+      'Pour annuler tout ou partie d’un paiement éligible déjà terminé (remboursement total ou partiel).',
+    caveats:
+      '**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable — pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.',
+    related:
+      '[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Remboursements](/build/refunds)',
+  },
   RefundsController_findAll: {
     whenToUse: 'Utilisez pour réconciliation, support et tableaux de bord.',
     related:
