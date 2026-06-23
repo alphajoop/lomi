@@ -23,7 +23,20 @@ Les noms d’en-têtes sont insensibles à la casse : `` `X-API-Key` `` ou `` `
 
 Remplacez `your_api_key` par votre clé secrète.
 
-## Test et production
+## Ciblage de compte réseau
+
+Les opérateurs lomi. Network approuvés peuvent cibler un compte membre connecté en ajoutant l’en-tête optionnel `` `Lomi-Account` ``.
+
+```http filename="Network request header"
+POST /checkout-sessions HTTP/1.1
+Host: api.lomi.africa
+X-API-Key: your_operator_api_key
+Lomi-Account: acct_1234567890
+```
+
+Sans `` `Lomi-Account` ``, les requêtes se comportent comme des appels API marchands classiques. Avec cet en-tête, la clé API identifie l’opérateur et le compte `` `acct_...` `` est le compte membre ciblé. Voir **[lomi. Network](/resources/network)** pour les endpoints pris en charge et les capacités requises.
+
+## Environnements test et production
 
 ### Environnement de test
 

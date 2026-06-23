@@ -309,6 +309,63 @@ curl -X GET "https://api.lomi.africa/customers/cus_abc123.../transactions" \
 
 ---
 
+## Créer une session de lancement portail client
+
+Génère une URL portail client hébergée à usage unique pour un client de votre organisation.
+
+- Endpoint : `POST /customers/{id}/portal-launch-session`
+- Appelant prévu : backend marchand (auth clé API)
+- Sortie : `launch_url` + `launch_token` + métadonnées de flux
+
+Utilisez ceci pour une passation hébergée depuis votre produit vers le portail client.
+
+<Tabs items={["TypeScript", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import axios from 'axios';
+
+const { data: launch } = await axios.post(
+  'https://api.lomi.africa/customers/cus_abc123.../portal-launch-session',
+  {
+    return_url: 'https://merchant.example.com/account',
+    flow_type: 'subscription_cancel',
+    flow_subscription_id: 'sub_abc123...',
+    flow_after_completion_url:
+      'https://merchant.example.com/account/subscription-cancelled',
+  },
+  {
+    headers: {
+      'X-API-KEY': process.env.LOMI_API_KEY!,
+      'Content-Type': 'application/json',
+    },
+  },
+);
+
+window.location.href = launch.launch_url;
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-session" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "return_url": "https://merchant.example.com/account",
+    "flow_type": "subscription_cancel",
+    "flow_subscription_id": "sub_abc123...",
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+Voir le flux complet et les conseils production dans [Portail client](/build/customer-portal).
+
+---
+
 ## Objet Customer
 
 | Champ | Type | Description |

@@ -1,9 +1,11 @@
 ---
 title: 'Serveur de développement local'
-description: 'Lancez lomi dev pour recevoir et inspecter les événements webhook sur votre machine.'
+description: 'Lancez lomi dev pour recevoir et inspecter les événements webhook sur votre machine pendant le développement.'
 ---
 
-La commande `lomi dev` démarre un serveur HTTP léger qui reçoit les webhooks POST et affiche les événements dans le terminal.
+La commande `lomi dev` démarre un serveur HTTP léger qui reçoit les requêtes POST webhook et affiche les événements dans le terminal.
+
+Pour de vrais webhooks sandbox sans ngrok, préférez [`lomi listen`](/build/cli/listen).
 
 Nécessite [`lomi login`](/build/cli/auth).
 
@@ -13,42 +15,75 @@ Nécessite [`lomi login`](/build/cli/auth).
 lomi dev
 ```
 
-URL par défaut : **`http://localhost:4242/webhook`**
+URL par défaut : **`http://localhost:4242/webhook`**
 
 ### Options
 
 | Option | Défaut | Description |
 | --- | --- | --- |
-| `-p, --port` | `4242` | Port du serveur |
-| `--env-file` | `.env` | Fichier dotenv |
-| `--verify-signature` | `false` | Vérifier `lomi-signature` via `LOMI_WEBHOOK_SECRET` |
+| `-p, --port` | `4242` | Port du serveur HTTP |
+| `--env-file` | `.env` | Fichier dotenv à charger |
+| `--verify-signature` | auto si `LOMI_WEBHOOK_SECRET` est défini | Vérifier `X-Lomi-Signature` avec `LOMI_WEBHOOK_SECRET` |
+| `--skip-rules-install` | - | Ignorer l’invite d’installation des règles agent |
+
+```bash filename="Terminal"
+lomi dev --port 3000
+lomi dev --verify-signature
+```
 
 ## Endpoints
 
 | Méthode | Chemin | Description |
 | --- | --- | --- |
-| `POST` | `/webhook` | Réception des événements |
+| `POST` | `/webhook` | Reçoit les charges utiles d’événements webhook |
 | `GET` | `/health` | Retourne `ok` |
 
 ## Test local
 
+<Steps>
+
+### Démarrer le serveur de dev
+
 ```bash filename="Terminal"
 lomi dev
+```
 
+### Envoyer un événement de test
+
+```bash filename="Terminal"
 curl -X POST http://localhost:4242/webhook \
   -H "Content-Type: application/json" \
   -d '{"type":"test.event","data":{}}'
 ```
 
-Pour des tests bout en bout, exposez le serveur via un tunnel (ngrok) et enregistrez l’URL dans le portail marchand.
+Le CLI affiche le type d’événement et la charge utile dans le terminal.
+
+### Recevoir de vrais événements sandbox (recommandé)
+
+```bash filename="Terminal"
+lomi listen http://localhost:4242/webhook
+```
+
+</Steps>
 
 ## Vérification de signature
 
-Avec `--verify-signature`, le serveur valide l’en-tête `lomi-signature` contre `LOMI_WEBHOOK_SECRET` du `.env`.
+Lorsque la vérification est activée, le serveur valide l’en-tête `X-Lomi-Signature` contre `LOMI_WEBHOOK_SECRET` de votre fichier `.env`.
 
-Voir [Gérer les webhooks](/build/advanced-guides/handling-webhooks) et [Référence webhooks](/build/webhooks).
+Assurez-vous que `LOMI_WEBHOOK_SECRET` est défini avant d’activer la vérification :
+
+```dotenv filename=".env"
+LOMI_WEBHOOK_SECRET=whsec_your_secret_here
+```
+
+Pour les modèles de traitement webhook en production, voir [Traiter les webhooks](/build/advanced-guides/handling-webhooks) et [Référence webhooks](/build/webhooks).
+
+## Lien avec `lomi init`
+
+Après [`lomi init`](/build/cli/init), `lomi dev` charge les identifiants depuis le `.env` du projet. L’exemple généré `examples/webhook-handler.ts` montre comment implémenter la vérification dans votre propre code.
 
 ## Suite
 
-- [Initialiser un projet](/build/cli/init)
-- [Webhooks](/build/webhooks)
+- [Traiter les webhooks](/build/advanced-guides/handling-webhooks)
+- [Fiabilité des webhooks](/build/advanced-guides/webhook-reliability)
+- [Référence webhooks](/build/webhooks)

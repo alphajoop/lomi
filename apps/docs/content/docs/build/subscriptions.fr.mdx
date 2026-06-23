@@ -15,8 +15,54 @@ L’API Subscriptions permet de lister et récupérer des **instances d’abonne
 </Callout>
 
 <Callout type="info">
-  Pour les parcours d’inscription (essais, types de premier paiement, montants de session), voir **[Comportement du tunnel: Abonnements](/build/payments/checkout-behavior)**.
+  Pour les parcours d’inscription (essais, types de premier paiement, montants de session), voir **[Comportement du tunnel : Abonnements](/build/payments/checkout-behavior#subscription-checkout)**.
 </Callout>
+
+## Comment les abonnements sont créés
+
+Les instances d’abonnement sont créées lorsqu’un client achète un **produit récurrent** via :
+
+- [Checkout hébergé](/build/checkout) ou [liens de paiement](/build/payment-links) avec un `product_id` récurrent
+- Votre parcours d’inscription vitrine
+
+Il n’existe pas d’API autonome « créer un abonnement » pour l’inscription : le checkout ou le lien crée l’instance après le premier paiement réussi (ou les règles d’essai du produit).
+
+Surveillez les **événements webhook** pour suivre les confirmations de paiement à chaque cycle. Écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` liés au renouvellement ; voir [Comportement du tunnel : Abonnements](/build/payments/checkout-behavior#subscription-checkout).
+
+## Renouvellements et paiements échoués
+
+lomi. utilise **deux chemins de renouvellement**, selon le moyen de paiement du client :
+
+### Abonnements carte (automatique)
+
+Lorsque l’inscription a enregistré une carte (`provider_customer_id` + `provider_payment_method_id`), les renouvellements s’exécutent **hors session** à `next_billing_date`. Un job quotidien débite la carte enregistrée et enregistre la transaction de renouvellement.
+
+- Webhook : **`SUBSCRIPTION_RENEWED`** en cas de succès
+- Webhook : **`PAYMENT_FAILED`** en cas d’échec de renouvellement (avec relances processeur / dunning si configuré)
+
+### Abonnements Wave / MTN (checkout de renouvellement manuel)
+
+Le mobile money n’expose pas de jeton hors session comme les cartes. Sans moyen de paiement carte, lomi. **ne débite pas automatiquement** le portefeuille. À la place :
+
+1. Des **crons de notification** envoient par e-mail ou message un **lien checkout de renouvellement hébergé** avant `next_billing_date`.
+2. Le client paie sur ce lien ; les webhooks confirment le cycle.
+3. Si le client ne paie pas à temps, le **traitement des impayés** peut passer l’abonnement en `past_due`, `paused` ou `cancelled` selon `failed_payment_action` du produit.
+
+Cela correspond au fonctionnement des rails mobile money en production (approbation PIN, pas de mandat permanent). C’est intentionnel, pas une fonctionnalité carte manquante.
+
+<Callout type="info">
+  **Raccourci support :** « Pourquoi mon abonnement Wave ne s’est pas débité automatiquement ? » → Les renouvellements mobile money exigent que le client ouvre le lien de renouvellement et approuve le paiement. Les cartes se renouvellent automatiquement si un moyen de paiement a été enregistré à l’inscription.
+</Callout>
+
+Votre intégration doit :
+
+1. **Écouter `SUBSCRIPTION_RENEWED`** : cycle facturé avec succès ; prolonger l’accès ou envoyer un reçu.
+2. **Écouter `PAYMENT_FAILED`** sur les transactions de renouvellement : le client peut devoir payer via le lien de renouvellement ou mettre à jour une carte dans le [portail client](/build/customer-portal).
+3. **Interroger ou lister les abonnements** via `GET /subscriptions` ou `GET /customer-subscriptions` si les webhooks sont retardés ; utilisez uniquement `status` et `next_billing_date` de la réponse API.
+
+Annulez ou mettez en pause via `POST /subscriptions/{id}/cancel` ou `PATCH /subscriptions/{id}` comme documenté dans l’[API Abonnements](/api/subscriptions).
+
+Pour les produits **à l’usage / facturation à la consommation** (appels API, crédits, sièges), voir **[Facturation à l’usage](/build/usage-billing)** — les abonnements metered sont distincts des abonnements récurrents checkout.
 
 ## Lister les abonnements
 
@@ -208,8 +254,10 @@ console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
 
 <Tab value="Python">
 ```python
+# Annuler immédiatement
 cancelled = client.subscriptions.cancel('sub_abc123...')
 
+# Annuler en fin de période
 scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
     "cancel_at_period_end": True,
     "cancellation_reason": "Customer requested cancellation"

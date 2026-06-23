@@ -52,28 +52,60 @@ Variable `LOMI_CONFIG_DIR` pour surcharger le répertoire.
 
 </Steps>
 
+<Callout type="info" emoji="💡" title="Différent de LOMI_API_KEY">
+  Le jeton CLI issu de `lomi login` authentifie les **commandes CLI**. La clé API secrète de votre application (`LOMI_API_KEY` dans `.env`) se configure séparément via [`lomi init`](/build/cli/init).
+</Callout>
+
 ## Vérifier l’authentification
 
 ```bash filename="Terminal"
-lomi whoami
-lomi status
+lomi whoami     # profil actuel
+lomi status     # jeton + connectivité API
 ```
 
+`lomi status` vérifie le jeton stocké via `GET /accounts/balance`.
+
 ## Profils
+
+Utilisez des profils nommés pour séparer les sessions CLI sandbox et production :
 
 ```bash filename="Terminal"
 lomi login --profile sandbox
 lomi login --profile production
+
 lomi list-profiles
 lomi switch sandbox
 lomi logout --profile sandbox
 ```
 
+## Se déconnecter
+
+```bash filename="Terminal"
+lomi logout
+lomi logout --profile sandbox
+```
+
+Supprime le jeton CLI du profil indiqué dans `config.json`.
+
 ## CI et environnements sans TTY
+
+Dans les environnements non interactifs, définissez un jeton explicitement :
 
 ```bash filename="Terminal"
 export LOMI_ACCESS_TOKEN=votre_jeton_cli
 lomi status
+```
+
+Vous pouvez aussi passer `--no-browser` lors de `lomi login` si vous ouvrez l’URL sur un autre appareil.
+
+Pour l’initialisation de projet sans interface :
+
+```bash filename="Terminal"
+lomi init --yes \
+  --environment sandbox \
+  --language ts \
+  --api-key lomi_sk_test_xxx \
+  --skip-package-install
 ```
 
 ## Dépannage
@@ -83,8 +115,10 @@ lomi status
 | Navigateur ne s’ouvre pas | Copier l’URL affichée |
 | Code expiré | Relancer `lomi login` |
 | Non authentifié | `lomi login` ou `LOMI_ACCESS_TOKEN` |
+| Mauvais environnement | `--profile` + `lomi switch`, ou `-a https://sandbox.api.lomi.africa` |
 
 ## Suite
 
 - [Initialiser un projet](/build/cli/init)
 - [Configuration](/build/cli/configuration)
+- [Référence des commandes](/build/cli/commands)

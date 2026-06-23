@@ -3,49 +3,94 @@ title: 'Configuration'
 description: 'Config globale CLI, variables d’environnement projet, profils et réglages CI pour le CLI lomi.'
 ---
 
-Le CLI lomi. utilise deux niveaux de configuration : **global** (authentification) et **projet** (clés SDK).
+Le CLI lomi. utilise deux niveaux de configuration : **global** (authentification et profils) et **projet** (clés SDK et réglages applicatifs).
 
 ## Config globale CLI
 
-Après [`lomi login`](/build/cli/auth) :
+Stockée après [`lomi login`](/build/cli/auth) :
 
 | Plateforme | Chemin |
 | --- | --- |
 | macOS | `~/Library/Application Support/lomi/config.json` |
 | Linux | `~/.config/lomi/config.json` |
 
-Surcharge : `export LOMI_CONFIG_DIR=/chemin/custom/lomi`
+Surcharge :
 
-## Variables d’environnement CLI
+```bash filename="Terminal"
+export LOMI_CONFIG_DIR=/chemin/custom/lomi
+```
+
+### Forme du fichier de config
+
+```json filename="config.json"
+{
+  "version": 2,
+  "current_profile": "default",
+  "profiles": {
+    "default": {
+      "cli_token": "lomi_sk_...",
+      "api_url": "https://api.lomi.africa"
+    },
+    "sandbox": {
+      "cli_token": "lomi_sk_test_...",
+      "api_url": "https://sandbox.api.lomi.africa"
+    }
+  },
+  "settings": {
+    "has_seen_rules_install_prompt": true,
+    "last_rules_install_version": "1.0.0"
+  }
+}
+```
+
+Gérez les profils avec [`lomi list-profiles`](/build/cli/commands#lomi-list-profiles), [`lomi switch`](/build/cli/commands#lomi-switch-profile) et [`lomi logout`](/build/cli/commands#lomi-logout).
+
+## Variables d’environnement
+
+### Authentification CLI
 
 | Variable | Description |
 | --- | --- |
-| `LOMI_ACCESS_TOKEN` | Jeton CLI pour CI (prioritaire sur le profil) |
+| `LOMI_ACCESS_TOKEN` | Jeton CLI pour CI / sans TTY (remplace le jeton du profil stocké) |
 | `LOMI_CONFIG_DIR` | Répertoire de config global |
-| `LOMI_SUPABASE_ANON_KEY` | Clé anon Supabase pour device auth (optionnel) |
+| `LOMI_SUPABASE_ANON_KEY` | Clé anon Supabase pour l’auth device (optionnel) |
 
-## Variables projet (`.env`)
+### SDK projet (via `.env`)
 
-Créées par [`lomi init`](/build/cli/init) :
+Définies par [`lomi init`](/build/cli/init) à la racine du projet :
 
 | Variable | Description |
 | --- | --- |
-| `LOMI_API_KEY` | Clé secrète SDK |
+| `LOMI_API_KEY` | Clé API secrète pour le SDK (`lomi_sk_test_…` / `lomi_sk_live_…`) |
 | `LOMI_WEBHOOK_SECRET` | Secret de signature webhook |
-| `LOMI_API_URL` | URL de base API |
+| `LOMI_API_URL` | URL de base API (`https://api.lomi.africa` ou sandbox) |
 
 <Callout type="warning" emoji="⚠️" title="Deux types d’identifiants">
-  **`LOMI_ACCESS_TOKEN`**: authentifie la **CLI**.
+  **`LOMI_ACCESS_TOKEN`** : authentifie la **CLI** (via `lomi login`).
 
-  **`LOMI_API_KEY`**: authentifie le **SDK** dans votre application.
+  **`LOMI_API_KEY`** : authentifie le **SDK** de votre application (portail marchand, stockée dans `.env` par `lomi init`).
 </Callout>
 
-## Options globales
+## Fichier de config projet
+
+`lomi init` crée `lomi.config.ts` pour les réglages projet utilisés par les exemples et les outils.
+
+## Options globales CLI
+
+Surchargez la config par commande :
 
 ```bash filename="Terminal"
 lomi --profile sandbox status
 lomi -a https://sandbox.api.lomi.africa checkout create
+lomi --log-level debug dev
 ```
+
+| Option | Description |
+| --- | --- |
+| `--profile` | Nom du profil (défaut : `default`) |
+| `-a, --api-url` | URL de base API |
+| `-l, --log-level` | Verbosité des logs |
+| `--skip-telemetry` | Désactiver la télémétrie |
 
 ## URLs API
 
@@ -54,16 +99,25 @@ lomi -a https://sandbox.api.lomi.africa checkout create
 | Production | `https://api.lomi.africa` |
 | Sandbox | `https://sandbox.api.lomi.africa` |
 
+Les profils `sandbox` et `default` mappent automatiquement l’URL appropriée lors de la connexion.
+
 ## Exemple CI
 
 ```bash filename="Terminal"
-export LOMI_ACCESS_TOKEN="$CLI_TOKEN"
-export LOMI_API_KEY="$API_KEY"
+export LOMI_ACCESS_TOKEN="${{ secrets.LOMI_CLI_TOKEN }}"
+export LOMI_API_KEY="${{ secrets.LOMI_API_KEY }}"
+
 lomi status
-lomi init --yes -e sandbox -L ts --api-key "$LOMI_API_KEY" --skip-package-install
+lomi init --yes \
+  --environment sandbox \
+  --language ts \
+  --api-key "$LOMI_API_KEY" \
+  --skip-package-install \
+  --skip-rules-install
 ```
 
 ## Suite
 
 - [Authentification](/build/cli/auth)
-- [Authentification API](/api/authentication)
+- [Initialiser un projet](/build/cli/init)
+- [Référence authentification API](/api/authentication)

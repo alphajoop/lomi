@@ -65,6 +65,7 @@ client = LomiClient(
     environment="test"
 )
 
+# Liste avec filtres
 transactions = client.transactions.list(
     status="completed",
     provider="WAVE",
@@ -86,6 +87,14 @@ curl -X GET "https://api.lomi.africa/transactions?status=completed&provider=WAVE
 </Tab>
 
 </Tabs>
+
+Lecture des transactions réseau :
+
+```bash
+curl -X GET "https://api.lomi.africa/transactions?status=completed" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890"
+```
 
 ### Réponse
 

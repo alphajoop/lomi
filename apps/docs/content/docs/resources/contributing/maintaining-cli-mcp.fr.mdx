@@ -24,9 +24,38 @@ Documentation mainteneur : [`apps/cli/CONTRIBUTING.md`](https://github.com/lomia
 | Tâche | Commande / emplacement |
 | --- | --- |
 | Dev local | `cd apps/cli && cargo build && cargo test` |
-| Dérive docs | `lomi docs check` (depuis la racine du monorepo) |
+| Dérive docs | `lomi docs check` ou `dt check` (depuis la racine du monorepo) |
+| Scan / graphe docs | `lomi docs scan`, `lomi docs graph` (délègue à `apps/doctool`) |
+| i18n docs | `lomi docs sync-i18n`, `lomi docs translate-i18n` |
+| Amélioration / diff docs | `lomi docs improve`, `lomi docs diff` |
 | Règles agent | `./apps/cli/scripts/generate-rules.sh` |
 | Release | Tag `cli-v*`, voir CONTRIBUTING.md |
+
+## doctool (`dt`)
+
+Outil de documentation CLI (CORE-38). **Dépôt autonome :** [github.com/lomiafrica/doctool](https://github.com/lomiafrica/doctool) (pas un sous-module git).
+
+Clone dans le monorepo pour le dev local :
+
+```bash
+git clone git@github.com:lomiafrica/doctool.git apps/doctool
+cd apps/doctool && cargo build
+```
+
+Documentation mainteneur : [`apps/doctool/CONTRIBUTING.md`](https://github.com/lomiafrica/doctool/blob/main/CONTRIBUTING.md)
+
+| Tâche | Commande / emplacement |
+| --- | --- |
+| Dev local | `cd apps/doctool && cargo build && cargo test` |
+| Index monorepo | `dt scan --root .` → `.doctool/index.json` |
+| Rapport de dérive | `dt drift --root .` |
+| Graphe de connaissances | `dt graph --root .` |
+| Scaffolder MDX REST | `dt scaffold --root .` |
+| Sync i18n (déterministe) | `dt sync-i18n --check` |
+| Traduction i18n (LLM) | `dt translate-i18n --dry-run` (définir `DOCTOOL_LLM_API_KEY` ou `DOCTOOL_LLM_MOCK=1`) |
+| Améliorer MDX | `dt improve --path build/usage-billing.mdx --stdout` |
+| Diff MDX proposé | `dt diff --path build/usage-billing.mdx --proposed .doctool/out/...` |
+| CI | `.github/workflows/doctool.yml` |
 
 ## MCP (`apps/mcp`)
 
@@ -36,6 +65,8 @@ Documentation mainteneur : [`apps/mcp/CONTRIBUTING.md`](https://github.com/lomia
 | --- | --- |
 | Serveur HTTP local | `cd apps/mcp && pnpm run start:http` |
 | Régénérer les outils | `pnpm run generate` → commit `src/generated/tools-manifest.json` |
+| Dérive CI | `pnpm docs:drift` (OpenAPI ↔ MDX, manifest MCP, contrats agent) |
+| OpenAPI agent | `cd apps/api && pnpm run openapi:export:agent` → `apps/docs/agent-openapi.json` |
 | Déploiement | `.env.example`, `railway.json` |
 | Tests | `pnpm test` |
 

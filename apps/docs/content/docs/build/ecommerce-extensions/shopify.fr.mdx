@@ -32,6 +32,12 @@ L’app lomi. pour Shopify permet aux marchands d’accepter **Wave, mobile mone
 
 URL d’installation : `https://connect.lomi.africa/install?shop={boutique}.myshopify.com`
 
+### Installation manuelle / partage équipe
+
+Copiez le lien d’installation depuis la modale du tableau de bord et envoyez-le à un collègue, ou ouvrez :
+
+[https://connect.lomi.africa/install](https://connect.lomi.africa/install)
+
 ## Checklist de configuration
 
 1. Collez la **clé secrète** et le **secret webhook** dans les réglages de l’app.
@@ -51,13 +57,41 @@ URL d’installation : `https://connect.lomi.africa/install?shop={boutique}.mysh
 5. Paiement sur lomi. → webhook **`PAYMENT_SUCCEEDED`** → finalisation du brouillon.
 6. Page **`/shopify/order-complete`** : panier vidé, référence commande affichée.
 
+## Webhooks
+
+| En-tête | Rôle |
+| --- | --- |
+| `X-Lomi-Event` | Doit être `PAYMENT_SUCCEEDED` pour finaliser le brouillon |
+| `X-Lomi-Signature` | HMAC-SHA256 hex du **corps brut**, secret = secret webhook du tableau de bord |
+
+Métadonnées utilisées pour la réconciliation :
+
+- `shopify_shop`
+- `shopify_draft_order_id`
+- `shopify_draft_order_name`
+- `shopify_checkout_session_id`
+
 ## Limitations
 
-- Pas de paiement natif au checkout Shopify.
-- Pas de tarifs de livraison dynamiques au panier, sous-total ou **forfait fixe** uniquement.
-- Remboursements via le tableau de bord lomi., pas depuis l’admin Shopify automatiquement.
+- Pas de **partenaire paiements** / moyen de paiement natif au checkout (pas Shop Pay, pas de passerelle UI checkout).
+- **Livraison et taxes** du checkout Shopify indisponibles sur la page panier : sous-total seul ou **forfait de livraison fixe** dans les réglages de l’app.
+- **Remboursements** gérés dans le tableau de bord lomi., pas automatiquement depuis l’admin Shopify.
+- Ne **soumettez pas** ce flux contournement panier à l’App Store public Shopify (politique Shopify sur le contournement du checkout).
+
+## QA mise en production
+
+| Scénario | Attendu |
+| --- | --- |
+| Panier un article | Une ligne sur le brouillon ; montant lomi = total brouillon |
+| Multi-articles / qté &gt; 1 | Toutes les variantes et quantités sur le brouillon |
+| Mode sous-total seul | Pas de ligne livraison sur le brouillon |
+| Mode forfait livraison | Total brouillon = sous-total + frais configurés |
+| Paiement réussi | Brouillon finalisé ; panier vidé sur la page succès |
+| Relance webhook | Pas de commandes Shopify en double |
+| Annulation sur lomi. | Client revient sur `/cart` ; brouillon reste ouvert |
 
 ## Voir aussi
 
 - [Hub extensions e‑commerce](/build/ecommerce-extensions)
-- [WooCommerce](/build/ecommerce-extensions/woocommerce)
+- [WooCommerce](/build/ecommerce-extensions/woocommerce) : référence pour checkout hébergé + contrat webhook
+- [Webhooks](/build/webhooks)

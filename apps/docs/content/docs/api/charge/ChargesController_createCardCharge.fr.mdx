@@ -16,7 +16,15 @@ Creates an embedded card charge and returns the client_secret for your payment U
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /charge/card` (Create card charge (client_secret)).
+Utilisez pour la saisie carte dans votre application lorsque vous gérez l’UI produit et la tokenisation.
+
+### À savoir
+
+Ne journalisez ni n’exposez `client_secret` publiquement ; traitez-le comme une capacité courte durée pour le SDK client.
+
+### Voir aussi
+
+[Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) si vous préférez l’encaissement hébergé.
 
 
 ## Authentification

@@ -16,7 +16,15 @@ Starts a payer-facing Wave mobile-money charge. Redirect the customer to `wave_l
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /charge/wave` (Create direct Wave charge).
+Utilisez pour un encaissement mobile money initié serveur lorsque vous n’utilisez **pas** une session checkout hébergée.
+
+### À savoir
+
+Suivez les instructions du fournisseur dans la réponse ; l’UX dépend du rail (USSD, redirection app, etc.).
+
+### Voir aussi
+
+[Mobile money](/build/mobile-money) · [Encaissements directs](/build/direct-charges) · [Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentification

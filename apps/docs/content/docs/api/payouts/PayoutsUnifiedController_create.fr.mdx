@@ -16,7 +16,15 @@ Virement vers votre compte enregistré (self) ou vers un tiers sur mobile money 
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /payouts` (Créer un virement).
+Utilisez pour les mouvements de trésorerie depuis votre solde lomi.
+
+### À savoir
+
+Les retraits self exigent payout_method_id ; les bénéficiaires Wave exigent recipient.name et recipient.phone (pas payout_method_id). Les rails Wave renvoient 400 avec une clé test — clés live uniquement. MTN renvoie 400 tant que non pris en charge.
+
+### Voir aussi
+
+[Lister les retraits](/api/payouts/PayoutsUnifiedController_findAll) · [Vérifier le solde disponible](/api/balances/AccountsController_checkAvailableBalance)
 
 
 ## Authentification

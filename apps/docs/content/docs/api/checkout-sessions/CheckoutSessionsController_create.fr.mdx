@@ -16,7 +16,15 @@ Crée une page de paiement hébergée pour que le client finalise son achat. La 
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /checkout-sessions` (Créer une session de paiement).
+Utilisez pour l’e-commerce, les factures ou tout flux où lomi. héberge l’encaissement et renvoie l’acheteur sur votre site.
+
+### À savoir
+
+Préférez les sessions checkout aux encaissements ad hoc pour une expérience acheteur cohérente. Pour les produits pay_what_you_want, le montant doit respecter minimum_amount et maximum_amount du prix lié (unité × quantité).
+
+### Voir aussi
+
+[Liens de paiement](/api/payment-links/PaymentLinksController_create) · [Récupérer une session checkout](/api/checkout-sessions/CheckoutSessionsController_findOne)
 
 
 ## Authentification

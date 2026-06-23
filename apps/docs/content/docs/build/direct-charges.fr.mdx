@@ -48,6 +48,25 @@ pnpm run dev
 
 Voir [Mobile money](/build/mobile-money).
 
+## Scénarios bac à sable (clé test uniquement)
+
+Avec une clé API **test**, les charges directes Wave et MTN se complètent automatiquement par défaut. Pour tester les chemins asynchrones ou les échecs en CI, envoyez `X-Scenario-Key` :
+
+| Valeur | Résultat |
+| --- | --- |
+| `pending` | La charge reste `PENDING` (pas d’auto-complétion) |
+| `failed` | Erreur `400` |
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_TEST_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
+
+Le checkout hébergé et les charges carte directes ne prennent **pas** encore en charge cet en-tête. Voir [Simuler les erreurs](/build/guides/simulate-errors) et [Paiements en bac à sable](/start/sandbox-payments#testing-mobile-money).
+
 ## lomi. Network
 
 Les opérateurs peuvent créer des charges pour les comptes membres :

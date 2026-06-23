@@ -4,8 +4,13 @@ description: Initiez des paiements directs avec des prestataires spécifiques co
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from '@/components/docs/docs-callout';
 
 L’API Charges permet d’initier des paiements directs avec des prestataires donnés. Utile pour un tunnel personnalisé ou pour débiter un client sans le rediriger tout de suite vers un tunnel hébergé (certains prestataires comme Wave peuvent tout de même renvoyer une URL de paiement).
+
+<Callout type="info">
+  Les opérateurs lomi. Network peuvent ajouter `Lomi-Account: acct_...` pour créer des charges carte, Wave ou MTN pour un compte membre connecté. L’adhésion doit avoir `payment.create`.
+</Callout>
 
 ## Créer une charge Wave
 
@@ -135,3 +140,54 @@ Renvoie un statut `201 Created` avec les détails de la session Wave et l’URL 
 | `400` | Requête incorrecte (ex. configuration prestataire manquante, montant invalide). |
 | `401` | Non autorisé (clé API invalide). |
 | `500` | Erreur serveur interne (échec du prestataire de paiement). |
+
+## Charge carte embarquée
+
+Créez un paiement carte et récupérez un `client_secret` pour votre propre UI de checkout.
+
+### Endpoints
+
+| Méthode | Chemin |
+|--------|------|
+| `POST` | `/charge/card` |
+| `GET` | `/charge/card/{id}` |
+| `POST` | `/charge/card/{id}/cancel` |
+
+```typescript
+const res = await lomi.charges.createCardCharge({
+  amount: 10000,
+  currency_code: 'XOF',
+  customer_email: 'buyer@example.com',
+  customer_name: 'Buyer Name',
+});
+// res.data.client_secret → confirmer côté client avec votre clé publiable
+```
+
+Voir [Créer une charge carte](/api/charge/ChargesController_createCardCharge) et [lomi Payment Elements](/build/payments/lomi-payment-elements).
+
+Exemple réseau :
+
+```bash
+curl -X POST "https://api.lomi.africa/charge/card" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "customer_email": "buyer@example.com",
+    "customer_name": "Buyer Name"
+  }'
+```
+
+## Implémentation de référence
+
+Démo minimale exécutable (Wave, MTN, carte via Payment Elements `@lomi./sdk`) dans le monorepo :
+
+- [`apps/plugins/direct-charge-integration-reference`](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/direct-charge-integration-reference) : proxy serveur, UI Payment Element et scripts cURL
+
+Pour les sessions checkout hébergées, voir [`payment-integration-sdk-reference`](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/payment-integration-sdk-reference).
+
+## Charge directe MTN
+
+`POST /charge/mtn`, même schéma que Wave ; voir [Créer une charge MTN](/api/charge/ChargesController_createMtnCharge).

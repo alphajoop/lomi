@@ -34,6 +34,17 @@ Lorsque vous acceptez des paiements dans plusieurs devises, lomi. peut convertir
 
 Les champs API « disponible » vs « en attente » figurent dans [Soldes](/api/balances).
 
+## Périodes de règlement (API)
+
+Les fonds deviennent retirables lorsque `available_at` est passé. Pour la comptabilité, regroupez les paiements complétés par **date de disponibilité** et devise :
+
+- **`GET /settlements`** : liste les périodes avec totaux brut, frais et net par `{currency}:{YYYY-MM-DD}` (date UTC de `available_at`).
+- **`GET /settlements/{id}/transactions`** : lignes d’une période ; les sommes doivent correspondre aux totaux de la période.
+
+Le `status` de chaque période est `available` lorsque toutes les transactions sous-jacentes sont passées `available_at`, sinon `pending`. Il s’agit d’une réconciliation au niveau organisation, distincte des lots de virement des prestataires Paystack ou Flutterwave.
+
+Voir [Lister les périodes de règlement](/api/settlements/SettlementsController_findAll) et [Lister les transactions de règlement](/api/settlements/SettlementsController_findTransactions).
+
 ## Coupons et complétion
 
 Les compteurs de coupons évoluent en général lorsque la transaction est complétée, pas au moment où le coupon est simplement saisi au tunnel.
@@ -41,5 +52,6 @@ Les compteurs de coupons évoluent en général lorsque la transaction est compl
 ## Pages connexes
 
 - [Machine à états du paiement](/api/payment-state-machine)
+- [Lister les périodes de règlement](/api/settlements/SettlementsController_findAll)
 - [Cycle de vie des virements](/build/payments/payout-lifecycle)
 - [Codes de réduction](/build/discount-coupons)

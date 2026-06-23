@@ -13,7 +13,15 @@ Mettre à jour un webhook
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `PATCH /webhooks/&#123;id&#125;` (Mettre à jour un webhook).
+Utilisez pour changer l’URL de destination, les événements écoutés ou la rotation de secret.
+
+### À savoir
+
+Après rotation du secret, mettez à jour la vérification de signature côté serveur avant de désactiver l’ancien secret.
+
+### Voir aussi
+
+[Créer un webhook](/api/webhooks/WebhooksController_create) · [Webhooks](/build/webhooks)
 
 
 ## Authentification
