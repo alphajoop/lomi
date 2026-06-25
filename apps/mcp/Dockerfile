@@ -10,7 +10,6 @@ RUN corepack enable \
 
 COPY tsconfig.json ./
 COPY src ./src
-COPY scripts ./scripts
 
 RUN pnpm exec tsc \
     && pnpm prune --prod
