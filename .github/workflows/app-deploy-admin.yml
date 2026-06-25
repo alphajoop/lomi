@@ -27,6 +27,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Load local actions
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/checkout-private-app
+
       - name: Checkout app source
         uses: ./.github/actions/checkout-private-app
         with:
