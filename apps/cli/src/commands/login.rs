@@ -13,9 +13,10 @@ pub struct LoginArgs {
 }
 
 pub async fn run(common: &CommonOptions, args: LoginArgs) -> Result<()> {
+    let profile = common.effective_profile()?;
     cli::banner::print_intro("Logging in to lomi.");
 
-    if let Some(existing) = GlobalConfig::load()?.profile(&common.profile) {
+    if let Some(existing) = GlobalConfig::load()?.profile(&profile) {
         if existing.cli_token.is_some() {
             let continue_login = cli::prompts::confirm(
                 "You are already logged in. Login with a different account?",
@@ -28,9 +29,9 @@ pub async fn run(common: &CommonOptions, args: LoginArgs) -> Result<()> {
         }
     }
 
-    let api_url = api_url_for_profile(&common.profile, common.api_url.as_deref());
+    let api_url = api_url_for_profile(&profile, common.api_url.as_deref());
     login(LoginOptions {
-        profile: common.profile.clone(),
+        profile: profile.clone(),
         api_url,
         open_browser: !args.no_browser,
         embedded: false,

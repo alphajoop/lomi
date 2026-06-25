@@ -63,6 +63,7 @@ impl GlobalConfig {
         }
         let contents = serde_json::to_string_pretty(self)?;
         fs::write(&path, contents)?;
+        restrict_config_permissions(&path)?;
         Ok(())
     }
 
@@ -110,6 +111,20 @@ pub fn config_dir() -> Result<PathBuf> {
 
 pub fn config_path() -> Result<PathBuf> {
     Ok(config_dir()?.join("config.json"))
+}
+
+#[cfg(unix)]
+fn restrict_config_permissions(path: &PathBuf) -> Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    let mut perms = fs::metadata(path)?.permissions();
+    perms.set_mode(0o600);
+    fs::set_permissions(path, perms)?;
+    Ok(())
+}
+
+#[cfg(not(unix))]
+fn restrict_config_permissions(_path: &PathBuf) -> Result<()> {
+    Ok(())
 }
 
 #[cfg(test)]

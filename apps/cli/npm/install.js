@@ -10,6 +10,7 @@ const REPO = 'lomiafrica/lomi.';
 const ROOT = path.join(__dirname);
 const BINARY_NAME = process.platform === 'win32' ? 'lomi.exe' : 'lomi';
 const BINARY_PATH = path.join(ROOT, BINARY_NAME);
+const VERSION_FILE = path.join(ROOT, '.lomi-version');
 
 function platformPackage() {
   const platform = process.platform;
@@ -21,6 +22,16 @@ function platformPackage() {
   if (platform === 'win32' && arch === 'x64') return 'lomi-x86_64-pc-windows-msvc.exe';
 
   throw new Error(`Unsupported platform: ${platform} ${arch}`);
+}
+
+function readInstalledVersion() {
+  if (!fs.existsSync(VERSION_FILE)) return null;
+  return fs.readFileSync(VERSION_FILE, 'utf8').trim();
+}
+
+function needsInstall() {
+  if (!fs.existsSync(BINARY_PATH)) return true;
+  return readInstalledVersion() !== VERSION;
 }
 
 function download(url, dest) {
@@ -45,8 +56,12 @@ function download(url, dest) {
 }
 
 async function install() {
-  if (fs.existsSync(BINARY_PATH)) {
+  if (!needsInstall()) {
     return;
+  }
+
+  if (fs.existsSync(BINARY_PATH)) {
+    fs.unlinkSync(BINARY_PATH);
   }
 
   const asset = platformPackage();
@@ -62,6 +77,7 @@ async function install() {
     if (process.platform !== 'win32') {
       fs.chmodSync(BINARY_PATH, 0o755);
     }
+    fs.writeFileSync(VERSION_FILE, VERSION);
     console.log('lomi. CLI installed successfully.');
   } catch (error) {
     if (fs.existsSync(tmp)) fs.unlinkSync(tmp);

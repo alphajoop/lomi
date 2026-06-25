@@ -7,9 +7,9 @@ import type { AddressInfo } from 'node:net';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 
-import manifestJson from '../src/generated/tools-manifest.json' with { type: 'json' };
-import { createHttpApplication } from '../src/http.ts';
-import { parseManifest } from '../src/manifest-parse.ts';
+import manifestJson from '../generated/tools-manifest.json' with { type: 'json' };
+import { createHttpApplication } from '../http.js';
+import { parseManifest } from '../manifest-parse.js';
 
 const bearer = process.env.LOMI_MCP_BEARER_TOKEN ?? 'smoke-local-token';
 process.env.LOMI_MCP_BEARER_TOKEN = bearer;

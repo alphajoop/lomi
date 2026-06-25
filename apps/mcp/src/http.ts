@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, timingSafeEqual } from 'node:crypto';
 
 import express, {
   type Express,
@@ -29,6 +29,7 @@ import {
   mcpMaxSessions,
   mcpRateLimitRpm,
   mcpSessionTtlMs,
+  mcpTrustProxy,
 } from './env-config.js';
 import { extractSessionMerchantApiKey } from './session-merchant-key.js';
 import { McpSessionRegistry } from './session-registry.js';
@@ -44,13 +45,29 @@ const MISSING_MERCHANT_KEY_MESSAGE =
 type RateBucket = { count: number; windowStart: number };
 
 function clientIp(req: Request): string {
-  const xf = req.headers['x-forwarded-for'];
-  if (typeof xf === 'string') {
-    const first = xf.split(',')[0]?.trim();
-    if (first) return first;
+  if (mcpTrustProxy()) {
+    const xf = req.headers['x-forwarded-for'];
+    if (typeof xf === 'string') {
+      const first = xf.split(',')[0]?.trim();
+      if (first) return first;
+    }
+    if (Array.isArray(xf) && xf[0]) return xf[0].trim();
   }
-  if (Array.isArray(xf) && xf[0]) return xf[0].trim();
   return req.socket.remoteAddress ?? 'unknown';
+}
+
+function bearerTokenMatches(presented: string, tokens: string[]): boolean {
+  const presentedBuf = Buffer.from(presented);
+  for (const token of tokens) {
+    const tokenBuf = Buffer.from(token);
+    if (
+      presentedBuf.length === tokenBuf.length &&
+      timingSafeEqual(presentedBuf, tokenBuf)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function checkMcpRateLimit(
@@ -82,6 +99,10 @@ function createLomiMcpExpressApp(hostOpts: ReturnType<typeof listenHostOptions>)
   const limit = mcpMaxBodyBytes();
   app.use(express.json({ limit: limit }));
 
+  if (mcpTrustProxy()) {
+    app.set('trust proxy', 1);
+  }
+
   const { host, allowedHosts } = hostOpts;
   if (allowedHosts) {
     app.use(hostHeaderValidation(allowedHosts));
@@ -98,11 +119,12 @@ function createLomiMcpExpressApp(hostOpts: ReturnType<typeof listenHostOptions>)
   return app;
 }
 
-function warnProductionWithoutBearer(): void {
+function ensureProductionBearer(): void {
   if (process.env.NODE_ENV === 'production' && getMcpHttpBearerTokens().length === 0) {
-    console.warn(
-      '[lomi-mcp] NODE_ENV=production but LOMI_MCP_BEARER_TOKEN is unset; /ready will fail.',
+    console.error(
+      '[lomi-mcp] FATAL: LOMI_MCP_BEARER_TOKEN is required when NODE_ENV=production',
     );
+    process.exit(1);
   }
 }
 
@@ -127,7 +149,7 @@ function bearerAuthMiddleware(
     return;
   }
   const presented = auth.slice('Bearer '.length).trim();
-  if (!tokens.includes(presented)) {
+  if (!bearerTokenMatches(presented, tokens)) {
     res.status(401).json({
       error: 'Unauthorized',
       error_code: 'invalid_bearer',
@@ -163,7 +185,6 @@ function hasMerchantCredential(
 }
 
 export function createHttpApplication(manifest: ToolsManifest): Express {
-  warnProductionWithoutBearer();
 
   const hostOpts = listenHostOptions();
   const app = createLomiMcpExpressApp(hostOpts);
@@ -457,6 +478,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 }
 
 export async function startHttpServer(): Promise<void> {
+  ensureProductionBearer();
   const manifest = parseManifest(manifestJson);
   const app = createHttpApplication(manifest);
   const port = httpListenPort();

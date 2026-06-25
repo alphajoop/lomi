@@ -1,7 +1,7 @@
 import {
   IsEnum,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -23,8 +23,8 @@ export class CreateRefundDto {
     description: 'Amount to refund (same currency as the transaction)',
     type: Number,
   })
-  @IsNumber()
-  @Min(0.01)
+  @IsInt()
+  @Min(1)
   @IsNotEmpty()
   amount: number;
 

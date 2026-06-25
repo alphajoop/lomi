@@ -4,6 +4,8 @@ pub mod prompts;
 
 use clap::Args;
 
+use crate::config::GlobalConfig;
+
 pub const PRODUCTION_API_URL: &str = "https://api.lomi.africa";
 pub const SANDBOX_API_URL: &str = "https://sandbox.api.lomi.africa";
 pub const LOCAL_API_URL: &str = "http://localhost:4242";
@@ -36,9 +38,9 @@ pub fn lomi_ui_item_url(name: &str) -> String {
 
 #[derive(Clone, Args, Debug)]
 pub struct CommonOptions {
-    /// The login profile to use
-    #[arg(long, default_value = "default", global = true)]
-    pub profile: String,
+    /// The login profile to use (defaults to the switched profile in config)
+    #[arg(long, global = true)]
+    pub profile: Option<String>,
 
     /// Override the API URL
     #[arg(short = 'a', long, global = true)]
@@ -60,6 +62,14 @@ pub struct CommonOptions {
 impl CommonOptions {
     pub fn use_json(&self) -> bool {
         self.json || !output::is_tty()
+    }
+
+    /// Resolved profile name: explicit `--profile` flag or `current_profile` from config.
+    pub fn effective_profile(&self) -> anyhow::Result<String> {
+        if let Some(ref profile) = self.profile {
+            return Ok(profile.clone());
+        }
+        Ok(GlobalConfig::load()?.current_profile)
     }
 }
 

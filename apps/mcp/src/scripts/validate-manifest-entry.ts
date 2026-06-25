@@ -1,7 +1,7 @@
 /**
  * Runtime validation for one generated MCP tool (used by generate-tools + tests).
  */
-import type { ResolvedJsonSchema } from '../src/generator/openapi-helpers.ts';
+import type { ResolvedJsonSchema } from '../generator/openapi-helpers.js';
 
 export type ManifestToolDraft = {
   name: string;

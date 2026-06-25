@@ -110,6 +110,13 @@ fn parse_sse_block(block: &str) -> Option<StreamEvent> {
     None
 }
 
+fn mask_secret(secret: &str) -> String {
+    if secret.len() <= 4 {
+        return "****".to_string();
+    }
+    format!("****{}", &secret[secret.len() - 4..])
+}
+
 async fn handle_event(
     event: &StreamEvent,
     forward_url: Option<&str>,
@@ -129,15 +136,16 @@ async fn handle_event(
             }
             if let Some(secret) = &event.webhook_secret {
                 if !secret.is_empty() {
+                    let masked = mask_secret(secret);
                     println!(
                         "{} {}",
                         "Webhook secret:".bright_black(),
-                        secret.yellow()
+                        masked.yellow()
                     );
                     println!(
                         "{} Add to .env: LOMI_WEBHOOK_SECRET={}",
                         "○".bright_black(),
-                        secret
+                        masked
                     );
                 }
             }

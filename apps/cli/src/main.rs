@@ -87,6 +87,7 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
+    init_runtime_from_common(&cli.common);
     if !cli.common.use_json() {
         cli::banner::print_banner(&cli.common).await?;
     }
@@ -119,4 +120,11 @@ async fn main() -> Result<()> {
         Commands::ListProfiles(args) => commands::list_profiles::run(&cli.common, args).await,
         Commands::Switch(args) => commands::switch::run(&cli.common, args).await,
     }
+}
+
+fn init_runtime_from_common(common: &CommonOptions) {
+    if common.skip_telemetry {
+        std::env::set_var("LOMI_SKIP_TELEMETRY", "1");
+    }
+    std::env::set_var("LOMI_LOG_LEVEL", common.log_level.as_str());
 }

@@ -13,8 +13,8 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, type OpenAPIObject } from '@nestjs/swagger';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
-import { AgentOpenApiExportModule } from '../agent-open-api-export.module';
-import { buildSwaggerDocumentBase } from '../swagger.config';
+import { AgentOpenApiExportModule } from '../../agent-open-api-export.module';
+import { buildSwaggerDocumentBase } from '../../swagger.config';
 
 function resolveDocsAgentOpenApiPath(): string {
   return path.resolve(process.cwd(), '../docs/agent-openapi.json');

@@ -24,3 +24,21 @@ export function normalizeIdempotencyKey(
   if (!t.length) return null;
   return t.slice(0, 255);
 }
+
+export type RequestIdempotencyContext = {
+  key: string;
+  bodyHash: string;
+};
+
+/** Build idempotency context from header + request body (write endpoints). */
+export function resolveRequestIdempotency(
+  header: string | string[] | undefined,
+  body: Record<string, unknown>,
+): RequestIdempotencyContext | undefined {
+  const key = normalizeIdempotencyKey(header);
+  if (!key) return undefined;
+  return {
+    key,
+    bodyHash: fingerprintRequestBody(body),
+  };
+}

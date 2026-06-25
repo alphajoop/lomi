@@ -5,8 +5,11 @@ import {
   Headers,
   Param,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { resolveRequestIdempotency } from '../../utils/idempotency-fingerprint';
 import {
   ApiTags,
   ApiOperation,
@@ -61,6 +64,8 @@ export class ChargesController {
     @Body() createChargeDto: CreateWaveChargeDto,
     @CurrentUser() user: AuthContext,
     @Headers('x-scenario-key') scenarioHeader?: string | string[],
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
@@ -68,11 +73,18 @@ export class ChargesController {
       environmentFromAuth(user) === 'test'
         ? normalizeScenarioKey(scenarioHeader)
         : undefined;
-    return this.chargesService.createWaveCharge(
-      createChargeDto,
-      user,
-      scenarioKey,
+    const idempotency = resolveRequestIdempotency(
+      idempotencyKey,
+      JSON.parse(JSON.stringify(createChargeDto)) as Record<string, unknown>,
     );
+    return this.chargesService
+      .createWaveCharge(createChargeDto, user, scenarioKey, idempotency)
+      .then((result) => {
+        if (result.idempotencyCacheHit && res) {
+          res.setHeader('Idempotency-Cache-Hit', 'true');
+        }
+        return result.data;
+      });
   }
 
   @Post('mtn')
@@ -92,6 +104,8 @@ export class ChargesController {
     @Body() createChargeDto: CreateMtnChargeDto,
     @CurrentUser() user: AuthContext,
     @Headers('x-scenario-key') scenarioHeader?: string | string[],
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
@@ -99,11 +113,18 @@ export class ChargesController {
       environmentFromAuth(user) === 'test'
         ? normalizeScenarioKey(scenarioHeader)
         : undefined;
-    return this.chargesService.createMtnCharge(
-      createChargeDto,
-      user,
-      scenarioKey,
+    const idempotency = resolveRequestIdempotency(
+      idempotencyKey,
+      JSON.parse(JSON.stringify(createChargeDto)) as Record<string, unknown>,
     );
+    return this.chargesService
+      .createMtnCharge(createChargeDto, user, scenarioKey, idempotency)
+      .then((result) => {
+        if (result.idempotencyCacheHit && res) {
+          res.setHeader('Idempotency-Cache-Hit', 'true');
+        }
+        return result.data;
+      });
   }
 
   @Post('card')
@@ -122,8 +143,21 @@ export class ChargesController {
   createCardCharge(
     @Body() createDto: CreateCardChargeDto,
     @CurrentUser() user: AuthContext,
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
   ) {
-    return this.cardChargeService.create(createDto, user);
+    const idempotency = resolveRequestIdempotency(
+      idempotencyKey,
+      JSON.parse(JSON.stringify(createDto)) as Record<string, unknown>,
+    );
+    return this.cardChargeService
+      .create(createDto, user, idempotency)
+      .then((result) => {
+        if (result.idempotencyCacheHit && res) {
+          res.setHeader('Idempotency-Cache-Hit', 'true');
+        }
+        return result.data;
+      });
   }
 
   @Get('card/:id')

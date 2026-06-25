@@ -137,7 +137,7 @@ pub async fn run(common: &CommonOptions, args: QuickstartArgs) -> Result<()> {
     if json {
         return cli::output::print_json(&QuickstartResponse {
             status: status.to_string(),
-            profile: common.profile.clone(),
+            profile: common.effective_profile()?,
             organization,
             environment,
             probe: QuickstartProbeSummary { passed, failed },

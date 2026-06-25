@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -9,6 +10,8 @@ import { OrganizationMetricsResponseDto } from './dto/organization-metrics-respo
 
 @Injectable()
 export class OrganizationsService {
+  private readonly logger = new Logger(OrganizationsService.name);
+
   constructor(private readonly supabase: SupabaseService) {}
 
   /**
@@ -25,7 +28,7 @@ export class OrganizationsService {
     );
 
     if (error) {
-      console.error('list_organizations RPC error:', error);
+      this.logger.error('list_organizations RPC error:', error);
       throw new InternalServerErrorException(
         `Failed to fetch organizations: ${error.message}`,
       );

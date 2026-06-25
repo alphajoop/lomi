@@ -290,7 +290,7 @@ export class WaveWebhookService {
             p_client_reference: data.client_reference,
             p_wave_session_id: sessionId,
             p_wave_transaction_id: waveTxnId,
-            p_amount: data.amount ? parseFloat(data.amount) : null,
+            p_amount: data.amount ? parseInt(String(data.amount), 10) : null,
             p_currency: data.currency,
           });
 

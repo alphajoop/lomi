@@ -7,6 +7,7 @@ import {
   Header,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AppService } from './app.service';
@@ -58,6 +59,10 @@ Disallow: /
     @Body() body: { event: string; data: any },
     @CurrentUser() user: AuthContext,
   ) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new NotFoundException();
+    }
+
     const payload = {
       ...body.data,
       organization_id: user.organizationId,

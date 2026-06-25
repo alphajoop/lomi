@@ -176,6 +176,6 @@ export class SpiPosService {
       throw new BadRequestException(error.message);
     }
 
-    return data as Record<string, unknown>;
+    return data as unknown as Record<string, unknown>;
   }
 }

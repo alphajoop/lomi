@@ -43,6 +43,12 @@ jobs:
       - name: Install docs dependencies
         working-directory: apps/docs
         run: pnpm install
+      - name: Install MCP dependencies
+        working-directory: apps/mcp
+        run: pnpm install --frozen-lockfile
+      - name: MCP unit tests
+        working-directory: apps/mcp
+        run: pnpm test
       - name: dt check
         run: ./apps/doctool/target/release/dt check --root .
       - name: dt sync-i18n check

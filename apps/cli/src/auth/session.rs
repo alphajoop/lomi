@@ -25,23 +25,25 @@ pub fn token_from_env() -> Option<String> {
 }
 
 pub fn resolve_auth(common: &CommonOptions) -> Result<Option<AuthContext>> {
+    let profile = common.effective_profile()?;
+
     if let Some(token) = token_from_env() {
         return Ok(Some(AuthContext {
-            profile: common.profile.clone(),
+            profile: profile.clone(),
             cli_token: token,
-            api_url: common.resolved_api_url(),
+            api_url: api_url_for_profile(&profile, common.api_url.as_deref()),
         }));
     }
 
     let config = GlobalConfig::load()?;
-    if let Some(profile) = config.profile(&common.profile) {
-        if let Some(token) = profile.cli_token.clone() {
-            let api_url = profile
+    if let Some(profile_settings) = config.profile(&profile) {
+        if let Some(token) = profile_settings.cli_token.clone() {
+            let api_url = profile_settings
                 .api_url
                 .clone()
-                .unwrap_or_else(|| common.resolved_api_url());
+                .unwrap_or_else(|| api_url_for_profile(&profile, common.api_url.as_deref()));
             return Ok(Some(AuthContext {
-                profile: common.profile.clone(),
+                profile,
                 cli_token: token,
                 api_url,
             }));
@@ -62,17 +64,19 @@ pub async fn ensure_authenticated(
     }
 
     if !embedded && !silent {
+        let profile = common.effective_profile()?;
         crate::cli::output::print_error("You must login first. Use `lomi login`.");
-        bail!("Not authenticated");
+        bail!("Not authenticated for profile `{profile}`");
     }
 
     if !crate::cli::output::is_tty() && embedded {
         bail!("Authentication required. Set LOMI_ACCESS_TOKEN or run `lomi login` in a TTY.");
     }
 
-    let api_url = api_url_for_profile(&common.profile, common.api_url.as_deref());
+    let profile = common.effective_profile()?;
+    let api_url = api_url_for_profile(&profile, common.api_url.as_deref());
     login(LoginOptions {
-        profile: common.profile.clone(),
+        profile: profile.clone(),
         api_url: api_url.clone(),
         open_browser,
         embedded,
@@ -84,7 +88,7 @@ pub async fn ensure_authenticated(
         .context("Authentication succeeded but token was not saved")
 }
 
-pub async fn try_authenticated(common: &CommonOptions) -> AuthResult {
+pub fn try_authenticated(common: &CommonOptions) -> AuthResult {
     match resolve_auth(common) {
         Ok(Some(auth)) => AuthResult::Authenticated(auth),
         Ok(None) => AuthResult::Failed("Not logged in".to_string()),

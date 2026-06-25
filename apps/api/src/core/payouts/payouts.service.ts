@@ -9,6 +9,11 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
 import { CreatePayoutDto } from './dto/create-payout.dto';
+import {
+  withApiIdempotency,
+  type ApiIdempotencyContext,
+} from '../../utils/api-idempotency';
+import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 
 type PayoutMethodRow = {
   payout_method_id: string;
@@ -27,7 +32,22 @@ export class PayoutsService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async create(dto: CreatePayoutDto, user: AuthContext) {
+  async create(
+    dto: CreatePayoutDto,
+    user: AuthContext,
+    idempotency?: ApiIdempotencyContext,
+  ): Promise<IdempotentCreateResult<unknown>> {
+    const scope = {
+      organizationId: user.organizationId,
+      environment: environmentFromAuth(user),
+      endpointRoute: 'POST:/payouts',
+    };
+    return withApiIdempotency(this.supabaseService, scope, idempotency, () =>
+      this.executeCreate(dto, user),
+    );
+  }
+
+  private async executeCreate(dto: CreatePayoutDto, user: AuthContext) {
     if (dto.destination === 'beneficiary') {
       if (dto.rail === 'bank') {
         throw new BadRequestException(

@@ -38,7 +38,19 @@ function registerOneTool(
       },
     },
     async (args: unknown) => {
-      const input = args as Record<string, unknown>;
+      const parsed = inputSchema.safeParse(args);
+      if (!parsed.success) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Invalid tool arguments: ${parsed.error.message}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+      const input = parsed.data as Record<string, unknown>;
       const apiKey = ctx.getApiKey();
       if (!apiKey) {
         return {

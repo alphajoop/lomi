@@ -28,6 +28,11 @@ import {
 } from '../../utils/stripe/stripe-keys';
 import { environmentFromAuth } from '../common/auth-environment';
 import { getMtnCountryConfig } from '../charges/mtn-country';
+import {
+  withApiIdempotency,
+  type ApiIdempotencyContext,
+} from '../../utils/api-idempotency';
+import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 
 type TransactionRow = {
   transaction_id: string;
@@ -77,7 +82,26 @@ export class RefundsService {
     private readonly supabaseService: SupabaseService,
   ) {}
 
-  async create(dto: CreateRefundDto, user: AuthContext) {
+  async create(
+    dto: CreateRefundDto,
+    user: AuthContext,
+    idempotency?: ApiIdempotencyContext,
+  ): Promise<IdempotentCreateResult<{ refund_id?: string; [key: string]: unknown }>> {
+    const scope = {
+      organizationId: user.organizationId,
+      environment: environmentFromAuth(user),
+      endpointRoute: 'POST:/refunds',
+    };
+
+    return withApiIdempotency(
+      this.supabaseService,
+      scope,
+      idempotency,
+      () => this.executeCreate(dto, user),
+    );
+  }
+
+  private async executeCreate(dto: CreateRefundDto, user: AuthContext) {
     const tx = await this.loadTransaction(
       dto.transaction_id,
       user.organizationId,
@@ -334,7 +358,7 @@ export class RefundsService {
     if (amount <= 0) {
       throw new BadRequestException('Refund amount must be positive');
     }
-    if (amount > Number(tx.gross_amount) + 0.01) {
+    if (amount > Math.trunc(Number(tx.gross_amount))) {
       throw new BadRequestException(
         'Refund amount exceeds transaction gross amount',
       );

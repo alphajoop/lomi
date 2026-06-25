@@ -2,13 +2,17 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Post,
   Query,
+  Res,
   UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { resolveRequestIdempotency } from '../../utils/idempotency-fingerprint';
 import {
   ApiTags,
   ApiSecurity,
@@ -48,8 +52,22 @@ export class PayoutsUnifiedController {
     status: 400,
     description: 'Entrée invalide ou rail non pris en charge',
   })
-  create(@Body() dto: CreatePayoutDto, @CurrentUser() user: AuthContext) {
-    return this.payoutsService.create(dto, user);
+  create(
+    @Body() dto: CreatePayoutDto,
+    @CurrentUser() user: AuthContext,
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
+  ) {
+    const idempotency = resolveRequestIdempotency(
+      idempotencyKey,
+      JSON.parse(JSON.stringify(dto)) as Record<string, unknown>,
+    );
+    return this.payoutsService.create(dto, user, idempotency).then((result) => {
+      if (result.idempotencyCacheHit && res) {
+        res.setHeader('Idempotency-Cache-Hit', 'true');
+      }
+      return result.data;
+    });
   }
 
   @Get()

@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -38,7 +38,7 @@ export class CreateWaveChargeDto {
     example: 1000,
     description: 'Amount in XOF (minimum 100)',
   })
-  @IsNumber()
+  @IsInt()
   @Min(1)
   amount: number;
 

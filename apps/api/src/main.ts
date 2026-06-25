@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule } from '@nestjs/swagger';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -73,12 +74,24 @@ async function bootstrap() {
       'X-Request-Id,Retry-After,X-RateLimit-Limit,X-RateLimit-Policy,X-RateLimit-Window-Seconds',
   });
 
-  const document = SwaggerModule.createDocument(
-    app,
-    buildSwaggerDocumentBase(),
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
   );
-  SwaggerModule.setup('api', app, document);
+
+  if (!isProduction) {
+    const document = SwaggerModule.createDocument(
+      app,
+      buildSwaggerDocumentBase(),
+    );
+    SwaggerModule.setup('api', app, document);
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
-void bootstrap();
+bootstrap().catch((err) => {
+  console.error('Failed to start application:', err);
+  process.exit(1);
+});

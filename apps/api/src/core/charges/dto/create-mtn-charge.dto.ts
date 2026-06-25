@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import {
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -14,7 +14,7 @@ import { CustomerDto } from './create-charge.dto';
 
 export class CreateMtnChargeDto {
   @ApiProperty({ type: Number, example: 1000 })
-  @IsNumber()
+  @IsInt()
   @Min(1)
   amount: number;
 
@@ -62,7 +62,7 @@ export class CreateMtnChargeDto {
   subscriptionId?: string;
 
   @ApiPropertyOptional({ type: Number, example: 1, default: 1 })
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   @Min(1)
   quantity?: number;

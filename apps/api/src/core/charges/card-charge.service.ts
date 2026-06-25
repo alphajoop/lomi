@@ -27,6 +27,12 @@ import {
   assertCardChargeReconciliationInput,
 } from './dto/assert-card-charge-reconciliation';
 import { RadarService } from '../radar/radar.service';
+import {
+  withApiIdempotency,
+  type ApiIdempotencyContext,
+} from '../../utils/api-idempotency';
+import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
+import { environmentFromAuth } from '../common/auth-environment';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
@@ -59,7 +65,25 @@ export class CardChargeService {
     private readonly radarService: RadarService,
   ) {}
 
-  async create(createDto: CreateCardChargeDto, user: AuthContext) {
+  async create(
+    createDto: CreateCardChargeDto,
+    user: AuthContext,
+    idempotency?: ApiIdempotencyContext,
+  ): Promise<IdempotentCreateResult<unknown>> {
+    const scope = {
+      organizationId: user.organizationId,
+      environment: environmentFromAuth(user),
+      endpointRoute: 'POST:/charge/card',
+    };
+    return withApiIdempotency(
+      this.supabase,
+      scope,
+      idempotency,
+      () => this.executeCreate(createDto, user),
+    );
+  }
+
+  private async executeCreate(createDto: CreateCardChargeDto, user: AuthContext) {
     const stripe = this.stripeClients.getClient(user.environment);
     const paymentEnv = normalizePaymentEnvironment(user.environment);
 

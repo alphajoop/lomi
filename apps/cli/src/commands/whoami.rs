@@ -11,9 +11,9 @@ use crate::config::global::config_path;
 pub struct WhoamiArgs {}
 
 pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
+    let profile = common.effective_profile()?;
     cli::banner::print_intro(&format!(
-        "Displaying your account details [{}]",
-        common.profile
+        "Displaying your account details [{profile}]"
     ));
 
     let spinner = indicatif::ProgressBar::new_spinner();
@@ -25,13 +25,12 @@ pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
     spinner.set_message("Checking your account details...");
     spinner.enable_steady_tick(std::time::Duration::from_millis(100));
 
-    let auth = match try_authenticated(common).await {
+    let auth = match try_authenticated(common) {
         crate::auth::AuthResult::Authenticated(auth) => auth,
         crate::auth::AuthResult::Failed(message) => {
             spinner.finish_and_clear();
             cli::output::print_error(&format!(
-                "You must login first. Use `lomi login --profile {}`.",
-                common.profile
+                "You must login first. Use `lomi login --profile {profile}`.",
             ));
             anyhow::bail!(message);
         }
@@ -45,10 +44,10 @@ pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
 
     spinner.finish_and_clear();
 
-    let token_preview = if auth.cli_token.len() > 8 {
-        format!("{}…", &auth.cli_token[..8])
+    let token_preview = if auth.cli_token.len() > 4 {
+        format!("****{}", &auth.cli_token[auth.cli_token.len() - 4..])
     } else {
-        "hidden".to_string()
+        "****".to_string()
     };
 
     let mut body = format!(
@@ -64,7 +63,7 @@ pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
     }
 
     cli::output::print_note(
-        &format!("Account details [{}]", common.profile),
+        &format!("Account details [{profile}]"),
         &body,
     );
 

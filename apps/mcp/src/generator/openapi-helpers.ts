@@ -2,6 +2,7 @@
  * Shared helpers for OpenAPI → MCP manifest generation (used by scripts/generate-tools.ts).
  */
 import type { ParameterObject } from './openapi-types.js';
+import { resolveEnglishSchemaDescription } from './mcp-english-copy.js';
 
 export type OpenAPISpec = {
   openapi?: string;
@@ -208,7 +209,10 @@ export function inlineRefs(
   return out;
 }
 
-function jsonSchemaFromParameter(param: ParameterObject): ResolvedJsonSchema {
+function jsonSchemaFromParameter(
+  param: ParameterObject,
+  fieldName?: string,
+): ResolvedJsonSchema {
   const schema =
     param.schema && typeof param.schema === 'object'
       ? (param.schema as ResolvedJsonSchema)
@@ -216,9 +220,13 @@ function jsonSchemaFromParameter(param: ParameterObject): ResolvedJsonSchema {
   const base: ResolvedJsonSchema = {
     ...cloneSchema(schema) as ResolvedJsonSchema,
   };
-  if (param.description && typeof param.description === 'string') {
-    base.description = param.description;
-  }
+  const name =
+    fieldName ??
+    (typeof param.name === 'string' ? param.name : 'parameter');
+  base.description = resolveEnglishSchemaDescription(
+    name,
+    typeof param.description === 'string' ? param.description : undefined,
+  );
   if (param.required === true && base.default === undefined) {
     // OpenAPI required flag on parameter
     return base;
@@ -309,7 +317,7 @@ export function buildInputJsonSchema(args: {
           ? p.name
           : p.name;
 
-    propBag[key] = jsonSchemaFromParameter(p);
+    propBag[key] = jsonSchemaFromParameter(p, key);
     if (p.required === true) required.add(key);
   }
 

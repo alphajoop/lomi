@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Download release assets and print sha256 lines for homebrew/lomi.rb
-# Usage: ./scripts/update-homebrew-sha256.sh 3.0.0
+# Usage: ./scripts/update-homebrew-sha256.sh 3.101.1
+# If the GitHub release is not published yet, build locally and hash binaries:
+#   cargo build --release
+#   cp target/release/lomi /tmp/lomi-aarch64-apple-darwin
+#   shasum -a 256 /tmp/lomi-aarch64-apple-darwin
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

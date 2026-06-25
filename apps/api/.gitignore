@@ -12,3 +12,7 @@ coverage/
 
 # IDE
 .cursor
+
+# Local dev scripts with secrets
+verify_charge.ts
+scripts/*.local.ts

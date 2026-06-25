@@ -14,9 +14,9 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, type OpenAPIObject } from '@nestjs/swagger';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
-import { OpenApiExportModule } from '../open-api-export.module';
-import { buildSwaggerDocumentBase } from '../swagger.config';
-import { isPublicRestApiOperation } from '../../../docs/lib/scripts/manual-api/constants';
+import { OpenApiExportModule } from '../../open-api-export.module';
+import { buildSwaggerDocumentBase } from '../../swagger.config';
+import { isPublicRestApiOperation } from '../../../../docs/lib/scripts/manual-api/constants';
 
 function resolveDocsOpenApiPath(): string {
   // Run with cwd `apps/api` (see package.json script).

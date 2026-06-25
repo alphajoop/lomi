@@ -331,3 +331,9 @@ export function mcpMaxResultCharsFromEnv(): number {
     500_000,
   );
 }
+
+/** When true, trust X-Forwarded-For for MCP rate limiting (set behind Railway/CDN). */
+export function mcpTrustProxy(): boolean {
+  const v = process.env.LOMI_MCP_TRUST_PROXY?.trim().toLowerCase();
+  return v === '1' || v === 'true' || v === 'yes';
+}

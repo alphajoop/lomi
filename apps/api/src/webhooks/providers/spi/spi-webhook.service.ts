@@ -120,7 +120,7 @@ export class SpiWebhookService {
       throw new BadRequestException(completeError.message);
     }
 
-    const result = completed as CompleteRpcResult;
+    const result = completed as unknown as CompleteRpcResult;
     if (!result.transaction_id) {
       return { event: eventCode, tx_id: spiTxId, transaction_missing: true };
     }
@@ -168,7 +168,7 @@ export class SpiWebhookService {
       this.logger.warn(
         'SPI_WEBHOOK_SECRET not set — accepting webhooks (dev only)',
       );
-      return true;
+      return process.env.NODE_ENV !== 'production';
     }
 
     const signature =

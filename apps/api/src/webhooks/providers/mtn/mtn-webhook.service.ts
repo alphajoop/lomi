@@ -1,10 +1,17 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { timingSafeEqual } from 'crypto';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
 import { WideEventService } from '../../../utils/telemetry/wide-event.service';
 import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
 import { maybeNotifySubscriptionRenewed } from '../../subscription-webhook.helper';
 import { WebhookEvent } from '../../../utils/types/api';
+import { getMtnCountryConfig } from '../../../core/charges/mtn-country';
 
 type MtnCallbackPayload = {
   externalId?: string;
@@ -19,6 +26,8 @@ type MtnTransactionLookup = {
   transaction_id: string;
   merchant_id?: string | null;
   organization_id: string;
+  environment?: string | null;
+  country_code?: string | null;
 };
 
 @Injectable()
@@ -52,6 +61,22 @@ export class MtnWebhookService {
       );
     }
 
+    const transaction = await this.resolveTransaction(payload, referenceId);
+    if (!transaction) {
+      this.logger.error('MTN webhook: transaction not found', {
+        externalId: payload.externalId,
+        referenceId,
+      });
+      throw new BadRequestException('Transaction not found for MTN callback');
+    }
+
+    await this.verifyCallbackAuthenticity(
+      headers,
+      payload,
+      referenceId,
+      transaction,
+    );
+
     const dedupeKey = `${payload.externalId ?? referenceId ?? 'unknown'}:${payload.status}:${payload.financialTransactionId ?? ''}`;
     const { data: claimed, error: claimError } = await this.supabase.rpc(
       'claim_inbound_provider_webhook_event',
@@ -75,15 +100,6 @@ export class MtnWebhookService {
         dedupe_key: dedupeKey,
       });
       return { received: true, duplicate: true };
-    }
-
-    const transaction = await this.resolveTransaction(payload, referenceId);
-    if (!transaction) {
-      this.logger.error('MTN webhook: transaction not found', {
-        externalId: payload.externalId,
-        referenceId,
-      });
-      throw new BadRequestException('Transaction not found for MTN callback');
     }
 
     const terminalStatus =
@@ -185,6 +201,137 @@ export class MtnWebhookService {
     return null;
   }
 
+  /**
+   * MTN MoMo does not sign callbacks. Authenticity is established by re-querying
+   * the Collection API for the X-Reference-Id and matching status/externalId.
+   * Optional MTN_WEBHOOK_SECRET is accepted only outside production (local/staging).
+   */
+  private async verifyCallbackAuthenticity(
+    headers: Record<string, string>,
+    payload: MtnCallbackPayload,
+    referenceId: string | undefined,
+    transaction: MtnTransactionLookup,
+  ): Promise<void> {
+    if (transaction.environment === 'test') {
+      return;
+    }
+
+    const effectiveReferenceId = referenceId?.trim();
+    if (!effectiveReferenceId) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new UnauthorizedException('Missing MTN X-Reference-Id');
+      }
+      if (this.verifyOptionalSharedSecret(headers)) {
+        return;
+      }
+      throw new UnauthorizedException('Missing MTN reference for verification');
+    }
+
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      this.verifyOptionalSharedSecret(headers)
+    ) {
+      return;
+    }
+
+    const verified = await this.confirmStatusWithMtnApi(
+      effectiveReferenceId,
+      payload,
+      transaction,
+    );
+    if (!verified) {
+      throw new UnauthorizedException('MTN callback could not be verified');
+    }
+  }
+
+  private async confirmStatusWithMtnApi(
+    referenceId: string,
+    payload: MtnCallbackPayload,
+    transaction: MtnTransactionLookup,
+  ): Promise<boolean> {
+    const countryCode = transaction.country_code?.trim() || 'CI';
+    const { targetEnvironment: countryTarget } =
+      getMtnCountryConfig(countryCode);
+    const paymentEnvironment = transaction.environment?.trim() || 'live';
+    const mtnApiEnvironment =
+      paymentEnvironment === 'test' ? 'development' : 'production';
+    const targetEnvironment =
+      mtnApiEnvironment === 'development' ? 'sandbox' : countryTarget;
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .functions.invoke('mtn', {
+        body: {
+          path: `/collection/v1_0/requesttopay/${referenceId}`,
+          method: 'GET',
+          environment: mtnApiEnvironment,
+          targetEnvironment,
+        },
+      });
+
+    if (error) {
+      this.logger.error(`MTN status verification failed: ${error.message}`);
+      return false;
+    }
+
+    const apiPayload = data as {
+      status?: string;
+      externalId?: string;
+      financialTransactionId?: string;
+    };
+
+    if (!apiPayload?.status || apiPayload.status !== payload.status) {
+      this.logger.warn({
+        message: 'mtn_callback_status_mismatch',
+        callback_status: payload.status,
+        api_status: apiPayload?.status,
+        reference_id: referenceId,
+      });
+      return false;
+    }
+
+    if (
+      payload.externalId &&
+      apiPayload.externalId &&
+      payload.externalId !== apiPayload.externalId
+    ) {
+      this.logger.warn({
+        message: 'mtn_callback_external_id_mismatch',
+        reference_id: referenceId,
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  private verifyOptionalSharedSecret(headers: Record<string, string>): boolean {
+    const secret = process.env.MTN_WEBHOOK_SECRET;
+    if (!secret) {
+      return false;
+    }
+
+    const headerSecret =
+      headers['x-mtn-webhook-secret'] ??
+      headers['X-MTN-Webhook-Secret'] ??
+      headers['x-webhook-secret'] ??
+      headers['X-Webhook-Secret'];
+
+    if (typeof headerSecret === 'string' && this.safeEqual(headerSecret, secret)) {
+      return true;
+    }
+
+    const auth = headers['authorization'] ?? headers['Authorization'];
+    if (typeof auth === 'string' && auth.startsWith('Bearer ')) {
+      const token = auth.slice('Bearer '.length).trim();
+      if (this.safeEqual(token, secret)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private async updateTransactionStatus(
     transactionId: string,
     status: string,
@@ -251,5 +398,14 @@ export class MtnWebhookService {
     } catch (error) {
       this.logger.error('Error triggering merchant webhook for MTN:', error);
     }
+  }
+
+  private safeEqual(a: string, b: string): boolean {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) {
+      return false;
+    }
+    return timingSafeEqual(bufA, bufB);
   }
 }

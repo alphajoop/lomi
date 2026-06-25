@@ -69,6 +69,19 @@ export type EnglishCopyOverride = {
   description?: string;
 };
 
+/** English description for OpenAPI parameter / schema fields shown to LLM clients. */
+export function resolveEnglishSchemaDescription(
+  fieldName: string,
+  openApiDescription?: string,
+): string {
+  const trimmed = openApiDescription?.trim();
+  if (trimmed && !/[àâäéèêëïîôùûüçœæ]/i.test(trimmed)) {
+    return trimmed;
+  }
+  const label = humanizePathSegment(fieldName.replace(/_/g, '-'));
+  return trimmed ? `${label} (see lomi. API docs)` : label;
+}
+
 export function resolveEnglishCopy(args: {
   operationKey: string;
   httpMethodLower: string;

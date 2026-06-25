@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 const CHECKOUT_SESSION_ID_UUID =
@@ -29,6 +30,8 @@ export type CheckoutIdempotencyContext = {
 
 @Injectable()
 export class CheckoutSessionsService {
+  private readonly logger = new Logger(CheckoutSessionsService.name);
+
   constructor(private readonly supabase: SupabaseService) {}
 
   /**
@@ -97,7 +100,7 @@ export class CheckoutSessionsService {
       );
 
       if (process.env.LOMI_DEBUG_CHECKOUT_RPC === '1') {
-        console.log('create_checkout_session_with_line_items RPC result:', {
+        this.logger.debug('create_checkout_session_with_line_items RPC result:', {
           data,
           error,
         });
@@ -203,7 +206,7 @@ export class CheckoutSessionsService {
     );
 
     if (process.env.LOMI_DEBUG_CHECKOUT_RPC === '1') {
-      console.log('create_checkout_session RPC result:', { data, error });
+      this.logger.debug('create_checkout_session RPC result:', { data, error });
     }
 
     if (error) throwMappedSupabaseRpcError(error.message);

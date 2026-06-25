@@ -2,13 +2,17 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Post,
   Query,
+  Res,
   UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
+import type { Response } from 'express';
+import { resolveRequestIdempotency } from '../../utils/idempotency-fingerprint';
 import {
   ApiTags,
   ApiSecurity,
@@ -58,8 +62,21 @@ export class RefundsController {
   async create(
     @Body() createRefundDto: CreateRefundDto,
     @CurrentUser() user: AuthContext,
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
   ) {
-    return this.refundsService.create(createRefundDto, user);
+    const idempotency = resolveRequestIdempotency(
+      idempotencyKey,
+      JSON.parse(JSON.stringify(createRefundDto)) as Record<string, unknown>,
+    );
+    return this.refundsService
+      .create(createRefundDto, user, idempotency)
+      .then((result) => {
+        if (result.idempotencyCacheHit && res) {
+          res.setHeader('Idempotency-Cache-Hit', 'true');
+        }
+        return result.data;
+      });
   }
 
   @Get()

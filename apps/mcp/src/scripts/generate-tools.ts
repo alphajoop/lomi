@@ -9,22 +9,22 @@ import {
   type OpenAPISpec,
   buildInputJsonSchema,
   toolNameFromOperation,
-} from '../src/generator/openapi-helpers.ts';
+} from '../generator/openapi-helpers.js';
 import {
   type EnglishCopyOverride,
   resolveEnglishCopy,
-} from '../src/generator/mcp-english-copy.ts';
+} from '../generator/mcp-english-copy.js';
 import {
   loadAlwaysLoadKeys,
   resolveToolPolicy,
-} from '../src/tool-policy.ts';
-import { validateManifestToolEntry } from './validate-manifest-entry.ts';
+} from '../tool-policy.js';
+import { validateManifestToolEntry } from './validate-manifest-entry.js';
 import {
   readSpecAndAllowlist,
   getNormalizedOperations,
   HTTP_WITH_BODY,
   METHOD_NAME_BY_OP,
-} from '../../sdks/scripts/public-sdk-operations.js';
+} from '../../../sdks/scripts/public-sdk-operations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const mcpRoot = join(__dirname, '..');

@@ -19,6 +19,11 @@ import {
 import { getMtnCountryConfig } from './mtn-country';
 import { randomUUID } from 'crypto';
 import {
+  withApiIdempotency,
+  type ApiIdempotencyContext,
+} from '../../utils/api-idempotency';
+import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
+import {
   attachChargeNextAction,
   deriveMtnChargeNextAction,
   deriveWaveChargeNextAction,
@@ -37,6 +42,25 @@ export class ChargesService {
   ) {}
 
   async createWaveCharge(
+    createChargeDto: CreateWaveChargeDto,
+    user: AuthContext,
+    scenarioKey?: ChargeScenarioKey,
+    idempotency?: ApiIdempotencyContext,
+  ): Promise<IdempotentCreateResult<unknown>> {
+    const scope = {
+      organizationId: user.organizationId,
+      environment: environmentFromAuth(user),
+      endpointRoute: 'POST:/charge/wave',
+    };
+    return withApiIdempotency(
+      this.supabaseService,
+      scope,
+      idempotency,
+      () => this.executeWaveCharge(createChargeDto, user, scenarioKey),
+    );
+  }
+
+  private async executeWaveCharge(
     createChargeDto: CreateWaveChargeDto,
     user: AuthContext,
     scenarioKey?: ChargeScenarioKey,
@@ -236,6 +260,25 @@ export class ChargesService {
   }
 
   async createMtnCharge(
+    createChargeDto: CreateMtnChargeDto,
+    user: AuthContext,
+    scenarioKey?: ChargeScenarioKey,
+    idempotency?: ApiIdempotencyContext,
+  ): Promise<IdempotentCreateResult<unknown>> {
+    const scope = {
+      organizationId: user.organizationId,
+      environment: environmentFromAuth(user),
+      endpointRoute: 'POST:/charge/mtn',
+    };
+    return withApiIdempotency(
+      this.supabaseService,
+      scope,
+      idempotency,
+      () => this.executeMtnCharge(createChargeDto, user, scenarioKey),
+    );
+  }
+
+  private async executeMtnCharge(
     createChargeDto: CreateMtnChargeDto,
     user: AuthContext,
     scenarioKey?: ChargeScenarioKey,

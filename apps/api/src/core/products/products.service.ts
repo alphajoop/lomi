@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
@@ -10,6 +10,8 @@ type Product = Database['public']['Tables']['products']['Row'];
 
 @Injectable()
 export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
+
   constructor(private readonly supabase: SupabaseService) {}
 
   /**
@@ -81,7 +83,7 @@ export class ProductsService {
           : [];
 
     if (pricesError) {
-      console.error('Error fetching prices:', pricesError);
+      this.logger.error('Error fetching prices:', pricesError);
     }
 
     const { data: feesData, error: feesError } = await this.supabase.rpc(
@@ -101,7 +103,7 @@ export class ProductsService {
           : [];
 
     if (feesError) {
-      console.error('Error fetching fees:', feesError);
+      this.logger.error('Error fetching fees:', feesError);
     }
 
     return {
@@ -185,7 +187,7 @@ export class ProductsService {
         : [pricesData];
 
     if (pricesError) {
-      console.error('Error fetching prices:', pricesError);
+      this.logger.error('Error fetching prices:', pricesError);
     }
 
     // Get associated fees using RPC function that bypasses RLS
@@ -204,7 +206,7 @@ export class ProductsService {
         : [feesData];
 
     if (feesError) {
-      console.error('Error fetching fees:', feesError);
+      this.logger.error('Error fetching fees:', feesError);
     }
 
     return {

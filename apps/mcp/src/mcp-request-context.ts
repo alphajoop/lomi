@@ -17,7 +17,7 @@ export function mcpLog(
   fields: Record<string, unknown> = {},
 ): void {
   const store = getMcpRequestStore();
-  console.log(
+  console.error(
     JSON.stringify({
       ts: new Date().toISOString(),
       service: 'lomi-mcp',

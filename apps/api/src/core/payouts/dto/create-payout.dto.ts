@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEnum,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -34,7 +34,7 @@ export class CreatePayoutDto {
   rail: 'wave' | 'spi' | 'bank' | 'mtn';
 
   @ApiProperty({ example: 5000, type: Number })
-  @IsNumber()
+  @IsInt()
   @Min(1)
   amount: number;
 

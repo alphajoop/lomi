@@ -286,12 +286,12 @@
           "limit": {
             "example": 20,
             "type": "number",
-            "description": "Nombre maximal de résultats"
+            "description": "Limit (see lomi. API docs)"
           },
           "offset": {
             "example": 0,
             "type": "number",
-            "description": "Décalage pour la pagination"
+            "description": "Offset (see lomi. API docs)"
           },
           "status": {
             "enum": [
@@ -366,14 +366,20 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "customer_id": {},
+          "customer_id": {
+            "description": "Customer Id"
+          },
           "limit": {
-            "type": "number"
+            "type": "number",
+            "description": "Limit"
           },
           "offset": {
-            "type": "number"
+            "type": "number",
+            "description": "Offset"
           },
-          "status": {}
+          "status": {
+            "description": "Status"
+          }
         }
       },
       "readOnly": true,
@@ -446,12 +452,12 @@
           "page": {
             "example": 1,
             "type": "number",
-            "description": "Numéro de page"
+            "description": "Page (see lomi. API docs)"
           },
           "pageSize": {
             "example": 50,
             "type": "number",
-            "description": "Nombre d'éléments par page"
+            "description": "PageSize (see lomi. API docs)"
           },
           "search": {
             "type": "string",
@@ -464,7 +470,7 @@
               "all"
             ],
             "type": "string",
-            "description": "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)"
+            "description": "Status (see lomi. API docs)"
           },
           "type": {
             "enum": [
@@ -555,11 +561,13 @@
           },
           "page": {
             "example": 1,
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "pageSize": {
             "example": 50,
-            "type": "number"
+            "type": "number",
+            "description": "PageSize"
           }
         },
         "required": [
@@ -727,7 +735,8 @@
         "type": "object",
         "properties": {
           "endDate": {
-            "type": "string"
+            "type": "string",
+            "description": "EndDate"
           },
           "header_Lomi-Account": {
             "type": "string",
@@ -735,16 +744,20 @@
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "pageSize": {
-            "type": "number"
+            "type": "number",
+            "description": "PageSize"
           },
           "startDate": {
-            "type": "string"
+            "type": "string",
+            "description": "StartDate"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Status"
           }
         }
       },
@@ -885,7 +898,8 @@
               "USD",
               "EUR"
             ],
-            "type": "string"
+            "type": "string",
+            "description": "Currency Code"
           },
           "id": {
             "description": "Merchant UUID"
@@ -956,9 +970,12 @@
         "type": "object",
         "properties": {
           "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "IsActive"
           },
-          "productId": {}
+          "productId": {
+            "description": "ProductId"
+          }
         }
       },
       "readOnly": true,
@@ -1181,7 +1198,7 @@
           "limit": {
             "example": 20,
             "type": "number",
-            "description": "Nombre maximal de résultats"
+            "description": "Limit (see lomi. API docs)"
           },
           "linkType": {
             "enum": [
@@ -1194,7 +1211,7 @@
           "offset": {
             "example": 0,
             "type": "number",
-            "description": "Décalage pour la pagination"
+            "description": "Offset (see lomi. API docs)"
           }
         }
       },
@@ -1267,12 +1284,12 @@
           "limit": {
             "example": 20,
             "type": "number",
-            "description": "Nombre maximal de résultats"
+            "description": "Limit (see lomi. API docs)"
           },
           "offset": {
             "example": 0,
             "type": "number",
-            "description": "Décalage pour la pagination"
+            "description": "Offset (see lomi. API docs)"
           },
           "status": {
             "enum": [
@@ -1350,19 +1367,24 @@
         "type": "object",
         "properties": {
           "endDate": {
-            "type": "string"
+            "type": "string",
+            "description": "EndDate"
           },
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "pageSize": {
-            "type": "number"
+            "type": "number",
+            "description": "PageSize"
           },
           "startDate": {
-            "type": "string"
+            "type": "string",
+            "description": "StartDate"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Status"
           }
         }
       },
@@ -1433,12 +1455,12 @@
           "limit": {
             "example": 15,
             "type": "number",
-            "description": "Nombre maximal de résultats"
+            "description": "Limit (see lomi. API docs)"
           },
           "offset": {
             "example": 0,
             "type": "number",
-            "description": "Décalage pour la pagination"
+            "description": "Offset (see lomi. API docs)"
           }
         }
       },
@@ -1543,7 +1565,8 @@
         "type": "object",
         "properties": {
           "endDate": {
-            "type": "string"
+            "type": "string",
+            "description": "EndDate"
           },
           "header_Lomi-Account": {
             "type": "string",
@@ -1551,16 +1574,20 @@
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
           "limit": {
-            "type": "number"
+            "type": "number",
+            "description": "Limit"
           },
           "offset": {
-            "type": "number"
+            "type": "number",
+            "description": "Offset"
           },
           "startDate": {
-            "type": "string"
+            "type": "string",
+            "description": "StartDate"
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Status"
           }
         }
       },
@@ -1638,10 +1665,12 @@
               "flag",
               "block"
             ],
-            "type": "string"
+            "type": "string",
+            "description": "Decision"
           },
           "endDate": {
-            "type": "string"
+            "type": "string",
+            "description": "EndDate"
           },
           "header_Lomi-Account": {
             "type": "string",
@@ -1649,10 +1678,12 @@
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "pageSize": {
-            "type": "number"
+            "type": "number",
+            "description": "PageSize"
           },
           "rail": {
             "enum": [
@@ -1660,10 +1691,12 @@
               "mtn",
               "wave"
             ],
-            "type": "string"
+            "type": "string",
+            "description": "Rail"
           },
           "startDate": {
-            "type": "string"
+            "type": "string",
+            "description": "StartDate"
           }
         }
       },
@@ -1735,19 +1768,24 @@
         "type": "object",
         "properties": {
           "currency": {
-            "type": "string"
+            "type": "string",
+            "description": "Currency"
           },
           "end_date": {
-            "type": "string"
+            "type": "string",
+            "description": "End Date"
           },
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "pageSize": {
-            "type": "number"
+            "type": "number",
+            "description": "PageSize"
           },
           "start_date": {
-            "type": "string"
+            "type": "string",
+            "description": "Start Date"
           }
         }
       },
@@ -1784,10 +1822,12 @@
             "description": "Settlement id, format {currency}:{YYYY-MM-DD}"
           },
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "pageSize": {
-            "type": "number"
+            "type": "number",
+            "description": "PageSize"
           }
         },
         "required": [
@@ -1823,12 +1863,12 @@
           "page": {
             "example": 1,
             "type": "number",
-            "description": "Numéro de page"
+            "description": "Page (see lomi. API docs)"
           },
           "pageSize": {
             "example": 50,
             "type": "number",
-            "description": "Nombre d'éléments par page"
+            "description": "PageSize (see lomi. API docs)"
           }
         }
       },
@@ -1937,12 +1977,12 @@
           "currency": {
             "example": "XOF,USD",
             "type": "string",
-            "description": "Filtrer par code devise (séparés par des virgules pour plusieurs valeurs)"
+            "description": "Currency (see lomi. API docs)"
           },
           "endDate": {
             "example": "2024-12-31T23:59:59Z",
             "type": "string",
-            "description": "Jusqu'à cette date (format ISO 8601)"
+            "description": "EndDate (see lomi. API docs)"
           },
           "header_Lomi-Account": {
             "type": "string",
@@ -1957,17 +1997,17 @@
           "page": {
             "example": 1,
             "type": "number",
-            "description": "Numéro de page"
+            "description": "Page (see lomi. API docs)"
           },
           "pageSize": {
             "example": 50,
             "type": "number",
-            "description": "Nombre d'éléments par page"
+            "description": "PageSize (see lomi. API docs)"
           },
           "paymentMethod": {
             "example": "MOBILE_MONEY,CARDS",
             "type": "string",
-            "description": "Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs)"
+            "description": "PaymentMethod (see lomi. API docs)"
           },
           "provider": {
             "example": "WAVE",
@@ -1977,17 +2017,17 @@
           "startDate": {
             "example": "2024-01-01T00:00:00Z",
             "type": "string",
-            "description": "À partir de cette date (format ISO 8601)"
+            "description": "StartDate (see lomi. API docs)"
           },
           "status": {
             "example": "completed,pending",
             "type": "string",
-            "description": "Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs)"
+            "description": "Status (see lomi. API docs)"
           },
           "type": {
             "example": "payment,refund",
             "type": "string",
-            "description": "Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs)"
+            "description": "Type (see lomi. API docs)"
           }
         }
       },
@@ -2082,12 +2122,16 @@
         "type": "object",
         "properties": {
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "page_size": {
-            "type": "number"
+            "type": "number",
+            "description": "Page Size"
           },
-          "subscription_id": {}
+          "subscription_id": {
+            "description": "Subscription Id"
+          }
         }
       },
       "readOnly": true,
@@ -2116,8 +2160,12 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "end_date": {},
-          "start_date": {}
+          "end_date": {
+            "description": "End Date"
+          },
+          "start_date": {
+            "description": "Start Date"
+          }
         },
         "required": [
           "end_date",
@@ -2187,13 +2235,19 @@
       "inputSchema": {
         "type": "object",
         "properties": {
-          "code": {},
-          "customer_id": {},
+          "code": {
+            "description": "Code"
+          },
+          "customer_id": {
+            "description": "Customer Id"
+          },
           "page": {
-            "type": "number"
+            "type": "number",
+            "description": "Page"
           },
           "page_size": {
-            "type": "number"
+            "type": "number",
+            "description": "Page Size"
           },
           "status": {
             "enum": [
@@ -2201,7 +2255,8 @@
               "processed",
               "failed"
             ],
-            "type": "string"
+            "type": "string",
+            "description": "Status"
           }
         }
       },
@@ -2270,7 +2325,7 @@
           "failedOnly": {
             "example": false,
             "type": "boolean",
-            "description": "Uniquement les livraisons en échec"
+            "description": "FailedOnly (see lomi. API docs)"
           },
           "limit": {
             "example": 25,
@@ -2280,12 +2335,12 @@
           "offset": {
             "example": 0,
             "type": "number",
-            "description": "Nombre de journaux à ignorer (pagination)"
+            "description": "Offset (see lomi. API docs)"
           },
           "successOnly": {
             "example": false,
             "type": "boolean",
-            "description": "Uniquement les livraisons réussies"
+            "description": "SuccessOnly (see lomi. API docs)"
           },
           "webhookId": {
             "type": "string",
