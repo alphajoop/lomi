@@ -1,0 +1,93 @@
+name: lomi · deploy · website
+
+on:
+  repository_dispatch:
+    types: [lomi-deploy-website]
+  push:
+    branches: [main]
+    paths:
+      - "apps/website/**"
+      - ".github/workflows/app-deploy-website.yml"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch to deploy
+        type: string
+        default: main
+
+concurrency:
+  group: lomi-deploy-website-${{ github.event.client_payload.pr_number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/website
+    steps:
+      - name: Checkout from private repository
+        if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v5
+        with:
+          repository: lomiafrica/website
+          ref: ${{{{ github.event_name == 'workflow_dispatch' && format('refs/heads/{{0}}', inputs.ref) || github.event.client_payload.sha }}}}
+          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+          path: apps/website
+
+      - name: Checkout monorepo submodule
+        if: github.event_name == 'push'
+        uses: actions/checkout@v5
+        with:
+          submodules: apps/website
+          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: apps/website/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+  deploy:
+    needs: verify
+    if: |
+      github.event.client_payload.target == 'production' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout from private repository
+        if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+        uses: actions/checkout@v5
+        with:
+          repository: lomiafrica/website
+          ref: ${{{{ github.event_name == 'workflow_dispatch' && format('refs/heads/{{0}}', inputs.ref) || github.event.client_payload.sha }}}}
+          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+          path: apps/website
+
+      - name: Checkout monorepo submodule
+        if: github.event_name == 'push'
+        uses: actions/checkout@v5
+        with:
+          submodules: apps/website
+          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v42.2.0
+        with:
+          vercel-token: ${{{{ secrets.VERCEL_TOKEN }}}}
+          vercel-org-id: ${{{{ secrets.VERCEL_ORG_ID }}}}
+          vercel-project-id: ${{{{ secrets.VERCEL_PROJECT_ID_WEBSITE }}}}
+          working-directory: apps/website
+          target: production
+

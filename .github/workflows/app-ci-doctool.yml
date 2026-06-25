@@ -1,4 +1,4 @@
-name: doctool
+name: lomi · ci · doctool
 
 on:
   pull_request:
@@ -7,11 +7,11 @@ on:
       - "apps/docs/**"
       - "apps/mcp/**"
       - "apps/sdks/ts/src/generated/**"
-      - ".github/workflows/doctool.yml"
+      - ".github/workflows/app-ci-doctool.yml"
   push:
     branches: [main]
     paths:
-      - ".github/workflows/doctool.yml"
+      - ".github/workflows/app-ci-doctool.yml"
 
 jobs:
   build-doctool:

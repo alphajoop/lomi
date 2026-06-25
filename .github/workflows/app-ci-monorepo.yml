@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: lomi · ci · monorepo
 
 on:
   push:
@@ -69,7 +69,7 @@ jobs:
           version: 8
       - uses: actions/setup-node@v6
         with:
-          node-version: "18"
+          node-version: "22"
           cache: "pnpm"
           cache-dependency-path: "./apps/docs/pnpm-lock.yaml"
       - uses: oven-sh/setup-bun@v2
@@ -89,18 +89,3 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test
       - run: cargo build --release
-
-  deploy:
-    needs: [build-api, build-docs, build-cli]
-    if: |
-      github.ref == 'refs/heads/main' && 
-      !cancelled() &&
-      (needs.build-api.result == 'success' || needs.build-api.result == 'skipped') &&
-      (needs.build-docs.result == 'success' || needs.build-docs.result == 'skipped') &&
-      (needs.build-cli.result == 'success' || needs.build-cli.result == 'skipped')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Deploy to production
-        run: |
-          echo "Deploying affected applications to production..."

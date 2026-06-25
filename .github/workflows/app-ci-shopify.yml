@@ -1,16 +1,16 @@
-name: Shopify App CI
+name: lomi · ci · shopify
 
 on:
   push:
     branches: [main, develop]
     paths:
       - "apps/plugins/shopify/**"
-      - ".github/workflows/shopify-ci.yml"
+      - ".github/workflows/app-ci-shopify.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/plugins/shopify/**"
-      - ".github/workflows/shopify-ci.yml"
+      - ".github/workflows/app-ci-shopify.yml"
   workflow_dispatch:
 
 jobs:

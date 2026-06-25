@@ -1,16 +1,16 @@
-name: Woo Plugin CI
+name: lomi · ci · woo
 
 on:
   push:
     branches: [main, develop]
     paths:
       - "apps/plugins/woo/**"
-      - ".github/workflows/woo-ci.yml"
+      - ".github/workflows/app-ci-woo.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/plugins/woo/**"
-      - ".github/workflows/woo-ci.yml"
+      - ".github/workflows/app-ci-woo.yml"
   workflow_dispatch:
 
 jobs:

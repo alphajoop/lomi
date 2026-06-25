@@ -1,4 +1,4 @@
-name: SDK Regeneration
+name: lomi · release · sdk-regeneration
 
 on:
   # Manual trigger - always available

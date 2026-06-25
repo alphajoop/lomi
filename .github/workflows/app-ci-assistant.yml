@@ -1,4 +1,4 @@
-name: Assistant Agent CI
+name: lomi · ci · assistant
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - "apps/dashboard/supabase/functions/assistant-cancel/**"
       - "apps/dashboard/src/lib/assistant/**"
       - "apps/dashboard/src/lib/scripts/generate-assistant-tool-manifest.mjs"
-      - ".github/workflows/assistant-agent-ci.yml"
+      - ".github/workflows/app-ci-assistant.yml"
   push:
     branches:
       - main
@@ -20,7 +20,7 @@ on:
       - "apps/dashboard/supabase/functions/assistant-cancel/**"
       - "apps/dashboard/src/lib/assistant/**"
       - "apps/dashboard/src/lib/scripts/generate-assistant-tool-manifest.mjs"
-      - ".github/workflows/assistant-agent-ci.yml"
+      - ".github/workflows/app-ci-assistant.yml"
 
 jobs:
   assistant-agent:

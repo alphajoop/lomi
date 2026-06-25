@@ -1,16 +1,16 @@
-name: Plugins Verify
+name: lomi · ci · plugins
 
 on:
   push:
     branches: [main, develop]
     paths:
       - "apps/plugins/**"
-      - ".github/workflows/plugins-verify.yml"
+      - ".github/workflows/app-ci-plugins.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/plugins/**"
-      - ".github/workflows/plugins-verify.yml"
+      - ".github/workflows/app-ci-plugins.yml"
   workflow_dispatch:
 
 jobs:
