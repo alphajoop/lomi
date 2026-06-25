@@ -1,6 +1,6 @@
 [submodule "apps/admin"]
 	path = apps/admin
-	url = https://github.com/lomiafrica/admin.lomi.africa
+	url = https://github.com/lomiafrica/admin.git
 [submodule "apps/dashboard"]
 	path = apps/dashboard
 	url = https://github.com/lomiafrica/dashboard.git

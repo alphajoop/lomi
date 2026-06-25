@@ -36,7 +36,7 @@ jobs:
         id: checkout-app
         uses: ./.github/actions/checkout-app-submodule
         with:
-          repository: lomiafrica/admin.lomi.africa
+          repository: lomiafrica/admin
           submodule-path: apps/admin
           token: ${{ secrets.REPO_CHECKOUT_PAT }}
           event-name: ${{ github.event_name }}
