@@ -48,6 +48,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DASHBOARD }}
-          working-directory: apps/dashboard
+          working-directory: ${{ github.workspace }}/apps/dashboard
           target: ${{ github.event.client_payload.target || 'production' }}
 

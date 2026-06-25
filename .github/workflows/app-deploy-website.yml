@@ -88,5 +88,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
-          working-directory: apps/website
+          working-directory: ${{ github.workspace }}/apps/website
           target: production

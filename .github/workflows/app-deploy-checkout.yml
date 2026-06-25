@@ -48,6 +48,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CHECKOUT }}
-          working-directory: apps/checkout
+          working-directory: ${{ github.workspace }}/apps/checkout
           target: ${{ github.event.client_payload.target || 'production' }}
 
