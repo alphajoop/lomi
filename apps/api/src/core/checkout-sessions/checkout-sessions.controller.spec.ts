@@ -53,8 +53,10 @@ describe('CheckoutSessionsController', () => {
       currency_code: 'XOF',
     } as CreateCheckoutSessionDto;
     service.create.mockResolvedValue({
-      checkout_session_id: 'cs_1',
-      checkout_url: 'https://checkout.lomi.africa/checkout/cs_1',
+      data: {
+        checkout_session_id: 'cs_1',
+        checkout_url: 'https://checkout.lomi.africa/checkout/cs_1',
+      },
     } as any);
 
     const result = (await controller.create(dto, user)) as {

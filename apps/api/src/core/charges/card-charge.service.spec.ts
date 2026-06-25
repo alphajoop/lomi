@@ -19,6 +19,7 @@ import {
 import { CardChargeService } from './card-charge.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
+import { RadarService } from '../radar/radar.service';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 
@@ -49,6 +50,12 @@ describe('CardChargeService', () => {
         {
           provide: SupabaseService,
           useValue: supabase,
+        },
+        {
+          provide: RadarService,
+          useValue: {
+            assertChargeAllowed: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile();
@@ -121,9 +128,9 @@ describe('CardChargeService', () => {
 
     const result = await service.create(dto, user);
 
-    expect((result.data as { client_secret: string }).client_secret).toBe(
-      'pi_test_secret',
-    );
+    expect(
+      (result.data as { data: { client_secret: string } }).data.client_secret,
+    ).toBe('pi_test_secret');
 
     expect(
       stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.create,
@@ -284,6 +291,12 @@ describe('CardChargeService', () => {
           CardChargeService,
           StripeClientsService,
           { provide: SupabaseService, useValue: supabaseOnly },
+          {
+            provide: RadarService,
+            useValue: {
+              assertChargeAllowed: jest.fn().mockResolvedValue(undefined),
+            },
+          },
         ],
       }).compile();
 

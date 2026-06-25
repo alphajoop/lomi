@@ -88,9 +88,11 @@ describe('PaymentRequestsService', () => {
         expiry_date: '2026-12-31T23:59:59.000Z',
       };
 
-      mockClientRpc.mockResolvedValue({
-        data: { request_id: 'x' },
-        error: null,
+      mockClientRpc.mockImplementation(async (name: string) => {
+        if (name === 'lookup_api_idempotency_record') {
+          return { data: null, error: null };
+        }
+        return { data: { request_id: 'x' }, error: null };
       });
 
       await service.create(dto, user, { key: 'ik', bodyHash: 'fh' });

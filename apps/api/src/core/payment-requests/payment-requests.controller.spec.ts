@@ -45,7 +45,7 @@ describe('PaymentRequestsController', () => {
       currency_code: 'XOF',
       expiry_date: '2026-01-01T00:00:00.000Z',
     } as CreatePaymentRequestDto;
-    service.create.mockResolvedValue({ request_id: 'pr_1' } as any);
+    service.create.mockResolvedValue({ data: { request_id: 'pr_1' } } as any);
 
     const result = await controller.create(dto, user);
 

@@ -765,6 +765,9 @@ describe('RefundsService', () => {
       if (name.startsWith('get_effective_other_fee_config')) {
         return { data: [{ percentage: 2, fixed_amount: 0 }], error: null };
       }
+      if (name === 'resolve_network_member_merchant_id') {
+        return { data: 'member-merchant-1', error: null };
+      }
       if (name === 'create_stripe_card_refund_api') {
         return {
           data: {

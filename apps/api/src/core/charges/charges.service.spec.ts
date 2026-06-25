@@ -51,6 +51,7 @@ describe('ChargesService (network)', () => {
       supabase,
       {
         evaluateCharge: jest.fn().mockResolvedValue({ action: 'allow' }),
+        assertChargeAllowed: jest.fn().mockResolvedValue(undefined),
       } as unknown as RadarService,
     );
   });
@@ -62,8 +63,14 @@ describe('ChargesService (network)', () => {
     });
 
     rpc.mockImplementation(async (name: string) => {
+      if (name === 'lookup_api_idempotency_record') {
+        return { data: null, error: null };
+      }
       if (name === 'create_or_update_customer') {
         return { data: 'cust-1', error: null };
+      }
+      if (name === 'resolve_network_member_merchant_id') {
+        return { data: 'member-merchant-1', error: null };
       }
       if (name === 'fetch_network_provider_settings_for_api') {
         return {
@@ -130,6 +137,9 @@ describe('ChargesService (network)', () => {
 
   it('rejects Wave charge when network provider is not connected', async () => {
     rpc.mockImplementation(async (name: string) => {
+      if (name === 'resolve_network_member_merchant_id') {
+        return { data: 'member-merchant-1', error: null };
+      }
       if (name === 'create_or_update_customer') {
         return { data: 'cust-1', error: null };
       }

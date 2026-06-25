@@ -158,6 +158,9 @@ describe('CheckoutSessionsService', () => {
     } as CreateCheckoutSessionDto;
 
     mockSupabaseService.rpc.mockImplementation(async (name: string) => {
+      if (name === 'lookup_api_idempotency_record') {
+        return { data: null, error: null };
+      }
       if (name === 'record_network_transaction_context') {
         return { data: 'ctx-network', error: null };
       }

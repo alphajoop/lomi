@@ -124,7 +124,7 @@ describe('PayoutsService', () => {
         }),
       },
     });
-    expect(result).toMatchObject({
+    expect(result.data).toMatchObject({
       success: true,
       kind: 'beneficiary',
       payout_id: 'payout-mtn-uuid',
@@ -247,7 +247,7 @@ describe('PayoutsService', () => {
         },
       },
     });
-    expect(result).toMatchObject({
+    expect(result.data).toMatchObject({
       success: true,
       kind: 'beneficiary',
       payout_id: 'payout-uuid',
