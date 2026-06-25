@@ -8,6 +8,7 @@ on:
     paths:
       - "apps/admin/**"
       - ".github/workflows/app-deploy-admin.yml"
+      - ".github/actions/checkout-private-app/**"
   workflow_dispatch:
     inputs:
       ref:
@@ -26,28 +27,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout monorepo pointer
-        if: github.event_name == 'push'
-        uses: actions/checkout@v5
-
-      - name: Resolve app ref
-        id: app-ref
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            REF="$(git rev-parse "HEAD:apps/admin")"
-            echo "ref=${REF}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "ref=refs/heads/${{ inputs.ref }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "ref=${{ github.event.client_payload.sha }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Checkout app repository
-        uses: actions/checkout@v5
+      - name: Checkout app source
+        uses: ./.github/actions/checkout-private-app
         with:
           repository: lomiafrica/admin.lomi.africa
-          ref: ${{ steps.app-ref.outputs.ref }}
+          submodule-path: apps/admin
           token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          event-name: ${{ github.event_name }}
+          workflow-ref: ${{ inputs.ref }}
+          dispatch-sha: ${{ github.event.client_payload.sha }}
+
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v42.2.0

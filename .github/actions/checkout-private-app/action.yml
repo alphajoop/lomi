@@ -1,0 +1,86 @@
+name: Checkout private app
+description: Verify PAT access and checkout a private lomi app repository at the resolved ref.
+
+inputs:
+  repository:
+    description: GitHub repository (owner/name)
+    required: true
+  submodule-path:
+    description: Submodule path in lomi. used to resolve SHAs on push events
+    required: true
+  token:
+    description: PAT with read access to the private repository
+    required: true
+  event-name:
+    description: github.event_name for the calling workflow
+    required: true
+  workflow-ref:
+    description: Branch input for workflow_dispatch
+    required: false
+    default: main
+  dispatch-sha:
+    description: Commit SHA from repository_dispatch client_payload
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Verify private repository access
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.token }}
+        REPOSITORY: ${{ inputs.repository }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "$TOKEN" ]; then
+          echo "::error::REPO_CHECKOUT_PAT is not set on lomiafrica/lomi. Add it under Settings → Secrets and variables → Actions."
+          exit 1
+        fi
+
+        STATUS="$(curl -s -o /dev/null -w "%{http_code}" \
+          -H "Authorization: Bearer ${TOKEN}" \
+          -H "Accept: application/vnd.github+json" \
+          "https://api.github.com/repos/${REPOSITORY}")"
+
+        if [ "$STATUS" != "200" ]; then
+          echo "::error::REPO_CHECKOUT_PAT cannot read ${REPOSITORY} (HTTP ${STATUS})."
+          echo "::error::Use a classic PAT with the repo scope, authorize SSO for the lomiafrica org, and grant read access to every private app repo."
+          exit 1
+        fi
+
+    - name: Checkout monorepo pointer
+      if: inputs.event-name == 'push'
+      uses: actions/checkout@v5
+
+    - name: Resolve app ref
+      id: app-ref
+      shell: bash
+      env:
+        EVENT_NAME: ${{ inputs.event-name }}
+        SUBMODULE_PATH: ${{ inputs.submodule-path }}
+        WORKFLOW_REF: ${{ inputs.workflow-ref }}
+        DISPATCH_SHA: ${{ inputs.dispatch-sha }}
+      run: |
+        set -euo pipefail
+
+        if [ "$EVENT_NAME" = "push" ]; then
+          REF="$(git rev-parse "HEAD:${SUBMODULE_PATH}")"
+          echo "ref=${REF}" >> "$GITHUB_OUTPUT"
+        elif [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+          echo "ref=refs/heads/${WORKFLOW_REF}" >> "$GITHUB_OUTPUT"
+        else
+          if [ -z "$DISPATCH_SHA" ]; then
+            echo "::error::repository_dispatch is missing client_payload.sha"
+            exit 1
+          fi
+          echo "ref=${DISPATCH_SHA}" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Checkout app repository
+      uses: actions/checkout@v5
+      with:
+        repository: ${{ inputs.repository }}
+        ref: ${{ steps.app-ref.outputs.ref }}
+        token: ${{ inputs.token }}
