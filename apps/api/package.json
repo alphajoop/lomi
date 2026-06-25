@@ -25,11 +25,9 @@
     "types": "pnpm run generate:api-types",
     "generate:modules": "pnpx tsx src/utils/scripts/generate-modules.ts",
     "generate:api-types": "pnpx tsx src/utils/scripts/generate-api-types.ts",
-    "list:tables": "pnpx tsx src/utils/scripts/list-tables.ts",
-    "fix:specs": "pnpx tsx src/utils/scripts/fix-specs.ts",
     "knip": "pnpm dlx knip",
-    "openapi:export": "pnpx tsx src/scripts/export-openapi.ts",
-    "openapi:export:agent": "pnpx tsx src/scripts/export-agent-openapi.ts",
+    "openapi:export": "pnpx tsx src/utils/scripts/export-openapi.ts",
+    "openapi:export:agent": "pnpx tsx src/utils/scripts/export-agent-openapi.ts",
     "openapi:export:all": "pnpm run openapi:export && pnpm run openapi:export:agent",
     "setup:whatsapp-webhooks": "pnpx tsx src/utils/scripts/setup-kapso-platform-webhook.ts --apply-secrets --project-ref mdswvokxrnfggrujsfjd"
   },

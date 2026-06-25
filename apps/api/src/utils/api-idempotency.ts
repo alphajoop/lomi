@@ -1,7 +1,6 @@
 import { SupabaseService } from './supabase/supabase.service';
 import {
   lookupIdempotencyCache,
-  type IdempotencyCacheLookup,
   type IdempotentCreateResult,
 } from './idempotency-cache';
 

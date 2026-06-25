@@ -40,7 +40,7 @@ function collectOperationIds(
   document: ReturnType<typeof readExportedOpenApi>,
 ): Set<string> {
   const ids = new Set<string>();
-  for (const [pathKey, pathItem] of Object.entries(document.paths)) {
+  for (const [_pathKey, pathItem] of Object.entries(document.paths)) {
     for (const [method, operation] of Object.entries(pathItem)) {
       if (method === 'parameters' || !operation?.operationId) continue;
       ids.add(operation.operationId);

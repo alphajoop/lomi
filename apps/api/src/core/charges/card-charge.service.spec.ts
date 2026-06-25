@@ -121,8 +121,9 @@ describe('CardChargeService', () => {
 
     const result = await service.create(dto, user);
 
-    expect(result.success).toBe(true);
-    expect(result.data.client_secret).toBe('pi_test_secret');
+    expect((result.data as { client_secret: string }).client_secret).toBe(
+      'pi_test_secret',
+    );
 
     expect(
       stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.create,

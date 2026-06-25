@@ -210,7 +210,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.refund_id).toBe('ref-1');
+    expect(result.data.refund_id).toBe('ref-1');
     expect(stripeRefundsCreate).toHaveBeenCalledWith(
       expect.objectContaining({ charge: 'ch_test' }),
     );
@@ -288,7 +288,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.subscription_action).toEqual({
+    expect(result.data.subscription_action).toEqual({
       applied: false,
       action: 'none',
     });
@@ -333,7 +333,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.refund_id).toBe('ref-wave-full');
+    expect(result.data.refund_id).toBe('ref-wave-full');
     expect(rpc).toHaveBeenCalledWith(
       'create_wave_refund_request_api',
       expect.objectContaining({
@@ -442,7 +442,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.refund_id).toBe('ref-partial');
+    expect(result.data.refund_id).toBe('ref-partial');
     expect(rpc).toHaveBeenCalledWith(
       'create_refund',
       expect.objectContaining({
@@ -497,7 +497,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.refund_id).toBe('ref-mtn-full');
+    expect(result.data.refund_id).toBe('ref-mtn-full');
     expect(rpc).toHaveBeenCalledWith(
       'create_mtn_refund_request_api',
       expect.objectContaining({
@@ -543,7 +543,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.refund_id).toBe('ref-mtn-test');
+    expect(result.data.refund_id).toBe('ref-mtn-test');
     expect(global.fetch).not.toHaveBeenCalled();
     expect(rpc).toHaveBeenCalledWith(
       'create_mtn_refund_request_api',
@@ -647,7 +647,7 @@ describe('RefundsService', () => {
       user,
     );
 
-    expect(result.refund_id).toBe('ref-mtn-partial');
+    expect(result.data.refund_id).toBe('ref-mtn-partial');
     expect(rpc).toHaveBeenCalledWith(
       'create_mtn_refund_request_api',
       expect.objectContaining({
@@ -793,7 +793,7 @@ describe('RefundsService', () => {
       networkUser,
     );
 
-    expect(result.refund_id).toBe('ref-network');
+    expect(result.data.refund_id).toBe('ref-network');
     expect(rpc).toHaveBeenCalledWith(
       'record_network_transaction_context',
       expect.objectContaining({

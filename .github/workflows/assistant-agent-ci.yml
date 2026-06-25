@@ -8,7 +8,7 @@ on:
       - "apps/dashboard/supabase/functions/assistant-resume/**"
       - "apps/dashboard/supabase/functions/assistant-cancel/**"
       - "apps/dashboard/src/lib/assistant/**"
-      - "apps/dashboard/scripts/generate-assistant-tool-manifest.mjs"
+      - "apps/dashboard/src/lib/scripts/generate-assistant-tool-manifest.mjs"
       - ".github/workflows/assistant-agent-ci.yml"
   push:
     branches:
@@ -19,7 +19,7 @@ on:
       - "apps/dashboard/supabase/functions/assistant-resume/**"
       - "apps/dashboard/supabase/functions/assistant-cancel/**"
       - "apps/dashboard/src/lib/assistant/**"
-      - "apps/dashboard/scripts/generate-assistant-tool-manifest.mjs"
+      - "apps/dashboard/src/lib/scripts/generate-assistant-tool-manifest.mjs"
       - ".github/workflows/assistant-agent-ci.yml"
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate tool manifest
         working-directory: apps/dashboard
-        run: node scripts/generate-assistant-tool-manifest.mjs
+        run: node src/lib/scripts/generate-assistant-tool-manifest.mjs
 
       - name: Check manifest drift
         working-directory: apps/dashboard
