@@ -34,8 +34,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: lomiafrica/website
-          ref: ${{{{ github.event_name == 'workflow_dispatch' && format('refs/heads/{{0}}', inputs.ref) || github.event.client_payload.sha }}}}
-          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/heads/{0}', inputs.ref) || github.event.client_payload.sha }}
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
           path: apps/website
 
       - name: Checkout monorepo submodule
@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: apps/website
-          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -71,8 +71,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: lomiafrica/website
-          ref: ${{{{ github.event_name == 'workflow_dispatch' && format('refs/heads/{{0}}', inputs.ref) || github.event.client_payload.sha }}}}
-          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/heads/{0}', inputs.ref) || github.event.client_payload.sha }}
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
           path: apps/website
 
       - name: Checkout monorepo submodule
@@ -80,14 +80,13 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: apps/website
-          token: ${{{{ secrets.REPO_CHECKOUT_PAT }}}}
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v42.2.0
         with:
-          vercel-token: ${{{{ secrets.VERCEL_TOKEN }}}}
-          vercel-org-id: ${{{{ secrets.VERCEL_ORG_ID }}}}
-          vercel-project-id: ${{{{ secrets.VERCEL_PROJECT_ID_WEBSITE }}}}
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
           working-directory: apps/website
           target: production
-
