@@ -1,6 +1,11 @@
 name: Checkout private app
 description: Verify PAT access and checkout a private lomi app repository at the resolved ref.
 
+outputs:
+  app-path:
+    description: Filesystem path where the private app repository was checked out
+    value: ${{ inputs.submodule-path }}
+
 inputs:
   repository:
     description: GitHub repository (owner/name)
@@ -84,3 +89,4 @@ runs:
         repository: ${{ inputs.repository }}
         ref: ${{ steps.app-ref.outputs.ref }}
         token: ${{ inputs.token }}
+        path: ${{ inputs.submodule-path }}

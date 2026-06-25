@@ -17,19 +17,25 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: pnpm
+          cache-dependency-path: apps/plugins/woo/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: apps/plugins/woo
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build plugin assets
         working-directory: apps/plugins/woo
         run: |
-          npm run build
-          npm run i18n
+          pnpm run build
+          pnpm run i18n
 
       - name: Package release zip
         working-directory: apps/plugins/woo

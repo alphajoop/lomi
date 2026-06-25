@@ -33,6 +33,7 @@ jobs:
           sparse-checkout: .github/actions/checkout-private-app
 
       - name: Checkout app source
+        id: checkout-app
         uses: ./.github/actions/checkout-private-app
         with:
           repository: lomiafrica/website
@@ -49,8 +50,11 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: ${{ steps.checkout-app.outputs.app-path }}/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+        working-directory: ${{ steps.checkout-app.outputs.app-path }}
       - run: pnpm lint
+        working-directory: ${{ steps.checkout-app.outputs.app-path }}
         env:
           NEXT_TELEMETRY_DISABLED: "1"
 
@@ -68,6 +72,7 @@ jobs:
           sparse-checkout: .github/actions/checkout-private-app
 
       - name: Checkout app source
+        id: checkout-app
         uses: ./.github/actions/checkout-private-app
         with:
           repository: lomiafrica/website
@@ -83,5 +88,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
-          working-directory: ${{ github.workspace }}
+          working-directory: ${{ github.workspace }}/${{ steps.checkout-app.outputs.app-path }}
           target: production

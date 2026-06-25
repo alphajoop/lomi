@@ -33,6 +33,7 @@ jobs:
           sparse-checkout: .github/actions/checkout-private-app
 
       - name: Checkout app source
+        id: checkout-app
         uses: ./.github/actions/checkout-private-app
         with:
           repository: lomiafrica/checkout
@@ -49,5 +50,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CHECKOUT }}
-          working-directory: ${{ github.workspace }}
+          working-directory: ${{ github.workspace }}/${{ steps.checkout-app.outputs.app-path }}
           target: ${{ github.event.client_payload.target || 'production' }}

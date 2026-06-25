@@ -24,14 +24,20 @@ jobs:
       - name: Run plugin parity checks
         run: apps/plugins/scripts/verify-lomi-plugins.sh
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/plugins/woo/pnpm-lock.yaml
 
       - name: Install Woo build dependencies
         working-directory: apps/plugins/woo
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build Woo assets
         working-directory: apps/plugins/woo
-        run: npm run build
+        run: pnpm run build

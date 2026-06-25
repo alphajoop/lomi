@@ -206,11 +206,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+          cache-dependency-path: apps/sdks/embed/pnpm-lock.yaml
 
       - name: Bump version
         if: inputs.version_bump != 'skip'
@@ -220,13 +226,13 @@ jobs:
       - name: Install dependencies, test, and build
         working-directory: apps/sdks/embed
         run: |
-          npm ci
-          npm test
-          npm run build
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm run build
 
       - name: Publish to npm
         working-directory: apps/sdks/embed
-        run: npm publish --access public
+        run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -241,11 +247,17 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+          cache-dependency-path: apps/design/shared/receipt-pdf/pnpm-lock.yaml
 
       - name: Bump version
         if: inputs.version_bump != 'skip'
@@ -255,11 +267,11 @@ jobs:
       - name: Install dependencies and build
         working-directory: apps/design/shared/receipt-pdf
         run: |
-          npm ci
-          npm run build
+          pnpm install --frozen-lockfile
+          pnpm run build
 
       - name: Publish to npm
         working-directory: apps/design/shared/receipt-pdf
-        run: npm publish --access public
+        run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
