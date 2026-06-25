@@ -2,7 +2,7 @@
 # Extensive CLI smoke tests — run from repo root or apps/cli
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 LOMI="${LOMI_BIN:-$ROOT/target/release/lomi}"
 PASS=0
 FAIL=0
@@ -207,9 +207,9 @@ mkdir -p "$UI_DRY_DIR"
 ) && pass "lomi ui add --dry-run" || fail "lomi ui add --dry-run"
 
 log "12. generate-rules.sh"
-if ./scripts/generate-rules.sh >/dev/null 2>&1; then
+if ./src/utils/scripts/generate-rules.sh >/dev/null 2>&1; then
   pass "generate-rules.sh"
-  [[ -f rules/llms.txt ]] && pass "rules/llms.txt exists" || fail "rules/llms.txt missing"
+  [[ -f src/utils/rules/llms.txt ]] && pass "src/utils/rules/llms.txt exists" || fail "src/utils/rules/llms.txt missing"
 else
   fail "generate-rules.sh"
 fi

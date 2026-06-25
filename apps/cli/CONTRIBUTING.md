@@ -35,7 +35,7 @@ Runs `pnpm lint` and `pnpm docs:drift` in `apps/docs`. See [Writing for lomi. do
 ## Publishing a release
 
 1. Bump version in `apps/cli/Cargo.toml` and `apps/cli/npm/package.json`
-2. Run `./scripts/generate-rules.sh` to refresh `rules/llms.txt` and API reference
+2. Run `./src/utils/scripts/generate-rules.sh` to refresh `src/utils/rules/llms.txt` and API reference
 3. Update SHA256 checksums in `apps/cli/homebrew/lomi.rb`
 4. Tag and push: `git tag cli-v3.0.0 && git push origin cli-v3.0.0`
 5. GitHub Actions builds binaries, creates a release, and publishes `lomi.cli` to npm (requires `NPM_TOKEN` secret)

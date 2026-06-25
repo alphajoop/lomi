@@ -82,7 +82,7 @@ fn install_llms_txt(options: &[RuleOption]) -> Result<PathBuf> {
         .iter()
         .find(|option| option.name == "llms-txt")
         .map(|option| option.contents.as_str())
-        .unwrap_or(include_str!("../../rules/llms.txt"));
+        .unwrap_or(include_str!("../utils/rules/llms.txt"));
 
     write_file(Path::new("llms.txt"), llms)
 }

@@ -100,10 +100,13 @@ export class CheckoutSessionsService {
       );
 
       if (process.env.LOMI_DEBUG_CHECKOUT_RPC === '1') {
-        this.logger.debug('create_checkout_session_with_line_items RPC result:', {
-          data,
-          error,
-        });
+        this.logger.debug(
+          'create_checkout_session_with_line_items RPC result:',
+          {
+            data,
+            error,
+          },
+        );
       }
 
       if (error) throwMappedSupabaseRpcError(error.message);

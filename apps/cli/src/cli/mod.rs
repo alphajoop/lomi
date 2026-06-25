@@ -72,11 +72,3 @@ impl CommonOptions {
         Ok(GlobalConfig::load()?.current_profile)
     }
 }
-
-impl CommonOptions {
-    pub fn resolved_api_url(&self) -> String {
-        self.api_url
-            .clone()
-            .unwrap_or_else(|| PRODUCTION_API_URL.to_string())
-    }
-}

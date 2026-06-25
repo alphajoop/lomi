@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 OPENAPI="${ROOT}/../docs/openapi.json"
-OUT_API="${ROOT}/rules/api-reference.md"
-OUT_LLMS="${ROOT}/rules/llms.txt"
+OUT_API="${ROOT}/src/utils/rules/api-reference.md"
+OUT_LLMS="${ROOT}/src/utils/rules/llms.txt"
 DOCS_LLMS_URL="${LOMI_DOCS_LLMS_URL:-https://docs.lomi.africa/llms.txt}"
 
 if [[ ! -f "${OPENAPI}" ]]; then
@@ -57,7 +57,7 @@ else
     cat > "${OUT_LLMS}" <<'EOF'
 # lomi.
 
-> Francophone West Africa's payment platform. Refresh this file with: ./scripts/generate-rules.sh
+> Francophone West Africa's payment platform. Refresh this file with: ./src/utils/scripts/generate-rules.sh
 
 - Documentation: https://docs.lomi.africa
 - Sandbox API: https://sandbox.api.lomi.africa

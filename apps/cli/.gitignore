@@ -14,4 +14,4 @@ node_modules/
 # Legacy TS build output
 dist/
 
-# rules/api-reference.md is committed for offline builds (refresh via scripts/generate-rules.sh)
+# src/utils/rules/api-reference.md is committed for offline builds (refresh via src/utils/scripts/generate-rules.sh)

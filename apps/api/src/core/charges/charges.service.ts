@@ -52,11 +52,8 @@ export class ChargesService {
       environment: environmentFromAuth(user),
       endpointRoute: 'POST:/charge/wave',
     };
-    return withApiIdempotency(
-      this.supabaseService,
-      scope,
-      idempotency,
-      () => this.executeWaveCharge(createChargeDto, user, scenarioKey),
+    return withApiIdempotency(this.supabaseService, scope, idempotency, () =>
+      this.executeWaveCharge(createChargeDto, user, scenarioKey),
     );
   }
 
@@ -270,11 +267,8 @@ export class ChargesService {
       environment: environmentFromAuth(user),
       endpointRoute: 'POST:/charge/mtn',
     };
-    return withApiIdempotency(
-      this.supabaseService,
-      scope,
-      idempotency,
-      () => this.executeMtnCharge(createChargeDto, user, scenarioKey),
+    return withApiIdempotency(this.supabaseService, scope, idempotency, () =>
+      this.executeMtnCharge(createChargeDto, user, scenarioKey),
     );
   }
 

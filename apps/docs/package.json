@@ -30,7 +30,7 @@
     "start": "next start",
     "mdx": "pnpm exec fumadocs-mdx",
     "format": "prettier --write .",
-    "map": "tsx --env-file=.env lib/scripts/core/generate_sitemap.ts",
+    "map": "pnpm exec tsx --env-file=.env lib/scripts/generate_sitemap.ts",
     "test:tryit": "bun test lib/openapi-secure-proxy.allowlist.test.ts",
     "screenshots:verify": "bun ./lib/scripts/verify-docs-screenshots.ts"
   },

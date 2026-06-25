@@ -75,15 +75,15 @@ export class CardChargeService {
       environment: environmentFromAuth(user),
       endpointRoute: 'POST:/charge/card',
     };
-    return withApiIdempotency(
-      this.supabase,
-      scope,
-      idempotency,
-      () => this.executeCreate(createDto, user),
+    return withApiIdempotency(this.supabase, scope, idempotency, () =>
+      this.executeCreate(createDto, user),
     );
   }
 
-  private async executeCreate(createDto: CreateCardChargeDto, user: AuthContext) {
+  private async executeCreate(
+    createDto: CreateCardChargeDto,
+    user: AuthContext,
+  ) {
     const stripe = this.stripeClients.getClient(user.environment);
     const paymentEnv = normalizePaymentEnvironment(user.environment);
 

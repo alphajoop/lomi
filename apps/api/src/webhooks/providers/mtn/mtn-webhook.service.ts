@@ -317,7 +317,10 @@ export class MtnWebhookService {
       headers['x-webhook-secret'] ??
       headers['X-Webhook-Secret'];
 
-    if (typeof headerSecret === 'string' && this.safeEqual(headerSecret, secret)) {
+    if (
+      typeof headerSecret === 'string' &&
+      this.safeEqual(headerSecret, secret)
+    ) {
       return true;
     }
 

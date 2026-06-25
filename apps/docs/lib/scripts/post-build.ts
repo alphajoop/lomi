@@ -1,13 +1,14 @@
 /* @proprietary license */
 
 import env from '@next/env';
+import { generateSitemap } from './generate_sitemap';
 import { updateSearchIndexes } from './update-orama-index';
 
 env.loadEnvConfig(process.cwd());
 
 async function main() {
   try {
-    await Promise.all([updateSearchIndexes()]);
+    await Promise.all([updateSearchIndexes(), generateSitemap()]);
   } catch (error) {
     console.warn(
       'Search index sync failed, but build continues:',

@@ -86,18 +86,17 @@ export class RefundsService {
     dto: CreateRefundDto,
     user: AuthContext,
     idempotency?: ApiIdempotencyContext,
-  ): Promise<IdempotentCreateResult<{ refund_id?: string; [key: string]: unknown }>> {
+  ): Promise<
+    IdempotentCreateResult<{ refund_id?: string; [key: string]: unknown }>
+  > {
     const scope = {
       organizationId: user.organizationId,
       environment: environmentFromAuth(user),
       endpointRoute: 'POST:/refunds',
     };
 
-    return withApiIdempotency(
-      this.supabaseService,
-      scope,
-      idempotency,
-      () => this.executeCreate(dto, user),
+    return withApiIdempotency(this.supabaseService, scope, idempotency, () =>
+      this.executeCreate(dto, user),
     );
   }
 
