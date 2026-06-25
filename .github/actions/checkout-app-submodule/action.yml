@@ -1,9 +1,9 @@
-name: Checkout private app
-description: Verify PAT access and checkout a private lomi app repository at the resolved ref.
+name: Checkout app submodule
+description: Verify PAT access and checkout a lomi app repository at the submodule ref resolved from the monorepo or dispatch payload.
 
 outputs:
   app-path:
-    description: Filesystem path where the private app repository was checked out
+    description: Filesystem path where the app repository was checked out
     value: ${{ inputs.submodule-path }}
 
 inputs:

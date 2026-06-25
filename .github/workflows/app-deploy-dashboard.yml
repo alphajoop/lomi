@@ -8,7 +8,7 @@ on:
     paths:
       - "apps/dashboard/**"
       - ".github/workflows/app-deploy-dashboard.yml"
-      - ".github/actions/checkout-private-app/**"
+      - ".github/actions/checkout-app-submodule/**"
   workflow_dispatch:
     inputs:
       ref:
@@ -30,11 +30,11 @@ jobs:
       - name: Load local actions
         uses: actions/checkout@v5
         with:
-          sparse-checkout: .github/actions/checkout-private-app
+          sparse-checkout: .github/actions/checkout-app-submodule
 
       - name: Checkout app source
         id: checkout-app
-        uses: ./.github/actions/checkout-private-app
+        uses: ./.github/actions/checkout-app-submodule
         with:
           repository: lomiafrica/dashboard
           submodule-path: apps/dashboard
