@@ -83,7 +83,9 @@ function writeSitemap(urlPaths: string[]): void {
 
 export async function generateSitemap(): Promise<void> {
   const urls = await collectDocUrls();
-  console.log(`Generating docs sitemap for ${urls.length} routes (${BASE_URL})`);
+  console.log(
+    `Generating docs sitemap for ${urls.length} routes (${BASE_URL})`,
+  );
   writeSitemap(urls);
 }
 

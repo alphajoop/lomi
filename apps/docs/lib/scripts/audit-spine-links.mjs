@@ -33,7 +33,10 @@ function expandSidebar(pages, prefix) {
 
 function linked(slug, spineLinks) {
   if (spineLinks.has(slug)) return true;
-  if (slug.endsWith('/index') && spineLinks.has(slug.slice(0, -'/index'.length))) {
+  if (
+    slug.endsWith('/index') &&
+    spineLinks.has(slug.slice(0, -'/index'.length))
+  ) {
     return true;
   }
   return false;
