@@ -26,20 +26,27 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout from private repository
-        if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+      - name: Checkout monorepo pointer
+        if: github.event_name == 'push'
+        uses: actions/checkout@v5
+
+      - name: Resolve app ref
+        id: app-ref
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            REF="$(git rev-parse "HEAD:apps/customers")"
+            echo "ref=${REF}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "ref=refs/heads/${{ inputs.ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.event.client_payload.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout app repository
         uses: actions/checkout@v5
         with:
           repository: lomiafrica/customers
-          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/heads/{0}', inputs.ref) || github.event.client_payload.sha }}
-          token: ${{ secrets.REPO_CHECKOUT_PAT }}
-          path: apps/customers
-
-      - name: Checkout monorepo submodule
-        if: github.event_name == 'push'
-        uses: actions/checkout@v5
-        with:
-          submodules: apps/customers
+          ref: ${{ steps.app-ref.outputs.ref }}
           token: ${{ secrets.REPO_CHECKOUT_PAT }}
 
       - name: Deploy to Vercel
@@ -48,6 +55,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CUSTOMERS }}
-          working-directory: ${{ github.workspace }}/apps/customers
+          working-directory: ${{ github.workspace }}
           target: ${{ github.event.client_payload.target || 'production' }}
-
