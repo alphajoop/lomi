@@ -96,15 +96,81 @@ jobs:
               ;;
           esac
 
-      - uses: supabase/setup-cli@v1
+      # GitHub-hosted runners are IPv4-only, and Supabase's shared pooler (the only
+      # free IPv4 path) has been unreliable (EAUTHQUERY/ECIRCUITBREAKER). The direct
+      # database host (db.<ref>.supabase.co) is reachable and stable, but IPv6-only.
+      # Cloudflare WARP gives the runner IPv6 egress so we can use the direct host.
+      - name: Set up IPv6 egress (Cloudflare WARP)
+        uses: fscarmen/warp-on-actions@v1.4
         with:
-          version: latest
+          stack: ipv6
+          mode: wireguard
+
+      - name: Verify IPv6 connectivity
+        run: |
+          set -euo pipefail
+          echo "Verifying IPv6 egress via WARP..."
+          for attempt in 1 2 3 4 5 6; do
+            if curl -6 -fsS -m 10 https://api64.ipify.org >/dev/null 2>&1; then
+              echo "IPv6 egress is up."
+              exit 0
+            fi
+            echo "IPv6 not ready yet (attempt ${attempt}); waiting..."
+            sleep 5
+          done
+          echo "::error::IPv6 egress is not available after WARP setup. The direct Supabase host (db.<ref>.supabase.co) is IPv6-only and cannot be reached without it."
+          exit 1
 
       - name: Install backup tools
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y age jq postgresql-client rclone
+          sudo apt-get install -y age jq rclone curl gnupg lsb-release
+
+          # Install the PostgreSQL 17 client. pg_dump must be >= the server major
+          # version (Supabase runs Postgres 17), which is newer than Ubuntu's default.
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          echo "deb [signed-by=/etc/apt/trusted.gpg.d/pgdg.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          pg_dump --version
+
+      # Derive the direct (IPv6) connection from SUPABASE_DB_URL. If the secret still
+      # points at the shared pooler, rewrite it to the direct host; otherwise use it
+      # as-is. The result is exported as BACKUP_DB_URL for the steps below.
+      - name: Resolve database connection
+        run: |
+          set -euo pipefail
+
+          url="$SUPABASE_DB_URL"
+          rest="${url#*://}"
+          userinfo="${rest%%@*}"
+          hostpath="${rest#*@}"
+          user="${userinfo%%:*}"
+          pass="${userinfo#*:}"
+          hostport="${hostpath%%/*}"
+          dbname="${hostpath#*/}"
+          dbname="${dbname%%\?*}"
+          host="${hostport%%:*}"
+          [ -n "$dbname" ] || dbname="postgres"
+
+          case "$host" in
+            *.pooler.supabase.com)
+              ref="${user#*.}"
+              backup_db_url="postgresql://postgres:${pass}@db.${ref}.supabase.co:5432/${dbname}"
+              echo "::notice::Pooler host detected; using direct IPv6 connection db.${ref}.supabase.co:5432 over Cloudflare WARP."
+              ;;
+            *)
+              backup_db_url="$url"
+              echo "::notice::Using SUPABASE_DB_URL host ${host} as-is."
+              ;;
+          esac
+
+          echo "::add-mask::$pass"
+          echo "::add-mask::$backup_db_url"
+          printf 'BACKUP_DB_URL=%s\n' "$backup_db_url" >> "$GITHUB_ENV"
 
       - name: Preflight database connection
         run: |
@@ -112,43 +178,43 @@ jobs:
 
           echo "Checking database reachability before backup..."
 
+          db_host="$(printf '%s' "$BACKUP_DB_URL" | sed -E 's#^[a-z]+://[^@]+@([^:/]+).*#\1#')"
+          db_port="$(printf '%s' "$BACKUP_DB_URL" | sed -nE 's#^[a-z]+://[^@]+@[^:/]+:([0-9]+)/.*#\1#p')"
+          echo "Target: ${db_host}:${db_port:-5432}"
+
           stderr_file="$(mktemp)"
           trap 'rm -f "$stderr_file"' EXIT
 
-          if PGCONNECT_TIMEOUT=20 psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -tAc "SELECT 1" 2>"$stderr_file"; then
+          if PGCONNECT_TIMEOUT=20 psql "$BACKUP_DB_URL" -v ON_ERROR_STOP=1 -tAc "SELECT 1" >/dev/null 2>"$stderr_file"; then
             echo "Database connection OK."
             exit 0
           fi
 
           err="$(tr '\n' ' ' <"$stderr_file" | sed 's/  */ /g')"
 
-          if printf '%s' "$err" | grep -qiE 'connection to database not available|EAUTHQUERY'; then
-            echo "::error::Supabase Postgres backend is unreachable through the pooler (project paused, still starting, restarting, or temporary outage). In the Supabase dashboard confirm the project is Active, try Restart project, wait a minute, then re-run this workflow."
+          if printf '%s' "$err" | grep -qiE 'connection to database not available|EAUTHQUERY|ECIRCUITBREAKER'; then
+            echo "::error::Pooler reported it cannot reach Postgres (EAUTHQUERY/ECIRCUITBREAKER). This backup targets the direct host, so SUPABASE_DB_URL likely still points at the pooler and was not rewritten. Verify the secret is a valid Supabase connection string."
+            exit 1
+          fi
+
+          if printf '%s' "$err" | grep -qiE 'Network is unreachable|No route to host|could not connect to server'; then
+            echo "::error::Cannot reach ${db_host}. The direct Supabase host is IPv6-only; confirm the Cloudflare WARP step established IPv6 egress (see the 'Verify IPv6 connectivity' step)."
             exit 1
           fi
 
           if printf '%s' "$err" | grep -qi 'password authentication failed'; then
-            echo "::error::Database authentication failed. Update the SUPABASE_DB_URL GitHub secret from Supabase Dashboard → Project Settings → Database → Connection string (URI, session pooler on port 5432, user postgres.<project-ref>)."
+            echo "::error::Authentication failed for the direct connection (user 'postgres'). Update the password in the SUPABASE_DB_URL secret from Supabase Dashboard → Project Settings → Database."
             exit 1
           fi
 
           if printf '%s' "$err" | grep -qiE 'could not translate host name|Name or service not known|nodename nor servname'; then
-            echo "::error::Cannot resolve the database host in SUPABASE_DB_URL. For GitHub Actions use the session pooler host (aws-0-<region>.pooler.supabase.com:5432), not the direct db.<project-ref>.supabase.co host unless you have the IPv4 add-on."
-            exit 1
-          fi
-
-          if printf '%s' "$err" | grep -qiE 'Connection refused|could not connect to server'; then
-            echo "::error::Connection refused by the database host. Check SUPABASE_DB_URL host, port (5432 for session pooler), and that the Supabase project is running."
+            echo "::error::Cannot resolve ${db_host}. Check the project ref encoded in SUPABASE_DB_URL."
             exit 1
           fi
 
           if printf '%s' "$err" | grep -qiE 'timeout expired|timed out'; then
-            echo "::error::Database connection timed out. The host may be unreachable from GitHub Actions or the project may be slow to wake; retry in a few minutes."
+            echo "::error::Connection to ${db_host} timed out. Likely an IPv6/WARP issue; re-run in a few minutes."
             exit 1
-          fi
-
-          if printf '%s' "$SUPABASE_DB_URL" | grep -qE ':6543/'; then
-            echo "::warning::SUPABASE_DB_URL uses transaction pooler port 6543. Backups are more reliable with session pooler port 5432 on the same pooler host."
           fi
 
           echo "::error::Database preflight failed: ${err}"
@@ -180,9 +246,82 @@ jobs:
 
           mkdir -p "$backup_dir"
 
-          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$backup_dir/roles.sql" --role-only
-          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$backup_dir/schema.sql"
-          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$backup_dir/data.sql" --data-only --use-copy -x storage.buckets_vectors -x storage.vector_indexes
+          # The three dumps below replicate `supabase db dump` (--role-only, schema,
+          # --data-only --use-copy) using the native PG17 client, so we can run them
+          # over the direct IPv6 connection without Docker. The flags and sed filters
+          # are taken verbatim from `supabase db dump --dry-run` to preserve Supabase's
+          # filtering (excluded internal schemas, stripped reserved roles, idempotent
+          # IF NOT EXISTS clauses). Do not "simplify" these into a plain pg_dump: that
+          # would include Supabase internals and break restores.
+
+          # Roles (equivalent of: supabase db dump --role-only)
+          pg_dumpall -d "$BACKUP_DB_URL" \
+            --roles-only \
+            --role "postgres" \
+            --quote-all-identifiers \
+            --no-role-passwords \
+            --no-comments \
+          | sed -E 's/^\\(un)?restrict .*$/-- &/' \
+          | sed -E "s/^CREATE ROLE \"(anon|authenticated|authenticator|cli_login_.*|dashboard_user|pgbouncer|postgres|service_role|supabase_.*|pgsodium_keyholder|pgsodium_keyiduser|pgsodium_keymaker|pgtle_admin)\"/-- &/" \
+          | sed -E "s/^ALTER ROLE \"(anon|authenticated|authenticator|cli_login_.*|dashboard_user|pgbouncer|postgres|service_role|supabase_.*|pgsodium_keyholder|pgsodium_keyiduser|pgsodium_keymaker|pgtle_admin)\"/-- &/" \
+          | sed -E "s/ (NOSUPERUSER|NOREPLICATION)//g" \
+          | sed -E "s/^-- (.* SET \"(pgaudit.*|pgrst.*|session_replication_role|statement_timeout|track_io_timing)\" .*)/\1/" \
+          | sed -E "s/GRANT \".*\" TO \"(anon|authenticated|authenticator|cli_login_.*|dashboard_user|pgbouncer|postgres|service_role|supabase_.*|pgsodium_keyholder|pgsodium_keyiduser|pgsodium_keymaker|pgtle_admin)\"/-- &/" \
+          | sed -E "/^--/d" \
+          | uniq > "$backup_dir/roles.sql"
+          echo "RESET ALL;" >> "$backup_dir/roles.sql"
+
+          # Schema (equivalent of: supabase db dump)
+          pg_dump -d "$BACKUP_DB_URL" \
+            --schema-only \
+            --quote-all-identifiers \
+            --role "postgres" \
+            --exclude-schema "information_schema|pg_*|_analytics|_realtime|_supavisor|auth|etl|extensions|pgbouncer|realtime|storage|supabase_functions|supabase_migrations|cron|dbdev|graphql|graphql_public|net|pgmq|pgsodium|pgsodium_masks|pgtle|repack|tiger|tiger_data|timescaledb_*|_timescaledb_*|topology|vault" \
+          | sed -E 's/^\\(un)?restrict .*$/-- &/' \
+          | sed -E 's/^CREATE SCHEMA "/CREATE SCHEMA IF NOT EXISTS "/' \
+          | sed -E 's/^CREATE TABLE "/CREATE TABLE IF NOT EXISTS "/' \
+          | sed -E 's/^CREATE SEQUENCE "/CREATE SEQUENCE IF NOT EXISTS "/' \
+          | sed -E 's/^CREATE VIEW "/CREATE OR REPLACE VIEW "/' \
+          | sed -E 's/^CREATE FUNCTION "/CREATE OR REPLACE FUNCTION "/' \
+          | sed -E 's/^CREATE TRIGGER "/CREATE OR REPLACE TRIGGER "/' \
+          | sed -E 's/^CREATE PUBLICATION "supabase_realtime/-- &/' \
+          | sed -E 's/^CREATE EVENT TRIGGER /-- &/' \
+          | sed -E 's/^         WHEN TAG IN /-- &/' \
+          | sed -E 's/^   EXECUTE FUNCTION /-- &/' \
+          | sed -E 's/^ALTER EVENT TRIGGER /-- &/' \
+          | sed -E 's/^ALTER PUBLICATION "supabase_realtime_/-- &/' \
+          | sed -E 's/^ALTER FOREIGN DATA WRAPPER (.+) OWNER TO /-- &/' \
+          | sed -E 's/^ALTER DEFAULT PRIVILEGES FOR ROLE "supabase_admin"/-- &/' \
+          | sed -E 's/^GRANT ALL ON FOREIGN DATA WRAPPER (.+) TO "postgres" WITH GRANT OPTION/-- &/' \
+          | sed -E "s/^GRANT (.+) ON (.+) \"(information_schema|pg_*|_analytics|_realtime|_supavisor|auth|etl|extensions|pgbouncer|realtime|storage|supabase_functions|supabase_migrations|cron|dbdev|graphql|graphql_public|net|pgmq|pgsodium|pgsodium_masks|pgtle|repack|tiger|tiger_data|timescaledb_*|_timescaledb_*|topology|vault)\"/-- &/" \
+          | sed -E "s/^REVOKE (.+) ON (.+) \"(information_schema|pg_*|_analytics|_realtime|_supavisor|auth|etl|extensions|pgbouncer|realtime|storage|supabase_functions|supabase_migrations|cron|dbdev|graphql|graphql_public|net|pgmq|pgsodium|pgsodium_masks|pgtle|repack|tiger|tiger_data|timescaledb_*|_timescaledb_*|topology|vault)\"/-- &/" \
+          | sed -E 's/^(CREATE EXTENSION IF NOT EXISTS "pg_tle").+/\1;/' \
+          | sed -E 's/^(CREATE EXTENSION IF NOT EXISTS "pgsodium").+/\1;/' \
+          | sed -E 's/^(CREATE EXTENSION IF NOT EXISTS "pgmq").+/\1;/' \
+          | sed -E 's/^COMMENT ON EXTENSION (.+)/-- &/' \
+          | sed -E 's/^CREATE POLICY "cron_job_/-- &/' \
+          | sed -E 's/^ALTER TABLE "cron"/-- &/' \
+          | sed -E 's/^SET transaction_timeout = 0;/-- &/' \
+          | sed -E "/^--/d" > "$backup_dir/schema.sql"
+
+          # Data (equivalent of: supabase db dump --data-only --use-copy -x storage.buckets_vectors -x storage.vector_indexes)
+          {
+            echo "SET session_replication_role = replica;"
+            echo
+            pg_dump -d "$BACKUP_DB_URL" \
+              --data-only \
+              --quote-all-identifiers \
+              --role "postgres" \
+              --exclude-schema "information_schema|pg_*|graphql|graphql_public|pgsodium|pgsodium_masks|pgtle|repack|tiger|tiger_data|timescaledb_*|_timescaledb_*|topology|vault|etl|extensions|pgbouncer|realtime|supabase_migrations|_analytics|_realtime|_supavisor" \
+              --exclude-table "auth.schema_migrations" \
+              --exclude-table "storage.migrations" \
+              --exclude-table "supabase_functions.migrations" \
+              --schema "*" \
+              --exclude-table "storage.buckets_vectors" \
+              --exclude-table "storage.vector_indexes" \
+            | sed -E 's/^\\(un)?restrict .*$/-- &/'
+            echo "RESET ALL;"
+          } > "$backup_dir/data.sql"
 
           db_content_sha="$(
             sha256sum "$backup_dir/roles.sql" "$backup_dir/schema.sql" "$backup_dir/data.sql" \
