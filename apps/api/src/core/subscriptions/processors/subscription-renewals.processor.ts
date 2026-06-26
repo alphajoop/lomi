@@ -1,16 +1,24 @@
 import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { Logger } from '@nestjs/common';
+import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { SubscriptionRenewalsService } from '../subscription-renewals.service';
+import { attachWorkerResilience } from '../../../utils/bullmq/worker-resilience';
 
 @Processor('subscription-renewals')
-export class SubscriptionRenewalsProcessor extends WorkerHost {
+export class SubscriptionRenewalsProcessor
+  extends WorkerHost
+  implements OnApplicationBootstrap
+{
   private readonly logger = new Logger(SubscriptionRenewalsProcessor.name);
 
   constructor(
     private readonly subscriptionRenewalsService: SubscriptionRenewalsService,
   ) {
     super();
+  }
+
+  onApplicationBootstrap() {
+    attachWorkerResilience(this.worker, this.logger, 'subscription-renewals');
   }
 
   async process(job: Job): Promise<unknown> {

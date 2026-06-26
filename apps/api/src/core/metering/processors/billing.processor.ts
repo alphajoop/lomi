@@ -1,14 +1,22 @@
 import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { Logger } from '@nestjs/common';
+import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { BillingService } from '../billing.service';
+import { attachWorkerResilience } from '../../../utils/bullmq/worker-resilience';
 
 @Processor('billing')
-export class BillingProcessor extends WorkerHost {
+export class BillingProcessor
+  extends WorkerHost
+  implements OnApplicationBootstrap
+{
   private readonly logger = new Logger(BillingProcessor.name);
 
   constructor(private readonly billingService: BillingService) {
     super();
+  }
+
+  onApplicationBootstrap() {
+    attachWorkerResilience(this.worker, this.logger, 'billing');
   }
 
   async process(job: Job): Promise<unknown> {

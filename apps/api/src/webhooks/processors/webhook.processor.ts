@@ -1,12 +1,16 @@
 import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { Logger } from '@nestjs/common';
+import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { WebhookSenderService } from '../webhook-sender.service';
 import { WebhookEvent } from '../../utils/types/api';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { attachWorkerResilience } from '../../utils/bullmq/worker-resilience';
 
 @Processor('webhooks')
-export class WebhookQueueProcessor extends WorkerHost {
+export class WebhookQueueProcessor
+  extends WorkerHost
+  implements OnApplicationBootstrap
+{
   private readonly logger = new Logger(WebhookQueueProcessor.name);
 
   constructor(
@@ -14,6 +18,10 @@ export class WebhookQueueProcessor extends WorkerHost {
     private readonly supabase: SupabaseService,
   ) {
     super();
+  }
+
+  onApplicationBootstrap() {
+    attachWorkerResilience(this.worker, this.logger, 'webhooks');
   }
 
   async process(job: Job<any, any, string>): Promise<any> {
