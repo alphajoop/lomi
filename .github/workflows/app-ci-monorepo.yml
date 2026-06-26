@@ -40,6 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Initialize dashboard submodule for SQL contract tests
+        working-directory: .
         env:
           TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
         run: |
