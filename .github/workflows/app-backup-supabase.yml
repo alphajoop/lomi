@@ -104,7 +104,55 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y age jq rclone
+          sudo apt-get install -y age jq postgresql-client rclone
+
+      - name: Preflight database connection
+        run: |
+          set -euo pipefail
+
+          echo "Checking database reachability before backup..."
+
+          stderr_file="$(mktemp)"
+          trap 'rm -f "$stderr_file"' EXIT
+
+          if PGCONNECT_TIMEOUT=20 psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -tAc "SELECT 1" 2>"$stderr_file"; then
+            echo "Database connection OK."
+            exit 0
+          fi
+
+          err="$(tr '\n' ' ' <"$stderr_file" | sed 's/  */ /g')"
+
+          if printf '%s' "$err" | grep -qiE 'connection to database not available|EAUTHQUERY'; then
+            echo "::error::Supabase Postgres backend is unreachable through the pooler (project paused, still starting, restarting, or temporary outage). In the Supabase dashboard confirm the project is Active, try Restart project, wait a minute, then re-run this workflow."
+            exit 1
+          fi
+
+          if printf '%s' "$err" | grep -qi 'password authentication failed'; then
+            echo "::error::Database authentication failed. Update the SUPABASE_DB_URL GitHub secret from Supabase Dashboard → Project Settings → Database → Connection string (URI, session pooler on port 5432, user postgres.<project-ref>)."
+            exit 1
+          fi
+
+          if printf '%s' "$err" | grep -qiE 'could not translate host name|Name or service not known|nodename nor servname'; then
+            echo "::error::Cannot resolve the database host in SUPABASE_DB_URL. For GitHub Actions use the session pooler host (aws-0-<region>.pooler.supabase.com:5432), not the direct db.<project-ref>.supabase.co host unless you have the IPv4 add-on."
+            exit 1
+          fi
+
+          if printf '%s' "$err" | grep -qiE 'Connection refused|could not connect to server'; then
+            echo "::error::Connection refused by the database host. Check SUPABASE_DB_URL host, port (5432 for session pooler), and that the Supabase project is running."
+            exit 1
+          fi
+
+          if printf '%s' "$err" | grep -qiE 'timeout expired|timed out'; then
+            echo "::error::Database connection timed out. The host may be unreachable from GitHub Actions or the project may be slow to wake; retry in a few minutes."
+            exit 1
+          fi
+
+          if printf '%s' "$SUPABASE_DB_URL" | grep -qE ':6543/'; then
+            echo "::warning::SUPABASE_DB_URL uses transaction pooler port 6543. Backups are more reliable with session pooler port 5432 on the same pooler host."
+          fi
+
+          echo "::error::Database preflight failed: ${err}"
+          exit 1
 
       - name: Create database dump
         id: db-dump
