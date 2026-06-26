@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T17:32:54.113Z",
+  "generatedAt": "2026-06-26T09:54:05.194Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -40,11 +40,26 @@
       "getPerformance",
       "list"
     ],
+    "disputes": [
+      "get",
+      "list"
+    ],
     "merchants": [
       "get",
       "getArr",
       "getBalance",
       "getMrr"
+    ],
+    "meters": [
+      "create",
+      "get",
+      "getCustomerBalance",
+      "list",
+      "update"
+    ],
+    "organization": [
+      "getSettings",
+      "updateSettings"
     ],
     "organizations": [
       "get",
@@ -81,6 +96,14 @@
       "get",
       "list"
     ],
+    "riskAssessments": [
+      "findOne",
+      "listAssessments"
+    ],
+    "settlements": [
+      "findAll",
+      "findTransactions"
+    ],
     "subscriptions": [
       "cancel",
       "changePlan",
@@ -93,6 +116,22 @@
     "transactions": [
       "get",
       "list"
+    ],
+    "usageBilling": [
+      "checkEntitlement",
+      "createEntitlement",
+      "getRevenue",
+      "getSubscriptionUsage",
+      "grantCredits",
+      "listPeriods"
+    ],
+    "usageEvents": [
+      "create",
+      "get",
+      "list"
+    ],
+    "usageSubscriptions": [
+      "create"
     ],
     "webhookDeliveryLogs": [
       "get",

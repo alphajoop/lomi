@@ -15,7 +15,10 @@ import {
   CustomerSubscriptionsService,
   CustomersService,
   DiscountCouponsService,
+  DisputesService,
   MerchantsService,
+  MetersService,
+  OrganizationService,
   OrganizationsService,
   PaymentLinksService,
   PaymentRequestsService,
@@ -23,8 +26,13 @@ import {
   ProductsService,
   ProvidersService,
   RefundsService,
+  RiskAssessmentsService,
+  SettlementsService,
   SubscriptionsService,
   TransactionsService,
+  UsageBillingService,
+  UsageEventsService,
+  UsageSubscriptionsService,
   WebhookDeliveryLogsService,
   WebhooksService,
 } from './generated/index.js';
@@ -36,7 +44,10 @@ export class LomiSDK {
   public readonly customerSubscriptions: typeof CustomerSubscriptionsService;
   public readonly customers: typeof CustomersService;
   public readonly discountCoupons: typeof DiscountCouponsService;
+  public readonly disputes: typeof DisputesService;
   public readonly merchants: typeof MerchantsService;
+  public readonly meters: typeof MetersService;
+  public readonly organization: typeof OrganizationService;
   public readonly organizations: typeof OrganizationsService;
   public readonly paymentLinks: typeof PaymentLinksService;
   public readonly paymentRequests: typeof PaymentRequestsService;
@@ -44,8 +55,13 @@ export class LomiSDK {
   public readonly products: typeof ProductsService;
   public readonly providers: typeof ProvidersService;
   public readonly refunds: typeof RefundsService;
+  public readonly riskAssessments: typeof RiskAssessmentsService;
+  public readonly settlements: typeof SettlementsService;
   public readonly subscriptions: typeof SubscriptionsService;
   public readonly transactions: typeof TransactionsService;
+  public readonly usageBilling: typeof UsageBillingService;
+  public readonly usageEvents: typeof UsageEventsService;
+  public readonly usageSubscriptions: typeof UsageSubscriptionsService;
   public readonly webhookDeliveryLogs: typeof WebhookDeliveryLogsService;
   public readonly webhooks: typeof WebhooksService;
 
@@ -71,7 +87,10 @@ export class LomiSDK {
     this.customerSubscriptions = CustomerSubscriptionsService;
     this.customers = CustomersService;
     this.discountCoupons = DiscountCouponsService;
+    this.disputes = DisputesService;
     this.merchants = MerchantsService;
+    this.meters = MetersService;
+    this.organization = OrganizationService;
     this.organizations = OrganizationsService;
     this.paymentLinks = PaymentLinksService;
     this.paymentRequests = PaymentRequestsService;
@@ -79,8 +98,13 @@ export class LomiSDK {
     this.products = ProductsService;
     this.providers = ProvidersService;
     this.refunds = RefundsService;
+    this.riskAssessments = RiskAssessmentsService;
+    this.settlements = SettlementsService;
     this.subscriptions = SubscriptionsService;
     this.transactions = TransactionsService;
+    this.usageBilling = UsageBillingService;
+    this.usageEvents = UsageEventsService;
+    this.usageSubscriptions = UsageSubscriptionsService;
     this.webhookDeliveryLogs = WebhookDeliveryLogsService;
     this.webhooks = WebhooksService;
   }

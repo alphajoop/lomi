@@ -8,7 +8,7 @@ import { request } from '../core/request.js';
 export class ChargesService {
     /**
      * OpenAPI operationId: `ChargesController_cancelCardCharge`.
-     * Annuler un encaissement carte
+     * Cancel card charge
      */
     public static async cancelCardCharge(id: string): Promise<any> {
         return await request<any>({
@@ -20,7 +20,7 @@ export class ChargesService {
 
     /**
      * OpenAPI operationId: `ChargesController_createCardCharge`.
-     * Créer un encaissement carte (client_secret)
+     * Create card charge (client_secret)
      */
     public static async createCardCharge(body?: unknown): Promise<any> {
         return await request<any>({
@@ -32,29 +32,31 @@ export class ChargesService {
 
     /**
      * OpenAPI operationId: `ChargesController_createMtnCharge`.
-     * Lancer un encaissement direct MTN MoMo
+     * Create MTN MoMo charge
      */
-    public static async createMtnCharge(): Promise<any> {
+    public static async createMtnCharge(body?: unknown): Promise<any> {
         return await request<any>({
             method: 'POST',
             url: '/charge/mtn',
+            body,
         });
     }
 
     /**
      * OpenAPI operationId: `ChargesController_createWaveCharge`.
-     * Lancer un encaissement direct Wave
+     * Create direct Wave charge
      */
-    public static async createWaveCharge(): Promise<any> {
+    public static async createWaveCharge(body?: unknown): Promise<any> {
         return await request<any>({
             method: 'POST',
             url: '/charge/wave',
+            body,
         });
     }
 
     /**
      * OpenAPI operationId: `ChargesController_getCardCharge`.
-     * Obtenir un encaissement carte
+     * Retrieve card charge
      */
     public static async getCardCharge(id: string): Promise<any> {
         return await request<any>({
