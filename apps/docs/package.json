@@ -16,12 +16,12 @@
   },
   "scripts": {
     "build": "pnpm build:pre && NODE_OPTIONS='--max-old-space-size=8192' next build && pnpm build:post",
-    "build:pre": "bun ./lib/scripts/pre-build.ts",
-    "build:pre:sync": "DOCS_SYNC_OPENAPI=1 bun ./lib/scripts/pre-build.ts",
-    "build:post": "bun ./lib/scripts/post-build.ts",
+    "build:pre": "pnpm exec tsx ./lib/scripts/pre-build.ts",
+    "build:pre:sync": "DOCS_SYNC_OPENAPI=1 pnpm exec tsx ./lib/scripts/pre-build.ts",
+    "build:post": "pnpm exec tsx ./lib/scripts/post-build.ts",
     "clean": "rimraf .next",
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev --turbo",
-    "lint": "fumadocs-mdx && bun ./lib/scripts/lint.ts && bun ./lib/scripts/check-mdx-sdk-snippets.ts && pnpm exec tsx lib/scripts/manual-api/verify-en-operation-overrides.ts && eslint .",
+    "lint": "fumadocs-mdx && pnpm exec tsx ./lib/scripts/lint.ts && pnpm exec tsx ./lib/scripts/check-mdx-sdk-snippets.ts && pnpm exec tsx lib/scripts/manual-api/verify-en-operation-overrides.ts && eslint .",
     "docs:drift": "pnpm exec tsx lib/scripts/docs-drift.ts",
     "docs:audit-spine": "node lib/scripts/audit-spine-links.mjs",
     "api:bootstrap": "pnpm exec tsx lib/scripts/bootstrap-manual-api-reference.ts",
@@ -31,8 +31,8 @@
     "mdx": "pnpm exec fumadocs-mdx",
     "format": "prettier --write .",
     "map": "pnpm exec tsx --env-file=.env lib/scripts/generate_sitemap.ts",
-    "test:tryit": "bun test lib/openapi-secure-proxy.allowlist.test.ts",
-    "screenshots:verify": "bun ./lib/scripts/verify-docs-screenshots.ts"
+    "test:tryit": "node --import tsx --test lib/openapi-secure-proxy.allowlist.test.ts",
+    "screenshots:verify": "pnpm exec tsx ./lib/scripts/verify-docs-screenshots.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.50",

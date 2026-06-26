@@ -79,7 +79,6 @@ jobs:
           node-version: "22"
           cache: "pnpm"
           cache-dependency-path: "./apps/docs/pnpm-lock.yaml"
-      - uses: oven-sh/setup-bun@v2
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm build
