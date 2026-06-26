@@ -62,8 +62,8 @@ importers:
         specifier: ^5.11.1
         version: 5.11.1
       pi-spi-sdk:
-        specifier: ^0.1.2
-        version: 0.1.2
+        specifier: ^0.1.3
+        version: 0.1.3
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -2666,8 +2666,8 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  pi-spi-sdk@0.1.2:
-    resolution: {integrity: sha512-j6b/mMEu8VPpNjwOZ7um+nLbivG6RyQCCSMhIFe7hp6GGNgHluuj4QpDeZtY/esUje6793NVhshqgLR5XDiSpQ==}
+  pi-spi-sdk@0.1.3:
+    resolution: {integrity: sha512-6NsdRlI1JN0fPAly5a3eTjnC6AcxAsyjA6nfsz0r6+Rr2ilpRlSAmZ4sDX9ClWkI1fYHU+PewBKb9PHHUKqbaQ==}
     engines: {node: '>=18.0.0'}
 
   picocolors@1.1.1:
@@ -6216,7 +6216,7 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  pi-spi-sdk@0.1.2:
+  pi-spi-sdk@0.1.3:
     dependencies:
       axios: 1.16.1
       dotenv: 16.6.1
