@@ -33,3 +33,11 @@
 [submodule "apps/design"]
 	path = apps/design
 	url = https://github.com/lomiafrica/design.git
+[submodule "apps/doctool"]
+	path = apps/doctool
+	url = https://github.com/lomiafrica/doctool.git
+	branch = main
+[submodule "apps/pi-spi-sdk"]
+	path = apps/pi-spi-sdk
+	url = https://github.com/lomiafrica/pi-spi-sdk.git
+	branch = main
