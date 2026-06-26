@@ -6,7 +6,9 @@ import { WebhookEvent } from '../../utils/types/api';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { attachWorkerResilience } from '../../utils/bullmq/worker-resilience';
 
-@Processor('webhooks')
+// drainDelay 60s: cuts idle long-poll command burn between webhook bursts.
+// A pushed (or delayed retry) job wakes the blocking fetch immediately.
+@Processor('webhooks', { drainDelay: 60 })
 export class WebhookQueueProcessor
   extends WorkerHost
   implements OnApplicationBootstrap

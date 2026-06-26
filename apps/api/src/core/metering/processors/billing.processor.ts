@@ -4,7 +4,10 @@ import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { BillingService } from '../billing.service';
 import { attachWorkerResilience } from '../../../utils/bullmq/worker-resilience';
 
-@Processor('billing')
+// drainDelay 60s: idle except for the monthly billing-cycle cron trigger.
+// Longer empty-queue long-poll cuts baseline Redis command burn; a pushed job
+// still wakes the blocking fetch immediately.
+@Processor('billing', { drainDelay: 60 })
 export class BillingProcessor
   extends WorkerHost
   implements OnApplicationBootstrap
