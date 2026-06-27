@@ -31,6 +31,36 @@ export class DashboardPosSpiService {
     });
   }
 
+  initRequestToPay(
+    user: DashboardUserContext,
+    body: {
+      amount: number;
+      payeurAlias: string;
+      currency?: string;
+      productId?: string;
+      metadata?: Record<string, unknown>;
+    },
+  ) {
+    if (!body.amount || body.amount <= 0) {
+      throw new BadRequestException('Amount must be greater than zero');
+    }
+
+    const payeurAlias = body.payeurAlias?.trim();
+    if (!payeurAlias) {
+      throw new BadRequestException('payeurAlias is required');
+    }
+
+    return this.spiPosService.initRequestToPay({
+      organizationId: user.organizationId,
+      merchantId: user.merchantId,
+      amount: body.amount,
+      payeurAlias,
+      currency: body.currency ?? 'XOF',
+      productId: body.productId,
+      metadata: body.metadata,
+    });
+  }
+
   getPaymentStatus(user: DashboardUserContext, checkoutSessionId: string) {
     return this.spiPosService.getPaymentStatus(
       user.organizationId,

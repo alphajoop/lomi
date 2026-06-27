@@ -18,9 +18,13 @@ export type InitPosSpiQrPaymentInput = {
   checkoutSessionId?: string;
 };
 
+export type InitPosSpiRequestToPayInput = InitPosSpiQrPaymentInput & {
+  payeurAlias: string;
+};
+
 export type InitPosSpiQrPaymentResult = {
   checkoutSessionId: string;
-  qrPayload: string;
+  qrPayload: string | null;
   spiTxId: string;
   amount: number;
   currency: string;
@@ -51,6 +55,27 @@ export class SpiPosService {
 
   async initQrPayment(
     input: InitPosSpiQrPaymentInput,
+  ): Promise<InitPosSpiQrPaymentResult> {
+    return this.initSpiPosPayment(input, { mode: 'mpm' });
+  }
+
+  async initRequestToPay(
+    input: InitPosSpiRequestToPayInput,
+  ): Promise<InitPosSpiQrPaymentResult> {
+    const payeurAlias = input.payeurAlias?.trim();
+    if (!payeurAlias) {
+      throw new BadRequestException('payeurAlias is required');
+    }
+
+    return this.initSpiPosPayment(
+      { ...input, payeurAlias },
+      { mode: 'cpm', payeurAlias },
+    );
+  }
+
+  private async initSpiPosPayment(
+    input: InitPosSpiQrPaymentInput,
+    options: { mode: 'mpm' } | { mode: 'cpm'; payeurAlias: string },
   ): Promise<InitPosSpiQrPaymentResult> {
     const { data: prepared, error: prepareError } = await this.supabase.rpc(
       'prepare_pos_spi_payment' as never,
@@ -84,15 +109,10 @@ export class SpiPosService {
 
     try {
       const sdk = await this.spiClient.getSdk(input.organizationId);
-      const spiAlias = await this.spiClient.getOrCreateMerchantShidAlias(
-        input.organizationId,
-        prep.spi_account_number,
-      );
-
       const montantCentimes = toProviderAmount(prep.amount);
       const spiResponse = await sdk.demandesPaiement.create({
         comptePaye: prep.spi_account_number,
-        payeurAlias: '',
+        payeurAlias: options.mode === 'cpm' ? options.payeurAlias : '',
         montant: montantCentimes,
         categorie: '500',
         motif: `Paiement POS - Transaction ${spiTxId}`,
@@ -107,13 +127,20 @@ export class SpiPosService {
         | 'IRREVOCABLE'
         | 'REJETE';
 
-      const qrPayload = sdk.qr.payload({
-        alias: spiAlias,
-        countryCode,
-        qrType: 'DYNAMIC',
-        referenceLabel: spiTxId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 25),
-        amount: toProviderAmount(prep.amount),
-      });
+      let qrPayload: string | null = null;
+      if (options.mode === 'mpm') {
+        const spiAlias = await this.spiClient.getOrCreateMerchantShidAlias(
+          input.organizationId,
+          prep.spi_account_number,
+        );
+        qrPayload = sdk.qr.payload({
+          alias: spiAlias,
+          countryCode,
+          qrType: 'DYNAMIC',
+          referenceLabel: spiTxId.replace(/[^a-zA-Z0-9]/g, '').slice(0, 25),
+          amount: montantCentimes,
+        });
+      }
 
       const { error: finalizeError } = await this.supabase.rpc(
         'finalize_pos_spi_payment_initiated' as never,

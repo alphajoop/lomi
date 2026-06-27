@@ -41,6 +41,22 @@ export class DashboardPosSpiController {
     return this.posSpiService.initQrPayment(user, body);
   }
 
+  @Post('request-payment')
+  @ApiOperation({ summary: 'Initiate POS SPI request-to-pay from scanned customer alias' })
+  initRequestToPay(
+    @CurrentDashboardUser() user: DashboardUserContext,
+    @Body()
+    body: {
+      amount: number;
+      payeurAlias: string;
+      currency?: string;
+      productId?: string;
+      metadata?: Record<string, unknown>;
+    },
+  ) {
+    return this.posSpiService.initRequestToPay(user, body);
+  }
+
   @Get('payments/:checkoutSessionId')
   @ApiOperation({ summary: 'Poll POS SPI payment status' })
   getPaymentStatus(
