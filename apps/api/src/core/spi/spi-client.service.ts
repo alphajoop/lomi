@@ -1,9 +1,10 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { PiSpiSDK, AliasType, PiSpiAuthError } from 'pi-spi-sdk';
+import type { PiSpiSDK } from 'pi-spi-sdk';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { loadSpiPlatformConfig } from './spi-config';
 import { getSpiMtlsDispatcher } from './spi-transport';
 import { SpiTokenService } from './spi-token.service';
+import { createPiSpiSdk, isPiSpiAuthError } from './spi-sdk.loader';
 
 @Injectable()
 export class SpiClientService {
@@ -33,7 +34,7 @@ export class SpiClientService {
       const sdk = await this.buildSdk();
       return await operation(sdk);
     } catch (error) {
-      if (!this.isAuthError(error)) {
+      if (!(await this.isAuthError(error))) {
         throw error;
       }
 
@@ -70,7 +71,7 @@ export class SpiClientService {
     const created = await this.executeWithSdk(organizationId, (sdk) =>
       sdk.alias.create({
         compte: spiAccountNumber,
-        type: AliasType.SHID,
+        type: 'SHID',
       }),
     );
 
@@ -103,7 +104,7 @@ export class SpiClientService {
     const accessToken = await this.tokenService.getAccessToken();
     const dispatcher = getSpiMtlsDispatcher();
 
-    return new PiSpiSDK({
+    return createPiSpiSdk({
       baseUrl: config.baseUrl,
       accessToken,
       ...(dispatcher ? { dispatcher } : {}),
@@ -132,8 +133,8 @@ export class SpiClientService {
     }
   }
 
-  private isAuthError(error: unknown): boolean {
-    if (error instanceof PiSpiAuthError) {
+  private async isAuthError(error: unknown): Promise<boolean> {
+    if (await isPiSpiAuthError(error)) {
       return true;
     }
 
