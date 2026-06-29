@@ -84,14 +84,18 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 @Injectable()
 export class GimClientService {
   private readonly logger = new Logger(GimClientService.name);
-  private readonly config: GimPlatformConfig;
+  private cachedConfig: GimPlatformConfig | null = null;
 
-  constructor(private readonly hmac: GimHmacService) {
-    this.config = loadGimPlatformConfig();
-  }
+  constructor(private readonly hmac: GimHmacService) {}
 
+  // Lazy so the API boots in "standby" without GIM env configured.
+  // Config (and its production validation) is only resolved when a GIM Pay
+  // call is actually attempted, never at module instantiation/boot.
   getConfig(): GimPlatformConfig {
-    return this.config;
+    if (!this.cachedConfig) {
+      this.cachedConfig = loadGimPlatformConfig();
+    }
+    return this.cachedConfig;
   }
 
   buildPayByCardBody(
