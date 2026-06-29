@@ -37,6 +37,7 @@ Your server calls `POST /checkout-sessions` and redirects the customer to `check
 | `product_id` / `price_id` | Catalog-backed checkout; amount derived from the price |
 | `success_url` / `cancel_url` | Where to send the customer after pay or cancel |
 | `customer_email` | Optional — pre-fills the hosted form |
+| `require_email` / `require_phone` / `require_billing_address` | Optional — control checkout form fields; see [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields) |
 
 Pass `metadata` for your own order IDs. See the API page for every optional field.
 

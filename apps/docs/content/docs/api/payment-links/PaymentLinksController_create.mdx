@@ -65,7 +65,10 @@ Schema: `object`
 | `price_id` | No | `string` | — |
 | `allow_coupon_code` | No | `boolean` | — |
 | `allow_quantity` | No | `boolean` | — |
-| `require_billing_address` | No | `boolean` | — |
+| `require_billing_address` | No | `boolean` | When `true`, show and require billing address on checkout. Default when unset follows org settings, then `false`. See [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields). |
+| `require_email` | No | `boolean` | When `true`, show and require email. When `false`, hide email. Default when unset: `true`. |
+| `require_phone` | No | `boolean` | When `true`, show and require phone. When `false`, show phone as optional. Default when unset: `false`. |
+| `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides `require_*` booleans. |
 | `expires_at` | No | `string` | — |
 | `success_url` | No | `string` | — |
 | `cancel_url` | No | `string` | — |

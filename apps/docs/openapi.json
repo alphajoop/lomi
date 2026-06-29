@@ -2617,7 +2617,26 @@
                     "type": "boolean"
                   },
                   "require_billing_address": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "When true, show and require billing address on checkout."
+                  },
+                  "require_email": {
+                    "type": "boolean",
+                    "description": "When true, show and require customer email. Default true when unset.",
+                    "default": true
+                  },
+                  "require_phone": {
+                    "type": "boolean",
+                    "description": "When true, show and require customer phone. Default false when unset.",
+                    "default": false
+                  },
+                  "fields": {
+                    "type": "array",
+                    "description": "Optional ordered checkout field schema. When provided, overrides require_* booleans.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
                   },
                   "payment_link_id": {
                     "type": "string",
@@ -2874,7 +2893,26 @@
                     "type": "boolean"
                   },
                   "require_billing_address": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "When true, show and require billing address on checkout."
+                  },
+                  "require_email": {
+                    "type": "boolean",
+                    "description": "When true, show and require customer email. Default true when unset.",
+                    "default": true
+                  },
+                  "require_phone": {
+                    "type": "boolean",
+                    "description": "When true, show and require customer phone. Default false when unset.",
+                    "default": false
+                  },
+                  "fields": {
+                    "type": "array",
+                    "description": "Optional ordered checkout field schema. When provided, overrides require_* booleans.",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
                   },
                   "expires_at": {
                     "type": "string",
@@ -6578,6 +6616,14 @@
             "type": "boolean",
             "example": true
           },
+          "require_email": {
+            "type": "boolean",
+            "example": true
+          },
+          "require_phone": {
+            "type": "boolean",
+            "example": false
+          },
           "spi_account_number": {
             "type": "string",
             "example": "string"
@@ -6637,6 +6683,8 @@
           "qr_code_type",
           "quantity",
           "require_billing_address",
+          "require_email",
+          "require_phone",
           "spi_account_number",
           "spi_qr_code_id",
           "status",
@@ -6725,6 +6773,14 @@
             "type": "boolean",
             "example": true
           },
+          "require_email": {
+            "type": "boolean",
+            "example": true
+          },
+          "require_phone": {
+            "type": "boolean",
+            "example": false
+          },
           "success_url": {
             "type": "string",
             "example": "string"
@@ -6762,6 +6818,8 @@
           "product_id",
           "quantity",
           "require_billing_address",
+          "require_email",
+          "require_phone",
           "success_url",
           "title",
           "updated_at",

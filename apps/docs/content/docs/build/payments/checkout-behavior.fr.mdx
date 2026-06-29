@@ -88,6 +88,42 @@ Voir [Abonnements](/build/subscriptions) pour le cycle de vie et les webhooks.
 
 Lorsque la devise de la session diffère de celle d’un tarif produit, la logique serveur peut **convertir** pour valider que le montant payé correspond au tarif configuré dans l’autre devise.
 
+## Champs du formulaire checkout
+
+Contrôlez quels champs client apparaissent sur le tunnel hébergé et s’ils sont obligatoires. Définissez les valeurs par défaut dans le tableau de bord (**Paramètres → Checkout**), surchargez par [lien de paiement](/build/payment-links), ou passez les indicateurs sur chaque [session checkout](/build/checkout).
+
+### Champs système
+
+| Champ | Indicateur API | Défaut si omis | Quand `false` |
+| --- | --- | --- | --- |
+| Nom | — | Toujours obligatoire | — |
+| E-mail | `require_email` | `true` | Masqué sur le formulaire |
+| Téléphone | `require_phone` | `false` | Affiché en optionnel |
+| Adresse de facturation | `require_billing_address` | `false` | Masquée sur le formulaire |
+
+<Callout type="info">
+  **Contact :** le tunnel collecte toujours au moins un moyen de joindre le client. Si l’e-mail est masqué et le téléphone optionnel, le téléphone devient obligatoire. Si e-mail et téléphone sont visibles, l’e-mail est obligatoire et le téléphone reste optionnel sauf si vous passez `require_phone: true`.
+</Callout>
+
+### Ordre de résolution
+
+À l’ouverture du tunnel, les indicateurs se combinent du plus spécifique au plus général :
+
+1. **Session checkout** (`require_email`, `require_phone`, `require_billing_address` sur `POST /checkout-sessions`)
+2. **Lien de paiement** (mêmes indicateurs sur le lien ayant créé la session)
+3. **Paramètres checkout de l’organisation** (défauts du tableau de bord)
+4. **Défauts plateforme** (e-mail obligatoire, téléphone optionnel, adresse masquée)
+
+Passez `customer_email`, `customer_phone` et les champs d’adresse sur la session pour **préremplir** le formulaire ; cela ne change pas les champs affichés.
+
+### Champs personnalisés
+
+Les organisations peuvent définir des **champs checkout personnalisés** (texte, case à cocher, CGU, etc.) dans les paramètres checkout du tableau de bord. Ils s’appliquent au tunnel hébergé, aux liens de paiement et à la vitrine, sauf surcharge dans `metadata.custom_fields` de la session ou du lien.
+
+### Avancé : tableau `fields`
+
+Sur `POST /checkout-sessions` et `POST /payment-links`, vous pouvez passer un tableau `fields` — liste ordonnée de champs système et personnalisés avec `visibility` à `hidden`, `optional` ou `required`. S’il est présent, il **remplace** les booléens `require_*`. La plupart des intégrations utilisent les booléens ; réservez `fields` à un ordre fin ou des champs personnalisés mixtes optionnels/obligatoires via l’API.
+
 ## Identité client
 
 Le tunnel peut **créer automatiquement ou fusionner** des fiches clients lorsque les champs de contact sont fournis, pour que les webhooks et transactions en aval s’associent lorsque possible à un `customer_id` stable.

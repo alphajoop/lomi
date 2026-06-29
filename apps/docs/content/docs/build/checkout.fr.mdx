@@ -37,6 +37,7 @@ Votre serveur appelle `POST /checkout-sessions` et redirige le client vers `chec
 | `product_id` / `price_id` | Checkout catalogue ; montant dérivé du tarif |
 | `success_url` / `cancel_url` | Redirection après paiement ou annulation |
 | `customer_email` | Optionnel — préremplit le formulaire hébergé |
+| `require_email` / `require_phone` / `require_billing_address` | Optionnel — contrôle les champs du formulaire ; voir [Champs du formulaire checkout](/build/payments/checkout-behavior#checkout-form-fields) |
 
 Passez `metadata` pour vos propres identifiants de commande. Voir la page API pour tous les champs optionnels.
 

@@ -98,9 +98,45 @@ See [Subscriptions](/build/subscriptions) for lifecycle and webhook details.
 
 When session currency differs from a product price currency, server logic may **convert** for validation so the paid amount matches the configured price in another currency.
 
+## Checkout form fields
+
+Control which customer fields appear on the hosted checkout form and whether they are required. Configure defaults in the dashboard under **Settings → Checkout**, override per [payment link](/build/payment-links), or set flags on each [checkout session](/build/checkout).
+
+### System fields
+
+| Field | API flag | Default when unset | When `false` |
+| --- | --- | --- | --- |
+| Name | — | Always required | — |
+| Email | `require_email` | `true` | Hidden on the form |
+| Phone | `require_phone` | `false` | Shown as optional |
+| Billing address | `require_billing_address` | `false` | Hidden on the form |
+
+<Callout type="info">
+  **Contact collection:** checkout always collects at least one reachable contact method. If email is hidden and phone is optional, phone becomes required. If both email and phone are visible, email is required and phone stays optional unless you set `require_phone: true`.
+</Callout>
+
+### Resolution order
+
+When a customer opens checkout, flags merge from most specific to least:
+
+1. **Checkout session** (`require_email`, `require_phone`, `require_billing_address` on `POST /checkout-sessions`)
+2. **Payment link** (same flags on the link that created the session)
+3. **Organization checkout settings** (dashboard defaults)
+4. **Platform defaults** (email required, phone optional, billing address hidden)
+
+Pass `customer_email`, `customer_phone`, and address fields on the session to **pre-fill** the form; they do not change which fields are shown.
+
+### Custom fields
+
+Organizations can define **custom checkout fields** (text, checkbox, terms, etc.) in dashboard checkout settings. They apply to hosted checkout, payment links, and storefront unless overridden in session or link `metadata.custom_fields`.
+
+### Advanced: `fields` array
+
+On `POST /checkout-sessions` and `POST /payment-links`, you may pass a `fields` array — an ordered list of system and custom field definitions with `visibility` set to `hidden`, `optional`, or `required`. When present, it **overrides** the `require_*` booleans. Most integrations should use the boolean flags; use `fields` only when you need fine-grained ordering or mixed optional/required custom fields via API.
+
 ## Customer identity
 
- Checkout may **auto-create or merge** customer records when contact fields are provided, so downstream webhooks and transactions always attach to a stable `customer_id` where possible.
+Checkout may **auto-create or merge** customer records when contact fields are provided, so downstream webhooks and transactions always attach to a stable `customer_id` where possible.
 
 ## Related pages
 

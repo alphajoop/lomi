@@ -86,7 +86,10 @@ Schéma: `object`
 | `success_url` | Non | `string` | — |
 | `cancel_url` | Non | `string` | — |
 | `allow_coupon_code` | Non | `boolean` | — |
-| `require_billing_address` | Non | `boolean` | — |
+| `require_billing_address` | Non | `boolean` | Si `true`, affiche et exige l’adresse de facturation. Si omis, suit les paramètres checkout de l’organisation, puis `false`. Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#checkout-form-fields). |
+| `require_email` | Non | `boolean` | Si `true`, affiche et exige l’e-mail. Si `false`, masque l’e-mail (les règles de contact peuvent imposer le téléphone). Défaut si omis : `true`. |
+| `require_phone` | Non | `boolean` | Si `true`, affiche et exige le téléphone. Si `false`, téléphone optionnel. Défaut si omis : `false`. |
+| `fields` | Non | `array<object>` | Schéma ordonné optionnel des champs checkout. S’il est fourni, remplace les booléens `require_*`. |
 | `payment_link_id` | Non | `string` | — |
 | `metadata` | Non | `object` | — |
 | `line_items` | Non | `array<object>` | — |
