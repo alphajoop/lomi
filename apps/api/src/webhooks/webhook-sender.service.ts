@@ -11,6 +11,7 @@ import {
 import { CliListenerService } from '../cli/cli-listener.service';
 import { CliStreamService } from '../cli/cli-stream.service';
 import { sanitizeMerchantWebhookTransactionPayload } from './sanitize-merchant-webhook-transaction-payload';
+import { safeBullJobId } from '../utils/bullmq/job-id';
 
 export interface Webhook {
   id: string;
@@ -546,7 +547,7 @@ export class WebhookSenderService {
         continue;
       }
 
-      const jobId = `wh-dispatch:${row.dispatch_id}`;
+      const jobId = safeBullJobId(`wh-dispatch:${row.dispatch_id}`);
 
       try {
         await queue.add(
@@ -688,10 +689,11 @@ export class WebhookSenderService {
         dispatchId = did as string;
       }
 
-      const jobId =
+      const jobId = safeBullJobId(
         dispatchId != null
           ? `wh-dispatch:${dispatchId}`
-          : `wh-fallback:${webhook.id}:${idempotencyKey}:${crypto.randomUUID()}`;
+          : `wh-fallback:${webhook.id}:${idempotencyKey}:${crypto.randomUUID()}`,
+      );
 
       try {
         await queue.add(

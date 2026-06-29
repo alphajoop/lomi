@@ -5,6 +5,7 @@ import { Queue } from 'bullmq';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
+import { safeBullJobId } from '../../utils/bullmq/job-id';
 
 @Injectable()
 export class BillingService {
@@ -25,7 +26,7 @@ export class BillingService {
         'run-usage-billing-cycle',
         { asOfDate: date },
         {
-          jobId: `billing-cycle:${date}`,
+          jobId: safeBullJobId(`billing-cycle:${date}`),
           attempts: 3,
           backoff: { type: 'exponential', delay: 5000 },
         },

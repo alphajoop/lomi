@@ -5,10 +5,11 @@ import { WebhookSenderService } from '../webhook-sender.service';
 import { WebhookEvent } from '../../utils/types/api';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { attachWorkerResilience } from '../../utils/bullmq/worker-resilience';
+import { LIVE_WORKER_OPTIONS } from '../../utils/bullmq/worker-options';
 
-// drainDelay 60s: cuts idle long-poll command burn between webhook bursts.
-// A pushed (or delayed retry) job wakes the blocking fetch immediately.
-@Processor('webhooks', { drainDelay: 60 })
+// LIVE worker options: short drainDelay so retries stay snappy, plus a widened
+// stalled-check interval to keep idle Upstash command burn to a minimum.
+@Processor('webhooks', LIVE_WORKER_OPTIONS)
 export class WebhookQueueProcessor
   extends WorkerHost
   implements OnApplicationBootstrap

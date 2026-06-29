@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { safeBullJobId } from '../utils/bullmq/job-id';
 
 export interface EnqueueJobBody {
   jobType: string;
@@ -32,7 +33,9 @@ export class InternalJobsService {
 
     const job = await this.jobsQueue.add(jobType, payload, {
       jobId:
-        typeof payload.dedupeKey === 'string' ? payload.dedupeKey : undefined,
+        typeof payload.dedupeKey === 'string'
+          ? safeBullJobId(payload.dedupeKey)
+          : undefined,
     });
 
     return { queued: true, jobId: job.id, jobType };

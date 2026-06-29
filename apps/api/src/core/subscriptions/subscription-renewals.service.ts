@@ -6,6 +6,7 @@ import Stripe from 'stripe';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
 import { Json } from '../../utils/types/api';
+import { safeBullJobId } from '../../utils/bullmq/job-id';
 
 type RenewalDunningResult = {
   retries_exhausted: boolean;
@@ -51,7 +52,7 @@ export class SubscriptionRenewalsService {
         'run-subscription-renewals',
         { dueDate: todayStr },
         {
-          jobId: `subscription-renewals:${todayStr}`,
+          jobId: safeBullJobId(`subscription-renewals:${todayStr}`),
           attempts: 2,
           backoff: { type: 'exponential', delay: 10000 },
         },

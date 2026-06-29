@@ -46,6 +46,17 @@ export class CheckoutSessionsService {
   ): Promise<IdempotentCreateResult<unknown>> {
     const scopedIdempotency = namespaceNetworkIdempotency(user, idempotency);
 
+    // currency_code maps to a non-defaulted RPC arg (p_currency_code). When it
+    // is absent, supabase-js drops the undefined key and PostgREST can no longer
+    // match the function overload, surfacing a confusing "Could not find the
+    // function public.create_checkout_session(...) in the schema cache" 500.
+    // Fail fast with a clear 400 so the caller knows what to fix.
+    if (!createDto.currency_code) {
+      throw new BadRequestException(
+        'currency_code is required and must be one of XOF, USD, EUR.',
+      );
+    }
+
     if (createDto.line_items && createDto.line_items.length > 0) {
       if (scopedIdempotency) {
         const cached = await lookupIdempotencyCache(this.supabase, {

@@ -3,10 +3,11 @@ import { Job } from 'bullmq';
 import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { UsageEventsService } from '../usage-events.service';
 import { attachWorkerResilience } from '../../../utils/bullmq/worker-resilience';
+import { LIVE_WORKER_OPTIONS } from '../../../utils/bullmq/worker-options';
 
-// drainDelay 60s: cuts idle long-poll command burn between usage-event bursts.
-// A pushed job wakes the blocking fetch immediately, so pickup is unaffected.
-@Processor('metering', { drainDelay: 60 })
+// LIVE worker options: short drainDelay so retries stay snappy, plus a widened
+// stalled-check interval to keep idle Upstash command burn to a minimum.
+@Processor('metering', LIVE_WORKER_OPTIONS)
 export class MeteringProcessor
   extends WorkerHost
   implements OnApplicationBootstrap

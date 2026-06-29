@@ -3,11 +3,12 @@ import { Job } from 'bullmq';
 import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { BillingService } from '../billing.service';
 import { attachWorkerResilience } from '../../../utils/bullmq/worker-resilience';
+import { CRON_WORKER_OPTIONS } from '../../../utils/bullmq/worker-options';
 
-// drainDelay 60s: idle except for the monthly billing-cycle cron trigger.
-// Longer empty-queue long-poll cuts baseline Redis command burn; a pushed job
-// still wakes the blocking fetch immediately.
-@Processor('billing', { drainDelay: 60 })
+// CRON worker options: this queue is idle except for the billing-cycle cron, so
+// we long-poll less often and widen the stalled-check interval to minimize
+// baseline Upstash command burn. A pushed job still wakes the fetch immediately.
+@Processor('billing', CRON_WORKER_OPTIONS)
 export class BillingProcessor
   extends WorkerHost
   implements OnApplicationBootstrap

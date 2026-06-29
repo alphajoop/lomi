@@ -3,11 +3,12 @@ import { Job } from 'bullmq';
 import { Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { SubscriptionRenewalsService } from '../subscription-renewals.service';
 import { attachWorkerResilience } from '../../../utils/bullmq/worker-resilience';
+import { CRON_WORKER_OPTIONS } from '../../../utils/bullmq/worker-options';
 
-// drainDelay 60s: this queue is idle except for daily/monthly cron triggers,
-// so long-poll less often to cut baseline Redis command burn. A pushed job
-// still wakes the blocking fetch immediately, so pickup latency is unchanged.
-@Processor('subscription-renewals', { drainDelay: 60 })
+// CRON worker options: idle except for daily/monthly cron triggers, so we
+// long-poll less often and widen the stalled-check interval to minimize
+// baseline Upstash command burn. A pushed job still wakes the fetch immediately.
+@Processor('subscription-renewals', CRON_WORKER_OPTIONS)
 export class SubscriptionRenewalsProcessor
   extends WorkerHost
   implements OnApplicationBootstrap

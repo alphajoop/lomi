@@ -14,6 +14,7 @@ import { Json } from '../../utils/types/api';
 import { CreateUsageEventDto } from './dto/create-usage-event.dto';
 import { CreateUsageSubscriptionDto } from './dto/create-usage-subscription.dto';
 import { ListUsageEventsQueryDto } from './dto/list-usage-events-query.dto';
+import { safeBullJobId } from '../../utils/bullmq/job-id';
 
 @Injectable()
 export class UsageEventsService {
@@ -47,7 +48,9 @@ export class UsageEventsService {
     if (error) throw new Error(error.message);
 
     const id = eventId as string;
-    const jobId = `usage:${user.organizationId}:${dto.transaction_id}`;
+    const jobId = safeBullJobId(
+      `usage:${user.organizationId}:${dto.transaction_id}`,
+    );
 
     if (!this.meteringQueue) {
       return this.processEvent(id, user.organizationId);
