@@ -18,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: recursive
 
-      - name: Run plugin parity checks
-        run: apps/plugins/scripts/verify-lomi-plugins.sh
+      - name: Initialize plugin submodules
+        run: |
+          git submodule update --init apps/plugins
+          git -C apps/plugins submodule update --init woo prestashop magento
 
       - uses: pnpm/action-setup@v4
         with:
@@ -34,10 +34,5 @@ jobs:
           cache: pnpm
           cache-dependency-path: apps/plugins/woo/pnpm-lock.yaml
 
-      - name: Install Woo build dependencies
-        working-directory: apps/plugins/woo
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Woo assets
-        working-directory: apps/plugins/woo
-        run: pnpm run build
+      - name: Run automated plugin test suite
+        run: apps/plugins/scripts/run-plugin-tests.sh
