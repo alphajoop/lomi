@@ -18,9 +18,7 @@ import {
   resolveNetworkMemberMerchantId,
 } from '../common/network-context';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
-import {
-  buildCreateOrUpdateCustomerRpcArgs,
-} from '../../utils/customers/create-or-update-customer-rpc';
+import { buildCreateOrUpdateCustomerRpcArgs } from '../../utils/customers/create-or-update-customer-rpc';
 import {
   attachChargeNextAction,
   deriveCardChargeNextAction,

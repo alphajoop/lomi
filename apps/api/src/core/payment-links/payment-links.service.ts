@@ -22,29 +22,26 @@ export class PaymentLinksService {
       fields: createDto.fields,
     });
 
-    const { data, error } = await this.supabase.rpc(
-      'create_payment_link',
-      {
-        p_organization_id: user.organizationId,
-        p_link_type: createDto.link_type as LinkType,
-        p_title: createDto.title,
-        p_currency_code: createDto.currency_code as CurrencyCode,
-        p_description: createDto.description || null,
-        p_price: createDto.amount || null,
-        p_allow_coupon_code: createDto.allow_coupon_code ?? false,
-        p_allow_quantity: createDto.allow_quantity ?? false,
-        p_require_billing_address: contactFlags.require_billing_address ?? true,
-        p_require_email: contactFlags.require_email ?? true,
-        p_require_phone: contactFlags.require_phone ?? false,
-        p_expires_at: createDto.expires_at || null,
-        p_success_url: createDto.success_url || null,
-        p_cancel_url: createDto.cancel_url || null,
-        p_product_id: createDto.product_id || null,
-        p_price_id: createDto.price_id || null,
-        p_created_by: user.merchantId,
-        p_environment: environmentFromAuth(user),
-      } as never,
-    );
+    const { data, error } = await this.supabase.rpc('create_payment_link', {
+      p_organization_id: user.organizationId,
+      p_link_type: createDto.link_type as LinkType,
+      p_title: createDto.title,
+      p_currency_code: createDto.currency_code as CurrencyCode,
+      p_description: createDto.description || null,
+      p_price: createDto.amount || null,
+      p_allow_coupon_code: createDto.allow_coupon_code ?? false,
+      p_allow_quantity: createDto.allow_quantity ?? false,
+      p_require_billing_address: contactFlags.require_billing_address ?? true,
+      p_require_email: contactFlags.require_email ?? true,
+      p_require_phone: contactFlags.require_phone ?? false,
+      p_expires_at: createDto.expires_at || null,
+      p_success_url: createDto.success_url || null,
+      p_cancel_url: createDto.cancel_url || null,
+      p_product_id: createDto.product_id || null,
+      p_price_id: createDto.price_id || null,
+      p_created_by: user.merchantId,
+      p_environment: environmentFromAuth(user),
+    } as never);
 
     if (error) throw new Error(error.message);
 

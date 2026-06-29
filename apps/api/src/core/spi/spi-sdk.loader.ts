@@ -18,19 +18,27 @@ export type PiSpiSDK = {
     getAccount: (accountNumber: string) => Promise<Record<string, unknown>>;
   };
   demandesPaiement: {
-    create: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+    create: (
+      input: Record<string, unknown>,
+    ) => Promise<Record<string, unknown>>;
   };
   demandesPaiementEnMasse: {
-    create: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+    create: (
+      input: Record<string, unknown>,
+    ) => Promise<Record<string, unknown>>;
   };
   paiements: {
-    create: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+    create: (
+      input: Record<string, unknown>,
+    ) => Promise<Record<string, unknown>>;
   };
   qr: {
     payload: (input: Record<string, unknown>) => Promise<string>;
   };
   webhooks: {
-    create: (input: Record<string, unknown>) => Promise<Record<string, unknown>>;
+    create: (
+      input: Record<string, unknown>,
+    ) => Promise<Record<string, unknown>>;
   };
 };
 
@@ -48,7 +56,11 @@ export async function isPiSpiAuthError(error: unknown): Promise<boolean> {
     return false;
   }
 
-  const candidate = error as { name?: string; status?: number; statusCode?: number };
+  const candidate = error as {
+    name?: string;
+    status?: number;
+    statusCode?: number;
+  };
   if (candidate.name === 'PiSpiAuthError') {
     return true;
   }

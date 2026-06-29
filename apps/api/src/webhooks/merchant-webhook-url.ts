@@ -360,7 +360,9 @@ const DEV_TUNNEL_HOSTNAME_SUFFIXES = [
 ] as const;
 
 function isDevTunnelHostname(hostname: string): boolean {
-  return DEV_TUNNEL_HOSTNAME_SUFFIXES.some((suffix) => hostname.endsWith(suffix));
+  return DEV_TUNNEL_HOSTNAME_SUFFIXES.some((suffix) =>
+    hostname.endsWith(suffix),
+  );
 }
 
 function buildUnresolvedHostnameMessage(hostname: string): string {
@@ -396,8 +398,7 @@ async function resolveHostnameAddressesViaDoh(
   const addresses: string[] = [];
 
   for (const type of [1, 28]) {
-    const queryUrl =
-      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=${type}`;
+    const queryUrl = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=${type}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 

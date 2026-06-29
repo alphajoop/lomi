@@ -72,9 +72,11 @@ export interface CheckoutFormSource extends CheckoutFormFieldFlags {
 }
 
 export interface CheckoutFormSources {
-  organizationSettings?: (CheckoutFormFieldFlags & {
-    custom_fields?: CustomFieldDefinition[];
-  }) | null;
+  organizationSettings?:
+    | (CheckoutFormFieldFlags & {
+        custom_fields?: CustomFieldDefinition[];
+      })
+    | null;
   paymentLink?: CheckoutFormSource | null;
   checkoutSession?: CheckoutFormSource | null;
 }
@@ -222,8 +224,9 @@ export function resolveCheckoutForm(
     phoneVisibility,
   ));
 
-  const billingVisibility =
-    requireFlagToBillingVisibility(requireBillingAddress);
+  const billingVisibility = requireFlagToBillingVisibility(
+    requireBillingAddress,
+  );
 
   const customFieldDefinitions = resolveCustomFieldDefinitions(sources);
 
@@ -285,7 +288,9 @@ export function normalizeCheckoutFieldFlags(input: {
   fields?: UnifiedCheckoutFieldDefinition[];
 }): CheckoutFormFieldFlags {
   if (input.fields && input.fields.length > 0) {
-    const systemFields = input.fields.filter((field) => field.scope === 'system');
+    const systemFields = input.fields.filter(
+      (field) => field.scope === 'system',
+    );
     const emailField = systemFields.find((field) => field.key === 'email');
     const phoneField = systemFields.find((field) => field.key === 'phone');
     const billingField = systemFields.find(

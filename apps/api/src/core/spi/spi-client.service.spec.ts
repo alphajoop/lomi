@@ -39,10 +39,7 @@ describe('SpiClientService', () => {
     jest.clearAllMocks();
     tokenServiceMock.getAccessToken.mockResolvedValue('platform-token');
     isPiSpiAuthErrorMock.mockImplementation(async (error: unknown) => {
-      return (
-        error instanceof Error &&
-        error.name === 'PiSpiAuthError'
-      );
+      return error instanceof Error && error.name === 'PiSpiAuthError';
     });
     createPiSpiSdkMock.mockResolvedValue({
       demandesPaiement: { create: jest.fn() },
