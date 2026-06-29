@@ -53,7 +53,12 @@ export class ApiLoggingInterceptor implements NestInterceptor {
     try {
       const user = request.user;
 
+      // Prefer the key ApiKeyGuard already validated; re-parsing headers can
+      // diverge (e.g. Bearer JWT on dashboard-adjacent routes) and trip the
+      // api_interactions → api_keys FK when logging.
       const apiKey =
+        (typeof request.apiKey === 'string' && request.apiKey) ||
+        user?.apiKey ||
         request.headers['x-api-key'] ||
         request.headers['x-lomi-api-key'] ||
         (request.headers.authorization &&
@@ -85,7 +90,7 @@ export class ApiLoggingInterceptor implements NestInterceptor {
               user.actorOrganizationId || user.organizationId,
             p_target_organization_id:
               user.targetOrganizationId || user.organizationId,
-            p_api_key: user.apiKey ?? apiKey,
+            p_api_key: apiKey,
             p_endpoint: endpointPath,
             p_request_method: request.method,
             p_request_payload: requestPayload,
@@ -97,6 +102,19 @@ export class ApiLoggingInterceptor implements NestInterceptor {
           })
           .then(({ error }) => {
             if (error) {
+              // 23503 = missing api_keys row; log_api_interaction_context skips
+              // those silently once migration 00112 is applied.
+              if (
+                typeof error === 'object' &&
+                error !== null &&
+                'code' in error &&
+                error.code === '23503'
+              ) {
+                this.logger.debug(
+                  `Skipped API interaction log: api_key not in api_keys (${error.message})`,
+                );
+                return;
+              }
               this.logger.error(
                 `Failed to log API interaction: ${error.message}`,
                 error,

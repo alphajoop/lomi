@@ -9,6 +9,7 @@ import {
 } from '../../utils/api-idempotency';
 import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
+import { buildCreateOrUpdateCustomerRpcArgs } from '../../utils/customers/create-or-update-customer-rpc';
 import { CreateGimChargeDto } from '../charges/dto/create-gim-charge.dto';
 import {
   attachChargeNextAction,
@@ -444,18 +445,15 @@ export class GimChargeService {
 
     const { data: custId, error } = await this.supabase.getClient().rpc(
       'create_or_update_customer' as never,
-      {
-        p_merchant_id: ledgerMerchantId,
-        p_organization_id: user.organizationId,
-        p_name: name,
-        p_email: email,
-        p_phone_number: createDto.customer_phone?.trim() || '',
-        p_city: '',
-        p_address: '',
-        p_country: 'CI',
-        p_postal_code: '',
-        p_whatsapp_number: createDto.customer_phone?.trim() || '',
-      } as never,
+      buildCreateOrUpdateCustomerRpcArgs({
+        merchantId: ledgerMerchantId,
+        organizationId: user.organizationId,
+        name,
+        email,
+        phoneNumber: createDto.customer_phone?.trim() || '',
+        whatsappNumber: createDto.customer_phone?.trim() || '',
+        environment: environmentFromAuth(user),
+      }) as never,
     );
 
     if (error || !custId) {

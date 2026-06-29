@@ -19,6 +19,9 @@ import {
 } from '../common/network-context';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import {
+  buildCreateOrUpdateCustomerRpcArgs,
+} from '../../utils/customers/create-or-update-customer-rpc';
+import {
   attachChargeNextAction,
   deriveCardChargeNextAction,
 } from './charge-next-action';
@@ -370,18 +373,15 @@ export class CardChargeService {
 
     const { data: custId, error } = await this.supabase.getClient().rpc(
       'create_or_update_customer' as any,
-      {
-        p_merchant_id: ledgerMerchantId,
-        p_organization_id: user.organizationId,
-        p_name: name,
-        p_email: email,
-        p_phone_number: createDto.customer_phone?.trim() || '',
-        p_city: '',
-        p_address: '',
-        p_country: 'CI',
-        p_postal_code: '',
-        p_whatsapp_number: createDto.customer_phone?.trim() || '',
-      } as any,
+      buildCreateOrUpdateCustomerRpcArgs({
+        merchantId: ledgerMerchantId,
+        organizationId: user.organizationId,
+        name,
+        email,
+        phoneNumber: createDto.customer_phone?.trim() || '',
+        whatsappNumber: createDto.customer_phone?.trim() || '',
+        environment: user.environment,
+      }) as any,
     );
 
     if (error || !custId) {

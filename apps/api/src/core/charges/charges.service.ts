@@ -23,6 +23,7 @@ import {
   type ApiIdempotencyContext,
 } from '../../utils/api-idempotency';
 import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
+import { buildCreateOrUpdateCustomerRpcArgs } from '../../utils/customers/create-or-update-customer-rpc';
 import {
   attachChargeNextAction,
   deriveMtnChargeNextAction,
@@ -77,27 +78,25 @@ export class ChargesService {
     const ledgerMerchantId = networkRequest
       ? await resolveNetworkMemberMerchantId(this.supabaseService, user)
       : merchantId;
+    const resolvedOrganizationId = organizationId ?? user.organizationId;
+    const resolvedMerchantId = ledgerMerchantId ?? user.merchantId;
 
     try {
       this.logger.log(
-        `Initiating Wave charge for organization ${organizationId}`,
+        `Initiating Wave charge for organization ${resolvedOrganizationId}`,
       );
 
       // 1. Get or Create Customer (RPC)
       const { data: custId, error: custError } = await this.supabaseService.rpc(
         'create_or_update_customer' as any,
-        {
-          p_merchant_id: ledgerMerchantId,
-          p_organization_id: organizationId,
-          p_name: customer.name,
-          p_email: customer.email,
-          p_phone_number: customer.phoneNumber,
-          p_city: null,
-          p_address: null,
-          p_country: 'CI',
-          p_postal_code: null,
-          p_whatsapp_number: null,
-        },
+        buildCreateOrUpdateCustomerRpcArgs({
+          merchantId: resolvedMerchantId,
+          organizationId: resolvedOrganizationId,
+          name: customer.name,
+          email: customer.email,
+          phoneNumber: customer.phoneNumber,
+          environment: paymentEnvironment,
+        }),
       );
 
       if (custError || !custId) {
@@ -302,6 +301,8 @@ export class ChargesService {
     const ledgerMerchantId = networkRequest
       ? await resolveNetworkMemberMerchantId(this.supabaseService, user)
       : merchantId;
+    const resolvedOrganizationId = organizationId ?? user.organizationId;
+    const resolvedMerchantId = ledgerMerchantId ?? user.merchantId;
     const { data: providers, error: providerError } = networkRequest
       ? await this.supabaseService.getClient().rpc(
           'fetch_network_provider_settings_for_api' as never,
@@ -334,18 +335,15 @@ export class ChargesService {
 
     const { data: custId, error: custError } = await this.supabaseService.rpc(
       'create_or_update_customer' as never,
-      {
-        p_merchant_id: ledgerMerchantId,
-        p_organization_id: organizationId,
-        p_name: customer.name,
-        p_email: customer.email ?? '',
-        p_phone_number: customer.phoneNumber,
-        p_city: null,
-        p_address: null,
-        p_country: countryCode ?? 'CI',
-        p_postal_code: null,
-        p_whatsapp_number: null,
-      } as never,
+      buildCreateOrUpdateCustomerRpcArgs({
+        merchantId: resolvedMerchantId,
+        organizationId: resolvedOrganizationId,
+        name: customer.name,
+        email: customer.email,
+        phoneNumber: customer.phoneNumber,
+        country: countryCode ?? 'CI',
+        environment: paymentEnvironment,
+      }) as never,
     );
 
     if (custError || !custId) {
