@@ -37,14 +37,16 @@ pnpm run start:dev
 
 | Setting | Value |
 |---------|--------|
-| Root directory | `apps/api` |
-| Build command | `pnpm install --frozen-lockfile && pnpm run build` |
-| Start command | `pnpm run start:prod` |
-| Health check path | `/ready` |
+| Root directory | `apps` |
+| Dockerfile | `api/Dockerfile` |
+| Start command | `node dist/main` (or use [`../railway.json`](../railway.json)) |
+| Health check path | `/health` |
 | Health check timeout | 120s |
 | Node version | 22 |
 
-Config: [`railway.json`](railway.json). Env vars: [`.env.example`](.env.example).
+The API depends on [`pi-spi-sdk`](../pi-spi-sdk) via `file:../pi-spi-sdk`; the Docker build context must include both packages.
+
+Config: [`../railway.json`](../railway.json). Env vars: [`.env.example`](.env.example).
 
 ```bash
 pnpm run smoke:http https://your-service.up.railway.app
