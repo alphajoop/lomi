@@ -134,7 +134,7 @@ export class SpiPosService {
           prep.spi_account_number,
         );
         const sdk = await this.spiClient.getSdk(input.organizationId);
-        qrPayload = sdk.qr.payload({
+        qrPayload = await sdk.qr.payload({
           alias: spiAlias,
           countryCode,
           qrType: 'DYNAMIC',

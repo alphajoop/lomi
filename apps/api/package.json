@@ -80,7 +80,6 @@
     "class-validator": "^0.14.4",
     "express": "^5.2.1",
     "ioredis": "^5.11.1",
-    "pi-spi-sdk": "file:../pi-spi-sdk",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "stripe": "^20.4.1",
@@ -150,8 +149,7 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1",
       "^@core/(.*)$": "<rootDir>/core/$1",
-      "^@utils/(.*)$": "<rootDir>/utils/$1",
-      "^pi-spi-sdk$": "<rootDir>/../test/mocks/pi-spi-sdk.ts"
+      "^@utils/(.*)$": "<rootDir>/utils/$1"
     }
   }
 }

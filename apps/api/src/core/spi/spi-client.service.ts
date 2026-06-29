@@ -1,10 +1,13 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import type { PiSpiSDK } from 'pi-spi-sdk';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { loadSpiPlatformConfig } from './spi-config';
 import { getSpiMtlsDispatcher } from './spi-transport';
 import { SpiTokenService } from './spi-token.service';
-import { createPiSpiSdk, isPiSpiAuthError } from './spi-sdk.loader';
+import {
+  createPiSpiSdk,
+  isPiSpiAuthError,
+  type PiSpiSDK,
+} from './spi-sdk.loader';
 
 @Injectable()
 export class SpiClientService {

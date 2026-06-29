@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { PiSpiAuthError } from 'pi-spi-sdk';
 import { SpiClientService } from './spi-client.service';
 import { SpiTokenService } from './spi-token.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { loadSpiPlatformConfig } from './spi-config';
 import { getSpiMtlsDispatcher } from './spi-transport';
+import { createPiSpiSdk, isPiSpiAuthError } from './spi-sdk.loader';
 
 jest.mock('./spi-config', () => ({
   loadSpiPlatformConfig: jest.fn(() => ({
@@ -20,25 +20,10 @@ jest.mock('./spi-transport', () => ({
   getSpiMtlsDispatcher: jest.fn(() => undefined),
 }));
 
-jest.mock('pi-spi-sdk', () => {
-  const instances: Array<{ demandesPaiement: { create: jest.Mock } }> = [];
-  return {
-    PiSpiSDK: jest.fn().mockImplementation(() => {
-      const instance = {
-        demandesPaiement: { create: jest.fn() },
-        alias: { create: jest.fn() },
-        qr: { payload: jest.fn() },
-      };
-      instances.push(instance);
-      return instance;
-    }),
-    PiSpiAuthError: class PiSpiAuthError extends Error {
-      statusCode = 401;
-    },
-    AliasType: { SHID: 'SHID' },
-    __instances: instances,
-  };
-});
+jest.mock('./spi-sdk.loader', () => ({
+  createPiSpiSdk: jest.fn(),
+  isPiSpiAuthError: jest.fn(),
+}));
 
 describe('SpiClientService', () => {
   let service: SpiClientService;
@@ -47,10 +32,23 @@ describe('SpiClientService', () => {
     getAccessToken: jest.fn().mockResolvedValue('platform-token'),
     invalidate: jest.fn(),
   };
+  const createPiSpiSdkMock = createPiSpiSdk as jest.Mock;
+  const isPiSpiAuthErrorMock = isPiSpiAuthError as jest.Mock;
 
   beforeEach(async () => {
     jest.clearAllMocks();
     tokenServiceMock.getAccessToken.mockResolvedValue('platform-token');
+    isPiSpiAuthErrorMock.mockImplementation(async (error: unknown) => {
+      return (
+        error instanceof Error &&
+        error.name === 'PiSpiAuthError'
+      );
+    });
+    createPiSpiSdkMock.mockResolvedValue({
+      demandesPaiement: { create: jest.fn() },
+      alias: { create: jest.fn() },
+      qr: { payload: jest.fn() },
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -71,6 +69,7 @@ describe('SpiClientService', () => {
     expect(tokenServiceMock.getAccessToken).toHaveBeenCalled();
     expect(loadSpiPlatformConfig).toHaveBeenCalled();
     expect(getSpiMtlsDispatcher).toHaveBeenCalled();
+    expect(createPiSpiSdkMock).toHaveBeenCalled();
     expect(sdk).toBeDefined();
   });
 
@@ -85,12 +84,16 @@ describe('SpiClientService', () => {
   it('retries once after auth error', async () => {
     rpcMock.mockResolvedValue({ data: {}, error: null });
 
+    class PiSpiAuthError extends Error {
+      name = 'PiSpiAuthError';
+    }
+
     let attempts = 0;
     await expect(
       service.executeWithSdk('org-1', async () => {
         attempts += 1;
         if (attempts === 1) {
-          throw new PiSpiAuthError('expired', 401, 'Unauthorized');
+          throw new PiSpiAuthError('expired');
         }
         return 'ok';
       }),

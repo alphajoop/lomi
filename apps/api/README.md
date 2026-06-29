@@ -8,7 +8,7 @@ NestJS API for payments, subscriptions, webhooks, and metering.
 
 | Environment | Platform | Config |
 |-------------|----------|--------|
-| **Production** | [Railway](https://railway.app) (long-running process) | [`Dockerfile`](Dockerfile), [`railway.json`](railway.json) |
+| **Production** | [Railway](https://railway.app) (long-running process) | [`railway.json`](railway.json) |
 | **Sandbox** | [Vercel](https://vercel.com) (serverless) | [`vercel.json`](vercel.json) |
 
 Production Railway conventions match [`apps/mcp`](../mcp): `/health`, `/ready`.
@@ -37,17 +37,16 @@ pnpm run start:dev
 
 | Setting | Value |
 |---------|--------|
-| Root directory | `.` (repository root) |
-| Dockerfile | `apps/api/Dockerfile` |
-| Git submodules | **Enabled** (`apps/pi-spi-sdk` is a submodule) |
-| Start command | `node dist/main` (see [`../../railway.json`](../../railway.json)) |
+| Root directory | `apps/api` |
+| Builder | Nixpacks (default — no Docker) |
+| Start command | `pnpm run start:prod` (see [`railway.json`](railway.json)) |
 | Health check path | `/health` |
 | Health check timeout | 120s |
 | Node version | 22 |
 
-The API depends on [`pi-spi-sdk`](../pi-spi-sdk) via `file:../pi-spi-sdk`; the Docker build copies `apps/pi-spi-sdk` from the monorepo root context.
+PI-SPI and GIM Pay run in **standby** until their credentials are configured; checkout and other core API routes work without them.
 
-Config: [`../../railway.json`](../../railway.json). Env vars: [`.env.example`](.env.example).
+Config: [`railway.json`](railway.json). Env vars: [`.env.example`](.env.example).
 
 ```bash
 pnpm run smoke:http https://your-service.up.railway.app
