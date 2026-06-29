@@ -257,12 +257,17 @@ export async function deliverMerchantWebhook(
     | { status: number; data: unknown; url: string; usedAlternateHost: boolean }
     | undefined;
 
+  let lastResolveError: UnsafeWebhookUrlError | undefined;
+
   for (let index = 0; index < candidates.length; index++) {
     const candidateUrl = candidates[index]!;
     let target: SafeMerchantWebhookTarget;
     try {
       target = await resolveSafeMerchantWebhookTarget(candidateUrl);
-    } catch {
+    } catch (error) {
+      if (error instanceof UnsafeWebhookUrlError) {
+        lastResolveError = error;
+      }
       continue;
     }
 
@@ -308,8 +313,11 @@ export async function deliverMerchantWebhook(
   }
 
   if (!lastResponse) {
-    throw new UnsafeWebhookUrlError(
-      'Webhook URL could not be resolved for delivery',
+    throw (
+      lastResolveError ??
+      new UnsafeWebhookUrlError(
+        'Webhook URL could not be resolved for delivery',
+      )
     );
   }
 
@@ -344,6 +352,112 @@ export function parseMerchantWebhookUrl(url: string): URL {
   return parsed;
 }
 
+const DEV_TUNNEL_HOSTNAME_SUFFIXES = [
+  '.trycloudflare.com',
+  '.ngrok.io',
+  '.ngrok-free.app',
+  '.ngrok.app',
+] as const;
+
+function isDevTunnelHostname(hostname: string): boolean {
+  return DEV_TUNNEL_HOSTNAME_SUFFIXES.some((suffix) => hostname.endsWith(suffix));
+}
+
+function buildUnresolvedHostnameMessage(hostname: string): string {
+  if (isDevTunnelHostname(hostname)) {
+    return (
+      `Webhook URL hostname could not be resolved from our delivery network: ${hostname}. ` +
+      'If the tunnel responds locally, ensure it is still running — webhook delivery ' +
+      'must be able to resolve the hostname on public DNS (e.g. Cloudflare Tunnel / ngrok).'
+    );
+  }
+
+  return (
+    `Webhook URL hostname could not be resolved from our delivery network: ${hostname}. ` +
+    'Verify the domain exists and resolves on public DNS.'
+  );
+}
+
+type DnsAddressRecord = { address: string };
+
+interface CloudflareDohAnswer {
+  type?: number;
+  data?: string;
+}
+
+interface CloudflareDohResponse {
+  Status?: number;
+  Answer?: CloudflareDohAnswer[];
+}
+
+async function resolveHostnameAddressesViaDoh(
+  hostname: string,
+): Promise<DnsAddressRecord[]> {
+  const addresses: string[] = [];
+
+  for (const type of [1, 28]) {
+    const queryUrl =
+      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(hostname)}&type=${type}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    let response: Response;
+    try {
+      response = await fetch(queryUrl, {
+        headers: { Accept: 'application/dns-json' },
+        signal: controller.signal,
+      });
+    } catch {
+      clearTimeout(timeoutId);
+      continue;
+    }
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      continue;
+    }
+
+    let payload: CloudflareDohResponse;
+    try {
+      payload = (await response.json()) as CloudflareDohResponse;
+    } catch {
+      continue;
+    }
+
+    if (payload.Status !== 0 || !Array.isArray(payload.Answer)) {
+      continue;
+    }
+
+    for (const answer of payload.Answer) {
+      if ((answer.type === 1 || answer.type === 28) && answer.data) {
+        if (!addresses.includes(answer.data)) {
+          addresses.push(answer.data);
+        }
+      }
+    }
+  }
+
+  return addresses.map((address) => ({ address }));
+}
+
+async function resolveHostnameAddresses(
+  hostname: string,
+): Promise<DnsAddressRecord[]> {
+  try {
+    const records = (await dnsLookup(hostname, {
+      all: true,
+      verbatim: true,
+    })) as LookupAddress[];
+    if (records.length) {
+      return records.map((record) => ({ address: record.address }));
+    }
+  } catch {
+    // Fall through to DoH.
+  }
+
+  return resolveHostnameAddressesViaDoh(hostname);
+}
+
 export async function resolveSafeMerchantWebhookTarget(
   url: string,
 ): Promise<SafeMerchantWebhookTarget> {
@@ -355,22 +469,10 @@ export async function resolveSafeMerchantWebhookTarget(
     throw new UnsafeWebhookUrlError('Webhook URL port is invalid');
   }
 
-  let records: LookupAddress[];
-  try {
-    records = (await dnsLookup(hostname, {
-      all: true,
-      verbatim: true,
-    })) as LookupAddress[];
-  } catch {
-    throw new UnsafeWebhookUrlError(
-      `Webhook URL hostname could not be resolved: ${hostname}`,
-    );
-  }
+  const records = await resolveHostnameAddresses(hostname);
 
   if (!records.length) {
-    throw new UnsafeWebhookUrlError(
-      `Webhook URL hostname could not be resolved: ${hostname}`,
-    );
+    throw new UnsafeWebhookUrlError(buildUnresolvedHostnameMessage(hostname));
   }
 
   const pinnedAddresses: string[] = [];

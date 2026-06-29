@@ -157,6 +157,43 @@ describe('merchant-webhook-url', () => {
         resolveSafeMerchantWebhookTarget('https://dual.example/webhook'),
       ).rejects.toThrow(UnsafeWebhookUrlError);
     });
+
+    it('falls back to public DNS when the platform resolver fails', async () => {
+      mockedLookup.mockRejectedValue(new Error('ENOTFOUND'));
+      const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          Status: 0,
+          Answer: [{ type: 1, data: '104.21.55.199' }],
+        }),
+      } as Response);
+
+      const target = await resolveSafeMerchantWebhookTarget(
+        'https://abc123.trycloudflare.com/webhook',
+      );
+
+      expect(target.hostname).toBe('abc123.trycloudflare.com');
+      expect(target.pinnedAddresses).toEqual(['104.21.55.199']);
+      expect(fetchMock).toHaveBeenCalled();
+
+      fetchMock.mockRestore();
+    });
+
+    it('includes a dev-tunnel hint when public DNS also fails', async () => {
+      mockedLookup.mockRejectedValue(new Error('ENOTFOUND'));
+      const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ Status: 3 }),
+      } as Response);
+
+      await expect(
+        resolveSafeMerchantWebhookTarget(
+          'https://abc123.trycloudflare.com/webhook',
+        ),
+      ).rejects.toThrow(/Cloudflare Tunnel \/ ngrok/);
+
+      fetchMock.mockRestore();
+    });
   });
 
   describe('deliverMerchantWebhook', () => {
