@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import type { UnifiedCheckoutFieldDefinition } from '../../../utils/checkout/resolve-checkout-form';
 
 export class CreatePaymentLinkDto {
   @ApiProperty({
@@ -75,6 +76,31 @@ export class CreatePaymentLinkDto {
     required: false,
   })
   require_billing_address?: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'Require customer email at checkout',
+    default: true,
+    required: false,
+  })
+  require_email?: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Require customer phone at checkout',
+    default: false,
+    required: false,
+  })
+  require_phone?: boolean;
+
+  @ApiProperty({
+    description:
+      'Optional unified checkout field schema. When provided, overrides require_* booleans.',
+    required: false,
+    type: 'array',
+    items: { type: 'object' },
+  })
+  fields?: UnifiedCheckoutFieldDefinition[];
 
   @ApiProperty({
     example: '2024-12-31T23:59:59Z',

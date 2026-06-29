@@ -15,6 +15,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import type { UnifiedCheckoutFieldDefinition } from '../../../utils/checkout/resolve-checkout-form';
 
 /**
  * Line item for multi-product checkout
@@ -242,12 +243,43 @@ export class CreateCheckoutSessionDto {
   @ApiProperty({
     example: false,
     description: 'Require billing address',
-    default: false,
+    default: true,
     required: false,
   })
   @IsOptional()
   @IsBoolean()
   require_billing_address?: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'Require customer email at checkout',
+    default: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  require_email?: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Require customer phone at checkout',
+    default: false,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  require_phone?: boolean;
+
+  @ApiProperty({
+    description:
+      'Optional unified checkout field schema. When provided, system field visibility is derived from this ordered list and overrides the require_* booleans.',
+    required: false,
+    type: 'array',
+    items: { type: 'object' },
+  })
+  @IsOptional()
+  @IsArray()
+  fields?: UnifiedCheckoutFieldDefinition[];
 
   @ApiProperty({
     example: '987e6543-e89b-12d3-a456-426614174000',

@@ -93,6 +93,12 @@ export class CheckoutSessionResponseDto {
   @ApiProperty({ example: true, type: Boolean })
   require_billing_address: boolean;
 
+  @ApiProperty({ example: true, type: Boolean })
+  require_email: boolean;
+
+  @ApiProperty({ example: false, type: Boolean })
+  require_phone: boolean;
+
   @ApiProperty({ example: 'string', type: String })
   spi_account_number: string;
 

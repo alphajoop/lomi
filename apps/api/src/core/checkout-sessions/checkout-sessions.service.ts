@@ -18,6 +18,7 @@ import {
 } from '../common/network-context';
 import type { CurrencyCode, Json } from '../../utils/types/api';
 import { throwMappedSupabaseRpcError } from '../../utils/supabase-rpc-errors';
+import { normalizeCheckoutFieldFlags } from '../../utils/checkout/resolve-checkout-form';
 import {
   lookupIdempotencyCache,
   type IdempotentCreateResult,
@@ -95,7 +96,7 @@ export class CheckoutSessionsService {
         p_customer_postal_code: createDto.customer_postal_code || null,
         p_allow_coupon_code: createDto.allow_coupon_code ?? false,
         p_expiration_minutes: 60,
-        p_require_billing_address: createDto.require_billing_address ?? false,
+        p_require_billing_address: createDto.require_billing_address ?? true,
         p_payment_link_id: createDto.payment_link_id || null,
         ...(scopedIdempotency
           ? {
@@ -122,6 +123,7 @@ export class CheckoutSessionsService {
 
       if (error) throwMappedSupabaseRpcError(error.message);
       await this.recordNetworkCheckoutSession(data, user);
+      await this.applyCheckoutContactFlags(data, createDto);
       return { data };
     }
 
@@ -221,7 +223,7 @@ export class CheckoutSessionsService {
       p_customer_address: createDto.customer_address || null,
       p_customer_postal_code: createDto.customer_postal_code || null,
       p_allow_coupon_code: createDto.allow_coupon_code ?? false,
-      p_require_billing_address: createDto.require_billing_address ?? false,
+      p_require_billing_address: createDto.require_billing_address ?? true,
       p_payment_link_id: createDto.payment_link_id || null,
       ...(scopedIdempotency
         ? {
@@ -242,6 +244,7 @@ export class CheckoutSessionsService {
 
     if (error) throwMappedSupabaseRpcError(error.message);
     await this.recordNetworkCheckoutSession(data, user);
+    await this.applyCheckoutContactFlags(data, createDto);
     return { data };
   }
 
@@ -315,6 +318,64 @@ export class CheckoutSessionsService {
       },
     });
     assertNetworkContextRecorded(user, networkContext, 'checkout session');
+  }
+
+  private async applyCheckoutContactFlags(
+    data: unknown,
+    createDto: CreateCheckoutSessionDto,
+  ): Promise<void> {
+    const checkoutSessionId = extractCheckoutSessionId(data);
+    if (!checkoutSessionId) {
+      return;
+    }
+
+    const normalized = normalizeCheckoutFieldFlags({
+      require_billing_address: createDto.require_billing_address,
+      require_email: createDto.require_email,
+      require_phone: createDto.require_phone,
+      fields: createDto.fields,
+    });
+
+    const hasOverrides =
+      createDto.require_billing_address !== undefined ||
+      createDto.require_email !== undefined ||
+      createDto.require_phone !== undefined ||
+      (createDto.fields && createDto.fields.length > 0);
+
+    if (!hasOverrides) {
+      return;
+    }
+
+    const patch: {
+      require_billing_address?: boolean;
+      require_email?: boolean;
+      require_phone?: boolean;
+    } = {};
+    if (normalized.require_billing_address != null) {
+      patch.require_billing_address = normalized.require_billing_address;
+    }
+    if (normalized.require_email != null) {
+      patch.require_email = normalized.require_email;
+    }
+    if (normalized.require_phone != null) {
+      patch.require_phone = normalized.require_phone;
+    }
+
+    if (Object.keys(patch).length === 0) {
+      return;
+    }
+
+    const { error } = await this.supabase
+      .getClient()
+      .from('checkout_sessions')
+      .update(patch as never)
+      .eq('checkout_session_id', checkoutSessionId);
+
+    if (error) {
+      this.logger.warn(
+        `Failed to apply checkout contact flags for ${checkoutSessionId}: ${error.message}`,
+      );
+    }
   }
 
   private async findBlockingInvoice(
