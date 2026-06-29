@@ -11,6 +11,7 @@ import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
 import { WebhookEvent } from '../../../utils/types/api';
 import { maybeNotifySubscriptionRenewed } from '../../subscription-webhook.helper';
+import { isSpiWebhookSecretRequired } from '../../../core/spi/spi-config';
 import {
   mapSpiEventToPaymentStatus,
   mapSpiWebhookEventToWebhookEvent,
@@ -29,9 +30,12 @@ type SpiWebhookPayload = {
 };
 
 type CompleteRpcResult = {
+  completion_type?: 'checkout' | 'invoice' | 'payout';
   organization_id: string;
   transaction_id: string | null;
   checkout_session_id: string | null;
+  invoice_id?: string | null;
+  payout_id?: string | null;
   already_completed: boolean;
   status: string;
 };
@@ -102,7 +106,7 @@ export class SpiWebhookService {
     const spiPaymentStatus = mapSpiEventToPaymentStatus(eventCode);
 
     const { data: completed, error: completeError } = await this.supabase.rpc(
-      'complete_pos_spi_payment' as never,
+      'complete_spi_payment' as never,
       {
         p_spi_tx_id: spiTxId,
         p_spi_payment_status: spiPaymentStatus,
@@ -115,14 +119,42 @@ export class SpiWebhookService {
 
     if (completeError) {
       this.logger.error(
-        `complete_pos_spi_payment failed: ${completeError.message}`,
+        `complete_spi_payment failed: ${completeError.message}`,
       );
       throw new BadRequestException(completeError.message);
     }
 
     const result = completed as unknown as CompleteRpcResult;
+
+    if (result.completion_type === 'payout') {
+      this.wideEvent.logEvent({
+        eventName: 'spi_payout_completed',
+        organizationId: result.organization_id,
+        attributes: {
+          'payout.id': result.payout_id ?? undefined,
+          'payment.provider': 'SPI',
+          'spi.tx_id': spiTxId,
+          'telemetry.source_layer': 'api:webhook',
+        },
+      });
+
+      return {
+        event: eventCode,
+        tx_id: spiTxId,
+        payout_id: result.payout_id,
+        status: result.status,
+        completion_type: 'payout',
+      };
+    }
+
     if (!result.transaction_id) {
-      return { event: eventCode, tx_id: spiTxId, transaction_missing: true };
+      return {
+        event: eventCode,
+        tx_id: spiTxId,
+        transaction_missing: true,
+        completion_type: result.completion_type,
+        invoice_id: result.invoice_id,
+      };
     }
 
     const merchantEvent = mapSpiWebhookEventToWebhookEvent(eventCode);
@@ -163,19 +195,27 @@ export class SpiWebhookService {
     headers: Record<string, string>,
     rawBody: string,
   ): boolean {
-    const webhookSecret = process.env.SPI_WEBHOOK_SECRET;
+    const webhookSecret = process.env.SPI_WEBHOOK_SECRET?.trim();
     if (!webhookSecret) {
+      if (isSpiWebhookSecretRequired()) {
+        this.logger.error(
+          'SPI_WEBHOOK_SECRET is required in production — rejecting webhook',
+        );
+        return false;
+      }
+
       this.logger.warn(
-        'SPI_WEBHOOK_SECRET not set — accepting webhooks (dev only)',
+        'SPI_WEBHOOK_SECRET not set — accepting unsigned webhooks (development only)',
       );
-      return process.env.NODE_ENV !== 'production';
+      return true;
     }
 
+    // BCEAO PI-SPI spec: X-Signature (HMAC-SHA256 of raw body)
     const signature =
-      headers['x-spi-signature'] ??
-      headers['X-SPI-Signature'] ??
       headers['x-signature'] ??
-      headers['X-Signature'];
+      headers['X-Signature'] ??
+      headers['x-spi-signature'] ??
+      headers['X-SPI-Signature'];
 
     if (!signature) {
       return false;

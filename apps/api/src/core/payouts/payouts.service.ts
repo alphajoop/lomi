@@ -9,6 +9,7 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { environmentFromAuth } from '../common/auth-environment';
 import { CreatePayoutDto } from './dto/create-payout.dto';
+import { SpiPayoutExecutionService } from '../spi/spi-payout-execution.service';
 import {
   withApiIdempotency,
   type ApiIdempotencyContext,
@@ -30,7 +31,10 @@ type PayoutMethodRow = {
 export class PayoutsService {
   private readonly logger = new Logger(PayoutsService.name);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly spiPayoutExecution: SpiPayoutExecutionService,
+  ) {}
 
   async create(
     dto: CreatePayoutDto,
@@ -388,14 +392,23 @@ export class PayoutsService {
       spi_tx_id: string;
     };
 
-    await this.supabaseService.getClient().rpc(
-      'update_spi_payout_status' as never,
-      {
-        p_payout_id: payoutId,
-        p_status: 'processing',
-        p_spi_tx_id: spiTxId,
-      } as never,
-    );
+    if (!dto.payout_method_id) {
+      throw new BadRequestException('payout_method_id is required');
+    }
+
+    try {
+      await this.spiPayoutExecution.executeAfterInitiation(
+        user.organizationId,
+        dto.payout_method_id,
+        dto.amount,
+        dto.currency_code ?? 'XOF',
+        { payout_id: payoutId, spi_tx_id: spiTxId },
+      );
+    } catch (error) {
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'SPI payout execution failed',
+      );
+    }
 
     return {
       success: true,

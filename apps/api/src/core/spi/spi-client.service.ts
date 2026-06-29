@@ -1,44 +1,47 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { PiSpiSDK, AliasType } from 'pi-spi-sdk';
+import { PiSpiSDK, AliasType, PiSpiAuthError } from 'pi-spi-sdk';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
-
-type SpiProviderMetadata = {
-  spi_access_token?: string;
-  spi_base_url?: string;
-};
+import { loadSpiPlatformConfig } from './spi-config';
+import { getSpiMtlsDispatcher } from './spi-transport';
+import { SpiTokenService } from './spi-token.service';
 
 @Injectable()
 export class SpiClientService {
   private readonly logger = new Logger(SpiClientService.name);
-  private readonly defaultBaseUrl =
-    process.env.SPI_BASE_URL ?? 'https://sandbox.api.pi-bceao.com/piz/v1';
 
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly tokenService: SpiTokenService,
+  ) {}
 
   async getSdk(organizationId: string): Promise<PiSpiSDK> {
-    const { data, error } = await this.supabase.rpc(
-      'get_spi_provider_metadata' as never,
-      { p_organization_id: organizationId } as never,
-    );
+    await this.assertOrgSpiConnected(organizationId);
+    return this.buildSdk();
+  }
 
-    if (error || !data) {
-      this.logger.error(
-        `SPI metadata lookup failed for org ${organizationId}: ${error?.message}`,
-      );
-      throw new BadRequestException(
-        'SPI provider is not configured for this organization',
-      );
+  async getPlatformSdk(): Promise<PiSpiSDK> {
+    return this.buildSdk();
+  }
+
+  async executeWithSdk<T>(
+    organizationId: string,
+    operation: (sdk: PiSpiSDK) => Promise<T>,
+  ): Promise<T> {
+    await this.assertOrgSpiConnected(organizationId);
+
+    try {
+      const sdk = await this.buildSdk();
+      return await operation(sdk);
+    } catch (error) {
+      if (!this.isAuthError(error)) {
+        throw error;
+      }
+
+      this.logger.warn('PI-SPI auth error — invalidating token and retrying once');
+      this.tokenService.invalidate();
+      const sdk = await this.buildSdk();
+      return operation(sdk);
     }
-
-    const metadata = data as SpiProviderMetadata;
-    const accessToken = metadata.spi_access_token;
-    const baseUrl = metadata.spi_base_url ?? this.defaultBaseUrl;
-
-    if (!accessToken) {
-      throw new BadRequestException('SPI access token is missing');
-    }
-
-    return new PiSpiSDK({ baseUrl, accessToken });
   }
 
   async getOrCreateMerchantShidAlias(
@@ -62,11 +65,12 @@ export class SpiClientService {
       return aliasValue;
     }
 
-    const sdk = await this.getSdk(organizationId);
-    const created = await sdk.alias.create({
-      compte: spiAccountNumber,
-      type: AliasType.SHID,
-    });
+    const created = await this.executeWithSdk(organizationId, (sdk) =>
+      sdk.alias.create({
+        compte: spiAccountNumber,
+        type: AliasType.SHID,
+      }),
+    );
 
     const aliasKey = created.cle;
     if (!aliasKey) {
@@ -90,5 +94,56 @@ export class SpiClientService {
     }
 
     return aliasKey;
+  }
+
+  private async buildSdk(): Promise<PiSpiSDK> {
+    const config = loadSpiPlatformConfig();
+    const accessToken = await this.tokenService.getAccessToken();
+    const dispatcher = getSpiMtlsDispatcher();
+
+    return new PiSpiSDK({
+      baseUrl: config.baseUrl,
+      accessToken,
+      ...(dispatcher ? { dispatcher } : {}),
+    });
+  }
+
+  private async assertOrgSpiConnected(organizationId: string): Promise<void> {
+    const { data, error } = await this.supabase.rpc(
+      'get_spi_provider_metadata' as never,
+      { p_organization_id: organizationId } as never,
+    );
+
+    if (error) {
+      this.logger.error(
+        `SPI provider lookup failed for org ${organizationId}: ${error.message}`,
+      );
+      throw new BadRequestException(
+        'SPI provider is not configured for this organization',
+      );
+    }
+
+    if (data === null || data === undefined) {
+      throw new BadRequestException(
+        'SPI provider is not connected for this organization',
+      );
+    }
+  }
+
+  private isAuthError(error: unknown): boolean {
+    if (error instanceof PiSpiAuthError) {
+      return true;
+    }
+
+    if (
+      error &&
+      typeof error === 'object' &&
+      'status' in error &&
+      (error as { status?: number }).status === 401
+    ) {
+      return true;
+    }
+
+    return false;
   }
 }

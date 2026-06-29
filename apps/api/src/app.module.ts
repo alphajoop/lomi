@@ -40,6 +40,7 @@ import { CliModule } from './cli/cli.module';
 import { CustomerPortalModule } from './core/customer-portal/customer-portal.module';
 import { HealthModule } from './health/health.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { CheckoutModule } from './checkout/checkout.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -157,6 +158,7 @@ const logger = new Logger('RedisConfig');
     CustomerPortalModule,
     HealthModule,
     DashboardModule,
+    CheckoutModule,
   ],
 
   controllers: [AppController],

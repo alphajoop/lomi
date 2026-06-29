@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { PayoutsService } from './payouts.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { SpiPayoutExecutionService } from '../spi/spi-payout-execution.service';
 
 describe('PayoutsService', () => {
   let service: PayoutsService;
@@ -38,6 +39,16 @@ describe('PayoutsService', () => {
         {
           provide: SupabaseService,
           useValue: supabaseMock,
+        },
+        {
+          provide: SpiPayoutExecutionService,
+          useValue: {
+            executeAfterInitiation: jest.fn().mockResolvedValue({
+              payoutId: 'payout-1',
+              spiTxId: 'SPI-payout-1',
+              spiStatus: 'ENVOYE',
+            }),
+          },
         },
       ],
     }).compile();

@@ -44,6 +44,24 @@ export function deriveMtnChargeNextAction(data: {
 }
 
 /** Derive next_action from a card charge data object. */
+/** Derive next_action from a GIM PayByCard result. */
+export function deriveGimChargeNextAction(data: {
+  status?: string;
+  three_ds_url?: string | null;
+}): ChargeNextActionDto | undefined {
+  const redirectUrl = readString(data.three_ds_url ?? undefined);
+  if (redirectUrl || data.status === 'redirect_3ds') {
+    if (redirectUrl) {
+      return { type: 'redirect', url: redirectUrl };
+    }
+  }
+  if (data.status === 'retry_other_rail') {
+    return { type: 'await_webhook', status: 'retry_other_rail' };
+  }
+  return undefined;
+}
+
+/** Derive next_action from a card charge data object. */
 export function deriveCardChargeNextAction(data: {
   client_secret?: string | null;
   status?: string;

@@ -5,9 +5,10 @@ import { CardChargeService } from './card-charge.service';
 import { ConfigModule } from '@nestjs/config';
 import { StripeModule } from '../../utils/stripe/stripe.module';
 import { RadarModule } from '../radar/radar.module';
+import { GimModule } from '../gim/gim.module';
 
 @Module({
-  imports: [ConfigModule, StripeModule, RadarModule],
+  imports: [ConfigModule, StripeModule, RadarModule, GimModule],
   controllers: [ChargesController],
   providers: [ChargesService, CardChargeService],
   exports: [ChargesService, CardChargeService],

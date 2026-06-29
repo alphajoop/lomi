@@ -3598,6 +3598,7 @@ export type Database = {
         | 'STRIPE'
         | 'SPI'
         | 'CYBERSOURCE'
+        | 'GIM'
         | 'FREE';
       provider_payment_status:
         | 'processing'

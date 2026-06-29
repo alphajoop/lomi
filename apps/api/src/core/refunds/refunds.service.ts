@@ -172,6 +172,10 @@ export class RefundsService {
             feePercentage,
             refundMerchantId,
           );
+    } else if (tx.provider_code === 'GIM') {
+      throw new BadRequestException(
+        'GIM Pay refunds are processed via the GIM merchant portal; API refunds are not yet supported',
+      );
     } else {
       throw new BadRequestException(
         'Refunds are not supported for this transaction type',

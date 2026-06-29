@@ -2,6 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import type { PortalSessionContext } from './portal-session.guard';
 
+function buildLomiCustomerQr(alias: string) {
+  return {
+    t: 'lomi.cust' as const,
+    v: 1 as const,
+    alias: alias.trim(),
+    aliasType: 'SHID' as const,
+  };
+}
+
 @Injectable()
 export class CustomerPortalService {
   constructor(private readonly supabase: SupabaseService) {}
@@ -146,5 +155,28 @@ export class CustomerPortalService {
     const payload = data as { error?: string } | null;
     if (payload?.error) throw new BadRequestException(payload.error);
     return payload;
+  }
+
+  async getSpiCustomerQr(session: PortalSessionContext) {
+    const { data: alias, error } = await this.supabase.rpc(
+      'get_customer_spi_alias' as never,
+      { p_customer_id: session.customerId } as never,
+    );
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    const aliasKey = alias as string | null;
+    if (!aliasKey?.trim()) {
+      throw new BadRequestException('Customer has no SPI alias configured');
+    }
+
+    const qr = buildLomiCustomerQr(aliasKey);
+
+    return {
+      qr,
+      payload: JSON.stringify(qr),
+    };
   }
 }

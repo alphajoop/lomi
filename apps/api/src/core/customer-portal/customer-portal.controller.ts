@@ -114,4 +114,12 @@ export class CustomerPortalController {
   ) {
     return this.customerPortalService.retrySubscriptionPayment(session, id);
   }
+
+  @Get('spi/qr')
+  @ApiOperation({
+    summary: 'lomi.cust JSON QR payload for consumer-presented SPI (CPM)',
+  })
+  getSpiCustomerQr(@PortalSession() session: PortalSessionContext) {
+    return this.customerPortalService.getSpiCustomerQr(session);
+  }
 }

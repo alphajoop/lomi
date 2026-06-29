@@ -69,6 +69,7 @@
   "POST /charge/card",
   "POST /charge/card/{id}/cancel",
   "POST /charge/mtn",
+  "POST /charge/gim",
   "POST /charge/wave",
   "POST /checkout-sessions",
   "POST /customers",

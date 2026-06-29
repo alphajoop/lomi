@@ -29,7 +29,8 @@
     "openapi:export": "pnpx tsx src/utils/scripts/export-openapi.ts",
     "openapi:export:agent": "pnpx tsx src/utils/scripts/export-agent-openapi.ts",
     "openapi:export:all": "pnpm run openapi:export && pnpm run openapi:export:agent",
-    "setup:whatsapp-webhooks": "pnpx tsx src/utils/scripts/setup-kapso-platform-webhook.ts --apply-secrets --project-ref mdswvokxrnfggrujsfjd"
+    "setup:whatsapp-webhooks": "pnpx tsx src/utils/scripts/setup-kapso-platform-webhook.ts --apply-secrets --project-ref mdswvokxrnfggrujsfjd",
+    "spi:register-webhooks": "pnpx tsx scripts/register-spi-webhooks.ts"
   },
   "keywords": [
     "lomi",
@@ -79,10 +80,11 @@
     "class-validator": "^0.14.4",
     "express": "^5.2.1",
     "ioredis": "^5.11.1",
-    "pi-spi-sdk": "^0.1.3",
+    "pi-spi-sdk": "file:../pi-spi-sdk",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
-    "stripe": "^20.4.1"
+    "stripe": "^20.4.1",
+    "undici": "^7.16.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",

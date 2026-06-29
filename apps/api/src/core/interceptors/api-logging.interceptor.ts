@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { createHash } from 'node:crypto';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 
 @Injectable()
@@ -86,7 +85,7 @@ export class ApiLoggingInterceptor implements NestInterceptor {
               user.actorOrganizationId || user.organizationId,
             p_target_organization_id:
               user.targetOrganizationId || user.organizationId,
-            p_api_key: maskApiKeyForLog(apiKey),
+            p_api_key: user.apiKey ?? apiKey,
             p_endpoint: endpointPath,
             p_request_method: request.method,
             p_request_payload: requestPayload,
@@ -124,12 +123,6 @@ export class ApiLoggingInterceptor implements NestInterceptor {
       this.logger.error(`Error in ApiLoggingInterceptor: ${e.message}`, e);
     }
   }
-}
-
-function maskApiKeyForLog(apiKey: string): string {
-  const hash = createHash('sha256').update(apiKey).digest('hex').slice(0, 16);
-  const last4 = apiKey.length >= 4 ? apiKey.slice(-4) : '****';
-  return `sha256:${hash}:...${last4}`;
 }
 
 function urlWithoutQuery(url: string): string {

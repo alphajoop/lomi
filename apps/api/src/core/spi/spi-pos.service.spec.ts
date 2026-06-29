@@ -10,6 +10,7 @@ describe('SpiPosService', () => {
 
   const spiClientMock = {
     getSdk: jest.fn(),
+    executeWithSdk: jest.fn(),
     getOrCreateMerchantShidAlias: jest.fn(),
   };
 
@@ -59,6 +60,19 @@ describe('SpiPosService', () => {
         payload: jest.fn().mockReturnValue('EMV_QR_PAYLOAD'),
       },
     });
+    spiClientMock.executeWithSdk.mockImplementation(
+      async (_orgId: string, operation: (sdk: unknown) => Promise<unknown>) => {
+        const sdk = {
+          demandesPaiement: {
+            create: jest.fn().mockResolvedValue({ statut: 'INITIE' }),
+          },
+          qr: {
+            payload: jest.fn().mockReturnValue('EMV_QR_PAYLOAD'),
+          },
+        };
+        return operation(sdk);
+      },
+    );
     spiClientMock.getOrCreateMerchantShidAlias.mockResolvedValue('alias-shid');
 
     const result = await service.initQrPayment({
@@ -97,7 +111,7 @@ describe('SpiPosService', () => {
       })
       .mockResolvedValueOnce({ data: { success: false }, error: null });
 
-    spiClientMock.getSdk.mockRejectedValue(new Error('SPI down'));
+    spiClientMock.executeWithSdk.mockRejectedValue(new Error('SPI down'));
 
     await expect(
       service.initQrPayment({
@@ -133,10 +147,15 @@ describe('SpiPosService', () => {
       })
       .mockResolvedValueOnce({ data: { success: true }, error: null });
 
-    spiClientMock.getSdk.mockResolvedValue({
-      demandesPaiement: { create: demandesCreate },
-      qr: { payload: jest.fn() },
-    });
+    spiClientMock.executeWithSdk.mockImplementation(
+      async (_orgId: string, operation: (sdk: unknown) => Promise<unknown>) => {
+        const sdk = {
+          demandesPaiement: { create: demandesCreate },
+          qr: { payload: jest.fn() },
+        };
+        return operation(sdk);
+      },
+    );
 
     const result = await service.initRequestToPay({
       organizationId: 'org-1',

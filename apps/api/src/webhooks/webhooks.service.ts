@@ -232,6 +232,20 @@ export class WebhooksService {
       );
     }
 
+    const result = body as {
+      success?: boolean;
+      status?: number;
+      response?: string;
+    };
+    if (result.success === false) {
+      throw new BadRequestException(
+        result.response ||
+          (result.status
+            ? `Webhook endpoint returned HTTP ${result.status}`
+            : 'Webhook test delivery failed'),
+      );
+    }
+
     return body;
   }
 

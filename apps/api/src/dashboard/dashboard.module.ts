@@ -13,8 +13,15 @@ import { DashboardNetworkController } from './dashboard-network.controller';
 import { DashboardNetworkService } from './dashboard-network.service';
 import { InternalJobsController } from './internal-jobs.controller';
 import { InternalJobsService } from './internal-jobs.service';
+import { InternalSpiController } from './internal-spi.controller';
 import { DashboardPosSpiController } from './dashboard-pos-spi.controller';
 import { DashboardPosSpiService } from './dashboard-pos-spi.service';
+import { DashboardInvoicingSpiController } from './dashboard-invoicing-spi.controller';
+import { DashboardInvoicingSpiService } from './dashboard-invoicing-spi.service';
+import { DashboardPayoutsSpiController } from './dashboard-payouts-spi.controller';
+import { DashboardPayoutsSpiService } from './dashboard-payouts-spi.service';
+import { DashboardSpiStatusController } from './dashboard-spi-status.controller';
+import { DashboardSpiStatusService } from './dashboard-spi-status.service';
 import { SpiModule } from '../core/spi/spi.module';
 
 @Module({
@@ -30,7 +37,11 @@ import { SpiModule } from '../core/spi/spi.module';
     DashboardCustomersController,
     DashboardNetworkController,
     DashboardPosSpiController,
+    DashboardInvoicingSpiController,
+    DashboardPayoutsSpiController,
+    DashboardSpiStatusController,
     InternalJobsController,
+    InternalSpiController,
   ],
   providers: [
     DashboardMeService,
@@ -38,6 +49,9 @@ import { SpiModule } from '../core/spi/spi.module';
     DashboardCustomersService,
     DashboardNetworkService,
     DashboardPosSpiService,
+    DashboardInvoicingSpiService,
+    DashboardPayoutsSpiService,
+    DashboardSpiStatusService,
     InternalJobsService,
     SupabaseSessionGuard,
     OrganizationContextGuard,

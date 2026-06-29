@@ -27,10 +27,14 @@ import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-head
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
+import { CreateGimChargeDto } from './dto/create-gim-charge.dto';
 import { CardChargeResponseDto } from './dto/card-charge-response.dto';
+import { GimChargeResponseDto } from './dto/gim-charge-response.dto';
 import { MtnChargeResponseDto } from './dto/mtn-charge-response.dto';
 import { WaveChargeResponseDto } from './dto/wave-charge-response.dto';
+import { GimChargeService } from '../gim/gim-charge.service';
 import { normalizeScenarioKey } from './charge-scenario';
+import { normalizeGimScenarioKey } from './gim-charge-scenario';
 import { environmentFromAuth } from '../common/auth-environment';
 
 @ApiTags('Encaissements')
@@ -41,6 +45,7 @@ export class ChargesController {
   constructor(
     private readonly chargesService: ChargesService,
     private readonly cardChargeService: CardChargeService,
+    private readonly gimChargeService: GimChargeService,
   ) {}
 
   @Post('wave')
@@ -119,6 +124,44 @@ export class ChargesController {
     );
     return this.chargesService
       .createMtnCharge(createChargeDto, user, scenarioKey, idempotency)
+      .then((result) => {
+        if (result.idempotencyCacheHit && res) {
+          res.setHeader('Idempotency-Cache-Hit', 'true');
+        }
+        return result.data;
+      });
+  }
+
+  @Post('gim')
+  @ApiLomiAccountHeader()
+  @ApiOperation({
+    summary: 'Create GIM Pay card charge (direct PayByCard)',
+    description:
+      'Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail for Stripe fallback.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'GIM charge created',
+    type: GimChargeResponseDto,
+  })
+  @ApiBody({ type: CreateGimChargeDto })
+  createGimCharge(
+    @Body() createDto: CreateGimChargeDto,
+    @CurrentUser() user: AuthContext,
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
+    @Headers('x-scenario-key') scenarioHeader?: string | string[],
+    @Res({ passthrough: true }) res?: Response,
+  ) {
+    const idempotency = resolveRequestIdempotency(
+      idempotencyKey,
+      JSON.parse(JSON.stringify(createDto)) as Record<string, unknown>,
+    );
+    const scenarioKey =
+      environmentFromAuth(user) === 'test'
+        ? normalizeGimScenarioKey(scenarioHeader)
+        : undefined;
+    return this.gimChargeService
+      .create(createDto, user, idempotency, scenarioKey)
       .then((result) => {
         if (result.idempotencyCacheHit && res) {
           res.setHeader('Idempotency-Cache-Hit', 'true');

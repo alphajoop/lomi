@@ -37,6 +37,7 @@ const PUBLIC_REST_API_OPERATIONS = [
   'GET /charge/card/{id}',
   'POST /charge/card/{id}/cancel',
   'POST /charge/mtn',
+  'POST /charge/gim',
   'POST /charge/wave',
   'checkout-sessions',
   'customers',

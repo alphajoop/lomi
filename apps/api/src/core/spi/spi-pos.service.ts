@@ -67,10 +67,7 @@ export class SpiPosService {
       throw new BadRequestException('payeurAlias is required');
     }
 
-    return this.initSpiPosPayment(
-      { ...input, payeurAlias },
-      { mode: 'cpm', payeurAlias },
-    );
+    return this.initSpiPosPayment(input, { mode: 'cpm', payeurAlias });
   }
 
   private async initSpiPosPayment(
@@ -108,18 +105,21 @@ export class SpiPosService {
       new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
     try {
-      const sdk = await this.spiClient.getSdk(input.organizationId);
       const montantCentimes = toProviderAmount(prep.amount);
-      const spiResponse = await sdk.demandesPaiement.create({
-        comptePaye: prep.spi_account_number,
-        payeurAlias: options.mode === 'cpm' ? options.payeurAlias : '',
-        montant: montantCentimes,
-        categorie: '500',
-        motif: `Paiement POS - Transaction ${spiTxId}`,
-        txId: spiTxId,
-        dateLimiteReponse,
-        confirmation: false,
-      });
+      const spiResponse = await this.spiClient.executeWithSdk(
+        input.organizationId,
+        (sdk) =>
+          sdk.demandesPaiement.create({
+            comptePaye: prep.spi_account_number,
+            payeurAlias: options.mode === 'cpm' ? options.payeurAlias : '',
+            montant: montantCentimes,
+            categorie: '500',
+            motif: `Paiement POS - Transaction ${spiTxId}`,
+            txId: spiTxId,
+            dateLimiteReponse,
+            confirmation: false,
+          }),
+      );
 
       const spiStatus = (spiResponse.statut ?? 'INITIE') as
         | 'INITIE'
@@ -133,6 +133,7 @@ export class SpiPosService {
           input.organizationId,
           prep.spi_account_number,
         );
+        const sdk = await this.spiClient.getSdk(input.organizationId);
         qrPayload = sdk.qr.payload({
           alias: spiAlias,
           countryCode,

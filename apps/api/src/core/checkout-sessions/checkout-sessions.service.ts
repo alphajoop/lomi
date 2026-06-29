@@ -165,11 +165,29 @@ export class CheckoutSessionsService {
       }
     }
 
+    let amount: number | undefined = createDto.amount;
+    if (amount == null && (createDto.product_id || createDto.price_id)) {
+      amount = (await this.resolveCatalogAmount(
+        createDto,
+        user.organizationId,
+      )) ?? undefined;
+      if (amount == null) {
+        throw new BadRequestException(
+          'Product has no price configured. Provide amount or configure product prices.',
+        );
+      }
+    }
+    if (amount == null) {
+      throw new BadRequestException(
+        'amount is required when product_id is not provided',
+      );
+    }
+
     const rpcArgs = {
       p_organization_id: user.organizationId,
       p_environment: user.environment,
       p_created_by: user.merchantId,
-      p_amount: (createDto.amount ?? null) as unknown as number,
+      p_amount: amount,
       p_currency_code: createDto.currency_code as CurrencyCode,
       p_customer_id: createDto.customer_id || null,
       p_metadata: mergeCheckoutMetadata(
@@ -321,6 +339,27 @@ export class CheckoutSessionsService {
     }
 
     return invoice as BlockingInvoice;
+  }
+
+  private async resolveCatalogAmount(
+    dto: CreateCheckoutSessionDto,
+    organizationId: string,
+  ): Promise<number | null> {
+    const { data, error } = await this.supabase.rpc(
+      'resolve_checkout_catalog_amount' as never,
+      {
+        p_organization_id: organizationId,
+        p_product_id: dto.product_id || null,
+        p_price_id: dto.price_id || null,
+        p_quantity: dto.quantity ?? 1,
+      } as never,
+    );
+
+    if (error || data == null) {
+      return null;
+    }
+
+    return Number(data);
   }
 }
 

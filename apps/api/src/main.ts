@@ -61,6 +61,7 @@ async function bootstrap() {
           'https://www.lomi.africa',
           'https://dashboard.lomi.africa',
           'https://api.lomi.africa',
+          'https://checkout.lomi.africa',
         ]
       : '*';
 
