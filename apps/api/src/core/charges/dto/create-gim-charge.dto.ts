@@ -1,7 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateGimChargeDto {
-  @ApiProperty({ type: Number, example: 10000, description: 'Amount in XOF francs' })
+  @ApiProperty({
+    type: Number,
+    example: 10000,
+    description: 'Amount in XOF francs',
+  })
   amount: number;
 
   @ApiPropertyOptional({ type: String, example: 'XOF', enum: ['XOF'] })
@@ -16,7 +20,10 @@ export class CreateGimChargeDto {
   @ApiProperty({ type: String, example: '123' })
   cvv: string;
 
-  @ApiPropertyOptional({ type: String, example: '550e8400-e29b-41d4-a716-446655440000' })
+  @ApiPropertyOptional({
+    type: String,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   customer_id?: string;
 
   @ApiPropertyOptional({ type: String, example: 'john@example.com' })

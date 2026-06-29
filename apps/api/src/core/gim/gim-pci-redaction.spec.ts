@@ -23,7 +23,9 @@ describe('GimClientService PCI redaction', () => {
   beforeEach(() => {
     service = new GimClientService(new GimHmacService());
     jest.spyOn(service, 'getConfig').mockReturnValue(config);
-    logSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+    logSpy = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -46,7 +48,9 @@ describe('GimClientService PCI redaction', () => {
         },
         {
           fetchImpl: async () => {
-            throw new Error(`upstream failed pan=${pan} cvv=${cvv} key=${secretKeyHex}`);
+            throw new Error(
+              `upstream failed pan=${pan} cvv=${cvv} key=${secretKeyHex}`,
+            );
           },
         },
       ),

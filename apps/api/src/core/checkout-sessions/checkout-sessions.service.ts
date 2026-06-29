@@ -167,10 +167,9 @@ export class CheckoutSessionsService {
 
     let amount: number | undefined = createDto.amount;
     if (amount == null && (createDto.product_id || createDto.price_id)) {
-      amount = (await this.resolveCatalogAmount(
-        createDto,
-        user.organizationId,
-      )) ?? undefined;
+      amount =
+        (await this.resolveCatalogAmount(createDto, user.organizationId)) ??
+        undefined;
       if (amount == null) {
         throw new BadRequestException(
           'Product has no price configured. Provide amount or configure product prices.',

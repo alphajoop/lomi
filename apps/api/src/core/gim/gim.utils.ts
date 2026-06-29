@@ -145,13 +145,11 @@ export function buildDateTimeLocalTrxn(
     pad2(now.getSeconds());
 
   if (digitLength === 12) {
-    dateTimeLocalTrxnSequence =
-      (dateTimeLocalTrxnSequence + 1) % 1000;
+    dateTimeLocalTrxnSequence = (dateTimeLocalTrxnSequence + 1) % 1000;
     return base;
   }
 
-  dateTimeLocalTrxnSequence =
-    (dateTimeLocalTrxnSequence + 1) % 1000;
+  dateTimeLocalTrxnSequence = (dateTimeLocalTrxnSequence + 1) % 1000;
   return `${base}${String(dateTimeLocalTrxnSequence).padStart(3, '0')}`;
 }
 
@@ -224,4 +222,3 @@ export function sanitizeGimLogPayload(value: string): string {
 export function resetDateTimeLocalTrxnSequenceForTests(): void {
   dateTimeLocalTrxnSequence = 0;
 }
-

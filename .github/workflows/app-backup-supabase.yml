@@ -1,12 +1,14 @@
-name: lomi · backup · supabase
+name: lomi · backup · supabase · db
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 2,14 * * *"
+    # Off-platform encrypted DB copy every 6 hours. This is the disaster-recovery
+    # copy in our own S3; Supabase's own backups/PITR cover lower-RPO needs.
+    - cron: "17 */6 * * *"
 
 concurrency:
-  group: lomi-backup-supabase
+  group: lomi-backup-supabase-db
   cancel-in-progress: false
 
 permissions:
@@ -14,15 +16,11 @@ permissions:
 
 jobs:
   backup:
-    name: Back up database and storage
+    name: Back up database
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-      SUPABASE_STORAGE_S3_ENDPOINT: ${{ secrets.SUPABASE_STORAGE_S3_ENDPOINT }}
-      SUPABASE_STORAGE_S3_REGION: ${{ secrets.SUPABASE_STORAGE_S3_REGION }}
-      SUPABASE_STORAGE_S3_ACCESS_KEY_ID: ${{ secrets.SUPABASE_STORAGE_S3_ACCESS_KEY_ID }}
-      SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY }}
       BACKUP_S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
       BACKUP_S3_ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
       BACKUP_S3_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
@@ -63,10 +61,6 @@ jobs:
 
           for name in \
             SUPABASE_DB_URL \
-            SUPABASE_STORAGE_S3_ENDPOINT \
-            SUPABASE_STORAGE_S3_REGION \
-            SUPABASE_STORAGE_S3_ACCESS_KEY_ID \
-            SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY \
             BACKUP_S3_BUCKET \
             BACKUP_S3_ENDPOINT \
             BACKUP_S3_ACCESS_KEY_ID \
@@ -125,17 +119,31 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y age jq rclone curl gnupg lsb-release
+          sudo apt-get install -y age jq curl gnupg lsb-release
 
-          # Install the PostgreSQL 17 client. pg_dump must be >= the server major
-          # version (Supabase runs Postgres 17), which is newer than Ubuntu's default.
+          # Install the PostgreSQL 17 client. pg_dump/pg_dumpall must be >= the server
+          # major version (Supabase runs Postgres 17), which is newer than Ubuntu's default.
           curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
             | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
           echo "deb [signed-by=/etc/apt/trusted.gpg.d/pgdg.gpg] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
             | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
-          pg_dump --version
+
+          # The ubuntu-latest runner ships a running PostgreSQL 16 cluster, so the
+          # pg_dump/pg_dumpall on PATH are the postgresql-common "pg_wrapper" shim, which
+          # resolves to the default local cluster's version (16) even after client 17 is
+          # installed. That caused "server version mismatch: server 17.x, pg_dumpall 16.x".
+          # Put the v17 binaries at the front of PATH (for all later steps) so the real
+          # v17 tools are used and the wrapper is bypassed.
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+          pg_dumpall_bin="/usr/lib/postgresql/17/bin/pg_dumpall"
+          "$pg_dumpall_bin" --version
+          case "$("$pg_dumpall_bin" --version)" in
+            *" 17."*) echo "pg_dumpall 17 confirmed." ;;
+            *) echo "::error::Expected pg_dumpall 17 at ${pg_dumpall_bin}."; exit 1 ;;
+          esac
 
       # Derive the direct (IPv6) connection from SUPABASE_DB_URL. If the secret still
       # points at the shared pooler, rewrite it to the direct host; otherwise use it
@@ -393,48 +401,3 @@ jobs:
           aws s3 cp "$DB_MANIFEST_FILE" "$destination/latest-manifest.json" "${endpoint_args[@]}" --only-show-errors
 
           echo "Uploaded encrypted database backup to $destination/$DB_BACKUP_FILE"
-
-      - name: Copy Supabase Storage buckets to object storage
-        env:
-          RCLONE_CONFIG_SUPABASE_TYPE: s3
-          RCLONE_CONFIG_SUPABASE_PROVIDER: Other
-          RCLONE_CONFIG_SUPABASE_ENV_AUTH: "false"
-          RCLONE_CONFIG_SUPABASE_FORCE_PATH_STYLE: "true"
-          RCLONE_CONFIG_BACKUP_TYPE: s3
-          RCLONE_CONFIG_BACKUP_PROVIDER: Other
-          RCLONE_CONFIG_BACKUP_ENV_AUTH: "false"
-          RCLONE_CONFIG_BACKUP_FORCE_PATH_STYLE: "true"
-        run: |
-          set -euo pipefail
-
-          export RCLONE_CONFIG_SUPABASE_ENDPOINT="$SUPABASE_STORAGE_S3_ENDPOINT"
-          export RCLONE_CONFIG_SUPABASE_REGION="$SUPABASE_STORAGE_S3_REGION"
-          export RCLONE_CONFIG_SUPABASE_ACCESS_KEY_ID="$SUPABASE_STORAGE_S3_ACCESS_KEY_ID"
-          export RCLONE_CONFIG_SUPABASE_SECRET_ACCESS_KEY="$SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY"
-          export RCLONE_CONFIG_BACKUP_ENDPOINT="$BACKUP_S3_ENDPOINT"
-          export RCLONE_CONFIG_BACKUP_REGION="${BACKUP_S3_REGION:-auto}"
-          export RCLONE_CONFIG_BACKUP_ACCESS_KEY_ID="$BACKUP_S3_ACCESS_KEY_ID"
-          export RCLONE_CONFIG_BACKUP_SECRET_ACCESS_KEY="$BACKUP_S3_SECRET_ACCESS_KEY"
-
-          timestamp="$(date -u +'%Y%m%dT%H%M%SZ')"
-          prefix="${BACKUP_S3_PREFIX:-supabase}"
-
-          mapfile -t buckets < <(rclone lsf supabase: --dirs-only | sed 's#/$##' | sed '/^$/d')
-
-          if [ "${#buckets[@]}" -eq 0 ]; then
-            echo "No Supabase Storage buckets found."
-            exit 0
-          fi
-
-          for bucket in "${buckets[@]}"; do
-            echo "Backing up Supabase Storage bucket: ${bucket}"
-            rclone copy \
-              "supabase:${bucket}" \
-              "backup:${BACKUP_S3_BUCKET}/${prefix}/storage/${bucket}" \
-              --backup-dir "backup:${BACKUP_S3_BUCKET}/${prefix}/storage-versions/${timestamp}/${bucket}" \
-              --fast-list \
-              --transfers 8 \
-              --checkers 16 \
-              --stats-one-line \
-              --stats 30s
-          done

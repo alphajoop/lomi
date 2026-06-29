@@ -42,7 +42,9 @@ export class DashboardPosSpiController {
   }
 
   @Post('request-payment')
-  @ApiOperation({ summary: 'Initiate POS SPI request-to-pay from scanned customer alias' })
+  @ApiOperation({
+    summary: 'Initiate POS SPI request-to-pay from scanned customer alias',
+  })
   initRequestToPay(
     @CurrentDashboardUser() user: DashboardUserContext,
     @Body()

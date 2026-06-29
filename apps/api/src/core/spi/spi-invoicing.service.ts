@@ -102,18 +102,20 @@ export class SpiInvoicingService {
           }),
       );
 
-      const spiStatus =
-        spiResponse.statut === 'REJETE' ? 'REJETE' : 'ENVOYE';
+      const spiStatus = spiResponse.statut === 'REJETE' ? 'REJETE' : 'ENVOYE';
 
-      await this.supabase.rpc('finalize_invoice_spi_rtp_initiated' as never, {
-        p_payment_request_id: prep.payment_request_id,
-        p_spi_payment_status: spiStatus,
-        p_metadata: {
-          spi_response: spiResponse,
-          date_limite_reponse:
-            spiResponse.dateLimiteReponse ?? dateLimiteReponse,
-        },
-      } as never);
+      await this.supabase.rpc(
+        'finalize_invoice_spi_rtp_initiated' as never,
+        {
+          p_payment_request_id: prep.payment_request_id,
+          p_spi_payment_status: spiStatus,
+          p_metadata: {
+            spi_response: spiResponse,
+            date_limite_reponse:
+              spiResponse.dateLimiteReponse ?? dateLimiteReponse,
+          },
+        } as never,
+      );
 
       if (spiStatus === 'REJETE') {
         throw new BadRequestException('SPI rejected invoice payment request');
@@ -126,17 +128,19 @@ export class SpiInvoicingService {
         amount: prep.amount,
         currency: prep.currency_code,
         alreadyInitiated: false,
-        dateLimiteReponse:
-          spiResponse.dateLimiteReponse ?? dateLimiteReponse,
+        dateLimiteReponse: spiResponse.dateLimiteReponse ?? dateLimiteReponse,
       };
     } catch (error) {
-      await this.supabase.rpc('finalize_invoice_spi_rtp_initiated' as never, {
-        p_payment_request_id: prep.payment_request_id,
-        p_spi_payment_status: 'REJETE',
-        p_metadata: {
-          error: error instanceof Error ? error.message : String(error),
-        },
-      } as never);
+      await this.supabase.rpc(
+        'finalize_invoice_spi_rtp_initiated' as never,
+        {
+          p_payment_request_id: prep.payment_request_id,
+          p_spi_payment_status: 'REJETE',
+          p_metadata: {
+            error: error instanceof Error ? error.message : String(error),
+          },
+        } as never,
+      );
 
       if (error instanceof BadRequestException) {
         throw error;
@@ -216,15 +220,19 @@ export class SpiInvoicingService {
       );
 
       for (const row of preparedRows) {
-        await this.supabase.rpc('finalize_invoice_spi_rtp_initiated' as never, {
-          p_payment_request_id: row.payment_request_id,
-          p_spi_payment_status: 'ENVOYE',
-          p_metadata: { bulk_response: bulkResponse },
-        } as never);
+        await this.supabase.rpc(
+          'finalize_invoice_spi_rtp_initiated' as never,
+          {
+            p_payment_request_id: row.payment_request_id,
+            p_spi_payment_status: 'ENVOYE',
+            p_metadata: { bulk_response: bulkResponse },
+          } as never,
+        );
       }
 
       const instructionId =
-        (bulkResponse as { instructionId?: string; id?: string }).instructionId ??
+        (bulkResponse as { instructionId?: string; id?: string })
+          .instructionId ??
         (bulkResponse as { id?: string }).id ??
         null;
 
@@ -235,13 +243,16 @@ export class SpiInvoicingService {
       };
     } catch (error) {
       for (const row of preparedRows) {
-        await this.supabase.rpc('finalize_invoice_spi_rtp_initiated' as never, {
-          p_payment_request_id: row.payment_request_id,
-          p_spi_payment_status: 'REJETE',
-          p_metadata: {
-            error: error instanceof Error ? error.message : String(error),
-          },
-        } as never);
+        await this.supabase.rpc(
+          'finalize_invoice_spi_rtp_initiated' as never,
+          {
+            p_payment_request_id: row.payment_request_id,
+            p_spi_payment_status: 'REJETE',
+            p_metadata: {
+              error: error instanceof Error ? error.message : String(error),
+            },
+          } as never,
+        );
       }
 
       this.logger.error('Bulk invoice SPI RTP SDK error', error);

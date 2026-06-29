@@ -61,7 +61,9 @@ export class InternalSpiController {
   }
 
   @Post('sync-balances')
-  @ApiOperation({ summary: 'Sync SPI account balances for all provisioned orgs' })
+  @ApiOperation({
+    summary: 'Sync SPI account balances for all provisioned orgs',
+  })
   syncBalances() {
     return this.balanceSync.syncAllSpiAccounts();
   }
@@ -82,7 +84,9 @@ export class InternalSpiController {
   }
 
   @Post('list-orgs-missing-account')
-  @ApiOperation({ summary: 'List orgs with SPI connected but no account number' })
+  @ApiOperation({
+    summary: 'List orgs with SPI connected but no account number',
+  })
   listOrgsMissingAccount() {
     return this.balanceSync.listOrgsMissingSpiAccount();
   }

@@ -82,7 +82,9 @@ export function loadGimPlatformConfig(): GimPlatformConfig {
       secretKeyHex: requireProductionEnv('GIM_SECRET_KEY_HEX', secretKeyHex),
       payByCardUrl: requireProductionEnv('GIM_BASE_URL', payByCardUrl),
       returnUrl: requireProductionEnv('GIM_RETURN_URL', returnUrl),
-      amountMultiplier: parseAmountMultiplier(process.env.GIM_AMOUNT_MULTIPLIER),
+      amountMultiplier: parseAmountMultiplier(
+        process.env.GIM_AMOUNT_MULTIPLIER,
+      ),
       disable3ds: parseBoolean(process.env.GIM_DISABLE_3DS, false),
       dateTimeLocalTrxnDigitLength: parseDateTimeDigitLength(
         process.env.GIM_DATETIME_LOCAL_TRXN_DIGITS,

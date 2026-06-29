@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { normalizePaymentEnvironment } from '../../utils/payment-environment';
 import { AuthContext } from '../common/decorators/current-user.decorator';
@@ -174,8 +170,7 @@ export class GimChargeService {
       ecomIp: createDto.ecom_ip,
       mobileNo: createDto.customer_phone,
       dateTimeLocalTrxn,
-      scenarioKey:
-        paymentEnv === 'test' ? scenarioKey : undefined,
+      scenarioKey: paymentEnv === 'test' ? scenarioKey : undefined,
       organizationId: user.organizationId,
     });
   }
@@ -247,10 +242,7 @@ export class GimChargeService {
           status: 'retry_other_rail',
           merchant_reference: input.merchantReference,
           action_code: result.actionCode,
-          message: actionCodeUserMessage(
-            result.actionCode,
-            result.message,
-          ),
+          message: actionCodeUserMessage(result.actionCode, result.message),
           transaction_id: input.transactionId,
         };
         return attachChargeNextAction(
@@ -333,7 +325,8 @@ export class GimChargeService {
         organizationId: input.organizationId,
       });
 
-      const threeDsUrl = 'https://checkout.lomi.africa/checkout/success?scenario=3ds';
+      const threeDsUrl =
+        'https://checkout.lomi.africa/checkout/success?scenario=3ds';
       const data: GimChargeResultData = {
         success: true,
         status: 'redirect_3ds',
@@ -360,7 +353,9 @@ export class GimChargeService {
       networkReference: 'TEST-NET-REF',
       authCode: approved ? '123456' : undefined,
       actionCode: approved ? '000' : '100',
-      gatewayMessage: approved ? 'Approved (test scenario)' : 'Declined (test scenario)',
+      gatewayMessage: approved
+        ? 'Approved (test scenario)'
+        : 'Declined (test scenario)',
       returnHashValid: null,
       organizationId: input.organizationId,
     });
@@ -568,8 +563,7 @@ export class GimChargeService {
         },
         {
           transactionId: result.transaction_id,
-          organizationId:
-            result.organization_id ?? params.organizationId ?? '',
+          organizationId: result.organization_id ?? params.organizationId ?? '',
           event: webhookEvent,
         },
       );

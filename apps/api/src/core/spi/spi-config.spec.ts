@@ -1,4 +1,8 @@
-import { resolvePemValue, loadSpiPlatformConfig, SPI_SANDBOX_BASE_URL } from './spi-config';
+import {
+  resolvePemValue,
+  loadSpiPlatformConfig,
+  SPI_SANDBOX_BASE_URL,
+} from './spi-config';
 import { createSpiMtlsDispatcher } from './spi-transport';
 
 describe('spi-config', () => {

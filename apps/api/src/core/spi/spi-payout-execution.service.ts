@@ -33,7 +33,9 @@ export class SpiPayoutExecutionService {
       } as never,
     );
 
-    const methodRow = (Array.isArray(methodRows) ? methodRows[0] : methodRows) as
+    const methodRow = (
+      Array.isArray(methodRows) ? methodRows[0] : methodRows
+    ) as
       | {
           spi_alias_shid: string | null;
           spi_alias_mbno: string | null;
@@ -70,11 +72,14 @@ export class SpiPayoutExecutionService {
       throw new Error('SPI account or destination alias missing');
     }
 
-    await this.supabase.rpc('update_spi_payout_status' as never, {
-      p_payout_id: payoutId,
-      p_status: 'processing',
-      p_spi_tx_id: spiTxId,
-    } as never);
+    await this.supabase.rpc(
+      'update_spi_payout_status' as never,
+      {
+        p_payout_id: payoutId,
+        p_status: 'processing',
+        p_spi_tx_id: spiTxId,
+      } as never,
+    );
 
     try {
       const spiResponse = (await this.spiClient.executeWithSdk(
@@ -101,7 +106,9 @@ export class SpiPayoutExecutionService {
 
       return { payoutId, spiTxId, spiStatus: spiResponse.statut };
     } catch (error) {
-      if (!(error instanceof Error && error.message === 'SPI rejected payout')) {
+      if (
+        !(error instanceof Error && error.message === 'SPI rejected payout')
+      ) {
         await this.failPayout(
           payoutId,
           spiTxId,
@@ -112,15 +119,14 @@ export class SpiPayoutExecutionService {
     }
   }
 
-  private async failPayout(
-    payoutId: string,
-    spiTxId: string,
-    error: string,
-  ) {
-    await this.supabase.rpc('fail_spi_payout' as never, {
-      p_payout_id: payoutId,
-      p_spi_tx_id: spiTxId,
-      p_error: error,
-    } as never);
+  private async failPayout(payoutId: string, spiTxId: string, error: string) {
+    await this.supabase.rpc(
+      'fail_spi_payout' as never,
+      {
+        p_payout_id: payoutId,
+        p_spi_tx_id: spiTxId,
+        p_error: error,
+      } as never,
+    );
   }
 }

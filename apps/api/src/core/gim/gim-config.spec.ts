@@ -1,7 +1,4 @@
-import {
-  GIM_UAT_PAY_BY_CARD_URL,
-  loadGimPlatformConfig,
-} from './gim-config';
+import { GIM_UAT_PAY_BY_CARD_URL, loadGimPlatformConfig } from './gim-config';
 
 describe('gim-config', () => {
   const originalEnv = process.env;

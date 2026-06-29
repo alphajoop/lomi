@@ -28,9 +28,9 @@ export class DashboardSpiStatusService {
       { p_organization_id: organizationId } as never,
     );
 
-    const providerRow = (Array.isArray(providerRows)
-      ? providerRows[0]
-      : providerRows) as SpiProviderConnectionRow | null | undefined;
+    const providerRow = (
+      Array.isArray(providerRows) ? providerRows[0] : providerRows
+    ) as SpiProviderConnectionRow | null | undefined;
 
     const { data: accountNumber } = await this.supabase.rpc(
       'get_spi_account_number' as never,
@@ -48,13 +48,15 @@ export class DashboardSpiStatusService {
       } as never,
     );
 
-    const accountRow = (Array.isArray(accountRows)
-      ? accountRows[0]
-      : accountRows) as SpiAccountSnapshotRow | null | undefined;
+    const accountRow = (
+      Array.isArray(accountRows) ? accountRows[0] : accountRows
+    ) as SpiAccountSnapshotRow | null | undefined;
 
     let shidAlias: string | null = null;
     const spiAccount =
-      (accountNumber as string | null) ?? accountRow?.spi_account_number ?? null;
+      (accountNumber as string | null) ??
+      accountRow?.spi_account_number ??
+      null;
 
     if (spiAccount) {
       const { data: aliasKey } = await this.supabase.rpc(

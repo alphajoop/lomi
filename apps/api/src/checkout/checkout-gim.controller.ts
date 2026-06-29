@@ -19,7 +19,9 @@ export class CheckoutGimController {
   constructor(private readonly checkoutGim: GimCheckoutService) {}
 
   @Post('pay')
-  @Throttle({ default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS } })
+  @Throttle({
+    default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS },
+  })
   @ApiOperation({ summary: 'Initiate hosted-checkout GIM PayByCard payment' })
   pay(@Body() body: CheckoutGimPayDto) {
     return this.checkoutGim.pay({

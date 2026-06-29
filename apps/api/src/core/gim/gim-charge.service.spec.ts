@@ -45,12 +45,16 @@ describe('GimChargeService', () => {
         { provide: GimHmacService, useValue: new GimHmacService() },
         {
           provide: RadarService,
-          useValue: { assertChargeAllowed: jest.fn().mockResolvedValue(undefined) },
+          useValue: {
+            assertChargeAllowed: jest.fn().mockResolvedValue(undefined),
+          },
         },
         { provide: SupabaseService, useValue: supabase },
         {
           provide: WebhookSenderService,
-          useValue: { notifyOrganization: jest.fn().mockResolvedValue(undefined) },
+          useValue: {
+            notifyOrganization: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile();

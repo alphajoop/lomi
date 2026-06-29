@@ -1,7 +1,4 @@
-import {
-  signGimRequest,
-  verifyGimReturn,
-} from './gim-hmac.service';
+import { signGimRequest, verifyGimReturn } from './gim-hmac.service';
 
 describe('gim-hmac.service', () => {
   describe('signGimRequest (Appendix A)', () => {

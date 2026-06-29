@@ -26,16 +26,25 @@ export class DashboardSpiStatusController {
   constructor(private readonly spiStatusService: DashboardSpiStatusService) {}
 
   @Get('status')
-  @ApiOperation({ summary: 'Read-only SPI merchant connection and account status' })
+  @ApiOperation({
+    summary: 'Read-only SPI merchant connection and account status',
+  })
   getStatus(@CurrentDashboardUser() user: DashboardUserContext) {
     return this.spiStatusService.getStatus(user.organizationId);
   }
 
   @Post('qr-payload')
-  @ApiOperation({ summary: 'Generate EMV QR payload for catalog/static QR codes' })
+  @ApiOperation({
+    summary: 'Generate EMV QR payload for catalog/static QR codes',
+  })
   generateQrPayload(
     @CurrentDashboardUser() user: DashboardUserContext,
-    @Body() body: { amount?: number; referenceLabel?: string; qrType?: 'STATIC' | 'DYNAMIC' },
+    @Body()
+    body: {
+      amount?: number;
+      referenceLabel?: string;
+      qrType?: 'STATIC' | 'DYNAMIC';
+    },
   ) {
     return this.spiStatusService.generateQrPayload(user.organizationId, body);
   }

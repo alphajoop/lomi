@@ -5,7 +5,11 @@ import {
   loadGimPlatformConfig,
 } from './gim-config';
 import { GimHmacService } from './gim-hmac.service';
-import { GIM_CURRENCY_CODE, buildDateTimeLocalTrxn, sanitizeGimLogPayload } from './gim.utils';
+import {
+  GIM_CURRENCY_CODE,
+  buildDateTimeLocalTrxn,
+  sanitizeGimLogPayload,
+} from './gim.utils';
 
 export type PayByCardRequest = {
   PAN: string;
@@ -98,10 +102,7 @@ export class GimClientService {
 
     const DateTimeLocalTrxn =
       input.dateTimeLocalTrxn ??
-      buildDateTimeLocalTrxn(
-        new Date(),
-        config.dateTimeLocalTrxnDigitLength,
-      );
+      buildDateTimeLocalTrxn(new Date(), config.dateTimeLocalTrxnDigitLength);
 
     const SecureHash = this.hmac.signRequest(
       {
@@ -211,9 +212,7 @@ export class GimClientService {
           message: 'gim_pay_by_card_http_error',
           status: response.status,
         });
-        throw new GimTransportError(
-          `GIM Pay HTTP error: ${response.status}`,
-        );
+        throw new GimTransportError(`GIM Pay HTTP error: ${response.status}`);
       }
 
       const raw = this.parsePayByCardResponse(parsed);

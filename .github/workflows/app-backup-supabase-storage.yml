@@ -1,0 +1,133 @@
+name: lomi · backup · supabase · storage
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Storage object sync is incremental (rclone copies only changed files), so it is
+    # cheap to run hourly and keeps the off-platform file copy close to real time.
+    - cron: "43 * * * *"
+
+concurrency:
+  group: lomi-backup-supabase-storage
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Back up storage
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SUPABASE_STORAGE_S3_ENDPOINT: ${{ secrets.SUPABASE_STORAGE_S3_ENDPOINT }}
+      SUPABASE_STORAGE_S3_REGION: ${{ secrets.SUPABASE_STORAGE_S3_REGION }}
+      SUPABASE_STORAGE_S3_ACCESS_KEY_ID: ${{ secrets.SUPABASE_STORAGE_S3_ACCESS_KEY_ID }}
+      SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY: ${{ secrets.SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY }}
+      BACKUP_S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+      BACKUP_S3_ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+      BACKUP_S3_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+      BACKUP_S3_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+      BACKUP_S3_PREFIX: ${{ vars.BACKUP_S3_PREFIX }}
+      BACKUP_S3_REGION: ${{ vars.BACKUP_S3_REGION }}
+    steps:
+      - name: Validate configuration
+        run: |
+          set -euo pipefail
+
+          missing=0
+
+          normalize_env_value() {
+            local name="$1"
+            local required="${2:-required}"
+            local raw="${!name-}"
+            local normalized
+
+            normalized="$(printf '%s' "$raw" | tr -d '\r\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+
+            if [ -z "$normalized" ]; then
+              if [ "$required" = "required" ]; then
+                echo "::error::Missing required secret: ${name}"
+                missing=1
+              fi
+              return
+            fi
+
+            if [ "$raw" != "$normalized" ]; then
+              echo "::warning::${name} contained leading/trailing whitespace or line breaks; using a trimmed single-line value."
+            fi
+
+            export "$name=$normalized"
+            printf '%s=%s\n' "$name" "$normalized" >> "$GITHUB_ENV"
+          }
+
+          for name in \
+            SUPABASE_STORAGE_S3_ENDPOINT \
+            SUPABASE_STORAGE_S3_REGION \
+            SUPABASE_STORAGE_S3_ACCESS_KEY_ID \
+            SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY \
+            BACKUP_S3_BUCKET \
+            BACKUP_S3_ENDPOINT \
+            BACKUP_S3_ACCESS_KEY_ID \
+            BACKUP_S3_SECRET_ACCESS_KEY
+          do
+            normalize_env_value "$name"
+          done
+
+          normalize_env_value BACKUP_S3_PREFIX optional
+          normalize_env_value BACKUP_S3_REGION optional
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Install backup tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y rclone
+
+      - name: Copy Supabase Storage buckets to object storage
+        env:
+          RCLONE_CONFIG_SUPABASE_TYPE: s3
+          RCLONE_CONFIG_SUPABASE_PROVIDER: Other
+          RCLONE_CONFIG_SUPABASE_ENV_AUTH: "false"
+          RCLONE_CONFIG_SUPABASE_FORCE_PATH_STYLE: "true"
+          RCLONE_CONFIG_BACKUP_TYPE: s3
+          RCLONE_CONFIG_BACKUP_PROVIDER: Other
+          RCLONE_CONFIG_BACKUP_ENV_AUTH: "false"
+          RCLONE_CONFIG_BACKUP_FORCE_PATH_STYLE: "true"
+        run: |
+          set -euo pipefail
+
+          export RCLONE_CONFIG_SUPABASE_ENDPOINT="$SUPABASE_STORAGE_S3_ENDPOINT"
+          export RCLONE_CONFIG_SUPABASE_REGION="$SUPABASE_STORAGE_S3_REGION"
+          export RCLONE_CONFIG_SUPABASE_ACCESS_KEY_ID="$SUPABASE_STORAGE_S3_ACCESS_KEY_ID"
+          export RCLONE_CONFIG_SUPABASE_SECRET_ACCESS_KEY="$SUPABASE_STORAGE_S3_SECRET_ACCESS_KEY"
+          export RCLONE_CONFIG_BACKUP_ENDPOINT="$BACKUP_S3_ENDPOINT"
+          export RCLONE_CONFIG_BACKUP_REGION="${BACKUP_S3_REGION:-auto}"
+          export RCLONE_CONFIG_BACKUP_ACCESS_KEY_ID="$BACKUP_S3_ACCESS_KEY_ID"
+          export RCLONE_CONFIG_BACKUP_SECRET_ACCESS_KEY="$BACKUP_S3_SECRET_ACCESS_KEY"
+
+          timestamp="$(date -u +'%Y%m%dT%H%M%SZ')"
+          prefix="${BACKUP_S3_PREFIX:-supabase}"
+
+          mapfile -t buckets < <(rclone lsf supabase: --dirs-only | sed 's#/$##' | sed '/^$/d')
+
+          if [ "${#buckets[@]}" -eq 0 ]; then
+            echo "No Supabase Storage buckets found."
+            exit 0
+          fi
+
+          for bucket in "${buckets[@]}"; do
+            echo "Backing up Supabase Storage bucket: ${bucket}"
+            rclone copy \
+              "supabase:${bucket}" \
+              "backup:${BACKUP_S3_BUCKET}/${prefix}/storage/${bucket}" \
+              --backup-dir "backup:${BACKUP_S3_BUCKET}/${prefix}/storage-versions/${timestamp}/${bucket}" \
+              --fast-list \
+              --transfers 8 \
+              --checkers 16 \
+              --stats-one-line \
+              --stats 30s
+          done

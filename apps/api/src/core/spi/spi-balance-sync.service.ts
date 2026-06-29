@@ -14,14 +14,19 @@ export class SpiBalanceSyncService {
   async syncOrganizationBalance(
     organizationId: string,
     currencyCode = 'XOF',
-  ): Promise<{ organizationId: string; balance: number | null; synced: boolean }> {
-    const { data: accountNumber, error: accountError } = await this.supabase.rpc(
-      'get_spi_account_number' as never,
-      {
-        p_organization_id: organizationId,
-        p_currency_code: currencyCode,
-      } as never,
-    );
+  ): Promise<{
+    organizationId: string;
+    balance: number | null;
+    synced: boolean;
+  }> {
+    const { data: accountNumber, error: accountError } =
+      await this.supabase.rpc(
+        'get_spi_account_number' as never,
+        {
+          p_organization_id: organizationId,
+          p_currency_code: currencyCode,
+        } as never,
+      );
 
     if (accountError || !accountNumber) {
       return { organizationId, balance: null, synced: false };
@@ -41,12 +46,15 @@ export class SpiBalanceSyncService {
             : null;
 
       if (balance !== null) {
-        await this.supabase.rpc('update_spi_account_balance' as never, {
-          p_organization_id: organizationId,
-          p_currency_code: currencyCode,
-          p_balance: balance / 100,
-          p_synced_at: new Date().toISOString(),
-        } as never);
+        await this.supabase.rpc(
+          'update_spi_account_balance' as never,
+          {
+            p_organization_id: organizationId,
+            p_currency_code: currencyCode,
+            p_balance: balance / 100,
+            p_synced_at: new Date().toISOString(),
+          } as never,
+        );
       }
 
       return { organizationId, balance, synced: balance !== null };

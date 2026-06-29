@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { GimChargeService } from './gim-charge.service';
 import {
@@ -103,25 +99,29 @@ export class GimCheckoutService {
       config.dateTimeLocalTrxnDigitLength,
     );
 
-    const { data: transactionId, error: createError } =
-      await this.supabase.getClient().rpc('create_gim_transaction' as never, {
-        p_merchant_id: prep.merchant_id,
-        p_organization_id: prep.organization_id,
-        p_customer_id: prep.customer_id,
-        p_amount: amount,
-        p_currency_code: 'XOF',
-        p_merchant_reference: prep.merchant_reference,
-        p_pan_masked: maskPan(pan),
-        p_amount_minor: amountMinor,
-        p_product_id: null,
-        p_subscription_id: null,
-        p_description: null,
-        p_metadata: null,
-        p_quantity: 1,
-        p_checkout_session_id: prep.checkout_session_id,
-        p_environment: 'live',
-        p_date_time_local_trxn: dateTimeLocalTrxn,
-      } as never);
+    const { data: transactionId, error: createError } = await this.supabase
+      .getClient()
+      .rpc(
+        'create_gim_transaction' as never,
+        {
+          p_merchant_id: prep.merchant_id,
+          p_organization_id: prep.organization_id,
+          p_customer_id: prep.customer_id,
+          p_amount: amount,
+          p_currency_code: 'XOF',
+          p_merchant_reference: prep.merchant_reference,
+          p_pan_masked: maskPan(pan),
+          p_amount_minor: amountMinor,
+          p_product_id: null,
+          p_subscription_id: null,
+          p_description: null,
+          p_metadata: null,
+          p_quantity: 1,
+          p_checkout_session_id: prep.checkout_session_id,
+          p_environment: 'live',
+          p_date_time_local_trxn: dateTimeLocalTrxn,
+        } as never,
+      );
 
     if (createError || !transactionId) {
       throw new BadRequestException(

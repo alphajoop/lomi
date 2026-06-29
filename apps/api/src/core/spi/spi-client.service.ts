@@ -37,7 +37,9 @@ export class SpiClientService {
         throw error;
       }
 
-      this.logger.warn('PI-SPI auth error — invalidating token and retrying once');
+      this.logger.warn(
+        'PI-SPI auth error — invalidating token and retrying once',
+      );
       this.tokenService.invalidate();
       const sdk = await this.buildSdk();
       return operation(sdk);

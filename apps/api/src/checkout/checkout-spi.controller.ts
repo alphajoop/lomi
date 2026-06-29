@@ -28,7 +28,9 @@ export class CheckoutSpiController {
   constructor(private readonly checkoutSpi: SpiCheckoutService) {}
 
   @Post('request-payment')
-  @Throttle({ default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS } })
+  @Throttle({
+    default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS },
+  })
   @ApiOperation({
     summary: 'Initiate hosted-checkout SPI request-to-pay from a payer alias',
   })

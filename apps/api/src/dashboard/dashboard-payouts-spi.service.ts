@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { SpiPayoutExecutionService } from '../core/spi/spi-payout-execution.service';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import type { DashboardUserContext } from './decorators/dashboard-user.decorator';
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @Injectable()
 export class DashboardPayoutsSpiService {

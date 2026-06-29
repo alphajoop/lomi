@@ -63,8 +63,11 @@ export function attachWorkerResilience(
 
     const now = Date.now();
     if (now - lastLoggedAt >= logThrottleMs) {
-      const suffix = suppressedLogs > 0 ? ` (+${suppressedLogs} suppressed)` : '';
-      logger.error(`[${queueName}] worker Redis error: ${error.message}${suffix}`);
+      const suffix =
+        suppressedLogs > 0 ? ` (+${suppressedLogs} suppressed)` : '';
+      logger.error(
+        `[${queueName}] worker Redis error: ${error.message}${suffix}`,
+      );
       lastLoggedAt = now;
       suppressedLogs = 0;
     } else {

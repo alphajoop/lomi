@@ -5,7 +5,10 @@ export class GimChargeResponseDto {
   @ApiProperty({ type: Boolean })
   success: boolean;
 
-  @ApiPropertyOptional({ type: String, enum: ['approved', 'declined', 'redirect_3ds', 'retry_other_rail'] })
+  @ApiPropertyOptional({
+    type: String,
+    enum: ['approved', 'declined', 'redirect_3ds', 'retry_other_rail'],
+  })
   status?: string;
 
   @ApiPropertyOptional({ type: Number })

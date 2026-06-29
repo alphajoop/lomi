@@ -28,7 +28,9 @@ export class DashboardInvoicingSpiController {
   ) {}
 
   @Post('request-payment')
-  @ApiOperation({ summary: 'Send SPI request-to-pay for a single invoice (category 401)' })
+  @ApiOperation({
+    summary: 'Send SPI request-to-pay for a single invoice (category 401)',
+  })
   requestPayment(
     @CurrentDashboardUser() user: DashboardUserContext,
     @Body()
@@ -41,7 +43,9 @@ export class DashboardInvoicingSpiController {
   }
 
   @Post('bulk-request-payment')
-  @ApiOperation({ summary: 'Send SPI bulk request-to-pay for multiple invoices' })
+  @ApiOperation({
+    summary: 'Send SPI bulk request-to-pay for multiple invoices',
+  })
   bulkRequestPayment(
     @CurrentDashboardUser() user: DashboardUserContext,
     @Body()
