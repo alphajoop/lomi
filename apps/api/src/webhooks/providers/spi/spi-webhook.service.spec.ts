@@ -60,8 +60,11 @@ describe('SpiWebhookService', () => {
 
     expect(result.transaction_id).toBe('tx-1');
     expect(rpcMock).toHaveBeenCalledWith(
-      'complete_pos_spi_payment',
-      expect.objectContaining({ p_spi_tx_id: 'POS-session-1' }),
+      'complete_spi_payment',
+      expect.objectContaining({
+        p_spi_tx_id: 'POS-session-1',
+        p_spi_payment_status: 'IRREVOCABLE',
+      }),
     );
     expect(rpcMock).toHaveBeenCalledWith(
       'get_transaction',

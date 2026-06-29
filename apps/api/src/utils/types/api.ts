@@ -3364,6 +3364,7 @@ export type Database = {
           price_amount: number;
           price_currency_code: string;
           price_billing_interval: APIEnums['billing_interval'];
+          environment: string;
         }[];
       };
       subscription_renewal_already_processed: {

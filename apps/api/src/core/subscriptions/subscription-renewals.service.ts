@@ -1,4 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Optional } from '@nestjs/common';
 import { Queue } from 'bullmq';
@@ -24,6 +28,7 @@ type DueSubscription = {
   price_currency_code: string;
   provider_customer_id: string | null;
   provider_payment_method_id: string | null;
+  environment: string;
 };
 
 export type RenewalResult = {
@@ -153,7 +158,21 @@ export class SubscriptionRenewalsService {
 
       const { stripe_amount_cents, stripe_currency } = conversionRows[0]!;
 
-      const stripe = this.stripeClients.getClient('live');
+      let stripe: Stripe;
+      try {
+        stripe = this.stripeClients.getClient(sub.environment);
+      } catch (clientErr: unknown) {
+        if (clientErr instanceof ServiceUnavailableException) {
+          const message = clientErr.message;
+          this.logger.warn(
+            `Stripe not configured for environment "${sub.environment}" on subscription ${sub.subscription_id}: ${message}`,
+          );
+          result.status = 'skipped_stripe_unconfigured';
+          result.error = message;
+          return result;
+        }
+        throw clientErr;
+      }
 
       const paymentIntent = await stripe.paymentIntents.create(
         {
