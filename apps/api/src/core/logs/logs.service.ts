@@ -31,7 +31,29 @@ export interface ListLogsParams {
 function maskApiKey(apiKey: string | null | undefined): string | null {
   if (!apiKey) return null;
   if (apiKey.length <= 12) return `${apiKey.slice(0, 4)}****`;
-  return `${apiKey.slice(0, 8)}****`;
+  return `${apiKey.slice(0, 12)}****`;
+}
+
+const WEBHOOK_HEADER_ALLOWLIST = new Set([
+  'Content-Type',
+  'User-Agent',
+  'X-Lomi-Event',
+  'X-Lomi-Signature',
+]);
+
+function sanitizeWebhookHeaders(
+  headers: unknown,
+): Record<string, unknown> | null {
+  if (!headers || typeof headers !== 'object' || Array.isArray(headers)) {
+    return null;
+  }
+  const sanitized: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(headers as Record<string, unknown>)) {
+    if (WEBHOOK_HEADER_ALLOWLIST.has(key)) {
+      sanitized[key] = value;
+    }
+  }
+  return Object.keys(sanitized).length > 0 ? sanitized : null;
 }
 
 function severityFromHttpStatus(status: number | null | undefined): LogSeverity {
@@ -337,7 +359,6 @@ export class LogsService {
         typeof row.request_id === 'string' ? row.request_id : null,
       data: {
         error_type: errorType,
-        stack_trace: row.stack_trace ?? null,
         context: row.context ?? null,
         api_key: maskApiKey(
           typeof row.api_key === 'string' ? row.api_key : null,
@@ -439,7 +460,7 @@ export class LogsService {
         attempt_number: row.attempt_number ?? null,
         ip_address: row.ip_address ?? null,
         user_agent: row.user_agent ?? null,
-        headers: row.headers ?? null,
+        headers: sanitizeWebhookHeaders(row.headers),
         request_duration_ms: row.request_duration_ms ?? null,
         attempts: row.attempts ?? [],
       },
