@@ -45,6 +45,15 @@ export interface WebhookSendResult {
 export class WebhookSenderService {
   private readonly logger = new Logger(WebhookSenderService.name);
 
+  /** ~2s base exponential backoff: retries land within ~1–2 min for transient failures. */
+  private static readonly WEBHOOK_QUEUE_JOB_OPTS = {
+    attempts: 6,
+    backoff: {
+      type: 'exponential' as const,
+      delay: 2000,
+    },
+  };
+
   constructor(
     private readonly supabase: SupabaseService,
     @Optional() private readonly cliListener?: CliListenerService,
@@ -329,6 +338,11 @@ export class WebhookSenderService {
       }
 
       const clientErr = delivery.status >= 400 && delivery.status < 500;
+      if (clientErr && delivery.status === 404) {
+        this.logger.warn(
+          `Webhook ${webhook.id} returned 404 for URL ${webhook.url} (org ${webhook.organization_id}) — endpoint not found; verify registered webhook URL`,
+        );
+      }
       return {
         success: false,
         shouldRetry: !clientErr,
@@ -562,8 +576,7 @@ export class WebhookSenderService {
           },
           {
             jobId,
-            attempts: 5,
-            backoff: { type: 'exponential', delay: 5000 },
+            ...WebhookSenderService.WEBHOOK_QUEUE_JOB_OPTS,
           },
         );
         queued += 1;
@@ -708,11 +721,7 @@ export class WebhookSenderService {
           },
           {
             jobId,
-            attempts: 5,
-            backoff: {
-              type: 'exponential',
-              delay: 5000,
-            },
+            ...WebhookSenderService.WEBHOOK_QUEUE_JOB_OPTS,
           },
         );
       } catch (e: any) {
