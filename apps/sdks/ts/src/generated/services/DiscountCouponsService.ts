@@ -14,8 +14,8 @@ export class DiscountCouponsService {
      * Create discount coupon
      * @see OpenAPI `DiscountCouponsController_create`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/discount-coupons']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/discount-coupons']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/discount-coupons']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/discount-coupons',
             ...options,
@@ -26,8 +26,8 @@ export class DiscountCouponsService {
      * Retrieve discount coupon
      * @see OpenAPI `DiscountCouponsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/discount-coupons/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/discount-coupons/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/discount-coupons/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/discount-coupons/{id}',
             path: { id: id },
@@ -39,8 +39,8 @@ export class DiscountCouponsService {
      * Coupon performance metrics
      * @see OpenAPI `DiscountCouponsController_getPerformance`
      */
-    public async getPerformance(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons/{id}/performance']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/discount-coupons/{id}/performance']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async getPerformance(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/discount-coupons/{id}/performance']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/discount-coupons/{id}/performance']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/discount-coupons/{id}/performance',
             path: { id: id },
@@ -52,8 +52,8 @@ export class DiscountCouponsService {
      * List discount coupons
      * @see OpenAPI `DiscountCouponsController_findAll`
      */
-    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/discount-coupons']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/discount-coupons']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/discount-coupons']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/discount-coupons',
             ...options,
@@ -70,7 +70,7 @@ export class DiscountCouponsService {
         const pageSize = 50;
 
         while (true) {
-            const response = await requestWithClient<paths['/discount-coupons']['get']['responses'][200]['content']['application/json']>(this.client, {
+            const response = await requestWithClient<NonNullable<NonNullable<paths['/discount-coupons']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
                 method: 'GET',
                 url: '/discount-coupons',
                 query: { page, pageSize },

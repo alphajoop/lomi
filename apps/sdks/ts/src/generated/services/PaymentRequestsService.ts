@@ -14,8 +14,8 @@ export class PaymentRequestsService {
      * Create payment request
      * @see OpenAPI `PaymentRequestsController_create`
      */
-    public async create(body: paths['/payment-requests']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/payment-requests']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/payment-requests']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(body: NonNullable<paths['/payment-requests']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payment-requests']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/payment-requests']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/payment-requests',
             body,
@@ -27,8 +27,8 @@ export class PaymentRequestsService {
      * Retrieve payment request
      * @see OpenAPI `PaymentRequestsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/payment-requests/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/payment-requests/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payment-requests/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/payment-requests/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/payment-requests/{id}',
             path: { id: id },
@@ -40,8 +40,8 @@ export class PaymentRequestsService {
      * List payment requests
      * @see OpenAPI `PaymentRequestsController_findAll`
      */
-    public async list(params?: paths['/payment-requests']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/payment-requests']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/payment-requests']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/payment-requests']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payment-requests']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/payment-requests']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/payment-requests',
             query: params,

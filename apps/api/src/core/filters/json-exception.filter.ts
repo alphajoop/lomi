@@ -192,21 +192,24 @@ export class GlobalJsonExceptionFilter implements ExceptionFilter {
     const endpoint = (req.path ?? req.url ?? '').split('?')[0];
 
     void this.supabase
-      .rpc('log_api_error' as never, {
-        p_error_type: 'internal_error',
-        p_error_message: err?.message ?? 'Unknown error',
-        p_stack_trace: err?.stack ?? null,
-        p_context: {
-          request_id: requestId,
-          organization_id: user.organizationId,
-        },
-        p_organization_id: user.organizationId,
-        p_api_key: apiKey,
-        p_endpoint: endpoint,
-        p_request_method: req.method,
-        p_request_id: requestId,
-        p_response_status: 500,
-      } as never)
+      .rpc(
+        'log_api_error' as never,
+        {
+          p_error_type: 'internal_error',
+          p_error_message: err?.message ?? 'Unknown error',
+          p_stack_trace: err?.stack ?? null,
+          p_context: {
+            request_id: requestId,
+            organization_id: user.organizationId,
+          },
+          p_organization_id: user.organizationId,
+          p_api_key: apiKey,
+          p_endpoint: endpoint,
+          p_request_method: req.method,
+          p_request_id: requestId,
+          p_response_status: 500,
+        } as never,
+      )
       .then(({ error }) => {
         if (error) {
           this.logger.error(

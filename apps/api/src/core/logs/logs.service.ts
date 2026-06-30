@@ -1,11 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
-import {
-  LogSeverity,
-  LogType,
-  LOG_SEVERITIES,
-} from './logs.types';
+import { LogSeverity, LogType, LOG_SEVERITIES } from './logs.types';
 import { LogEntryResponseDto } from './dto/log-entry-response.dto';
 import { LogListResponseDto } from './dto/log-list-response.dto';
 
@@ -48,7 +44,9 @@ function sanitizeWebhookHeaders(
     return null;
   }
   const sanitized: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(headers as Record<string, unknown>)) {
+  for (const [key, value] of Object.entries(
+    headers as Record<string, unknown>,
+  )) {
     if (WEBHOOK_HEADER_ALLOWLIST.has(key)) {
       sanitized[key] = value;
     }
@@ -56,7 +54,9 @@ function sanitizeWebhookHeaders(
   return Object.keys(sanitized).length > 0 ? sanitized : null;
 }
 
-function severityFromHttpStatus(status: number | null | undefined): LogSeverity {
+function severityFromHttpStatus(
+  status: number | null | undefined,
+): LogSeverity {
   if (status == null) return 'info';
   if (status >= 500) return 'error';
   if (status >= 400) return 'warning';
@@ -84,11 +84,7 @@ function severityFromApiError(
 ): LogSeverity {
   if (errorType.toLowerCase().includes('critical')) return 'critical';
   if (responseStatus != null && responseStatus >= 500) return 'error';
-  if (
-    responseStatus != null &&
-    responseStatus >= 400 &&
-    responseStatus < 500
-  ) {
+  if (responseStatus != null && responseStatus >= 400 && responseStatus < 500) {
     return 'warning';
   }
   if (errorType.toLowerCase().includes('rate_limit')) return 'warning';
@@ -352,11 +348,9 @@ export class LogsService {
       method:
         typeof row.request_method === 'string' ? row.request_method : null,
       endpoint: typeof row.endpoint === 'string' ? row.endpoint : null,
-      message:
-        typeof row.error_message === 'string' ? row.error_message : null,
+      message: typeof row.error_message === 'string' ? row.error_message : null,
       success: statusCode != null ? statusCode < 400 : null,
-      request_id:
-        typeof row.request_id === 'string' ? row.request_id : null,
+      request_id: typeof row.request_id === 'string' ? row.request_id : null,
       data: {
         error_type: errorType,
         context: row.context ?? null,
@@ -478,18 +472,21 @@ export class LogsService {
         : null;
     const severities = dbSeverity ? [dbSeverity] : null;
 
-    const { data, error } = await this.supabase.rpc('fetch_logs' as never, {
-      p_merchant_id: user.merchantId,
-      p_event: params.event ?? null,
-      p_severity: dbSeverity,
-      p_severities: severities,
-      p_events: null,
-      p_exclude_delivery_noise: true,
-      p_limit: params.limit,
-      p_offset: params.offset,
-      p_start_date: params.startDate ?? null,
-      p_end_date: params.endDate ?? null,
-    } as never);
+    const { data, error } = await this.supabase.rpc(
+      'fetch_logs' as never,
+      {
+        p_merchant_id: user.merchantId,
+        p_event: params.event ?? null,
+        p_severity: dbSeverity,
+        p_severities: severities,
+        p_events: null,
+        p_exclude_delivery_noise: true,
+        p_limit: params.limit,
+        p_offset: params.offset,
+        p_start_date: params.startDate ?? null,
+        p_end_date: params.endDate ?? null,
+      } as never,
+    );
 
     if (error) throw new Error(error.message);
 
@@ -547,8 +544,7 @@ export class LogsService {
       status_code: statusCode,
       method:
         typeof row.request_method === 'string' ? row.request_method : null,
-      endpoint:
-        typeof row.request_url === 'string' ? row.request_url : null,
+      endpoint: typeof row.request_url === 'string' ? row.request_url : null,
       message: event,
       success: statusCode != null ? statusCode < 400 : null,
       request_id: null,

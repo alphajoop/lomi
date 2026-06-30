@@ -7,12 +7,7 @@ export const LOG_TYPES = [
 
 export type LogType = (typeof LOG_TYPES)[number];
 
-export const LOG_SEVERITIES = [
-  'info',
-  'warning',
-  'error',
-  'critical',
-] as const;
+export const LOG_SEVERITIES = ['info', 'warning', 'error', 'critical'] as const;
 
 export type LogSeverity = (typeof LOG_SEVERITIES)[number];
 

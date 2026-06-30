@@ -14,8 +14,8 @@ export class UsageSubscriptionsService {
      * Create a usage subscription
      * @see OpenAPI `UsageEventsController_createUsageSubscription`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/usage-subscriptions']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/usage-subscriptions']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/usage-subscriptions']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/usage-subscriptions']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/usage-subscriptions',
             ...options,

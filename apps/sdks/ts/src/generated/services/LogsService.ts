@@ -14,8 +14,8 @@ export class LogsService {
      * Get a log entry
      * @see OpenAPI `LogsController_findOne`
      */
-    public async get(type: string, id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/logs/{type}/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/logs/{type}/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(type: string, id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/logs/{type}/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/logs/{type}/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/logs/{type}/{id}',
             path: { type: type, id: id },
@@ -27,8 +27,8 @@ export class LogsService {
      * List logs
      * @see OpenAPI `LogsController_findAll`
      */
-    public async list(params?: paths['/logs']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/logs']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/logs']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/logs']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/logs']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/logs']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/logs',
             query: params,

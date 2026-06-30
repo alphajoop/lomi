@@ -95,10 +95,7 @@ export async function GET() {
     '5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.',
   );
   const integrationJourney = pageBySlugPath(pages, 'start/integration-journey');
-  const paymentMethodsHub = pageBySlugPath(
-    pages,
-    'build/payment-channels',
-  );
+  const paymentMethodsHub = pageBySlugPath(pages, 'build/payment-channels');
   const verifyPayments = pageBySlugPath(pages, 'build/guides/verify-payments');
   const paymentLifecycle = pageBySlugPath(
     pages,

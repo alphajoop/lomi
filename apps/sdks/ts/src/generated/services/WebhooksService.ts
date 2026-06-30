@@ -40,8 +40,8 @@ export class WebhooksService {
      * Retrieve webhook
      * @see OpenAPI `WebhooksController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/webhooks/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/webhooks/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/webhooks/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/webhooks/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/webhooks/{id}',
             path: { id: id },
@@ -53,8 +53,8 @@ export class WebhooksService {
      * List webhooks
      * @see OpenAPI `WebhooksController_findAll`
      */
-    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/webhooks']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/webhooks']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/webhooks']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/webhooks']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/webhooks',
             ...options,
@@ -71,7 +71,7 @@ export class WebhooksService {
         const pageSize = 50;
 
         while (true) {
-            const response = await requestWithClient<paths['/webhooks']['get']['responses'][200]['content']['application/json']>(this.client, {
+            const response = await requestWithClient<NonNullable<NonNullable<paths['/webhooks']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
                 method: 'GET',
                 url: '/webhooks',
                 query: { page, pageSize },
@@ -128,8 +128,8 @@ export class WebhooksService {
      * Update webhook
      * @see OpenAPI `WebhooksController_update`
      */
-    public async update(id: string, body: paths['/webhooks/{id}']['patch']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/webhooks/{id}']['patch']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/webhooks/{id}']['patch']['responses'][200]['content']['application/json']>(this.client, {
+    public async update(id: string, body: NonNullable<paths['/webhooks/{id}']['patch']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/webhooks/{id}']['patch']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/webhooks/{id}']['patch']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'PATCH',
             url: '/webhooks/{id}',
             path: { id: id },

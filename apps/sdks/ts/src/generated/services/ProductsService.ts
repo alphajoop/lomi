@@ -14,8 +14,8 @@ export class ProductsService {
      * Add product price
      * @see OpenAPI `ProductsController_addPrice`
      */
-    public async addPrice(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products/{id}/prices']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/products/{id}/prices']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async addPrice(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/products/{id}/prices']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/products/{id}/prices']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/products/{id}/prices',
             path: { id: id },
@@ -27,8 +27,8 @@ export class ProductsService {
      * Create product
      * @see OpenAPI `ProductsController_create`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/products']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/products']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/products']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/products',
             ...options,
@@ -39,8 +39,8 @@ export class ProductsService {
      * Retrieve product
      * @see OpenAPI `ProductsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/products/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/products/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/products/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/products/{id}',
             path: { id: id },
@@ -52,8 +52,8 @@ export class ProductsService {
      * List products
      * @see OpenAPI `ProductsController_findAll`
      */
-    public async list(params?: paths['/products']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/products']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/products']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/products']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/products']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/products',
             query: params,
@@ -101,8 +101,8 @@ export class ProductsService {
      * Set default price
      * @see OpenAPI `ProductsController_setDefaultPrice`
      */
-    public async setDefaultPrice(id: string, priceId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products/{id}/prices/{priceId}/set-default']['post']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/products/{id}/prices/{priceId}/set-default']['post']['responses'][200]['content']['application/json']>(this.client, {
+    public async setDefaultPrice(id: string, priceId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/products/{id}/prices/{priceId}/set-default']['post']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/products/{id}/prices/{priceId}/set-default']['post']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/products/{id}/prices/{priceId}/set-default',
             path: { id: id, priceId: priceId },

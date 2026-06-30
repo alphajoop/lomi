@@ -14,8 +14,8 @@ export class RefundsService {
      * Create refund
      * @see OpenAPI `RefundsController_create`
      */
-    public async create(body: paths['/refunds']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/refunds']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/refunds']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(body: NonNullable<paths['/refunds']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/refunds']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/refunds']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/refunds',
             body,
@@ -27,8 +27,8 @@ export class RefundsService {
      * Get refund
      * @see OpenAPI `RefundsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/refunds/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/refunds/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/refunds/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/refunds/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/refunds/{id}',
             path: { id: id },

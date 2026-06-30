@@ -14,8 +14,8 @@ export class MetersService {
      * Create a meter
      * @see OpenAPI `MetersController_create`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/meters']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/meters']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/meters']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/meters',
             ...options,
@@ -26,8 +26,8 @@ export class MetersService {
      * Get a meter
      * @see OpenAPI `MetersController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/meters/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/meters/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/meters/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/meters/{id}',
             path: { id: id },
@@ -39,8 +39,8 @@ export class MetersService {
      * Get meter balance for a customer
      * @see OpenAPI `MetersController_getBalance`
      */
-    public async getCustomerBalance(id: string, customerId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters/{id}/balances/{customerId}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/meters/{id}/balances/{customerId}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async getCustomerBalance(id: string, customerId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/meters/{id}/balances/{customerId}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/meters/{id}/balances/{customerId}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/meters/{id}/balances/{customerId}',
             path: { id: id, customerId: customerId },
@@ -52,8 +52,8 @@ export class MetersService {
      * List meters
      * @see OpenAPI `MetersController_findAll`
      */
-    public async list(params?: paths['/meters']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/meters']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/meters']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/meters']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/meters']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/meters',
             query: params,
@@ -101,8 +101,8 @@ export class MetersService {
      * Update a meter
      * @see OpenAPI `MetersController_update`
      */
-    public async update(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters/{id}']['patch']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/meters/{id}']['patch']['responses'][200]['content']['application/json']>(this.client, {
+    public async update(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/meters/{id}']['patch']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/meters/{id}']['patch']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'PATCH',
             url: '/meters/{id}',
             path: { id: id },

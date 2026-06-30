@@ -14,8 +14,8 @@ export class TransactionsService {
      * Retrieve transaction
      * @see OpenAPI `TransactionsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/transactions/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/transactions/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/transactions/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/transactions/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/transactions/{id}',
             path: { id: id },
@@ -27,8 +27,8 @@ export class TransactionsService {
      * List transactions
      * @see OpenAPI `TransactionsController_findAll`
      */
-    public async list(params?: paths['/transactions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/transactions']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/transactions']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/transactions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/transactions']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/transactions']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/transactions',
             query: params,

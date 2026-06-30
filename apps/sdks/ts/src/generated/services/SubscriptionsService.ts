@@ -14,8 +14,8 @@ export class SubscriptionsService {
      * Cancel subscription
      * @see OpenAPI `SubscriptionsController_cancel`
      */
-    public async cancel(id: string, body: paths['/subscriptions/{id}/cancel']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions/{id}/cancel']['post']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions/{id}/cancel']['post']['responses'][200]['content']['application/json']>(this.client, {
+    public async cancel(id: string, body: NonNullable<paths['/subscriptions/{id}/cancel']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions/{id}/cancel']['post']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions/{id}/cancel']['post']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/subscriptions/{id}/cancel',
             path: { id: id },
@@ -28,8 +28,8 @@ export class SubscriptionsService {
      * Change subscription plan
      * @see OpenAPI `SubscriptionsController_changePlan`
      */
-    public async changePlan(id: string, body: paths['/subscriptions/{id}/change-plan']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions/{id}/change-plan']['post']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions/{id}/change-plan']['post']['responses'][200]['content']['application/json']>(this.client, {
+    public async changePlan(id: string, body: NonNullable<paths['/subscriptions/{id}/change-plan']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions/{id}/change-plan']['post']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions/{id}/change-plan']['post']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/subscriptions/{id}/change-plan',
             path: { id: id },
@@ -42,8 +42,8 @@ export class SubscriptionsService {
      * List subscriptions for customer
      * @see OpenAPI `SubscriptionsController_findByCustomer`
      */
-    public async findByCustomer(customerId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions/customer/{customerId}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions/customer/{customerId}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async findByCustomer(customerId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions/customer/{customerId}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions/customer/{customerId}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/subscriptions/customer/{customerId}',
             path: { customerId: customerId },
@@ -55,8 +55,8 @@ export class SubscriptionsService {
      * Retrieve subscription
      * @see OpenAPI `SubscriptionsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/subscriptions/{id}',
             path: { id: id },
@@ -68,8 +68,8 @@ export class SubscriptionsService {
      * List subscriptions
      * @see OpenAPI `SubscriptionsController_findAll`
      */
-    public async list(params?: paths['/subscriptions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/subscriptions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/subscriptions',
             query: params,
@@ -117,8 +117,8 @@ export class SubscriptionsService {
      * Uncancel subscription
      * @see OpenAPI `SubscriptionsController_uncancel`
      */
-    public async uncancel(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions/{id}/uncancel']['post']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions/{id}/uncancel']['post']['responses'][200]['content']['application/json']>(this.client, {
+    public async uncancel(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions/{id}/uncancel']['post']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions/{id}/uncancel']['post']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/subscriptions/{id}/uncancel',
             path: { id: id },
@@ -130,8 +130,8 @@ export class SubscriptionsService {
      * Update subscription
      * @see OpenAPI `SubscriptionsController_update`
      */
-    public async update(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/subscriptions/{id}']['patch']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/subscriptions/{id}']['patch']['responses'][200]['content']['application/json']>(this.client, {
+    public async update(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/subscriptions/{id}']['patch']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/subscriptions/{id}']['patch']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'PATCH',
             url: '/subscriptions/{id}',
             path: { id: id },

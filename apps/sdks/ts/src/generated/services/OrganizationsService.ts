@@ -14,8 +14,8 @@ export class OrganizationsService {
      * Retrieve organization
      * @see OpenAPI `OrganizationsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/organizations/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/organizations/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/organizations/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/organizations/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/organizations/{id}',
             path: { id: id },
@@ -27,8 +27,8 @@ export class OrganizationsService {
      * Organization metrics
      * @see OpenAPI `OrganizationsController_getMetrics`
      */
-    public async getMetrics(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/organizations/metrics']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/organizations/metrics']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async getMetrics(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/organizations/metrics']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/organizations/metrics']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/organizations/metrics',
             ...options,
@@ -39,8 +39,8 @@ export class OrganizationsService {
      * List organizations
      * @see OpenAPI `OrganizationsController_findAll`
      */
-    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/organizations']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/organizations']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/organizations']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/organizations']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/organizations',
             ...options,
@@ -57,7 +57,7 @@ export class OrganizationsService {
         const pageSize = 50;
 
         while (true) {
-            const response = await requestWithClient<paths['/organizations']['get']['responses'][200]['content']['application/json']>(this.client, {
+            const response = await requestWithClient<NonNullable<NonNullable<paths['/organizations']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
                 method: 'GET',
                 url: '/organizations',
                 query: { page, pageSize },

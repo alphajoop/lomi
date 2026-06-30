@@ -14,8 +14,8 @@ export class MerchantsService {
      * Get merchant details
      * @see OpenAPI `MerchantsController_getDetails`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/merchants/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/merchants/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/merchants/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/merchants/{id}',
             path: { id: id },
@@ -27,8 +27,8 @@ export class MerchantsService {
      * Get merchant ARR
      * @see OpenAPI `MerchantsController_getArr`
      */
-    public async getArr(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}/arr']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/merchants/{id}/arr']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async getArr(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/merchants/{id}/arr']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/merchants/{id}/arr']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/merchants/{id}/arr',
             path: { id: id },
@@ -40,8 +40,8 @@ export class MerchantsService {
      * Get merchant balance
      * @see OpenAPI `MerchantsController_getBalance`
      */
-    public async getBalance(id: string, params?: paths['/merchants/{id}/balance']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}/balance']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/merchants/{id}/balance']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async getBalance(id: string, params?: paths['/merchants/{id}/balance']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/merchants/{id}/balance']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/merchants/{id}/balance']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/merchants/{id}/balance',
             path: { id: id },
@@ -54,8 +54,8 @@ export class MerchantsService {
      * Get merchant MRR
      * @see OpenAPI `MerchantsController_getMrr`
      */
-    public async getMrr(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}/mrr']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/merchants/{id}/mrr']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async getMrr(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/merchants/{id}/mrr']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/merchants/{id}/mrr']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/merchants/{id}/mrr',
             path: { id: id },

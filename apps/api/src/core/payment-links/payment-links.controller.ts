@@ -75,7 +75,8 @@ export class PaymentLinksController {
         allow_quantity: { type: 'boolean' },
         require_billing_address: {
           type: 'boolean',
-          description: 'When true, show and require billing address on checkout.',
+          description:
+            'When true, show and require billing address on checkout.',
         },
         require_email: {
           type: 'boolean',

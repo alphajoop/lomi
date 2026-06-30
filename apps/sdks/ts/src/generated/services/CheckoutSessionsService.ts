@@ -14,8 +14,8 @@ export class CheckoutSessionsService {
      * Create checkout session
      * @see OpenAPI `CheckoutSessionsController_create`
      */
-    public async create(body: paths['/checkout-sessions']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/checkout-sessions']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/checkout-sessions']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(body: NonNullable<paths['/checkout-sessions']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/checkout-sessions']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/checkout-sessions']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/checkout-sessions',
             body,
@@ -27,8 +27,8 @@ export class CheckoutSessionsService {
      * Retrieve checkout session
      * @see OpenAPI `CheckoutSessionsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/checkout-sessions/{id}']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/checkout-sessions/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/checkout-sessions/{id}']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/checkout-sessions/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/checkout-sessions/{id}',
             path: { id: id },
@@ -40,8 +40,8 @@ export class CheckoutSessionsService {
      * List checkout sessions
      * @see OpenAPI `CheckoutSessionsController_findAll`
      */
-    public async list(params?: paths['/checkout-sessions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/checkout-sessions']['get']['responses'][200]['content']['application/json']> {
-        return requestWithClient<paths['/checkout-sessions']['get']['responses'][200]['content']['application/json']>(this.client, {
+    public async list(params?: paths['/checkout-sessions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/checkout-sessions']['get']['responses'][200]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/checkout-sessions']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
             method: 'GET',
             url: '/checkout-sessions',
             query: params,

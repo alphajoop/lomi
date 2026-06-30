@@ -80,12 +80,12 @@ function buildOperationTypes(pathTpl, httpMethod, op) {
 
   const hasBody = wantsBody(httpMethod, op);
   const bodyType = hasBody
-    ? `${opType}['requestBody']['content']['application/json']`
+    ? `NonNullable<${opType}['requestBody']>['content']['application/json']`
     : null;
 
   const resContent = op.responses?.[code]?.content?.['application/json'];
   const responseType = resContent
-    ? `${opType}['responses'][${code}]['content']['application/json']`
+    ? `NonNullable<NonNullable<${opType}['responses'][${code}]>['content']>['application/json']>`
     : 'unknown';
 
   const hasQuery = flattenParams(

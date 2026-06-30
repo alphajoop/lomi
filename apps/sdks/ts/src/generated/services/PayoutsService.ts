@@ -14,8 +14,8 @@ export class PayoutsService {
      * Create payout
      * @see OpenAPI `PayoutsUnifiedController_create`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/payouts']['post']['responses'][201]['content']['application/json']> {
-        return requestWithClient<paths['/payouts']['post']['responses'][201]['content']['application/json']>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payouts']['post']['responses'][201]>['content']>['application/json']>> {
+        return requestWithClient<NonNullable<NonNullable<paths['/payouts']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
             method: 'POST',
             url: '/payouts',
             ...options,
