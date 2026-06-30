@@ -43,6 +43,18 @@ export class ChargesService {
     }
 
     /**
+     * OpenAPI operationId: `ChargesController_createSwitchCharge`.
+     * Create Switch charge (server-side card authorization)
+     */
+    public static async createSwitchCharge(body?: unknown): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/charge/switch',
+            body,
+        });
+    }
+
+    /**
      * OpenAPI operationId: `ChargesController_createWaveCharge`.
      * Create direct Wave charge
      */

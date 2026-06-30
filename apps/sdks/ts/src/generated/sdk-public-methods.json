@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-26T09:54:05.194Z",
+  "generatedAt": "2026-06-30T09:56:13.811Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -10,6 +10,7 @@
       "cancelCardCharge",
       "createCardCharge",
       "createMtnCharge",
+      "createSwitchCharge",
       "createWaveCharge",
       "getCardCharge"
     ],

@@ -78,7 +78,7 @@ export const METHOD_NAME_BY_OP = {
   'PATCH /subscriptions/{id}': 'update',
   'POST /charge/wave': 'createWaveCharge',
   'POST /charge/mtn': 'createMtnCharge',
-  'POST /charge/gim': 'createGimCharge',
+  'POST /charge/switch': 'createSwitchCharge',
   'POST /charge/card': 'createCardCharge',
   'GET /charge/card/{id}': 'getCardCharge',
   'POST /charge/card/{id}/cancel': 'cancelCardCharge',
