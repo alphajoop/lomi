@@ -302,6 +302,29 @@ export function sdkPropToGoField(camelSdkProp) {
   return camelSdkProp.charAt(0).toUpperCase() + camelSdkProp.slice(1);
 }
 
+/** List endpoints that also expose auto-pagination helpers (`listAll`, `findAllAll`, …). */
+export const LIST_METHOD_NAMES = new Set(['list', 'findAll']);
+
+/**
+ * Expand OpenAPI-derived method names with SDK-only helpers (pagination + webhooks).
+ * @param {string} serviceClassName e.g. WebhooksService
+ * @param {string[]} methodNames
+ */
+export function expandSdkManifestMethods(serviceClassName, methodNames) {
+  /** @type {string[]} */
+  const names = [];
+  for (const methodName of methodNames) {
+    names.push(methodName);
+    if (LIST_METHOD_NAMES.has(methodName)) {
+      names.push(`${methodName}All`);
+    }
+  }
+  if (serviceClassName === 'WebhooksService') {
+    names.push('verifySignature');
+  }
+  return [...new Set(names)].sort();
+}
+
 /** TS camelCase sdk method → Go exported name */
 export function tsMethodToGo(tsName) {
   return tsName.charAt(0).toUpperCase() + tsName.slice(1);
@@ -316,9 +339,8 @@ export function buildSdkManifestGrouped(byServiceMap) {
   );
   for (const svc of sortedServices) {
     const prop = sdkPropertyName(svc);
-    const methods = [...byServiceMap.get(svc)].map((o) => o.sdkMethodName);
-    methods.sort();
-    manifest[prop] = methods;
+    const baseMethods = [...byServiceMap.get(svc)].map((o) => o.sdkMethodName);
+    manifest[prop] = expandSdkManifestMethods(svc, baseMethods);
   }
   return manifest;
 }

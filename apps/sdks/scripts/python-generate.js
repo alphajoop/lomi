@@ -14,6 +14,7 @@ import {
   sdkPropertyName,
   camelSdkPropToSnake,
   tsMethodToPythonName,
+  expandSdkManifestMethods,
 } from './public-sdk-operations.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -301,9 +302,10 @@ writeFileSync(join(outputDir, '__init__.py'), initContent);
 const manifestSdk = {};
 for (const svc of sortedServicesForClient) {
   const key = sdkPropertyName(svc);
-  manifestSdk[key] = [...byService.get(svc)]
-    .map((o) => o.sdkMethodName)
-    .sort();
+  manifestSdk[key] = expandSdkManifestMethods(
+    svc,
+    [...byService.get(svc)].map((o) => o.sdkMethodName),
+  );
 }
 
 writeFileSync(

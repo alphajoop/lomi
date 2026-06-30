@@ -27,6 +27,8 @@ import {
   readSpecAndAllowlist,
   getNormalizedOperations,
   resolveRef,
+  LIST_METHOD_NAMES,
+  expandSdkManifestMethods,
 } from './public-sdk-operations.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,8 +42,6 @@ const enOverridesPath = join(
   __dirname,
   '../../docs/lib/scripts/manual-api/en-operation-overrides.ts',
 );
-
-const LIST_METHOD_NAMES = new Set(['list', 'findAll']);
 
 /** @returns {Record<string, string>} operationId -> English summary */
 function loadEnSummaries() {
@@ -478,12 +478,14 @@ function main() {
   const serviceNamesSorted = [...groups.keys()].sort((a, b) => a.localeCompare(b));
 
   for (const serviceName of serviceNamesSorted) {
-    const cls = generateServiceClass(serviceName, groups.get(serviceName));
+    const methods = groups.get(serviceName) ?? [];
+    const cls = generateServiceClass(serviceName, methods);
     writeFileSync(join(outputDir, `services/${serviceName}.ts`), cls);
     const propKey = sdkPropertyName(serviceName);
-    manifest[propKey] = [...groups.get(serviceName)]
-      .map((m) => m.methodName)
-      .sort();
+    manifest[propKey] = expandSdkManifestMethods(
+      serviceName,
+      methods.map((m) => m.methodName),
+    );
     console.log(`   ${serviceName}`);
   }
 

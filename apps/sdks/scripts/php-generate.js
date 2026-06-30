@@ -11,6 +11,7 @@ import {
   readSpecAndAllowlist,
   getNormalizedOperations,
   sdkPropertyName,
+  expandSdkManifestMethods,
 } from './public-sdk-operations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -222,9 +223,10 @@ writeFileSync(join(srcDir, 'LomiClient.php'), lomiClientPhp);
 
 const manifestSdk = {};
 for (const svc of sortedSvc) {
-  manifestSdk[sdkPropertyName(svc)] = [...byService.get(svc)]
-    .map((o) => o.sdkMethodName)
-    .sort();
+  manifestSdk[sdkPropertyName(svc)] = expandSdkManifestMethods(
+    svc,
+    [...byService.get(svc)].map((o) => o.sdkMethodName),
+  );
 }
 
 writeFileSync(

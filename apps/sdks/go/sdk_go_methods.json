@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T11:05:14.581Z",
+  "generatedAt": "2026-06-30T11:42:12.512Z",
   "language": "go",
   "sdk": {
     "accounts": [
@@ -18,7 +18,8 @@
     "checkoutSessions": [
       "create",
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "customers": [
       "create",
@@ -28,27 +29,32 @@
       "getPortalAudit",
       "getTransactions",
       "list",
+      "listAll",
       "update"
     ],
     "customerSubscriptions": [
       "delete",
       "get",
       "list",
+      "listAll",
       "update"
     ],
     "discountCoupons": [
       "create",
       "get",
       "getPerformance",
-      "list"
+      "list",
+      "listAll"
     ],
     "disputes": [
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "logs": [
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "merchants": [
       "get",
@@ -61,6 +67,7 @@
       "get",
       "getCustomerBalance",
       "list",
+      "listAll",
       "update"
     ],
     "organization": [
@@ -70,37 +77,44 @@
     "organizations": [
       "get",
       "getMetrics",
-      "list"
+      "list",
+      "listAll"
     ],
     "paymentLinks": [
       "create",
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "paymentRequests": [
       "create",
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "payouts": [
       "create",
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "products": [
       "addPrice",
       "create",
       "get",
       "list",
+      "listAll",
       "setDefaultPrice"
     ],
     "providers": [
-      "list"
+      "list",
+      "listAll"
     ],
     "refunds": [
       "create",
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "riskAssessments": [
       "findOne",
@@ -108,6 +122,7 @@
     ],
     "settlements": [
       "findAll",
+      "findAllAll",
       "findTransactions"
     ],
     "subscriptions": [
@@ -116,12 +131,14 @@
       "findByCustomer",
       "get",
       "list",
+      "listAll",
       "uncancel",
       "update"
     ],
     "transactions": [
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "usageBilling": [
       "checkEntitlement",
@@ -134,23 +151,27 @@
     "usageEvents": [
       "create",
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "usageSubscriptions": [
       "create"
     ],
     "webhookDeliveryLogs": [
       "get",
-      "list"
+      "list",
+      "listAll"
     ],
     "webhooks": [
       "create",
       "delete",
       "get",
       "list",
+      "listAll",
       "retryDelivery",
       "test",
-      "update"
+      "update",
+      "verifySignature"
     ]
   }
 }
