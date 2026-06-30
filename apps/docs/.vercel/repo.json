@@ -1,0 +1,11 @@
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_5jOZnZkNh0ZbboxKn5M3gmJbHV3S",
+      "name": "docs.lomi.africa",
+      "directory": "apps/docs",
+      "orgId": "team_LKXkTUhU4GBlZDSsOMQB2I7b"
+    }
+  ]
+}

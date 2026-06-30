@@ -12,6 +12,7 @@
 /.next/
 /build
 *.tsbuildinfo
+.vercel
 
 # misc
 .DS_Store

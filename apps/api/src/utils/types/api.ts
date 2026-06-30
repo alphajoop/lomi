@@ -3367,6 +3367,22 @@ export type Database = {
           environment: string;
         }[];
       };
+      calculate_subscription_first_charge_amount: {
+        Args: {
+          p_as_of_date?: string;
+          p_price_id: string;
+          p_product_id: string;
+        };
+        Returns: number;
+      };
+      calculate_renewal_charge_amount: {
+        Args: {
+          p_base_amount: number;
+          p_currency_code: APIEnums['currency_code'];
+          p_organization_id: string;
+        };
+        Returns: number;
+      };
       subscription_renewal_already_processed: {
         Args: { p_billing_date: string; p_subscription_id: string };
         Returns: boolean;

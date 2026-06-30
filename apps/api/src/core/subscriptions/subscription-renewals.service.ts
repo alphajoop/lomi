@@ -141,7 +141,22 @@ export class SubscriptionRenewalsService {
         `Processing renewal for subscription ${sub.subscription_id} (${sub.customer_email})`,
       );
 
-      const amountMinor = Math.round(sub.price_amount);
+      const amountMinorBase = Math.round(sub.price_amount);
+
+      const { data: grossChargeAmount, error: grossChargeError } =
+        await this.supabase.rpc('calculate_renewal_charge_amount', {
+          p_organization_id: sub.organization_id,
+          p_base_amount: amountMinorBase,
+          p_currency_code: sub.price_currency_code as 'XOF' | 'USD' | 'EUR',
+        });
+
+      if (grossChargeError) {
+        throw new Error(
+          `Failed to calculate renewal charge amount: ${grossChargeError.message}`,
+        );
+      }
+
+      const amountMinor = Math.round(Number(grossChargeAmount ?? amountMinorBase));
       const toCurrency = sub.price_currency_code.toLowerCase();
 
       const { data: conversionData, error: conversionError } =
