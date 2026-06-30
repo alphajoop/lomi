@@ -9,6 +9,7 @@
     "create-account",
     "api-keys",
     "cli-quickstart",
+    "sdk-quickstart",
     "first-payment",
     "sandbox-payments",
     "go-live"

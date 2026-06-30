@@ -29,7 +29,7 @@ describe('createHttpApplication', () => {
     process.env.LOMI_MCP_ALLOWED_HOSTS = '127.0.0.1';
     delete process.env.LOMI_MCP_BEARER_TOKEN;
     delete process.env.LOMI_MCP_RATE_LIMIT_RPM;
-    delete process.env.LOMI_API_BASE_URL_ALLOWLIST;
+    delete process.env.LOMI_API_URL_ALLOWLIST;
   });
 
   afterEach(async () => {

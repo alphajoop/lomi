@@ -66,7 +66,7 @@ Il peut aussi proposer [`lomi install-rules`](/build/cli/install-rules) si vous 
 
 | Fichier | Rôle |
 | --- | --- |
-| `.env` | `LOMI_API_KEY`, placeholder `LOMI_WEBHOOK_SECRET`, `LOMI_API_URL` |
+| `.env` | `LOMI_SECRET_KEY`, placeholder `LOMI_WEBHOOK_SECRET`, `LOMI_API_URL` |
 | `lib/lomi./client.{ts\|js}` | Client SDK initialisé depuis `.env` |
 | `examples/create-checkout-session.{ts\|js}` | Exemple création session checkout |
 | `examples/webhook-handler.{ts\|js}` | Exemple handler webhook basique |
@@ -76,7 +76,7 @@ Il peut aussi proposer [`lomi install-rules`](/build/cli/install-rules) si vous 
 Exemple `.env` :
 
 ```dotenv filename=".env"
-LOMI_API_KEY=lomi_sk_test_xxx
+LOMI_SECRET_KEY=lomi_sk_test_xxx
 LOMI_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 LOMI_API_URL=https://sandbox.api.lomi.africa
 ```

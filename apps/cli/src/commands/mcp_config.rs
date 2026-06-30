@@ -39,15 +39,18 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
         cli::banner::print_intro("MCP HTTP configuration");
     }
 
-    let api_key = std::env::var("LOMI_API_KEY").ok();
+    let api_key = std::env::var("LOMI_SECRET_KEY").ok();
+
+    let key_placeholder = "<your-lomi-secret-key>";
 
     let snippet = match args.target.as_str() {
         "cursor" => serde_json::json!({
             "mcpServers": {
                 "lomi": {
-                    "url": args.url,
+                    "url": format!("{}/mcp", args.url.trim_end_matches('/')),
                     "headers": {
-                        "X-API-KEY": api_key.clone().unwrap_or_else(|| "<your-api-key>".to_string())
+                        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
+                        "x-lomi-api-key": api_key.clone().unwrap_or_else(|| key_placeholder.to_string())
                     }
                 }
             }
@@ -56,9 +59,10 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
             "mcpServers": {
                 "lomi": {
                     "type": "http",
-                    "url": args.url,
+                    "url": format!("{}/mcp", args.url.trim_end_matches('/')),
                     "headers": {
-                        "X-API-KEY": api_key.clone().unwrap_or_else(|| "<your-api-key>".to_string())
+                        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
+                        "x-lomi-api-key": api_key.clone().unwrap_or_else(|| key_placeholder.to_string())
                     }
                 }
             }
@@ -77,7 +81,7 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
     if api_key.is_none() {
         println!(
             "{}",
-            "Tip: run `lomi login` or set LOMI_API_KEY to embed your key.".yellow()
+            "Tip: set LOMI_SECRET_KEY in your environment to embed your key.".yellow()
         );
     }
     Ok(())

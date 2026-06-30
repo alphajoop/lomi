@@ -1,15 +1,15 @@
 /**
  * Local-only dev script to smoke-test a Wave charge.
- * Usage: LOMI_API_KEY=lomi_sk_... API_URL=http://localhost:3000 pnpm ts-node scripts/verify-charge.ts
+ * Usage: LOMI_SECRET_KEY=lomi_sk_... API_URL=http://localhost:3000 pnpm ts-node scripts/verify-charge.ts
  */
 import axios from 'axios';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/charge/wave';
-const API_KEY = process.env.LOMI_API_KEY;
+const API_KEY = process.env.LOMI_SECRET_KEY;
 
 async function verifyCharge() {
   if (!API_KEY) {
-    console.error('Set LOMI_API_KEY in the environment');
+    console.error('Set LOMI_SECRET_KEY in the environment');
     process.exit(1);
   }
 

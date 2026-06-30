@@ -49,7 +49,7 @@ use Lomi\ApiClient;
 use Lomi\Api\CustomersApi;
 
 $config = Configuration::getDefaultConfiguration()
-    ->setApiKey('X-API-KEY', getenv('LOMI_API_KEY'));
+    ->setApiKey('X-API-KEY', getenv('LOMI_SECRET_KEY'));
 
 // For sandbox/testing
 // $config->setHost('https://sandbox.api.lomi.africa');
@@ -211,7 +211,7 @@ class LomiServiceProvider extends ServiceProvider
 return [
     // ...
     'lomi' => [
-        'api_key' => env('LOMI_API_KEY'),
+        'api_key' => env('LOMI_SECRET_KEY'),
         'webhook_secret' => env('LOMI_WEBHOOK_SECRET'),
     ],
 ];

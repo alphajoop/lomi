@@ -37,7 +37,7 @@ func main() {
         context.Background(),
         lomi.ContextAPIKeys,
         map[string]lomi.APIKey{
-            "ApiKeyAuth": {Key: os.Getenv("LOMI_API_KEY")},
+            "ApiKeyAuth": {Key: os.Getenv("LOMI_SECRET_KEY")},
         },
     )
 

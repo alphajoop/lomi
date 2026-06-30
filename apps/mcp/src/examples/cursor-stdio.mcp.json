@@ -4,8 +4,8 @@
       "command": "npx",
       "args": ["-y", "@lomi./mcp"],
       "env": {
-        "LOMI_API_KEY": "YOUR_MERCHANT_API_KEY",
-        "LOMI_API_BASE_URL": "https://api.lomi.africa"
+        "LOMI_SECRET_KEY": "YOUR_LOMI_SECRET_KEY",
+        "LOMI_API_URL": "https://api.lomi.africa"
       }
     }
   }

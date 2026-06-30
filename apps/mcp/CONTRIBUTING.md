@@ -17,7 +17,7 @@ See [`railway.json`](./railway.json) for Railway deployment.
 Key operator settings:
 
 - `LOMI_MCP_BEARER_TOKEN` — transport gate for HTTP MCP
-- `LOMI_API_BASE_URL` — default merchant API base URL for tool calls
+- `LOMI_API_URL` — default merchant API base URL for tool calls
 
 ## Regenerate tools
 

@@ -15,7 +15,7 @@ import { Callout } from '@/components/docs/docs-callout';
 
 ```bash
 curl -X PATCH "https://api.lomi.africa/organization/radar-settings" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "enabled": true, "mode": "block" }'
 ```
@@ -40,7 +40,7 @@ curl -X PATCH "https://api.lomi.africa/organization/radar-settings" \
 
 ```bash
 curl "https://api.lomi.africa/risk-assessments?decision=flag" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 Filtres : `decision`, `rail`, `startDate`, `endDate`.

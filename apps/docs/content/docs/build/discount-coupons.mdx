@@ -68,7 +68,7 @@ The API enforces these rules at creation:
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -101,7 +101,7 @@ from lomi import LomiClient
 import os
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"
 )
 
@@ -121,7 +121,7 @@ print(f"Coupon created: {coupon['code']}")
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/discount-coupons" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "code": "SAVE20",
@@ -219,7 +219,7 @@ coupons = client.discount_coupons.list()
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/discount-coupons" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -248,7 +248,7 @@ coupon = client.discount_coupons.get('dc_abc123...')
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -283,7 +283,7 @@ print(f"Total uses: {performance['total_uses']}")
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123.../performance" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 

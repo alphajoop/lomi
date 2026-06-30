@@ -7,14 +7,14 @@ description: 'Mettre en œuvre une sécurité solide est indispensable lorsque v
 
 ### Sécurité des clés API
 
-1.  **Stockage sécurisé :** **ne jamais** coder en dur les clés API (`LOMI_API_KEY`) ni les commiter dans le dépôt. Utilisez des variables d’environnement ou un gestionnaire de secrets.
+1.  **Stockage sécurisé :** **ne jamais** coder en dur les clés API (`LOMI_SECRET_KEY`) ni les commiter dans le dépôt. Utilisez des variables d’environnement ou un gestionnaire de secrets.
 
     ```typescript filename="Utiliser une variable d’environnement pour la clé API"
     import { LomiSDK } from '@lomi./sdk';
 
     // Ne pas coder la clé en dur
     const lomi = new LomiSDK({
-      apiKey: process.env.LOMI_API_KEY, // Chargée depuis l’environnement
+      apiKey: process.env.LOMI_SECRET_KEY, // Chargée depuis l’environnement
     });
     ```
 
@@ -33,12 +33,12 @@ Toute communication avec l’API lomi. **doit** passer par HTTPS (TLS 1.2 ou sup
 ```typescript filename="S’assurer d’une URL de base HTTPS"
 import axios from 'axios';
 
-const LOMI_API_BASE_URL = 'https://api.lomi.africa'; // Toujours HTTPS
+const LOMI_API_URL = 'https://api.lomi.africa'; // Toujours HTTPS
 
 const apiClient = axios.create({
-  baseURL: LOMI_API_BASE_URL,
+  baseURL: LOMI_API_URL,
   headers: {
-    Authorization: `Bearer ${process.env.LOMI_API_KEY}`,
+    Authorization: `Bearer ${process.env.LOMI_SECRET_KEY}`,
     'Content-Type': 'application/json',
   },
 });
@@ -204,7 +204,7 @@ import axios from 'axios';
 const apiClient = axios.create({
   baseURL: 'https://api.lomi.africa',
   timeout: 15000,
-  headers: { Authorization: `Bearer ${process.env.LOMI_API_KEY}` },
+  headers: { Authorization: `Bearer ${process.env.LOMI_SECRET_KEY}` },
 });
 ```
 
@@ -230,12 +230,12 @@ const apiClient = axios.create({
     const config = {
       development: {
         apiUrl: 'https://sandbox.api.lomi.africa',
-        apiKey: process.env.LOMI_TEST_API_KEY,
+        apiKey: process.env.LOMI_TEST_SECRET_KEY,
         webhookSecret: process.env.LOMI_TEST_WEBHOOK_SECRET,
       },
       production: {
         apiUrl: 'https://api.lomi.africa',
-        apiKey: process.env.LOMI_PROD_API_KEY,
+        apiKey: process.env.LOMI_PROD_SECRET_KEY,
         webhookSecret: process.env.LOMI_PROD_WEBHOOK_SECRET,
       },
     }[process.env.NODE_ENV || 'development'];

@@ -27,7 +27,7 @@ import os
 from lomi import LomiClient
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"  # 'test' for sandbox, 'live' for production
 )
 ```
@@ -225,7 +225,7 @@ except LomiError as e:
 
 ```python
 # settings.py
-LOMI_API_KEY = os.environ.get("LOMI_API_KEY")
+LOMI_SECRET_KEY = os.environ.get("LOMI_SECRET_KEY")
 LOMI_WEBHOOK_SECRET = os.environ.get("LOMI_WEBHOOK_SECRET")
 
 # views.py

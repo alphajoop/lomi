@@ -59,7 +59,7 @@ Before collecting payment, create a Payment Intent on your server:
 const response = await fetch('https://api.lomi.africa/charge/card', {
   method: 'POST',
   headers: {
-    'X-API-KEY': process.env.LOMI_API_KEY,
+    'X-API-KEY': process.env.LOMI_SECRET_KEY,
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({

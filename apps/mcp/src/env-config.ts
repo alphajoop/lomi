@@ -39,30 +39,21 @@ function parseCsvHosts(raw: string, varName: string): string[] {
 }
 
 export function getLomiApiBaseUrl(): string {
-  const primary = process.env.LOMI_API_BASE_URL?.trim();
-  const legacy = process.env.LOMI_API_URL?.trim();
-
-  if (primary && legacy && primary !== legacy) {
-    throw new Error(
-      `[env] LOMI_API_BASE_URL (${quoted(primary)}) conflicts with legacy LOMI_API_URL (${quoted(legacy)}). Keep only one value, preferably LOMI_API_BASE_URL.`,
-    );
-  }
-
-  const raw = primary ?? legacy ?? 'https://api.lomi.africa';
-  const parsed = parseUrlOrThrow(raw, primary ? 'LOMI_API_BASE_URL' : legacy ? 'LOMI_API_URL' : 'LOMI_API_BASE_URL');
+  const raw = process.env.LOMI_API_URL?.trim() ?? 'https://api.lomi.africa';
+  const parsed = parseUrlOrThrow(raw, 'LOMI_API_URL');
   const normalized = parsed.toString().replace(/\/$/, '');
   assertOutboundHostnameAllowed(normalized);
   return normalized;
 }
 
 function assertOutboundHostnameAllowed(baseUrl: string): void {
-  const raw = process.env.LOMI_API_BASE_URL_ALLOWLIST?.trim();
+  const raw = process.env.LOMI_API_URL_ALLOWLIST?.trim();
   if (!raw) return;
-  const allowed = new Set(parseCsvHosts(raw, 'LOMI_API_BASE_URL_ALLOWLIST'));
-  const hostname = parseUrlOrThrow(baseUrl, 'LOMI_API_BASE_URL').hostname;
+  const allowed = new Set(parseCsvHosts(raw, 'LOMI_API_URL_ALLOWLIST'));
+  const hostname = parseUrlOrThrow(baseUrl, 'LOMI_API_URL').hostname;
   if (!allowed.has(hostname)) {
     throw new Error(
-      `[env] Outbound API hostname "${hostname}" is not allowed by LOMI_API_BASE_URL_ALLOWLIST (${quoted(raw)}). Add "${hostname}" to the allowlist.`,
+      `[env] Outbound API hostname "${hostname}" is not allowed by LOMI_API_URL_ALLOWLIST (${quoted(raw)}). Add "${hostname}" to the allowlist.`,
     );
   }
 }
@@ -76,14 +67,13 @@ export function getOptionalMerchantApiKey(): string | null {
     return cachedPositiveMerchantKey;
   }
   const keyCandidates = [
-    process.env.LOMI_API_KEY?.trim(),
-    process.env.X_API_KEY?.trim(),
     process.env.LOMI_SECRET_KEY?.trim(),
+    process.env.X_API_KEY?.trim(),
   ].filter((v): v is string => Boolean(v && v.length > 0));
   const distinct = Array.from(new Set(keyCandidates));
   if (distinct.length > 1) {
     throw new Error(
-      '[env] Multiple merchant key env vars are set with different values (LOMI_API_KEY / X_API_KEY / LOMI_SECRET_KEY). Keep exactly one to avoid ambiguous auth.',
+      '[env] Multiple merchant key env vars are set with different values (LOMI_SECRET_KEY / X_API_KEY). Keep exactly one to avoid ambiguous auth.',
     );
   }
   const key = distinct[0] ?? null;

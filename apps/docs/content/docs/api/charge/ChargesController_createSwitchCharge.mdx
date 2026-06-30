@@ -110,7 +110,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/switch" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"amount":10000,"pan":"4221941234569109","expiry":"06/25","cvv":"123"}'
 ```

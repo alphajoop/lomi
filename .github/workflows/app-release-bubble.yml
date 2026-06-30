@@ -33,10 +33,10 @@ jobs:
 
       - name: Smoke test (optional)
         env:
-          LOMI_API_KEY: ${{ secrets.LOMI_API_KEY }}
+          LOMI_SECRET_KEY: ${{ secrets.LOMI_SECRET_KEY }}
         run: |
-          if [ -z "$LOMI_API_KEY" ]; then
-            echo "LOMI_API_KEY not set — skipping API smoke test"
+          if [ -z "$LOMI_SECRET_KEY" ]; then
+            echo "LOMI_SECRET_KEY not set — skipping API smoke test"
             exit 0
           fi
           node apps/plugins/bubble/scripts/smoke-test.mjs

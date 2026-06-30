@@ -85,7 +85,7 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/customers/value/portal-launch-session" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"return_url":"string","flow_type":"portal_home","flow_subscription_id":"string"}'
 ```

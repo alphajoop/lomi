@@ -36,7 +36,7 @@ Récupère le détail de votre organisation authentifiée.
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -51,7 +51,7 @@ from lomi import LomiClient
 import os
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"
 )
 
@@ -63,7 +63,7 @@ print(f"Organization: {orgs[0]['name']}")
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/organizations" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -92,7 +92,7 @@ org = client.organizations.get('org_abc123...')
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/organizations/org_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -132,7 +132,7 @@ print(f"Total Customers: {metrics['total_customers']}")
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/organizations/metrics" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 

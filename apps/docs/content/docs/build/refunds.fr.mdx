@@ -27,7 +27,7 @@ Listez et consultez les remboursements avec **`GET /refunds`** et **`GET /refund
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -46,7 +46,7 @@ import requests, os
 
 r = requests.post(
     "https://api.lomi.africa/refunds",
-    headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
+    headers={"X-API-KEY": os.environ["LOMI_SECRET_KEY"], "Content-Type": "application/json"},
     json={
         "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
         "amount": 5000,
@@ -60,7 +60,7 @@ print(r.status_code, r.json())
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/refunds" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "transaction_id": "123e4567-e89b-12d3-a456-426614174000",

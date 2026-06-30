@@ -23,7 +23,7 @@ Include the `Idempotency-Key` header in your API calls. Most lomi. SDKs provide 
 import { LomiSDK } from '@lomi./sdk';
 import { v4 as uuidv4 } from 'uuid';
 
-const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY! });
 
 // Generate a unique key *before* making the request
 const idempotencyKey = uuidv4(); // e.g., 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
@@ -58,7 +58,7 @@ try {
 import { v4 as uuidv4 } from 'uuid';
 
 const idempotencyKey = uuidv4();
-const apiKey = process.env.LOMI_API_KEY;
+const apiKey = process.env.LOMI_SECRET_KEY;
 const apiUrl = 'https://api.lomi.africa/checkout-sessions'; // Use correct endpoint
 
 async function createSessionDirectly() {

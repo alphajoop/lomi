@@ -13,13 +13,10 @@ afterEach(() => {
 });
 
 describe('env-config validation', () => {
-  it('throws helpful error for conflicting API base URLs', async () => {
-    process.env.LOMI_API_BASE_URL = 'https://api.lomi.africa';
+  it('uses LOMI_API_URL when set', async () => {
     process.env.LOMI_API_URL = 'https://sandbox.api.lomi.africa';
     const cfg = await loadEnvConfig();
-    expect(() => cfg.getLomiApiBaseUrl()).toThrow(
-      /conflicts with legacy LOMI_API_URL/,
-    );
+    expect(cfg.getLomiApiBaseUrl()).toBe('https://sandbox.api.lomi.africa');
   });
 
   it('throws helpful error for malformed host allowlist entry', async () => {
@@ -30,13 +27,13 @@ describe('env-config validation', () => {
   });
 
   it('throws helpful error for malformed outbound allowlist', async () => {
-    process.env.LOMI_API_BASE_URL_ALLOWLIST = 'api.lomi.africa,,sandbox.api.lomi.africa';
+    process.env.LOMI_API_URL_ALLOWLIST = 'api.lomi.africa,,sandbox.api.lomi.africa';
     const cfg = await loadEnvConfig();
     expect(() => cfg.getLomiApiBaseUrl()).toThrow(/contains empty entries/);
   });
 
   it('throws helpful error for ambiguous merchant keys', async () => {
-    process.env.LOMI_API_KEY = 'lomi_sk_one';
+    process.env.LOMI_SECRET_KEY = 'lomi_sk_one';
     process.env.X_API_KEY = 'lomi_sk_two';
     const cfg = await loadEnvConfig();
     expect(() => cfg.getOptionalMerchantApiKey()).toThrow(

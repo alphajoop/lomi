@@ -21,7 +21,7 @@ Disputes are created automatically when the card network sends `charge.dispute.*
 
 ```bash
 curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ### Query parameters
@@ -57,7 +57,7 @@ curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
 
 ```bash
 curl "https://api.lomi.africa/disputes/{dispute_id}" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 The single-dispute response includes the same fields plus `evidence_details`, `transaction_gross_amount`, and `transaction_status`.

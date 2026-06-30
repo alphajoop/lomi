@@ -31,7 +31,7 @@ Elles surviennent lorsque les données de la requête sont invalides ou que des 
 ```typescript filename="Gestion des erreurs de validation (exemple)"
 import { LomiSDK, LomiError } from '@lomi./sdk'; // En supposant que le SDK exporte le type d’erreur
 
-const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY! });
 
 try {
   const session = await lomi.checkoutSessions.createCheckoutSession({
@@ -54,7 +54,7 @@ try {
 
 ### Erreurs d’authentification (HTTP 401)
 
-Elles surviennent lorsque la `LOMI_API_KEY` est absente, invalide ou ne dispose pas des autorisations nécessaires.
+Elles surviennent lorsque la `LOMI_SECRET_KEY` est absente, invalide ou ne dispose pas des autorisations nécessaires.
 
 ```typescript filename="Gestion des erreurs d’authentification (exemple)"
 import { LomiSDK, LomiError } from '@lomi./sdk';
@@ -67,13 +67,13 @@ try {
   if (error instanceof LomiApiError && error.statusCode === 401) {
     console.error('Authentication failed:', error.message);
     // Vérifications courantes :
-    if (!process.env.LOMI_API_KEY) {
+    if (!process.env.LOMI_SECRET_KEY) {
       console.error(
-        'Suggestion : la variable d’environnement LOMI_API_KEY est peut-être absente.',
+        'Suggestion : la variable d’environnement LOMI_SECRET_KEY est peut-être absente.',
       );
     } else {
       console.error(
-        'Suggestion : vérifiez que LOMI_API_KEY est correcte et active.',
+        'Suggestion : vérifiez que LOMI_SECRET_KEY est correcte et active.',
       );
     }
   } else {
@@ -89,7 +89,7 @@ Elles surviennent lorsque vous dépassez le nombre de requêtes autorisées sur 
 ```typescript filename="Gestion des erreurs de limite de débit (exemple)"
 import { LomiSDK, LomiError } from '@lomi./sdk';
 
-const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY! });
 
 async function makeRequestWithRateLimitHandling() {
   try {

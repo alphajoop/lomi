@@ -20,7 +20,7 @@ The Customers API allows you to create, retrieve, update, and manage customer pr
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -46,7 +46,7 @@ from lomi import LomiClient
 import os
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"
 )
 
@@ -67,7 +67,7 @@ print(f"Customer created: {customer['id']}")
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/customers" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Amadou Ba",
@@ -118,7 +118,7 @@ customers = client.customers.list(
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/customers?search=amadou&type=individual&page=1&pageSize=20" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -161,7 +161,7 @@ customer = client.customers.get('cus_abc123...')
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/customers/cus_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -196,7 +196,7 @@ updated = client.customers.update('cus_abc123...', {
 <Tab value="cURL">
 ```bash
 curl -X PATCH "https://api.lomi.africa/customers/cus_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"email": "new.email@example.com"}'
 ```
@@ -227,7 +227,7 @@ client.customers.delete('cus_abc123...')
 <Tab value="cURL">
 ```bash
 curl -X DELETE "https://api.lomi.africa/customers/cus_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -263,7 +263,7 @@ for tx in transactions:
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/customers/cus_abc123.../transactions" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -309,7 +309,7 @@ const { data: launch } = await axios.post(
   },
   {
     headers: {
-      'X-API-KEY': process.env.LOMI_API_KEY!,
+      'X-API-KEY': process.env.LOMI_SECRET_KEY!,
       'Content-Type': 'application/json',
     },
   },
@@ -322,7 +322,7 @@ window.location.href = launch.launch_url;
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-session" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "return_url": "https://merchant.example.com/account",

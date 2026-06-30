@@ -53,7 +53,7 @@ La plupart des marchands devraient commencer par le **checkout hébergé** ou le
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,
@@ -75,7 +75,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,

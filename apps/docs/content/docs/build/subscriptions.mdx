@@ -75,7 +75,7 @@ For **metered / usage-based** products (API calls, credits, seats), see **[Usage
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -96,7 +96,7 @@ from lomi import LomiClient
 import os
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"
 )
 
@@ -110,7 +110,7 @@ for sub in subscriptions:
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -139,7 +139,7 @@ customer_subs = client.subscriptions.get_by_customer('cus_abc123...')
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -171,7 +171,7 @@ print(f"Status: {subscription['status']}")
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -259,7 +259,7 @@ scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "cancel_at_period_end": true,
@@ -278,7 +278,7 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ---
@@ -289,7 +289,7 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
 
 ```bash
 curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../change-plan" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
 ```

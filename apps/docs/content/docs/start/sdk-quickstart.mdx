@@ -1,0 +1,132 @@
+---
+title: 'Get started with the SDK'
+description: 'Install the lomi. SDK, set your API key, make your first sandbox call, create a test checkout, and verify webhooks.'
+---
+
+The **lomi. SDK** is the fastest way to call the lomi. API from your application code, create checkout sessions, manage customers and subscriptions, issue refunds, and verify webhooks, with typed methods and built-in error handling.
+
+This guide uses the **TypeScript SDK** (`@lomi./sdk`). The same flow applies to [Python](/build/sdks/python), [Go](/build/sdks/go), and [PHP](/build/sdks/php).
+
+<Steps>
+
+### Install the SDK
+
+```bash filename="Terminal"
+npm install @lomi./sdk
+```
+
+Also available with `pnpm add`, `yarn add`, or `bun add`. See the [TypeScript SDK reference](/build/sdks/typescript) for other runtimes.
+
+### Add your test API key
+
+Copy a **test secret key** (`lomi_sk_test_…`) from **Settings → Access tokens** and add it to a `.env` file. See [Access tokens](/start/api-keys).
+
+```bash filename=".env"
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+```
+
+<Callout type="info" emoji="💡" title="Let the CLI scaffold this for you">
+  `lomi init` writes the SDK client, example files, and your `.env` automatically. See the [CLI quickstart](/start/cli-quickstart) and [Initialize a project](/build/cli/init).
+</Callout>
+
+### Make your first sandbox call
+
+Create `first-call.ts`, then fetch your sandbox balance to confirm the key works:
+
+```typescript
+import { LomiSDK, LomiAuthError } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'test', // sandbox; use 'live' only in production
+});
+
+async function main() {
+  try {
+    const balance = await lomi.accounts.getBalance();
+    console.log('Balance:', balance);
+  } catch (error) {
+    if (error instanceof LomiAuthError) {
+      console.error(`Auth failed [${error.statusCode}]: ${error.message}`);
+      process.exit(1);
+    }
+    throw error;
+  }
+}
+
+main();
+```
+
+```bash filename="Terminal"
+npm install @lomi./sdk
+# load .env with your tooling (dotenv, Next.js, etc.)
+npx tsx first-call.ts
+```
+
+### Create a test checkout
+
+```typescript
+const session = await lomi.checkoutSessions.create({
+  amount: 10000,
+  currency_code: 'XOF',
+  title: 'Premium subscription',
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel',
+});
+
+console.log('Redirect to:', session.checkout_url);
+```
+
+Open `checkout_url` in your browser and pay with a [sandbox test method](/start/sandbox-payments).
+
+### Verify a webhook
+
+Confirm events are authentic before trusting them, no hand-rolled HMAC required:
+
+```typescript
+import { verifyWebhookSignature } from '@lomi./sdk';
+
+const valid = verifyWebhookSignature(
+  rawBody,                          // raw string or Buffer, not parsed JSON
+  req.headers['x-lomi-signature'],
+  process.env.LOMI_WEBHOOK_SECRET!,
+);
+
+if (!valid) return res.status(401).send('Invalid signature');
+```
+
+Forward events to your local server with the CLI, no ngrok required:
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+See [Listen for webhooks](/build/cli/listen) and [Webhooks](/build/webhooks).
+
+</Steps>
+
+## What to build next
+
+| Goal | Reference |
+| --- | --- |
+| Full TypeScript SDK API | [TypeScript SDK](/build/sdks/typescript) |
+| Other languages | [Python](/build/sdks/python) · [Go](/build/sdks/go) · [PHP](/build/sdks/php) |
+| Hosted checkout | [Checkout](/build/checkout) |
+| Recurring billing | [Subscriptions](/build/subscriptions) |
+| Error handling | [Error handling](/build/advanced-guides/error-handling) |
+
+## Two kinds of credentials
+
+<Callout type="info" emoji="💡" title="API key vs CLI token">
+  The **SDK** uses your **secret API key** (`LOMI_SECRET_KEY`) in application code.
+
+  The **CLI** uses a separate **CLI token** from `lomi login` for terminal commands like `checkout create` and `listen`.
+
+  These are different credentials for different purposes.
+</Callout>
+
+## Next steps
+
+- [Make a test payment](/start/first-payment): CLI and cURL paths
+- [Choose an integration](/build/choose-integration): hosted checkout, links, subscriptions
+- [Go live](/start/go-live): production checklist

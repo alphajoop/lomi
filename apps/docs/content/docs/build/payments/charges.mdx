@@ -41,7 +41,7 @@ Initiate a payment request specifically for Wave Mobile Money.
 ```bash
 curl -X POST "https://api.lomi.africa/charge/wave" \
   -H "Content-Type: application/json" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -d '{
     "amount": 1000,
     "currency": "XOF",
@@ -63,7 +63,7 @@ const response = await fetch('https://api.lomi.africa/charge/wave', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'X-API-KEY': process.env.LOMI_API_KEY!,
+    'X-API-KEY': process.env.LOMI_SECRET_KEY!,
   },
   body: JSON.stringify({
     amount: 1000,
@@ -91,7 +91,7 @@ import os
 url = "https://api.lomi.africa/charge/wave"
 headers = {
     "Content-Type": "application/json",
-    "X-API-KEY": os.environ["LOMI_API_KEY"]
+    "X-API-KEY": os.environ["LOMI_SECRET_KEY"]
 }
 payload = {
     "amount": 1000,

@@ -9,7 +9,7 @@ description: 'Ce guide présente les bonnes pratiques pour intégrer lomi. à vo
 
 ```yaml filename="Exemple de fichier .env pour la CI"
 # .env.ci
-LOMI_API_KEY=lomi_sk_test_... # Clé de test dédiée
+LOMI_SECRET_KEY=lomi_sk_test_... # Clé de test dédiée
 LOMI_WEBHOOK_SECRET=whsec_... # Secret webhook de test
 LOMI_API_URL=https://sandbox.api.lomi.africa # Bac à sable
 LOMI_ENV=test
@@ -22,7 +22,7 @@ Chargez les secrets requis de façon sécurisée dans votre CI/CD. Ne commitez j
 ```typescript filename="Charger les secrets en Node.js"
 // config/secrets.ts
 export function loadSecrets(): void {
-  const requiredSecrets = ['LOMI_API_KEY', 'LOMI_WEBHOOK_SECRET'];
+  const requiredSecrets = ['LOMI_SECRET_KEY', 'LOMI_WEBHOOK_SECRET'];
 
   for (const secret of requiredSecrets) {
     if (!process.env[secret]) {
@@ -70,7 +70,7 @@ jobs:
       - name: Run tests
         run: npm test
         env:
-          LOMI_API_KEY: ${{ secrets.LOMI_TEST_API_KEY }}
+          LOMI_SECRET_KEY: ${{ secrets.LOMI_TEST_SECRET_KEY }}
           LOMI_WEBHOOK_SECRET: ${{ secrets.LOMI_TEST_WEBHOOK_SECRET }}
           LOMI_API_URL: 'https://sandbox.api.lomi.africa'
           LOMI_ENV: test
@@ -114,7 +114,7 @@ jobs:
           npm run build
           npm run deploy
         env:
-          LOMI_API_KEY: ${{ secrets.LOMI_PROD_API_KEY }}
+          LOMI_SECRET_KEY: ${{ secrets.LOMI_PROD_SECRET_KEY }}
           LOMI_WEBHOOK_SECRET: ${{ secrets.LOMI_PROD_WEBHOOK_SECRET }}
           LOMI_API_URL: 'https://api.lomi.africa'
           LOMI_ENV: production
@@ -132,11 +132,11 @@ import { LomiSDK } from '@lomi./sdk';
 
 async function runPreDeploymentChecks(): Promise<void> {
   console.log('Exécution des contrôles pré-déploiement…');
-  const apiKey = process.env.LOMI_API_KEY;
+  const apiKey = process.env.LOMI_SECRET_KEY;
   const apiUrl = process.env.LOMI_API_URL;
 
   if (!apiKey || !apiUrl) {
-    throw new Error('LOMI_API_KEY and LOMI_API_URL must be set');
+    throw new Error('LOMI_SECRET_KEY and LOMI_API_URL must be set');
   }
 
   const lomi = new LomiSDK({
@@ -177,11 +177,11 @@ describe('Payment Integration', () => {
   let lomi: LomiSDK;
 
   beforeAll(() => {
-    if (!process.env.LOMI_TEST_API_KEY || !process.env.TEST_MERCHANT_ID) {
+    if (!process.env.LOMI_TEST_SECRET_KEY || !process.env.TEST_MERCHANT_ID) {
       throw new Error('Missing test environment variables');
     }
     lomi = new LomiSDK({
-      apiKey: process.env.LOMI_TEST_API_KEY,
+      apiKey: process.env.LOMI_TEST_SECRET_KEY,
       baseUrl: 'https://sandbox.api.lomi.africa',
     });
   });
@@ -290,7 +290,7 @@ export async function checkServiceHealth(): Promise<{
 }> {
   const errors: string[] = [];
   const lomi = new LomiSDK({
-    apiKey: process.env.LOMI_API_KEY!,
+    apiKey: process.env.LOMI_SECRET_KEY!,
     baseUrl: process.env.LOMI_API_URL!,
   });
 

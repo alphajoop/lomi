@@ -605,7 +605,7 @@ export function renderOperationPageMdx(input: {
 
   const curlLines = [
     `curl -sS -X ${method.toUpperCase()} "${servers[0]}${fullPath}"`,
-    `  -H "X-API-KEY: $LOMI_API_KEY"`,
+    `  -H "X-API-KEY: $LOMI_SECRET_KEY"`,
     shouldHaveBody ? `  -H "Content-Type: application/json"` : '',
     shouldHaveBody
       ? `  -d '${JSON.stringify(

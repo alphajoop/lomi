@@ -29,7 +29,7 @@ Use **`POST /payouts`** for all outbound money movement.
 ```typescript
 import { LomiSDK } from '@lomi./sdk';
 
-const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY!, environment: 'live' });
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY!, environment: 'live' });
 
 // Withdraw to your registered Wave mobile money method
 await lomi.payouts.create({
@@ -55,7 +55,7 @@ await lomi.payouts.create({
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/payouts" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "destination": "beneficiary",

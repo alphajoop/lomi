@@ -20,7 +20,7 @@ The Payment requests API allows you to create timed payment requests for custome
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -47,7 +47,7 @@ from lomi import LomiClient
 import os
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"
 )
 
@@ -67,7 +67,7 @@ print(f"Payment request: {request['id']}")
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/payment-requests" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 50000,
@@ -108,7 +108,7 @@ requests = client.payment_requests.list(status="pending", limit=20)
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/payment-requests?status=pending&limit=20" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 
@@ -138,7 +138,7 @@ request = client.payment_requests.get('pr_abc123...')
 <Tab value="cURL">
 ```bash
 curl -X GET "https://api.lomi.africa/payment-requests/pr_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
 

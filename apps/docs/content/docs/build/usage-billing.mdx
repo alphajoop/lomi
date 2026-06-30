@@ -23,7 +23,7 @@ Define the billable metric code your app will send on each usage event.
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/meters" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "api_calls",
@@ -41,7 +41,7 @@ Before ingesting usage for a customer, enroll them on the usage-based product.
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/usage-subscriptions" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "customer_id": "cus_...",
@@ -57,7 +57,7 @@ Send usage as it happens. Use a stable `transaction_id` per logical event for id
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "transaction_id": "evt_unique_123",
@@ -97,7 +97,7 @@ Returns **202 Accepted**; processing is asynchronous.
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "transaction_id": "radar_screen_evt_123",

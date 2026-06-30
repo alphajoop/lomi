@@ -18,8 +18,8 @@ import { LomiSDK } from '@lomi./sdk';
 import 'dotenv/config';
 
 export const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
-  environment: process.env.LOMI_API_KEY?.includes('_test_') ? 'test' : 'live',
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: process.env.LOMI_SECRET_KEY?.includes('_test_') ? 'test' : 'live',
 });
 ```
 
@@ -27,7 +27,7 @@ export const lomi = new LomiSDK({
 
 | Variable | Description |
 | --- | --- |
-| `LOMI_API_KEY` | Secret API key from the dashboard |
+| `LOMI_SECRET_KEY` | Secret API key from the dashboard |
 | `LOMI_WEBHOOK_SECRET` | Webhook signing secret (`whsec_…`) |
 | `LOMI_API_URL` | Optional API base URL override (use `baseUrl` on `LomiSDK` instead) |
 

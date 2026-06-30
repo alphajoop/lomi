@@ -9,12 +9,12 @@ export function buildServerInstructions(mode: InstructionMode): string {
   const baseUrl = getLomiApiBaseUrl();
   const lines = [
     'lomi. merchant REST API exposed as MCP tools.',
-    `Default API base URL: ${baseUrl}. Override with LOMI_API_BASE_URL (sandbox: https://sandbox.api.lomi.africa).`,
+    `Default API base URL: ${baseUrl}. Override with LOMI_API_URL (sandbox: https://sandbox.api.lomi.africa).`,
     '',
     'Authentication:',
     mode === 'http'
       ? '- Merchant key: x-lomi-api-key or x-api-key on MCP session initialize (required for tool calls).'
-      : '- Merchant key: LOMI_API_KEY or X_API_KEY in server environment.',
+      : '- Merchant key: LOMI_SECRET_KEY or X_API_KEY in server environment.',
     mode === 'http'
       ? '- Transport gate: Authorization Bearer LOMI_MCP_BEARER_TOKEN when configured on the host.'
       : '',

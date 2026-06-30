@@ -59,7 +59,7 @@ This avoids exposing an empty portal to contacts that never transacted.
 ```typescript
 import axios from "axios";
 
-const apiKey = process.env.LOMI_API_KEY!;
+const apiKey = process.env.LOMI_SECRET_KEY!;
 const customerId = "2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265";
 
 const { data } = await axios.post(
@@ -86,7 +86,7 @@ return data.launch_url;
 <Tab value="cURL">
 ```bash
 curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265/portal-launch-session" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "return_url": "https://merchant.example.com/account",

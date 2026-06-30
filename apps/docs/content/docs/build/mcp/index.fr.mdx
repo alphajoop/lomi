@@ -21,14 +21,14 @@ Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude 
 
 ## Ce dont vous avez besoin (deux valeurs)
 
-| Valeur | En-tête | Où l’obtenir |
+| Valeur | En-tête / variable d’env | Où l’obtenir |
 | --- | --- | --- |
-| **Clé API marchande** | `x-lomi-api-key` | [Tableau de bord](https://dashboard.lomi.africa) → **Développeurs → Clés API**: toute clé **secrète** (`lomi_sk_…`) ou clé MCP (`lomi_mcp_…`) depuis **Connecter MCP** |
+| **Clé secrète (`LOMI_SECRET_KEY`)** | `x-lomi-api-key` (HTTP) ou `LOMI_SECRET_KEY` (stdio) | [Tableau de bord](https://dashboard.lomi.africa) → **Développeurs → Clés API**: toute clé **secrète** (`lomi_sk_…`) ou clé MCP (`lomi_mcp_…`) depuis **Connecter MCP** |
 | **Jeton de transport** (serveur hébergé uniquement) | `Authorization: Bearer …` | Valeur fournie par lomi. pour accéder au serveur MCP partagé `https://mcp.lomi.africa`, remplacez `YOUR_TRANSPORT_SECRET` dans l’extrait |
 
-Votre **clé marchande** identifie votre organisation et limite chaque appel d’outil.
+Votre **`LOMI_SECRET_KEY`** identifie votre organisation et limite chaque appel d’outil.
 
-Le **jeton de transport** ne fait qu’ouvrir l’accès au point de terminaison MCP hébergé par lomi. Ce n’est **pas** votre clé marchande, ne mettez pas votre clé API dans `Authorization` quand un jeton de transport est requis.
+Le **jeton de transport** ne fait qu’ouvrir l’accès au point de terminaison MCP hébergé par lomi. Ce n’est **pas** votre clé secrète — ne mettez pas `LOMI_SECRET_KEY` dans `Authorization` quand un jeton de transport est requis.
 
 ## Connexion HTTP (Cursor, Claude Desktop)
 
@@ -49,7 +49,7 @@ Exemple de config **Cursor** / **Claude Desktop** :
       "url": "https://mcp.lomi.africa/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
-        "x-lomi-api-key": "YOUR_MERCHANT_API_KEY"
+        "x-lomi-api-key": "YOUR_LOMI_SECRET_KEY"
       }
     }
   }
@@ -71,8 +71,8 @@ Lance le serveur MCP sur votre machine, pas de jeton de transport. Idéal pour l
       "command": "npx",
       "args": ["-y", "@lomi./mcp"],
       "env": {
-        "LOMI_API_KEY": "YOUR_MERCHANT_API_KEY",
-        "LOMI_API_BASE_URL": "https://api.lomi.africa"
+        "LOMI_SECRET_KEY": "YOUR_LOMI_SECRET_KEY",
+        "LOMI_API_URL": "https://api.lomi.africa"
       }
     }
   }
@@ -89,12 +89,12 @@ Utilisez `https://sandbox.api.lomi.africa` pour des données sandbox.
 
 ## Sandbox vs production
 
-| Mode | `LOMI_API_BASE_URL` (stdio) | Clés API |
+| Mode | `LOMI_API_URL` (stdio) | Clés API |
 | --- | --- | --- |
 | **Production** | `https://api.lomi.africa` | Clés secrètes live du tableau de bord |
 | **Sandbox** | `https://sandbox.api.lomi.africa` | Clés secrètes sandbox du tableau de bord |
 
-En HTTP MCP, les appels utilisent l’environnement API associé à votre clé marchande.
+En HTTP MCP, les appels utilisent l’environnement API associé à votre `LOMI_SECRET_KEY`.
 
 ## Outils, ressources et prompts
 

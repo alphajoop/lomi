@@ -23,7 +23,7 @@ Définissez le code de métrique facturable que votre application enverra à cha
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/meters" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "api_calls",
@@ -41,7 +41,7 @@ Avant d'ingérer de l'usage pour un client, inscrivez-le sur le produit à l'usa
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/usage-subscriptions" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "customer_id": "cus_...",
@@ -57,7 +57,7 @@ Envoyez l'usage au fil de l'eau. Utilisez un `transaction_id` stable par événe
 
 ```bash
 curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
-  -H "Authorization: Bearer $LOMI_API_KEY" \
+  -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "transaction_id": "evt_unique_123",

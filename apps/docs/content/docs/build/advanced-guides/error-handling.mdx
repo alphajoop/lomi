@@ -31,7 +31,7 @@ These occur when the request data is invalid or missing required fields.
 ```typescript filename="Handling validation errors (example)"
 import { LomiSDK, LomiError } from '@lomi./sdk'; // Assuming SDK exports error type
 
-const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY! });
 
 try {
   const session = await lomi.checkoutSessions.createCheckoutSession({
@@ -54,7 +54,7 @@ try {
 
 ### Authentication errors (HTTP 401)
 
-These occur when the `LOMI_API_KEY` is missing, invalid, or doesn't have the necessary permissions.
+These occur when the `LOMI_SECRET_KEY` is missing, invalid, or doesn't have the necessary permissions.
 
 ```typescript filename="Handling authentication errors (example)"
 import { LomiSDK, LomiError } from '@lomi./sdk';
@@ -67,13 +67,13 @@ try {
   if (error instanceof LomiApiError && error.statusCode === 401) {
     console.error('Authentication failed:', error.message);
     // Check common issues:
-    if (!process.env.LOMI_API_KEY) {
+    if (!process.env.LOMI_SECRET_KEY) {
       console.error(
-        'Suggestion: LOMI_API_KEY environment variable might be missing.',
+        'Suggestion: LOMI_SECRET_KEY environment variable might be missing.',
       );
     } else {
       console.error(
-        'Suggestion: Verify the LOMI_API_KEY is correct and active.',
+        'Suggestion: Verify the LOMI_SECRET_KEY is correct and active.',
       );
     }
   } else {
@@ -89,7 +89,7 @@ Occur when you exceed the allowed number of requests within a given time window 
 ```typescript filename="Handling rate limit errors (example)"
 import { LomiSDK, LomiError } from '@lomi./sdk';
 
-const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY! });
 
 async function makeRequestWithRateLimitHandling() {
   try {

@@ -13,7 +13,7 @@ Always use your **Test API Key** (`lomi_sk_test_...`) for development and testin
 import { LomiSDK } from '@lomi./sdk'; // Your SDK package
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_TEST_API_KEY, // Use the TEST key from environment
+  apiKey: process.env.LOMI_TEST_SECRET_KEY, // Use the TEST key from environment
   baseUrl: 'https://sandbox.api.lomi.africa', // Point to the sandbox URL
 });
 ```
@@ -58,7 +58,7 @@ describe('Checkout Session Flow', () => {
 
   beforeAll(() => {
     lomi = new LomiSDK({
-      apiKey: process.env.LOMI_TEST_API_KEY!,
+      apiKey: process.env.LOMI_TEST_SECRET_KEY!,
       baseUrl: 'https://sandbox.api.lomi.africa',
     });
   });
@@ -351,7 +351,7 @@ jobs:
       - name: Run Unit & Integration Tests
         run: npm test
         env:
-          LOMI_TEST_API_KEY: ${{ secrets.LOMI_TEST_API_KEY }}
+          LOMI_TEST_SECRET_KEY: ${{ secrets.LOMI_TEST_SECRET_KEY }}
           LOMI_TEST_WEBHOOK_SECRET: ${{ secrets.LOMI_TEST_WEBHOOK_SECRET }}
           TEST_MERCHANT_ID: ${{ secrets.TEST_MERCHANT_ID }}
           # Add other necessary test env vars

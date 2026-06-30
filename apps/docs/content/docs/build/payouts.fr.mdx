@@ -40,7 +40,7 @@ await lomi.payouts.create({
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/payouts" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"destination":"beneficiary","rail":"wave","amount":10000,"currency_code":"XOF","recipient":{"name":"Ada","phone":"+221771234567"}}'
 ```

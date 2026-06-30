@@ -90,7 +90,7 @@ const subscriptionSession = await lomi.checkoutSessions.create({
 import { LomiSDK } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_API_KEY!,
+  apiKey: process.env.LOMI_SECRET_KEY!,
   environment: 'live',
 });
 
@@ -136,7 +136,7 @@ from lomi import LomiClient
 import os
 
 client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
+    api_key=os.environ["LOMI_SECRET_KEY"],
     environment="test"
 )
 
@@ -169,7 +169,7 @@ print(f"Redirect to: {session['checkout_url']}")
 <Tab value="cURL">
 ```bash
 curl -X POST "https://api.lomi.africa/checkout-sessions" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 10000,

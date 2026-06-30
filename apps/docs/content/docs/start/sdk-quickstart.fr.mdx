@@ -1,0 +1,132 @@
+---
+title: 'Démarrer avec le SDK'
+description: 'Installez le SDK lomi., configurez votre clé API, effectuez votre premier appel sandbox, créez un checkout de test et vérifiez les webhooks.'
+---
+
+Le **SDK lomi.** est le moyen le plus rapide d'appeler l'API lomi. depuis le code de votre application, créer des sessions de checkout, gérer les clients et abonnements, émettre des remboursements et vérifier les webhooks, avec des méthodes typées et une gestion d'erreurs intégrée.
+
+Ce guide utilise le **SDK TypeScript** (`@lomi./sdk`). Le même parcours s'applique à [Python](/build/sdks/python), [Go](/build/sdks/go) et [PHP](/build/sdks/php).
+
+<Steps>
+
+### Installer le SDK
+
+```bash filename="Terminal"
+npm install @lomi./sdk
+```
+
+Également disponible avec `pnpm add`, `yarn add` ou `bun add`. Consultez la [référence du SDK TypeScript](/build/sdks/typescript) pour les autres runtimes.
+
+### Ajouter votre clé API de test
+
+Copiez une **clé secrète de test** (`lomi_sk_test_…`) depuis **Paramètres → Jetons d'accès** et ajoutez-la à un fichier `.env`. Voir [Jetons d'accès](/start/api-keys).
+
+```bash filename=".env"
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+```
+
+<Callout type="info" emoji="💡" title="Laissez le CLI le configurer pour vous">
+  `lomi init` écrit automatiquement le client SDK, des fichiers d'exemple et votre `.env`. Voir le [guide CLI quickstart](/start/cli-quickstart) et [Initialiser un projet](/build/cli/init).
+</Callout>
+
+### Effectuer votre premier appel sandbox
+
+Créez `first-call.ts`, puis récupérez le solde de votre sandbox pour confirmer que la clé fonctionne :
+
+```typescript
+import { LomiSDK, LomiAuthError } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'test', // sandbox ; utilisez 'live' uniquement en production
+});
+
+async function main() {
+  try {
+    const balance = await lomi.accounts.getBalance();
+    console.log('Solde :', balance);
+  } catch (error) {
+    if (error instanceof LomiAuthError) {
+      console.error(`Échec d'authentification [${error.statusCode}] : ${error.message}`);
+      process.exit(1);
+    }
+    throw error;
+  }
+}
+
+main();
+```
+
+```bash filename="Terminal"
+npm install @lomi./sdk
+# chargez .env avec votre outillage (dotenv, Next.js, etc.)
+npx tsx first-call.ts
+```
+
+### Créer un checkout de test
+
+```typescript
+const session = await lomi.checkoutSessions.create({
+  amount: 10000,
+  currency_code: 'XOF',
+  title: 'Abonnement premium',
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel',
+});
+
+console.log('Rediriger vers :', session.checkout_url);
+```
+
+Ouvrez `checkout_url` dans votre navigateur et payez avec une [méthode de test sandbox](/start/sandbox-payments).
+
+### Vérifier un webhook
+
+Confirmez que les événements sont authentiques avant de leur faire confiance, sans HMAC manuel :
+
+```typescript
+import { verifyWebhookSignature } from '@lomi./sdk';
+
+const valid = verifyWebhookSignature(
+  rawBody,                          // corps brut (string ou Buffer), pas du JSON parsé
+  req.headers['x-lomi-signature'],
+  process.env.LOMI_WEBHOOK_SECRET!,
+);
+
+if (!valid) return res.status(401).send('Signature invalide');
+```
+
+Transférez les événements vers votre serveur local avec le CLI, sans ngrok :
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+Voir [Écouter les webhooks](/build/cli/listen) et [Webhooks](/build/webhooks).
+
+</Steps>
+
+## À construire ensuite
+
+| Objectif | Référence |
+| --- | --- |
+| API complète du SDK TypeScript | [SDK TypeScript](/build/sdks/typescript) |
+| Autres langages | [Python](/build/sdks/python) · [Go](/build/sdks/go) · [PHP](/build/sdks/php) |
+| Checkout hébergé | [Checkout](/build/checkout) |
+| Facturation récurrente | [Abonnements](/build/subscriptions) |
+| Gestion des erreurs | [Gestion des erreurs](/build/advanced-guides/error-handling) |
+
+## Deux types d'identifiants
+
+<Callout type="info" emoji="💡" title="Clé API vs jeton CLI">
+  Le **SDK** utilise votre **clé API secrète** (`LOMI_SECRET_KEY`) dans le code de l'application.
+
+  Le **CLI** utilise un **jeton CLI** distinct issu de `lomi login` pour les commandes terminal comme `checkout create` et `listen`.
+
+  Ce sont des identifiants différents pour des usages différents.
+</Callout>
+
+## Suite
+
+- [Effectuer un paiement de test](/start/first-payment) : parcours CLI et cURL
+- [Choisir une intégration](/build/choose-integration) : checkout hébergé, liens, abonnements
+- [Passer en production](/start/go-live) : check-list de mise en ligne

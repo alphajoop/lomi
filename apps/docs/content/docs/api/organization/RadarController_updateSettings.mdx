@@ -95,7 +95,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 
 ```bash
 curl -sS -X PATCH "https://sandbox.api.lomi.africa/organization/radar-settings" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"enabled":true,"mode":"monitor","stripe_radar_passthrough":true}'
 ```

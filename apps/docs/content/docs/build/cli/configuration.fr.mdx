@@ -61,14 +61,14 @@ Définies par [`lomi init`](/build/cli/init) à la racine du projet :
 
 | Variable | Description |
 | --- | --- |
-| `LOMI_API_KEY` | Clé API secrète pour le SDK (`lomi_sk_test_…` / `lomi_sk_live_…`) |
+| `LOMI_SECRET_KEY` | Clé API secrète pour le SDK (`lomi_sk_test_…` / `lomi_sk_live_…`) |
 | `LOMI_WEBHOOK_SECRET` | Secret de signature webhook |
 | `LOMI_API_URL` | URL de base API (`https://api.lomi.africa` ou sandbox) |
 
 <Callout type="warning" emoji="⚠️" title="Deux types d’identifiants">
   **`LOMI_ACCESS_TOKEN`** : authentifie la **CLI** (via `lomi login`).
 
-  **`LOMI_API_KEY`** : authentifie le **SDK** de votre application (portail marchand, stockée dans `.env` par `lomi init`).
+  **`LOMI_SECRET_KEY`** : authentifie le **SDK** de votre application (portail marchand, stockée dans `.env` par `lomi init`).
 </Callout>
 
 ## Fichier de config projet
@@ -105,13 +105,13 @@ Les profils `sandbox` et `default` mappent automatiquement l’URL appropriée l
 
 ```bash filename="Terminal"
 export LOMI_ACCESS_TOKEN="${{ secrets.LOMI_CLI_TOKEN }}"
-export LOMI_API_KEY="${{ secrets.LOMI_API_KEY }}"
+export LOMI_SECRET_KEY="${{ secrets.LOMI_SECRET_KEY }}"
 
 lomi status
 lomi init --yes \
   --environment sandbox \
   --language ts \
-  --api-key "$LOMI_API_KEY" \
+  --api-key "$LOMI_SECRET_KEY" \
   --skip-package-install \
   --skip-rules-install
 ```

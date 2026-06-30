@@ -21,7 +21,7 @@ Les litiges sont créés automatiquement lorsque le réseau carte envoie des év
 
 ```bash
 curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ### Paramètres de requête
@@ -57,7 +57,7 @@ curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
 
 ```bash
 curl "https://api.lomi.africa/disputes/{dispute_id}" \
-  -H "X-API-KEY: $LOMI_API_KEY"
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 La réponse détaillée inclut aussi `evidence_details`, `transaction_gross_amount` et `transaction_status`.

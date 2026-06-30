@@ -357,11 +357,11 @@ mod templates {
             r#"import { DefaultService, OpenAPI } from '@lomi./sdk';
 import 'dotenv/config';
 
-const apiKey = process.env.LOMI_API_KEY;
+const apiKey = process.env.LOMI_SECRET_KEY;
 const baseUrl = process.env.LOMI_API_URL || undefined;
 
 if (!apiKey) {
-  console.error('Error: LOMI_API_KEY not found in environment variables.');
+  console.error('Error: LOMI_SECRET_KEY not found in environment variables.');
   process.exit(1);
 }
 
@@ -378,11 +378,11 @@ export default lomiApi;
             r#"const { DefaultService, OpenAPI } = require('@lomi./sdk');
 require('dotenv').config();
 
-const apiKey = process.env.LOMI_API_KEY;
+const apiKey = process.env.LOMI_SECRET_KEY;
 const baseUrl = process.env.LOMI_API_URL || undefined;
 
 if (!apiKey) {
-  console.error('Error: LOMI_API_KEY not found in environment variables.');
+  console.error('Error: LOMI_SECRET_KEY not found in environment variables.');
   process.exit(1);
 }
 
@@ -608,7 +608,7 @@ server.listen(PORT, () => console.log(`Webhook server listening on http://localh
     pub fn env_file(api_key: &str, api_url: &str) -> String {
         format!(
             r#"# lomi. environment variables
-LOMI_API_KEY={api_key}
+LOMI_SECRET_KEY={api_key}
 # Run `lomi listen` to receive your webhook secret, or copy from the dashboard
 LOMI_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 LOMI_API_URL={api_url}

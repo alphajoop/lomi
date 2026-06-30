@@ -58,7 +58,7 @@ function registerOneTool(
             {
               type: 'text',
               text:
-                'Missing merchant API key: provide x-lomi-api-key (or x-api-key) when creating MCP session, or set server-side LOMI_API_KEY fallback. See https://docs.lomi.africa/build/mcp',
+                'Missing merchant API key: provide x-lomi-api-key (or x-api-key) when creating MCP session, or set server-side LOMI_SECRET_KEY fallback. See https://docs.lomi.africa/build/mcp',
             },
           ],
           isError: true,
