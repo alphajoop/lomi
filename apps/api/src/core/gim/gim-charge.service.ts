@@ -10,7 +10,7 @@ import {
 import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
 import { buildCreateOrUpdateCustomerRpcArgs } from '../../utils/customers/create-or-update-customer-rpc';
-import { CreateGimChargeDto } from '../charges/dto/create-gim-charge.dto';
+import { CreateSwitchChargeDto } from '../charges/dto/create-switch-charge.dto';
 import {
   attachChargeNextAction,
   deriveGimChargeNextAction,
@@ -65,7 +65,7 @@ export class GimChargeService {
   ) {}
 
   async create(
-    createDto: CreateGimChargeDto,
+    createDto: CreateSwitchChargeDto,
     user: AuthContext,
     idempotency?: ApiIdempotencyContext,
     scenarioKey?: GimChargeScenarioKey,
@@ -73,7 +73,7 @@ export class GimChargeService {
     const scope = {
       organizationId: user.organizationId,
       environment: environmentFromAuth(user),
-      endpointRoute: 'POST:/charge/gim',
+      endpointRoute: 'POST:/charge/switch',
     };
     return withApiIdempotency(this.supabase, scope, idempotency, () =>
       this.executeCreate(createDto, user, scenarioKey),
@@ -81,7 +81,7 @@ export class GimChargeService {
   }
 
   private async executeCreate(
-    createDto: CreateGimChargeDto,
+    createDto: CreateSwitchChargeDto,
     user: AuthContext,
     scenarioKey?: GimChargeScenarioKey,
   ) {
@@ -426,7 +426,7 @@ export class GimChargeService {
   }
 
   private async resolveCustomerId(
-    createDto: CreateGimChargeDto,
+    createDto: CreateSwitchChargeDto,
     user: AuthContext,
     ledgerMerchantId: string,
   ): Promise<string> {
@@ -464,7 +464,7 @@ export class GimChargeService {
   }
 
   private async createPendingTransaction(params: {
-    createDto: CreateGimChargeDto;
+    createDto: CreateSwitchChargeDto;
     user: AuthContext;
     merchantId: string;
     paymentEnv: string;

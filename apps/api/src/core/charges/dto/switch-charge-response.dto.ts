@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ChargeNextActionDto } from './charge-next-action.dto';
 
-export class GimChargeResponseDto {
+export class SwitchChargeResponseDto {
   @ApiProperty({ type: Boolean })
   success: boolean;
 

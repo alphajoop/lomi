@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class CreateGimChargeDto {
+export class CreateSwitchChargeDto {
   @ApiProperty({
     type: Number,
     example: 10000,

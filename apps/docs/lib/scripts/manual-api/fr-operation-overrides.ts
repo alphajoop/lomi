@@ -30,11 +30,11 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     related:
       '[Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) si vous préférez l’encaissement hébergé.',
   },
-  ChargesController_createGimCharge: {
+  ChargesController_createSwitchCharge: {
     whenToUse:
-      'Utilisez pour la capture carte côté serveur lorsque votre intégration appelle GIM Pay directement plutôt que le checkout hébergé ou Payment Elements.',
+      'Utilisez lorsque votre intégration est conforme PCI-DSS et soumet les informations de carte côté serveur, plutôt que de collecter les cartes via le checkout hébergé ou Payment Elements.',
     caveats:
-      'Traitez PAN/CVV uniquement dans un environnement conforme PCI. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.',
+      'La soumission des informations de carte brutes nécessite une intégration conforme PCI-DSS. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.',
     related:
       '[Créer un encaissement carte](/api/charge/ChargesController_createCardCharge) · [Encaissements directs](/build/direct-charges)',
   },

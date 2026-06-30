@@ -27,9 +27,9 @@ import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-head
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
-import { CreateGimChargeDto } from './dto/create-gim-charge.dto';
+import { CreateSwitchChargeDto } from './dto/create-switch-charge.dto';
 import { CardChargeResponseDto } from './dto/card-charge-response.dto';
-import { GimChargeResponseDto } from './dto/gim-charge-response.dto';
+import { SwitchChargeResponseDto } from './dto/switch-charge-response.dto';
 import { MtnChargeResponseDto } from './dto/mtn-charge-response.dto';
 import { WaveChargeResponseDto } from './dto/wave-charge-response.dto';
 import { GimChargeService } from '../gim/gim-charge.service';
@@ -132,21 +132,21 @@ export class ChargesController {
       });
   }
 
-  @Post('gim')
+  @Post('switch')
   @ApiLomiAccountHeader()
   @ApiOperation({
-    summary: 'Create GIM Pay card charge (direct PayByCard)',
+    summary: 'Create Switch charge (server-side card authorization)',
     description:
-      'Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail to try another card-payment rail.',
+      'Authorizes a card from server-supplied credentials and routes it across acquiring rails. May return a redirect URL for 3DS authentication or signal `retry_other_rail` to fall back to another rail. Requires a PCI-DSS-compliant integration.',
   })
   @ApiResponse({
     status: 201,
-    description: 'GIM charge created',
-    type: GimChargeResponseDto,
+    description: 'Switch charge created',
+    type: SwitchChargeResponseDto,
   })
-  @ApiBody({ type: CreateGimChargeDto })
-  createGimCharge(
-    @Body() createDto: CreateGimChargeDto,
+  @ApiBody({ type: CreateSwitchChargeDto })
+  createSwitchCharge(
+    @Body() createDto: CreateSwitchChargeDto,
     @CurrentUser() user: AuthContext,
     @Headers('idempotency-key') idempotencyKey?: string | string[],
     @Headers('x-scenario-key') scenarioHeader?: string | string[],

@@ -1,26 +1,26 @@
 ---
-title: "Create GIM Pay card charge (direct PayByCard)"
-description: "Create GIM Pay card charge (direct PayByCard)"
+title: "Create Switch charge (server-side card authorization)"
+description: "Create Switch charge (server-side card authorization)"
 full: true
 method: post
-path: /charge/gim
-operationId: ChargesController_createGimCharge
+path: /charge/switch
+operationId: ChargesController_createSwitchCharge
 ---
 
 ## Aperçu
 
-Create GIM Pay card charge (direct PayByCard)
+Create Switch charge (server-side card authorization)
 
-Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail to try another card-payment rail.
+Authorizes a card from server-supplied credentials and routes it across acquiring rails. May return a redirect URL for 3DS authentication or signal `retry_other_rail` to fall back to another rail. Requires a PCI-DSS-compliant integration.
 
 
 ### Quand l’utiliser
 
-Utilisez pour la capture carte côté serveur lorsque votre intégration appelle GIM Pay directement plutôt que le checkout hébergé ou Payment Elements.
+Utilisez lorsque votre intégration est conforme PCI-DSS et soumet les informations de carte côté serveur, plutôt que de collecter les cartes via le checkout hébergé ou Payment Elements.
 
 ### À savoir
 
-Traitez PAN/CVV uniquement dans un environnement conforme PCI. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.
+La soumission des informations de carte brutes nécessite une intégration conforme PCI-DSS. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.
 
 ### Voir aussi
 
@@ -33,7 +33,7 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 ## Endpoint
 
-`POST /charge/gim`
+`POST /charge/switch`
 
 URLs de base :
 
@@ -62,7 +62,7 @@ _Aucun paramètre de requête._
 
 Corps JSON.
 
-Schéma: `CreateGimChargeDto`
+Schéma: `CreateSwitchChargeDto`
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
@@ -100,7 +100,7 @@ Exemple de corps :
 
 | Statut | Description |
 | --- | --- |
-| `201` | GIM charge created |
+| `201` | Switch charge created |
 
 ## Erreurs
 
@@ -109,7 +109,7 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 ## Exemple
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/charge/gim" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/switch" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"amount":10000,"pan":"4221941234569109","expiry":"06/25","cvv":"123"}'
@@ -117,7 +117,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/gim" \
 
 ## OpenAPI
 
-- **operationId**: `ChargesController_createGimCharge`
-- **Operation**: `POST /charge/gim`
+- **operationId**: `ChargesController_createSwitchCharge`
+- **Operation**: `POST /charge/switch`
 
 Schémas complets et **Try it** : [référence API](/api).

@@ -1,26 +1,26 @@
 ---
-title: "Create GIM Pay card charge (direct PayByCard)"
-description: "Create GIM Pay card charge (direct PayByCard)"
+title: "Create Switch charge"
+description: "Create Switch charge"
 full: true
 method: post
-path: /charge/gim
-operationId: ChargesController_createGimCharge
+path: /charge/switch
+operationId: ChargesController_createSwitchCharge
 ---
 
 ## Overview
 
-Create GIM Pay card charge (direct PayByCard)
+Create Switch charge
 
-Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal `retry_other_rail` to try another card-payment rail.
+Authorizes a card from server-supplied credentials and routes it across acquiring rails. May return a 3DS redirect URL or signal `retry_other_rail` to fall back to another rail.
 
 
 ### When to use this
 
-Use for server-side card capture when your integration calls GIM Pay directly rather than hosted checkout or embedded Payment Elements.
+Use when your integration is PCI-DSS compliant and submits card credentials server-side, rather than collecting cards through hosted checkout or embedded Payment Elements.
 
 ### Good to know
 
-Handle PAN/CVV only in PCI-scoped environments. Follow `next_action` for 3DS redirects and `retry_other_rail` when the primary rail declines.
+Submitting raw card credentials requires a PCI-DSS-compliant integration. Follow `next_action` for 3DS redirects and `retry_other_rail` when the primary rail declines.
 
 ### See also
 
@@ -33,7 +33,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`POST /charge/gim`
+`POST /charge/switch`
 
 Base URLs:
 
@@ -62,7 +62,7 @@ _No query parameters._
 
 JSON request payload.
 
-Schema: `CreateGimChargeDto`
+Schema: `CreateSwitchChargeDto`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
@@ -100,7 +100,7 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | GIM charge created |
+| `201` | Switch charge created |
 
 ## Errors
 
@@ -109,7 +109,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/charge/gim" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/switch" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"amount":10000,"pan":"4221941234569109","expiry":"06/25","cvv":"123"}'
@@ -117,7 +117,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/gim" \
 
 ## OpenAPI
 
-- **operationId**: `ChargesController_createGimCharge`
-- **Operation**: `POST /charge/gim`
+- **operationId**: `ChargesController_createSwitchCharge`
+- **Operation**: `POST /charge/switch`
 
 Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

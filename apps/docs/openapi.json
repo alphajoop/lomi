@@ -4097,10 +4097,10 @@
         ]
       }
     },
-    "/charge/gim": {
+    "/charge/switch": {
       "post": {
-        "description": "Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail to try another card-payment rail.",
-        "operationId": "ChargesController_createGimCharge",
+        "description": "Authorizes a card from server-supplied credentials and routes it across acquiring rails. May return a redirect URL for 3DS authentication or signal `retry_other_rail` to fall back to another rail. Requires a PCI-DSS-compliant integration.",
+        "operationId": "ChargesController_createSwitchCharge",
         "parameters": [
           {
             "name": "Lomi-Account",
@@ -4118,18 +4118,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateGimChargeDto"
+                "$ref": "#/components/schemas/CreateSwitchChargeDto"
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "GIM charge created",
+            "description": "Switch charge created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GimChargeResponseDto"
+                  "$ref": "#/components/schemas/SwitchChargeResponseDto"
                 }
               }
             }
@@ -4140,7 +4140,7 @@
             "api-key": []
           }
         ],
-        "summary": "Create GIM Pay card charge (direct PayByCard)",
+        "summary": "Create Switch charge (server-side card authorization)",
         "tags": [
           "Advanced Direct Charges"
         ]
@@ -7395,7 +7395,7 @@
           "data"
         ]
       },
-      "CreateGimChargeDto": {
+      "CreateSwitchChargeDto": {
         "type": "object",
         "properties": {
           "amount": {
@@ -7474,7 +7474,7 @@
           "cvv"
         ]
       },
-      "GimChargeResponseDto": {
+      "SwitchChargeResponseDto": {
         "type": "object",
         "properties": {
           "success": {

@@ -6,7 +6,7 @@
     "ChargesController_createWaveCharge",
     "ChargesController_createMtnCharge",
     "ChargesController_createCardCharge",
-    "ChargesController_createGimCharge",
+    "ChargesController_createSwitchCharge",
     "ChargesController_getCardCharge",
     "ChargesController_cancelCardCharge"
   ]
