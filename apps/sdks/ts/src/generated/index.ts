@@ -3,11 +3,8 @@
  * AUTO-GENERATED — public merchant surface
  */
 
-export { OpenAPI } from './core/OpenAPI.js';
-export type { OpenAPIConfig } from './core/OpenAPI.js';
-export { request, ApiError } from './core/request.js';
-export type { ApiRequestOptions } from './core/request.js';
-
+export type { paths, components, operations } from './schema.js';
+export * from './type-aliases.js';
 export * from './types.js';
 
 export { AccountsService } from './services/AccountsService.js';
@@ -17,6 +14,7 @@ export { CustomersService } from './services/CustomersService.js';
 export { CustomerSubscriptionsService } from './services/CustomerSubscriptionsService.js';
 export { DiscountCouponsService } from './services/DiscountCouponsService.js';
 export { DisputesService } from './services/DisputesService.js';
+export { LogsService } from './services/LogsService.js';
 export { MerchantsService } from './services/MerchantsService.js';
 export { MetersService } from './services/MetersService.js';
 export { OrganizationService } from './services/OrganizationService.js';

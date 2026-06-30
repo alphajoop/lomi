@@ -3,42 +3,49 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class AccountsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `AccountsController_checkAvailableBalance`.
-     * Vérifier le solde disponible
+     * Check available balance
+     * @see OpenAPI `AccountsController_checkAvailableBalance`
      */
-    public static async checkBalance(currency: string): Promise<any> {
-        return await request<any>({
+    public async checkBalance(currency: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/accounts/balance/check/{currency}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/accounts/balance/check/{currency}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/accounts/balance/check/{currency}',
             path: { currency: currency },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `AccountsController_getBalance`.
-     * Solde du compte
+     * Account balances
+     * @see OpenAPI `AccountsController_getBalance`
      */
-    public static async getBalance(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async getBalance(params?: paths['/accounts/balance']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/accounts/balance']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/accounts/balance']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/accounts/balance',
-            query: options,
+            query: params,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `AccountsController_getBalanceBreakdown`.
-     * Détail du solde
+     * Balance breakdown
+     * @see OpenAPI `AccountsController_getBalanceBreakdown`
      */
-    public static async getBalanceBreakdown(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async getBalanceBreakdown(params?: paths['/accounts/balance/breakdown']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/accounts/balance/breakdown']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/accounts/balance/breakdown']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/accounts/balance/breakdown',
-            query: options,
+            query: params,
+            ...options,
         });
     }
 }

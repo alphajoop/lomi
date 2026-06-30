@@ -1,10 +1,9 @@
 {
   "title": "Guides",
-  "description": "End-to-end integration guides: verify payments, lifecycles, channels, and error simulation.",
+  "description": "End-to-end integration guides: verify payments, lifecycles, and error simulation.",
   "pages": [
     "verify-payments",
     "payment-lifecycle",
-    "payment-methods",
     "simulate-errors"
   ]
 }

@@ -9,6 +9,7 @@ use crate::auth::session::ensure_authenticated;
 use crate::cli::{self, CommonOptions};
 
 #[derive(Args, Debug)]
+#[command(after_help = "Example:\n  lomi listen http://localhost:3000/webhooks")]
 pub struct ListenArgs {
     /// Forward webhook events to this URL (e.g. http://localhost:3000/webhooks)
     pub forward_url: Option<String>,

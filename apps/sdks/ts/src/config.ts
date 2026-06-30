@@ -4,37 +4,48 @@
 
 export interface LomiConfig {
   /**
-   * API key for authentication
-   * Get your API key from the lomi. dashboard
+   * Secret API key (`lomi_sk_test_…` or `lomi_sk_live_…`)
    */
   apiKey: string;
 
   /**
-   * Base URL for the API
-   * @default 'https://api.lomi.africa'
+   * Sandbox (`test`) or production (`live`). Maps to the API host when `baseUrl` is omitted.
+   * @default 'live'
+   */
+  environment?: 'live' | 'test';
+
+  /**
+   * Override API base URL (optional). When omitted, `environment` selects the host.
    */
   baseUrl?: string;
 
   /**
-   * Additional headers to include in requests
+   * Default connected account for operator integrations (`acct_…` → `Lomi-Account` header).
+   */
+  account?: string;
+
+  /**
+   * Extra headers merged into every request.
    */
   headers?: Record<string, string>;
 
   /**
-   * Request timeout in milliseconds
-   * @default 30000 (30 seconds)
+   * Request timeout in milliseconds.
+   * @default 30000
    */
   timeout?: number;
 
   /**
-   * Environment: 'live' or 'test'
-   * @default 'live'
+   * Retry count for idempotent GET requests and 429 responses (exponential backoff).
+   * @default 0
    */
-  environment?: 'live' | 'test';
+  retries?: number;
 }
 
 export const DEFAULT_CONFIG = {
   baseUrl: 'https://api.lomi.africa',
+  sandboxBaseUrl: 'https://sandbox.api.lomi.africa',
   timeout: 30000,
   environment: 'live' as const,
+  retries: 0,
 };

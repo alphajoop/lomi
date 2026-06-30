@@ -3,65 +3,110 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class MetersService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `MetersController_create`.
      * Create a meter
+     * @see OpenAPI `MetersController_create`
      */
-    public static async create(): Promise<any> {
-        return await request<any>({
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/meters']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/meters',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MetersController_findOne`.
      * Get a meter
+     * @see OpenAPI `MetersController_findOne`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/meters/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/meters/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MetersController_getBalance`.
      * Get meter balance for a customer
+     * @see OpenAPI `MetersController_getBalance`
      */
-    public static async getCustomerBalance(id: string, customerId: string): Promise<any> {
-        return await request<any>({
+    public async getCustomerBalance(id: string, customerId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters/{id}/balances/{customerId}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/meters/{id}/balances/{customerId}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/meters/{id}/balances/{customerId}',
             path: { id: id, customerId: customerId },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MetersController_findAll`.
      * List meters
+     * @see OpenAPI `MetersController_findAll`
      */
-    public static async list(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async list(params?: paths['/meters']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/meters']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/meters',
-            query: options,
+            query: params,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MetersController_update`.
-     * Update a meter
+     * Auto-paginate all pages from `list`.
      */
-    public static async update(id: string): Promise<any> {
-        return await request<any>({
+    public async *listAll(
+        params?: paths['/meters']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+        options?: import("../../request-options.js").LomiRequestOptions,
+    ): AsyncGenerator<unknown, void, undefined> {
+        let page = (params as { page?: number } | undefined)?.page ?? 1;
+        const pageSize = (params as { pageSize?: number } | undefined)?.pageSize ?? 50;
+
+        while (true) {
+            const response = await this.list(
+                { ...params, page, pageSize } as paths['/meters']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+                options,
+            );
+
+            const items =
+                (response as { data?: unknown[] })?.data ??
+                (response as { items?: unknown[] })?.items;
+
+            if (!Array.isArray(items) || items.length === 0) {
+                break;
+            }
+
+            for (const item of items) {
+                yield item;
+            }
+
+            if (items.length < pageSize) {
+                break;
+            }
+
+            page += 1;
+        }
+    }
+
+    /**
+     * Update a meter
+     * @see OpenAPI `MetersController_update`
+     */
+    public async update(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/meters/{id}']['patch']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/meters/{id}']['patch']['responses'][200]['content']['application/json']>(this.client, {
             method: 'PATCH',
             url: '/meters/{id}',
             path: { id: id },
+            ...options,
         });
     }
 }

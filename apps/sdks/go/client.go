@@ -20,6 +20,7 @@ type Client struct {
 	CustomerSubscriptions *CustomerSubscriptionsService
 	DiscountCoupons *DiscountCouponsService
 	Disputes *DisputesService
+	Logs *LogsService
 	Merchants *MerchantsService
 	Meters *MetersService
 	Organization *OrganizationService
@@ -57,6 +58,7 @@ func NewClient(apiKey string, opts ...ClientOption) *Client {
 	c.CustomerSubscriptions = &CustomerSubscriptionsService{client: c}
 	c.DiscountCoupons = &DiscountCouponsService{client: c}
 	c.Disputes = &DisputesService{client: c}
+	c.Logs = &LogsService{client: c}
 	c.Merchants = &MerchantsService{client: c}
 	c.Meters = &MetersService{client: c}
 	c.Organization = &OrganizationService{client: c}

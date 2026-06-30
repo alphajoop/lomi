@@ -1,6 +1,6 @@
 ---
 title: 'How do I accept card payments?'
-description: 'Hosted checkout cards and embedded Payment Elements via POST /charge/card.'
+description: 'Choose hosted checkout for most card flows, or embedded card collection when your app needs full UI control.'
 docType: how-to
 ---
 
@@ -10,9 +10,20 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
+For most teams, card payments should start with hosted checkout. Use embedded card collection only when your product needs card entry inside your own UI.
+
 Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment Elements](/build/payments/lomi-payment-elements) and `POST /charge/card`.
 
 <DocsScreenshot name="build/cards" alt="Card payment form on lomi. hosted checkout" />
+
+## Which card flow should I use?
+
+| Flow | Use when |
+| --- | --- |
+| Hosted checkout | You want the fastest, safest card experience |
+| Payment links | You want a card-capable shareable URL |
+| Embedded card charge | You own the checkout UI and can handle client confirmation |
+| Payment Elements | You want reusable card UI primitives in your application |
 
 ## Hosted checkout (recommended)
 
@@ -27,7 +38,7 @@ Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment 
 2. Confirm with Payment Elements on your site.
 3. Poll or webhook for final `transaction_status`.
 
-See [Cards guide](/build/cards), [Charges API](/api/charge/ChargesController_createCardCharge), and the [direct charge reference app](/build/direct-charges#reference-implementation).
+See [Charges API](/api/charge/ChargesController_createCardCharge) and the [direct charge reference app](/build/direct-charges#reference-implementation).
 
 ## Sandbox test cards
 
@@ -40,7 +51,17 @@ See [Cards guide](/build/cards), [Charges API](/api/charge/ChargesController_cre
   Never use real card numbers in test mode or test numbers in live mode.
 </Callout>
 
+## Safety notes
+
+- Never handle secret keys in a browser or mobile app.
+- Treat `client_secret` values as short-lived sensitive capabilities.
+- Use publishable keys only where the card flow requires them.
+- Confirm final state from webhooks or server-side API reads.
+
 ## Related
 
+- [Hosted checkout](/build/checkout)
+- [Payment Elements](/build/payments/lomi-payment-elements)
 - [Verify payments](/build/guides/verify-payments)
 - [Simulate errors](/build/guides/simulate-errors)
+- [Sandbox payments](/start/sandbox-payments)

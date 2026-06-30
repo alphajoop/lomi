@@ -39,7 +39,7 @@ pub async fn run(common: &CommonOptions, args: TransactionsArgs) -> Result<()> {
 
 async fn list_transactions(common: &CommonOptions, args: TransactionsListArgs) -> Result<()> {
     let json = cli::output::should_use_json(common);
-    if !json {
+    if common.show_ui() {
         cli::banner::print_intro("Transactions");
     }
 
@@ -54,7 +54,7 @@ async fn list_transactions(common: &CommonOptions, args: TransactionsListArgs) -
     }
 
     if rows.is_empty() {
-        println!("{} No transactions found.", "○".bright_black());
+        cli::output::print_dim("No transactions found.");
         return Ok(());
     }
 
@@ -66,7 +66,7 @@ async fn list_transactions(common: &CommonOptions, args: TransactionsListArgs) -
 
 async fn get_transaction(common: &CommonOptions, id: &str) -> Result<()> {
     let json = cli::output::should_use_json(common);
-    if !json {
+    if common.show_ui() {
         cli::banner::print_intro("Transaction details");
     }
 

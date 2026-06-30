@@ -1,0 +1,84 @@
+---
+title: "List logs"
+description: "List logs"
+full: true
+method: get
+path: /logs
+operationId: LogsController_findAll
+---
+
+## Aperçu
+
+List logs
+
+Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.
+
+
+### Quand l’utiliser
+
+Utilisez cet endpoint quand vous devez exécuter `GET /logs` (List logs).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /logs`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+_Pas d’autre paramètre dans l’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `event` | query | Non | — | Filter activity logs by event type |
+| `failed` | query | Non | — | Only failed webhook deliveries |
+| `success` | query | Non | — | Only successful webhook deliveries |
+| `webhook_id` | query | Non | — | Filter webhook_delivery logs by webhook ID |
+| `severity` | query | Non | — |  |
+| `status` | query | Non | — | Comma-separated HTTP status codes (api_request, api_error). Example: 400,500 |
+| `end_date` | query | Non | — | ISO 8601 end timestamp (inclusive) |
+| `start_date` | query | Non | — | ISO 8601 start timestamp (inclusive) |
+| `offset` | query | Non | — |  |
+| `limit` | query | Non | — |  |
+| `type` | query | Oui | — | Log stream to query |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Paginated log list |
+| `400` | Invalid query parameters |
+| `401` | Invalid or missing API key |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/logs?event=value&failed=true" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `LogsController_findAll`
+- **Operation**: `GET /logs`
+
+Schémas complets et **Try it** : [référence API](/api).

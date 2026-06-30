@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use chrono::{DateTime, Utc};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -12,6 +13,18 @@ pub struct ProfileSettings {
     pub cli_token: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub api_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organization_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organization_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub environment: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub token_suffix: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -20,6 +33,12 @@ pub struct Settings {
     pub has_seen_rules_install_prompt: bool,
     #[serde(default)]
     pub last_rules_install_version: Option<String>,
+    #[serde(default)]
+    pub has_seen_telemetry_notice: bool,
+    #[serde(default)]
+    pub last_update_check_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub latest_known_cli_version: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -41,6 +60,14 @@ impl Default for GlobalConfig {
             settings: Settings::default(),
         }
     }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ProfileMetadata {
+    pub organization_name: Option<String>,
+    pub organization_id: Option<String>,
+    pub environment: Option<String>,
+    pub expires_at: Option<DateTime<Utc>>,
 }
 
 impl GlobalConfig {
@@ -72,16 +99,51 @@ impl GlobalConfig {
     }
 
     pub fn profile_mut(&mut self, name: &str) -> &mut ProfileSettings {
-        self.profiles
-            .entry(name.to_string())
-            .or_default()
+        self.profiles.entry(name.to_string()).or_default()
+    }
+
+    pub fn token_suffix(token: &str) -> String {
+        if token.len() > 4 {
+            token[token.len() - 4..].to_string()
+        } else {
+            "****".to_string()
+        }
     }
 
     pub fn set_token(&mut self, profile: &str, token: String, api_url: String) -> Result<()> {
         let settings = self.profile_mut(profile);
-        settings.cli_token = Some(token);
+        settings.cli_token = Some(token.clone());
         settings.api_url = Some(api_url);
+        settings.created_at = Some(Utc::now());
+        settings.token_suffix = Some(Self::token_suffix(&token));
         self.current_profile = profile.to_string();
+        self.save()
+    }
+
+    pub fn update_profile_metadata(
+        &mut self,
+        profile: &str,
+        metadata: ProfileMetadata,
+    ) -> Result<()> {
+        let settings = self.profile_mut(profile);
+        settings.organization_name = metadata.organization_name;
+        settings.organization_id = metadata.organization_id;
+        settings.environment = metadata.environment;
+        if metadata.expires_at.is_some() {
+            settings.expires_at = metadata.expires_at;
+        }
+        self.save()
+    }
+
+    pub fn clear_token(&mut self, profile: &str) -> Result<()> {
+        if let Some(settings) = self.profiles.get_mut(profile) {
+            settings.cli_token = None;
+            settings.expires_at = None;
+            settings.organization_name = None;
+            settings.organization_id = None;
+            settings.environment = None;
+            settings.token_suffix = None;
+        }
         self.save()
     }
 
@@ -97,6 +159,12 @@ impl GlobalConfig {
         let mut names: Vec<_> = self.profiles.keys().cloned().collect();
         names.sort();
         names
+    }
+
+    pub fn is_token_expired(profile: &ProfileSettings) -> bool {
+        profile
+            .expires_at
+            .is_some_and(|expires| expires <= Utc::now())
     }
 }
 
@@ -135,7 +203,7 @@ mod tests {
     #[test]
     fn roundtrip_config() -> Result<()> {
         let temp = tempfile::tempdir()?;
-        env::set_var("XDG_CONFIG_HOME", temp.path());
+        env::set_var("LOMI_CONFIG_DIR", temp.path());
 
         let mut config = GlobalConfig::default();
         config.set_token(
@@ -146,9 +214,24 @@ mod tests {
 
         let loaded = GlobalConfig::load()?;
         assert_eq!(
-            loaded.profile("sandbox").and_then(|p| p.cli_token.as_deref()),
+            loaded
+                .profile("sandbox")
+                .and_then(|p| p.cli_token.as_deref()),
             Some("test_token")
         );
+        assert_eq!(
+            loaded.profile("sandbox").and_then(|p| p.token_suffix.as_deref()),
+            Some("oken")
+        );
         Ok(())
+    }
+
+    #[test]
+    fn detects_expired_token() {
+        let profile = ProfileSettings {
+            expires_at: Some(Utc::now() - chrono::Duration::hours(1)),
+            ..Default::default()
+        };
+        assert!(GlobalConfig::is_token_expired(&profile));
     }
 }

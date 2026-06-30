@@ -3,78 +3,88 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class ChargesService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `ChargesController_cancelCardCharge`.
-     * Cancel card charge
+     * Cancel embedded card charge
+     * @see OpenAPI `ChargesController_cancelCardCharge`
      */
-    public static async cancelCardCharge(id: string): Promise<any> {
-        return await request<any>({
+    public async cancelCardCharge(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'POST',
             url: '/charge/card/{id}/cancel',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ChargesController_createCardCharge`.
-     * Create card charge (client_secret)
+     * Create embedded card charge
+     * @see OpenAPI `ChargesController_createCardCharge`
      */
-    public static async createCardCharge(body?: unknown): Promise<any> {
-        return await request<any>({
+    public async createCardCharge(body: paths['/charge/card']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/charge/card']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/charge/card']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/charge/card',
             body,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ChargesController_createMtnCharge`.
      * Create MTN MoMo charge
+     * @see OpenAPI `ChargesController_createMtnCharge`
      */
-    public static async createMtnCharge(body?: unknown): Promise<any> {
-        return await request<any>({
+    public async createMtnCharge(body: paths['/charge/mtn']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/charge/mtn']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/charge/mtn']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/charge/mtn',
             body,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ChargesController_createSwitchCharge`.
-     * Create Switch charge (server-side card authorization)
+     * Create Switch charge
+     * @see OpenAPI `ChargesController_createSwitchCharge`
      */
-    public static async createSwitchCharge(body?: unknown): Promise<any> {
-        return await request<any>({
+    public async createSwitchCharge(body: paths['/charge/switch']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/charge/switch']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/charge/switch']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/charge/switch',
             body,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ChargesController_createWaveCharge`.
-     * Create direct Wave charge
+     * Create direct mobile-money charge
+     * @see OpenAPI `ChargesController_createWaveCharge`
      */
-    public static async createWaveCharge(body?: unknown): Promise<any> {
-        return await request<any>({
+    public async createWaveCharge(body: paths['/charge/wave']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/charge/wave']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/charge/wave']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/charge/wave',
             body,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ChargesController_getCardCharge`.
-     * Retrieve card charge
+     * Get embedded card charge
+     * @see OpenAPI `ChargesController_getCardCharge`
      */
-    public static async getCardCharge(id: string): Promise<any> {
-        return await request<any>({
+    public async getCardCharge(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/charge/card/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/charge/card/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/charge/card/{id}',
             path: { id: id },
+            ...options,
         });
     }
 }

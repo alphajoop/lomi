@@ -1,0 +1,75 @@
+---
+title: "Get a log entry"
+description: "Get a log entry"
+full: true
+method: get
+path: /logs/{type}/{id}
+operationId: LogsController_findOne
+---
+
+## Overview
+
+Get a log entry
+
+Returns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.
+
+
+### When to use this
+
+Use this endpoint when your flow needs `GET /logs/&#123;type&#125;/&#123;id&#125;` (Get a log entry).
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /logs/{type}/{id}`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | Log entry UUID |
+| `type` | Yes | — |  |
+
+### Query parameters
+
+_No query parameters._
+
+
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `200` | Log entry details |
+| `401` | Invalid or missing API key |
+| `404` | Log not found or access denied |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/logs/api_request/value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `LogsController_findOne`
+- **Operation**: `GET /logs/{type}/{id}`
+
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

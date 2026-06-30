@@ -3,55 +3,63 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class MerchantsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `MerchantsController_getDetails`.
      * Get merchant details
+     * @see OpenAPI `MerchantsController_getDetails`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/merchants/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/merchants/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MerchantsController_getArr`.
      * Get merchant ARR
+     * @see OpenAPI `MerchantsController_getArr`
      */
-    public static async getArr(id: string): Promise<any> {
-        return await request<any>({
+    public async getArr(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}/arr']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/merchants/{id}/arr']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/merchants/{id}/arr',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MerchantsController_getBalance`.
-     * Get merchant account balance for a currency
+     * Get merchant balance
+     * @see OpenAPI `MerchantsController_getBalance`
      */
-    public static async getBalance(id: string, options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async getBalance(id: string, params?: paths['/merchants/{id}/balance']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}/balance']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/merchants/{id}/balance']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/merchants/{id}/balance',
             path: { id: id },
-            query: options,
+            query: params,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `MerchantsController_getMrr`.
      * Get merchant MRR
+     * @see OpenAPI `MerchantsController_getMrr`
      */
-    public static async getMrr(id: string): Promise<any> {
-        return await request<any>({
+    public async getMrr(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/merchants/{id}/mrr']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/merchants/{id}/mrr']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/merchants/{id}/mrr',
             path: { id: id },
+            ...options,
         });
     }
 }

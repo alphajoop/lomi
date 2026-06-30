@@ -3,89 +3,149 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
+import { verifyWebhookSignature } from '../../webhook-verify.js';
 
 export class WebhooksService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `WebhooksController_create`.
-     * Créer un webhook
+     * Create webhook
+     * @see OpenAPI `WebhooksController_create`
      */
-    public static async create(): Promise<any> {
-        return await request<any>({
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'POST',
             url: '/webhooks',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `WebhooksController_remove`.
-     * Supprimer un webhook
+     * Delete webhook
+     * @see OpenAPI `WebhooksController_remove`
      */
-    public static async delete(id: string): Promise<any> {
-        return await request<any>({
+    public async delete(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'DELETE',
             url: '/webhooks/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `WebhooksController_findOne`.
-     * Obtenir un webhook par ID
+     * Retrieve webhook
+     * @see OpenAPI `WebhooksController_findOne`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/webhooks/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/webhooks/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/webhooks/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `WebhooksController_findAll`.
-     * Lister les webhooks
+     * List webhooks
+     * @see OpenAPI `WebhooksController_findAll`
      */
-    public static async list(): Promise<any> {
-        return await request<any>({
+    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/webhooks']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/webhooks']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/webhooks',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `WebhooksController_retryDelivery`.
-     * Relancer une livraison webhook
+     * Auto-paginate all pages from `list`.
      */
-    public static async retryDelivery(webhookId: string, logId: string): Promise<any> {
-        return await request<any>({
+    public async *listAll(
+        options?: import("../../request-options.js").LomiRequestOptions,
+    ): AsyncGenerator<unknown, void, undefined> {
+        let page = 1;
+        const pageSize = 50;
+
+        while (true) {
+            const response = await requestWithClient<paths['/webhooks']['get']['responses'][200]['content']['application/json']>(this.client, {
+                method: 'GET',
+                url: '/webhooks',
+                query: { page, pageSize },
+                ...options,
+            });
+
+            const items =
+                (response as { data?: unknown[] })?.data ??
+                (response as { items?: unknown[] })?.items;
+
+            if (!Array.isArray(items) || items.length === 0) {
+                break;
+            }
+
+            for (const item of items) {
+                yield item;
+            }
+
+            if (items.length < pageSize) {
+                break;
+            }
+
+            page += 1;
+        }
+    }
+
+    /**
+     * Retry webhook delivery
+     * @see OpenAPI `WebhooksController_retryDelivery`
+     */
+    public async retryDelivery(webhookId: string, logId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'POST',
             url: '/webhooks/{webhookId}/logs/{logId}/retry',
             path: { webhookId: webhookId, logId: logId },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `WebhooksController_test`.
-     * Envoyer un événement test au webhook
+     * Test webhook
+     * @see OpenAPI `WebhooksController_test`
      */
-    public static async test(id: string): Promise<any> {
-        return await request<any>({
+    public async test(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'POST',
             url: '/webhooks/{id}/test',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `WebhooksController_update`.
-     * Mettre à jour un webhook
+     * Update webhook
+     * @see OpenAPI `WebhooksController_update`
      */
-    public static async update(id: string, body?: unknown): Promise<any> {
-        return await request<any>({
+    public async update(id: string, body: paths['/webhooks/{id}']['patch']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/webhooks/{id}']['patch']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/webhooks/{id}']['patch']['responses'][200]['content']['application/json']>(this.client, {
             method: 'PATCH',
             url: '/webhooks/{id}',
             path: { id: id },
             body,
+            ...options,
         });
+    }
+
+    /**
+     * Verify an incoming webhook signature (HMAC SHA-256).
+     */
+    public verifySignature(
+        rawBody: string | Buffer,
+        signature: string,
+        secret: string,
+    ): boolean {
+        return verifyWebhookSignature(rawBody, signature, secret);
     }
 }

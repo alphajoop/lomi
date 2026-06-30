@@ -1,6 +1,6 @@
 ---
 title: 'Comment accepter les paiements par carte ?'
-description: 'Cartes sur checkout hébergé et Payment Elements embarqués via POST /charge/card.'
+description: 'Choisissez le checkout hébergé pour la plupart des flux carte, ou la collecte embarquée si votre app doit contrôler toute l’interface.'
 docType: how-to
 ---
 
@@ -10,9 +10,20 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
+Pour la plupart des équipes, les paiements carte devraient commencer par le checkout hébergé. Utilisez la collecte embarquée uniquement si votre produit doit afficher la saisie carte dans sa propre interface.
+
 Les cartes fonctionnent en **checkout hébergé** (le plus rapide) ou en flux embarqué avec [Payment Elements](/build/payments/lomi-payment-elements) et `POST /charge/card`.
 
 <DocsScreenshot name="build/cards" alt="Formulaire carte sur le checkout hébergé lomi." />
+
+## Quel flux carte choisir ?
+
+| Flux | À utiliser quand |
+| --- | --- |
+| Checkout hébergé | Vous voulez l’expérience carte la plus rapide et sûre |
+| Liens de paiement | Vous voulez une URL partageable compatible carte |
+| Charge carte embarquée | Vous contrôlez l’UI checkout et la confirmation client |
+| Payment Elements | Vous voulez des primitives UI carte réutilisables dans votre app |
 
 ## Checkout hébergé (recommandé)
 
@@ -27,7 +38,7 @@ Les cartes fonctionnent en **checkout hébergé** (le plus rapide) ou en flux em
 2. Confirmez avec Payment Elements.
 3. Webhook ou polling pour le statut final.
 
-Voir [Cartes](/build/cards) et [API Charges](/api/charge/ChargesController_createCardCharge).
+Voir [API Charges](/api/charge/ChargesController_createCardCharge) et l’[app de référence charge directe](/build/direct-charges#reference-implementation).
 
 ## Cartes test
 
@@ -40,6 +51,16 @@ Voir [Cartes](/build/cards) et [API Charges](/api/charge/ChargesController_creat
   N’utilisez jamais de vraies cartes en test ni de numéros test en live.
 </Callout>
 
+## Notes de sécurité
+
+- Ne manipulez jamais de clés secrètes dans un navigateur ou une app mobile.
+- Traitez les valeurs `client_secret` comme des capacités sensibles et temporaires.
+- Utilisez les clés publiables uniquement quand le flux carte le demande.
+- Confirmez l’état final via webhooks ou lectures API serveur.
+
 ## Voir aussi
 
+- [Checkout hébergé](/build/checkout)
+- [Payment Elements](/build/payments/lomi-payment-elements)
 - [Vérifier les paiements](/build/guides/verify-payments)
+- [Paiements sandbox](/start/sandbox-payments)

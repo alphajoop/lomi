@@ -1,11 +1,12 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 use clap::Args;
 use colored::Colorize;
 use serde::Serialize;
 
-use crate::api::{ApiClient, MeResponse};
-use crate::auth::session::ensure_authenticated;
+use crate::api::ApiClient;
+use crate::auth::session::{ensure_authenticated, try_authenticated, verify_and_refresh_metadata, AuthResult};
 use crate::cli::{self, CommonOptions};
+use crate::commands::probe_checks::{ensure_probe_passed, run_core_checks};
 
 #[derive(Args, Debug)]
 pub struct QuickstartArgs {
@@ -15,9 +16,9 @@ pub struct QuickstartArgs {
 }
 
 #[derive(Serialize)]
-struct QuickstartStep {
-    command: String,
-    description: String,
+pub struct QuickstartStep {
+    pub command: String,
+    pub description: String,
 }
 
 #[derive(Serialize)]
@@ -38,11 +39,20 @@ struct QuickstartProbeSummary {
 
 pub async fn run(common: &CommonOptions, args: QuickstartArgs) -> Result<()> {
     let json = cli::output::should_use_json(common);
-    if !json {
+    if common.show_ui() {
         cli::banner::print_intro("lomi. quickstart");
     }
 
-    let auth = ensure_authenticated(common, true, false, false).await?;
+    let auth = match try_authenticated(common) {
+        AuthResult::Authenticated(auth) => auth,
+        AuthResult::Expired(_) | AuthResult::Failed(_) => {
+            if common.show_ui() {
+                cli::output::print_info("No valid session found — starting login...");
+            }
+            ensure_authenticated(common, true, true, json).await?
+        }
+    };
+
     let client = ApiClient::new(&auth)?;
 
     let mut passed = 0u32;
@@ -51,86 +61,26 @@ pub async fn run(common: &CommonOptions, args: QuickstartArgs) -> Result<()> {
     let mut environment = String::from("unknown");
 
     if !args.skip_probe {
-        if !json {
-            println!("Running integration checks...");
+        if common.show_ui() {
+            println!();
+            println!("{}", "Running checks...".bold());
         }
 
-        match async {
-            client.get_text("/").await?;
-            Ok::<(), anyhow::Error>(())
+        let summary = run_core_checks(&client, json).await;
+        passed = summary.passed;
+        failed = summary.failed;
+        if let Some(org) = summary.organization {
+            organization = org;
         }
-        .await
-        {
-            Ok(()) => {
-                passed += 1;
-                if !json {
-                    println!("  {} API connectivity", "✓".green());
-                }
-            }
-            Err(error) => {
-                failed += 1;
-                if !json {
-                    println!("  {} API connectivity — {error}", "✗".red());
-                }
-            }
+        if let Some(env) = summary.environment {
+            environment = env;
         }
-
-        match client.get::<MeResponse>("/me").await {
-            Ok(identity) => {
-                passed += 1;
-                if !json {
-                    println!(
-                        "  {} Identity: {} ({})",
-                        "✓".green(),
-                        identity.organization_name,
-                        identity.environment
-                    );
-                }
-                organization = identity.organization_name;
-                environment = identity.environment;
-            }
-            Err(error) => {
-                failed += 1;
-                if !json {
-                    println!("  {} Identity — {error}", "✗".red());
-                }
-            }
-        }
-
-        match client.get::<serde_json::Value>("/accounts/balance").await {
-            Ok(_) => {
-                passed += 1;
-                if !json {
-                    println!("  {} Account balance", "✓".green());
-                }
-            }
-            Err(error) => {
-                failed += 1;
-                if !json {
-                    println!("  {} Account balance — {error}", "✗".red());
-                }
-            }
-        }
+    } else if let Ok(identity) = verify_and_refresh_metadata(&auth).await {
+        organization = identity.organization_name;
+        environment = identity.environment;
     }
 
-    let next_steps = vec![
-        QuickstartStep {
-            command: "lomi checkout create --amount 10000 --currency XOF --success-url https://example.com/success --cancel-url https://example.com/cancel --json".to_string(),
-            description: "Create a sandbox test checkout session".to_string(),
-        },
-        QuickstartStep {
-            command: "lomi listen http://localhost:3000/webhooks".to_string(),
-            description: "Forward webhooks to your local server (sandbox-first)".to_string(),
-        },
-        QuickstartStep {
-            command: "lomi install-rules".to_string(),
-            description: "Install AI agent rules for Cursor, Claude, and Codex".to_string(),
-        },
-        QuickstartStep {
-            command: "lomi probe".to_string(),
-            description: "Run full integration health checks".to_string(),
-        },
-    ];
+    let next_steps = default_next_steps();
 
     let status = if failed > 0 { "degraded" } else { "ready" };
 
@@ -147,13 +97,11 @@ pub async fn run(common: &CommonOptions, args: QuickstartArgs) -> Result<()> {
 
     cli::output::divider();
     if failed > 0 {
-        println!(
-            "{} {} probe check(s) failed — fix auth/API connectivity, then retry.",
-            "Note:".yellow(),
-            failed
-        );
+        cli::output::print_hint(&format!(
+            "{failed} check(s) failed — run `lomi login` if your token expired, then retry."
+        ));
     } else if args.skip_probe {
-        println!("{} Skipped probe checks.", "Note:".bright_black());
+        cli::output::print_dim("Skipped probe checks.");
     } else {
         cli::output::print_success("Your CLI is connected and ready.");
     }
@@ -161,13 +109,31 @@ pub async fn run(common: &CommonOptions, args: QuickstartArgs) -> Result<()> {
     println!();
     println!("{}", "Next steps:".bold());
     for (index, step) in next_steps.iter().enumerate() {
-        println!("  {}. {} — {}", index + 1, step.command.cyan(), step.description);
+        cli::output::print_list_item(index, &step.command, &step.description);
     }
 
-    if failed > 0 {
-        bail!("Quickstart completed with {failed} probe failure(s)");
-    }
-
+    ensure_probe_passed(failed)?;
     cli::banner::print_outro("Quickstart complete");
     Ok(())
+}
+
+pub fn default_next_steps() -> Vec<QuickstartStep> {
+    vec![
+        QuickstartStep {
+            command: "lomi checkout create --amount 10000 --currency XOF --success-url https://example.com/success --cancel-url https://example.com/cancel --json".to_string(),
+            description: "Create a sandbox test checkout session".to_string(),
+        },
+        QuickstartStep {
+            command: "lomi listen http://localhost:3000/webhooks".to_string(),
+            description: "Forward webhooks to your local server".to_string(),
+        },
+        QuickstartStep {
+            command: "lomi install-rules".to_string(),
+            description: "Install AI agent rules for Cursor, Claude, and Codex".to_string(),
+        },
+        QuickstartStep {
+            command: "lomi init".to_string(),
+            description: "Scaffold a project with SDK examples".to_string(),
+        },
+    ]
 }

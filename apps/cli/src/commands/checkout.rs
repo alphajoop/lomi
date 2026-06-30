@@ -22,6 +22,7 @@ pub enum CheckoutCommand {
 }
 
 #[derive(Args, Debug)]
+#[command(after_help = "Example:\n  lomi checkout create --amount 10000 --currency XOF \\\n    --success-url https://example.com/success \\\n    --cancel-url https://example.com/cancel --json")]
 pub struct CheckoutCreateArgs {
     /// Checkout amount (omit when using --price-id)
     #[arg(long)]

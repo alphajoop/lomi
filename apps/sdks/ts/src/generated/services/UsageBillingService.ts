@@ -3,75 +3,85 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class UsageBillingService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `UsageBillingController_checkEntitlement`.
-     * Check if a customer has an active entitlement
+     * Check customer entitlement
+     * @see OpenAPI `UsageBillingController_checkEntitlement`
      */
-    public static async checkEntitlement(): Promise<any> {
-        return await request<any>({
+    public async checkEntitlement(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'GET',
             url: '/usage-billing/entitlements/check',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageBillingController_createEntitlement`.
-     * Create or update a plan entitlement feature
+     * Create or update an entitlement
+     * @see OpenAPI `UsageBillingController_createEntitlement`
      */
-    public static async createEntitlement(): Promise<any> {
-        return await request<any>({
+    public async createEntitlement(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'POST',
             url: '/usage-billing/entitlements',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageBillingController_getRevenue`.
-     * Combined MRR + usage + one-time revenue metrics
+     * Combined revenue metrics
+     * @see OpenAPI `UsageBillingController_getRevenue`
      */
-    public static async getRevenue(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async getRevenue(params?: paths['/usage-billing/revenue']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'GET',
             url: '/usage-billing/revenue',
-            query: options,
+            query: params,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageBillingController_getSubscriptionUsage`.
      * Get meter usage for a subscription
+     * @see OpenAPI `UsageBillingController_getSubscriptionUsage`
      */
-    public static async getSubscriptionUsage(subscriptionId: string): Promise<any> {
-        return await request<any>({
+    public async getSubscriptionUsage(subscriptionId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'GET',
             url: '/usage-billing/subscriptions/{subscriptionId}/usage',
             path: { subscriptionId: subscriptionId },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageBillingController_creditWallet`.
-     * Credit prepaid usage units to a customer meter wallet
+     * Credit prepaid usage units
+     * @see OpenAPI `UsageBillingController_creditWallet`
      */
-    public static async grantCredits(): Promise<any> {
-        return await request<any>({
+    public async grantCredits(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'POST',
             url: '/usage-billing/credits',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageBillingController_listPeriods`.
      * List usage billing periods
+     * @see OpenAPI `UsageBillingController_listPeriods`
      */
-    public static async listPeriods(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async listPeriods(params?: paths['/usage-billing/periods']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'GET',
             url: '/usage-billing/periods',
-            query: options,
+            query: params,
+            ...options,
         });
     }
 }

@@ -27,6 +27,7 @@ import { DisputesModule } from './core/disputes/disputes.module';
 import { RadarModule } from './core/radar/radar.module';
 import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
+import { LogsModule } from './core/logs/logs.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
@@ -145,6 +146,7 @@ const logger = new Logger('RedisConfig');
     RadarModule,
     SettlementsModule,
     WebhookDeliveryLogsModule,
+    LogsModule,
     WebhooksModule,
     ChargesModule,
     MerchantsModule,

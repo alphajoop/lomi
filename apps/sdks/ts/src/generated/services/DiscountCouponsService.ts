@@ -3,52 +3,97 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class DiscountCouponsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `DiscountCouponsController_create`.
-     * Créer un coupon
+     * Create discount coupon
+     * @see OpenAPI `DiscountCouponsController_create`
      */
-    public static async create(): Promise<any> {
-        return await request<any>({
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/discount-coupons']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/discount-coupons',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `DiscountCouponsController_findOne`.
-     * Obtenir un coupon par ID
+     * Retrieve discount coupon
+     * @see OpenAPI `DiscountCouponsController_findOne`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/discount-coupons/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/discount-coupons/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `DiscountCouponsController_getPerformance`.
-     * Indicateurs de performance du coupon
+     * Coupon performance metrics
+     * @see OpenAPI `DiscountCouponsController_getPerformance`
      */
-    public static async getPerformance(id: string): Promise<any> {
-        return await request<any>({
+    public async getPerformance(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons/{id}/performance']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/discount-coupons/{id}/performance']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/discount-coupons/{id}/performance',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `DiscountCouponsController_findAll`.
-     * Lister les coupons
+     * List discount coupons
+     * @see OpenAPI `DiscountCouponsController_findAll`
      */
-    public static async list(): Promise<any> {
-        return await request<any>({
+    public async list(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/discount-coupons']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/discount-coupons']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/discount-coupons',
+            ...options,
         });
+    }
+
+    /**
+     * Auto-paginate all pages from `list`.
+     */
+    public async *listAll(
+        options?: import("../../request-options.js").LomiRequestOptions,
+    ): AsyncGenerator<unknown, void, undefined> {
+        let page = 1;
+        const pageSize = 50;
+
+        while (true) {
+            const response = await requestWithClient<paths['/discount-coupons']['get']['responses'][200]['content']['application/json']>(this.client, {
+                method: 'GET',
+                url: '/discount-coupons',
+                query: { page, pageSize },
+                ...options,
+            });
+
+            const items =
+                (response as { data?: unknown[] })?.data ??
+                (response as { items?: unknown[] })?.items;
+
+            if (!Array.isArray(items) || items.length === 0) {
+                break;
+            }
+
+            for (const item of items) {
+                yield item;
+            }
+
+            if (items.length < pageSize) {
+                break;
+            }
+
+            page += 1;
+        }
     }
 }

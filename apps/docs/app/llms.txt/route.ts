@@ -11,7 +11,7 @@ const LLMS_CURATED_SLUGS = [
   'start/integration-journey',
   'build/guides/verify-payments',
   'build/guides/payment-lifecycle',
-  'build/guides/payment-methods',
+  'build/payment-channels',
   'api/payment-state-machine',
 ] as const;
 void LLMS_CURATED_SLUGS;
@@ -97,7 +97,7 @@ export async function GET() {
   const integrationJourney = pageBySlugPath(pages, 'start/integration-journey');
   const paymentMethodsHub = pageBySlugPath(
     pages,
-    'build/guides/payment-methods',
+    'build/payment-channels',
   );
   const verifyPayments = pageBySlugPath(pages, 'build/guides/verify-payments');
   const paymentLifecycle = pageBySlugPath(

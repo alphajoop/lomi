@@ -17,7 +17,10 @@ function mockHost(res: {
 }
 
 describe('GlobalJsonExceptionFilter', () => {
-  const filter = new GlobalJsonExceptionFilter();
+  const supabase = {
+    rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
+  };
+  const filter = new GlobalJsonExceptionFilter(supabase as never);
 
   it('formats ThrottlerException with Retry-After and rate_limit_exceeded', () => {
     const res = {

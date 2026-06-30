@@ -24,6 +24,7 @@ export const REST_API_SECTION_ORDER = [
   'payouts',
   'settlements',
   'webhooks',
+  'logs',
   'meters',
   'usage-events',
   'usage-billing',
@@ -56,6 +57,7 @@ const PUBLIC_REST_API_OPERATIONS = [
   'transactions',
   'webhook-delivery-logs',
   'webhooks',
+  'logs',
   'organizations',
   'merchants',
   'providers',
@@ -85,6 +87,7 @@ export function pathToFolder(route: string): string {
   if (first === 'accounts') return 'balances';
   if (first === 'customer-subscriptions') return 'subscriptions';
   if (first === 'webhook-delivery-logs') return 'webhooks';
+  if (first === 'logs') return 'logs';
   if (first === 'usage-subscriptions') return 'usage-events';
   return first;
 }

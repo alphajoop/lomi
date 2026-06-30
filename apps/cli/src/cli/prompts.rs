@@ -44,9 +44,3 @@ pub fn password(message: &str) -> Result<String> {
         .prompt()
         .map_err(Into::into)
 }
-
-pub fn wait_for_enter(message: &str) -> Result<()> {
-    require_tty()?;
-    Text::new(message).with_default("").prompt()?;
-    Ok(())
-}

@@ -1,46 +1,55 @@
 /**
- * Error handler for API calls
+ * Error handler for API calls (legacy axios interop).
  */
 
+import axios from 'axios';
 import {
   LomiError,
   LomiValidationError,
   LomiAuthError,
   LomiNotFoundError,
   LomiRateLimitError,
+  ApiError,
+  type LomiApiErrorBody,
 } from './errors.js';
+import { mapResponseToLomiError } from './http.js';
 
-export function handleApiError(error: any): never {
-  // If it's already a LomiError, rethrow it
+export function handleApiError(error: unknown): never {
   if (error instanceof LomiError) {
     throw error;
   }
 
-  // Handle axios errors
-  if (error.response) {
-    const { status, data } = error.response;
-    const message = data?.message || data?.error || error.message;
-
-    switch (status) {
-      case 400:
-        throw new LomiValidationError(message, data?.errors);
-      case 401:
-      case 403:
-        throw new LomiAuthError(message);
-      case 404:
-        throw new LomiNotFoundError(message);
-      case 429:
-        throw new LomiRateLimitError(message);
-      default:
-        throw new LomiError(message, status, data?.code, data);
-    }
+  if (error instanceof ApiError) {
+    throw error;
   }
 
-  // Handle network errors
-  if (error.request) {
+  if (axios.isAxiosError(error) && error.response) {
+    const { status, data, statusText } = error.response;
+    const body = (data ?? {}) as LomiApiErrorBody;
+    throw mapResponseToLomiError(
+      status,
+      body,
+      error.message,
+      error.config?.url ?? '',
+      statusText,
+    );
+  }
+
+  if (axios.isAxiosError(error) && error.request) {
     throw new LomiError('Network error - no response received', undefined, 'NETWORK_ERROR');
   }
 
-  // Handle other errors
-  throw new LomiError(error.message || 'An unknown error occurred');
+  if (error instanceof Error) {
+    throw new LomiError(error.message);
+  }
+
+  throw new LomiError('An unknown error occurred');
 }
+
+// Re-export for instanceof checks in docs
+export {
+  LomiValidationError,
+  LomiAuthError,
+  LomiNotFoundError,
+  LomiRateLimitError,
+};

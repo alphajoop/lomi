@@ -31,6 +31,7 @@ import { DisputesModule } from './core/disputes/disputes.module';
 import { RadarModule } from './core/radar/radar.module';
 import { SettlementsModule } from './core/settlements/settlements.module';
 import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
+import { LogsModule } from './core/logs/logs.module';
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
@@ -70,6 +71,7 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     RadarModule,
     SettlementsModule,
     WebhookDeliveryLogsModule,
+    LogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
     MeteringOpenApiModule,

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
  * Post-generation script to automatically create SDK wrapper
- * This reads the generated services and creates a clean SDK interface
  */
 
 import { writeFileSync, readdirSync, existsSync } from 'fs';
@@ -21,78 +20,54 @@ if (!existsSync(servicesDir)) {
   process.exit(1);
 }
 
-// Read all generated service files
-const serviceFiles = readdirSync(servicesDir).filter(f => f.endsWith('.ts'));
-const services = serviceFiles.map(f => f.replace('.ts', ''));
+const serviceFiles = readdirSync(servicesDir).filter((f) => f.endsWith('.ts'));
+const services = serviceFiles.map((f) => f.replace('.ts', ''));
 
-console.log(`Found ${services.length} services:`, services);
-
-// Generate property names from service names (e.g., AccountsService -> accounts)
 function getPropertyName(serviceName) {
-  // Remove 'Service' suffix and convert to camelCase
   const withoutService = serviceName.replace(/Service$/, '');
   return withoutService.charAt(0).toLowerCase() + withoutService.slice(1);
 }
 
-// Generate the SDK class
 const sdkContent = `/**
  * Main lomi. SDK class
  * AUTO-GENERATED - Do not edit manually
  */
 
 import type { LomiConfig } from './config.js';
-import { DEFAULT_CONFIG } from './config.js';
-import { OpenAPI } from './generated/index.js';
-
-// Import all generated services
+import { LomiClient } from './client.js';
 import {
-${services.map(s => `  ${s},`).join('\n')}
+${services.map((s) => `  ${s},`).join('\n')}
 } from './generated/index.js';
 
 export class LomiSDK {
-${services.map(s => `  public readonly ${getPropertyName(s)}: typeof ${s};`).join('\n')}
+  private readonly client: LomiClient;
 
-  /**
-   * Initialize the lomi. SDK
-   */
-  constructor(config: LomiConfig) {
-    const baseUrl = config.environment === 'test' 
-      ? 'https://sandbox.api.lomi.africa'
-      : config.baseUrl || DEFAULT_CONFIG.baseUrl;
-
-    // Configure OpenAPI client
-    OpenAPI.BASE = baseUrl;
-    OpenAPI.HEADERS = {
-      'X-API-KEY': config.apiKey,
-      ...config.headers,
-    };
-
-    // Assign all generated services
-${services.map(s => {
+${services.map((s) => {
   const propName = getPropertyName(s);
-  return `    this.${propName} = ${s};`;
+  return `  public readonly ${propName}: ${s};`;
+}).join('\n')}
+
+  constructor(config: LomiConfig) {
+    this.client = new LomiClient(config);
+
+${services.map((s) => {
+  const propName = getPropertyName(s);
+  return `    this.${propName} = new ${s}(this.client);`;
 }).join('\n')}
   }
 
-  /**
-   * Update the API key
-   */
+  /** Rotate the secret API key on this client instance. */
   setApiKey(apiKey: string): void {
-    OpenAPI.HEADERS = {
-      ...OpenAPI.HEADERS,
-      'X-API-KEY': apiKey,
-    };
+    this.client.setApiKey(apiKey);
   }
 
-  /**
-   * Get the current base URL
-   */
+  /** Current API base URL for this client instance. */
   getBaseUrl(): string {
-    return OpenAPI.BASE;
+    return this.client.baseUrl;
   }
 }
 `;
 
 writeFileSync(sdkPath, sdkContent, 'utf-8');
 console.log('✅ SDK wrapper generated successfully!');
-console.log(`   Available services: ${services.map(s => getPropertyName(s)).join(', ')}`);
+console.log(`   Available services: ${services.map((s) => getPropertyName(s)).join(', ')}`);

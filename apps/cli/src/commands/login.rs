@@ -14,7 +14,6 @@ pub struct LoginArgs {
 
 pub async fn run(common: &CommonOptions, args: LoginArgs) -> Result<()> {
     let profile = common.effective_profile()?;
-    cli::banner::print_intro("Logging in to lomi.");
 
     if let Some(existing) = GlobalConfig::load()?.profile(&profile) {
         if existing.cli_token.is_some() {

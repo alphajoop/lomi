@@ -19,6 +19,8 @@
   "GET /discount-coupons/{id}/performance",
   "GET /disputes",
   "GET /disputes/{id}",
+  "GET /logs",
+  "GET /logs/{type}/{id}",
   "GET /merchants/{id}",
   "GET /merchants/{id}/arr",
   "GET /merchants/{id}/balance",

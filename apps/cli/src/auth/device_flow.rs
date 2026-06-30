@@ -4,8 +4,9 @@ use reqwest::StatusCode;
 use serde::Deserialize;
 use std::time::{Duration, Instant};
 
+use crate::api::{ApiClient, MeResponse};
 use crate::cli::{cli_auth_base, PRODUCTION_API_URL, SUPABASE_ANON_KEY};
-use crate::config::GlobalConfig;
+use crate::config::{GlobalConfig, ProfileMetadata};
 
 fn auth_client() -> Result<reqwest::Client> {
     let mut headers = reqwest::header::HeaderMap::new();
@@ -82,42 +83,40 @@ pub async fn login(options: LoginOptions) -> Result<String> {
 
     if !options.silent {
         println!();
-        println!("{}", "Action Required to complete authentication:".bold());
-        println!();
-        println!("1. Copy this code: {}", device_auth.user_code.yellow().bold());
-        println!("2. Press Enter to open your browser");
-        println!("3. Paste the code when prompted on the webpage.");
-        println!();
         println!(
-            "{} After signing in, you may be redirected to your dashboard.",
-            "IMPORTANT:".yellow()
+            "  {} {}",
+            "Code:".bold(),
+            device_auth.user_code.yellow().bold()
         );
+        println!();
         println!(
-            "If needed, return to: {}",
+            "  Opening {} in your browser...",
             device_auth.verification_uri.cyan()
         );
+        println!(
+            "  {} Paste the code above if prompted.",
+            "Tip:".bright_black()
+        );
         println!();
-
-        crate::cli::prompts::wait_for_enter("Press Enter to open the browser and continue...")?;
     }
 
     if options.open_browser {
         if let Err(error) = open::that(&device_auth.verification_uri) {
             crate::cli::output::print_error(&format!(
-                "Could not open browser automatically: {error}. Open this URL manually: {}",
+                "Could not open browser: {error}. Visit {}",
                 device_auth.verification_uri
             ));
         }
     } else if !options.silent {
         println!(
-            "Browser auto-open disabled. Visit: {}",
+            "  Visit manually: {}",
             device_auth.verification_uri.cyan()
         );
     }
 
     if !options.silent {
         println!();
-        println!("Waiting for you to authorize in the browser...");
+        println!("  Waiting for authorization...");
     }
 
     let spinner = if options.silent {
@@ -127,7 +126,9 @@ pub async fn login(options: LoginOptions) -> Result<String> {
     };
     if let Some(spinner) = &spinner {
         spinner.set_style(
-            indicatif::ProgressStyle::default_spinner().template("{spinner} {msg}").unwrap(),
+            indicatif::ProgressStyle::default_spinner()
+                .template("{spinner} {msg}")
+                .unwrap(),
         );
         spinner.set_message("Waiting for authorization in browser...");
         spinner.enable_steady_tick(Duration::from_millis(100));
@@ -172,11 +173,14 @@ pub async fn login(options: LoginOptions) -> Result<String> {
         match body.error.as_deref() {
             Some("authorization_pending") => continue,
             Some("expired_token") => bail!("Login failed: The authorization code expired."),
-            Some("access_denied") => bail!("Login failed: Authorization was denied in the browser."),
+            Some("access_denied") => {
+                bail!("Login failed: Authorization was denied in the browser.")
+            }
             _ if status == StatusCode::BAD_REQUEST => {
                 bail!(
                     "Login failed: {}",
-                    body.message.unwrap_or_else(|| "Unknown polling error".to_string())
+                    body.message
+                        .unwrap_or_else(|| "Unknown polling error".to_string())
                 );
             }
             _ => bail!("Login failed: Could not connect to authentication service."),
@@ -190,13 +194,40 @@ pub async fn login(options: LoginOptions) -> Result<String> {
     let token = token.context("Login failed: Timed out waiting for authorization.")?;
 
     let mut config = GlobalConfig::load()?;
-    config.set_token(&options.profile, token.clone(), options.api_url)?;
+    config.set_token(&options.profile, token.clone(), options.api_url.clone())?;
+
+    let auth = crate::auth::AuthContext {
+        profile: options.profile.clone(),
+        cli_token: token.clone(),
+        api_url: options.api_url.clone(),
+    };
+
+    if let Ok(api_client) = ApiClient::new(&auth) {
+        if let Ok(identity) = api_client.get::<MeResponse>("/me").await {
+            let mut config = GlobalConfig::load()?;
+            config.update_profile_metadata(
+                &options.profile,
+                ProfileMetadata {
+                    organization_name: Some(identity.organization_name.clone()),
+                    organization_id: Some(identity.organization_id.clone()),
+                    environment: Some(identity.environment.clone()),
+                    expires_at: None,
+                },
+            )?;
+
+            if !options.silent && !options.embedded {
+                crate::cli::output::print_success(&format!(
+                    "Logged in as {} ({})",
+                    identity.organization_name, identity.environment
+                ));
+            }
+        }
+    }
 
     if !options.silent && !options.embedded {
-        crate::cli::output::print_success("Login successful! CLI token saved globally.");
         crate::cli::banner::print_outro("You're all set!");
         println!();
-        println!("Run `lomi init` in your project directory to get started.");
+        crate::cli::output::print_hint("Run `lomi quickstart` to verify and see next steps.");
     }
 
     Ok(token)

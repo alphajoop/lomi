@@ -22,8 +22,13 @@ const config = {
         permanent: true,
       },
       {
-        source: '/build/ecommerce-extensions/mcp',
-        destination: '/build/mcp',
+        source: '/build/guides/payment-methods',
+        destination: '/build/payment-channels',
+        permanent: true,
+      },
+      {
+        source: '/build/cards',
+        destination: '/build/payment-methods/cards',
         permanent: true,
       },
     ];

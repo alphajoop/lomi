@@ -3,29 +3,35 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class OrganizationService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `RadarController_getSettings`.
-     * Get Radar settings for the organization
+     * Get Radar settings
+     * @see OpenAPI `RadarController_getSettings`
      */
-    public static async getSettings(): Promise<any> {
-        return await request<any>({
+    public async getSettings(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'GET',
             url: '/organization/radar-settings',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `RadarController_updateSettings`.
      * Update Radar settings
+     * @see OpenAPI `RadarController_updateSettings`
      */
-    public static async updateSettings(body?: unknown): Promise<any> {
-        return await request<any>({
+    public async updateSettings(body: paths['/organization/radar-settings']['patch']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
             method: 'PATCH',
             url: '/organization/radar-settings',
             body,
+            ...options,
         });
     }
 }

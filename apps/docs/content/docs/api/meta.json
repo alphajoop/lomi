@@ -23,6 +23,7 @@
     "payouts",
     "settlements",
     "webhooks",
+    "logs",
     "meters",
     "usage-events",
     "usage-billing"

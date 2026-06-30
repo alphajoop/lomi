@@ -3,65 +3,110 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class ProductsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `ProductsController_addPrice`.
-     * Ajouter un prix à un produit
+     * Add product price
+     * @see OpenAPI `ProductsController_addPrice`
      */
-    public static async addPrice(id: string): Promise<any> {
-        return await request<any>({
+    public async addPrice(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products/{id}/prices']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/products/{id}/prices']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/products/{id}/prices',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ProductsController_create`.
-     * Créer un produit
+     * Create product
+     * @see OpenAPI `ProductsController_create`
      */
-    public static async create(): Promise<any> {
-        return await request<any>({
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/products']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/products',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ProductsController_findOne`.
-     * Obtenir un produit par ID
+     * Retrieve product
+     * @see OpenAPI `ProductsController_findOne`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/products/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/products/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ProductsController_findAll`.
-     * Lister les produits
+     * List products
+     * @see OpenAPI `ProductsController_findAll`
      */
-    public static async list(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async list(params?: paths['/products']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/products']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/products',
-            query: options,
+            query: params,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `ProductsController_setDefaultPrice`.
-     * Définir le prix par défaut
+     * Auto-paginate all pages from `list`.
      */
-    public static async setDefaultPrice(id: string, priceId: string): Promise<any> {
-        return await request<any>({
+    public async *listAll(
+        params?: paths['/products']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+        options?: import("../../request-options.js").LomiRequestOptions,
+    ): AsyncGenerator<unknown, void, undefined> {
+        let page = (params as { page?: number } | undefined)?.page ?? 1;
+        const pageSize = (params as { pageSize?: number } | undefined)?.pageSize ?? 50;
+
+        while (true) {
+            const response = await this.list(
+                { ...params, page, pageSize } as paths['/products']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+                options,
+            );
+
+            const items =
+                (response as { data?: unknown[] })?.data ??
+                (response as { items?: unknown[] })?.items;
+
+            if (!Array.isArray(items) || items.length === 0) {
+                break;
+            }
+
+            for (const item of items) {
+                yield item;
+            }
+
+            if (items.length < pageSize) {
+                break;
+            }
+
+            page += 1;
+        }
+    }
+
+    /**
+     * Set default price
+     * @see OpenAPI `ProductsController_setDefaultPrice`
+     */
+    public async setDefaultPrice(id: string, priceId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/products/{id}/prices/{priceId}/set-default']['post']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/products/{id}/prices/{priceId}/set-default']['post']['responses'][200]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/products/{id}/prices/{priceId}/set-default',
             path: { id: id, priceId: priceId },
+            ...options,
         });
     }
 }

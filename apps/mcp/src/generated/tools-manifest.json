@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 93,
+  "toolCount": 96,
   "tools": [
     {
       "name": "lomi_delete_customer_subscriptions_subscription_id",
@@ -803,6 +803,150 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "disputes get id litiges"
+    },
+    {
+      "name": "lomi_get_logs",
+      "operationKey": "GET /logs",
+      "method": "get",
+      "pathTemplate": "/logs",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "event",
+        "failed",
+        "success",
+        "webhook_id",
+        "severity",
+        "status",
+        "end_date",
+        "start_date",
+        "offset",
+        "limit",
+        "type"
+      ],
+      "title": "List Logs",
+      "description": "List logs\n\nReturns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.\n\nREST: GET /logs",
+      "tags": [
+        "Logs"
+      ],
+      "operationId": "LogsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "type": "string",
+            "description": "ISO 8601 end timestamp (inclusive)"
+          },
+          "event": {
+            "type": "string",
+            "description": "Filter activity logs by event type"
+          },
+          "failed": {
+            "type": "boolean",
+            "description": "Only failed webhook deliveries"
+          },
+          "limit": {
+            "example": 25,
+            "type": "number",
+            "description": "Limit"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning",
+              "error",
+              "critical"
+            ],
+            "type": "string",
+            "description": "Severity"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "ISO 8601 start timestamp (inclusive)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Comma-separated HTTP status codes (api_request, api_error). Example: 400,500"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Only successful webhook deliveries"
+          },
+          "type": {
+            "enum": [
+              "api_request",
+              "api_error",
+              "webhook_delivery",
+              "activity"
+            ],
+            "type": "string",
+            "description": "Log stream to query"
+          },
+          "webhook_id": {
+            "type": "string",
+            "description": "Filter webhook_delivery logs by webhook ID"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get logs"
+    },
+    {
+      "name": "lomi_get_logs_type_id",
+      "operationKey": "GET /logs/{type}/{id}",
+      "method": "get",
+      "pathTemplate": "/logs/{type}/{id}",
+      "pathParamNames": [
+        "type",
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get Logs",
+      "description": "Get a log entry\n\nReturns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.\n\nREST: GET /logs/{type}/{id}",
+      "tags": [
+        "Logs"
+      ],
+      "operationId": "LogsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Log entry UUID"
+          },
+          "type": {
+            "enum": [
+              "api_request",
+              "api_error",
+              "webhook_delivery",
+              "activity"
+            ],
+            "type": "string",
+            "description": "Type"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get id logs type"
     },
     {
       "name": "lomi_get_merchants_id",
@@ -2833,7 +2977,7 @@
               "customer_email": {
                 "type": "string",
                 "example": "john@example.com",
-                "description": "Customer email, required together with customer_name when customer_id is omitted."
+                "description": "Customer email — required together with customer_name when customer_id is omitted."
               },
               "customer_id": {
                 "type": "string",
@@ -2843,7 +2987,7 @@
               "customer_name": {
                 "type": "string",
                 "example": "John Doe",
-                "description": "Customer display name, required together with customer_email when customer_id is omitted."
+                "description": "Customer display name — required together with customer_email when customer_id is omitted."
               },
               "customer_phone": {
                 "type": "string",
@@ -3059,6 +3203,123 @@
       "searchHint": "advanced charge charges direct mtn post"
     },
     {
+      "name": "lomi_post_charge_switch",
+      "operationKey": "POST /charge/switch",
+      "method": "post",
+      "pathTemplate": "/charge/switch",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create Advanced Direct Charges",
+      "description": "Create Switch charge (server-side card authorization)\n\nAuthorizes a card from server-supplied credentials and routes it across acquiring rails. May return a redirect URL for 3DS authentication or signal `retry_other_rail` to fall back to another rail. Requires a PCI-DSS-compliant integration.\n\nREST: POST /charge/switch",
+      "tags": [
+        "Advanced Direct Charges"
+      ],
+      "operationId": "ChargesController_createSwitchCharge",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "example": 10000,
+                "description": "Amount in XOF francs"
+              },
+              "checkout_session_id": {
+                "type": "string"
+              },
+              "currency_code": {
+                "type": "string",
+                "example": "XOF",
+                "enum": [
+                  "XOF"
+                ]
+              },
+              "customer_email": {
+                "type": "string",
+                "example": "john@example.com"
+              },
+              "customer_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440000"
+              },
+              "customer_name": {
+                "type": "string",
+                "example": "John Doe"
+              },
+              "customer_phone": {
+                "type": "string",
+                "example": "+221771234567"
+              },
+              "cvv": {
+                "type": "string",
+                "example": "123"
+              },
+              "description": {
+                "type": "string"
+              },
+              "ecom_ip": {
+                "type": "string",
+                "description": "Customer IP for EComIp"
+              },
+              "expiry": {
+                "type": "string",
+                "example": "06/25",
+                "description": "MM/YY or YYMM"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "pan": {
+                "type": "string",
+                "example": "4221941234569109"
+              },
+              "payment_reference": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number",
+                "default": 1
+              },
+              "subscription_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "amount",
+              "cvv",
+              "expiry",
+              "pan"
+            ],
+            "description": "JSON request body for this operation."
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "advanced charge charges direct post switch"
+    },
+    {
       "name": "lomi_post_charge_wave",
       "operationKey": "POST /charge/wave",
       "method": "post",
@@ -3241,6 +3502,14 @@
               "description": {
                 "type": "string"
               },
+              "fields": {
+                "type": "array",
+                "description": "Optional ordered checkout field schema. When provided, overrides require_* booleans.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
               "line_items": {
                 "type": "array",
                 "items": {
@@ -3283,7 +3552,18 @@
                 "type": "number"
               },
               "require_billing_address": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "When true, show and require billing address on checkout."
+              },
+              "require_email": {
+                "type": "boolean",
+                "description": "When true, show and require customer email. Default true when unset.",
+                "default": true
+              },
+              "require_phone": {
+                "type": "boolean",
+                "description": "When true, show and require customer phone. Default false when unset.",
+                "default": false
               },
               "subscription_id": {
                 "type": "string",
@@ -3576,6 +3856,14 @@
                 "type": "string",
                 "format": "date-time"
               },
+              "fields": {
+                "type": "array",
+                "description": "Optional ordered checkout field schema. When provided, overrides require_* booleans.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
               "link_type": {
                 "type": "string",
                 "enum": [
@@ -3596,7 +3884,18 @@
                 "format": "uuid"
               },
               "require_billing_address": {
-                "type": "boolean"
+                "type": "boolean",
+                "description": "When true, show and require billing address on checkout."
+              },
+              "require_email": {
+                "type": "boolean",
+                "description": "When true, show and require customer email. Default true when unset.",
+                "default": true
+              },
+              "require_phone": {
+                "type": "boolean",
+                "description": "When true, show and require customer phone. Default false when unset.",
+                "default": false
               },
               "success_url": {
                 "type": "string",

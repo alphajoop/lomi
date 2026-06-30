@@ -100,6 +100,8 @@ export const METHOD_NAME_BY_OP = {
   'GET /settlements/{id}/transactions': 'findTransactions',
   'GET /disputes': 'list',
   'GET /disputes/{id}': 'get',
+  'GET /logs': 'list',
+  'GET /logs/{type}/{id}': 'get',
   'GET /meters': 'list',
   'GET /meters/{id}': 'get',
   'GET /meters/{id}/balances/{customerId}': 'getCustomerBalance',

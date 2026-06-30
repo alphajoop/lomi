@@ -77,9 +77,13 @@ let lomiPromise: Promise<Lomi | null> | null = null;
 
 /**
  * Load and initialize lomi. for payment processing.
- * 
- * @param publishableKey - Your lomi. publishable key (lomi_pk_...)
- * @returns Promise resolving to lomi. instance
+ *
+ * **Note:** Card Payment Elements run on lomi.'s PCI platform infrastructure.
+ * Your `lomi_pk_…` publishable key is validated for format but initialization
+ * uses the lomi. platform Stripe account — merchants never handle raw PAN data.
+ *
+ * @param publishableKey - Your lomi. publishable key (`lomi_pk_…`)
+ * @returns Promise resolving to a Lomi (Stripe-backed) instance for Elements
  * 
  * @example
  * ```ts

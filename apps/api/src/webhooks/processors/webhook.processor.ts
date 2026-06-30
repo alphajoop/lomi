@@ -119,5 +119,26 @@ export class WebhookQueueProcessor
       p_dispatch_id: dispatchId,
       p_reason: `exhausted_bull_attempts:${error.message?.slice(0, 500)}`,
     });
+
+    const { webhook, event, data, outboxId, merchantId } = job.data ?? {};
+    if (!webhook?.id || !event) return;
+
+    await this.supabase.rpc('log_webhook_delivery', {
+      p_webhook_id: webhook.id,
+      p_merchant_id:
+        merchantId ?? data?.merchant_id ?? data?.organization_id ?? null,
+      p_organization_id: data?.organization_id ?? webhook.organization_id,
+      p_event_type: event,
+      p_payload: this.webhookSender.prepareWebhookPayload(
+        event,
+        data,
+        outboxId,
+      ),
+      p_response_status: 0,
+      p_response_body: error.message?.slice(0, 4000) ?? 'exhausted_retries',
+      p_attempt_number: job.attemptsMade,
+      p_headers: null,
+      p_request_duration_ms: undefined,
+    });
   }
 }

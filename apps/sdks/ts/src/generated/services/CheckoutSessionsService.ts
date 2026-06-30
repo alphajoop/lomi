@@ -3,42 +3,85 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class CheckoutSessionsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `CheckoutSessionsController_create`.
-     * Créer une session de paiement
+     * Create checkout session
+     * @see OpenAPI `CheckoutSessionsController_create`
      */
-    public static async create(body?: unknown): Promise<any> {
-        return await request<any>({
+    public async create(body: paths['/checkout-sessions']['post']['requestBody']['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/checkout-sessions']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/checkout-sessions']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/checkout-sessions',
             body,
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `CheckoutSessionsController_findOne`.
-     * Obtenir une session de paiement par ID
+     * Retrieve checkout session
+     * @see OpenAPI `CheckoutSessionsController_findOne`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/checkout-sessions/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/checkout-sessions/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/checkout-sessions/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `CheckoutSessionsController_findAll`.
-     * Lister les sessions de paiement
+     * List checkout sessions
+     * @see OpenAPI `CheckoutSessionsController_findAll`
      */
-    public static async list(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async list(params?: paths['/checkout-sessions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/checkout-sessions']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/checkout-sessions']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/checkout-sessions',
-            query: options,
+            query: params,
+            ...options,
         });
+    }
+
+    /**
+     * Auto-paginate all pages from `list`.
+     */
+    public async *listAll(
+        params?: paths['/checkout-sessions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+        options?: import("../../request-options.js").LomiRequestOptions,
+    ): AsyncGenerator<unknown, void, undefined> {
+        let page = (params as { page?: number } | undefined)?.page ?? 1;
+        const pageSize = (params as { pageSize?: number } | undefined)?.pageSize ?? 50;
+
+        while (true) {
+            const response = await this.list(
+                { ...params, page, pageSize } as paths['/checkout-sessions']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+                options,
+            );
+
+            const items =
+                (response as { data?: unknown[] })?.data ??
+                (response as { items?: unknown[] })?.items;
+
+            if (!Array.isArray(items) || items.length === 0) {
+                break;
+            }
+
+            for (const item of items) {
+                yield item;
+            }
+
+            if (items.length < pageSize) {
+                break;
+            }
+
+            page += 1;
+        }
     }
 }

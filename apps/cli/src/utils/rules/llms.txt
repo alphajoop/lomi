@@ -22,7 +22,7 @@
 6. Follow the [integration journey](https://docs.lomi.africa/start/integration-journey) for sandbox → webhooks → go-live.
 - [Verify payments](https://docs.lomi.africa/build/guides/verify-payments) — confirm status before fulfilling.
 - [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle) — merchant-facing lifecycle hub.
-- Supported countries and rails: [Payment methods](https://docs.lomi.africa/build/guides/payment-methods).
+- Supported countries and rails: [Payment channels](https://docs.lomi.africa/build/payment-channels).
 - Test cards and MoMo sandbox behavior: [Sandbox payments](https://docs.lomi.africa/start/sandbox-payments).
 
 ## Authentication and environments
@@ -57,7 +57,7 @@ Choose the path that matches your UX—not every merchant needs every API. **Pre
 - [Integration journey](https://docs.lomi.africa/start/integration-journey)
 - [Verify payments](https://docs.lomi.africa/build/guides/verify-payments)
 - [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle)
-- [Payment methods](https://docs.lomi.africa/build/guides/payment-methods)
+- [Payment channels](https://docs.lomi.africa/build/payment-channels)
 - [Payment state machine](https://docs.lomi.africa/api/payment-state-machine) — status transitions and balances
 
 ## Contact and support

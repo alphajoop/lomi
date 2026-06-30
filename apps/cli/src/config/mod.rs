@@ -1,6 +1,6 @@
 pub mod global;
 
-pub use global::GlobalConfig;
+pub use global::{GlobalConfig, ProfileMetadata};
 
 use crate::cli::{PRODUCTION_API_URL, SANDBOX_API_URL};
 

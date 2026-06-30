@@ -16,6 +16,7 @@ import {
   CustomersService,
   DiscountCouponsService,
   DisputesService,
+  LogsService,
   MerchantsService,
   MetersService,
   OrganizationService,
@@ -45,6 +46,7 @@ export class LomiSDK {
   public readonly customers: typeof CustomersService;
   public readonly discountCoupons: typeof DiscountCouponsService;
   public readonly disputes: typeof DisputesService;
+  public readonly logs: typeof LogsService;
   public readonly merchants: typeof MerchantsService;
   public readonly meters: typeof MetersService;
   public readonly organization: typeof OrganizationService;
@@ -88,6 +90,7 @@ export class LomiSDK {
     this.customers = CustomersService;
     this.discountCoupons = DiscountCouponsService;
     this.disputes = DisputesService;
+    this.logs = LogsService;
     this.merchants = MerchantsService;
     this.meters = MetersService;
     this.organization = OrganizationService;

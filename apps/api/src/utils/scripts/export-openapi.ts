@@ -140,6 +140,7 @@ function getPublicOperationTag(pathKey: string): string | undefined {
   if (pathKey.startsWith('/transactions')) return 'Transactions';
   if (pathKey.startsWith('/webhooks')) return 'Webhooks';
   if (pathKey.startsWith('/webhook-delivery-logs')) return 'Webhooks';
+  if (pathKey.startsWith('/logs')) return 'Logs';
   if (pathKey.startsWith('/meters')) return 'Meters';
   if (
     pathKey.startsWith('/usage-events') ||

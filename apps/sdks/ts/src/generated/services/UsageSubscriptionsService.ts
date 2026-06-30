@@ -3,17 +3,22 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class UsageSubscriptionsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `UsageEventsController_createUsageSubscription`.
      * Create a usage subscription
+     * @see OpenAPI `UsageEventsController_createUsageSubscription`
      */
-    public static async create(): Promise<any> {
-        return await request<any>({
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/usage-subscriptions']['post']['responses'][201]['content']['application/json']> {
+        return requestWithClient<paths['/usage-subscriptions']['post']['responses'][201]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/usage-subscriptions',
+            ...options,
         });
     }
 }

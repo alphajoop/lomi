@@ -5,7 +5,7 @@ description: 'Matrice pays, devise et canal pour le checkout hébergé et les ch
 
 import { Callout } from '@/components/docs/docs-callout';
 
-Utilisez cette page pour confirmer les rails et devises avant de choisir une intégration. Pour l’arbre de décision, voir [Quelle intégration choisir ?](/build/choose-integration).
+Utilisez cette page pour confirmer les rails et devises avant de choisir une intégration. Pour chaque canal, voir les [guides par canal](/build/payment-methods/wave). Pour l’arbre de décision, voir [Quelle intégration choisir ?](/build/choose-integration).
 
 <Callout type="info">
   La disponibilité exacte dépend des prestataires activés pour votre organisation dans le portail. Contactez le support si un canal manque.
@@ -13,12 +13,12 @@ Utilisez cette page pour confirmer les rails et devises avant de choisir une int
 
 ## Chemin recommandé par canal
 
-| Canal | Checkout hébergé / liens | API directe |
-| --- | --- | --- |
-| Cartes (Visa, Mastercard, Amex, …) | Oui | `POST /charge/card` + Payment Elements |
-| Wave | Oui | `POST /charge/wave` |
-| MTN MoMo | Oui | `POST /charge/mtn` |
-| SPI, virement | Oui (hébergé) | Préférez le checkout hébergé sauf indication contraire |
+| Canal | Checkout hébergé / liens | API directe | Guide |
+| --- | --- | --- | --- |
+| Cartes (Visa, Mastercard, Amex, …) | Oui | `POST /charge/card` + Payment Elements | [Cartes](/build/payment-methods/cards) |
+| Wave | Oui | `POST /charge/wave` | [Wave](/build/payment-methods/wave) |
+| MTN MoMo | Oui | `POST /charge/mtn` | [MTN MoMo](/build/payment-methods/mtn-momo) |
+| SPI, virement | Oui (hébergé) | Préférez le checkout hébergé sauf indication contraire | [SPI](/build/payment-methods/spi) |
 
 **Par défaut :** checkout hébergé ou liens de paiement. Charges directes si vous maîtrisez l’UI et le comportement asynchrone.
 

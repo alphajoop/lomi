@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T09:56:13.811Z",
+  "generatedAt": "2026-06-30T10:28:01.383Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -42,6 +42,10 @@
       "list"
     ],
     "disputes": [
+      "get",
+      "list"
+    ],
+    "logs": [
       "get",
       "list"
     ],

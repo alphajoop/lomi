@@ -26,7 +26,7 @@ pub async fn run(common: &CommonOptions, args: ProductsArgs) -> Result<()> {
 
 async fn list_products(common: &CommonOptions) -> Result<()> {
     let json = cli::output::should_use_json(common);
-    if !json {
+    if common.show_ui() {
         cli::banner::print_intro("Products");
     }
 
@@ -40,7 +40,7 @@ async fn list_products(common: &CommonOptions) -> Result<()> {
     }
 
     if rows.is_empty() {
-        println!("{} No products found.", "○".bright_black());
+        cli::output::print_dim("No products found.");
         return Ok(());
     }
 
@@ -54,7 +54,7 @@ async fn list_products(common: &CommonOptions) -> Result<()> {
             .or_else(|| row.get("id"))
             .and_then(|v| v.as_str())
             .unwrap_or("-");
-        println!("{} {}", name.bold(), product_id.bright_black());
+        cli::output::print_step(&format!("{} {}", name.bold(), product_id.bright_black()));
 
         if let Some(prices) = row.get("prices").and_then(|v| v.as_array()) {
             for price in prices {
@@ -68,12 +68,11 @@ async fn list_products(common: &CommonOptions) -> Result<()> {
                     .get("currency_code")
                     .and_then(|v| v.as_str())
                     .unwrap_or("XOF");
-                println!(
-                    "  {} {} {}",
-                    "○".bright_black(),
+                cli::output::print_step(&format!(
+                    "○ {} {}",
                     price_id.cyan(),
                     format!("{amount} {currency}").bright_black()
-                );
+                ));
             }
         }
     }

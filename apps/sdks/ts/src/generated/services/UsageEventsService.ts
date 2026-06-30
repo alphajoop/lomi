@@ -3,41 +3,84 @@
  * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
-import { request } from '../core/request.js';
+import type { LomiClient } from '../../client.js';
+import { requestWithClient } from '../../http.js';
+import type { paths } from '../schema.js';
 
 export class UsageEventsService {
+    constructor(private readonly client: LomiClient) {}
+
     /**
-     * OpenAPI operationId: `UsageEventsController_ingest`.
      * Record a usage event
+     * @see OpenAPI `UsageEventsController_ingest`
      */
-    public static async create(): Promise<any> {
-        return await request<any>({
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/usage-events']['post']['responses'][202]['content']['application/json']> {
+        return requestWithClient<paths['/usage-events']['post']['responses'][202]['content']['application/json']>(this.client, {
             method: 'POST',
             url: '/usage-events',
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageEventsController_findOne`.
      * Get a usage event
+     * @see OpenAPI `UsageEventsController_findOne`
      */
-    public static async get(id: string): Promise<any> {
-        return await request<any>({
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/usage-events/{id}']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/usage-events/{id}']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/usage-events/{id}',
             path: { id: id },
+            ...options,
         });
     }
 
     /**
-     * OpenAPI operationId: `UsageEventsController_findAll`.
      * List usage events
+     * @see OpenAPI `UsageEventsController_findAll`
      */
-    public static async list(options?: Record<string, unknown>): Promise<any> {
-        return await request<any>({
+    public async list(params?: paths['/usage-events']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<paths['/usage-events']['get']['responses'][200]['content']['application/json']> {
+        return requestWithClient<paths['/usage-events']['get']['responses'][200]['content']['application/json']>(this.client, {
             method: 'GET',
             url: '/usage-events',
-            query: options,
+            query: params,
+            ...options,
         });
+    }
+
+    /**
+     * Auto-paginate all pages from `list`.
+     */
+    public async *listAll(
+        params?: paths['/usage-events']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+        options?: import("../../request-options.js").LomiRequestOptions,
+    ): AsyncGenerator<unknown, void, undefined> {
+        let page = (params as { page?: number } | undefined)?.page ?? 1;
+        const pageSize = (params as { pageSize?: number } | undefined)?.pageSize ?? 50;
+
+        while (true) {
+            const response = await this.list(
+                { ...params, page, pageSize } as paths['/usage-events']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>,
+                options,
+            );
+
+            const items =
+                (response as { data?: unknown[] })?.data ??
+                (response as { items?: unknown[] })?.items;
+
+            if (!Array.isArray(items) || items.length === 0) {
+                break;
+            }
+
+            for (const item of items) {
+                yield item;
+            }
+
+            if (items.length < pageSize) {
+                break;
+            }
+
+            page += 1;
+        }
     }
 }

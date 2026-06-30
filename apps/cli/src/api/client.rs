@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use serde::de::DeserializeOwned;
 
+use crate::api::ApiError;
 use crate::auth::AuthContext;
 
 pub struct ApiClient {
@@ -44,7 +45,9 @@ impl ApiClient {
             .with_context(|| format!("Network error connecting to {url}"))?;
 
         if !response.status().is_success() {
-            anyhow::bail!("API request failed ({})", response.status());
+            let status = response.status();
+            let text = response.text().await.unwrap_or_default();
+            return Err(ApiError::from_response(status, &text).into());
         }
 
         response.text().await.context("Failed to read API response")
@@ -79,7 +82,7 @@ impl ApiClient {
         if !response.status().is_success() {
             let status = response.status();
             let text = response.text().await.unwrap_or_default();
-            anyhow::bail!("API request failed ({status}): {text}");
+            return Err(ApiError::from_response(status, &text).into());
         }
 
         if response.status() == reqwest::StatusCode::NO_CONTENT {
@@ -105,10 +108,7 @@ impl ApiClient {
 pub async fn health_check(auth: &AuthContext) -> Result<()> {
     let client = ApiClient::new(auth)?;
 
-    // Connectivity: root endpoint is public
     let _: String = client.get_text("/").await?;
-
-    // Auth: verify the CLI token against a protected route
     let _: serde_json::Value = client.get("/me").await?;
     let _: serde_json::Value = client.get("/accounts/balance").await?;
     Ok(())

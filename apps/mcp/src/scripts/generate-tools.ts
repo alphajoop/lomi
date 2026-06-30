@@ -27,7 +27,7 @@ import {
 } from '../../../sdks/scripts/public-sdk-operations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const mcpRoot = join(__dirname, '..');
+const mcpRoot = join(__dirname, '../..');
 const openapiPath = join(mcpRoot, '../docs/openapi.json');
 const allowlistPath = join(
   mcpRoot,

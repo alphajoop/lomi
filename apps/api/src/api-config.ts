@@ -276,6 +276,48 @@ export const API_RESOURCES: APIResourceConfig[] = [
       delete: false,
     },
   },
+  {
+    tableName: 'api_interactions',
+    enabled: true,
+    tag: 'API Interactions',
+    idField: 'interaction_id',
+    description: 'Merchant API request and response audit trail',
+    operations: {
+      list: false,
+      get: false,
+      create: false,
+      update: false,
+      delete: false,
+    },
+  },
+  {
+    tableName: 'api_error_logs',
+    enabled: true,
+    tag: 'API Error Logs',
+    idField: 'error_id',
+    description: 'Merchant API error log entries',
+    operations: {
+      list: false,
+      get: false,
+      create: false,
+      update: false,
+      delete: false,
+    },
+  },
+  {
+    tableName: 'webhook_delivery_attempts',
+    enabled: true,
+    tag: 'Webhook Delivery Attempts',
+    idField: 'attempt_id',
+    description: 'Per-HTTP-attempt webhook delivery history',
+    operations: {
+      list: false,
+      get: false,
+      create: false,
+      update: false,
+      delete: false,
+    },
+  },
 ];
 
 export function getEnabledResources(): APIResourceConfig[] {
@@ -349,6 +391,15 @@ export const EXPOSED_FUNCTIONS = [
   // Auth & logging
   'verify_api_key',
   'log_api_interaction',
+  'log_api_error',
+  'get_api_request_logs',
+  'get_api_request_log',
+  'get_api_error_logs',
+  'get_api_error_log',
+  'get_webhook_delivery_logs_with_attempts',
+  'get_webhook_delivery_log_with_attempts',
+  'get_activity_log',
+  'fetch_logs',
   // Organizations
   'list_organizations',
   'fetch_organization_details',

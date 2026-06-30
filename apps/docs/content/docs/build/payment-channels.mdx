@@ -5,7 +5,7 @@ description: 'Country, currency, and channel matrix for hosted checkout and dire
 
 import { Callout } from '@/components/docs/docs-callout';
 
-Use this page to confirm which rails and currencies you can offer before you pick an integration path. For the decision tree, see [Which payment integration should I choose?](/build/choose-integration).
+Use this page to confirm which rails and currencies you can offer before you pick an integration path. For per-channel flows, see the [payment channel guides](/build/payment-methods/wave). For the decision tree, see [Which payment integration should I choose?](/build/choose-integration).
 
 <Callout type="info">
   Exact availability depends on your organization's enabled providers in the dashboard. Contact support if a channel you need is not active.
@@ -13,12 +13,12 @@ Use this page to confirm which rails and currencies you can offer before you pic
 
 ## Recommended path by channel
 
-| Channel | Hosted checkout / links | Direct API |
-| --- | --- | --- |
-| Cards (Visa, Mastercard, Amex, …) | Yes | `POST /charge/card` + Payment Elements |
-| Wave | Yes | `POST /charge/wave` |
-| MTN MoMo | Yes | `POST /charge/mtn` |
-| SPI, bank transfer | Yes (hosted) | Use hosted checkout unless documented otherwise |
+| Channel | Hosted checkout / links | Direct API | Deep dive |
+| --- | --- | --- | --- |
+| Cards (Visa, Mastercard, Amex, …) | Yes | `POST /charge/card` + Payment Elements | [Cards](/build/payment-methods/cards) |
+| Wave | Yes | `POST /charge/wave` | [Wave](/build/payment-methods/wave) |
+| MTN MoMo | Yes | `POST /charge/mtn` | [MTN MoMo](/build/payment-methods/mtn-momo) |
+| SPI, bank transfer | Yes (hosted) | Use hosted checkout unless documented otherwise | [SPI](/build/payment-methods/spi) |
 
 <Callout type="info">
   **Djamo** support for Côte d'Ivoire and Senegal is coming soon.

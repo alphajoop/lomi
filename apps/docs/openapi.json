@@ -3778,6 +3778,209 @@
         ]
       }
     },
+    "/logs": {
+      "get": {
+        "description": "Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.",
+        "operationId": "LogsController_findAll",
+        "parameters": [
+          {
+            "name": "event",
+            "required": false,
+            "in": "query",
+            "description": "Filter activity logs by event type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "failed",
+            "required": false,
+            "in": "query",
+            "description": "Only failed webhook deliveries",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "success",
+            "required": false,
+            "in": "query",
+            "description": "Only successful webhook deliveries",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "webhook_id",
+            "required": false,
+            "in": "query",
+            "description": "Filter webhook_delivery logs by webhook ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "severity",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "info",
+                "warning",
+                "error",
+                "critical"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated HTTP status codes (api_request, api_error). Example: 400,500",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "description": "ISO 8601 end timestamp (inclusive)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "description": "ISO 8601 start timestamp (inclusive)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 25,
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "query",
+            "description": "Log stream to query",
+            "schema": {
+              "enum": [
+                "api_request",
+                "api_error",
+                "webhook_delivery",
+                "activity"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated log list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List logs",
+        "tags": [
+          "Logs"
+        ]
+      }
+    },
+    "/logs/{type}/{id}": {
+      "get": {
+        "description": "Returns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.",
+        "operationId": "LogsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Log entry UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "api_request",
+                "api_error",
+                "webhook_delivery",
+                "activity"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Log entry details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogEntryResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Log not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a log entry",
+        "tags": [
+          "Logs"
+        ]
+      }
+    },
     "/webhooks": {
       "post": {
         "operationId": "WebhooksController_create",
@@ -4784,6 +4987,9 @@
     },
     {
       "name": "Discount Coupons"
+    },
+    {
+      "name": "Logs"
     },
     {
       "name": "Meters"
@@ -7059,6 +7265,136 @@
           "amount",
           "spi_event_code",
           "created_at"
+        ]
+      },
+      "LogEntryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "api_request",
+              "api_error",
+              "webhook_delivery",
+              "activity"
+            ],
+            "example": "api_request"
+          },
+          "timestamp": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "error",
+              "critical"
+            ],
+            "example": "info"
+          },
+          "status_code": {
+            "type": "number",
+            "example": 200,
+            "nullable": true
+          },
+          "method": {
+            "type": "string",
+            "example": "GET",
+            "nullable": true
+          },
+          "endpoint": {
+            "type": "string",
+            "example": "/transactions",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Payment not found",
+            "nullable": true
+          },
+          "success": {
+            "type": "boolean",
+            "example": true,
+            "nullable": true
+          },
+          "request_id": {
+            "type": "string",
+            "example": "req_abc123",
+            "nullable": true
+          },
+          "data": {
+            "type": "object",
+            "description": "Type-specific payload"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "timestamp",
+          "severity",
+          "status_code",
+          "method",
+          "endpoint",
+          "message",
+          "success",
+          "request_id",
+          "data"
+        ]
+      },
+      "LogListResponseDto": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "example": "list"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "api_request",
+              "api_error",
+              "webhook_delivery",
+              "activity"
+            ],
+            "example": "api_request"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LogEntryResponseDto"
+            }
+          },
+          "total_count": {
+            "type": "number",
+            "example": 42
+          },
+          "limit": {
+            "type": "number",
+            "example": 25
+          },
+          "offset": {
+            "type": "number",
+            "example": 0
+          },
+          "has_more": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "object",
+          "type",
+          "data",
+          "total_count",
+          "limit",
+          "offset",
+          "has_more"
         ]
       },
       "WebhookResponseDto": {

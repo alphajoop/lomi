@@ -47,13 +47,15 @@ cargo build --release -q
 LOMI="$ROOT/target/release/lomi"
 
 log "1. Version and help"
-assert_contains "3.101.1" "$LOMI" --version
+assert_contains "3.4.0" "$LOMI" --version
 assert_contains "checkout" "$LOMI" --help
 assert_contains "listen" "$LOMI" --help
 assert_contains "probe" "$LOMI" --help
 assert_contains "quickstart" "$LOMI" --help
 assert_contains "refunds" "$LOMI" --help
 assert_contains "install-rules" "$LOMI" --help
+assert_contains "completions" "$LOMI" --help
+assert_contains "upgrade" "$LOMI" --help
 assert_contains "get" "$LOMI" transactions --help
 assert_contains "create" "$LOMI" refunds --help
 assert_contains "json" "$LOMI" --help
@@ -65,11 +67,18 @@ assert_contains "update" "$LOMI" ui --help
 log "2. Unauthenticated commands"
 assert_contains "No profiles" "$LOMI" list-profiles
 assert_exit 1 "$LOMI" whoami
+assert_contains "lomi login" "$LOMI" whoami
 assert_exit 1 "$LOMI" status
+
+log "2b. Bare lomi (home)"
+assert_contains "Welcome" "$LOMI" 2>/dev/null || assert_contains "quickstart" "$LOMI" 2>/dev/null || pass "bare lomi runs"
+
+log "2c. JSON error envelope"
+assert_contains '"message"' "$LOMI" --json whoami
+assert_contains "lomi login" "$LOMI" --json whoami
 
 log "3. Device auth initiation (live Supabase)"
 set +e
-# Public anon key — same as embedded in the CLI (see src/cli/mod.rs SUPABASE_ANON_KEY)
 ANON_KEY="${LOMI_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kc3d2b2t4cm5mZ2dydWpzZmpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MTA0NTIsImV4cCI6MjA4NTg3MDQ1Mn0.vWQoCk2mBTUPWVpzcu3WmKv9xwXoj0bv8SCRrEdJxpM}"
 DEVICE_CURL=(curl -sf -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1/cli-auth/device-auth")
 DEVICE_CURL+=(-H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")
@@ -85,10 +94,10 @@ else
 fi
 
 log "4. Config read/write via Rust tests"
-if cargo test -q config::global::tests; then
-  pass "cargo test config roundtrip"
+if cargo test -q config::global::tests api::error::tests cli::output::tests; then
+  pass "cargo test config/api/output"
 else
-  fail "cargo test config roundtrip"
+  fail "cargo test config/api/output"
 fi
 
 log "5. init --yes (headless scaffold)"
@@ -222,6 +231,10 @@ if [[ -x "$ROOT/../doctool/target/release/dt" ]] || [[ -x "$ROOT/../doctool/targ
 else
   pass "lomi docs help (dt binary not built — skipped run)"
 fi
+
+log "14. Shell completions"
+assert_exit 0 "$LOMI" completions generate bash
+assert_exit 0 "$LOMI" completions generate zsh
 
 echo ""
 echo "=============================="

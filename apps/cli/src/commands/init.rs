@@ -12,6 +12,7 @@ use crate::commands::ui;
 use crate::config::{Environment, GlobalConfig, Language};
 
 #[derive(Args, Debug)]
+#[command(after_help = "Example:\n  lomi init\n  lomi init --yes --environment sandbox --language ts --api-key lomi_sk_test_xxx")]
 pub struct InitArgs {
     /// Project path (default: current directory)
     #[arg(default_value = ".")]
