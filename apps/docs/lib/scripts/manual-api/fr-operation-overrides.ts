@@ -30,6 +30,14 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     related:
       '[Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) si vous préférez l’encaissement hébergé.',
   },
+  ChargesController_createGimCharge: {
+    whenToUse:
+      'Utilisez pour la capture carte côté serveur lorsque votre intégration appelle GIM Pay directement plutôt que le checkout hébergé ou Payment Elements.',
+    caveats:
+      'Traitez PAN/CVV uniquement dans un environnement conforme PCI. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.',
+    related:
+      '[Créer un encaissement carte](/api/charge/ChargesController_createCardCharge) · [Encaissements directs](/build/direct-charges)',
+  },
   ChargesController_createWaveCharge: {
     whenToUse:
       'Utilisez pour un encaissement mobile money initié serveur lorsque vous n’utilisez **pas** une session checkout hébergée.',

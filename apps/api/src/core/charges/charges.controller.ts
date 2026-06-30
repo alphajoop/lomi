@@ -137,7 +137,7 @@ export class ChargesController {
   @ApiOperation({
     summary: 'Create GIM Pay card charge (direct PayByCard)',
     description:
-      'Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail for Stripe fallback.',
+      'Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail to try another card-payment rail.',
   })
   @ApiResponse({
     status: 201,

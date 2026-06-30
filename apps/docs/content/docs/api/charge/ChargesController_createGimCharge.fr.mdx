@@ -1,0 +1,123 @@
+---
+title: "Create GIM Pay card charge (direct PayByCard)"
+description: "Create GIM Pay card charge (direct PayByCard)"
+full: true
+method: post
+path: /charge/gim
+operationId: ChargesController_createGimCharge
+---
+
+## Aperçu
+
+Create GIM Pay card charge (direct PayByCard)
+
+Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal retry_other_rail to try another card-payment rail.
+
+
+### Quand l’utiliser
+
+Utilisez pour la capture carte côté serveur lorsque votre intégration appelle GIM Pay directement plutôt que le checkout hébergé ou Payment Elements.
+
+### À savoir
+
+Traitez PAN/CVV uniquement dans un environnement conforme PCI. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.
+
+### Voir aussi
+
+[Créer un encaissement carte](/api/charge/ChargesController_createCardCharge) · [Encaissements directs](/build/direct-charges)
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`POST /charge/gim`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+_Pas d’autre paramètre dans l’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
+### Corps de la requête
+
+Corps JSON.
+
+Schéma: `CreateGimChargeDto`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Oui | `number` | Amount in XOF francs |
+| `currency_code` | Non | `enum ("XOF")` | — |
+| `pan` | Oui | `string` | — |
+| `expiry` | Oui | `string` | MM/YY or YYMM |
+| `cvv` | Oui | `string` | — |
+| `customer_id` | Non | `string` | — |
+| `customer_email` | Non | `string` | — |
+| `customer_name` | Non | `string` | — |
+| `customer_phone` | Non | `string` | — |
+| `description` | Non | `string` | — |
+| `payment_reference` | Non | `string` | — |
+| `product_id` | Non | `string` | — |
+| `subscription_id` | Non | `string` | — |
+| `checkout_session_id` | Non | `string` | — |
+| `quantity` | Non | `number` | — |
+| `metadata` | Non | `object` | — |
+| `ecom_ip` | Non | `string` | Customer IP for EComIp |
+
+Exemple de corps :
+
+```json
+{
+  "amount": 10000,
+  "pan": "4221941234569109",
+  "expiry": "06/25",
+  "cvv": "123"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `201` | GIM charge created |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/gim" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":10000,"pan":"4221941234569109","expiry":"06/25","cvv":"123"}'
+```
+
+## OpenAPI
+
+- **operationId**: `ChargesController_createGimCharge`
+- **Operation**: `POST /charge/gim`
+
+Schémas complets et **Try it** : [référence API](/api).

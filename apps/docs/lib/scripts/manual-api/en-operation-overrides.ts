@@ -232,6 +232,16 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     related:
       '[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) if you prefer hosted card collection.',
   },
+  ChargesController_createGimCharge: {
+    summary: 'Create GIM Pay card charge (direct PayByCard)',
+    body: 'Charges a card via GIM Pay PayByCard. May return a redirect URL for 3DS or signal `retry_other_rail` to try another card-payment rail.',
+    whenToUse:
+      'Use for server-side card capture when your integration calls GIM Pay directly rather than hosted checkout or embedded Payment Elements.',
+    caveats:
+      'Handle PAN/CVV only in PCI-scoped environments. Follow `next_action` for 3DS redirects and `retry_other_rail` when the primary rail declines.',
+    related:
+      '[Create card charge](/api/charge/ChargesController_createCardCharge) · [Direct charges](/build/direct-charges)',
+  },
   ChargesController_getCardCharge: {
     summary: 'Get embedded card charge',
     body: 'Retrieves card charge status and linked transaction when present.',

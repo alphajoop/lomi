@@ -3,6 +3,7 @@
   "pages": [
     "ChargesController_cancelCardCharge",
     "ChargesController_createCardCharge",
+    "ChargesController_createGimCharge",
     "ChargesController_createMtnCharge",
     "ChargesController_createWaveCharge",
     "ChargesController_getCardCharge"
