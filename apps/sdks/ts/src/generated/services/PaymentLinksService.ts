@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class PaymentLinksService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class PaymentLinksService {
      * Create payment link
      * @see OpenAPI `PaymentLinksController_create`
      */
-    public async create(body: NonNullable<paths['/payment-links']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payment-links']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/payment-links']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async create(body: NonNullable<paths['/payment-links']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['PaymentLinkResponseDto']> {
+        return requestWithClient<components['schemas']['PaymentLinkResponseDto']>(this.client, {
             method: 'POST',
             url: '/payment-links',
             body,
@@ -27,8 +27,8 @@ export class PaymentLinksService {
      * Retrieve payment link
      * @see OpenAPI `PaymentLinksController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payment-links/{id}']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/payment-links/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['PaymentLinkResponseDto']> {
+        return requestWithClient<components['schemas']['PaymentLinkResponseDto']>(this.client, {
             method: 'GET',
             url: '/payment-links/{id}',
             path: { id: id },
@@ -40,8 +40,8 @@ export class PaymentLinksService {
      * List payment links
      * @see OpenAPI `PaymentLinksController_findAll`
      */
-    public async list(params?: paths['/payment-links']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payment-links']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/payment-links']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async list(params?: paths['/payment-links']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/payment-links']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/payment-links']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'GET',
             url: '/payment-links',
             query: params,

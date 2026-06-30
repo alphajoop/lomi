@@ -31,16 +31,24 @@ jobs:
     name: Publish TypeScript SDK
     runs-on: ubuntu-latest
     if: inputs.sdk == 'typescript' || inputs.sdk == 'all'
-    
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+          cache-dependency-path: apps/sdks/ts/pnpm-lock.yaml
 
       - name: Bump version
         if: inputs.version_bump != 'skip'
@@ -48,17 +56,26 @@ jobs:
         run: npm version ${{ inputs.version_bump }} --no-git-tag-version
 
       - name: Install dependencies and build
-        working-directory: apps/sdks/ts
         run: |
-          npm install
-          npm run generate
-          npm run build
+          cd apps/sdks && npm install
+          cd ts && pnpm install --frozen-lockfile
+          pnpm run generate
+          pnpm run build
 
       - name: Publish to npm
         working-directory: apps/sdks/ts
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Commit version bump
+        if: inputs.version_bump != 'skip'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/sdks/ts/package.json
+          git diff --staged --quiet || git commit -m "chore(sdks): release @lomi./sdk $(node -p "require('./apps/sdks/ts/package.json').version")"
+          git push
 
   publish-javascript:
     name: Publish JavaScript SDK

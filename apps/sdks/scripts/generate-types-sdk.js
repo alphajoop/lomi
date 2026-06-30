@@ -69,31 +69,41 @@ function first2xxResponseCode(op) {
   return codes.sort((a, b) => Number(a) - Number(b))[0] ?? '200';
 }
 
+/** @param {any} schema @param {any} spec @param {string} opType @param {'request'|'response'} kind */
+function resolveSchemaType(schema, spec, opType, kind) {
+  if (schema?.$ref) {
+    const name = schema.$ref.split('/').pop();
+    if (name) return `components['schemas']['${name}']`;
+  }
+  if (kind === 'request') {
+    return `NonNullable<${opType}['requestBody']>['content']['application/json']`;
+  }
+  return `(NonNullable<NonNullable<${opType}['responses'][201]>['content']>['application/json'])`;
+}
+
 /**
  * @param {string} pathTpl
  * @param {string} httpMethod
  * @param {any} op
+ * @param {any} spec
  */
-function buildOperationTypes(pathTpl, httpMethod, op) {
+function buildOperationTypes(pathTpl, httpMethod, op, spec) {
   const opType = pathsOpType(pathTpl, httpMethod);
   const code = first2xxResponseCode(op);
 
   const hasBody = wantsBody(httpMethod, op);
+  const reqSchema = op.requestBody?.content?.['application/json']?.schema;
   const bodyType = hasBody
-    ? `NonNullable<${opType}['requestBody']>['content']['application/json']`
+    ? resolveSchemaType(reqSchema, spec, opType, 'request')
     : null;
 
-  const resContent = op.responses?.[code]?.content?.['application/json'];
-  const responseType = resContent
-    ? `NonNullable<NonNullable<${opType}['responses'][${code}]>['content']>['application/json']>`
+  const resSchema = op.responses?.[code]?.content?.['application/json']?.schema;
+  const responseType = resSchema || op.responses?.[code]?.content?.['application/json']
+    ? resSchema?.$ref
+      ? resolveSchemaType(resSchema, spec, opType, 'response')
+      : `(NonNullable<NonNullable<${opType}['responses'][${code}]>['content']>['application/json'])`
     : 'unknown';
 
-  const hasQuery = flattenParams(
-    /** @type any */ ({}),
-    /** @type any */ ({}),
-    op,
-  );
-  // query typing via paths if parameters exist on operation in spec
   const queryType = `${opType}['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>`;
 
   return { bodyType, responseType, queryType, hasBody, code };
@@ -128,6 +138,7 @@ function buildMethodSource(
     pathTpl,
     httpMethod,
     op,
+    spec,
   );
 
   const opt = 'import("../../request-options.js").LomiRequestOptions';
@@ -191,7 +202,7 @@ function buildListAllSource(methodName, pathTpl, httpMethod, op, spec) {
 
   const pathItem = spec.paths[pathTpl];
   const qParams = flattenParams(spec, pathItem, op).filter((q) => q.in === 'query');
-  const { queryType, responseType } = buildOperationTypes(pathTpl, httpMethod, op);
+  const { queryType, responseType } = buildOperationTypes(pathTpl, httpMethod, op, spec);
   const listMethod = methodName;
   const opt = 'import("../../request-options.js").LomiRequestOptions';
 
@@ -312,7 +323,7 @@ function generateServiceClass(serviceName, methods) {
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';${webhookImport}
+import type { paths, components } from '../schema.js';${webhookImport}
 
 export class ${serviceName} {
     constructor(private readonly client: LomiClient) {}

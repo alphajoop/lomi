@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class SettlementsService {
     constructor(private readonly client: LomiClient) {}

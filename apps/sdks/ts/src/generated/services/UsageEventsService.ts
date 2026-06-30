@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class UsageEventsService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class UsageEventsService {
      * Record a usage event
      * @see OpenAPI `UsageEventsController_ingest`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/usage-events']['post']['responses'][202]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/usage-events']['post']['responses'][202]>['content']>['application/json']>>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['UsageEventResponseDto']> {
+        return requestWithClient<components['schemas']['UsageEventResponseDto']>(this.client, {
             method: 'POST',
             url: '/usage-events',
             ...options,
@@ -26,8 +26,8 @@ export class UsageEventsService {
      * Get a usage event
      * @see OpenAPI `UsageEventsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/usage-events/{id}']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/usage-events/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['UsageEventListItemDto']> {
+        return requestWithClient<components['schemas']['UsageEventListItemDto']>(this.client, {
             method: 'GET',
             url: '/usage-events/{id}',
             path: { id: id },
@@ -39,8 +39,8 @@ export class UsageEventsService {
      * List usage events
      * @see OpenAPI `UsageEventsController_findAll`
      */
-    public async list(params?: paths['/usage-events']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/usage-events']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/usage-events']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async list(params?: paths['/usage-events']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/usage-events']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/usage-events']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'GET',
             url: '/usage-events',
             query: params,

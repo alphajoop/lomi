@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class WebhookDeliveryLogsService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class WebhookDeliveryLogsService {
      * Retrieve webhook delivery log
      * @see OpenAPI `WebhookDeliveryLogsController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/webhook-delivery-logs/{id}']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/webhook-delivery-logs/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['WebhookDeliveryLogResponseDto']> {
+        return requestWithClient<components['schemas']['WebhookDeliveryLogResponseDto']>(this.client, {
             method: 'GET',
             url: '/webhook-delivery-logs/{id}',
             path: { id: id },
@@ -27,8 +27,8 @@ export class WebhookDeliveryLogsService {
      * List webhook delivery logs
      * @see OpenAPI `WebhookDeliveryLogsController_findAll`
      */
-    public async list(params?: paths['/webhook-delivery-logs']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/webhook-delivery-logs']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/webhook-delivery-logs']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async list(params?: paths['/webhook-delivery-logs']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/webhook-delivery-logs']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/webhook-delivery-logs']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'GET',
             url: '/webhook-delivery-logs',
             query: params,

@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class UsageSubscriptionsService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class UsageSubscriptionsService {
      * Create a usage subscription
      * @see OpenAPI `UsageEventsController_createUsageSubscription`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/usage-subscriptions']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/usage-subscriptions']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['UsageSubscriptionResponseDto']> {
+        return requestWithClient<components['schemas']['UsageSubscriptionResponseDto']>(this.client, {
             method: 'POST',
             url: '/usage-subscriptions',
             ...options,

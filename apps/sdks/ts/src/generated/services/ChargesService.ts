@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class ChargesService {
     constructor(private readonly client: LomiClient) {}
@@ -27,8 +27,8 @@ export class ChargesService {
      * Create embedded card charge
      * @see OpenAPI `ChargesController_createCardCharge`
      */
-    public async createCardCharge(body: NonNullable<paths['/charge/card']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/charge/card']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/charge/card']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async createCardCharge(body: components['schemas']['CreateCardChargeDto'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['CardChargeResponseDto']> {
+        return requestWithClient<components['schemas']['CardChargeResponseDto']>(this.client, {
             method: 'POST',
             url: '/charge/card',
             body,
@@ -40,8 +40,8 @@ export class ChargesService {
      * Create MTN MoMo charge
      * @see OpenAPI `ChargesController_createMtnCharge`
      */
-    public async createMtnCharge(body: NonNullable<paths['/charge/mtn']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/charge/mtn']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/charge/mtn']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async createMtnCharge(body: components['schemas']['CreateMtnChargeDto'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['MtnChargeResponseDto']> {
+        return requestWithClient<components['schemas']['MtnChargeResponseDto']>(this.client, {
             method: 'POST',
             url: '/charge/mtn',
             body,
@@ -53,8 +53,8 @@ export class ChargesService {
      * Create Switch charge
      * @see OpenAPI `ChargesController_createSwitchCharge`
      */
-    public async createSwitchCharge(body: NonNullable<paths['/charge/switch']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/charge/switch']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/charge/switch']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async createSwitchCharge(body: components['schemas']['CreateSwitchChargeDto'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['SwitchChargeResponseDto']> {
+        return requestWithClient<components['schemas']['SwitchChargeResponseDto']>(this.client, {
             method: 'POST',
             url: '/charge/switch',
             body,
@@ -66,8 +66,8 @@ export class ChargesService {
      * Create direct mobile-money charge
      * @see OpenAPI `ChargesController_createWaveCharge`
      */
-    public async createWaveCharge(body: NonNullable<paths['/charge/wave']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/charge/wave']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/charge/wave']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async createWaveCharge(body: components['schemas']['CreateWaveChargeDto'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['WaveChargeResponseDto']> {
+        return requestWithClient<components['schemas']['WaveChargeResponseDto']>(this.client, {
             method: 'POST',
             url: '/charge/wave',
             body,
@@ -79,8 +79,8 @@ export class ChargesService {
      * Get embedded card charge
      * @see OpenAPI `ChargesController_getCardCharge`
      */
-    public async getCardCharge(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/charge/card/{id}']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/charge/card/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async getCardCharge(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['CardChargeResponseDto']> {
+        return requestWithClient<components['schemas']['CardChargeResponseDto']>(this.client, {
             method: 'GET',
             url: '/charge/card/{id}',
             path: { id: id },

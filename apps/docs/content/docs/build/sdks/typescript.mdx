@@ -51,7 +51,7 @@ const lomi = new LomiSDK({
 Copy-paste runnable example: install the SDK, set `LOMI_SECRET_KEY` in `.env`, then fetch your sandbox balance.
 
 ```typescript
-import { LomiSDK, LomiError } from '@lomi./sdk';
+import { LomiSDK, LomiAuthError, LomiNotFoundError } from '@lomi./sdk';
 
 const lomi = new LomiSDK({
   apiKey: process.env.LOMI_SECRET_KEY!,
@@ -63,8 +63,9 @@ async function main() {
     const balance = await lomi.accounts.getBalance();
     console.log('Balance:', balance);
   } catch (error) {
-    if (error instanceof LomiError) {
-      console.error(`API error [${error.status}]: ${error.message}`);
+    if (error instanceof LomiAuthError) {
+      console.error(`Auth failed [${error.statusCode}]: ${error.message}`);
+      if (error.requestId) console.error('request_id:', error.requestId);
       process.exit(1);
     }
     throw error;
@@ -236,13 +237,42 @@ await lomi.charges.createWaveCharge({
 ### Embedded card charge (`POST /charge/card`)
 
 ```typescript
-await lomi.charges.createCardCharge({
+const charge = await lomi.charges.createCardCharge({
   amount: 2500,
   currency_code: 'XOF',
   customer_email: 'buyer@example.com',
   customer_name: 'Buyer Name',
 });
+
+// Use charge.data.client_secret with Payment Elements on your frontend
+console.log(charge.data?.client_secret);
 ```
+
+### Switch charge — server-side card authorization (`POST /charge/switch`)
+
+For PCI-compliant fintech integrations that authorize cards server-side (not hosted checkout):
+
+```typescript
+const result = await lomi.charges.createSwitchCharge(
+  {
+    amount: 10000,
+    currency_code: 'XOF',
+    pan: '4221941234569109',
+    expiry: '06/30',
+    cvv: '123',
+    card_holder_name: 'Amadou Ba',
+  },
+  { idempotencyKey: 'switch-attempt-001' },
+);
+
+if (result.status === 'redirect_3ds') {
+  console.log('Complete 3DS at:', result.three_ds_url);
+}
+```
+
+<Callout type="warning">
+  Switch requires a PCI-DSS-compliant integration. For most merchants, use [Payment Elements](/build/sdks/typescript#payment-elements) or [checkout sessions](/api/checkout-sessions/CheckoutSessionsController_create) instead.
+</Callout>
 
 ---
 
@@ -270,19 +300,30 @@ console.log('Total Customers:', metrics.total_customers);
 
 ## Error Handling
 
+The SDK throws typed `LomiError` subclasses with the API message, HTTP status, error code, and `request_id`:
+
 ```typescript
-import { LomiSDK, LomiError, LomiNotFoundError } from '@lomi./sdk';
+import {
+  LomiSDK,
+  LomiAuthError,
+  LomiNotFoundError,
+  LomiValidationError,
+  LomiRateLimitError,
+} from '@lomi./sdk';
 
 try {
   const customer = await lomi.customers.get('invalid_id');
 } catch (error) {
   if (error instanceof LomiNotFoundError) {
-    console.error('Customer not found');
-  } else if (error instanceof LomiError) {
-    console.error(`API Error [${error.status}]: ${error.message}`);
-  } else {
-    throw error;
+    console.error('Customer not found:', error.message);
+  } else if (error instanceof LomiValidationError) {
+    console.error('Invalid request:', error.details);
+  } else if (error instanceof LomiRateLimitError) {
+    console.error('Rate limited — retry later');
+  } else if (error instanceof LomiAuthError) {
+    console.error(`Auth error [${error.statusCode}]: ${error.message}`);
   }
+  console.error('request_id:', error.requestId);
 }
 ```
 
@@ -290,15 +331,73 @@ try {
 
 ## Configuration Options
 
+Each `LomiSDK` instance is isolated — safe for multi-tenant workers and tests:
+
 ```typescript
-interface LomiConfig {
-  apiKey: string;              // Your secret API key
-  environment?: 'test' | 'live'; // Sandbox or production
-  baseUrl?: string;            // Custom base URL (overrides environment)
-  headers?: Record<string, string>; // Additional request headers
-  timeout?: number;            // Request timeout in ms (default: 30000)
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'test',           // 'live' in production
+  account: 'acct_connected_…',   // default Lomi-Account header (operator mode)
+  timeout: 30_000,               // request timeout in ms (default: 30000)
+  retries: 2,                    // retry idempotent GETs + 429s with backoff
+  headers: { 'X-Custom': '1' },
+});
+```
+
+### Per-request options
+
+Pass on any create-style call:
+
+```typescript
+await lomi.checkoutSessions.create(body, {
+  idempotencyKey: 'checkout-001',  // Idempotency-Key header
+  account: 'acct_other_…',         // override Lomi-Account for this call
+  signal: abortController.signal,  // AbortSignal
+});
+```
+
+---
+
+## Webhooks
+
+Verify incoming webhook signatures without hand-rolling HMAC:
+
+```typescript
+const valid = lomi.webhooks.verifySignature(
+  rawBody,                          // string or Buffer (use raw body, not parsed JSON)
+  req.headers['x-lomi-signature'],
+  process.env.LOMI_WEBHOOK_SECRET!,
+);
+
+if (!valid) return res.status(401).send('Invalid signature');
+```
+
+---
+
+## Auto-pagination
+
+List endpoints expose an async iterator via `listAll`:
+
+```typescript
+for await (const tx of lomi.transactions.listAll({ status: 'completed' })) {
+  console.log(tx.id, tx.gross_amount);
 }
 ```
+
+---
+
+## Payment Elements
+
+```typescript
+import { loadLomi } from '@lomi./sdk';
+
+// Your lomi_pk_… is validated; Elements run on lomi.'s PCI platform infrastructure.
+const elements = await loadLomi('lomi_pk_test_…');
+```
+
+<Callout type="info">
+  Payment Elements initialize on lomi.'s platform account. Your publishable key identifies your merchant context; you never handle raw card numbers.
+</Callout>
 
 ---
 
@@ -307,36 +406,62 @@ interface LomiConfig {
 | Service | Methods |
 |---------|---------|
 | `accounts` | `getBalance`, `getBalanceBreakdown`, `checkBalance` |
-| `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `getCardCharge`, `cancelCardCharge` |
-| `checkoutSessions` | `list`, `get`, `create` |
-| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions`, `createPortalLaunchSession`, `getPortalAudit` |
-| `discountCoupons` | `list`, `get`, `create`, `getPerformance` |
+| `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `createSwitchCharge`, `getCardCharge`, `cancelCardCharge` |
+| `checkoutSessions` | `list`, `listAll`, `get`, `create` |
+| `customerSubscriptions` | `list`, `listAll`, `get`, `update`, `delete` |
+| `customers` | `list`, `listAll`, `get`, `create`, `update`, `delete`, `getTransactions`, `createPortalLaunchSession`, `getPortalAudit` |
+| `discountCoupons` | `list`, `listAll`, `get`, `create`, `getPerformance` |
+| `disputes` | `list`, `listAll`, `get` |
+| `logs` | `list`, `listAll`, `get` |
 | `merchants` | `get`, `getArr`, `getBalance`, `getMrr` |
-| `organizations` | `list`, `get`, `getMetrics` |
-| `paymentLinks` | `list`, `get`, `create` |
-| `paymentRequests` | `list`, `get`, `create` |
-| `payouts` | `create`, `list`, `get` |
-| `products` | `list`, `get`, `create`, `addPrice`, `setDefaultPrice` |
-| `providers` | `list` |
-| `refunds` | `create`, `list`, `get` |
-| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel`, `uncancel`, `changePlan`, `update` |
-| `transactions` | `list`, `get` |
-| `webhookDeliveryLogs` | `list`, `get` |
-| `webhooks` | `list`, `get`, `create`, `update`, `delete`, `test`, `retryDelivery` |
+| `meters` | `list`, `listAll`, `get`, `create`, `update`, `getCustomerBalance` |
+| `organization` | `get` |
+| `organizations` | `list`, `listAll`, `get`, `getMetrics` |
+| `paymentLinks` | `list`, `listAll`, `get`, `create` |
+| `paymentRequests` | `list`, `listAll`, `get`, `create` |
+| `payouts` | `create`, `list`, `listAll`, `get` |
+| `products` | `list`, `listAll`, `get`, `create`, `addPrice`, `setDefaultPrice` |
+| `providers` | `list`, `listAll` |
+| `refunds` | `create`, `list`, `listAll`, `get` |
+| `riskAssessments` | `list`, `listAll`, `get` |
+| `settlements` | `findAll`, `findTransactions` |
+| `subscriptions` | `list`, `listAll`, `get`, `findByCustomer`, `cancel`, `uncancel`, `changePlan`, `update` |
+| `transactions` | `list`, `listAll`, `get` |
+| `usageBilling` | `checkEntitlement`, `listPeriods`, `getRevenue`, `getSubscriptionUsage`, `grantCredits`, `createEntitlement` |
+| `usageEvents` | `list`, `listAll`, `get`, `create` |
+| `usageSubscriptions` | `create` |
+| `webhookDeliveryLogs` | `list`, `listAll`, `get` |
+| `webhooks` | `list`, `listAll`, `get`, `create`, `update`, `delete`, `test`, `retryDelivery`, `verifySignature` |
 
 ---
 
 ## TypeScript types
 
-Database row types ship with the package for advanced integrations:
+Request and response bodies are fully typed from the OpenAPI schema:
+
+```typescript
+import type {
+  CreateSwitchCharge,
+  SwitchChargeResponse,
+  components,
+  paths,
+} from '@lomi./sdk';
+
+// DTO aliases (generated from components.schemas)
+type SwitchBody = CreateSwitchCharge;
+
+// Or reference paths directly
+type CheckoutCreate =
+  paths['/checkout-sessions']['post']['requestBody']['content']['application/json'];
+```
+
+Database row types also ship for advanced integrations:
 
 ```typescript
 import type { Database } from '@lomi./sdk';
 
 type Customer = Database['public']['Tables']['customers']['Row'];
 ```
-
-For request bodies, infer from examples or introspect payloads at runtime, the public SDK methods use `unknown` placeholders on purpose until stricter codegen lands.
 
 ---
 

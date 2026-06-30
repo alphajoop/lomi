@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class PayoutsService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class PayoutsService {
      * Create payout
      * @see OpenAPI `PayoutsUnifiedController_create`
      */
-    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/payouts']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/payouts']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async create(options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['CreatePayoutResponseDto']> {
+        return requestWithClient<components['schemas']['CreatePayoutResponseDto']>(this.client, {
             method: 'POST',
             url: '/payouts',
             ...options,

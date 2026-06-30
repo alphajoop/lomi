@@ -120,6 +120,17 @@ writeFileSync(join(outputDir, 'configuration.go'), cfg);
 writeFileSync(join(outputDir, 'response.go'), response);
 writeFileSync(join(outputDir, 'utils.go'), utils);
 
+const GO_RESERVED = new Set([
+  'break', 'default', 'func', 'interface', 'select', 'case', 'defer', 'go', 'map', 'struct',
+  'chan', 'else', 'goto', 'package', 'switch', 'const', 'fallthrough', 'if', 'range', 'type',
+  'continue', 'for', 'import', 'return', 'var',
+]);
+
+/** @param {string} name */
+function goParamName(name) {
+  return GO_RESERVED.has(name) ? `${name}Param` : name;
+}
+
 /**
  * @param {string} serviceClassName
  * @param {any} nop
@@ -131,14 +142,15 @@ function buildGoMethod(serviceClassName, nop) {
   const q = nop.httpMethodLower === 'get' && nop.queryParams.length > 0;
   const body = nop.wantsBody;
 
-  const plist = [...ids.map((n) => `${n} string`)];
+  const plist = [...ids.map((n) => `${goParamName(n)} string`)];
   if (q) plist.push('params map[string]string');
   if (body) plist.push('body interface{}');
   const plistStr = plist.join(', ');
 
   const pathLines = [`path := ${JSON.stringify(tmpl)}`];
   for (const n of ids) {
-    pathLines.push(`path = strings.ReplaceAll(path, "{${n}}", ${n})`);
+    const p = goParamName(n);
+    pathLines.push(`path = strings.ReplaceAll(path, "{${n}}", ${p})`);
   }
 
   let queryExpr = 'nil';

@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class LogsService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class LogsService {
      * Get a log entry
      * @see OpenAPI `LogsController_findOne`
      */
-    public async get(type: string, id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/logs/{type}/{id}']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/logs/{type}/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async get(type: string, id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['LogEntryResponseDto']> {
+        return requestWithClient<components['schemas']['LogEntryResponseDto']>(this.client, {
             method: 'GET',
             url: '/logs/{type}/{id}',
             path: { type: type, id: id },
@@ -27,8 +27,8 @@ export class LogsService {
      * List logs
      * @see OpenAPI `LogsController_findAll`
      */
-    public async list(params?: paths['/logs']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/logs']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/logs']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async list(params?: paths['/logs']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['LogListResponseDto']> {
+        return requestWithClient<components['schemas']['LogListResponseDto']>(this.client, {
             method: 'GET',
             url: '/logs',
             query: params,

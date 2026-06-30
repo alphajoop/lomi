@@ -5,7 +5,7 @@
 
 import type { LomiClient } from '../../client.js';
 import { requestWithClient } from '../../http.js';
-import type { paths } from '../schema.js';
+import type { paths, components } from '../schema.js';
 
 export class CustomersService {
     constructor(private readonly client: LomiClient) {}
@@ -14,8 +14,8 @@ export class CustomersService {
      * Create a customer
      * @see OpenAPI `CustomersController_create`
      */
-    public async create(body: NonNullable<paths['/customers']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async create(body: NonNullable<paths['/customers']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['CustomerResponseDto']> {
+        return requestWithClient<components['schemas']['CustomerResponseDto']>(this.client, {
             method: 'POST',
             url: '/customers',
             body,
@@ -27,8 +27,8 @@ export class CustomersService {
      * Create customer portal session
      * @see OpenAPI `CustomersController_createPortalLaunchSession`
      */
-    public async createPortalLaunchSession(id: string, body: NonNullable<paths['/customers/{id}/portal-launch-session']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers/{id}/portal-launch-session']['post']['responses'][201]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers/{id}/portal-launch-session']['post']['responses'][201]>['content']>['application/json']>>(this.client, {
+    public async createPortalLaunchSession(id: string, body: NonNullable<paths['/customers/{id}/portal-launch-session']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['PortalLaunchSessionResponseDto']> {
+        return requestWithClient<components['schemas']['PortalLaunchSessionResponseDto']>(this.client, {
             method: 'POST',
             url: '/customers/{id}/portal-launch-session',
             path: { id: id },
@@ -41,8 +41,8 @@ export class CustomersService {
      * Remove a customer
      * @see OpenAPI `CustomersController_remove`
      */
-    public async delete(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers/{id}']['delete']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers/{id}']['delete']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async delete(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/customers/{id}']['delete']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/customers/{id}']['delete']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'DELETE',
             url: '/customers/{id}',
             path: { id: id },
@@ -54,8 +54,8 @@ export class CustomersService {
      * Retrieve a customer
      * @see OpenAPI `CustomersController_findOne`
      */
-    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers/{id}']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers/{id}']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async get(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['CustomerResponseDto']> {
+        return requestWithClient<components['schemas']['CustomerResponseDto']>(this.client, {
             method: 'GET',
             url: '/customers/{id}',
             path: { id: id },
@@ -81,8 +81,8 @@ export class CustomersService {
      * List customer transactions
      * @see OpenAPI `CustomersController_getTransactions`
      */
-    public async getTransactions(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers/{id}/transactions']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers/{id}/transactions']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async getTransactions(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/customers/{id}/transactions']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/customers/{id}/transactions']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'GET',
             url: '/customers/{id}/transactions',
             path: { id: id },
@@ -94,8 +94,8 @@ export class CustomersService {
      * List customers
      * @see OpenAPI `CustomersController_findAll`
      */
-    public async list(params?: paths['/customers']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers']['get']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers']['get']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async list(params?: paths['/customers']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/customers']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/customers']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'GET',
             url: '/customers',
             query: params,
@@ -143,8 +143,8 @@ export class CustomersService {
      * Update a customer
      * @see OpenAPI `CustomersController_update`
      */
-    public async update(id: string, body: NonNullable<paths['/customers/{id}']['patch']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<NonNullable<NonNullable<paths['/customers/{id}']['patch']['responses'][200]>['content']>['application/json']>> {
-        return requestWithClient<NonNullable<NonNullable<paths['/customers/{id}']['patch']['responses'][200]>['content']>['application/json']>>(this.client, {
+    public async update(id: string, body: NonNullable<paths['/customers/{id}']['patch']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['CustomerResponseDto']> {
+        return requestWithClient<components['schemas']['CustomerResponseDto']>(this.client, {
             method: 'PATCH',
             url: '/customers/{id}',
             path: { id: id },
