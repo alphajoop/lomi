@@ -21,9 +21,7 @@ async fn run() -> i32 {
     let cli = match Cli::try_parse() {
         Ok(cli) => cli,
         Err(error) => {
-            if error.use_stderr() {
-                error.print().expect("failed to write clap error");
-            }
+            error.print().expect("failed to write clap error");
             return error
                 .exit_code()
                 .try_into()

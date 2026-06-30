@@ -3,7 +3,7 @@
  * Emit openapi-typescript schema.d.ts from apps/docs/openapi.json
  */
 
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import openapiTS from 'openapi-typescript';
@@ -14,7 +14,8 @@ const outputPath = join(__dirname, '../ts/src/generated/schema.d.ts');
 
 async function main() {
   console.log('📋 Generating OpenAPI schema types (openapi-typescript)…');
-  const types = await openapiTS(new URL(`file://${DEFAULT_OPENAPI_PATH}`));
+  const spec = JSON.parse(readFileSync(DEFAULT_OPENAPI_PATH, 'utf-8'));
+  const types = await openapiTS(spec);
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(
     outputPath,

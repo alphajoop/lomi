@@ -9,6 +9,11 @@ import {
 import { LogEntryResponseDto } from './dto/log-entry-response.dto';
 import { LogListResponseDto } from './dto/log-list-response.dto';
 
+/**
+ * Merchant log reads go through Supabase RPCs only (no direct table queries).
+ * API key material is masked in SQL before persistence and again in mappers here.
+ */
+
 export interface ListLogsParams {
   type: LogType;
   limit: number;

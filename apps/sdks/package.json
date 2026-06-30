@@ -20,5 +20,8 @@
     "sdk"
   ],
   "author": "lomi. <hello@lomi.africa>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "openapi-typescript": "^7.8.0"
+  }
 }

@@ -4,10 +4,7 @@
  */
 
 import type { LomiConfig } from './config.js';
-import { DEFAULT_CONFIG } from './config.js';
-import { OpenAPI } from './generated/index.js';
-
-// Import all generated services
+import { LomiClient } from './client.js';
 import {
   AccountsService,
   ChargesService,
@@ -39,93 +36,75 @@ import {
 } from './generated/index.js';
 
 export class LomiSDK {
-  public readonly accounts: typeof AccountsService;
-  public readonly charges: typeof ChargesService;
-  public readonly checkoutSessions: typeof CheckoutSessionsService;
-  public readonly customerSubscriptions: typeof CustomerSubscriptionsService;
-  public readonly customers: typeof CustomersService;
-  public readonly discountCoupons: typeof DiscountCouponsService;
-  public readonly disputes: typeof DisputesService;
-  public readonly logs: typeof LogsService;
-  public readonly merchants: typeof MerchantsService;
-  public readonly meters: typeof MetersService;
-  public readonly organization: typeof OrganizationService;
-  public readonly organizations: typeof OrganizationsService;
-  public readonly paymentLinks: typeof PaymentLinksService;
-  public readonly paymentRequests: typeof PaymentRequestsService;
-  public readonly payouts: typeof PayoutsService;
-  public readonly products: typeof ProductsService;
-  public readonly providers: typeof ProvidersService;
-  public readonly refunds: typeof RefundsService;
-  public readonly riskAssessments: typeof RiskAssessmentsService;
-  public readonly settlements: typeof SettlementsService;
-  public readonly subscriptions: typeof SubscriptionsService;
-  public readonly transactions: typeof TransactionsService;
-  public readonly usageBilling: typeof UsageBillingService;
-  public readonly usageEvents: typeof UsageEventsService;
-  public readonly usageSubscriptions: typeof UsageSubscriptionsService;
-  public readonly webhookDeliveryLogs: typeof WebhookDeliveryLogsService;
-  public readonly webhooks: typeof WebhooksService;
+  private readonly client: LomiClient;
 
-  /**
-   * Initialize the lomi. SDK
-   */
+  public readonly accounts: AccountsService;
+  public readonly charges: ChargesService;
+  public readonly checkoutSessions: CheckoutSessionsService;
+  public readonly customerSubscriptions: CustomerSubscriptionsService;
+  public readonly customers: CustomersService;
+  public readonly discountCoupons: DiscountCouponsService;
+  public readonly disputes: DisputesService;
+  public readonly logs: LogsService;
+  public readonly merchants: MerchantsService;
+  public readonly meters: MetersService;
+  public readonly organization: OrganizationService;
+  public readonly organizations: OrganizationsService;
+  public readonly paymentLinks: PaymentLinksService;
+  public readonly paymentRequests: PaymentRequestsService;
+  public readonly payouts: PayoutsService;
+  public readonly products: ProductsService;
+  public readonly providers: ProvidersService;
+  public readonly refunds: RefundsService;
+  public readonly riskAssessments: RiskAssessmentsService;
+  public readonly settlements: SettlementsService;
+  public readonly subscriptions: SubscriptionsService;
+  public readonly transactions: TransactionsService;
+  public readonly usageBilling: UsageBillingService;
+  public readonly usageEvents: UsageEventsService;
+  public readonly usageSubscriptions: UsageSubscriptionsService;
+  public readonly webhookDeliveryLogs: WebhookDeliveryLogsService;
+  public readonly webhooks: WebhooksService;
+
   constructor(config: LomiConfig) {
-    const baseUrl = config.environment === 'test' 
-      ? 'https://sandbox.api.lomi.africa'
-      : config.baseUrl || DEFAULT_CONFIG.baseUrl;
+    this.client = new LomiClient(config);
 
-    // Configure OpenAPI client
-    OpenAPI.BASE = baseUrl;
-    OpenAPI.HEADERS = {
-      'X-API-KEY': config.apiKey,
-      ...config.headers,
-    };
-
-    // Assign all generated services
-    this.accounts = AccountsService;
-    this.charges = ChargesService;
-    this.checkoutSessions = CheckoutSessionsService;
-    this.customerSubscriptions = CustomerSubscriptionsService;
-    this.customers = CustomersService;
-    this.discountCoupons = DiscountCouponsService;
-    this.disputes = DisputesService;
-    this.logs = LogsService;
-    this.merchants = MerchantsService;
-    this.meters = MetersService;
-    this.organization = OrganizationService;
-    this.organizations = OrganizationsService;
-    this.paymentLinks = PaymentLinksService;
-    this.paymentRequests = PaymentRequestsService;
-    this.payouts = PayoutsService;
-    this.products = ProductsService;
-    this.providers = ProvidersService;
-    this.refunds = RefundsService;
-    this.riskAssessments = RiskAssessmentsService;
-    this.settlements = SettlementsService;
-    this.subscriptions = SubscriptionsService;
-    this.transactions = TransactionsService;
-    this.usageBilling = UsageBillingService;
-    this.usageEvents = UsageEventsService;
-    this.usageSubscriptions = UsageSubscriptionsService;
-    this.webhookDeliveryLogs = WebhookDeliveryLogsService;
-    this.webhooks = WebhooksService;
+    this.accounts = new AccountsService(this.client);
+    this.charges = new ChargesService(this.client);
+    this.checkoutSessions = new CheckoutSessionsService(this.client);
+    this.customerSubscriptions = new CustomerSubscriptionsService(this.client);
+    this.customers = new CustomersService(this.client);
+    this.discountCoupons = new DiscountCouponsService(this.client);
+    this.disputes = new DisputesService(this.client);
+    this.logs = new LogsService(this.client);
+    this.merchants = new MerchantsService(this.client);
+    this.meters = new MetersService(this.client);
+    this.organization = new OrganizationService(this.client);
+    this.organizations = new OrganizationsService(this.client);
+    this.paymentLinks = new PaymentLinksService(this.client);
+    this.paymentRequests = new PaymentRequestsService(this.client);
+    this.payouts = new PayoutsService(this.client);
+    this.products = new ProductsService(this.client);
+    this.providers = new ProvidersService(this.client);
+    this.refunds = new RefundsService(this.client);
+    this.riskAssessments = new RiskAssessmentsService(this.client);
+    this.settlements = new SettlementsService(this.client);
+    this.subscriptions = new SubscriptionsService(this.client);
+    this.transactions = new TransactionsService(this.client);
+    this.usageBilling = new UsageBillingService(this.client);
+    this.usageEvents = new UsageEventsService(this.client);
+    this.usageSubscriptions = new UsageSubscriptionsService(this.client);
+    this.webhookDeliveryLogs = new WebhookDeliveryLogsService(this.client);
+    this.webhooks = new WebhooksService(this.client);
   }
 
-  /**
-   * Update the API key
-   */
+  /** Rotate the secret API key on this client instance. */
   setApiKey(apiKey: string): void {
-    OpenAPI.HEADERS = {
-      ...OpenAPI.HEADERS,
-      'X-API-KEY': apiKey,
-    };
+    this.client.setApiKey(apiKey);
   }
 
-  /**
-   * Get the current base URL
-   */
+  /** Current API base URL for this client instance. */
   getBaseUrl(): string {
-    return OpenAPI.BASE;
+    return this.client.baseUrl;
   }
 }
