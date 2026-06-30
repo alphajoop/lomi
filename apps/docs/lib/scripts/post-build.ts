@@ -1,10 +1,10 @@
 /* @proprietary license */
 
-import env from '@next/env';
+import { loadEnvConfig } from '@next/env';
 import { generateSitemap } from './generate_sitemap';
 import { updateSearchIndexes } from './update-orama-index';
 
-env.loadEnvConfig(process.cwd());
+loadEnvConfig(process.cwd());
 
 async function main() {
   try {
@@ -18,4 +18,4 @@ async function main() {
   }
 }
 
-await main();
+void main();

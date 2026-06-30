@@ -98,7 +98,28 @@ export class CheckoutSessionsController {
         success_url: { type: 'string', format: 'uri' },
         cancel_url: { type: 'string', format: 'uri' },
         allow_coupon_code: { type: 'boolean' },
-        require_billing_address: { type: 'boolean' },
+        require_billing_address: {
+          type: 'boolean',
+          description: 'When true, show and require billing address on checkout.',
+        },
+        require_email: {
+          type: 'boolean',
+          description:
+            'When true, show and require customer email. Default true when unset.',
+          default: true,
+        },
+        require_phone: {
+          type: 'boolean',
+          description:
+            'When true, show and require customer phone. Default false when unset.',
+          default: false,
+        },
+        fields: {
+          type: 'array',
+          description:
+            'Optional ordered checkout field schema. When provided, overrides require_* booleans.',
+          items: { type: 'object', additionalProperties: true },
+        },
         payment_link_id: { type: 'string', format: 'uuid' },
         metadata: { type: 'object', additionalProperties: true },
         line_items: {

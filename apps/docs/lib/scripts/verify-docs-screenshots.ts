@@ -123,4 +123,4 @@ async function main(): Promise<void> {
   process.exit(1);
 }
 
-await main();
+void main();
