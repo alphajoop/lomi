@@ -1,7 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import ws from 'ws';
 import { Database } from '../types/api';
+
+/** Node < 22 has no global WebSocket; supabase realtime-js requires `ws` in server runtimes. */
+const serverSupabaseOptions = {
+  auth: { persistSession: false },
+  realtime: { transport: ws },
+} as const;
 
 type DatabaseFunctions = Database['public']['Functions'];
 
@@ -32,11 +39,11 @@ export class SupabaseService implements OnModuleInit {
       );
     }
 
-    this.client = createClient<Database>(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
-      },
-    });
+    this.client = createClient<Database>(
+      supabaseUrl,
+      supabaseKey,
+      serverSupabaseOptions,
+    );
   }
 
   getClient(): SupabaseClient<Database> {
@@ -57,7 +64,7 @@ export class SupabaseService implements OnModuleInit {
     }
 
     return createClient<Database>(supabaseUrl, publishableKey, {
-      auth: { persistSession: false },
+      ...serverSupabaseOptions,
       global: {
         headers: {
           Authorization: `Bearer ${accessToken}`,
