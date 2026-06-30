@@ -6,13 +6,12 @@ import (
 	"strings"
 )
 
-type ChargesService struct {
+type MetersService struct {
 	client *Client
 }
 
-func (s *ChargesService) CancelCardCharge(id string) (interface{}, error) {
-		path := "/charge/card/{id}/cancel"
-		path = strings.ReplaceAll(path, "{id}", id)
+func (s *MetersService) Create() (interface{}, error) {
+		path := "/meters"
 		bodyResp, err := s.client.doRequest("POST", path, nil, nil)
 		if err != nil {
 			return nil, err
@@ -28,78 +27,64 @@ func (s *ChargesService) CancelCardCharge(id string) (interface{}, error) {
 	}
 
 
-func (s *ChargesService) CreateCardCharge(body interface{}) (interface{}, error) {
-		path := "/charge/card"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *ChargesService) CreateMtnCharge(body interface{}) (interface{}, error) {
-		path := "/charge/mtn"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *ChargesService) CreateSwitchCharge(body interface{}) (interface{}, error) {
-		path := "/charge/switch"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *ChargesService) CreateWaveCharge(body interface{}) (interface{}, error) {
-		path := "/charge/wave"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *ChargesService) GetCardCharge(id string) (interface{}, error) {
-		path := "/charge/card/{id}"
+func (s *MetersService) Get(id string) (interface{}, error) {
+		path := "/meters/{id}"
 		path = strings.ReplaceAll(path, "{id}", id)
 		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
+	}
+
+
+func (s *MetersService) GetCustomerBalance(id string, customerId string) (interface{}, error) {
+		path := "/meters/{id}/balances/{customerId}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		path = strings.ReplaceAll(path, "{customerId}", customerId)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
+	}
+
+
+func (s *MetersService) List(params map[string]string) (interface{}, error) {
+		path := "/meters"
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
+	}
+
+
+func (s *MetersService) Update(id string) (interface{}, error) {
+		path := "/meters/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("PATCH", path, nil, nil)
 		if err != nil {
 			return nil, err
 		}

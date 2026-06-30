@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T16:10:16.589Z",
+  "generatedAt": "2026-06-30T10:04:38.436Z",
   "language": "go",
   "sdk": {
     "accounts": [
@@ -11,6 +11,7 @@
       "cancelCardCharge",
       "createCardCharge",
       "createMtnCharge",
+      "createSwitchCharge",
       "createWaveCharge",
       "getCardCharge"
     ],
@@ -41,11 +42,26 @@
       "getPerformance",
       "list"
     ],
+    "disputes": [
+      "get",
+      "list"
+    ],
     "merchants": [
       "get",
       "getArr",
       "getBalance",
       "getMrr"
+    ],
+    "meters": [
+      "create",
+      "get",
+      "getCustomerBalance",
+      "list",
+      "update"
+    ],
+    "organization": [
+      "getSettings",
+      "updateSettings"
     ],
     "organizations": [
       "get",
@@ -82,16 +98,42 @@
       "get",
       "list"
     ],
+    "riskAssessments": [
+      "findOne",
+      "listAssessments"
+    ],
+    "settlements": [
+      "findAll",
+      "findTransactions"
+    ],
     "subscriptions": [
       "cancel",
+      "changePlan",
       "findByCustomer",
       "get",
       "list",
+      "uncancel",
       "update"
     ],
     "transactions": [
       "get",
       "list"
+    ],
+    "usageBilling": [
+      "checkEntitlement",
+      "createEntitlement",
+      "getRevenue",
+      "getSubscriptionUsage",
+      "grantCredits",
+      "listPeriods"
+    ],
+    "usageEvents": [
+      "create",
+      "get",
+      "list"
+    ],
+    "usageSubscriptions": [
+      "create"
     ],
     "webhookDeliveryLogs": [
       "get",

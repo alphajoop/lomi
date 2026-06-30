@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-type RefundsService struct {
+type SettlementsService struct {
 	client *Client
 }
 
-func (s *RefundsService) Create(body interface{}) (interface{}, error) {
-		path := "/refunds"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
+func (s *SettlementsService) FindAll(params map[string]string) (interface{}, error) {
+		path := "/settlements"
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -27,26 +27,9 @@ func (s *RefundsService) Create(body interface{}) (interface{}, error) {
 	}
 
 
-func (s *RefundsService) Get(id string) (interface{}, error) {
-		path := "/refunds/{id}"
+func (s *SettlementsService) FindTransactions(id string, params map[string]string) (interface{}, error) {
+		path := "/settlements/{id}/transactions"
 		path = strings.ReplaceAll(path, "{id}", id)
-		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *RefundsService) List(params map[string]string) (interface{}, error) {
-		path := "/refunds"
 		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
 		if err != nil {
 			return nil, err

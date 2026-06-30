@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-type RefundsService struct {
+type UsageEventsService struct {
 	client *Client
 }
 
-func (s *RefundsService) Create(body interface{}) (interface{}, error) {
-		path := "/refunds"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
+func (s *UsageEventsService) Create() (interface{}, error) {
+		path := "/usage-events"
+		bodyResp, err := s.client.doRequest("POST", path, nil, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -27,8 +27,8 @@ func (s *RefundsService) Create(body interface{}) (interface{}, error) {
 	}
 
 
-func (s *RefundsService) Get(id string) (interface{}, error) {
-		path := "/refunds/{id}"
+func (s *UsageEventsService) Get(id string) (interface{}, error) {
+		path := "/usage-events/{id}"
 		path = strings.ReplaceAll(path, "{id}", id)
 		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
 		if err != nil {
@@ -45,8 +45,8 @@ func (s *RefundsService) Get(id string) (interface{}, error) {
 	}
 
 
-func (s *RefundsService) List(params map[string]string) (interface{}, error) {
-		path := "/refunds"
+func (s *UsageEventsService) List(params map[string]string) (interface{}, error) {
+		path := "/usage-events"
 		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
 		if err != nil {
 			return nil, err

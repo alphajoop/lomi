@@ -19,7 +19,10 @@ type Client struct {
 	Customers *CustomersService
 	CustomerSubscriptions *CustomerSubscriptionsService
 	DiscountCoupons *DiscountCouponsService
+	Disputes *DisputesService
 	Merchants *MerchantsService
+	Meters *MetersService
+	Organization *OrganizationService
 	Organizations *OrganizationsService
 	PaymentLinks *PaymentLinksService
 	PaymentRequests *PaymentRequestsService
@@ -27,8 +30,13 @@ type Client struct {
 	Products *ProductsService
 	Providers *ProvidersService
 	Refunds *RefundsService
+	RiskAssessments *RiskAssessmentsService
+	Settlements *SettlementsService
 	Subscriptions *SubscriptionsService
 	Transactions *TransactionsService
+	UsageBilling *UsageBillingService
+	UsageEvents *UsageEventsService
+	UsageSubscriptions *UsageSubscriptionsService
 	WebhookDeliveryLogs *WebhookDeliveryLogsService
 	Webhooks *WebhooksService
 }
@@ -48,7 +56,10 @@ func NewClient(apiKey string, opts ...ClientOption) *Client {
 	c.Customers = &CustomersService{client: c}
 	c.CustomerSubscriptions = &CustomerSubscriptionsService{client: c}
 	c.DiscountCoupons = &DiscountCouponsService{client: c}
+	c.Disputes = &DisputesService{client: c}
 	c.Merchants = &MerchantsService{client: c}
+	c.Meters = &MetersService{client: c}
+	c.Organization = &OrganizationService{client: c}
 	c.Organizations = &OrganizationsService{client: c}
 	c.PaymentLinks = &PaymentLinksService{client: c}
 	c.PaymentRequests = &PaymentRequestsService{client: c}
@@ -56,8 +67,13 @@ func NewClient(apiKey string, opts ...ClientOption) *Client {
 	c.Products = &ProductsService{client: c}
 	c.Providers = &ProvidersService{client: c}
 	c.Refunds = &RefundsService{client: c}
+	c.RiskAssessments = &RiskAssessmentsService{client: c}
+	c.Settlements = &SettlementsService{client: c}
 	c.Subscriptions = &SubscriptionsService{client: c}
 	c.Transactions = &TransactionsService{client: c}
+	c.UsageBilling = &UsageBillingService{client: c}
+	c.UsageEvents = &UsageEventsService{client: c}
+	c.UsageSubscriptions = &UsageSubscriptionsService{client: c}
 	c.WebhookDeliveryLogs = &WebhookDeliveryLogsService{client: c}
 	c.Webhooks = &WebhooksService{client: c}
 	return c

@@ -6,29 +6,12 @@ import (
 	"strings"
 )
 
-type RefundsService struct {
+type RiskAssessmentsService struct {
 	client *Client
 }
 
-func (s *RefundsService) Create(body interface{}) (interface{}, error) {
-		path := "/refunds"
-		bodyResp, err := s.client.doRequest("POST", path, nil, body)
-		if err != nil {
-			return nil, err
-		}
-		if len(bodyResp) == 0 {
-			return nil, nil
-		}
-		var out interface{}
-		if err := json.Unmarshal(bodyResp, &out); err != nil {
-			return nil, err
-		}
-		return out, nil
-	}
-
-
-func (s *RefundsService) Get(id string) (interface{}, error) {
-		path := "/refunds/{id}"
+func (s *RiskAssessmentsService) FindOne(id string) (interface{}, error) {
+		path := "/risk-assessments/{id}"
 		path = strings.ReplaceAll(path, "{id}", id)
 		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
 		if err != nil {
@@ -45,8 +28,8 @@ func (s *RefundsService) Get(id string) (interface{}, error) {
 	}
 
 
-func (s *RefundsService) List(params map[string]string) (interface{}, error) {
-		path := "/refunds"
+func (s *RiskAssessmentsService) ListAssessments(params map[string]string) (interface{}, error) {
+		path := "/risk-assessments"
 		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
 		if err != nil {
 			return nil, err
