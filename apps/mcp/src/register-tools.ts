@@ -71,12 +71,16 @@ function registerOneTool(
           apiKey,
         });
         const latencyMs = Date.now() - t0;
-        mcpLog('tool_upstream_complete', {
-          tool: tool.name,
-          method: tool.method,
-          upstreamStatus: result.status,
-          latencyMs,
-        });
+        mcpLog(
+          'tool_upstream_complete',
+          {
+            tool: tool.name,
+            method: tool.method,
+            upstreamStatus: result.status,
+            latencyMs,
+          },
+          result.status >= 400 ? 'warn' : 'info',
+        );
         const text = truncateToolResultText(formatHttpResult(result));
         const ok = result.status >= 200 && result.status < 300;
         return {

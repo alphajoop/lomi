@@ -283,11 +283,15 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           store.sessionId = sessionId;
         } else if (!sessionId && isInitializeRequest(req.body)) {
           if (!registry.canAcceptNewSession()) {
-            mcpLog('mcp_session_rejected', {
-              reason: 'max_sessions',
-              activeSessions: registry.size,
-              maxSessions: mcpMaxSessions(),
-            });
+            mcpLog(
+              'mcp_session_rejected',
+              {
+                reason: 'max_sessions',
+                activeSessions: registry.size,
+                maxSessions: mcpMaxSessions(),
+              },
+              'warn',
+            );
             res.status(503).json({
               jsonrpc: '2.0',
               error: {
@@ -365,9 +369,13 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           req.body,
         );
       } catch (error) {
-        mcpLog('mcp_post_error', {
-          error: error instanceof Error ? error.message : String(error),
-        });
+        mcpLog(
+          'mcp_post_error',
+          {
+            error: error instanceof Error ? error.message : String(error),
+          },
+          'error',
+        );
         if (!res.headersSent) {
           res.status(500).json({
             jsonrpc: '2.0',
@@ -407,9 +415,13 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           res as ServerResponse,
         );
       } catch (error) {
-        mcpLog('mcp_get_error', {
-          error: error instanceof Error ? error.message : String(error),
-        });
+        mcpLog(
+          'mcp_get_error',
+          {
+            error: error instanceof Error ? error.message : String(error),
+          },
+          'error',
+        );
         if (!res.headersSent) {
           res.status(500).send('Internal server error');
         }
@@ -441,9 +453,13 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           res as ServerResponse,
         );
       } catch (error) {
-        mcpLog('mcp_delete_error', {
-          error: error instanceof Error ? error.message : String(error),
-        });
+        mcpLog(
+          'mcp_delete_error',
+          {
+            error: error instanceof Error ? error.message : String(error),
+          },
+          'error',
+        );
         if (!res.headersSent) {
           res.status(500).send('Internal server error');
         }
