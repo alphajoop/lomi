@@ -133,6 +133,15 @@ export class CreatePaymentLinkDto {
   require_phone?: boolean;
 
   @ApiPropertyOptional({
+    example: true,
+    description: 'Require customer name at checkout',
+    default: true,
+  })
+  @IsBoolean()
+  @IsOptional()
+  require_name?: boolean;
+
+  @ApiPropertyOptional({
     description:
       'Optional unified checkout field schema. When provided, overrides require_* booleans.',
     type: 'array',

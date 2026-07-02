@@ -24,6 +24,7 @@ export interface SuiteContext {
   webhookId?: string;
   webhookSecret?: string;
   webhookDeliveryLogId?: string;
+  apiLogEntryId?: string;
   [key: string]: unknown;
 }
 

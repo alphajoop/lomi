@@ -58,6 +58,26 @@ export class CheckoutSessionsService {
       );
     }
 
+    const normalizedContactFlags = normalizeCheckoutFieldFlags({
+      require_billing_address: createDto.require_billing_address,
+      require_email: createDto.require_email,
+      require_phone: createDto.require_phone,
+      require_name: createDto.require_name,
+      fields: createDto.fields,
+    });
+
+    if (
+      normalizedContactFlags.require_name === false &&
+      normalizedContactFlags.require_email === false &&
+      normalizedContactFlags.require_phone === false &&
+      !createDto.customer_name?.trim() &&
+      !createDto.customer_id
+    ) {
+      throw new BadRequestException(
+        'require_name cannot be false when email and phone are both hidden without customer_name or customer_id',
+      );
+    }
+
     if (createDto.line_items && createDto.line_items.length > 0) {
       if (scopedIdempotency) {
         const cached = await lookupIdempotencyCache(this.supabase, {
@@ -333,6 +353,7 @@ export class CheckoutSessionsService {
       require_billing_address: createDto.require_billing_address,
       require_email: createDto.require_email,
       require_phone: createDto.require_phone,
+      require_name: createDto.require_name,
       fields: createDto.fields,
     });
 
@@ -340,6 +361,7 @@ export class CheckoutSessionsService {
       createDto.require_billing_address !== undefined ||
       createDto.require_email !== undefined ||
       createDto.require_phone !== undefined ||
+      createDto.require_name !== undefined ||
       (createDto.fields && createDto.fields.length > 0);
 
     if (!hasOverrides) {
@@ -350,6 +372,7 @@ export class CheckoutSessionsService {
       require_billing_address?: boolean;
       require_email?: boolean;
       require_phone?: boolean;
+      require_name?: boolean;
     } = {};
     if (normalized.require_billing_address != null) {
       patch.require_billing_address = normalized.require_billing_address;
@@ -359,6 +382,9 @@ export class CheckoutSessionsService {
     }
     if (normalized.require_phone != null) {
       patch.require_phone = normalized.require_phone;
+    }
+    if (normalized.require_name != null) {
+      patch.require_name = normalized.require_name;
     }
 
     if (Object.keys(patch).length === 0) {

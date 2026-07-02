@@ -311,3 +311,107 @@ export function validateWebhookListHasNoSecrets(body: unknown): string | null {
   }
   return null;
 }
+
+const LOG_TYPES = [
+  'api_request',
+  'api_error',
+  'webhook_delivery',
+  'activity',
+] as const;
+
+type LogType = (typeof LOG_TYPES)[number];
+
+/** Validates GET /logs list envelope and optional minimum useful entries. */
+export function validateLogsListResponse(
+  body: unknown,
+  expectedType: LogType,
+  options?: { minEntries?: number; requireUsefulFields?: boolean },
+): string | null {
+  if (!body || typeof body !== 'object') {
+    return 'Expected logs list response object';
+  }
+  const record = body as Record<string, unknown>;
+  if (record.object !== 'list') {
+    return 'Expected logs list object: "list"';
+  }
+  if (record.type !== expectedType) {
+    return `Expected log type "${expectedType}", got "${String(record.type)}"`;
+  }
+  if (!Array.isArray(record.data)) {
+    return 'Expected logs data array';
+  }
+  if (typeof record.total_count !== 'number') {
+    return 'Expected numeric total_count';
+  }
+  if (typeof record.has_more !== 'boolean') {
+    return 'Expected boolean has_more';
+  }
+
+  const minEntries = options?.minEntries ?? 0;
+  if (record.data.length < minEntries) {
+    return `Expected at least ${minEntries} ${expectedType} log(s), got ${record.data.length}`;
+  }
+
+  if (options?.requireUsefulFields && record.data.length > 0) {
+    const entry = record.data[0] as Record<string, unknown>;
+    if (typeof entry.id !== 'string' || !entry.id) {
+      return 'Expected log entry id';
+    }
+    if (typeof entry.timestamp !== 'string' || !entry.timestamp) {
+      return 'Expected log entry timestamp';
+    }
+    if (entry.type !== expectedType) {
+      return `Expected entry type "${expectedType}"`;
+    }
+
+    switch (expectedType) {
+      case 'api_request':
+        if (typeof entry.method !== 'string' || typeof entry.endpoint !== 'string') {
+          return 'api_request log should include method and endpoint for debugging';
+        }
+        if (entry.data && typeof entry.data === 'object') {
+          const data = entry.data as Record<string, unknown>;
+          if (
+            typeof data.api_key === 'string' &&
+            !data.api_key.includes('****')
+          ) {
+            return 'api_request logs must mask api_key values';
+          }
+        }
+        break;
+      case 'webhook_delivery':
+        if (entry.success !== true && entry.success !== false) {
+          return 'webhook_delivery log should include success boolean';
+        }
+        break;
+      case 'api_error':
+        break;
+      case 'activity':
+        break;
+      default: {
+        const _exhaustive: never = expectedType;
+        return `Unhandled log type: ${String(_exhaustive)}`;
+      }
+    }
+  }
+
+  return null;
+}
+
+/** Validates GET /logs/:type/:id single entry response. */
+export function validateLogEntryResponse(
+  body: unknown,
+  expectedType: LogType,
+): string | null {
+  if (!body || typeof body !== 'object') {
+    return 'Expected log entry object';
+  }
+  const entry = body as Record<string, unknown>;
+  if (entry.type !== expectedType) {
+    return `Expected log entry type "${expectedType}"`;
+  }
+  if (typeof entry.id !== 'string' || !entry.id) {
+    return 'Expected log entry id';
+  }
+  return null;
+}

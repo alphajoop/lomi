@@ -90,6 +90,12 @@ export class PaymentLinksController {
             'When true, show and require customer phone. Default false when unset.',
           default: false,
         },
+        require_name: {
+          type: 'boolean',
+          description:
+            'When true, show and require customer name. Default true when unset.',
+          default: true,
+        },
         fields: {
           type: 'array',
           description:

@@ -106,20 +106,20 @@ Control which customer fields appear on the hosted checkout form and whether the
 
 | Field | API flag | Default when unset | When `false` |
 | --- | --- | --- | --- |
-| Name | — | Always required | — |
+| Name | `require_name` | `true` | Hidden on the form |
 | Email | `require_email` | `true` | Hidden on the form |
 | Phone | `require_phone` | `false` | Shown as optional |
 | Billing address | `require_billing_address` | `false` | Hidden on the form |
 
 <Callout type="info">
-  **Contact collection:** checkout always collects at least one reachable contact method. If email is hidden and phone is optional, phone becomes required. If both email and phone are visible, email is required and phone stays optional unless you set `require_phone: true`.
+  **Contact collection:** email and phone visibility follow the flags above. When both are hidden (`require_email: false` and `require_phone: false`), neither field is shown. Phone may still be required for mobile-money payment methods when it is visible. When the name field is hidden, the customer record still stores a display name derived from the typed name, email, or phone (in that order).
 </Callout>
 
 ### Resolution order
 
 When a customer opens checkout, flags merge from most specific to least:
 
-1. **Checkout session** (`require_email`, `require_phone`, `require_billing_address` on `POST /checkout-sessions`)
+1. **Checkout session** (`require_email`, `require_phone`, `require_name`, `require_billing_address` on `POST /checkout-sessions`)
 2. **Payment link** (same flags on the link that created the session)
 3. **Organization checkout settings** (dashboard defaults)
 4. **Platform defaults** (email required, phone optional, billing address hidden)

@@ -96,20 +96,20 @@ Contrôlez quels champs client apparaissent sur le tunnel hébergé et s’ils s
 
 | Champ | Indicateur API | Défaut si omis | Quand `false` |
 | --- | --- | --- | --- |
-| Nom | — | Toujours obligatoire | — |
+| Nom | `require_name` | `true` | Masqué sur le formulaire |
 | E-mail | `require_email` | `true` | Masqué sur le formulaire |
 | Téléphone | `require_phone` | `false` | Affiché en optionnel |
 | Adresse de facturation | `require_billing_address` | `false` | Masquée sur le formulaire |
 
 <Callout type="info">
-  **Contact :** le tunnel collecte toujours au moins un moyen de joindre le client. Si l’e-mail est masqué et le téléphone optionnel, le téléphone devient obligatoire. Si e-mail et téléphone sont visibles, l’e-mail est obligatoire et le téléphone reste optionnel sauf si vous passez `require_phone: true`.
+  **Contact :** la visibilité de l’e-mail et du téléphone suit les indicateurs ci-dessus. Si les deux sont masqués (`require_email: false` et `require_phone: false`), aucun des deux champs n’est affiché. Le téléphone peut rester obligatoire pour les moyens mobile money lorsqu’il est visible. Si le nom est masqué, la fiche client enregistre tout de même un nom d’affichage dérivé du nom saisi, de l’e-mail ou du téléphone (dans cet ordre).
 </Callout>
 
 ### Ordre de résolution
 
 À l’ouverture du tunnel, les indicateurs se combinent du plus spécifique au plus général :
 
-1. **Session checkout** (`require_email`, `require_phone`, `require_billing_address` sur `POST /checkout-sessions`)
+1. **Session checkout** (`require_email`, `require_phone`, `require_name`, `require_billing_address` sur `POST /checkout-sessions`)
 2. **Lien de paiement** (mêmes indicateurs sur le lien ayant créé la session)
 3. **Paramètres checkout de l’organisation** (défauts du tableau de bord)
 4. **Défauts plateforme** (e-mail obligatoire, téléphone optionnel, adresse masquée)

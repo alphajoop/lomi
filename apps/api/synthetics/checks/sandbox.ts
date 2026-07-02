@@ -2,6 +2,8 @@ import { newIdempotencyKey } from '../client';
 import {
   pickString,
   unwrapData,
+  validateLogEntryResponse,
+  validateLogsListResponse,
   validateMerchantFacingError,
   validateUnavailableChargeResponse,
   validateWebhookCreateResponse,
@@ -574,20 +576,79 @@ export function createSandboxChecks(): CheckDefinition[] {
         ctx.webhookId ? null : 'webhookId not captured from create',
     },
 
-    // --- Radar / logs / accounts ---
+    // --- Logs API (unified merchant observability) ---
+    {
+      name: 'logs api_request stream',
+      service: 'logs',
+      method: 'GET',
+      path: '/logs?type=api_request&limit=5',
+      expectStatus: 200,
+      validate: (_ctx, res) =>
+        validateLogsListResponse(res.data, 'api_request', {
+          minEntries: 1,
+          requireUsefulFields: true,
+        }),
+      capture: (ctx, res) => {
+        const data = (res.data as { data?: Array<{ id?: string }> })?.data;
+        const id = data?.[0]?.id;
+        if (id) ctx.apiLogEntryId = id;
+      },
+    },
+    {
+      name: 'logs api_request entry by id',
+      service: 'logs',
+      method: 'GET',
+      path: (ctx) => `/logs/api_request/${ctx.apiLogEntryId}`,
+      expectStatus: 200,
+      skipIf: (ctx) =>
+        ctx.apiLogEntryId ? null : 'apiLogEntryId not captured from list',
+      validate: (_ctx, res) =>
+        validateLogEntryResponse(res.data, 'api_request'),
+    },
+    {
+      name: 'logs webhook_delivery stream',
+      service: 'logs',
+      method: 'GET',
+      path: (ctx) =>
+        `/logs?type=webhook_delivery&webhook_id=${ctx.webhookId}&limit=5`,
+      expectStatus: 200,
+      skipIf: (ctx) =>
+        ctx.webhookId ? null : 'webhookId not captured from create',
+      validate: (_ctx, res) =>
+        validateLogsListResponse(res.data, 'webhook_delivery', {
+          minEntries: 0,
+        }),
+    },
+    {
+      name: 'logs api_error stream',
+      service: 'logs',
+      method: 'GET',
+      path: '/logs?type=api_error&limit=5',
+      expectStatus: 200,
+      validate: (_ctx, res) =>
+        validateLogsListResponse(res.data, 'api_error', {
+          requireUsefulFields: false,
+        }),
+    },
+    {
+      name: 'logs activity stream',
+      service: 'logs',
+      method: 'GET',
+      path: '/logs?type=activity&limit=5',
+      expectStatus: 200,
+      validate: (_ctx, res) =>
+        validateLogsListResponse(res.data, 'activity', {
+          requireUsefulFields: false,
+        }),
+    },
+
+    // --- Radar / accounts ---
     {
       name: 'radar settings',
       service: 'radar',
       method: 'GET',
       path: '/organization/radar-settings',
       expectStatus: [200, 404],
-    },
-    {
-      name: 'api request logs',
-      service: 'logs',
-      method: 'GET',
-      path: '/logs?type=api_request&limit=1',
-      expectStatus: 200,
     },
     {
       name: 'accounts balance',

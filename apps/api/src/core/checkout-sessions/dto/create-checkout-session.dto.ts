@@ -271,6 +271,16 @@ export class CreateCheckoutSessionDto {
   require_phone?: boolean;
 
   @ApiProperty({
+    example: true,
+    description: 'Require customer name at checkout',
+    default: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  require_name?: boolean;
+
+  @ApiProperty({
     description:
       'Optional unified checkout field schema. When provided, system field visibility is derived from this ordered list and overrides the require_* booleans.',
     required: false,

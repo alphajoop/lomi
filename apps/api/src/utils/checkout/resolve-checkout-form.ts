@@ -55,6 +55,7 @@ export interface ResolvedCheckoutForm {
   requireBillingAddress: boolean;
   requireEmail: boolean;
   requirePhone: boolean;
+  requireName: boolean;
   showEmail: boolean;
   showPhone: boolean;
   showName: boolean;
@@ -65,6 +66,7 @@ export interface CheckoutFormFieldFlags {
   require_billing_address?: boolean | null;
   require_email?: boolean | null;
   require_phone?: boolean | null;
+  require_name?: boolean | null;
 }
 
 export interface CheckoutFormSource extends CheckoutFormFieldFlags {
@@ -198,6 +200,13 @@ export function resolveCheckoutForm(
     false,
   );
 
+  const requireNameFlag = resolveBooleanFlag(
+    sources.checkoutSession?.require_name,
+    sources.paymentLink?.require_name,
+    sources.organizationSettings?.require_name,
+    true,
+  );
+
   let emailVisibility = requireFlagToEmailVisibility(requireEmailFlag);
   let phoneVisibility = requireFlagToPhoneVisibility(requirePhoneFlag);
 
@@ -210,6 +219,8 @@ export function resolveCheckoutForm(
     requireBillingAddress,
   );
 
+  const nameVisibility = requireFlagToEmailVisibility(requireNameFlag);
+
   const customFieldDefinitions = resolveCustomFieldDefinitions(sources);
 
   const systemFields: UnifiedCheckoutFieldDefinition[] = [
@@ -217,7 +228,7 @@ export function resolveCheckoutForm(
       key: 'name',
       scope: 'system',
       type: 'text',
-      visibility: 'required',
+      visibility: nameVisibility,
       order: SYSTEM_FIELD_ORDER.name,
     },
     {
@@ -256,9 +267,10 @@ export function resolveCheckoutForm(
     requireBillingAddress: billingVisibility === 'required',
     requireEmail: emailVisibility === 'required',
     requirePhone: phoneVisibility === 'required',
+    requireName: nameVisibility === 'required',
     showEmail: emailVisibility !== 'hidden',
     showPhone: phoneVisibility !== 'hidden',
-    showName: true,
+    showName: nameVisibility !== 'hidden',
     customFields: customFieldDefinitions,
   };
 }
@@ -267,12 +279,14 @@ export function normalizeCheckoutFieldFlags(input: {
   require_billing_address?: boolean;
   require_email?: boolean;
   require_phone?: boolean;
+  require_name?: boolean;
   fields?: UnifiedCheckoutFieldDefinition[];
 }): CheckoutFormFieldFlags {
   if (input.fields && input.fields.length > 0) {
     const systemFields = input.fields.filter(
       (field) => field.scope === 'system',
     );
+    const nameField = systemFields.find((field) => field.key === 'name');
     const emailField = systemFields.find((field) => field.key === 'email');
     const phoneField = systemFields.find((field) => field.key === 'phone');
     const billingField = systemFields.find(
@@ -283,6 +297,7 @@ export function normalizeCheckoutFieldFlags(input: {
       require_billing_address: billingField?.visibility === 'required',
       require_email: emailField?.visibility === 'required',
       require_phone: phoneField?.visibility === 'required',
+      require_name: nameField?.visibility === 'required',
     };
   }
 
@@ -290,5 +305,6 @@ export function normalizeCheckoutFieldFlags(input: {
     require_billing_address: input.require_billing_address,
     require_email: input.require_email,
     require_phone: input.require_phone,
+    require_name: input.require_name,
   };
 }

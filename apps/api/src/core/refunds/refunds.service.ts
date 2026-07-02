@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { resolveSupabaseEdgeInvocation } from '../../utils/supabase/resolve-supabase-edge';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import {
   isNetworkRequest,
@@ -1203,20 +1204,18 @@ export class RefundsService {
     path: string,
     body: Record<string, unknown>,
   ): Promise<unknown> {
-    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
-    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
-
-    if (!projectRef || !anonKey) {
+    const edge = resolveSupabaseEdgeInvocation(this.configService);
+    if (!edge) {
       throw new InternalServerErrorException('Payment configuration missing');
     }
 
-    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/wave`;
+    const edgeFunctionUrl = `${edge.functionsBaseUrl}/wave`;
 
     const response = await fetch(edgeFunctionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${anonKey}`,
+        Authorization: `Bearer ${edge.publishableKey}`,
       },
       body: JSON.stringify({
         path,
@@ -1239,10 +1238,8 @@ export class RefundsService {
     user: AuthContext,
     body: Record<string, unknown>,
   ): Promise<unknown> {
-    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
-    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
-
-    if (!projectRef || !anonKey) {
+    const edge = resolveSupabaseEdgeInvocation(this.configService);
+    if (!edge) {
       throw new InternalServerErrorException('Payment configuration missing');
     }
 
@@ -1254,13 +1251,13 @@ export class RefundsService {
     const targetEnvironment =
       mtnApiEnvironment === 'development' ? 'sandbox' : countryTarget;
 
-    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/mtn`;
+    const edgeFunctionUrl = `${edge.functionsBaseUrl}/mtn`;
 
     const response = await fetch(edgeFunctionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${anonKey}`,
+        Authorization: `Bearer ${edge.publishableKey}`,
       },
       body: JSON.stringify({
         path,

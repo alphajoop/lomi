@@ -4,13 +4,15 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import { CreateWebhookBodyDto } from './dto/create-webhook-body.dto';
 import { UpdateWebhookDto } from './dto/update-webhook.dto';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
 import { Database } from '../utils/types/api';
 import {
+  deliverMerchantWebhook,
   resolveSafeMerchantWebhookTarget,
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
@@ -21,7 +23,6 @@ import { WebhookSenderService, type Webhook } from './webhook-sender.service';
 export class WebhooksService {
   constructor(
     private readonly supabase: SupabaseService,
-    private readonly configService: ConfigService,
     private readonly webhookSender: WebhookSenderService,
   ) {}
 
@@ -203,53 +204,130 @@ export class WebhooksService {
   }
 
   async test(id: string, user: AuthContext) {
-    await this.findOne(id, user);
+    const webhookRow = (await this.findOne(id, user)) as Record<string, unknown>;
+    const url = String(webhookRow.url ?? '');
+    const verificationToken = String(webhookRow.verification_token ?? '');
+    const organizationId = String(webhookRow.organization_id ?? '');
 
-    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
-    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
-    if (!projectRef || !anonKey) {
-      throw new InternalServerErrorException(
-        'Webhook test is not configured on this API host',
-      );
+    if (!url || !verificationToken) {
+      throw new InternalServerErrorException('Webhook configuration error');
     }
 
-    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/test_webhook`;
-    const response = await fetch(edgeFunctionUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${anonKey}`,
+    const eventId = randomUUID();
+    const timestamp = new Date().toISOString();
+    const testPayload = {
+      id: `evt_test_${eventId}`,
+      type: 'test.webhook',
+      created: timestamp,
+      data: {
+        object: {
+          id: `obj_test_${randomUUID()}`,
+          merchant_id: user.merchantId,
+          organization_id: organizationId,
+          test: true,
+          created: timestamp,
+          status: 'success',
+          amount: 1000,
+          currency: 'XOF',
+          description: 'Simple test webhook event',
+          metadata: {
+            test_mode: true,
+            webhook_id: id,
+            source: 'webhook_test',
+          },
+        },
       },
-      body: JSON.stringify({
-        webhook_id: id,
-        merchant_id: user.merchantId,
-      }),
-    });
+      livemode: (user.environment ?? 'live') !== 'test',
+      webhook_id: id,
+    };
 
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
+    const payloadString = JSON.stringify(testPayload);
+    const signature = crypto
+      .createHmac('sha256', verificationToken)
+      .update(payloadString)
+      .digest('hex');
+
+    const webhookHeaders = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Lomi-Webhook/1.0',
+      'X-Lomi-Signature': signature,
+      'X-Lomi-Event': 'test.webhook',
+      'X-Lomi-Timestamp': timestamp,
+    };
+
+    const requestStartTime = Date.now();
+    let responseStatus: number;
+    let responseBody: string;
+    let deliveredUrl = url;
+
+    try {
+      const delivery = await deliverMerchantWebhook(
+        url,
+        payloadString,
+        webhookHeaders,
+      );
+      responseStatus = delivery.status;
+      responseBody =
+        typeof delivery.data === 'string'
+          ? delivery.data
+          : JSON.stringify(delivery.data);
+      deliveredUrl = delivery.deliveredUrl;
+    } catch (error) {
+      responseStatus = 502;
+      responseBody =
+        error instanceof Error ? error.message : 'Webhook delivery failed';
+    }
+
+    const requestDurationMs = Date.now() - requestStartTime;
+
+    await this.supabase.rpc('update_webhook_delivery_status' as never, {
+      p_webhook_id: id,
+      p_last_response_status: responseStatus,
+      p_last_response_body: responseBody,
+      p_last_payload: testPayload,
+    } as never);
+
+    const { data: logData, error: logError } = await this.supabase.rpc(
+      'log_webhook_delivery' as never,
+      {
+        p_webhook_id: id,
+        p_merchant_id: user.merchantId,
+        p_organization_id: organizationId,
+        p_event_type: 'test.webhook',
+        p_payload: testPayload,
+        p_response_status: responseStatus,
+        p_response_body: responseBody,
+        p_attempt_number: 1,
+        p_headers: webhookHeaders,
+        p_request_duration_ms: requestDurationMs,
+        p_ip_address: 'api',
+        p_user_agent: 'Lomi-Webhook/1.0',
+      } as never,
+    );
+
+    if (logError) {
       throw new BadRequestException(
-        (body as { message?: string; error?: string }).message ||
-          (body as { error?: string }).error ||
-          'Webhook test delivery failed',
+        `Webhook test delivery logged with error: ${logError.message}`,
       );
     }
 
-    const result = body as {
-      success?: boolean;
-      status?: number;
-      response?: string;
-    };
-    if (result.success === false) {
+    const success = responseStatus >= 200 && responseStatus < 300;
+    if (!success) {
       throw new BadRequestException(
-        result.response ||
-          (result.status
-            ? `Webhook endpoint returned HTTP ${result.status}`
+        responseBody ||
+          (responseStatus
+            ? `Webhook endpoint returned HTTP ${responseStatus}`
             : 'Webhook test delivery failed'),
       );
     }
 
-    return body;
+    return {
+      success,
+      status: responseStatus,
+      response: responseBody.substring(0, 500),
+      delivered_url: deliveredUrl,
+      log_id: logData,
+    };
   }
 
   async retryDelivery(webhookId: string, logId: string, user: AuthContext) {

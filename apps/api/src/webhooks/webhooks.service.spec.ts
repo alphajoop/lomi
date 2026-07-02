@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import { WebhookSenderService } from './webhook-sender.service';
 import { AuthContext } from '../core/common/decorators/current-user.decorator';
 import {
+  deliverMerchantWebhook,
   resolveSafeMerchantWebhookTarget,
   UnsafeWebhookUrlError,
 } from './merchant-webhook-url';
@@ -13,12 +13,16 @@ import {
 jest.mock('./merchant-webhook-url', () => ({
   ...jest.requireActual('./merchant-webhook-url'),
   resolveSafeMerchantWebhookTarget: jest.fn(),
+  deliverMerchantWebhook: jest.fn(),
 }));
 
 const mockedResolveSafeTarget =
   resolveSafeMerchantWebhookTarget as jest.MockedFunction<
     typeof resolveSafeMerchantWebhookTarget
   >;
+const mockedDeliver = deliverMerchantWebhook as jest.MockedFunction<
+  typeof deliverMerchantWebhook
+>;
 
 describe('WebhooksService', () => {
   let service: WebhooksService;
@@ -44,10 +48,6 @@ describe('WebhooksService', () => {
         WebhooksService,
         { provide: SupabaseService, useValue: mockSupabaseService },
         { provide: WebhookSenderService, useValue: mockWebhookSender },
-        {
-          provide: ConfigService,
-          useValue: { get: jest.fn() },
-        },
       ],
     }).compile();
 
@@ -123,5 +123,68 @@ describe('WebhooksService', () => {
 
     const rows = await service.findAll(user);
     expect(rows[0]).not.toHaveProperty('verification_token');
+  });
+
+  it('delivers test webhook in-process without Supabase edge env vars', async () => {
+    mockRpc
+      .mockResolvedValueOnce({
+        data: [
+          {
+            webhook_id: 'wh-uuid',
+            url: 'https://httpbin.org/post',
+            organization_id: 'org-1',
+            verification_token: 'whsec_test',
+            is_active: true,
+          },
+        ],
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: null, error: null })
+      .mockResolvedValueOnce({ data: 'log-1', error: null });
+
+    mockedDeliver.mockResolvedValue({
+      status: 200,
+      data: '{"ok":true}',
+      deliveredUrl: 'https://httpbin.org/post',
+      usedAlternateHost: false,
+    });
+
+    const result = await service.test('wh-uuid', user);
+
+    expect(mockedDeliver).toHaveBeenCalledWith(
+      'https://httpbin.org/post',
+      expect.any(String),
+      expect.objectContaining({
+        'X-Lomi-Event': 'test.webhook',
+        'X-Lomi-Signature': expect.stringMatching(/^[a-f0-9]{64}$/),
+      }),
+    );
+    expect(result.success).toBe(true);
+    expect(result.status).toBe(200);
+    expect(result.log_id).toBe('log-1');
+  });
+
+  it('rejects test delivery when receiver returns non-2xx', async () => {
+    mockRpc.mockResolvedValueOnce({
+      data: [
+        {
+          webhook_id: 'wh-uuid',
+          url: 'https://httpbin.org/post',
+          organization_id: 'org-1',
+          verification_token: 'whsec_test',
+        },
+      ],
+      error: null,
+    });
+    mockedDeliver.mockResolvedValue({
+      status: 405,
+      data: 'Method Not Allowed',
+      deliveredUrl: 'https://httpbin.org/post',
+      usedAlternateHost: false,
+    });
+
+    await expect(service.test('wh-uuid', user)).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
   });
 });

@@ -11,8 +11,10 @@ describe('resolveCheckoutForm', () => {
 
     expect(form.requireEmail).toBe(true);
     expect(form.requirePhone).toBe(false);
+    expect(form.requireName).toBe(true);
     expect(form.showEmail).toBe(true);
     expect(form.showPhone).toBe(true);
+    expect(form.showName).toBe(true);
   });
 
   it('hides email and keeps phone required when email is off and phone is on', () => {
@@ -77,5 +79,19 @@ describe('resolveCheckoutForm', () => {
     expect(form.requirePhone).toBe(true);
     expect(form.showEmail).toBe(true);
     expect(form.showPhone).toBe(true);
+  });
+
+  it('hides name when require_name is false', () => {
+    const form = resolveCheckoutForm({
+      checkoutSession: {
+        require_name: false,
+        require_email: true,
+      },
+    });
+
+    expect(form.requireName).toBe(false);
+    expect(form.showName).toBe(false);
+    expect(form.requireEmail).toBe(true);
+    expect(form.showEmail).toBe(true);
   });
 });
