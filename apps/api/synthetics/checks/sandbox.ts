@@ -87,6 +87,26 @@ export function createSandboxChecks(): CheckDefinition[] {
       },
     },
     {
+      name: 'logs api_request correlation after /me',
+      service: 'logs',
+      method: 'GET',
+      path: '/logs?type=api_request&limit=50',
+      expectStatus: 200,
+      retry: { attempts: 5, delayMs: 1000 },
+      skipIf: (ctx) =>
+        ctx.correlatedRequestId
+          ? null
+          : 'correlatedRequestId not captured from /me',
+      validate: (ctx, res) => {
+        const listErr = validateLogsListResponse(res.data, 'api_request', {
+          minEntries: 1,
+          requireUsefulFields: true,
+        });
+        if (listErr) return listErr;
+        return validateApiRequestCorrelation(res.data, ctx.correlatedRequestId);
+      },
+    },
+    {
       name: 'list providers',
       service: 'providers',
       method: 'GET',
@@ -588,14 +608,11 @@ export function createSandboxChecks(): CheckDefinition[] {
       method: 'GET',
       path: '/logs?type=api_request&limit=5',
       expectStatus: 200,
-      validate: (ctx, res) => {
-        const listErr = validateLogsListResponse(res.data, 'api_request', {
+      validate: (_ctx, res) =>
+        validateLogsListResponse(res.data, 'api_request', {
           minEntries: 1,
           requireUsefulFields: true,
-        });
-        if (listErr) return listErr;
-        return validateApiRequestCorrelation(res.data, ctx.correlatedRequestId);
-      },
+        }),
       capture: (ctx, res) => {
         const data = (res.data as { data?: Array<{ id?: string }> })?.data;
         const id = data?.[0]?.id;

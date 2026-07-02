@@ -46,6 +46,8 @@ export interface CheckDefinition {
   capture?: (ctx: SuiteContext, res: HttpResponse) => void;
   /** Return skip reason to skip this check */
   skipIf?: (ctx: SuiteContext) => string | null;
+  /** Re-run the HTTP request when validate fails (e.g. async log indexing). */
+  retry?: { attempts: number; delayMs: number };
 }
 
 export interface Anomaly {
