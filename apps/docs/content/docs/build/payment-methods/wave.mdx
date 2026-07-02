@@ -20,18 +20,26 @@ Wave is the primary mobile-money rail for **UEMOA (XOF)** merchants. Most teams 
 
 ## Direct charge
 
-`POST /charge/wave` requires **XOF**. The response includes `wave_launch_url` or `checkout_url`, redirect or deep-link the customer.
+`POST /charge/wave` requires **XOF** and a nested `customer` object with `name` and `phoneNumber` in E.164 format. The response includes `wave_launch_url` or `checkout_url` — redirect or deep-link the customer.
+
+<Callout type="warn">
+  Wave must be connected in the dashboard with an **Aggregated Merchant ID**. If it is missing, the API returns `400` with `Wave provider not configured for this organization (missing Aggregated Merchant ID)`.
+</Callout>
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
-  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,
-    "currency_code": "XOF",
-    "customer_email": "customer@example.com",
-    "success_url": "https://example.com/success",
-    "cancel_url": "https://example.com/cancel"
+    "currency": "XOF",
+    "customer": {
+      "name": "Jane Doe",
+      "email": "customer@example.com",
+      "phoneNumber": "+2250707070707"
+    },
+    "successUrl": "https://example.com/success",
+    "errorUrl": "https://example.com/error"
   }'
 ```
 
