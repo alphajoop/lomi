@@ -35,6 +35,7 @@ import {
 import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
 import { assertDirectCardChargesAvailable } from './direct-card-charge-guard';
+import { logStructured } from '../../utils/logging/structured-console-logger';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
@@ -178,6 +179,11 @@ export class CardChargeService {
         message: 'prepare_stripe_payment_amount_failed',
         organization_id: user.organizationId,
         error: conversionError?.message || null,
+      });
+      logStructured({
+        event: 'prepare_stripe_payment_amount_failed',
+        organization_id: user.organizationId,
+        message: conversionError?.message ?? 'prepare_stripe_payment_amount_failed',
       });
       throw new BadRequestException('Failed to prepare Stripe payment amount');
     }

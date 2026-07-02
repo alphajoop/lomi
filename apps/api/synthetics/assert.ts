@@ -415,3 +415,21 @@ export function validateLogEntryResponse(
   }
   return null;
 }
+
+/** Validates api_request logs include correlation id from X-Request-Id when captured. */
+export function validateApiRequestCorrelation(
+  body: unknown,
+  correlatedRequestId: string | undefined,
+): string | null {
+  if (!correlatedRequestId) return null;
+  const record = body as { data?: Array<Record<string, unknown>> };
+  const rows = record?.data ?? [];
+  const match = rows.find(
+    (row) =>
+      row.request_id === correlatedRequestId && row.type === 'api_request',
+  );
+  if (!match) {
+    return `Expected api_request log with request_id "${correlatedRequestId}"`;
+  }
+  return null;
+}

@@ -22,6 +22,11 @@ describe('GlobalJsonExceptionFilter', () => {
   };
   const filter = new GlobalJsonExceptionFilter(supabase as never);
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    delete process.env.LOG_HTTP_EXCEPTIONS;
+  });
+
   it('formats ThrottlerException with Retry-After and rate_limit_exceeded', () => {
     const res = {
       status: jest.fn().mockReturnThis(),
@@ -64,5 +69,43 @@ describe('GlobalJsonExceptionFilter', () => {
         request_id: 'req-1',
       }),
     );
+    expect(supabase.rpc).not.toHaveBeenCalled();
+  });
+
+  it('persists 503 to api_error_logs when LOG_HTTP_EXCEPTIONS is enabled', () => {
+    process.env.LOG_HTTP_EXCEPTIONS = 'true';
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      setHeader: jest.fn(),
+      headersSent: false,
+    };
+    const host = {
+      switchToHttp: () => ({
+        getResponse: () => res,
+        getRequest: () => ({
+          headers: {},
+          id: 'req-503',
+          method: 'POST',
+          path: '/charge/card',
+          user: { organizationId: 'org-1' },
+        }),
+      }),
+    } as unknown as ArgumentsHost;
+
+    filter.catch(
+      new HttpException('Unavailable', HttpStatus.SERVICE_UNAVAILABLE),
+      host,
+    );
+
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'log_api_error',
+      expect.objectContaining({
+        p_error_type: 'service_unavailable',
+        p_request_id: 'req-503',
+        p_response_status: 503,
+      }),
+    );
+    delete process.env.LOG_HTTP_EXCEPTIONS;
   });
 });

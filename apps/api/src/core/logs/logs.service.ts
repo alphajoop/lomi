@@ -251,7 +251,10 @@ export class LogsService {
       message: null,
       success:
         statusCode != null ? statusCode >= 200 && statusCode < 300 : null,
-      request_id: null,
+      request_id:
+        typeof row.request_id === 'string' && row.request_id.length > 0
+          ? row.request_id
+          : null,
       data: {
         request_payload: row.request_payload ?? null,
         response_payload: row.response_payload ?? null,

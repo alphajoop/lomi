@@ -2,6 +2,7 @@ import { newIdempotencyKey } from '../client';
 import {
   pickString,
   unwrapData,
+  validateApiRequestCorrelation,
   validateLogEntryResponse,
   validateLogsListResponse,
   validateMerchantFacingError,
@@ -79,6 +80,10 @@ export function createSandboxChecks(): CheckDefinition[] {
           return `Expected environment "test", got "${env ?? 'missing'}"`;
         }
         return null;
+      },
+      capture: (ctx, res) => {
+        const rid = res.headers['x-request-id'];
+        if (rid) ctx.correlatedRequestId = rid;
       },
     },
     {
@@ -583,11 +588,14 @@ export function createSandboxChecks(): CheckDefinition[] {
       method: 'GET',
       path: '/logs?type=api_request&limit=5',
       expectStatus: 200,
-      validate: (_ctx, res) =>
-        validateLogsListResponse(res.data, 'api_request', {
+      validate: (ctx, res) => {
+        const listErr = validateLogsListResponse(res.data, 'api_request', {
           minEntries: 1,
           requireUsefulFields: true,
-        }),
+        });
+        if (listErr) return listErr;
+        return validateApiRequestCorrelation(res.data, ctx.correlatedRequestId);
+      },
       capture: (ctx, res) => {
         const data = (res.data as { data?: Array<{ id?: string }> })?.data;
         const id = data?.[0]?.id;
@@ -616,7 +624,7 @@ export function createSandboxChecks(): CheckDefinition[] {
         ctx.webhookId ? null : 'webhookId not captured from create',
       validate: (_ctx, res) =>
         validateLogsListResponse(res.data, 'webhook_delivery', {
-          minEntries: 0,
+          minEntries: 1,
         }),
     },
     {

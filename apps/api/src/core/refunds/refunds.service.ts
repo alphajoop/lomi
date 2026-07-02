@@ -22,6 +22,7 @@ import {
   refundFeePercentageForBalanceRpc,
   type RefundFeeConfig,
 } from './refund-fees';
+import { logStructured } from '../../utils/logging/structured-console-logger';
 
 import {
   createStripeClient,
@@ -1227,6 +1228,13 @@ export class RefundsService {
     if (!response.ok) {
       const errorText = await response.text();
       this.logger.error(`Payment edge ${path} failed: ${errorText}`);
+      logStructured({
+        event: 'refund_payment_edge_failed',
+        organization_id:
+          typeof body.organization_id === 'string' ? body.organization_id : undefined,
+        message: errorText,
+        path,
+      });
       throw new BadRequestException(`Refund processing failed: ${errorText}`);
     }
 
