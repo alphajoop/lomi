@@ -35,8 +35,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return the lomi. console brand banner', () => {
+      const response = appController.getHello();
+      expect(response).toContain('▲');
+      expect(response).toContain('Open Source');
+      expect(response).toContain('https://github.com/lomiafrica/lomi.');
     });
   });
 });

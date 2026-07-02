@@ -45,6 +45,9 @@ export class WebhooksService {
   }
 
   stripSecret<T extends Record<string, unknown>>(row: T): T {
+    if (!row || typeof row !== 'object' || Array.isArray(row)) {
+      return row;
+    }
     const { verification_token: _removed, ...rest } = row;
     return rest as T;
   }

@@ -1,4 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 
 export class CreateUsageEventDto {
   @ApiProperty({
@@ -6,6 +14,7 @@ export class CreateUsageEventDto {
     example: 'evt_abc123',
     description: 'Idempotency key — unique per organization',
   })
+  @IsString()
   transaction_id: string;
 
   @ApiProperty({
@@ -13,15 +22,19 @@ export class CreateUsageEventDto {
     example: 'api_calls',
     description: 'Billable metric code (matches meter name)',
   })
+  @IsString()
   code: string;
 
   @ApiProperty({ type: String, description: 'Customer being billed' })
+  @IsUUID()
   customer_id: string;
 
   @ApiPropertyOptional({
     type: String,
     description: 'Optional usage subscription anchor',
   })
+  @IsUUID()
+  @IsOptional()
   subscription_id?: string;
 
   @ApiPropertyOptional({
@@ -29,6 +42,8 @@ export class CreateUsageEventDto {
     example: '2025-06-01T12:00:00Z',
     description: 'When usage occurred (defaults to now)',
   })
+  @IsString()
+  @IsOptional()
   timestamp?: string;
 
   @ApiPropertyOptional({
@@ -36,6 +51,9 @@ export class CreateUsageEventDto {
     example: 1,
     description: 'Usage units (defaults to 1)',
   })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
   quantity?: number;
 
   @ApiPropertyOptional({
@@ -44,6 +62,8 @@ export class CreateUsageEventDto {
     example: { quantity: 5, region: 'sn' },
     description: 'Additional properties for sum aggregation',
   })
+  @IsObject()
+  @IsOptional()
   properties?: Record<string, unknown>;
 }
 

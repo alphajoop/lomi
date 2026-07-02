@@ -5,7 +5,6 @@ import {
   IsObject,
   IsOptional,
   IsString,
-  IsUrl,
 } from 'class-validator';
 
 export class CreateWebhookBodyDto {
@@ -13,7 +12,7 @@ export class CreateWebhookBodyDto {
     example: 'https://example.com/webhooks/lomi',
     type: String,
   })
-  @IsUrl()
+  @IsString()
   url: string;
 
   @ApiProperty({

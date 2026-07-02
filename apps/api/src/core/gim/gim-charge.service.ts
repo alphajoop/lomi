@@ -11,6 +11,7 @@ import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
 import { buildCreateOrUpdateCustomerRpcArgs } from '../../utils/customers/create-or-update-customer-rpc';
 import { CreateSwitchChargeDto } from '../charges/dto/create-switch-charge.dto';
+import { assertDirectSwitchChargesAvailable } from '../charges/direct-card-charge-guard';
 import {
   attachChargeNextAction,
   deriveGimChargeNextAction,
@@ -85,6 +86,7 @@ export class GimChargeService {
     user: AuthContext,
     scenarioKey?: GimChargeScenarioKey,
   ) {
+    assertDirectSwitchChargesAvailable();
     const config = this.gimClient.getConfig();
     const paymentEnv = normalizePaymentEnvironment(user.environment);
 

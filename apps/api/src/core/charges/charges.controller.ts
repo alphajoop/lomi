@@ -36,6 +36,10 @@ import { GimChargeService } from '../gim/gim-charge.service';
 import { normalizeScenarioKey } from './charge-scenario';
 import { normalizeGimScenarioKey } from './gim-charge-scenario';
 import { environmentFromAuth } from '../common/auth-environment';
+import {
+  assertDirectCardChargesAvailable,
+  assertDirectSwitchChargesAvailable,
+} from './direct-card-charge-guard';
 
 @ApiTags('Encaissements')
 @ApiSecurity('api-key')
@@ -152,6 +156,7 @@ export class ChargesController {
     @Headers('x-scenario-key') scenarioHeader?: string | string[],
     @Res({ passthrough: true }) res?: Response,
   ) {
+    assertDirectSwitchChargesAvailable();
     const idempotency = resolveRequestIdempotency(
       idempotencyKey,
       JSON.parse(JSON.stringify(createDto)) as Record<string, unknown>,
@@ -189,6 +194,7 @@ export class ChargesController {
     @Headers('idempotency-key') idempotencyKey?: string | string[],
     @Res({ passthrough: true }) res?: Response,
   ) {
+    assertDirectCardChargesAvailable();
     const idempotency = resolveRequestIdempotency(
       idempotencyKey,
       JSON.parse(JSON.stringify(createDto)) as Record<string, unknown>,

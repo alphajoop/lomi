@@ -22,6 +22,8 @@ export interface SuiteContext {
   couponId?: string;
   meterName?: string;
   webhookId?: string;
+  webhookSecret?: string;
+  webhookDeliveryLogId?: string;
   [key: string]: unknown;
 }
 

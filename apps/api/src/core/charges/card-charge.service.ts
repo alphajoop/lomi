@@ -34,6 +34,7 @@ import {
 } from '../../utils/api-idempotency';
 import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
+import { assertDirectCardChargesAvailable } from './direct-card-charge-guard';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
@@ -85,6 +86,7 @@ export class CardChargeService {
     createDto: CreateCardChargeDto,
     user: AuthContext,
   ) {
+    assertDirectCardChargesAvailable();
     const stripe = this.stripeClients.getClient(user.environment);
     const paymentEnv = normalizePaymentEnvironment(user.environment);
 

@@ -193,11 +193,12 @@ describe('App (e2e)', () => {
     await app.close();
   });
 
-  it('GET / is public', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('GET / is public', async () => {
+    const res = await request(app.getHttpServer()).get('/').expect(200);
+    expect(res.headers['content-type']).toMatch(/text\/plain/);
+    expect(res.text).toContain('▲');
+    expect(res.text).toContain('Open Source');
+    expect(res.text).toContain('https://github.com/lomiafrica/lomi.');
   });
 
   it('GET /agent/capabilities is public (L5 negotiation surface)', async () => {

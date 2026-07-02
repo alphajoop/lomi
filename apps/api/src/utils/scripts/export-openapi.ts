@@ -219,14 +219,22 @@ function assertNoForbiddenProviderIngressPaths(document: {
 }
 
 function attachExpressMiddleware(expressApp: express.Express) {
-  expressApp.use(
-    '/webhooks',
-    express.raw({ type: 'application/json', limit: '10mb' }),
-    (req, res, next) => {
-      (req as express.Request & { rawBody?: unknown }).rawBody = req.body;
-      next();
-    },
-  );
+  const providerWebhookPaths = [
+    '/webhooks/stripe',
+    '/webhooks/wave',
+    '/webhooks/mtn',
+    '/webhooks/spi',
+  ];
+  for (const path of providerWebhookPaths) {
+    expressApp.use(
+      path,
+      express.raw({ type: 'application/json', limit: '10mb' }),
+      (req, res, next) => {
+        (req as express.Request & { rawBody?: unknown }).rawBody = req.body;
+        next();
+      },
+    );
+  }
   expressApp.use(express.json({ limit: '10mb' }));
 }
 

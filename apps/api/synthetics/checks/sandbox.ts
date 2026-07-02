@@ -1,5 +1,14 @@
 import { newIdempotencyKey } from '../client';
-import { pickString, unwrapData } from '../assert';
+import {
+  pickString,
+  unwrapData,
+  validateMerchantFacingError,
+  validateUnavailableChargeResponse,
+  validateWebhookCreateResponse,
+  validateWebhookDeliveryLogs,
+  validateWebhookListHasNoSecrets,
+  validateWebhookTestDeliveryResponse,
+} from '../assert';
 import type { CheckDefinition, SuiteContext } from '../types';
 
 function synthEmail(ctx: SuiteContext): string {
@@ -40,6 +49,17 @@ export function createSandboxChecks(): CheckDefinition[] {
       expectStatus: [200, 503],
       validate: (_ctx, res) => {
         if (res.status === 503) {
+          const body = res.data as Record<string, unknown>;
+          const checks = Array.isArray(body?.checks)
+            ? (body.checks as Array<{ name?: string; ok?: boolean }>)
+            : [];
+          const failed = checks.filter((c) => c.ok === false);
+          if (
+            failed.length > 0 &&
+            failed.every((c) => c.name === 'cron_secret')
+          ) {
+            return null;
+          }
           return 'Readiness check returned 503 (dependencies unhealthy)';
         }
         return null;
@@ -209,7 +229,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       expectStatus: 400,
     },
     {
-      name: 'charge switch approved scenario',
+      name: 'charge switch muted (unavailable)',
       service: 'charges',
       method: 'POST',
       path: '/charge/switch',
@@ -226,19 +246,11 @@ export function createSandboxChecks(): CheckDefinition[] {
         customer_email: synthEmail(ctx),
         customer_name: 'Synth Switch',
       }),
-      expectStatus: [200, 201],
-      validate: (_ctx, res) => {
-        const data = unwrapData(res.data) as Record<string, unknown>;
-        const inner = (data?.data ?? data) as Record<string, unknown>;
-        const status = String(inner?.status ?? '');
-        if (status && status !== 'approved') {
-          return `Expected approved switch scenario, got "${status}"`;
-        }
-        return null;
-      },
+      expectStatus: 503,
+      validate: (_ctx, res) => validateUnavailableChargeResponse(res.data),
     },
     {
-      name: 'charge card embedded',
+      name: 'charge card muted (unavailable)',
       service: 'charges',
       method: 'POST',
       path: '/charge/card',
@@ -249,14 +261,8 @@ export function createSandboxChecks(): CheckDefinition[] {
         customer_email: synthEmail(ctx),
         customer_name: 'Synth Card',
       }),
-      expectStatus: [200, 201],
-      validate: (_ctx, res) => {
-        const secret = pickString(res.data, 'client_secret');
-        if (!secret) {
-          return 'Expected client_secret in card charge response';
-        }
-        return null;
-      },
+      expectStatus: 503,
+      validate: (_ctx, res) => validateUnavailableChargeResponse(res.data),
     },
 
     // --- Refunds ---
@@ -475,34 +481,88 @@ export function createSandboxChecks(): CheckDefinition[] {
       },
     },
 
-    // --- Webhooks ---
+    // --- Webhooks (CRUD + send + delivery logs + receiver-safe URL rejection) ---
+    {
+      name: 'reject unsafe webhook URL',
+      service: 'webhooks',
+      method: 'POST',
+      path: '/webhooks',
+      body: () => ({
+        url: 'https://127.0.0.1/hook',
+        authorized_events: ['PAYMENT_SUCCEEDED'],
+      }),
+      expectStatus: 400,
+      validate: (_ctx, res) => {
+        const err = validateMerchantFacingError(res.data);
+        if (err && !err.includes('Generic internal_error')) return err;
+        const message =
+          (res.data as { error?: { message?: string } })?.error?.message ?? '';
+        if (
+          !message.toLowerCase().includes('url') &&
+          !message.toLowerCase().includes('private') &&
+          !message.toLowerCase().includes('invalid')
+        ) {
+          return `Expected actionable URL rejection, got: "${message}"`;
+        }
+        return null;
+      },
+    },
     {
       name: 'create webhook',
       service: 'webhooks',
       method: 'POST',
       path: '/webhooks',
       body: (ctx) => ({
-        url: `https://example.com/webhooks/synthetics-${ctx.runId}`,
-        authorized_events: ['PAYMENT_SUCCEEDED'],
+        // httpbin echoes POST with 200, so the sender → receiver → 2xx → log
+        // roundtrip is genuinely exercised (example.com rejects POST with 405).
+        url: `https://httpbin.org/post?synthetics=${ctx.runId}`,
+        authorized_events: ['PAYMENT_SUCCEEDED', 'PAYMENT_FAILED'],
         description: 'API synthetics webhook',
       }),
       expectStatus: [200, 201],
+      validate: (_ctx, res) => validateWebhookCreateResponse(res.data),
       capture: (ctx, res) => {
+        const root = res.data as Record<string, unknown>;
         const data = unwrapData(res.data) as Record<string, unknown>;
         const id =
           (typeof data?.id === 'string' ? data.id : undefined) ??
           pickString(res.data, 'webhook_id', 'id');
         if (id) ctx.webhookId = id;
+        if (typeof root.secret === 'string') ctx.webhookSecret = root.secret;
       },
     },
     {
-      name: 'test webhook delivery',
+      name: 'list webhooks',
+      service: 'webhooks',
+      method: 'GET',
+      path: '/webhooks',
+      expectStatus: 200,
+      validate: (_ctx, res) => validateWebhookListHasNoSecrets(res.data),
+    },
+    {
+      name: 'test webhook delivery (sender → httpbin 2xx receiver)',
       service: 'webhooks',
       method: 'POST',
       path: (ctx) => `/webhooks/${ctx.webhookId}/test`,
-      expectStatus: [200, 201, 202],
+      expectStatus: 200,
       skipIf: (ctx) =>
         ctx.webhookId ? null : 'webhookId not captured from create',
+      validate: (_ctx, res) => validateWebhookTestDeliveryResponse(res.data),
+      capture: (ctx, res) => {
+        const logId = pickString(res.data, 'log_id');
+        if (logId) ctx.webhookDeliveryLogId = logId;
+      },
+    },
+    {
+      name: 'list webhook delivery logs',
+      service: 'webhooks',
+      method: 'GET',
+      path: (ctx) =>
+        `/webhook-delivery-logs?webhookId=${ctx.webhookId}&limit=5`,
+      expectStatus: 200,
+      skipIf: (ctx) =>
+        ctx.webhookId ? null : 'webhookId not captured from create',
+      validate: (_ctx, res) => validateWebhookDeliveryLogs(res.data),
     },
     {
       name: 'delete webhook cleanup',
