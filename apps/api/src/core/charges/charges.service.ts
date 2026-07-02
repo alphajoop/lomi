@@ -207,11 +207,12 @@ export class ChargesService {
         });
 
       if (edgeError) {
+        // Log the infrastructure detail server-side; do not leak it to callers.
         this.logger.error(
           `Edge Function invocation failed: ${edgeError.message}`,
         );
         throw new InternalServerErrorException(
-          `Payment processing failed: ${edgeError.message}`,
+          'Payment processing is temporarily unavailable. Please try again later.',
         );
       }
 

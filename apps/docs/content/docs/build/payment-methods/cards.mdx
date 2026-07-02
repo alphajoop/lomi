@@ -34,6 +34,10 @@ Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment 
 
 ## Embedded card charge
 
+<Callout type="warn">
+  Embedded card charges (`POST /charge/card`) and Switch charges (`POST /charge/switch`) are not available yet and currently return `503 service_unavailable`. Use [hosted checkout](/build/checkout) for cards today.
+</Callout>
+
 1. `POST /charge/card` → receive `client_secret`.
 2. Confirm with Payment Elements on your site.
 3. Poll or webhook for final `transaction_status`.

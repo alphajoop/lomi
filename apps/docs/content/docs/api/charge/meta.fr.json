@@ -1,13 +1,9 @@
 {
   "title": "Encaissements directs avancés",
-  "description": "Création de paiement bas niveau pour les équipes qui ont besoin de flux Wave, MTN MoMo ou carte embarquée.",
+  "description": "Création de paiement bas niveau pour les équipes qui ont besoin de flux Wave ou MTN MoMo.",
   "pages": [
     "index",
     "ChargesController_createWaveCharge",
-    "ChargesController_createMtnCharge",
-    "ChargesController_createCardCharge",
-    "ChargesController_createSwitchCharge",
-    "ChargesController_getCardCharge",
-    "ChargesController_cancelCardCharge"
+    "ChargesController_createMtnCharge"
   ]
 }

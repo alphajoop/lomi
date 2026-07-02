@@ -1,11 +1,7 @@
 {
   "title": "Charge",
   "pages": [
-    "ChargesController_cancelCardCharge",
-    "ChargesController_createCardCharge",
     "ChargesController_createMtnCharge",
-    "ChargesController_createSwitchCharge",
-    "ChargesController_createWaveCharge",
-    "ChargesController_getCardCharge"
+    "ChargesController_createWaveCharge"
   ]
 }

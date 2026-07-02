@@ -24,10 +24,13 @@ export class StripeClientsService {
 
     const secretKey = resolveStripeSecretKey(paymentEnv);
     if (!secretKey) {
+      // Keep the operational cause (missing platform credentials) in server
+      // logs only. API consumers must never see internal configuration details.
+      this.logger.error(
+        `Card payment credentials are missing for the "${paymentEnv}" environment on this API instance.`,
+      );
       throw new ServiceUnavailableException(
-        paymentEnv === 'test'
-          ? 'Stripe test mode is not configured (set STRIPE_SECRET_KEY_TEST)'
-          : 'Stripe is not configured for this API instance',
+        'Card payments are temporarily unavailable. Please use another payment method or try again later.',
       );
     }
 

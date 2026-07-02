@@ -34,6 +34,10 @@ Les cartes fonctionnent en **checkout hébergé** (le plus rapide) ou en flux em
 
 ## Charge carte embarquée
 
+<Callout type="warn">
+  Les charges carte embarquées (`POST /charge/card`) et Switch (`POST /charge/switch`) ne sont pas encore disponibles et renvoient actuellement `503 service_unavailable`. Utilisez le [checkout hébergé](/build/checkout) pour les cartes.
+</Callout>
+
 1. `POST /charge/card` → `client_secret`.
 2. Confirmez avec Payment Elements.
 3. Webhook ou polling pour le statut final.

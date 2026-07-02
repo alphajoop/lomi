@@ -13,6 +13,8 @@ Create Switch charge
 
 Authorizes a card from server-supplied credentials and routes it across acquiring rails. May return a 3DS redirect URL or signal `retry_other_rail` to fall back to another rail.
 
+> **Not available yet.** Switch (server-side card) charges are turned off while the card rails are being finalized; this endpoint currently returns `503 service_unavailable`. Use [hosted checkout](/build/checkout) for card payments today.
+
 
 ### When to use this
 

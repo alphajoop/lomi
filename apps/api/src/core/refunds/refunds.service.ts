@@ -484,7 +484,12 @@ export class RefundsService {
           refundMerchantId,
         );
       }
-      throw new InternalServerErrorException('Stripe is not configured');
+      this.logger.error(
+        'Card refund credentials are missing on this API instance; unable to process card refund.',
+      );
+      throw new InternalServerErrorException(
+        'Card refunds are temporarily unavailable. Please try again later.',
+      );
     }
 
     const stripe = createStripeClient(stripeSecret);

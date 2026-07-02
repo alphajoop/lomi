@@ -8,7 +8,11 @@ import { Callout } from '@/components/docs/docs-callout';
 Direct charges let you collect payment from your server using `POST /charge/*`. Unlike hosted [checkout sessions](/build/checkout), you build the customer-facing flow yourself.
 
 <Callout type="warn">
-  Prefer [hosted checkout](/build/checkout) or [payment links](/build/payment-links) unless you need embedded card UI or a custom mobile-money flow. Direct charges require you to handle pending states and webhooks.
+  **Card and Switch direct charges are not available yet.** `POST /charge/card` and `POST /charge/switch` are turned off while the card rails are being finalized, and calling them today returns `503 service_unavailable`. Use [hosted checkout](/build/checkout) or [payment links](/build/payment-links) for cards. Only Wave and MTN mobile money direct charges are live.
+</Callout>
+
+<Callout type="warn">
+  Prefer [hosted checkout](/build/checkout) or [payment links](/build/payment-links) unless you need a custom mobile-money flow. Direct charges require you to handle pending states and webhooks.
 </Callout>
 
 ## When to use direct charges
@@ -19,7 +23,8 @@ Use direct charges when you want to charge quickly and will not reuse the same p
 | --- | --- | --- |
 | Wave | `POST /charge/wave` | Open `wave_launch_url` or `checkout_url` from the response |
 | MTN MoMo | `POST /charge/mtn` | Approve on their phone; live status starts `PENDING` |
-| Card | `POST /charge/card` | Confirm with `client_secret` via [Payment Elements](/build/payments/lomi-payment-elements) |
+| Card | `POST /charge/card` | **Not available yet** — use [hosted checkout](/build/checkout) |
+| Switch (server-side card) | `POST /charge/switch` | **Not available yet** — use [hosted checkout](/build/checkout) |
 
 ## Reference implementation
 
@@ -36,6 +41,10 @@ pnpm run dev
 ```
 
 ## Card flow (summary)
+
+<Callout type="warn">
+  Not available yet. The steps below describe the planned card flow; `POST /charge/card` and `POST /charge/switch` currently return `503 service_unavailable`. Use [hosted checkout](/build/checkout) for cards.
+</Callout>
 
 1. `POST /charge/card` with amount, currency, and `customer_id` or (`customer_email` + `customer_name`).
 2. Mount Payment Elements with `lomi_pk_...` and the returned `client_secret`.
