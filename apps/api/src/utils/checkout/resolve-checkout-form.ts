@@ -161,35 +161,17 @@ function clampContactVisibility(
   emailVisibility: CheckoutFieldVisibility;
   phoneVisibility: CheckoutFieldVisibility;
 } {
-  const emailRequired = emailVisibility === 'required';
-  const phoneRequired = phoneVisibility === 'required';
-
-  if (emailRequired || phoneRequired) {
+  // Email visible: keep phone exactly as requested (optional or required).
+  if (emailVisibility !== 'hidden') {
     return { emailVisibility, phoneVisibility };
   }
 
-  const emailVisible = emailVisibility !== 'hidden';
-  const phoneVisible = phoneVisibility !== 'hidden';
-
-  if (!emailVisible && !phoneVisible) {
-    return {
-      emailVisibility: 'required',
-      phoneVisibility: 'optional',
-    };
-  }
-
-  if (emailVisible && phoneVisible) {
-    return {
-      emailVisibility: 'required',
-      phoneVisibility,
-    };
-  }
-
-  if (emailVisible) {
-    return { emailVisibility: 'required', phoneVisibility };
-  }
-
-  return { emailVisibility, phoneVisibility: 'required' };
+  // Email hidden: phone follows its own flag. A required phone stays required;
+  // otherwise phone is hidden too, letting a merchant collect no contact field.
+  return {
+    emailVisibility,
+    phoneVisibility: phoneVisibility === 'required' ? 'required' : 'hidden',
+  };
 }
 
 export function resolveCheckoutForm(

@@ -103,6 +103,10 @@ export class HealthService implements OnModuleDestroy {
   }> {
     const checks: ReadinessCheck[] = [];
     const isProduction = process.env.NODE_ENV === 'production';
+    const isSandboxDeploy =
+      (process.env.LOMI_API_ENV || process.env.API_ENV || '')
+        .trim()
+        .toLowerCase() === 'sandbox';
 
     this.runEnvCheck(checks, 'supabase_url', () => {
       if (!process.env.SUPABASE_URL?.trim()) {
@@ -124,7 +128,7 @@ export class HealthService implements OnModuleDestroy {
       }
     });
 
-    if (isProduction) {
+    if (isProduction && !isSandboxDeploy) {
       this.runEnvCheck(checks, 'cron_secret', () => {
         if (!process.env.CRON_SECRET?.trim()) {
           throw new Error('CRON_SECRET is required in production');

@@ -1,5 +1,31 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUrl,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import type { UnifiedCheckoutFieldDefinition } from '../../../utils/checkout/resolve-checkout-form';
+
+class CheckoutFieldDefinitionDto {
+  @IsString()
+  key: string;
+
+  @IsString()
+  type: string;
+
+  @IsBoolean()
+  @IsOptional()
+  required?: boolean;
+}
 
 export class CreatePaymentLinkDto {
   @ApiProperty({
@@ -7,12 +33,14 @@ export class CreatePaymentLinkDto {
     description: 'Type of payment link',
     enum: ['product', 'instant'],
   })
+  @IsIn(['product', 'instant'])
   link_type: string;
 
   @ApiProperty({
     example: 'Premium Subscription',
     description: 'Title of the payment link',
   })
+  @IsString()
   title: string;
 
   @ApiProperty({
@@ -20,113 +48,131 @@ export class CreatePaymentLinkDto {
     description: 'Currency code',
     enum: ['XOF', 'USD', 'EUR'],
   })
+  @IsIn(['XOF', 'USD', 'EUR'])
   currency_code: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Monthly subscription to premium features',
     description: 'Description',
-    required: false,
   })
+  @IsString()
+  @IsOptional()
   description?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 10000.0,
     description:
       'Amount (required for instant links, not allowed for product links)',
-    required: false,
   })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
   amount?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '123e4567-e89b-12d3-a456-426614174000',
     description:
       'Product ID (required for product links, not allowed for instant links)',
-    required: false,
   })
+  @IsUUID()
+  @IsOptional()
   product_id?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '321e4567-e89b-12d3-a456-426614174000',
     description:
       'Specific price ID (optional, for product links with multiple prices)',
-    required: false,
   })
+  @IsUUID()
+  @IsOptional()
   price_id?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: true,
     description: 'Allow customers to apply discount codes',
     default: false,
-    required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   allow_coupon_code?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: false,
     description: 'Allow customers to change quantity',
     default: false,
-    required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   allow_quantity?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: true,
     description: 'Require billing address',
     default: true,
-    required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   require_billing_address?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: true,
     description: 'Require customer email at checkout',
     default: true,
-    required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   require_email?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: false,
     description: 'Require customer phone at checkout',
     default: false,
-    required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   require_phone?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'Optional unified checkout field schema. When provided, overrides require_* booleans.',
-    required: false,
     type: 'array',
     items: { type: 'object' },
   })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CheckoutFieldDefinitionDto)
+  @IsOptional()
   fields?: UnifiedCheckoutFieldDefinition[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '2024-12-31T23:59:59Z',
     description: 'Expiration date/time (optional)',
-    required: false,
   })
+  @IsString()
+  @IsOptional()
   expires_at?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'https://example.com/success',
     description: 'Success redirect URL',
-    required: false,
   })
+  @IsUrl()
+  @IsOptional()
   success_url?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'https://example.com/cancel',
     description: 'Cancel redirect URL',
-    required: false,
   })
+  @IsUrl()
+  @IsOptional()
   cancel_url?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: { campaign: 'summer2024' },
     description: 'Additional metadata',
-    required: false,
   })
-  metadata?: Record<string, any>;
+  @IsObject()
+  @IsOptional()
+  metadata?: Record<string, unknown>;
 }

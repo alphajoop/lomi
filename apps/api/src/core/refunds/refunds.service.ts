@@ -825,7 +825,7 @@ export class RefundsService {
 
     const customer = await this.loadCustomer(
       tx.customer_id,
-      user.organizationId,
+      user.merchantId,
     );
     const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
@@ -1002,7 +1002,7 @@ export class RefundsService {
 
     const customer = await this.loadCustomer(
       tx.customer_id,
-      user.organizationId,
+      user.merchantId,
     );
     const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
@@ -1134,12 +1134,12 @@ export class RefundsService {
     }
   }
 
-  private async loadCustomer(customerId: string, organizationId: string) {
+  private async loadCustomer(customerId: string, merchantId: string) {
     const { data, error } = await this.supabaseService.getClient().rpc(
       'get_customer' as never,
       {
         p_customer_id: customerId,
-        p_organization_id: organizationId,
+        p_merchant_id: merchantId,
       } as never,
     );
 

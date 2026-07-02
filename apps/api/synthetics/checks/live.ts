@@ -99,7 +99,7 @@ export function createLiveChecks(): CheckDefinition[] {
       name: 'list refunds',
       service: 'refunds',
       method: 'GET',
-      path: '/refunds?limit=1',
+      path: '/refunds?pageSize=1',
       expectStatus: 200,
     },
     {
@@ -113,7 +113,7 @@ export function createLiveChecks(): CheckDefinition[] {
       name: 'list disputes',
       service: 'disputes',
       method: 'GET',
-      path: '/disputes?limit=1',
+      path: '/disputes?pageSize=1',
       expectStatus: 200,
     },
     {

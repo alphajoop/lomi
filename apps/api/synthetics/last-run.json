@@ -1,0 +1,478 @@
+{
+  "startedAt": "2026-07-02T18:44:54.926Z",
+  "finishedAt": "2026-07-02T18:45:10.868Z",
+  "durationMs": 15897,
+  "suites": [
+    {
+      "suite": "sandbox",
+      "baseUrl": "https://sandbox.api.lomi.africa",
+      "startedAt": "2026-07-02T18:44:54.926Z",
+      "finishedAt": "2026-07-02T18:45:10.868Z",
+      "durationMs": 15897,
+      "checks": [
+        {
+          "suite": "sandbox",
+          "name": "health liveness",
+          "service": "health",
+          "method": "GET",
+          "path": "/health",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 1297,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "health readiness",
+          "service": "health",
+          "method": "GET",
+          "path": "/ready",
+          "status": "fail",
+          "httpStatus": 503,
+          "latencyMs": 555,
+          "anomalies": [
+            {
+              "kind": "service_unavailable",
+              "message": "Service unavailable (503): {\"ready\":false,\"service\":\"lomi-api\",\"checks\":[{\"name\":\"supabase_url\",\"ok\":true},{\"name\":\"supabase_secret_key\",\"ok\":true},{\"name\":\"upstash_redis_url\",\"ok\":true},…"
+            },
+            {
+              "kind": "validation",
+              "message": "Readiness check returned 503 (dependencies unhealthy)"
+            }
+          ],
+          "responsePreview": "{\"ready\":false,\"service\":\"lomi-api\",\"checks\":[{\"name\":\"supabase_url\",\"ok\":true},{\"name\":\"supabase_secret_key\",\"ok\":true},{\"name\":\"upstash_redis_url\",\"ok\":true},{\"name\":\"cron_secret\",\"ok\":false,\"detail\":\"CRON_SECRET is required in production\"},{\"name\":\"redis_ping\",\"ok\":true}],\"red…"
+        },
+        {
+          "suite": "sandbox",
+          "name": "me identity",
+          "service": "identity",
+          "method": "GET",
+          "path": "/me",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 606,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "list providers",
+          "service": "providers",
+          "method": "GET",
+          "path": "/providers",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 492,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create customer",
+          "service": "customers",
+          "method": "POST",
+          "path": "/customers",
+          "status": "pass",
+          "httpStatus": 201,
+          "latencyMs": 588,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "get customer",
+          "service": "customers",
+          "method": "GET",
+          "path": "/customers/75169464-6780-4fd0-8b22-de1b957e721e",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 468,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create product",
+          "service": "products",
+          "method": "POST",
+          "path": "/products",
+          "status": "fail",
+          "httpStatus": 500,
+          "latencyMs": 548,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 500"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"internal_error\",\"message\":\"An unexpected error occurred\",\"details\":null},\"request_id\":\"fbd96728-1afa-42c3-b5bc-9bb59f10e8fd\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "get product",
+          "service": "products",
+          "method": "GET",
+          "path": "/products/undefined",
+          "status": "skip",
+          "skipReason": "productId not captured from create",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "charge wave pending scenario",
+          "service": "charges",
+          "method": "POST",
+          "path": "/charge/wave",
+          "status": "pass",
+          "httpStatus": 201,
+          "latencyMs": 915,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "charge mtn auto-complete",
+          "service": "charges",
+          "method": "POST",
+          "path": "/charge/mtn",
+          "status": "pass",
+          "httpStatus": 201,
+          "latencyMs": 824,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "charge mtn failed scenario",
+          "service": "charges",
+          "method": "POST",
+          "path": "/charge/mtn",
+          "status": "pass",
+          "httpStatus": 400,
+          "latencyMs": 1423,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "charge switch approved scenario",
+          "service": "charges",
+          "method": "POST",
+          "path": "/charge/switch",
+          "status": "fail",
+          "httpStatus": 500,
+          "latencyMs": 470,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 500"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"internal_error\",\"message\":\"An unexpected error occurred\",\"details\":null},\"request_id\":\"1c24cb96-b434-4685-9c28-4fb865a6a2ad\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "charge card embedded",
+          "service": "charges",
+          "method": "POST",
+          "path": "/charge/card",
+          "status": "fail",
+          "httpStatus": 503,
+          "latencyMs": 343,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 503"
+            },
+            {
+              "kind": "service_unavailable",
+              "message": "Service unavailable (503): Card payments are temporarily unavailable. Please use another payment method or try again later."
+            },
+            {
+              "kind": "validation",
+              "message": "Expected client_secret in card charge response"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"service_unavailable\",\"message\":\"Card payments are temporarily unavailable. Please use another payment method or try again later.\",\"details\":\"Service Unavailable\"},\"request_id\":\"b8882850-76ed-4608-aafb-ad1f035d752a\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "create refund",
+          "service": "refunds",
+          "method": "POST",
+          "path": "/refunds",
+          "status": "fail",
+          "httpStatus": 400,
+          "latencyMs": 553,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 400"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"bad_request\",\"message\":\"Could not find the function public.get_customer(p_customer_id, p_organization_id) in the schema cache\",\"details\":\"Bad Request\"},\"request_id\":\"2e1bba85-0940-49e8-889c-7e7c37db743d\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "get refund",
+          "service": "refunds",
+          "method": "GET",
+          "path": "/refunds/undefined",
+          "status": "skip",
+          "skipReason": "refundId not captured from create",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create checkout session",
+          "service": "checkout-sessions",
+          "method": "POST",
+          "path": "/checkout-sessions",
+          "status": "pass",
+          "httpStatus": 201,
+          "latencyMs": 529,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "get checkout session",
+          "service": "checkout-sessions",
+          "method": "GET",
+          "path": "/checkout-sessions/cbb1a8e2-96f5-439a-af18-85435491bef5",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 379,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create payment link",
+          "service": "payment-links",
+          "method": "POST",
+          "path": "/payment-links",
+          "status": "fail",
+          "httpStatus": 500,
+          "latencyMs": 363,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 500"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"internal_error\",\"message\":\"An unexpected error occurred\",\"details\":null},\"request_id\":\"376992c6-21f7-434a-ba69-4a8db483752b\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "get payment link",
+          "service": "payment-links",
+          "method": "GET",
+          "path": "/payment-links/undefined",
+          "status": "skip",
+          "skipReason": "paymentLinkId not captured",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create payment request",
+          "service": "payment-requests",
+          "method": "POST",
+          "path": "/payment-requests",
+          "status": "fail",
+          "httpStatus": 500,
+          "latencyMs": 423,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 500"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"internal_error\",\"message\":\"An unexpected error occurred\",\"details\":null},\"request_id\":\"68e3dfac-69d9-4325-8769-e34b2348b8e0\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "get payment request",
+          "service": "payment-requests",
+          "method": "GET",
+          "path": "/payment-requests/undefined",
+          "status": "skip",
+          "skipReason": "paymentRequestId not captured",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "list transactions",
+          "service": "transactions",
+          "method": "GET",
+          "path": "/transactions?pageSize=1",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 528,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "get transaction",
+          "service": "transactions",
+          "method": "GET",
+          "path": "/transactions/66241881-bddf-4d31-8959-263cb51c7245",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 359,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "list subscriptions",
+          "service": "subscriptions",
+          "method": "GET",
+          "path": "/subscriptions?pageSize=1",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 349,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create discount coupon",
+          "service": "discount-coupons",
+          "method": "POST",
+          "path": "/discount-coupons",
+          "status": "pass",
+          "httpStatus": 201,
+          "latencyMs": 826,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "get discount coupon",
+          "service": "discount-coupons",
+          "method": "GET",
+          "path": "/discount-coupons/ca705655-6cea-468e-befa-46f9e7922bdd",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 365,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create meter",
+          "service": "metering",
+          "method": "POST",
+          "path": "/meters",
+          "status": "fail",
+          "httpStatus": 500,
+          "latencyMs": 349,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 500"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"internal_error\",\"message\":\"An unexpected error occurred\",\"details\":null},\"request_id\":\"19789b11-883f-4c8b-a568-e129e99e9ddc\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "list meters",
+          "service": "metering",
+          "method": "GET",
+          "path": "/meters",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 349,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "ingest usage event",
+          "service": "metering",
+          "method": "POST",
+          "path": "/usage-events",
+          "status": "skip",
+          "skipReason": "meterName not captured",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create webhook",
+          "service": "webhooks",
+          "method": "POST",
+          "path": "/webhooks",
+          "status": "fail",
+          "httpStatus": 500,
+          "latencyMs": 343,
+          "anomalies": [
+            {
+              "kind": "status",
+              "message": "Expected HTTP 200 or 201, got 500"
+            }
+          ],
+          "responsePreview": "{\"error\":{\"code\":\"internal_error\",\"message\":\"An unexpected error occurred\",\"details\":null},\"request_id\":\"3bbc2e73-ef8f-4497-bdf9-279322c9d0ac\"}"
+        },
+        {
+          "suite": "sandbox",
+          "name": "test webhook delivery",
+          "service": "webhooks",
+          "method": "POST",
+          "path": "/webhooks/undefined/test",
+          "status": "skip",
+          "skipReason": "webhookId not captured from create",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "delete webhook cleanup",
+          "service": "webhooks",
+          "method": "DELETE",
+          "path": "/webhooks/undefined",
+          "status": "skip",
+          "skipReason": "webhookId not captured from create",
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "radar settings",
+          "service": "radar",
+          "method": "GET",
+          "path": "/organization/radar-settings",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 427,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "api request logs",
+          "service": "logs",
+          "method": "GET",
+          "path": "/logs?type=api_request&limit=1",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 376,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "accounts balance",
+          "service": "accounts",
+          "method": "GET",
+          "path": "/accounts/balance",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 362,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "delete customer cleanup",
+          "service": "customers",
+          "method": "DELETE",
+          "path": "/customers/75169464-6780-4fd0-8b22-de1b957e721e",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 461,
+          "anomalies": []
+        }
+      ],
+      "passed": 20,
+      "failed": 9,
+      "skipped": 7
+    }
+  ],
+  "totalPassed": 20,
+  "totalFailed": 9,
+  "totalSkipped": 7,
+  "ok": false
+}
