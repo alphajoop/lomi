@@ -592,6 +592,21 @@ export function createSandboxChecks(): CheckDefinition[] {
       validate: (_ctx, res) => validateWebhookDeliveryLogs(res.data),
     },
     {
+      name: 'logs webhook_delivery stream',
+      service: 'logs',
+      method: 'GET',
+      path: (ctx) =>
+        `/logs?type=webhook_delivery&webhook_id=${ctx.webhookId}&limit=5`,
+      expectStatus: 200,
+      retry: { attempts: 5, delayMs: 1000 },
+      skipIf: (ctx) =>
+        ctx.webhookId ? null : 'webhookId not captured from create',
+      validate: (_ctx, res) =>
+        validateLogsListResponse(res.data, 'webhook_delivery', {
+          minEntries: 1,
+        }),
+    },
+    {
       name: 'delete webhook cleanup',
       service: 'webhooks',
       method: 'DELETE',
@@ -629,20 +644,6 @@ export function createSandboxChecks(): CheckDefinition[] {
         ctx.apiLogEntryId ? null : 'apiLogEntryId not captured from list',
       validate: (_ctx, res) =>
         validateLogEntryResponse(res.data, 'api_request'),
-    },
-    {
-      name: 'logs webhook_delivery stream',
-      service: 'logs',
-      method: 'GET',
-      path: (ctx) =>
-        `/logs?type=webhook_delivery&webhook_id=${ctx.webhookId}&limit=5`,
-      expectStatus: 200,
-      skipIf: (ctx) =>
-        ctx.webhookId ? null : 'webhookId not captured from create',
-      validate: (_ctx, res) =>
-        validateLogsListResponse(res.data, 'webhook_delivery', {
-          minEntries: 1,
-        }),
     },
     {
       name: 'logs api_error stream',
