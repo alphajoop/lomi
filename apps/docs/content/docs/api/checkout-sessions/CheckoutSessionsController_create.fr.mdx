@@ -118,12 +118,32 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 
 ## Exemple
 
+Session minimale :
+
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{"currency_code":"XOF"}'
 ```
+
+Checkout téléphone seul (nom, e-mail et adresse masqués) :
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 1000,
+    "currency_code": "XOF",
+    "require_name": false,
+    "require_email": false,
+    "require_phone": true,
+    "require_billing_address": false
+  }'
+```
+
+Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#checkout-form-fields) pour toutes les combinaisons.
 
 ## OpenAPI
 

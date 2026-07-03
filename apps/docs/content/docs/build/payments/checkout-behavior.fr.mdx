@@ -90,7 +90,7 @@ Lorsque la devise de la session diffère de celle d’un tarif produit, la logiq
 
 ## Champs du formulaire checkout
 
-Contrôlez quels champs client apparaissent sur le tunnel hébergé et s’ils sont obligatoires. Définissez les valeurs par défaut dans le tableau de bord (**Paramètres → Checkout**), surchargez par [lien de paiement](/build/payment-links), ou passez les indicateurs sur chaque [session checkout](/build/checkout).
+Contrôlez quels champs client apparaissent sur le tunnel hébergé et s’ils sont obligatoires. Surchargez par [lien de paiement](/build/payment-links) ou définissez les indicateurs sur chaque [session checkout](/build/checkout). Les défauts d’organisation pour **l’e-mail**, le **téléphone** et **l’adresse de facturation** se configurent dans le tableau de bord sous **Paramètres → Checkout**. **`require_name`** est disponible sur les liens de paiement et les sessions checkout via l’API (obligatoire par défaut si omis).
 
 Chaque indicateur `require_*` est un booléen. Quand il vaut `true`, le champ est **affiché et obligatoire** avant le paiement. Quand il vaut `false`, le comportement dépend du champ (voir ci-dessous). Passer `customer_name`, `customer_email` ou `customer_phone` sur une session **préremplit** seulement les valeurs ; cela ne change pas les champs affichés.
 
@@ -136,6 +136,35 @@ Une fois les indicateurs résolus, le tunnel hébergé applique ces règles :
 | `true` | `true` | E-mail obligatoire, téléphone obligatoire |
 | `false` | `true` | E-mail masqué, téléphone obligatoire |
 | `false` | `false` | Ni e-mail ni téléphone |
+
+<Callout type="warning">
+  **Au moins un champ de contact :** l’API rejette `require_name: false` avec `require_email: false` et `require_phone: false` sauf si vous passez `customer_name` ou `customer_id` sur la session. Le tunnel doit pouvoir identifier le client via le nom, l’e-mail ou le téléphone.
+</Callout>
+
+### Combinaisons courantes
+
+| Objectif | Indicateurs |
+| --- | --- |
+| Checkout téléphone seul | `require_name: false`, `require_email: false`, `require_phone: true`, `require_billing_address: false` |
+| E-mail seul (sans téléphone) | `require_email: true`, `require_phone: false` (téléphone optionnel tant que l’e-mail est visible) |
+| Masquer le nom, collecter l’e-mail | `require_name: false`, `require_email: true` |
+| Contact minimal (e-mail + téléphone optionnel) | Défauts — omettre les indicateurs ou `require_phone: false` |
+
+Exemple — session **téléphone seul** :
+
+```json
+{
+  "amount": 1000,
+  "currency_code": "XOF",
+  "title": "Checkout téléphone seul",
+  "require_name": false,
+  "require_email": false,
+  "require_phone": true,
+  "require_billing_address": false
+}
+```
+
+Le client ne voit que le champ téléphone (plus le basculement WhatsApp optionnel). Nom, e-mail et adresse de facturation sont masqués.
 
 <Callout type="info">
   **Mobile money :** Quand le téléphone est visible mais optionnel, **Wave** et **MTN** exigent quand même un numéro valide au moment du paiement. Carte et autres moyens peuvent continuer sans téléphone quand il est optionnel.

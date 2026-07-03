@@ -100,7 +100,7 @@ When session currency differs from a product price currency, server logic may **
 
 ## Checkout form fields
 
-Control which customer fields appear on the hosted checkout form and whether they are required. Configure defaults in the dashboard under **Settings → Checkout**, override per [payment link](/build/payment-links), or set flags on each [checkout session](/build/checkout).
+Control which customer fields appear on the hosted checkout form and whether they are required. Override per [payment link](/build/payment-links) or set flags on each [checkout session](/build/checkout). Organization defaults for **email**, **phone**, and **billing address** are configured in the dashboard under **Settings → Checkout**. **`require_name`** is available on payment links and checkout sessions via the API (defaults to required when unset).
 
 Each `require_*` flag is a boolean. When `true`, the field is **shown and required** before payment. When `false`, behavior depends on the field (see below). Passing `customer_name`, `customer_email`, or `customer_phone` on a session only **pre-fills** values; it does not change which fields are shown.
 
@@ -146,6 +146,35 @@ After flags are resolved, hosted checkout applies these rules:
 | `true` | `true` | Email required, phone required |
 | `false` | `true` | Email hidden, phone required |
 | `false` | `false` | No email or phone fields |
+
+<Callout type="warning">
+  **At least one contact field:** The API rejects `require_name: false` together with `require_email: false` and `require_phone: false` unless you pass `customer_name` or `customer_id` on the session. Checkout must be able to identify the customer from name, email, or phone.
+</Callout>
+
+### Common combinations
+
+| Goal | Flags |
+| --- | --- |
+| Phone-only checkout | `require_name: false`, `require_email: false`, `require_phone: true`, `require_billing_address: false` |
+| Email only (no phone) | `require_email: true`, `require_phone: false` (phone hidden when email hidden is false — phone stays optional) |
+| Hide name, collect email | `require_name: false`, `require_email: true` |
+| Minimal contact (email + optional phone) | Defaults — omit flags or set `require_phone: false` |
+
+Example — **phone-only** session:
+
+```json
+{
+  "amount": 1000,
+  "currency_code": "XOF",
+  "title": "Phone-only checkout",
+  "require_name": false,
+  "require_email": false,
+  "require_phone": true,
+  "require_billing_address": false
+}
+```
+
+The customer sees only the phone field (plus the optional WhatsApp toggle). Name, email, and billing address are hidden.
 
 <Callout type="info">
   **Mobile money:** When the phone field is visible but optional, **Wave** and **MTN** still require a valid phone number at payment time. Card and other methods may proceed without phone when it is optional.
