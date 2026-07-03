@@ -435,6 +435,68 @@
         ]
       }
     },
+    "/provisioning/v1/merchants/{merchantId}/live-activation/request": {
+      "post": {
+        "description": "Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.",
+        "operationId": "ProvisioningController_requestLiveActivation",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Request live mode activation (requires merchant approval)",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/live-activation/status": {
+      "get": {
+        "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard — not via this API.",
+        "operationId": "ProvisioningController_getLiveActivationStatus",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Get live activation request status",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
     "/partners/v1/provisioning-keys": {
       "post": {
         "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning/v1 for agent onboarding.",

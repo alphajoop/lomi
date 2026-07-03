@@ -283,6 +283,18 @@ export async function GET() {
     '5. Connect MCP with `Authorization: Bearer <access_token>`; session auto-adopts merchant `lomi_sk_test_*` after onboarding completes.',
   );
   lines.push('');
+  lines.push('**Test → live (human-gated):**');
+  lines.push('');
+  lines.push(
+    '- `POST /provisioning/v1/merchants/{id}/live-activation/request` — agent requests go-live; share `merchant_approval_path` with the human merchant.',
+  );
+  lines.push(
+    '- `GET /provisioning/v1/merchants/{id}/live-activation/status` — poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).',
+  );
+  lines.push(
+    '- Merchant approves at `https://dashboard.lomi.africa/connect/go-live` and retrieves `lomi_sk_*` live secret (never via provisioning API). Starter: AI KYC review; registered: admin approval.',
+  );
+  lines.push('');
   const mcpPage = pageBySlugPath(pages, 'build/mcp');
   if (mcpPage) {
     lines.push(

@@ -23,6 +23,7 @@ import { CreateProvisioningAccountDto } from './dto/create-provisioning-account.
 import { UploadProvisioningDocumentDto } from './dto/upload-provisioning-document.dto';
 import { ExtractProvisioningOnboardingDto } from './dto/extract-provisioning-onboarding.dto';
 import { CompleteProvisioningOnboardingDto } from './dto/complete-provisioning-onboarding.dto';
+import { RequestLiveActivationDto } from './dto/request-live-activation.dto';
 import { ProvisioningService } from './provisioning.service';
 
 @ApiTags('Provisioning')
@@ -114,5 +115,35 @@ export class ProvisioningController {
     @Req() req: Request,
   ) {
     return this.service.getApiKeys(ctx, merchantId, req.ip);
+  }
+
+  @Post('merchants/:merchantId/live-activation/request')
+  @ApiOperation({
+    summary: 'Request live mode activation (requires merchant approval)',
+    description:
+      'Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.',
+  })
+  @ApiParam({ name: 'merchantId', type: 'string', format: 'uuid' })
+  requestLiveActivation(
+    @CurrentProvisioning() ctx: ProvisioningContext,
+    @Param('merchantId', ParseUUIDPipe) merchantId: string,
+    @Body() dto: RequestLiveActivationDto,
+    @Req() req: Request,
+  ) {
+    return this.service.requestLiveActivation(ctx, merchantId, dto, req.ip);
+  }
+
+  @Get('merchants/:merchantId/live-activation/status')
+  @ApiOperation({
+    summary: 'Get live activation request status',
+    description:
+      'Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard — not via this API.',
+  })
+  @ApiParam({ name: 'merchantId', type: 'string', format: 'uuid' })
+  getLiveActivationStatus(
+    @CurrentProvisioning() ctx: ProvisioningContext,
+    @Param('merchantId', ParseUUIDPipe) merchantId: string,
+  ) {
+    return this.service.getLiveActivationStatus(ctx, merchantId);
   }
 }

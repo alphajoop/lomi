@@ -17,6 +17,7 @@ import {
   validatePaymentWebhookDelivered,
 } from '../assert';
 import type { CheckDefinition, SuiteContext } from '../types';
+import { createAgentOnboardingChecks } from './agent';
 
 function synthEmail(ctx: SuiteContext): string {
   return `synthetics+${ctx.runId}@lomi.test`;
@@ -34,6 +35,7 @@ function futureExpiry(): string {
 
 export function createSandboxChecks(): CheckDefinition[] {
   return [
+    ...createAgentOnboardingChecks(),
     // --- Identity / infra ---
     {
       name: 'health liveness',

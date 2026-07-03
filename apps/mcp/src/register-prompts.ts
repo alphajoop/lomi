@@ -49,6 +49,16 @@ export function registerLomiPrompts(
     provisioningManifest?.tools.find((t) =>
       t.name.includes('merchants_merchantId_api_keys'),
     )?.name ?? 'lomi_get_provisioning_v1_merchants_merchantId_api_keys';
+  const requestLiveActivation =
+    provisioningManifest?.tools.find((t) =>
+      t.name.includes('live_activation_request'),
+    )?.name ??
+    'lomi_post_provisioning_v1_merchants_merchantId_live_activation_request';
+  const getLiveActivationStatus =
+    provisioningManifest?.tools.find((t) =>
+      t.name.includes('live_activation_status'),
+    )?.name ??
+    'lomi_get_provisioning_v1_merchants_merchantId_live_activation_status';
 
   server.registerPrompt(
     'provision_merchant_from_zero',
@@ -78,7 +88,11 @@ export function registerLomiPrompts(
               `   - ${createCheckout} — create a hosted checkout session`,
               `   - (optional) ${createWebhook} — register a webhook endpoint`,
               '',
-              'TEST mode works immediately after step 4. LIVE mode: starter accounts may auto-approve via AI; registered businesses require admin review.',
+              'TEST mode works immediately after step 4. To go LIVE:',
+              `7. ${requestLiveActivation} — request live activation; share merchant_approval_path with the human merchant`,
+              `8. ${getLiveActivationStatus} — poll until approved (starter: AI review; registered: admin review)`,
+              '9. Merchant opens /connect/go-live on dashboard, approves, and retrieves lomi_sk_* live key themselves — never via provisioning API.',
+              '',
               'Use idempotency_key on each write.',
             ].join('\n'),
           },

@@ -75,6 +75,48 @@ export class ProvisioningOnboardingStatusResponseDto {
 
   @ApiProperty()
   can_use_live_mode: boolean;
+
+  @ApiPropertyOptional()
+  live_activation?: Record<string, unknown>;
+}
+
+export class LiveActivationRequestResponseDto {
+  @ApiProperty()
+  request_id!: string;
+
+  @ApiProperty({
+    enum: [
+      'pending_merchant',
+      'pending_review',
+      'approved',
+      'rejected',
+      'expired',
+    ],
+  })
+  status!: string;
+
+  @ApiProperty()
+  merchant_approval_path!: string;
+
+  @ApiPropertyOptional()
+  already_pending?: boolean;
+}
+
+export class LiveActivationStatusResponseDto {
+  @ApiProperty()
+  found!: boolean;
+
+  @ApiPropertyOptional()
+  organization_id?: string;
+
+  @ApiPropertyOptional()
+  verification_status?: string;
+
+  @ApiProperty()
+  can_use_live_mode!: boolean;
+
+  @ApiPropertyOptional()
+  request?: Record<string, unknown> | null;
 }
 
 export class ProvisioningCompleteResponseDto {

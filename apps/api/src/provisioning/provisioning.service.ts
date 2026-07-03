@@ -17,8 +17,11 @@ import type {
   ProvisioningApiKeyDto,
   ProvisioningCompleteResponseDto,
   ProvisioningDocumentUploadResponseDto,
+  LiveActivationRequestResponseDto,
+  LiveActivationStatusResponseDto,
   ProvisioningOnboardingStatusResponseDto,
 } from './dto/provisioning-response.dto';
+import type { RequestLiveActivationDto } from './dto/request-live-activation.dto';
 
 @Injectable()
 export class ProvisioningService {
@@ -224,6 +227,12 @@ export class ProvisioningService {
   ): Promise<ProvisioningCompleteResponseDto> {
     await this.assertMerchantAccess(ctx, merchantId);
 
+    if (!dto.identity_proof_url?.trim()) {
+      throw new BadRequestException(
+        'identity_proof_url is required to complete onboarding and enable live activation review',
+      );
+    }
+
     try {
       await this.repository.completeOnboarding(merchantId, dto);
     } catch (error) {
@@ -309,6 +318,72 @@ export class ProvisioningService {
       is_starter_business: Boolean(status.is_starter_business),
       can_use_test_mode: Boolean(status.can_use_test_mode ?? true),
       can_use_live_mode: Boolean(status.can_use_live_mode),
+      live_activation: status.live_activation as
+        | Record<string, unknown>
+        | undefined,
+    };
+  }
+
+  async requestLiveActivation(
+    ctx: ProvisioningContext,
+    merchantId: string,
+    dto: RequestLiveActivationDto,
+    ipAddress?: string,
+  ): Promise<LiveActivationRequestResponseDto> {
+    await this.assertMerchantAccess(ctx, merchantId);
+
+    try {
+      const result = await this.repository.requestLiveActivation(
+        ctx.provisioningKeyId,
+        merchantId,
+        dto.metadata,
+      );
+
+      await this.repository.logAudit({
+        provisioningKeyId: ctx.provisioningKeyId,
+        action: 'live_activation_requested',
+        merchantId,
+        ipAddress,
+        metadata: {
+          request_id: result.request_id,
+          already_pending: result.already_pending,
+        },
+      });
+
+      return {
+        request_id: String(result.request_id),
+        status: String(result.status),
+        merchant_approval_path: String(result.merchant_approval_path),
+        already_pending: Boolean(result.already_pending),
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Live activation request failed';
+      throw new BadRequestException(message);
+    }
+  }
+
+  async getLiveActivationStatus(
+    ctx: ProvisioningContext,
+    merchantId: string,
+  ): Promise<LiveActivationStatusResponseDto> {
+    await this.assertMerchantAccess(ctx, merchantId);
+
+    const status = await this.repository.getLiveActivationStatus(
+      ctx.provisioningKeyId,
+      merchantId,
+    );
+
+    if (!status.found) {
+      throw new NotFoundException('Merchant not found');
+    }
+
+    return {
+      found: true,
+      organization_id: status.organization_id as string | undefined,
+      verification_status: status.verification_status as string | undefined,
+      can_use_live_mode: Boolean(status.can_use_live_mode),
+      request: (status.request as Record<string, unknown> | null) ?? null,
     };
   }
 

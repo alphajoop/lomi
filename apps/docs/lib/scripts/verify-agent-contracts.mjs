@@ -19,6 +19,10 @@ const paths = {
     docsRoot,
     'lib/scripts/manual-api/_expected-partner-operations.json',
   ),
+  expectedProvisioningOps: join(
+    docsRoot,
+    'lib/scripts/manual-api/_expected-provisioning-operations.json',
+  ),
 };
 
 function mustParseJson(label, filePath) {
@@ -114,6 +118,25 @@ for (const entry of expectedPartnerOps) {
   if (!op) {
     throw new Error(
       `agent-openapi.json missing partner operation ${entry} (re-run openapi:export:agent)`,
+    );
+  }
+}
+
+const expectedProvisioningOps = mustParseJson(
+  'expected provisioning operations',
+  paths.expectedProvisioningOps,
+);
+if (!Array.isArray(expectedProvisioningOps)) {
+  throw new Error('_expected-provisioning-operations.json must be a JSON array');
+}
+for (const entry of expectedProvisioningOps) {
+  const [method, ...pathParts] = String(entry).split(/\s+/);
+  const pathKey = pathParts.join(' ');
+  const pathItem = agentSpec.paths[pathKey];
+  const op = pathItem?.[method.toLowerCase()];
+  if (!op) {
+    throw new Error(
+      `agent-openapi.json missing provisioning operation ${entry} (re-run openapi:export:agent)`,
     );
   }
 }

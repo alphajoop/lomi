@@ -259,4 +259,40 @@ export class ProvisioningRepository {
     const row = Array.isArray(data) ? data[0] : data;
     return (row as { status?: string } | null)?.status ?? null;
   }
+
+  async requestLiveActivation(
+    provisioningKeyId: string,
+    merchantId: string,
+    metadata?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    const { data, error } = await this.supabase.rpc(
+      'request_live_activation' as never,
+      {
+        p_provisioning_key_id: provisioningKeyId,
+        p_merchant_id: merchantId,
+        p_metadata: metadata ?? {},
+      } as never,
+    );
+    if (error) {
+      throw error;
+    }
+    return (data ?? {}) as Record<string, unknown>;
+  }
+
+  async getLiveActivationStatus(
+    provisioningKeyId: string,
+    merchantId: string,
+  ): Promise<Record<string, unknown>> {
+    const { data, error } = await this.supabase.rpc(
+      'get_live_activation_status' as never,
+      {
+        p_provisioning_key_id: provisioningKeyId,
+        p_merchant_id: merchantId,
+      } as never,
+    );
+    if (error) {
+      throw error;
+    }
+    return (data ?? {}) as Record<string, unknown>;
+  }
 }

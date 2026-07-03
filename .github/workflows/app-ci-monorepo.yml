@@ -57,10 +57,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - run: pnpm test
-      - name: Export OpenAPI and verify committed spec
+      - name: Export OpenAPI and verify committed specs
         run: |
           pnpm run openapi:export
           git diff --exit-code ../docs/openapi.json
+          pnpm run openapi:export:agent
+          git diff --exit-code ../docs/agent-openapi.json
+          node ../docs/lib/scripts/verify-agent-contracts.mjs
 
   build-docs:
     needs: detect-changes
@@ -81,6 +84,7 @@ jobs:
           cache-dependency-path: "./apps/docs/pnpm-lock.yaml"
       - run: pnpm install
       - run: pnpm lint
+      - run: pnpm docs:drift
       - run: pnpm build
 
   build-cli:
