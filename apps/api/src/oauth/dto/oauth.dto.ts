@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class OAuthConsentDto {
   @ApiProperty()
@@ -49,14 +49,20 @@ export class OAuthRegisterClientDto {
   client_name!: string;
 
   @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsString({ each: true })
   redirect_uris!: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   grant_types?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   response_types?: string[];
 
   @ApiPropertyOptional()

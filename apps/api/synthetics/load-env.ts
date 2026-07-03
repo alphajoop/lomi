@@ -4,6 +4,8 @@ import { join } from 'node:path';
 const KEYS = [
   'LOMI_TEST_KEY',
   'LOMI_LIVE_KEY',
+  'LOMI_PROVISIONING_KEY',
+  'LOMI_PARTNER_KEY',
   'SANDBOX_API_URL',
   'LIVE_API_URL',
 ] as const;

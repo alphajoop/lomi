@@ -31,6 +31,8 @@ jobs:
         env:
           LOMI_TEST_KEY: ${{ secrets.LOMI_TEST_KEY }}
           LOMI_LIVE_KEY: ${{ secrets.LOMI_LIVE_KEY }}
+          LOMI_PROVISIONING_KEY: ${{ secrets.LOMI_PROVISIONING_KEY }}
+          LOMI_PARTNER_KEY: ${{ secrets.LOMI_PARTNER_KEY }}
         run: pnpm synthetics
 
       - name: Upload synthetics report
