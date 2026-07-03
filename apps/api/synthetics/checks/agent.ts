@@ -153,8 +153,10 @@ export function createAgentOnboardingChecks(): CheckDefinition[] {
 }
 
 /** Partner API flow: mint → list → usage (requires LOMI_PARTNER_KEY). */
-export function createPartnerFlowChecks(): CheckDefinition[] {
-  return [
+export function createPartnerFlowChecks(options?: {
+  includeAccountCreation?: boolean;
+}): CheckDefinition[] {
+  const checks: CheckDefinition[] = [
     {
       name: 'partner usage summary',
       service: 'partners',
@@ -225,7 +227,10 @@ export function createPartnerFlowChecks(): CheckDefinition[] {
         return null;
       },
     },
-    {
+  ];
+
+  if (options?.includeAccountCreation) {
+    checks.push({
       name: 'partner-minted provisioning create account',
       service: 'provisioning',
       method: 'POST',
@@ -254,8 +259,10 @@ export function createPartnerFlowChecks(): CheckDefinition[] {
       },
       validate: (_ctx, res) =>
         pickString(res.data, 'merchant_id') ? null : 'Expected merchant_id',
-    },
-    {
+    });
+  }
+
+  checks.push({
       name: 'partner revoke minted provisioning key',
       service: 'partners',
       method: 'DELETE',
@@ -271,8 +278,9 @@ export function createPartnerFlowChecks(): CheckDefinition[] {
           : 'mintedProvisioningKeyId not captured';
       },
       expectStatus: 200,
-    },
-  ];
+    });
+
+  return checks;
 }
 
 /**

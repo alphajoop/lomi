@@ -23,6 +23,22 @@ import {
   createPartnerFlowChecks,
 } from './agent';
 
+function includeFullProvisioningSynthetics(): boolean {
+  return process.env.LOMI_SYNTHETICS_FULL_PROVISIONING === '1';
+}
+
+function createSandboxAgentChecks(): CheckDefinition[] {
+  const fullProvisioning = includeFullProvisioningSynthetics();
+  const checks = [
+    ...createAgentOnboardingChecks(),
+    ...createPartnerFlowChecks({ includeAccountCreation: fullProvisioning }),
+  ];
+  if (fullProvisioning) {
+    checks.push(...createAgentProvisioningFlowChecks());
+  }
+  return checks;
+}
+
 function synthEmail(ctx: SuiteContext): string {
   return `synthetics+${ctx.runId}@lomi.test`;
 }
@@ -39,9 +55,7 @@ function futureExpiry(): string {
 
 export function createSandboxChecks(): CheckDefinition[] {
   return [
-    ...createAgentOnboardingChecks(),
-    ...createPartnerFlowChecks(),
-    ...createAgentProvisioningFlowChecks(),
+    ...createSandboxAgentChecks(),
     // --- Identity / infra ---
     {
       name: 'health liveness',

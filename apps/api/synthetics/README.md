@@ -37,6 +37,7 @@ Exit code `0` = all checks passed. Exit code `1` = at least one failure, skip wi
 | `LOMI_LIVE_KEY` | Live suite | Live merchant secret key (read-only checks) |
 | `SANDBOX_API_URL` | No | Default `https://sandbox.api.lomi.africa` |
 | `LIVE_API_URL` | No | Default `https://api.lomi.africa` |
+| `LOMI_SYNTHETICS_FULL_PROVISIONING` | No | Set to `1` to run mutating agent/partner provisioning flows (creates auth users). Off by default to avoid daily orphan merchants and Resend noise. |
 
 ## Output
 
@@ -60,6 +61,10 @@ Billing cycle / invoice generation is intentionally not exercised here (it requi
 **Live** (read-only): health, identity, providers, balances, and list endpoints across transactions, customers, checkout, links, requests, subscriptions, refunds, payouts, disputes, products, webhooks, logs.
 
 Every error response is scanned for internal leak patterns (Stripe/Supabase/env var names, stack traces, etc.).
+
+**Agent / partner (default):** OAuth metadata, DCR, unauthenticated 401 smoke, partner key mint/list/revoke, agent capabilities. No merchant accounts are created.
+
+**Agent / partner (optional, `LOMI_SYNTHETICS_FULL_PROVISIONING=1`):** Full provisioning onboarding (account → KYC → complete → live activation) and partner-minted account creation. Use manually when validating provisioning changes; not run in daily CI.
 
 ## CI
 
