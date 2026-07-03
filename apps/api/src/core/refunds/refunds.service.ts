@@ -825,10 +825,7 @@ export class RefundsService {
       );
     }
 
-    const customer = await this.loadCustomer(
-      tx.customer_id,
-      user.merchantId,
-    );
+    const customer = await this.loadCustomer(tx.customer_id, user.merchantId);
     const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
       throw new BadRequestException(
@@ -1002,10 +999,7 @@ export class RefundsService {
       );
     }
 
-    const customer = await this.loadCustomer(
-      tx.customer_id,
-      user.merchantId,
-    );
+    const customer = await this.loadCustomer(tx.customer_id, user.merchantId);
     const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
       throw new BadRequestException(
@@ -1231,7 +1225,9 @@ export class RefundsService {
       logStructured({
         event: 'refund_payment_edge_failed',
         organization_id:
-          typeof body.organization_id === 'string' ? body.organization_id : undefined,
+          typeof body.organization_id === 'string'
+            ? body.organization_id
+            : undefined,
         message: errorText,
         path,
       });

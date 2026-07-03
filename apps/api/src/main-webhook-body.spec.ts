@@ -30,7 +30,8 @@ function createWebhookBodyTestApp() {
       parsed: {
         isBuffer: Buffer.isBuffer(req.body),
         url: (req.body as { url?: string })?.url,
-        events: (req.body as { authorized_events?: string[] })?.authorized_events,
+        events: (req.body as { authorized_events?: string[] })
+          ?.authorized_events,
       },
     });
   });

@@ -14,7 +14,11 @@ const SENSITIVE_KEYS = new Set([
   'authorization',
 ]);
 
-const HEAVY_PAYLOAD_PREFIXES = ['/checkout-sessions', '/charge/card', '/webhooks'];
+const HEAVY_PAYLOAD_PREFIXES = [
+  '/checkout-sessions',
+  '/charge/card',
+  '/webhooks',
+];
 
 export function isHeavyOrSensitiveLogPath(path: string): boolean {
   return HEAVY_PAYLOAD_PREFIXES.some(
@@ -47,7 +51,7 @@ export function sanitizeLogPayload(
     return {};
   }
 
-  let sanitized = isHeavyOrSensitiveLogPath(endpointPath)
+  const sanitized = isHeavyOrSensitiveLogPath(endpointPath)
     ? redactSensitiveFields(value)
     : value;
 

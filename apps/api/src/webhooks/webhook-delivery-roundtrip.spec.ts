@@ -3,7 +3,7 @@ import { WebhookSenderService } from './webhook-sender.service';
 import type { WebhookEvent } from '../utils/types/api';
 import {
   deliverMerchantWebhook,
-  type MerchantWebhookDelivery,
+  type MerchantWebhookDeliveryResult,
 } from './merchant-webhook-url';
 
 jest.mock('./merchant-webhook-url', () => ({
@@ -44,7 +44,8 @@ const ALL_WEBHOOK_EVENTS = [
 
 // Compile-time exhaustiveness: errors if the enum has events not listed above.
 type MissingEvents = Exclude<WebhookEvent, (typeof ALL_WEBHOOK_EVENTS)[number]>;
-const _exhaustiveEventCatalog: MissingEvents extends never ? true : false = true;
+const _exhaustiveEventCatalog: MissingEvents extends never ? true : false =
+  true;
 void _exhaustiveEventCatalog;
 
 /** Merchant-side verification of outbound lomi. webhooks (X-Lomi-Signature). */
@@ -68,7 +69,7 @@ function verifyOutboundLomiWebhook(
 function captureDelivery() {
   const captured = { body: '', signature: '', event: '', url: '' };
   mockedDeliver.mockImplementation(
-    async (url, body, headers): Promise<MerchantWebhookDelivery> => {
+    async (url, body, headers): Promise<MerchantWebhookDeliveryResult> => {
       captured.url = url;
       captured.body = body;
       captured.signature = String(headers['X-Lomi-Signature'] ?? '');
@@ -140,11 +141,9 @@ describe('webhook delivery roundtrip (sender → merchant receiver)', () => {
     };
     captureDelivery();
 
-    const delivered = await sender.sendWebhook(
-      webhook,
-      'DISPUTE_CREATED',
-      { id: 'dsp_1' },
-    );
+    const delivered = await sender.sendWebhook(webhook, 'DISPUTE_CREATED', {
+      id: 'dsp_1',
+    });
 
     expect(delivered).toBe(false);
     expect(mockedDeliver).not.toHaveBeenCalled();
@@ -161,11 +160,9 @@ describe('webhook delivery roundtrip (sender → merchant receiver)', () => {
     };
     captureDelivery();
 
-    const delivered = await sender.sendWebhook(
-      webhook,
-      'PAYMENT_SUCCEEDED',
-      { id: 'tx_1' },
-    );
+    const delivered = await sender.sendWebhook(webhook, 'PAYMENT_SUCCEEDED', {
+      id: 'tx_1',
+    });
 
     expect(delivered).toBe(false);
     expect(mockedDeliver).not.toHaveBeenCalled();

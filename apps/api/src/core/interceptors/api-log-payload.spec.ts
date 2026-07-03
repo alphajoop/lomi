@@ -1,4 +1,7 @@
-import { sanitizeLogPayload, isHeavyOrSensitiveLogPath } from './api-log-payload';
+import {
+  sanitizeLogPayload,
+  isHeavyOrSensitiveLogPath,
+} from './api-log-payload';
 
 describe('api-log-payload', () => {
   it('redacts card and webhook secrets on sensitive paths', () => {

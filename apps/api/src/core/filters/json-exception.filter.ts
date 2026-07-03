@@ -110,7 +110,10 @@ function isHttpExceptionLoggingEnabled(): boolean {
 
 function shouldPersistHttpException(status: number): boolean {
   if (!isHttpExceptionLoggingEnabled()) return false;
-  return status === HttpStatus.SERVICE_UNAVAILABLE || status === HttpStatus.TOO_MANY_REQUESTS;
+  return (
+    status === HttpStatus.SERVICE_UNAVAILABLE ||
+    status === HttpStatus.TOO_MANY_REQUESTS
+  );
 }
 
 @Catch()
@@ -151,11 +154,16 @@ export class GlobalJsonExceptionFilter implements ExceptionFilter {
         request_id: requestId,
       });
       if (shouldPersistHttpException(HttpStatus.TOO_MANY_REQUESTS)) {
-        this.persistHttpException(req, requestId, HttpStatus.TOO_MANY_REQUESTS, {
-          code: 'rate_limit_exceeded',
-          message: 'Too many requests',
-          details: { retry_after_seconds: retryAfter, limit: limitCap },
-        });
+        this.persistHttpException(
+          req,
+          requestId,
+          HttpStatus.TOO_MANY_REQUESTS,
+          {
+            code: 'rate_limit_exceeded',
+            message: 'Too many requests',
+            details: { retry_after_seconds: retryAfter, limit: limitCap },
+          },
+        );
       }
       return;
     }

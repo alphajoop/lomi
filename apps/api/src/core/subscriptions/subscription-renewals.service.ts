@@ -156,7 +156,9 @@ export class SubscriptionRenewalsService {
         );
       }
 
-      const amountMinor = Math.round(Number(grossChargeAmount ?? amountMinorBase));
+      const amountMinor = Math.round(
+        Number(grossChargeAmount ?? amountMinorBase),
+      );
       const toCurrency = sub.price_currency_code.toLowerCase();
 
       const { data: conversionData, error: conversionError } =

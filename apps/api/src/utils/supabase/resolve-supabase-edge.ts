@@ -6,7 +6,10 @@ export type SupabaseEdgeInvocationConfig = {
   functionsBaseUrl: string;
 };
 
-function readEnv(configService: ConfigService | undefined, key: string): string {
+function readEnv(
+  configService: ConfigService | undefined,
+  key: string,
+): string {
   const fromConfig = configService?.get<string>(key)?.trim();
   if (fromConfig) return fromConfig;
   return process.env[key]?.trim() ?? '';

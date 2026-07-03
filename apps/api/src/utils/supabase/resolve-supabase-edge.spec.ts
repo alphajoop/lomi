@@ -21,8 +21,7 @@ describe('resolveSupabaseEdgeInvocation', () => {
     expect(config).toEqual({
       projectRef: 'mdswvokxrnfggrujsfjd',
       publishableKey: 'anon_key',
-      functionsBaseUrl:
-        'https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1',
+      functionsBaseUrl: 'https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1',
     });
   });
 
@@ -58,13 +57,15 @@ describe('resolveSupabaseEdgeInvocation', () => {
 
 describe('parseSupabaseProjectRefFromUrl', () => {
   it('parses standard Supabase hostnames', () => {
-    expect(
-      parseSupabaseProjectRefFromUrl('https://abc-123.supabase.co'),
-    ).toBe('abc-123');
+    expect(parseSupabaseProjectRefFromUrl('https://abc-123.supabase.co')).toBe(
+      'abc-123',
+    );
   });
 
   it('returns undefined for non-Supabase hosts', () => {
-    expect(parseSupabaseProjectRefFromUrl('https://example.com')).toBeUndefined();
+    expect(
+      parseSupabaseProjectRefFromUrl('https://example.com'),
+    ).toBeUndefined();
   });
 });
 

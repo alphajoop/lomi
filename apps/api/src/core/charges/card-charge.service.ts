@@ -183,7 +183,8 @@ export class CardChargeService {
       logStructured({
         event: 'prepare_stripe_payment_amount_failed',
         organization_id: user.organizationId,
-        message: conversionError?.message ?? 'prepare_stripe_payment_amount_failed',
+        message:
+          conversionError?.message ?? 'prepare_stripe_payment_amount_failed',
       });
       throw new BadRequestException('Failed to prepare Stripe payment amount');
     }

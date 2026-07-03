@@ -204,7 +204,10 @@ export class WebhooksService {
   }
 
   async test(id: string, user: AuthContext) {
-    const webhookRow = (await this.findOne(id, user)) as Record<string, unknown>;
+    const webhookRow = (await this.findOne(id, user)) as Record<
+      string,
+      unknown
+    >;
     const url = String(webhookRow.url ?? '');
     const verificationToken = String(webhookRow.verification_token ?? '');
     const organizationId = String(webhookRow.organization_id ?? '');
@@ -280,12 +283,15 @@ export class WebhooksService {
 
     const requestDurationMs = Date.now() - requestStartTime;
 
-    await this.supabase.rpc('update_webhook_delivery_status' as never, {
-      p_webhook_id: id,
-      p_last_response_status: responseStatus,
-      p_last_response_body: responseBody,
-      p_last_payload: testPayload,
-    } as never);
+    await this.supabase.rpc(
+      'update_webhook_delivery_status' as never,
+      {
+        p_webhook_id: id,
+        p_last_response_status: responseStatus,
+        p_last_response_body: responseBody,
+        p_last_payload: testPayload,
+      } as never,
+    );
 
     const { data: logData, error: logError } = await this.supabase.rpc(
       'log_webhook_delivery' as never,
