@@ -484,6 +484,21 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for receipt screens, support tickets, and webhook-triggered deep links.',
   },
+  LogsController_findAll: {
+    summary: 'List logs',
+    body: 'Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: `api_request`, `api_error`, `webhook_delivery`, or `activity`.',
+    whenToUse:
+      'Use when debugging API errors, auditing webhook deliveries, or building support dashboards.',
+    related:
+      '[Retrieve log entry](/api/logs/LogsController_findOne) · [Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findAll)',
+  },
+  LogsController_findOne: {
+    summary: 'Retrieve log entry',
+    body: 'Returns a single log entry by type and ID. Responds with **404** when the entry does not exist or is outside the API key organization scope.',
+    whenToUse:
+      'Use when drilling into one failed request, webhook delivery, or activity event from a list view.',
+    related: '[List logs](/api/logs/LogsController_findAll)',
+  },
   WebhookDeliveryLogsController_findAll: {
     summary: 'List webhook delivery logs',
     body: 'Returns delivery attempts for an outbound webhook endpoint, including HTTP status and retry hints.',
