@@ -3,11 +3,13 @@ import { RefundsService } from './refunds.service';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 
 const stripeRefundsCreate = jest.fn();
+const stripeChargesRetrieve = jest.fn();
 
 jest.mock('../../utils/stripe/stripe-keys', () => ({
   resolveStripeSecretKey: jest.fn(() => 'sk_test_mock'),
   createStripeClient: jest.fn(() => ({
     refunds: { create: stripeRefundsCreate },
+    charges: { retrieve: stripeChargesRetrieve },
   })),
 }));
 
@@ -149,9 +151,19 @@ describe('RefundsService', () => {
     };
   }
 
+  beforeEach(() => {
+    // Card presentment amount (EUR 15.20 in cents), nothing refunded yet.
+    stripeChargesRetrieve.mockResolvedValue({
+      amount: 1520,
+      amount_refunded: 0,
+      currency: 'eur',
+    });
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
     stripeRefundsCreate.mockReset();
+    stripeChargesRetrieve.mockReset();
   });
 
   it('rejects unsupported provider', async () => {
@@ -211,8 +223,12 @@ describe('RefundsService', () => {
     );
 
     expect(result.data.refund_id).toBe('ref-1');
+    expect(stripeChargesRetrieve).toHaveBeenCalledWith('ch_test');
     expect(stripeRefundsCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ charge: 'ch_test' }),
+      // Full refund uses the exact remaining charge amount (EUR 1520 cents),
+      // never the XOF gross (10000) inferred as cents.
+      expect.objectContaining({ charge: 'ch_test', amount: 1520 }),
+      expect.objectContaining({ idempotencyKey: expect.any(String) }),
     );
     expect(rpc).toHaveBeenCalledWith(
       'create_stripe_card_refund_api',

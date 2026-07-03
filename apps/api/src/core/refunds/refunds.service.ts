@@ -495,25 +495,50 @@ export class RefundsService {
     }
 
     const stripe = createStripeClient(stripeSecret);
-    const refundCents = this.computeStripeRefundCents(
-      dto.amount,
-      Number(tx.gross_amount),
-      tx.metadata,
-    );
+
+    // Source of truth for the refund amount + currency: the actual Stripe charge.
+    let charge;
+    try {
+      charge = await stripe.charges.retrieve(chargeId);
+    } catch (error) {
+      if (useManualFallback) {
+        return this.createManualCardRefund(
+          dto,
+          user,
+          feePercentage,
+          refundMerchantId,
+        );
+      }
+      throw this.mapStripeRefundError(error);
+    }
+
+    const { cents: refundCents, alreadyRefunded } =
+      this.resolveStripeRefundCents(
+        dto.amount,
+        Number(tx.gross_amount),
+        charge.amount,
+        charge.amount_refunded ?? 0,
+      );
 
     let stripeRefund;
     try {
-      stripeRefund = await stripe.refunds.create({
-        charge: chargeId,
-        amount: refundCents,
-        reason: 'requested_by_customer',
-        metadata: {
-          refund_id: '',
-          transaction_id: dto.transaction_id,
-          organization_id: user.organizationId,
-          refunded_by: 'merchant_api',
+      stripeRefund = await stripe.refunds.create(
+        {
+          charge: chargeId,
+          amount: refundCents,
+          reason: 'requested_by_customer',
+          metadata: {
+            refund_id: '',
+            transaction_id: dto.transaction_id,
+            organization_id: user.organizationId,
+            refunded_by: 'merchant_api',
+          },
         },
-      });
+        {
+          // Collapse rapid duplicate submissions into a single Stripe refund.
+          idempotencyKey: `refund:${dto.transaction_id}:${refundCents}:${alreadyRefunded}`,
+        },
+      );
     } catch (error) {
       if (useManualFallback) {
         return this.createManualCardRefund(
@@ -677,31 +702,37 @@ export class RefundsService {
     return typeof chargeId === 'string' && chargeId ? chargeId : null;
   }
 
-  private computeStripeRefundCents(
-    refundAmountXof: number,
-    grossAmountXof: number,
-    metadata?: Record<string, unknown> | null,
-  ): number {
-    const raw = metadata?.stripe_amount_cents;
-    const stripeAmountCents =
-      typeof raw === 'string'
-        ? parseInt(raw, 10)
-        : typeof raw === 'number'
-          ? raw
-          : null;
-
-    if (
-      stripeAmountCents != null &&
-      stripeAmountCents > 0 &&
-      grossAmountXof > 0
-    ) {
-      return Math.max(
-        1,
-        Math.round((refundAmountXof / grossAmountXof) * stripeAmountCents),
+  /**
+   * Resolve the amount to refund on Stripe, in the minor units of the ACTUAL
+   * charge currency. The charge is the single source of truth: cards settle in
+   * the card's presentment currency (often different from the stored gross /
+   * display currency). Never infer minor units from the display amount - doing
+   * so once refunded 9.93 -> 10 cents = EUR 0.10 instead of the full charge.
+   */
+  private resolveStripeRefundCents(
+    refundAmount: number,
+    grossAmount: number,
+    chargeAmount: number,
+    chargeAmountRefunded: number,
+  ): { cents: number; alreadyRefunded: number } {
+    const remaining = chargeAmount - chargeAmountRefunded;
+    if (!Number.isFinite(remaining) || remaining <= 0) {
+      throw new BadRequestException(
+        'This charge has already been fully refunded',
       );
     }
 
-    return Math.max(1, Math.round(refundAmountXof));
+    let cents: number;
+    if (grossAmount > 0 && refundAmount < grossAmount - 0.01) {
+      // Partial refund: scale by the proportion of the original gross amount.
+      cents = Math.round((refundAmount / grossAmount) * chargeAmount);
+    } else {
+      // Full (remaining) refund: refund exactly what is left to avoid drift.
+      cents = remaining;
+    }
+
+    cents = Math.min(Math.max(1, cents), remaining);
+    return { cents, alreadyRefunded: chargeAmountRefunded };
   }
 
   private mapStripeRefundError(error: unknown): BadRequestException {
