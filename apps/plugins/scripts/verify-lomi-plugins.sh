@@ -148,18 +148,21 @@ echo "PASS: No legacy brand references found."
 
 log "2/8 Validating Lomi API contract references in plugins"
 
+# Woo sends X-API-KEY and reads HTTP_X_LOMI_SIGNATURE / HTTP_X_LOMI_EVENT ($_SERVER keys).
+LOMI_API_CONTRACT_RE='checkout-sessions|X-API-[Kk]ey|X-Lomi-Signature|HTTP_X_LOMI_SIGNATURE|X-Lomi-Event|HTTP_X_LOMI_EVENT|api\.lomi\.africa|sandbox\.api\.lomi\.africa'
+
 echo "- Magento"
-search_must_exist "POST.*checkout-sessions|/checkout-sessions|X-API-Key|X-Lomi-Signature|X-Lomi-Event|api\.lomi\.africa|sandbox\.api\.lomi\.africa" \
+search_must_exist "$LOMI_API_CONTRACT_RE" \
   "$PLUGINS_DIR/magento"
 echo "  PASS"
 
 echo "- PrestaShop"
-search_must_exist "/checkout-sessions|X-API-Key|X-Lomi-Signature|X-Lomi-Event|api\.lomi\.africa|sandbox\.api\.lomi\.africa" \
+search_must_exist "$LOMI_API_CONTRACT_RE" \
   "$PLUGINS_DIR/prestashop"
 echo "  PASS"
 
 echo "- Woo"
-search_must_exist "/checkout-sessions|X-API-Key|X-Lomi-Signature|X-Lomi-Event|api\.lomi\.africa|sandbox\.api\.lomi\.africa" \
+search_must_exist "$LOMI_API_CONTRACT_RE" \
   "$PLUGINS_DIR/woo"
 echo "  PASS"
 
@@ -174,7 +177,7 @@ fi
 
 echo "- Bubble"
 if plugin_present "$PLUGINS_DIR/bubble"; then
-  search_must_exist "/checkout-sessions|X-API-Key|X-Lomi-Signature|api\.lomi\.africa|sandbox\.api\.lomi\.africa" \
+  search_must_exist "$LOMI_API_CONTRACT_RE" \
     "$PLUGINS_DIR/bubble"
   echo "  PASS"
 else
