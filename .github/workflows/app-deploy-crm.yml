@@ -1,0 +1,124 @@
+name: lomi · deploy · crm
+
+on:
+  repository_dispatch:
+    types: [lomi-deploy-crm]
+  push:
+    branches: [main]
+    paths:
+      - "apps/crm/**"
+      - ".github/workflows/app-deploy-crm.yml"
+      - ".github/actions/checkout-app-submodule/**"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch to deploy
+        type: string
+        default: main
+
+concurrency:
+  group: lomi-deploy-crm-${{ github.event.client_payload.pr_number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  RAILWAY_PROJECT_ID: b931934c-995c-4f3c-9587-09c71940c2f0
+  REACT_APP_SERVER_BASE_URL: https://api.crm.lomi.africa
+
+jobs:
+  deploy-railway-server:
+    name: Railway · crm-server
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - name: Load local actions
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/checkout-app-submodule
+
+      - name: Checkout app source
+        id: checkout-app
+        uses: ./.github/actions/checkout-app-submodule
+        with:
+          repository: lomiafrica/crm
+          submodule-path: apps/crm
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          event-name: ${{ github.event_name }}
+          workflow-ref: ${{ inputs.ref }}
+          dispatch-sha: ${{ github.event.client_payload.sha }}
+
+      - name: Deploy API
+        working-directory: ${{ steps.checkout-app.outputs.app-path }}
+        run: railway up --ci --service crm-server
+
+  deploy-railway-worker:
+    name: Railway · crm-worker
+    needs: deploy-railway-server
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - name: Load local actions
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/checkout-app-submodule
+
+      - name: Checkout app source
+        id: checkout-app
+        uses: ./.github/actions/checkout-app-submodule
+        with:
+          repository: lomiafrica/crm
+          submodule-path: apps/crm
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          event-name: ${{ github.event_name }}
+          workflow-ref: ${{ inputs.ref }}
+          dispatch-sha: ${{ github.event.client_payload.sha }}
+
+      - name: Deploy worker
+        working-directory: ${{ steps.checkout-app.outputs.app-path }}
+        run: railway up --ci --service crm-worker
+
+  deploy-vercel:
+    name: Vercel · crm.lomi.africa
+    needs: deploy-railway-server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load local actions
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/checkout-app-submodule
+
+      - name: Checkout app source
+        id: checkout-app
+        uses: ./.github/actions/checkout-app-submodule
+        with:
+          repository: lomiafrica/crm
+          submodule-path: apps/crm
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          event-name: ${{ github.event_name }}
+          workflow-ref: ${{ inputs.ref }}
+          dispatch-sha: ${{ github.event.client_payload.sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Deploy frontend
+        uses: amondnet/vercel-action@v42.2.0
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_CRM }}
+          working-directory: ${{ github.workspace }}/${{ steps.checkout-app.outputs.app-path }}
+          vercel-args: "--prod"
+          target: ${{ github.event.client_payload.target || 'production' }}
+        env:
+          REACT_APP_SERVER_BASE_URL: ${{ env.REACT_APP_SERVER_BASE_URL }}
