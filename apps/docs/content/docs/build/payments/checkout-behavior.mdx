@@ -102,29 +102,65 @@ When session currency differs from a product price currency, server logic may **
 
 Control which customer fields appear on the hosted checkout form and whether they are required. Configure defaults in the dashboard under **Settings → Checkout**, override per [payment link](/build/payment-links), or set flags on each [checkout session](/build/checkout).
 
-### System fields
+Each `require_*` flag is a boolean. When `true`, the field is **shown and required** before payment. When `false`, behavior depends on the field (see below). Passing `customer_name`, `customer_email`, or `customer_phone` on a session only **pre-fills** values; it does not change which fields are shown.
 
-| Field | API flag | Default when unset | When `false` |
-| --- | --- | --- | --- |
-| Name | `require_name` | `true` | Hidden on the form |
-| Email | `require_email` | `true` | Hidden on the form |
-| Phone | `require_phone` | `false` | Shown as optional |
-| Billing address | `require_billing_address` | `false` | Hidden on the form |
+### System field flags
+
+| Field | API flag | Default when unset | When `true` | When `false` |
+| --- | --- | --- | --- | --- |
+| Name | `require_name` | `true` | Name field shown and required | Name field hidden |
+| Email | `require_email` | `true` | Email field shown and required | Email field hidden |
+| Phone | `require_phone` | `false` | Phone field shown and required | See [Email and phone together](#email-and-phone-together) |
+| Billing address | `require_billing_address` | `false` | Billing address fields shown and required | Billing address hidden |
+
+### `require_name`
+
+- **`true` (default):** The full name field is shown. The customer must enter a non-empty value to continue.
+- **`false`:** The name field is hidden on the form. Checkout still creates or updates the customer with a display name using the first available value: name (if provided elsewhere), email, phone, then `"Customer"`.
+
+Use `customer_name` on a checkout session to pre-fill the name when the field is visible.
+
+### `require_email`
+
+- **`true` (default):** The email field is shown and required. The value must contain `@`.
+- **`false`:** The email field is hidden. Checkout does not ask for email even if `customer_email` was passed for pre-fill.
+
+Hiding email affects how `require_phone` is interpreted (see below).
+
+### `require_phone`
+
+- **`true`:** The phone field is shown and required. The number must be valid for the selected country.
+- **`false` (default):** Behavior depends on whether email is visible:
+  - If email is **visible**, phone is shown as **optional**.
+  - If email is **hidden**, phone is **hidden** too (unless you set `require_phone: true`).
+
+Use `customer_phone` on a checkout session to pre-fill the phone when the field is visible.
+
+### Email and phone together
+
+After flags are resolved, hosted checkout applies these rules:
+
+| `require_email` | `require_phone` | What the customer sees |
+| --- | --- | --- |
+| `true` | `false` | Email required, phone optional |
+| `true` | `true` | Email required, phone required |
+| `false` | `true` | Email hidden, phone required |
+| `false` | `false` | No email or phone fields |
 
 <Callout type="info">
-  **Contact collection:** email and phone visibility follow the flags above. When both are hidden (`require_email: false` and `require_phone: false`), neither field is shown. Phone may still be required for mobile-money payment methods when it is visible. When the name field is hidden, the customer record still stores a display name derived from the typed name, email, or phone (in that order).
+  **Mobile money:** When the phone field is visible but optional, **Wave** and **MTN** still require a valid phone number at payment time. Card and other methods may proceed without phone when it is optional.
 </Callout>
 
 ### Resolution order
 
 When a customer opens checkout, flags merge from most specific to least:
 
-1. **Checkout session** (`require_email`, `require_phone`, `require_name`, `require_billing_address` on `POST /checkout-sessions`)
+1. **Checkout session** (`require_name`, `require_email`, `require_phone`, `require_billing_address` on `POST /checkout-sessions`)
 2. **Payment link** (same flags on the link that created the session)
 3. **Organization checkout settings** (dashboard defaults)
-4. **Platform defaults** (email required, phone optional, billing address hidden)
+4. **Platform defaults** (name required, email required, phone optional, billing address hidden)
 
-Pass `customer_email`, `customer_phone`, and address fields on the session to **pre-fill** the form; they do not change which fields are shown.
+Pass `customer_name`, `customer_email`, `customer_phone`, and address fields on the session to **pre-fill** the form; they do not change which fields are shown.
 
 ### Custom fields
 
