@@ -2990,6 +2990,7 @@ export type Database = {
           p_checkout_session_id?: string | null;
           p_currency_code: APIEnums['currency_code'];
           p_customer_id: string;
+          p_defer_test_settlement?: boolean | null;
           p_description?: string | null;
           p_environment?: string | null;
           p_merchant_id: string;

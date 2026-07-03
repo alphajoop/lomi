@@ -15,6 +15,7 @@ export interface SuiteContext {
   customerId?: string;
   productId?: string;
   transactionId?: string;
+  pendingTransactionId?: string;
   checkoutSessionId?: string;
   paymentLinkId?: string;
   paymentRequestId?: string;

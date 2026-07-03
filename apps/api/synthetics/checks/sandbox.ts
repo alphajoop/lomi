@@ -186,7 +186,7 @@ export function createSandboxChecks(): CheckDefinition[] {
         customer: {
           name: 'Synth Wave',
           email: 'wave@lomi.test',
-          phoneNumber: '+2250707070707',
+          phoneNumber: '+2250707070701',
         },
         description: 'API synthetics wave pending',
       }),
@@ -218,7 +218,7 @@ export function createSandboxChecks(): CheckDefinition[] {
         customer: {
           name: 'Synth MTN',
           email: 'mtn@lomi.test',
-          phoneNumber: '+2250707070707',
+          phoneNumber: '+2250707070702',
         },
         description: 'API synthetics mtn',
       }),
@@ -237,6 +237,59 @@ export function createSandboxChecks(): CheckDefinition[] {
       },
     },
     {
+      name: 'charge mtn pending scenario',
+      service: 'charges',
+      method: 'POST',
+      path: '/charge/mtn',
+      headers: () => ({
+        'X-Scenario-Key': 'pending',
+        'Idempotency-Key': newIdempotencyKey(),
+      }),
+      body: () => ({
+        amount: 1000,
+        currency: 'XOF',
+        customer: {
+          name: 'Synth MTN Pending',
+          email: 'mtn-pending@lomi.test',
+          phoneNumber: '+2250707070703',
+        },
+        description: 'API synthetics mtn pending',
+      }),
+      expectStatus: [200, 201],
+      capture: (ctx, res) => {
+        ctx.pendingTransactionId =
+          pickString(res.data, 'transaction_id', 'id') ??
+          ctx.pendingTransactionId;
+      },
+      validate: (_ctx, res) => {
+        const data = unwrapData(res.data) as Record<string, unknown>;
+        const status = String(data?.status ?? data?.transaction_status ?? '');
+        if (status.toUpperCase() !== 'PENDING') {
+          return `Expected PENDING MTN charge in sandbox, got "${status}"`;
+        }
+        return null;
+      },
+    },
+    {
+      name: 'get mtn pending transaction ledger status',
+      service: 'transactions',
+      method: 'GET',
+      path: (ctx) => `/transactions/${ctx.pendingTransactionId}`,
+      expectStatus: 200,
+      skipIf: (ctx) =>
+        ctx.pendingTransactionId
+          ? null
+          : 'pendingTransactionId not captured from pending charge',
+      validate: (_ctx, res) => {
+        const data = unwrapData(res.data) as Record<string, unknown>;
+        const status = String(data?.status ?? data?.transaction_status ?? '');
+        if (status.toLowerCase() !== 'pending') {
+          return `Expected pending ledger status, got "${status}"`;
+        }
+        return null;
+      },
+    },
+    {
       name: 'charge mtn failed scenario',
       service: 'charges',
       method: 'POST',
@@ -250,10 +303,17 @@ export function createSandboxChecks(): CheckDefinition[] {
         currency: 'XOF',
         customer: {
           name: 'Synth MTN Fail',
-          phoneNumber: '+2250707070707',
+          phoneNumber: '+2250707070704',
         },
       }),
       expectStatus: 400,
+      validate: (_ctx, res) => {
+        const txId = pickString(res.data, 'transaction_id', 'id');
+        if (txId) {
+          return 'Failed scenario must not return a transaction_id';
+        }
+        return null;
+      },
     },
     {
       name: 'charge switch muted (unavailable)',
@@ -540,9 +600,9 @@ export function createSandboxChecks(): CheckDefinition[] {
       method: 'POST',
       path: '/webhooks',
       body: (ctx) => ({
-        // httpbin echoes POST with 200, so the sender → receiver → 2xx → log
+        // postman-echo echoes POST with 200, so the sender → receiver → 2xx → log
         // roundtrip is genuinely exercised (example.com rejects POST with 405).
-        url: `https://httpbin.org/post?synthetics=${ctx.runId}`,
+        url: `https://postman-echo.com/post?synthetics=${ctx.runId}`,
         authorized_events: ['PAYMENT_SUCCEEDED', 'PAYMENT_FAILED'],
         description: 'API synthetics webhook',
       }),
@@ -567,11 +627,12 @@ export function createSandboxChecks(): CheckDefinition[] {
       validate: (_ctx, res) => validateWebhookListHasNoSecrets(res.data),
     },
     {
-      name: 'test webhook delivery (sender → httpbin 2xx receiver)',
+      name: 'test webhook delivery (sender → postman-echo 2xx receiver)',
       service: 'webhooks',
       method: 'POST',
       path: (ctx) => `/webhooks/${ctx.webhookId}/test`,
       expectStatus: 200,
+      retry: { attempts: 3, delayMs: 2000 },
       skipIf: (ctx) =>
         ctx.webhookId ? null : 'webhookId not captured from create',
       validate: (_ctx, res) => validateWebhookTestDeliveryResponse(res.data),
