@@ -30,6 +30,7 @@ const LLMS_REQUIRED_SLUGS = [
   'build/guides/payment-lifecycle',
   'build/payment-channels',
   'api/payment-state-machine',
+  'build/mcp',
 ] as const;
 
 const INTERNAL_LINK_RE = /\]\(\/(start|build|api|resources)\/([^)\s#]+)/g;

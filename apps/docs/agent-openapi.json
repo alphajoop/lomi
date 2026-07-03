@@ -434,6 +434,95 @@
           "Provisioning"
         ]
       }
+    },
+    "/partners/v1/provisioning-keys": {
+      "post": {
+        "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning/v1 for agent onboarding.",
+        "operationId": "PartnersController_mintProvisioningKey",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "Mint a per-user provisioning key",
+        "tags": [
+          "Partners"
+        ]
+      },
+      "get": {
+        "operationId": "PartnersController_listProvisioningKeys",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "List provisioning keys minted by this partner",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/v1/provisioning-keys/{provisioningKeyId}": {
+      "delete": {
+        "operationId": "PartnersController_revokeProvisioningKey",
+        "parameters": [
+          {
+            "name": "provisioningKeyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "Revoke a provisioning key",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/partners/v1/usage": {
+      "get": {
+        "operationId": "PartnersController_getUsage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "Partner provisioning usage summary",
+        "tags": [
+          "Partners"
+        ]
+      }
     }
   },
   "info": {
@@ -448,6 +537,9 @@
     },
     {
       "name": "Provisioning"
+    },
+    {
+      "name": "Partners"
     }
   ],
   "servers": [
@@ -471,6 +563,11 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-Lomi-Provisioning-Key"
+      },
+      "partner-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Lomi-Partner-Key"
       }
     },
     "schemas": {

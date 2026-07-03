@@ -51,6 +51,33 @@ Choose the path that matches your UX—not every merchant needs every API. **Pre
 - **Payouts (self wallet or third-party beneficiaries)** → [Payouts](https://docs.lomi.africa/api/payouts).
 - **Outbound webhooks (events to your server)** → [Webhooks](https://docs.lomi.africa/api/webhooks).
 
+## Agent onboarding & MCP OAuth
+
+Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the `/provisioning/v1/*` REST API. Full guide: [MCP for AI clients](https://docs.lomi.africa/build/mcp). Machine contract: `apps/docs/agent-openapi.json` (provisioning + partner routes).
+
+**Credential types:**
+
+- **`lomi_partner_*`** — platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.
+- **`lomi_prov_*`** — provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).
+- **`lomi_oat_*`** — OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.
+
+**Partner API** (header `x-lomi-partner-key` or `Authorization: Bearer lomi_partner_*`):
+
+- `POST /partners/v1/provisioning-keys` — mint scoped `lomi_prov_*` for `external_user_ref`
+- `GET /partners/v1/provisioning-keys` — list keys
+- `DELETE /partners/v1/provisioning-keys/{id}` — revoke
+- `GET /partners/v1/usage` — usage summary
+
+**OAuth self-service** (MCP clients with authorization support):
+
+1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`
+2. `POST https://api.lomi.africa/oauth/register` (optional DCR)
+3. `GET https://api.lomi.africa/oauth/authorize` (PKCE + `resource`) → user approves at `https://dashboard.lomi.africa/connect/agent-connect`
+4. `POST https://api.lomi.africa/oauth/token` → `lomi_oat_*`
+5. Connect MCP with `Authorization: Bearer <access_token>`; session auto-adopts merchant `lomi_sk_test_*` after onboarding completes.
+
+- [MCP for AI clients](https://docs.lomi.africa/build/mcp) — tools, prompts, hosted server config
+
 ## Guides to read next
 
 - [What is lomi.?](https://docs.lomi.africa/start/overview)
@@ -59,6 +86,7 @@ Choose the path that matches your UX—not every merchant needs every API. **Pre
 - [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle)
 - [Payment channels](https://docs.lomi.africa/build/payment-channels)
 - [Payment state machine](https://docs.lomi.africa/api/payment-state-machine) — status transitions and balances
+- [MCP for AI clients](https://docs.lomi.africa/build/mcp)
 
 ## Contact and support
 

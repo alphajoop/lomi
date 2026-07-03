@@ -111,7 +111,7 @@ async function exportAgentOpenApi(): Promise<void> {
     { url: 'https://api.lomi.africa', description: 'Live' },
     { url: 'https://sandbox.api.lomi.africa', description: 'Test' },
   ];
-  document.tags = [{ name: 'Agent' }, { name: 'Provisioning' }];
+  document.tags = [{ name: 'Agent' }, { name: 'Provisioning' }, { name: 'Partners' }];
 
   const outPath = resolveDocsAgentOpenApiPath();
   writeFileSync(outPath, `${JSON.stringify(document, null, 2)}\n`, 'utf-8');

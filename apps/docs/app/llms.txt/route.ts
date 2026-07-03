@@ -13,6 +13,7 @@ const LLMS_CURATED_SLUGS = [
   'build/guides/payment-lifecycle',
   'build/payment-channels',
   'api/payment-state-machine',
+  'build/mcp',
 ] as const;
 void LLMS_CURATED_SLUGS;
 
@@ -239,6 +240,53 @@ export async function GET() {
     const label = sectionTitleFromFolder(folder);
     lines.push(
       `- **${label}**: [${p.data.title ?? label}](${docsOrigin}${p.url})`,
+    );
+  }
+  lines.push('');
+
+  lines.push('## Agent onboarding & MCP OAuth');
+  lines.push('');
+  lines.push(
+    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/v1/*\` REST API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes).`,
+  );
+  lines.push('');
+  lines.push('**Credential types:**');
+  lines.push('');
+  lines.push(
+    '- **`lomi_partner_*`** — platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.',
+  );
+  lines.push(
+    '- **`lomi_prov_*`** — provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).',
+  );
+  lines.push(
+    '- **`lomi_oat_*`** — OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.',
+  );
+  lines.push('');
+  lines.push('**Partner API** (header `x-lomi-partner-key` or `Authorization: Bearer lomi_partner_*`):');
+  lines.push('');
+  lines.push('- `POST /partners/v1/provisioning-keys` — mint scoped `lomi_prov_*` for `external_user_ref`');
+  lines.push('- `GET /partners/v1/provisioning-keys` — list keys');
+  lines.push('- `DELETE /partners/v1/provisioning-keys/{id}` — revoke');
+  lines.push('- `GET /partners/v1/usage` — usage summary');
+  lines.push('');
+  lines.push('**OAuth self-service** (MCP clients with authorization support):');
+  lines.push('');
+  lines.push(
+    '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`',
+  );
+  lines.push('2. `POST https://api.lomi.africa/oauth/register` (optional DCR)');
+  lines.push(
+    '3. `GET https://api.lomi.africa/oauth/authorize` (PKCE + `resource`) → user approves at `https://dashboard.lomi.africa/connect/agent-connect`',
+  );
+  lines.push('4. `POST https://api.lomi.africa/oauth/token` → `lomi_oat_*`');
+  lines.push(
+    '5. Connect MCP with `Authorization: Bearer <access_token>`; session auto-adopts merchant `lomi_sk_test_*` after onboarding completes.',
+  );
+  lines.push('');
+  const mcpPage = pageBySlugPath(pages, 'build/mcp');
+  if (mcpPage) {
+    lines.push(
+      `- [${mcpPage.data.title ?? 'MCP'}](${docsOrigin}${mcpPage.url}) — tools, prompts, hosted server config`,
     );
   }
   lines.push('');
