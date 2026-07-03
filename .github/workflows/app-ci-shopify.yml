@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Initialize Shopify plugin submodule
+        run: git submodule update --init apps/plugins/shopify
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9

@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: recursive
+
+      - name: Initialize WooCommerce plugin submodule
+        run: git submodule update --init apps/plugins/woo
 
       - uses: pnpm/action-setup@v4
         with:

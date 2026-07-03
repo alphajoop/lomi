@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lomi Payment Integration Reference</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>lomi Payment Integration Reference</h1>
+        <p>
+          This demo shows three checkout session creation flows: dynamic amount, price-led checkout, and line-items
+          checkout. It also exposes a webhook endpoint with signature verification.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>1) Dynamic Pricing</h2>
+        <form id="dynamic-form">
+          <label>Amount</label>
+          <input name="amount" type="number" min="1" step="1" value="10000" required />
+          <label>Currency</label>
+          <input name="currency_code" value="XOF" />
+          <label>Customer Email</label>
+          <input name="customer_email" type="email" placeholder="customer@example.com" required />
+          <button type="submit">Create Dynamic Checkout Session</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>2) Price-led Checkout</h2>
+        <form id="price-form">
+          <label>Price ID</label>
+          <input name="price_id" placeholder="price uuid from your lomi dashboard" required />
+          <label>Quantity</label>
+          <input name="quantity" type="number" min="1" value="1" />
+          <label>Customer Email</label>
+          <input name="customer_email" type="email" placeholder="customer@example.com" required />
+          <button type="submit">Create Price Checkout Session</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>3) Line-items Checkout</h2>
+        <form id="line-items-form">
+          <label>Customer Email</label>
+          <input name="customer_email" type="email" placeholder="customer@example.com" required />
+          <label>Line items JSON</label>
+          <textarea name="line_items" rows="6">
+[
+  { "price_id": "replace-with-price-id-1", "quantity": 1 },
+  { "price_id": "replace-with-price-id-2", "quantity": 2 }
+]
+          </textarea>
+          <button type="submit">Create Line-items Session</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Webhook Events</h2>
+        <div class="row">
+          <button id="refresh-events" type="button">Refresh webhook events</button>
+        </div>
+        <pre id="events-output">No events loaded yet.</pre>
+      </section>
+
+      <section class="card">
+        <h2>Last API response</h2>
+        <pre id="output">No request yet.</pre>
+      </section>
+
+      <section class="card">
+        <h2>Embedded Checkout Preview</h2>
+        <p>
+          If the created session includes a checkout URL, you can load it inline to simulate an embedded payment form
+          experience. The embed preview automatically adds <code>embedded=true</code>.
+        </p>
+        <div class="row">
+          <button id="embed-last-session" type="button">Embed last checkout URL</button>
+          <button id="open-last-session" type="button">Open last checkout URL in new tab</button>
+          <button id="clear-embed" type="button">Clear embed</button>
+        </div>
+        <iframe id="checkout-embed" title="Embedded checkout" class="checkout-embed"></iframe>
+      </section>
+    </main>
+
+    <script src="/main.js"></script>
+  </body>
+</html>

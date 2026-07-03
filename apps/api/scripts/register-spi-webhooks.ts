@@ -1,7 +1,7 @@
 /**
  * PI-SPI webhook registration lives in the pi-spi-sdk repo until SPI is operational.
  *
- * Usage (from apps/pi-spi-sdk when credentials are configured):
+ * Usage (from apps/sdks/pi-spi-sdk when credentials are configured):
  *   pnpm run register-webhooks
  */
 async function main(): Promise<void> {

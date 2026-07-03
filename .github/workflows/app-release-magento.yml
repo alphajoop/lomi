@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: recursive
+
+      - name: Initialize Magento plugin submodule
+        run: git submodule update --init apps/plugins/magento
 
       - name: Run plugin parity checks
         run: apps/plugins/scripts/verify-lomi-plugins.sh

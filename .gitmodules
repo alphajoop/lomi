@@ -21,9 +21,6 @@
 [submodule "apps/website"]
 	path = apps/website
 	url = https://github.com/lomiafrica/website.git
-[submodule "apps/plugins"]
-	path = apps/plugins
-	url = https://github.com/lomiafrica/plugins.git
 [submodule "apps/jumbo"]
 	path = apps/jumbo
 	url = https://github.com/lomiafrica/jumbo.git
@@ -37,7 +34,27 @@
 	path = apps/doctool
 	url = https://github.com/lomiafrica/doctool.git
 	branch = main
-[submodule "apps/pi-spi-sdk"]
-	path = apps/pi-spi-sdk
+[submodule "apps/sdks/pi-spi-sdk"]
+	path = apps/sdks/pi-spi-sdk
 	url = https://github.com/lomiafrica/pi-spi-sdk.git
+	branch = main
+[submodule "apps/plugins/woo"]
+	path = apps/plugins/woo
+	url = https://github.com/lomiafrica/woo.git
+	branch = main
+[submodule "apps/plugins/prestashop"]
+	path = apps/plugins/prestashop
+	url = https://github.com/lomiafrica/prestashop.git
+	branch = main
+[submodule "apps/plugins/magento"]
+	path = apps/plugins/magento
+	url = https://github.com/lomiafrica/magento.git
+	branch = main
+[submodule "apps/plugins/shopify"]
+	path = apps/plugins/shopify
+	url = https://github.com/lomiafrica/shopify.git
+	branch = main
+[submodule "apps/plugins/bubble"]
+	path = apps/plugins/bubble
+	url = https://github.com/lomiafrica/bubble.git
 	branch = main

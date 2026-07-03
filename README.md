@@ -69,7 +69,7 @@ lomi. integrates with the **SPI**, the official Central Bank-backed payment inte
 
 The platform provides instant payment confirmation and settlement, allowing you to send payments using SHID, MCOD, or MBNO aliases without ever sharing account numbers. We offer native support for the West African CFA Franc (XOF).
 
-For fellow fintechs, we built an SDK around this infrastructure: `pi-spi-sdk` - a community TypeScript SDK for the PI-SPI Business API ([apps/pi-spi-sdk](./apps/pi-spi-sdk)).
+For fellow fintechs, we built an SDK around this infrastructure: `pi-spi-sdk` - a community TypeScript SDK for the PI-SPI Business API ([apps/sdks/pi-spi-sdk](./apps/sdks/pi-spi-sdk)).
 
 ## Documentation
 
