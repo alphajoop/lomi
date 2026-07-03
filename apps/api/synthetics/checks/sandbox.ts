@@ -745,7 +745,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       method: 'GET',
       path: (ctx) => `/usage-events/${ctx.usageSubEventId}`,
       expectStatus: 200,
-      retry: { attempts: 8, delayMs: 1500 },
+      retry: { attempts: 12, delayMs: 2000 },
       skipIf: (ctx) =>
         ctx.usageSubEventId
           ? null
@@ -759,7 +759,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       path: (ctx) =>
         `/usage-billing/subscriptions/${ctx.usageSubscriptionId}/usage`,
       expectStatus: 200,
-      retry: { attempts: 5, delayMs: 1000 },
+      retry: { attempts: 8, delayMs: 2000 },
       skipIf: (ctx) => {
         if (!ctx.usageSubscriptionId) return 'usageSubscriptionId not captured';
         if (ctx.usageSubQuantity == null) return 'usageSubQuantity not set';

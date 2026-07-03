@@ -9,6 +9,8 @@ import { ConfigModule } from '@nestjs/config';
 import { SupabaseModule } from './utils/supabase/supabase.module';
 import { AgentModule } from './agent/agent.module';
 import { ProvisioningModule } from './provisioning/provisioning.module';
+import { PartnersModule } from './partners/partners.module';
+import { OAuthModule } from './oauth/oauth.module';
 import { ApiKeyGuard } from './core/common/guards/api-key.guard';
 
 @Module({
@@ -20,6 +22,8 @@ import { ApiKeyGuard } from './core/common/guards/api-key.guard';
     SupabaseModule,
     AgentModule,
     ProvisioningModule,
+    PartnersModule,
+    OAuthModule,
   ],
   providers: [ApiKeyGuard],
 })

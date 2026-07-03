@@ -129,6 +129,23 @@ Exemple HTTP pour un nouveau marchand (provisioning seul tant que vous n’avez 
 
 Après l’onboarding, ajoutez `x-lomi-api-key` (ou passez `LOMI_SECRET_KEY` en env) pour les outils paiement et catalogue. Le mode **TEST** est disponible tout de suite ; le **LIVE** exige la validation KYC (IA pour les comptes starter, revue admin pour les entreprises enregistrées).
 
+### Connexion OAuth (self-service)
+
+Les clients MCP compatibles [l’autorisation MCP](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization) peuvent se connecter sans coller de clé de provisioning :
+
+1. Découverte : `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`
+2. Enregistrement (DCR optionnel) : `POST https://api.lomi.africa/oauth/register`
+3. Autorisation : `GET https://api.lomi.africa/oauth/authorize` (PKCE + paramètre `resource`)
+4. Connexion sur `https://dashboard.lomi.africa/connect/agent-connect` et approbation
+5. Échange : `POST https://api.lomi.africa/oauth/token`
+6. Connexion MCP avec `Authorization: Bearer <access_token>` (`lomi_oat_*`)
+
+Le serveur MCP introspecte le jeton et attache un `lomi_prov_*` limité à la session. Comptes self-service plafonnés (e-mail vérifié, test uniquement).
+
+### API Partenaire (intégrateurs plateforme)
+
+Les plateformes autorisées reçoivent une clé de gestion **`lomi_partner_*`** (admin lomi). Elles émettent des clés **`lomi_prov_*`** par utilisateur via `/partners/v1/provisioning-keys` avec l’en-tête `x-lomi-partner-key`. Suivi dans **admin.lomi.africa → Provisioning**.
+
 ## Déployer votre propre serveur MCP
 
 La plupart des intégrateurs utilisent `https://mcp.lomi.africa` ou le stdio local. Déployer une instance MCP séparée est réservé à **l’ingénierie et aux opérateurs lomi.** Voir [Maintenir la CLI et le MCP](/resources/contributing/maintaining-cli-mcp).

@@ -48,22 +48,95 @@ export class UsageEventsService {
     if (error) throw new Error(error.message);
 
     const id = eventId as string;
-    const jobId = safeBullJobId(
-      `usage:${user.organizationId}:${dto.transaction_id}`,
+    return this.scheduleProcessing(id, user.organizationId, dto.customer_id, dto.code);
+  }
+
+  /**
+   * Re-enqueue or synchronously process usage events left pending after BullMQ
+   * drops or dedupes a job. Called from pg_cron via internal API.
+   */
+  async reconcileStalePendingEvents(options?: {
+    staleAfterSeconds?: number;
+    limit?: number;
+  }) {
+    const { data, error } = await this.supabase.getClient().rpc(
+      'list_stale_pending_usage_events' as never,
+      {
+        p_stale_after_seconds: options?.staleAfterSeconds ?? 30,
+        p_limit: options?.limit ?? 50,
+      } as never,
     );
 
-    if (!this.meteringQueue) {
-      return this.processEvent(id, user.organizationId);
+    if (error) throw new Error(error.message);
+
+    const rows = (Array.isArray(data) ? data : []) as Array<{
+      event_id: string;
+      organization_id: string;
+      customer_id: string;
+      code: string;
+    }>;
+
+    let requeued = 0;
+    let processed = 0;
+    let failed = 0;
+
+    for (const row of rows) {
+      try {
+        const outcome = await this.scheduleProcessing(
+          row.event_id,
+          row.organization_id,
+          row.customer_id,
+          row.code,
+        );
+        if (outcome.status === 'pending') {
+          requeued += 1;
+        } else {
+          processed += 1;
+        }
+      } catch (reconcileError: unknown) {
+        const message =
+          reconcileError instanceof Error
+            ? reconcileError.message
+            : String(reconcileError);
+        this.logger.warn(
+          `Failed to reconcile usage event ${row.event_id}: ${message}`,
+        );
+        failed += 1;
+      }
     }
 
+    return {
+      scanned: rows.length,
+      requeued,
+      processed,
+      failed,
+    };
+  }
+
+  private usageEventJobId(eventId: string): string {
+    return safeBullJobId(`usage:event:${eventId}`);
+  }
+
+  private async scheduleProcessing(
+    eventId: string,
+    organizationId: string,
+    customerId: string,
+    code: string,
+  ) {
+    if (!this.meteringQueue) {
+      return this.processEvent(eventId, organizationId);
+    }
+
+    const jobId = this.usageEventJobId(eventId);
+
     try {
-      await this.meteringQueue.add(
+      const job = await this.meteringQueue.add(
         'process-usage-event',
         {
-          eventId: id,
-          organizationId: user.organizationId,
-          customerId: dto.customer_id,
-          code: dto.code,
+          eventId,
+          organizationId,
+          customerId,
+          code,
         },
         {
           jobId,
@@ -73,19 +146,54 @@ export class UsageEventsService {
           removeOnFail: 5000,
         },
       );
+
+      const state = await job.getState();
+      if (state === 'completed' || state === 'failed') {
+        return this.ensureProcessedIfPending(eventId, organizationId);
+      }
     } catch (queueError: unknown) {
       const message =
         queueError instanceof Error ? queueError.message : String(queueError);
       this.logger.warn(
-        `Metering queue unavailable, processing synchronously: ${message}`,
+        `Metering queue unavailable for event ${eventId}, processing synchronously: ${message}`,
       );
-      return this.processEvent(id, user.organizationId);
+      return this.processEvent(eventId, organizationId);
     }
 
     return {
-      event_id: id,
+      event_id: eventId,
       status: 'pending',
     };
+  }
+
+  private async ensureProcessedIfPending(
+    eventId: string,
+    organizationId: string,
+  ) {
+    const status = await this.fetchProcessingStatus(eventId, organizationId);
+    if (status === 'processed' || status === 'failed') {
+      return { event_id: eventId, status };
+    }
+
+    return this.processEvent(eventId, organizationId);
+  }
+
+  private async fetchProcessingStatus(
+    eventId: string,
+    organizationId: string,
+  ): Promise<string | null> {
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_usage_event_api' as never,
+      {
+        p_event_id: eventId,
+        p_organization_id: organizationId,
+      } as never,
+    );
+
+    if (error) throw new Error(error.message);
+
+    const row = data as { processing_status?: string } | null;
+    return row?.processing_status ?? null;
   }
 
   async processEvent(eventId: string, organizationId: string) {

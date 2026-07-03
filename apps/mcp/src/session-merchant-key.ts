@@ -34,6 +34,16 @@ export function extractSessionProvisioningKey(req: Request): string | null {
   return null;
 }
 
+/** Bearer token that may be an OAuth access token (resolved via introspection in HTTP layer). */
+export function extractOAuthAccessToken(req: Request): string | null {
+  const auth = firstHeaderValue(req.headers.authorization);
+  if (!auth?.startsWith('Bearer ')) return null;
+  const bearer = auth.slice('Bearer '.length).trim();
+  if (!bearer || isMcpTransportBearerToken(bearer)) return null;
+  if (bearer.startsWith('lomi_oat_')) return bearer;
+  return null;
+}
+
 /**
  * Resolves the merchant REST credential for this MCP HTTP session.
  *

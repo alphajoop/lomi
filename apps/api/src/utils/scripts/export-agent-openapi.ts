@@ -25,7 +25,11 @@ function stripAgentAndProvisioningPaths(document: OpenAPIObject): OpenAPIObject 
   const paths: OpenAPIObject['paths'] = {};
 
   for (const [pathKey, pathItem] of Object.entries(document.paths)) {
-    if (!pathKey.startsWith('/agent') && !pathKey.startsWith('/provisioning')) {
+    if (
+      !pathKey.startsWith('/agent') &&
+      !pathKey.startsWith('/provisioning') &&
+      !pathKey.startsWith('/partners')
+    ) {
       continue;
     }
     paths[pathKey] = pathItem;

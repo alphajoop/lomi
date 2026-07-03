@@ -32,15 +32,39 @@ import {
   mcpSessionTtlMs,
   mcpTrustProxy,
 } from './env-config.js';
-import { extractSessionMerchantApiKey, extractSessionProvisioningKey } from './session-merchant-key.js';
+import { extractSessionMerchantApiKey, extractSessionProvisioningKey, extractOAuthAccessToken } from './session-merchant-key.js';
 import { McpSessionRegistry } from './session-registry.js';
 import { mcpLog, mcpRequestAls } from './mcp-request-context.js';
 import { wireMcpServer } from './wire-mcp-server.js';
+import {
+  buildProtectedResourceMetadata,
+  getMcpResourceUrl,
+  introspectOAuthAccessToken,
+} from './oauth-introspection.js';
 
 type TransportEntry = StreamableHTTPServerTransport;
 
 const MISSING_SESSION_CREDENTIAL_MESSAGE =
-  'Missing credentials: send x-lomi-provisioning-key for 0-to-1 onboarding, or x-lomi-api-key / x-api-key for merchant API tools. Optional server-side fallbacks: LOMI_PROVISIONING_KEY, LOMI_SECRET_KEY. See https://docs.lomi.africa/build/mcp';
+  'Missing credentials: complete OAuth at the authorization server, send x-lomi-provisioning-key for 0-to-1 onboarding, or x-lomi-api-key / x-api-key for merchant API tools. See https://docs.lomi.africa/build/mcp';
+
+async function resolveProvisioningKeyFromRequest(
+  req: Request,
+  headerProvisioningKey: string | null,
+): Promise<string | null> {
+  if (headerProvisioningKey) return headerProvisioningKey;
+  const oauthToken = extractOAuthAccessToken(req);
+  if (!oauthToken) return null;
+  const introspected = await introspectOAuthAccessToken(oauthToken);
+  if (!introspected.active || !introspected.provisioning_key) return null;
+  return introspected.provisioning_key;
+}
+
+function oauthUnauthorizedChallenge(): string {
+  const resource = getMcpResourceUrl();
+  const origin = new URL(resource).origin;
+  const metadataUrl = `${origin}/.well-known/oauth-protected-resource`;
+  return `Bearer resource_metadata="${metadataUrl}"`;
+}
 
 /** Rolling 60s window per IP for MCP routes */
 type RateBucket = { count: number; windowStart: number };
@@ -229,6 +253,10 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
     });
   }
 
+  app.get('/.well-known/oauth-protected-resource', (_req, res) => {
+    res.status(200).json(buildProtectedResourceMetadata());
+  });
+
   app.get('/health', (_req, res) => {
     res.status(200).json({
       ok: true,
@@ -289,11 +317,14 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
         const headerMerchantKey = extractSessionMerchantApiKey(req);
         const headerProvisioningKey = extractSessionProvisioningKey(req);
+        const resolvedProvisioningKey =
+          (await resolveProvisioningKeyFromRequest(req, headerProvisioningKey)) ??
+          headerProvisioningKey;
         if (sessionId && registry.has(sessionId) && headerMerchantKey) {
           registry.updateMerchantApiKey(sessionId, headerMerchantKey);
         }
-        if (sessionId && registry.has(sessionId) && headerProvisioningKey) {
-          registry.updateProvisioningApiKey(sessionId, headerProvisioningKey);
+        if (sessionId && registry.has(sessionId) && resolvedProvisioningKey) {
+          registry.updateProvisioningApiKey(sessionId, resolvedProvisioningKey);
         }
 
         let transport: TransportEntry | undefined;
@@ -329,9 +360,10 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
               registry,
               undefined,
               headerMerchantKey,
-              headerProvisioningKey,
+              resolvedProvisioningKey,
             )
           ) {
+            res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge());
             res.status(401).json({
               jsonrpc: '2.0',
               error: {
@@ -351,7 +383,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           const sessionState = {
             sessionId: null as string | null,
             merchantApiKey: headerMerchantKey,
-            provisioningApiKey: headerProvisioningKey,
+            provisioningApiKey: resolvedProvisioningKey,
           };
 
           transport = new StreamableHTTPServerTransport({

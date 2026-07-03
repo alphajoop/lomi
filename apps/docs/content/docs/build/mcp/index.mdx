@@ -129,6 +129,32 @@ Hosted HTTP example for a brand-new merchant (provisioning only until you have `
 
 After onboarding, add `x-lomi-api-key` (or switch env to `LOMI_SECRET_KEY`) for payment and catalog tools. **TEST mode** works immediately; **LIVE** requires KYC clearance (AI for starter accounts, admin review for registered businesses).
 
+### OAuth connect (self-service)
+
+MCP clients that support [MCP authorization](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization) can connect without pasting a provisioning key:
+
+1. Discover the resource server at `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`
+2. Register (optional DCR) at `POST https://api.lomi.africa/oauth/register`
+3. Open `GET https://api.lomi.africa/oauth/authorize` (PKCE + `resource` parameter)
+4. Sign in on `https://dashboard.lomi.africa/connect/agent-connect` and approve
+5. Exchange the code at `POST https://api.lomi.africa/oauth/token`
+6. Connect to MCP with `Authorization: Bearer <access_token>` (`lomi_oat_*`)
+
+The MCP server introspects the token and provisions a scoped `lomi_prov_*` for your session. Self-service accounts are capped (verified email required, test-only, low daily merchant limits).
+
+### Partner API (platform integrators)
+
+Authorized platforms receive a **`lomi_partner_*`** management key from lomi admin. They mint per-end-user **`lomi_prov_*`** keys via:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /partners/v1/provisioning-keys` | Mint a scoped provisioning key for an `external_user_ref` |
+| `GET /partners/v1/provisioning-keys` | List keys |
+| `DELETE /partners/v1/provisioning-keys/{id}` | Revoke a key |
+| `GET /partners/v1/usage` | Usage summary |
+
+Send `x-lomi-partner-key: lomi_partner_*` (or `Authorization: Bearer lomi_partner_*`). End users pass the returned `lomi_prov_*` to MCP or `/provisioning/v1/*`. Monitor partners and audit events in **admin.lomi.africa → Provisioning**.
+
 ## Deploying your own MCP server
 
 Most integrators use `https://mcp.lomi.africa` or local stdio. Deploying a separate MCP instance is for **lomi. engineering and operators** only. See [Maintaining CLI and MCP](/resources/contributing/maintaining-cli-mcp).

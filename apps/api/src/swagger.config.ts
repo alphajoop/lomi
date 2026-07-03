@@ -18,5 +18,9 @@ export function buildSwaggerDocumentBase() {
       { type: 'apiKey', name: 'X-Lomi-Provisioning-Key', in: 'header' },
       'provisioning-key',
     )
+    .addApiKey(
+      { type: 'apiKey', name: 'X-Lomi-Partner-Key', in: 'header' },
+      'partner-key',
+    )
     .build();
 }
