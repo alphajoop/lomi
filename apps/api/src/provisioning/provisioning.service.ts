@@ -156,7 +156,9 @@ export class ProvisioningService {
 
     if (dto.type === 'website') {
       if (!dto.website_url) {
-        throw new BadRequestException('website_url is required for website extraction');
+        throw new BadRequestException(
+          'website_url is required for website extraction',
+        );
       }
 
       const { data, error } = await this.supabase
@@ -172,7 +174,9 @@ export class ProvisioningService {
         });
 
       if (error) {
-        throw new BadRequestException(error.message || 'Website extraction failed');
+        throw new BadRequestException(
+          error.message || 'Website extraction failed',
+        );
       }
 
       await this.repository.logAudit({
@@ -206,7 +210,9 @@ export class ProvisioningService {
       });
 
     if (error) {
-      throw new BadRequestException(error.message || 'Document extraction failed');
+      throw new BadRequestException(
+        error.message || 'Document extraction failed',
+      );
     }
 
     await this.repository.logAudit({
@@ -252,7 +258,8 @@ export class ProvisioningService {
 
     await this.repository.linkOrganization(merchantId, organizationId);
 
-    const org = await this.repository.getOrganizationVerification(organizationId);
+    const org =
+      await this.repository.getOrganizationVerification(organizationId);
     const kycStatus =
       (await this.repository.getKycStatus(merchantId, organizationId)) ??
       'pending';
@@ -264,7 +271,9 @@ export class ProvisioningService {
     const testSecretKey = keys.find(
       (k) => k.key_type === 'secret' && k.environment === 'test',
     )?.api_key;
-    const publishableKey = keys.find((k) => k.key_type === 'publishable')?.api_key;
+    const publishableKey = keys.find(
+      (k) => k.key_type === 'publishable',
+    )?.api_key;
 
     await this.repository.logAudit({
       provisioningKeyId: ctx.provisioningKeyId,
@@ -358,7 +367,9 @@ export class ProvisioningService {
       };
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Live activation request failed';
+        error instanceof Error
+          ? error.message
+          : 'Live activation request failed';
       throw new BadRequestException(message);
     }
   }

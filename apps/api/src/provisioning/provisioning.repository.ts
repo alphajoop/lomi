@@ -2,14 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 import type { CompleteProvisioningOnboardingDto } from './dto/complete-provisioning-onboarding.dto';
 
-type VerifyProvisioningKeyRow = {
-  is_valid: boolean;
-  provisioning_key_id: string;
-  partner_name: string;
-  environment: string;
-  message: string;
-};
-
 type QuotaRow = {
   allowed: boolean;
   accounts_created_today: number;
@@ -29,7 +21,10 @@ export class ProvisioningRepository {
     if (error) {
       throw error;
     }
-    const row = (Array.isArray(data) ? data[0] : data) as QuotaRow | null | undefined;
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | QuotaRow
+      | null
+      | undefined;
     if (!row) {
       throw new Error('Failed to check provisioning quota');
     }
@@ -54,14 +49,17 @@ export class ProvisioningRepository {
     ipAddress?: string;
     metadata?: Record<string, unknown>;
   }): Promise<void> {
-    const { error } = await this.supabase.rpc('log_provisioning_audit' as never, {
-      p_provisioning_key_id: input.provisioningKeyId,
-      p_action: input.action,
-      p_merchant_id: input.merchantId ?? null,
-      p_organization_id: input.organizationId ?? null,
-      p_ip_address: input.ipAddress ?? null,
-      p_metadata: input.metadata ?? {},
-    } as never);
+    const { error } = await this.supabase.rpc(
+      'log_provisioning_audit' as never,
+      {
+        p_provisioning_key_id: input.provisioningKeyId,
+        p_action: input.action,
+        p_merchant_id: input.merchantId ?? null,
+        p_organization_id: input.organizationId ?? null,
+        p_ip_address: input.ipAddress ?? null,
+        p_metadata: input.metadata ?? {},
+      } as never,
+    );
     if (error) {
       throw error;
     }
@@ -161,48 +159,51 @@ export class ProvisioningRepository {
     merchantId: string,
     dto: CompleteProvisioningOnboardingDto,
   ): Promise<void> {
-    const { error } = await this.supabase.rpc('complete_onboarding' as never, {
-      p_merchant_id: merchantId,
-      p_first_name: dto.first_name,
-      p_last_name: dto.last_name,
-      p_phone_number: dto.phone_number,
-      p_country: dto.country,
-      p_org_name: dto.org_name,
-      p_org_email: dto.org_email,
-      p_org_phone_number: dto.org_phone_number ?? dto.phone_number,
-      p_org_country: dto.org_country,
-      p_org_region: dto.org_region,
-      p_org_city: dto.org_city,
-      p_org_street: dto.org_street ?? '',
-      p_org_district: dto.org_district ?? '',
-      p_org_postal_code: dto.org_postal_code ?? '',
-      p_org_industry: dto.org_industry,
-      p_org_website_url: dto.org_website_url ?? '',
-      p_org_employee_number: dto.org_employee_number ?? '',
-      p_preferred_language: dto.preferred_language ?? 'fr',
-      p_avatar_url: dto.avatar_url ?? '',
-      p_logo_url: dto.logo_url ?? '',
-      p_organization_position: dto.organization_position,
-      p_is_starter_business: dto.is_starter_business,
-      p_is_authorized_signatory: dto.is_authorized_signatory ?? true,
-      p_proof_of_business: dto.proof_of_business ?? null,
-      p_proof_of_business_url: dto.proof_of_business_url ?? null,
-      p_identity_proof_url: dto.identity_proof_url ?? null,
-      p_signatory_name: dto.signatory_name ?? null,
-      p_signatory_email: dto.signatory_email ?? null,
-      p_address_proof_url: dto.address_proof_url ?? null,
-      p_business_registration_url: dto.business_registration_url ?? null,
-      p_tax_number: dto.tax_number ?? null,
-      p_business_description: dto.business_description ?? null,
-      p_legal_country: dto.legal_country ?? null,
-      p_legal_region: dto.legal_region ?? null,
-      p_legal_city: dto.legal_city ?? null,
-      p_legal_street: dto.legal_street ?? null,
-      p_legal_postal_code: dto.legal_postal_code ?? null,
-      p_legal_organization_name: dto.legal_organization_name ?? null,
-      p_document_extraction: dto.document_extraction ?? null,
-      p_id_document_number: dto.id_document_number ?? null,
-    } as never);
+    const { error } = await this.supabase.rpc(
+      'complete_onboarding' as never,
+      {
+        p_merchant_id: merchantId,
+        p_first_name: dto.first_name,
+        p_last_name: dto.last_name,
+        p_phone_number: dto.phone_number,
+        p_country: dto.country,
+        p_org_name: dto.org_name,
+        p_org_email: dto.org_email,
+        p_org_phone_number: dto.org_phone_number ?? dto.phone_number,
+        p_org_country: dto.org_country,
+        p_org_region: dto.org_region,
+        p_org_city: dto.org_city,
+        p_org_street: dto.org_street ?? '',
+        p_org_district: dto.org_district ?? '',
+        p_org_postal_code: dto.org_postal_code ?? '',
+        p_org_industry: dto.org_industry,
+        p_org_website_url: dto.org_website_url ?? '',
+        p_org_employee_number: dto.org_employee_number ?? '',
+        p_preferred_language: dto.preferred_language ?? 'fr',
+        p_avatar_url: dto.avatar_url ?? '',
+        p_logo_url: dto.logo_url ?? '',
+        p_organization_position: dto.organization_position,
+        p_is_starter_business: dto.is_starter_business,
+        p_is_authorized_signatory: dto.is_authorized_signatory ?? true,
+        p_proof_of_business: dto.proof_of_business ?? null,
+        p_proof_of_business_url: dto.proof_of_business_url ?? null,
+        p_identity_proof_url: dto.identity_proof_url ?? null,
+        p_signatory_name: dto.signatory_name ?? null,
+        p_signatory_email: dto.signatory_email ?? null,
+        p_address_proof_url: dto.address_proof_url ?? null,
+        p_business_registration_url: dto.business_registration_url ?? null,
+        p_tax_number: dto.tax_number ?? null,
+        p_business_description: dto.business_description ?? null,
+        p_legal_country: dto.legal_country ?? null,
+        p_legal_region: dto.legal_region ?? null,
+        p_legal_city: dto.legal_city ?? null,
+        p_legal_street: dto.legal_street ?? null,
+        p_legal_postal_code: dto.legal_postal_code ?? null,
+        p_legal_organization_name: dto.legal_organization_name ?? null,
+        p_document_extraction: dto.document_extraction ?? null,
+        p_id_document_number: dto.id_document_number ?? null,
+      } as never,
+    );
     if (error) {
       throw error;
     }
@@ -219,12 +220,17 @@ export class ProvisioningRepository {
       throw error;
     }
     const row = Array.isArray(data) ? data[0] : data;
-    return (row as { organization_id?: string } | null)?.organization_id ?? null;
+    return (
+      (row as { organization_id?: string } | null)?.organization_id ?? null
+    );
   }
 
   async getOrganizationVerification(
     organizationId: string,
-  ): Promise<{ verification_status: string; is_starter_business: boolean } | null> {
+  ): Promise<{
+    verification_status: string;
+    is_starter_business: boolean;
+  } | null> {
     const { data, error } = await this.supabase
       .from('organizations')
       .select('verification_status, is_starter_business')

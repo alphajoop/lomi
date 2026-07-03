@@ -41,16 +41,22 @@ pub async fn run(common: &CommonOptions, _args: WhoamiArgs) -> Result<()> {
         }
     };
 
-    let identity = verify_and_refresh_metadata(&auth).await.map_err(|error| {
-        if let Some(spinner) = &spinner {
-            spinner.finish_and_clear();
+    let identity = match verify_and_refresh_metadata(&auth).await {
+        Ok(identity) => identity,
+        Err(error) => {
+            if let Some(spinner) = &spinner {
+                spinner.finish_and_clear();
+            }
+            let _ = crate::auth::session::handle_auth_api_error(common, &error).await;
+            if error
+                .downcast_ref::<crate::api::ApiError>()
+                .is_some_and(|e| e.is_unauthorized())
+            {
+                cli::output::print_auth_expired(&profile);
+            }
+            return Err(error);
         }
-        let _ = crate::auth::session::handle_auth_api_error(common, &error);
-        if error.downcast_ref::<crate::api::ApiError>().is_some_and(|e| e.is_unauthorized()) {
-            cli::output::print_auth_expired(&profile);
-        }
-        error
-    })?;
+    };
 
     if let Some(spinner) = spinner {
         spinner.finish_and_clear();

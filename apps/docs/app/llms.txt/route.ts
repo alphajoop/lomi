@@ -262,14 +262,20 @@ export async function GET() {
     '- **`lomi_oat_*`** — OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.',
   );
   lines.push('');
-  lines.push('**Partner API** (header `x-lomi-partner-key` or `Authorization: Bearer lomi_partner_*`):');
+  lines.push(
+    '**Partner API** (header `x-lomi-partner-key` or `Authorization: Bearer lomi_partner_*`):',
+  );
   lines.push('');
-  lines.push('- `POST /partners/v1/provisioning-keys` — mint scoped `lomi_prov_*` for `external_user_ref`');
+  lines.push(
+    '- `POST /partners/v1/provisioning-keys` — mint scoped `lomi_prov_*` for `external_user_ref`',
+  );
   lines.push('- `GET /partners/v1/provisioning-keys` — list keys');
   lines.push('- `DELETE /partners/v1/provisioning-keys/{id}` — revoke');
   lines.push('- `GET /partners/v1/usage` — usage summary');
   lines.push('');
-  lines.push('**OAuth self-service** (MCP clients with authorization support):');
+  lines.push(
+    '**OAuth self-service** (MCP clients with authorization support):',
+  );
   lines.push('');
   lines.push(
     '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`',

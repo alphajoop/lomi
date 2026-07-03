@@ -127,7 +127,9 @@ const expectedProvisioningOps = mustParseJson(
   paths.expectedProvisioningOps,
 );
 if (!Array.isArray(expectedProvisioningOps)) {
-  throw new Error('_expected-provisioning-operations.json must be a JSON array');
+  throw new Error(
+    '_expected-provisioning-operations.json must be a JSON array',
+  );
 }
 for (const entry of expectedProvisioningOps) {
   const [method, ...pathParts] = String(entry).split(/\s+/);

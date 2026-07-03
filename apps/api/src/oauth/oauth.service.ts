@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { OAuthRepository } from './oauth.repository';
 
@@ -52,7 +51,9 @@ export class OAuthService {
     scope?: string;
   }) {
     if (!body.client_name?.trim() || !body.redirect_uris?.length) {
-      throw new BadRequestException('client_name and redirect_uris are required');
+      throw new BadRequestException(
+        'client_name and redirect_uris are required',
+      );
     }
     const scopes = body.scope
       ? body.scope.split(' ').filter(Boolean)
@@ -154,7 +155,12 @@ export class OAuthService {
   async token(body: Record<string, string>) {
     const grantType = body.grant_type;
     if (grantType === 'authorization_code') {
-      if (!body.code || !body.client_id || !body.redirect_uri || !body.code_verifier) {
+      if (
+        !body.code ||
+        !body.client_id ||
+        !body.redirect_uri ||
+        !body.code_verifier
+      ) {
         throw new BadRequestException('Missing token request parameters');
       }
       try {
@@ -165,7 +171,8 @@ export class OAuthService {
           codeVerifier: body.code_verifier,
         });
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Token exchange failed';
+        const message =
+          error instanceof Error ? error.message : 'Token exchange failed';
         throw new BadRequestException(message);
       }
     }
@@ -180,7 +187,8 @@ export class OAuthService {
           body.client_id,
         );
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Refresh failed';
+        const message =
+          error instanceof Error ? error.message : 'Refresh failed';
         throw new BadRequestException(message);
       }
     }

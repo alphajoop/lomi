@@ -44,7 +44,9 @@ export class ProvisioningKeyGuard implements CanActivate {
         }
       | undefined;
     if (error || !row?.is_valid) {
-      throw new UnauthorizedException(row?.message || 'Invalid provisioning key');
+      throw new UnauthorizedException(
+        row?.message || 'Invalid provisioning key',
+      );
     }
 
     request.provisioning = {

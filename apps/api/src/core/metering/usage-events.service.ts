@@ -48,7 +48,12 @@ export class UsageEventsService {
     if (error) throw new Error(error.message);
 
     const id = eventId as string;
-    return this.scheduleProcessing(id, user.organizationId, dto.customer_id, dto.code);
+    return this.scheduleProcessing(
+      id,
+      user.organizationId,
+      dto.customer_id,
+      dto.code,
+    );
   }
 
   /**

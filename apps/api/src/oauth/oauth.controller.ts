@@ -35,7 +35,9 @@ export class OAuthController {
   constructor(private readonly service: OAuthService) {}
 
   @Get('.well-known/oauth-authorization-server')
-  @ApiOperation({ summary: 'OAuth 2.1 authorization server metadata (RFC 8414)' })
+  @ApiOperation({
+    summary: 'OAuth 2.1 authorization server metadata (RFC 8414)',
+  })
   authorizationServerMetadata() {
     return this.service.getAuthorizationServerMetadata(getOAuthIssuer());
   }

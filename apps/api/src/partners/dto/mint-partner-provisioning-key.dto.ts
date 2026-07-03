@@ -8,7 +8,8 @@ export class MintPartnerProvisioningKeyDto {
   name!: string;
 
   @ApiPropertyOptional({
-    description: 'Partner-side identifier for the end user (for attribution and idempotency)',
+    description:
+      'Partner-side identifier for the end user (for attribution and idempotency)',
     example: 'user_abc123',
   })
   @IsOptional()

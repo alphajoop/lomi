@@ -8,7 +8,11 @@ import { ProvisioningRepository } from './provisioning.repository';
 @Module({
   imports: [SupabaseModule],
   controllers: [ProvisioningController],
-  providers: [ProvisioningService, ProvisioningRepository, ProvisioningKeyGuard],
+  providers: [
+    ProvisioningService,
+    ProvisioningRepository,
+    ProvisioningKeyGuard,
+  ],
   exports: [ProvisioningService],
 })
 export class ProvisioningModule {}

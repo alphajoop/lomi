@@ -175,10 +175,9 @@ describe('UsageEventsService', () => {
         meter_id: 'meter-1',
       }),
     );
-    expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
-      'process_usage_event',
-      { p_event_id: 'event-1' },
-    );
+    expect(mockSupabaseClient.rpc).toHaveBeenCalledWith('process_usage_event', {
+      p_event_id: 'event-1',
+    });
   });
 
   it('reconciles stale pending usage events', async () => {

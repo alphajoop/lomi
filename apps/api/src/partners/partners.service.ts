@@ -11,7 +11,10 @@ import { PartnersRepository } from './partners.repository';
 export class PartnersService {
   constructor(private readonly repository: PartnersRepository) {}
 
-  async mintProvisioningKey(ctx: PartnerContext, dto: MintPartnerProvisioningKeyDto) {
+  async mintProvisioningKey(
+    ctx: PartnerContext,
+    dto: MintPartnerProvisioningKeyDto,
+  ) {
     try {
       const row = await this.repository.mintProvisioningKey({
         partnerId: ctx.partnerId,
@@ -30,7 +33,9 @@ export class PartnersService {
       };
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Failed to mint provisioning key';
+        error instanceof Error
+          ? error.message
+          : 'Failed to mint provisioning key';
       throw new BadRequestException(message);
     }
   }

@@ -9,12 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiSecurity,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ProvisioningKeyGuard } from '../core/common/guards/provisioning-key.guard';
 import { CurrentProvisioning } from './decorators/current-provisioning.decorator';

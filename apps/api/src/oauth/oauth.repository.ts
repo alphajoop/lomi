@@ -18,7 +18,10 @@ export class OAuthRepository {
       {
         p_client_name: input.clientName,
         p_redirect_uris: input.redirectUris,
-        p_grant_types: input.grantTypes ?? ['authorization_code', 'refresh_token'],
+        p_grant_types: input.grantTypes ?? [
+          'authorization_code',
+          'refresh_token',
+        ],
         p_response_types: input.responseTypes ?? ['code'],
         p_token_endpoint_auth_method: input.tokenEndpointAuthMethod ?? 'none',
         p_scopes: input.scopes ?? ['provisioning.onboard'],
@@ -39,7 +42,10 @@ export class OAuthRepository {
       { p_client_id: clientId } as never,
     );
     if (error) throw error;
-    return (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null;
+    return (Array.isArray(data) ? data[0] : data) as Record<
+      string,
+      unknown
+    > | null;
   }
 
   async getOrCreateSelfServicePartner(userId: string, email: string) {
@@ -164,7 +170,10 @@ export class OAuthRepository {
       { p_token: token } as never,
     );
     if (error) throw error;
-    return (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | null;
+    return (Array.isArray(data) ? data[0] : data) as Record<
+      string,
+      unknown
+    > | null;
   }
 
   async revokeToken(token: string) {
@@ -188,8 +197,9 @@ export class OAuthRepository {
       const { data: userData } = await admin.auth.admin.getUserById(userId);
       return Boolean(userData.user?.email_confirmed_at);
     }
-    const { data: userData, error: userError } =
-      await this.supabase.getClient().auth.admin.getUserById(userId);
+    const { data: userData, error: userError } = await this.supabase
+      .getClient()
+      .auth.admin.getUserById(userId);
     if (userError) return false;
     return Boolean(userData.user?.email_confirmed_at);
   }

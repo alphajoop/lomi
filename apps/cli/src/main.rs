@@ -22,10 +22,7 @@ async fn run() -> i32 {
         Ok(cli) => cli,
         Err(error) => {
             error.print().expect("failed to write clap error");
-            return error
-                .exit_code()
-                .try_into()
-                .unwrap_or(1);
+            return error.exit_code();
         }
     };
 

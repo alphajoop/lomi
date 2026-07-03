@@ -118,7 +118,7 @@ export class LogsService {
     user: AuthContext,
     params: ListLogsParams,
   ): Promise<LogListResponseDto> {
-    const { type, limit, offset } = params;
+    const { type } = params;
     const environment = user.environment ?? 'live';
 
     switch (type) {

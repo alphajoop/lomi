@@ -203,21 +203,23 @@ const mtnChargeDto = {
 };
 
 function setupMtnRpcMocks(clientRpc: jest.Mock, serviceRpc: jest.Mock) {
-  clientRpc.mockImplementation(async (name: string, args?: Record<string, unknown>) => {
-    if (name === 'fetch_organization_providers_settings_api') {
-      return {
-        data: [{ provider_code: 'MTN', is_connected: true }],
-        error: null,
-      };
-    }
-    if (name === 'create_mtn_transaction') {
-      return {
-        data: [{ transaction_id: 'txn-mtn-1', external_id: 'ext-1' }],
-        error: null,
-      };
-    }
-    return { data: null, error: null };
-  });
+  clientRpc.mockImplementation(
+    async (name: string, _args?: Record<string, unknown>) => {
+      if (name === 'fetch_organization_providers_settings_api') {
+        return {
+          data: [{ provider_code: 'MTN', is_connected: true }],
+          error: null,
+        };
+      }
+      if (name === 'create_mtn_transaction') {
+        return {
+          data: [{ transaction_id: 'txn-mtn-1', external_id: 'ext-1' }],
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    },
+  );
 
   serviceRpc.mockImplementation(async (name: string) => {
     if (name === 'lookup_api_idempotency_record') {
