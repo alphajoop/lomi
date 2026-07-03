@@ -8,10 +8,17 @@ import { wireMcpServer } from './wire-mcp-server.js';
 export async function startStdioServer(): Promise<void> {
   const manifest = parseManifest(manifestJson);
 
+  // A key minted during provisioning in this process takes precedence over the
+  // env fallback, so a single stdio session can go 0->1 then drive the REST API.
+  let promotedMerchantKey: string | null = null;
+
   const server = wireMcpServer({
     manifest,
     mode: 'stdio',
-    getApiKey: getOptionalMerchantApiKey,
+    getApiKey: () => promotedMerchantKey ?? getOptionalMerchantApiKey(),
+    onMerchantKeyDiscovered: (secretKey) => {
+      promotedMerchantKey = secretKey;
+    },
   });
 
   const transport = new StdioServerTransport();

@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "generate": "tsx src/scripts/generate-tools.ts",
+    "generate": "tsx src/scripts/generate-tools.ts && tsx src/scripts/generate-provisioning-tools.ts",
     "generate:check": "pnpm run generate && git diff --exit-code src/generated/",
     "prebuild": "pnpm run generate",
     "prepublishOnly": "pnpm run build",

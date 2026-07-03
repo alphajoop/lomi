@@ -11,7 +11,9 @@
           }
         },
         "summary": "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/events": {
@@ -29,7 +31,9 @@
           }
         ],
         "summary": "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/subscriptions": {
@@ -46,8 +50,10 @@
             "api-key": []
           }
         ],
-        "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
-        "tags": ["Agent"]
+        "summary": "S'inscrire aux notifications adaptées à l'agent (persistant + relais SSE Redis)",
+        "tags": [
+          "Agent"
+        ]
       },
       "get": {
         "operationId": "AgentSubscriptionsController_list",
@@ -63,7 +69,9 @@
           }
         ],
         "summary": "Lister les abonnements de l'agent",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/subscriptions/{id}": {
@@ -92,7 +100,9 @@
           }
         ],
         "summary": "Supprimer un abonnement",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/workflows": {
@@ -119,8 +129,10 @@
             "api-key": []
           }
         ],
-        "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
-        "tags": ["Agent"]
+        "summary": "Démarrer un workflow multi-étapes (idempotence sur idempotency_key, persistant)",
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/workflows/{runId}": {
@@ -145,7 +157,9 @@
           }
         ],
         "summary": "Obtenir l'état d'une exécution de workflow",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/workflows/{runId}/steps/{stepId}": {
@@ -186,7 +200,9 @@
           }
         ],
         "summary": "Faire avancer une étape du workflow (primitive d'orchestration)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/handoff": {
@@ -214,7 +230,9 @@
           }
         ],
         "summary": "Transfert inter-services / inter-agents (contexte + enveloppe de tâche)",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
       }
     },
     "/agent/handoff/{id}": {
@@ -239,7 +257,182 @@
           }
         ],
         "summary": "Récupérer un enregistrement de transfert",
-        "tags": ["Agent"]
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/provisioning/v1/accounts": {
+      "post": {
+        "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
+        "operationId": "ProvisioningController_createAccount",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Create a merchant account for agent-driven onboarding",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/documents": {
+      "post": {
+        "operationId": "ProvisioningController_uploadDocument",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Upload a KYC document for onboarding",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/extract": {
+      "post": {
+        "operationId": "ProvisioningController_extractOnboarding",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Extract onboarding data from website or uploaded documents",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/complete": {
+      "post": {
+        "description": "Atomically creates the organization, provisions test API keys, and queues KYC review.",
+        "operationId": "ProvisioningController_completeOnboarding",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Complete merchant onboarding and submit KYC",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/status": {
+      "get": {
+        "operationId": "ProvisioningController_getOnboardingStatus",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Get onboarding, KYC, and verification status",
+        "tags": [
+          "Provisioning"
+        ]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/api-keys": {
+      "get": {
+        "description": "Returns test secret keys and publishable keys after onboarding completes.",
+        "operationId": "ProvisioningController_getApiKeys",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Retrieve provisioned test API keys for the merchant",
+        "tags": [
+          "Provisioning"
+        ]
       }
     }
   },
@@ -252,6 +445,9 @@
   "tags": [
     {
       "name": "Agent"
+    },
+    {
+      "name": "Provisioning"
     }
   ],
   "servers": [
@@ -270,6 +466,11 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
+      },
+      "provisioning-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Lomi-Provisioning-Key"
       }
     },
     "schemas": {

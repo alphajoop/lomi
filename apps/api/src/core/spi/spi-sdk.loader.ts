@@ -33,7 +33,11 @@ export type PiSpiSDK = {
     ) => Promise<Record<string, unknown>>;
   };
   qr: {
-    payload: (input: Record<string, unknown>) => Promise<string>;
+    payload: (input: Record<string, unknown>) => string;
+    svg: (
+      input: Record<string, unknown>,
+      options?: Record<string, unknown>,
+    ) => Promise<string>;
   };
   webhooks: {
     create: (
@@ -46,9 +50,21 @@ const SPI_STANDBY_MESSAGE =
   'PI-SPI is not operational yet. Install and configure pi-spi-sdk when ready.';
 
 export async function createPiSpiSdk(
-  _config: PiSpiSdkConfig,
+  config: PiSpiSdkConfig,
 ): Promise<PiSpiSDK> {
-  throw new ServiceUnavailableException(SPI_STANDBY_MESSAGE);
+  try {
+    const { PiSpiSDK } = await import('pi-spi-sdk');
+    const sdkConfig = {
+      baseUrl: config.baseUrl,
+      accessToken: config.accessToken,
+      ...(config.dispatcher ? { dispatcher: config.dispatcher } : {}),
+    };
+    return new PiSpiSDK(
+      sdkConfig as ConstructorParameters<typeof PiSpiSDK>[0],
+    ) as unknown as PiSpiSDK;
+  } catch {
+    throw new ServiceUnavailableException(SPI_STANDBY_MESSAGE);
+  }
 }
 
 export async function isPiSpiAuthError(error: unknown): Promise<boolean> {
@@ -61,8 +77,18 @@ export async function isPiSpiAuthError(error: unknown): Promise<boolean> {
     status?: number;
     statusCode?: number;
   };
+
   if (candidate.name === 'PiSpiAuthError') {
     return true;
+  }
+
+  try {
+    const { PiSpiAuthError } = await import('pi-spi-sdk');
+    if (error instanceof PiSpiAuthError) {
+      return true;
+    }
+  } catch {
+    // SDK not installed — fall through to status checks
   }
 
   return candidate.status === 401 || candidate.statusCode === 401;

@@ -11,6 +11,10 @@ import {
   validateWebhookDeliveryLogs,
   validateWebhookListHasNoSecrets,
   validateWebhookTestDeliveryResponse,
+  validateUsageEventProcessed,
+  validateMeterBalanceAtLeast,
+  validateSubscriptionUsage,
+  validatePaymentWebhookDelivered,
 } from '../assert';
 import type { CheckDefinition, SuiteContext } from '../types';
 
@@ -168,6 +172,29 @@ export function createSandboxChecks(): CheckDefinition[] {
       expectStatus: 200,
       skipIf: (ctx) =>
         ctx.productId ? null : 'productId not captured from create',
+    },
+
+    // --- Payment webhook (registered BEFORE charges so PAYMENT_SUCCEEDED is
+    // captured; outbox dispatches bind to active webhooks at enqueue time) ---
+    {
+      name: 'register payment webhook (PAYMENT_SUCCEEDED)',
+      service: 'webhooks',
+      method: 'POST',
+      path: '/webhooks',
+      body: (ctx) => ({
+        url: `https://postman-echo.com/post?synthetics_payment=${ctx.runId}`,
+        authorized_events: ['PAYMENT_SUCCEEDED'],
+        description: 'API synthetics payment webhook',
+      }),
+      expectStatus: [200, 201],
+      validate: (_ctx, res) => validateWebhookCreateResponse(res.data),
+      capture: (ctx, res) => {
+        const data = unwrapData(res.data) as Record<string, unknown>;
+        const id =
+          (typeof data?.id === 'string' ? data.id : undefined) ??
+          pickString(res.data, 'webhook_id', 'id');
+        if (id) ctx.paymentWebhookId = id;
+      },
     },
 
     // --- Charges: Wave ---
@@ -540,6 +567,8 @@ export function createSandboxChecks(): CheckDefinition[] {
       capture: (ctx, res) => {
         const name = pickString(res.data, 'name', 'meter_code');
         if (name) ctx.meterName = name;
+        const meterId = pickString(res.data, 'meter_id', 'id');
+        if (meterId) ctx.meterId = meterId;
       },
     },
     {
@@ -554,17 +583,207 @@ export function createSandboxChecks(): CheckDefinition[] {
       service: 'metering',
       method: 'POST',
       path: '/usage-events',
-      body: (ctx) => ({
-        transaction_id: `synth_evt_${ctx.runId}`,
-        code: ctx.meterName,
-        customer_id: ctx.customerId,
-        quantity: 1,
-      }),
+      body: (ctx) => {
+        ctx.usageQuantity = 3;
+        return {
+          transaction_id: `synth_evt_${ctx.runId}`,
+          code: ctx.meterName,
+          customer_id: ctx.customerId,
+          quantity: ctx.usageQuantity,
+        };
+      },
       expectStatus: [200, 201, 202],
       skipIf: (ctx) => {
         if (!ctx.meterName) return 'meterName not captured';
         if (!ctx.customerId) return 'customerId required for usage event';
         return null;
+      },
+      capture: (ctx, res) => {
+        const eventId = pickString(res.data, 'event_id', 'id');
+        if (eventId) ctx.usageEventId = eventId;
+      },
+    },
+    {
+      name: 'usage event processed',
+      service: 'metering',
+      method: 'GET',
+      path: (ctx) => `/usage-events/${ctx.usageEventId}`,
+      expectStatus: 200,
+      retry: { attempts: 8, delayMs: 1500 },
+      skipIf: (ctx) =>
+        ctx.usageEventId ? null : 'usageEventId not captured from ingest',
+      validate: (_ctx, res) => validateUsageEventProcessed(res.data),
+    },
+    {
+      name: 'meter balance reflects usage',
+      service: 'metering',
+      method: 'GET',
+      path: (ctx) =>
+        `/meters/${ctx.meterId}/balances/${ctx.customerId}`,
+      expectStatus: 200,
+      retry: { attempts: 5, delayMs: 1000 },
+      skipIf: (ctx) => {
+        if (!ctx.meterId) return 'meterId not captured from create meter';
+        if (!ctx.customerId) return 'customerId required for meter balance';
+        if (ctx.usageQuantity == null) {
+          return 'usageQuantity not set from ingest';
+        }
+        return null;
+      },
+      validate: (ctx, res) =>
+        validateMeterBalanceAtLeast(res.data, ctx.usageQuantity ?? 0),
+    },
+
+    // --- Usage billing: subscription-tied metering (product-linked meter
+    // forces the active_usage_subscription_required path) ---
+    {
+      name: 'create usage_based product',
+      service: 'metering',
+      method: 'POST',
+      path: '/products',
+      body: (ctx) => ({
+        name: `Synth usage ${ctx.runId}`,
+        product_type: 'usage_based',
+        usage_unit: 'api_calls',
+        usage_aggregation: 'sum',
+        prices: [
+          {
+            amount: 100,
+            currency_code: 'XOF',
+            billing_interval: 'month',
+            pricing_model: 'standard',
+            is_default: true,
+          },
+        ],
+        metadata: { source: 'api_synthetics' },
+      }),
+      expectStatus: [200, 201],
+      capture: (ctx, res) => {
+        ctx.usageProductId =
+          pickString(res.data, 'product_id', 'id') ?? ctx.usageProductId;
+      },
+    },
+    {
+      name: 'discover usage product meter',
+      service: 'metering',
+      method: 'GET',
+      path: (ctx) => `/meters?productId=${ctx.usageProductId}`,
+      expectStatus: 200,
+      retry: { attempts: 5, delayMs: 1000 },
+      skipIf: (ctx) =>
+        ctx.usageProductId ? null : 'usageProductId not captured from product',
+      validate: (_ctx, res) => {
+        const rows = Array.isArray(res.data)
+          ? res.data
+          : ((res.data as { data?: unknown[] })?.data ?? []);
+        const name = (rows[0] as Record<string, unknown>)?.name;
+        return typeof name === 'string' && name.length > 0
+          ? null
+          : 'Expected an auto-created meter for the usage_based product';
+      },
+      capture: (ctx, res) => {
+        const rows = Array.isArray(res.data)
+          ? res.data
+          : ((res.data as { data?: unknown[] })?.data ?? []);
+        const name = (rows[0] as Record<string, unknown>)?.name;
+        if (typeof name === 'string' && name.length > 0) {
+          ctx.usageMeterCode = name;
+        }
+      },
+    },
+    {
+      name: 'create usage subscription',
+      service: 'metering',
+      method: 'POST',
+      path: '/usage-subscriptions',
+      body: (ctx) => ({
+        customer_id: ctx.customerId,
+        product_id: ctx.usageProductId,
+      }),
+      expectStatus: [200, 201],
+      skipIf: (ctx) => {
+        if (!ctx.customerId) return 'customerId required for usage subscription';
+        if (!ctx.usageProductId) return 'usageProductId not captured';
+        return null;
+      },
+      capture: (ctx, res) => {
+        ctx.usageSubscriptionId =
+          pickString(res.data, 'subscription_id', 'id') ??
+          ctx.usageSubscriptionId;
+      },
+    },
+    {
+      name: 'ingest subscription usage event',
+      service: 'metering',
+      method: 'POST',
+      path: '/usage-events',
+      body: (ctx) => {
+        ctx.usageSubQuantity = 4;
+        return {
+          transaction_id: `synth_subevt_${ctx.runId}`,
+          code: ctx.usageMeterCode,
+          customer_id: ctx.customerId,
+          subscription_id: ctx.usageSubscriptionId,
+          quantity: ctx.usageSubQuantity,
+        };
+      },
+      expectStatus: [200, 201, 202],
+      skipIf: (ctx) => {
+        if (!ctx.usageMeterCode) return 'usageMeterCode not discovered';
+        if (!ctx.customerId) return 'customerId required for usage event';
+        if (!ctx.usageSubscriptionId) return 'usageSubscriptionId not captured';
+        return null;
+      },
+      capture: (ctx, res) => {
+        const eventId = pickString(res.data, 'event_id', 'id');
+        if (eventId) ctx.usageSubEventId = eventId;
+      },
+    },
+    {
+      name: 'subscription usage event processed',
+      service: 'metering',
+      method: 'GET',
+      path: (ctx) => `/usage-events/${ctx.usageSubEventId}`,
+      expectStatus: 200,
+      retry: { attempts: 8, delayMs: 1500 },
+      skipIf: (ctx) =>
+        ctx.usageSubEventId
+          ? null
+          : 'usageSubEventId not captured from ingest',
+      validate: (_ctx, res) => validateUsageEventProcessed(res.data),
+    },
+    {
+      name: 'subscription usage reflects balance',
+      service: 'metering',
+      method: 'GET',
+      path: (ctx) =>
+        `/usage-billing/subscriptions/${ctx.usageSubscriptionId}/usage`,
+      expectStatus: 200,
+      retry: { attempts: 5, delayMs: 1000 },
+      skipIf: (ctx) => {
+        if (!ctx.usageSubscriptionId) return 'usageSubscriptionId not captured';
+        if (ctx.usageSubQuantity == null) return 'usageSubQuantity not set';
+        return null;
+      },
+      validate: (ctx, res) =>
+        validateSubscriptionUsage(res.data, ctx.usageSubQuantity ?? 0),
+    },
+    {
+      name: 'list usage billing periods',
+      service: 'metering',
+      method: 'GET',
+      path: (ctx) =>
+        `/usage-billing/periods?subscription_id=${ctx.usageSubscriptionId}&page=1&page_size=5`,
+      expectStatus: 200,
+      skipIf: (ctx) =>
+        ctx.usageSubscriptionId ? null : 'usageSubscriptionId not captured',
+      validate: (_ctx, res) => {
+        const rows = Array.isArray(res.data)
+          ? res.data
+          : ((res.data as { data?: unknown[] })?.data ?? null);
+        return Array.isArray(rows)
+          ? null
+          : 'Expected an array of billing periods';
       },
     },
 
@@ -729,6 +948,25 @@ export function createSandboxChecks(): CheckDefinition[] {
         }),
     },
 
+    // --- Real domain webhook: PAYMENT_SUCCEEDED from the MTN auto-complete
+    // charge (async DB outbox -> queue -> delivery); placed late so the
+    // pipeline has had time to deliver ---
+    {
+      name: 'payment webhook delivered (PAYMENT_SUCCEEDED)',
+      service: 'webhooks',
+      method: 'GET',
+      path: (ctx) =>
+        `/webhook-delivery-logs?webhookId=${ctx.paymentWebhookId}&limit=10`,
+      expectStatus: 200,
+      retry: { attempts: 15, delayMs: 2000 },
+      skipIf: (ctx) =>
+        ctx.paymentWebhookId
+          ? null
+          : 'paymentWebhookId not captured from register',
+      validate: (_ctx, res) =>
+        validatePaymentWebhookDelivered(res.data, 'PAYMENT_SUCCEEDED'),
+    },
+
     // --- Radar / accounts ---
     {
       name: 'radar settings',
@@ -746,6 +984,17 @@ export function createSandboxChecks(): CheckDefinition[] {
     },
 
     // --- Cleanup ---
+    {
+      name: 'delete payment webhook cleanup',
+      service: 'webhooks',
+      method: 'DELETE',
+      path: (ctx) => `/webhooks/${ctx.paymentWebhookId}`,
+      expectStatus: [200, 204],
+      skipIf: (ctx) =>
+        ctx.paymentWebhookId
+          ? null
+          : 'paymentWebhookId not captured from register',
+    },
     {
       name: 'delete customer cleanup',
       service: 'customers',

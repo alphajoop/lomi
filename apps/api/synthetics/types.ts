@@ -22,6 +22,15 @@ export interface SuiteContext {
   refundId?: string;
   couponId?: string;
   meterName?: string;
+  meterId?: string;
+  usageEventId?: string;
+  usageQuantity?: number;
+  usageProductId?: string;
+  usageMeterCode?: string;
+  usageSubscriptionId?: string;
+  usageSubQuantity?: number;
+  usageSubEventId?: string;
+  paymentWebhookId?: string;
   webhookId?: string;
   webhookSecret?: string;
   webhookDeliveryLogId?: string;

@@ -433,3 +433,108 @@ export function validateApiRequestCorrelation(
   }
   return null;
 }
+
+/** Validates GET /usage-events/:id shows processed status and meter_id. */
+export function validateUsageEventProcessed(body: unknown): string | null {
+  const data = unwrapData(body) as Record<string, unknown>;
+  const status = String(
+    data?.processing_status ?? data?.status ?? '',
+  ).toLowerCase();
+  if (status === 'failed') {
+    const err = data?.error_message;
+    return `Usage event processing failed${err ? `: ${String(err)}` : ''}`;
+  }
+  if (status !== 'processed') {
+    return `Expected usage event status "processed", got "${status || 'missing'}"`;
+  }
+  const meterId = pickString(body, 'meter_id');
+  if (!meterId) {
+    return 'Expected meter_id on processed usage event';
+  }
+  return null;
+}
+
+/** Validates GET /meters/:id/balances/:customerId consumed_units >= min. */
+export function validateMeterBalanceAtLeast(
+  body: unknown,
+  min: number,
+): string | null {
+  const data = unwrapData(body) as Record<string, unknown>;
+  const consumed = data?.consumed_units;
+  if (typeof consumed !== 'number' || Number.isNaN(consumed)) {
+    return 'Expected consumed_units number on meter balance';
+  }
+  if (consumed < min) {
+    return `Expected consumed_units >= ${min}, got ${consumed}`;
+  }
+  return null;
+}
+
+/**
+ * Validates GET /usage-billing/subscriptions/:id/usage: an active usage_based
+ * subscription whose meter balances reflect at least `minConsumed` units.
+ */
+export function validateSubscriptionUsage(
+  body: unknown,
+  minConsumed: number,
+): string | null {
+  const data = unwrapData(body) as Record<string, unknown>;
+  if (!data || typeof data !== 'object') {
+    return 'Expected subscription usage object';
+  }
+  const status = String(data.status ?? '').toLowerCase();
+  if (status !== 'active') {
+    return `Expected active usage subscription, got "${status || 'missing'}"`;
+  }
+  const productType = String(data.product_type ?? '').toLowerCase();
+  if (productType !== 'usage_based') {
+    return `Expected product_type "usage_based", got "${productType || 'missing'}"`;
+  }
+  const balances = data.meter_balances;
+  if (!Array.isArray(balances) || balances.length === 0) {
+    return 'Expected non-empty meter_balances on usage subscription';
+  }
+  const maxConsumed = balances.reduce((max, row) => {
+    const consumed = Number((row as Record<string, unknown>)?.consumed_units);
+    return Number.isFinite(consumed) && consumed > max ? consumed : max;
+  }, 0);
+  if (maxConsumed < minConsumed) {
+    return `Expected a meter balance with consumed_units >= ${minConsumed}, got max ${maxConsumed}`;
+  }
+  return null;
+}
+
+/**
+ * Validates that a real domain webhook of `expectedEvent` was delivered
+ * successfully (2xx) by scanning webhook delivery log rows.
+ */
+export function validatePaymentWebhookDelivered(
+  body: unknown,
+  expectedEvent: string,
+): string | null {
+  const rows = Array.isArray(body) ? body : body ? [body] : [];
+  if (rows.length === 0) {
+    return `Expected at least one delivery log for ${expectedEvent}`;
+  }
+  const match = rows.find((row) => {
+    const record = row as Record<string, unknown>;
+    const eventType = String(record.event_type ?? record.event ?? '');
+    return eventType === expectedEvent;
+  }) as Record<string, unknown> | undefined;
+  if (!match) {
+    const seen = rows
+      .map((row) => String((row as Record<string, unknown>).event_type ?? ''))
+      .filter(Boolean)
+      .join(', ');
+    return `Expected a ${expectedEvent} delivery log, saw event types: [${seen}]`;
+  }
+  const success = match.success;
+  const status = Number(match.response_status ?? match.status_code);
+  const delivered =
+    success === true ||
+    (Number.isFinite(status) && status >= 200 && status < 300);
+  if (!delivered) {
+    return `Found ${expectedEvent} delivery log but it was not successful (status=${String(match.response_status ?? match.status_code)})`;
+  }
+  return null;
+}

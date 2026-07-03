@@ -100,7 +100,34 @@ En HTTP MCP, les appels utilisent l’environnement API associé à votre `LOMI_
 
 - **`lomi_search_tools`**: recherche dans le catalogue d’outils quand le client charge les outils à la demande.
 - **Ressources**: `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
-- **Prompts**: `onboard_merchant`, `debug_failed_payment`, `setup_webhook`.
+- **Prompts**: `provision_merchant_from_zero` (onboarding 0→1), `onboard_merchant` (intégration après inscription), `debug_failed_payment`, `setup_webhook`.
+
+## Onboarding piloté par agent (0 à 1)
+
+Les outils de provisioning permettent à un agent de créer un compte marchand, déposer les documents KYC, finaliser l’onboarding et récupérer les clés API **test** avant toute clé secrète marchand.
+
+| Valeur | En-tête / env | Rôle |
+| --- | --- | --- |
+| **Clé de provisioning (`LOMI_PROVISIONING_KEY`)** | `x-lomi-provisioning-key` | Identifiant bootstrap (`lomi_prov_*`) pour `/provisioning/v1/*` |
+| **Secret marchand (`LOMI_SECRET_KEY`)** | `x-lomi-api-key` | Après l’onboarding, utilisez les clés test renvoyées par `GET /provisioning/v1/merchants/{id}/api-keys` |
+
+Exemple HTTP pour un nouveau marchand (provisioning seul tant que vous n’avez pas `lomi_sk_test_*`) :
+
+```json
+{
+  "mcpServers": {
+    "lomi": {
+      "url": "https://mcp.lomi.africa/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
+        "x-lomi-provisioning-key": "YOUR_LOMI_PROVISIONING_KEY"
+      }
+    }
+  }
+}
+```
+
+Après l’onboarding, ajoutez `x-lomi-api-key` (ou passez `LOMI_SECRET_KEY` en env) pour les outils paiement et catalogue. Le mode **TEST** est disponible tout de suite ; le **LIVE** exige la validation KYC (IA pour les comptes starter, revue admin pour les entreprises enregistrées).
 
 ## Déployer votre propre serveur MCP
 

@@ -14,5 +14,9 @@ export function buildSwaggerDocumentBase() {
     )
     .setVersion('1.1.0')
     .addApiKey({ type: 'apiKey', name: 'X-API-KEY', in: 'header' }, 'api-key')
+    .addApiKey(
+      { type: 'apiKey', name: 'X-Lomi-Provisioning-Key', in: 'header' },
+      'provisioning-key',
+    )
     .build();
 }

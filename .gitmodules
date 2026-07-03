@@ -58,3 +58,7 @@
 	path = apps/plugins/bubble
 	url = https://github.com/lomiafrica/bubble.git
 	branch = main
+[submodule "apps/crm"]
+	path = apps/crm
+	url = https://github.com/lomiafrica/crm.git
+	branch = main

@@ -1,45 +1,41 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
+/**
+ * Only the fields the update service actually consumes are exposed. Internal
+ * columns (verification_token, delivery stats, environment, deleted_at, ...)
+ * are intentionally omitted so clients cannot set them.
+ */
 export class UpdateWebhookDto {
-  @ApiProperty({ required: false, example: 'string' })
-  authorized_events?: string;
-
-  @ApiProperty({ required: false, example: 'string' })
-  deleted_at?: string;
-
-  @ApiProperty({ required: false, example: 'string' })
-  environment?: string;
-
-  @ApiProperty({ required: false, example: true })
-  is_active?: boolean;
-
-  @ApiProperty({ required: false, example: {} })
-  last_payload?: any;
-
-  @ApiProperty({ required: false, example: 'string' })
-  last_response_body?: string;
-
-  @ApiProperty({ required: false, example: 123 })
-  last_response_status?: number;
-
-  @ApiProperty({ required: false, example: 'string' })
-  last_triggered_at?: string;
-
-  @ApiProperty({ required: false, example: {} })
-  metadata?: any;
-
-  @ApiProperty({ required: false, example: 123 })
-  retry_count?: number;
-
-  @ApiProperty({ required: false, example: 'string' })
-  spi_event_types?: string;
-
-  @ApiProperty({ required: false, example: true })
-  supports_spi?: boolean;
-
-  @ApiProperty({ required: false, example: 'string' })
+  @ApiPropertyOptional({ example: 'https://example.com/webhooks/lomi' })
+  @IsString()
+  @IsOptional()
   url?: string;
 
-  @ApiProperty({ required: false, example: 'string' })
-  verification_token?: string;
+  @ApiPropertyOptional({
+    example: ['PAYMENT_SUCCEEDED', 'PAYMENT_FAILED'],
+    type: [String],
+  })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  @IsOptional()
+  authorized_events?: string[];
+
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  is_active?: boolean;
+
+  @ApiPropertyOptional({ type: Object })
+  @IsObject()
+  @IsOptional()
+  metadata?: Record<string, unknown>;
 }

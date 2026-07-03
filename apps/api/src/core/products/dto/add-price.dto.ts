@@ -1,4 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class AddPriceDto {
   @ApiProperty({
@@ -6,6 +14,8 @@ export class AddPriceDto {
     description:
       'Price amount. For standard/tiered: fixed unit price. For pay_what_you_want: suggested unit price pre-filled at checkout (defaults to minimum_amount if omitted).',
   })
+  @IsNumber()
+  @Min(0)
   amount: number;
 
   @ApiProperty({
@@ -13,6 +23,7 @@ export class AddPriceDto {
     description: 'Currency code',
     enum: ['XOF', 'USD', 'EUR'],
   })
+  @IsIn(['XOF', 'USD', 'EUR'])
   currency_code: string;
 
   @ApiProperty({
@@ -21,6 +32,8 @@ export class AddPriceDto {
     enum: ['day', 'week', 'month', 'year'],
     required: false,
   })
+  @IsIn(['day', 'week', 'month', 'year'])
+  @IsOptional()
   billing_interval?: string;
 
   @ApiProperty({
@@ -30,6 +43,8 @@ export class AddPriceDto {
     default: 'standard',
     required: false,
   })
+  @IsIn(['standard', 'pay_what_you_want', 'tiered'])
+  @IsOptional()
   pricing_model?: string;
 
   @ApiProperty({
@@ -38,6 +53,9 @@ export class AddPriceDto {
       'Lowest unit price the customer may pay. Required when pricing_model is pay_what_you_want.',
     required: false,
   })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
   minimum_amount?: number;
 
   @ApiProperty({
@@ -46,6 +64,9 @@ export class AddPriceDto {
       'Optional upper bound on unit price when pricing_model is pay_what_you_want.',
     required: false,
   })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
   maximum_amount?: number;
 
   @ApiProperty({
@@ -54,6 +75,8 @@ export class AddPriceDto {
     default: false,
     required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   is_default?: boolean;
 
   @ApiProperty({
@@ -61,5 +84,7 @@ export class AddPriceDto {
     description: 'Additional metadata',
     required: false,
   })
+  @IsObject()
+  @IsOptional()
   metadata?: Record<string, any>;
 }
