@@ -15,7 +15,7 @@ import {
  */
 
 if (!hasTestDb()) {
-  // eslint-disable-next-line no-console
+   
   console.warn(
     '[db-spec] SUPABASE_DB_TEST_URL not set — DB integration suite is SKIPPED. ' +
       'Set it in apps/api/.env to run these tests.',
@@ -69,12 +69,8 @@ dbDescribe('DB integration harness :: connectivity + RPC contract', () => {
   it('runs inside a transaction that is rolled back (zero residue)', async () => {
     const probe = `harness_probe_${Date.now()}`;
     await withRollback(async (client: Db) => {
-      await client.query(
-        `CREATE TEMP TABLE ${probe} (id int) ON COMMIT DROP`,
-      );
-      const inside = await client.query(`SELECT to_regclass($1) AS t`, [
-        probe,
-      ]);
+      await client.query(`CREATE TEMP TABLE ${probe} (id int) ON COMMIT DROP`);
+      const inside = await client.query(`SELECT to_regclass($1) AS t`, [probe]);
       expect(inside.rows[0].t).not.toBeNull();
     });
     // After rollback the temp table must be gone.
@@ -110,11 +106,15 @@ dbDescribe('DB integration harness :: connectivity + RPC contract', () => {
   it('named-argument RPC calls coerce types correctly (smoke)', async () => {
     await withRollback(async (client: Db) => {
       // Pure function, no seed needed: adds one month to a fixed date.
-      const res = await callFn(client, 'public.compute_subscription_next_billing_date', {
-        p_from_date: '2025-01-15',
-        p_billing_interval: 'month',
-        p_charge_day: 0,
-      });
+      const res = await callFn(
+        client,
+        'public.compute_subscription_next_billing_date',
+        {
+          p_from_date: '2025-01-15',
+          p_billing_interval: 'month',
+          p_charge_day: 0,
+        },
+      );
       expect(res.rows[0].result).toBeInstanceOf(Date);
     });
   });

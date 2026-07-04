@@ -31,7 +31,7 @@ export async function ensureReferenceData(client: Db): Promise<void> {
       ('SPI', 'SPI', 'SPI bank transfer'),
       ('GIM', 'GIM', 'GIM cards'),
       ('FREE', 'FREE', 'Free / zero-amount')
-    ON CONFLICT (name) DO NOTHING;
+    ON CONFLICT (code) DO NOTHING;
   `);
   await client.query(`
     INSERT INTO public.payment_methods (payment_method_code, provider_code) VALUES
@@ -81,7 +81,10 @@ export async function createMerchant(
     `INSERT INTO public.merchants (name, email)
      VALUES ($1, $2)
      RETURNING merchant_id`,
-    [options.name ?? `Merchant ${suffix}`, options.email ?? `m-${suffix}@example.test`],
+    [
+      options.name ?? `Merchant ${suffix}`,
+      options.email ?? `m-${suffix}@example.test`,
+    ],
   );
   return res.rows[0].merchant_id as string;
 }

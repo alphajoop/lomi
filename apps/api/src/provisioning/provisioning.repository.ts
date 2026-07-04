@@ -225,9 +225,7 @@ export class ProvisioningRepository {
     );
   }
 
-  async getOrganizationVerification(
-    organizationId: string,
-  ): Promise<{
+  async getOrganizationVerification(organizationId: string): Promise<{
     verification_status: string;
     is_starter_business: boolean;
   } | null> {
