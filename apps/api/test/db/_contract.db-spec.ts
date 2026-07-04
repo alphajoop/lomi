@@ -15,7 +15,6 @@ import {
  */
 
 if (!hasTestDb()) {
-   
   console.warn(
     '[db-spec] SUPABASE_DB_TEST_URL not set — DB integration suite is SKIPPED. ' +
       'Set it in apps/api/.env to run these tests.',
