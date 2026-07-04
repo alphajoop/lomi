@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 type DocsScreenshotProps = {
@@ -40,7 +41,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
   return (
     <figure className="not-prose my-6 overflow-hidden rounded-lg border border-border aspect-video w-full">
       {missingTheme !== 'light' ? (
-        <img
+        <Image
           src={`${base}-light.webp`}
           alt={alt}
           className="block size-full object-cover object-center dark:hidden"
@@ -51,7 +52,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
         />
       ) : null}
       {missingTheme !== 'dark' ? (
-        <img
+        <Image
           src={`${base}-dark.webp`}
           alt={alt}
           className="hidden size-full object-cover object-center dark:block"
@@ -62,7 +63,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
         />
       ) : null}
       {missingTheme === 'light' ? (
-        <img
+        <Image
           src={`${base}-dark.webp`}
           alt={alt}
           className="block size-full object-cover object-center dark:hidden"
@@ -73,7 +74,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
         />
       ) : null}
       {missingTheme === 'dark' ? (
-        <img
+        <Image
           src={`${base}-light.webp`}
           alt={alt}
           className="hidden size-full object-cover object-center dark:block"

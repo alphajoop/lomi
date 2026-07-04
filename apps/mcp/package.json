@@ -25,6 +25,7 @@
     "dev": "tsx src/index.ts",
     "dev:http": "LOMI_MCP_TRANSPORT=http tsx src/http-entry.ts",
     "test": "vitest run",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "smoke:http": "tsx src/scripts/smoke-http.ts"
   },
   "engines": {
@@ -45,8 +46,13 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^22.19.21",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "globals": "^16.5.0",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.60.0",
     "vite": "7.3.5",
     "vitest": "^4.1.9"
   },

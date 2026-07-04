@@ -1,7 +1,7 @@
 /**
  * Generates src/generated/provisioning-tools-manifest.json from agent-openapi.json.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {

@@ -1,4 +1,3 @@
-/* eslint-env node */
 /**
  * Verifies machine-readable agent assets for CI (Silicon-friendly / L5 runbook).
  * Run from repo root: node apps/docs/lib/scripts/verify-agent-contracts.mjs

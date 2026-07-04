@@ -1,5 +1,4 @@
 import {
-  callFn,
   callScalar,
   dbDescribe,
   expectRpcError,
@@ -9,7 +8,6 @@ import {
 import {
   createCustomer,
   createOrgWithAdmin,
-  createProduct,
   ensureReferenceData,
   getTransaction,
 } from './support/seed';
