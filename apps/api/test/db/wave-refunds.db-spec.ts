@@ -19,9 +19,9 @@ import {
  *   rollback_wave_refund           → credits the balance back (provider failed)
  *   complete_wave_refund_provider  → confirms the provider refund (locks rollback)
  *
- * Balances are asserted by DIRECTION (debit / credit-back) rather than exact
- * amounts, because the debit removes the net while the rollback also restores
- * the proportional original fee — the amounts are provider-fee dependent.
+ * A debit followed by a rollback must restore the EXACT pre-refund balance:
+ * rollback credits back only what was debited (net + refund processing fee),
+ * never the original transaction fee (which was never re-debited).
  */
 
 interface WaveRefundResult {
@@ -139,13 +139,14 @@ dbDescribe('Wave refunds :: create_wave_refund_request_api', () => {
 });
 
 dbDescribe('Wave refunds :: rollback + provider confirmation', () => {
-  it('rollback_wave_refund credits the balance back', async () => {
+  it('rollback_wave_refund restores the exact pre-refund balance', async () => {
     await withRollback(async (client) => {
       const ctx = await seedPaymentCtx(client, 'live');
       const { txId, gross } = await completedCreditedLiveTx(client, ctx, {
         provider: 'WAVE',
         method: 'MOBILE_MONEY',
       });
+      const beforeRefund = await accountBalance(client, ctx.organizationId);
 
       const refund = await requestWaveRefund(client, {
         merchantId: ctx.merchantId,
@@ -155,6 +156,7 @@ dbDescribe('Wave refunds :: rollback + provider confirmation', () => {
       });
       expect(refund.success).toBe(true);
       const afterRefund = await accountBalance(client, ctx.organizationId);
+      expect(afterRefund!).toBeLessThan(beforeRefund!);
 
       const rollback = await callScalar<WaveRefundResult>(
         client,
@@ -165,6 +167,9 @@ dbDescribe('Wave refunds :: rollback + provider confirmation', () => {
 
       const afterRollback = await accountBalance(client, ctx.organizationId);
       expect(afterRollback!).toBeGreaterThan(afterRefund!);
+      // Correctness invariant: rollback restores the pre-refund balance exactly.
+      // Before the fix this over-shot by the original transaction fee.
+      expect(afterRollback!).toBeCloseTo(beforeRefund!, 2);
     });
   });
 
