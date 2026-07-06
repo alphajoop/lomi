@@ -51,7 +51,7 @@ Copy this list and tick as you go:
 - [ ] `build/woocommerce-payments-light.webp` + `build/woocommerce-payments-dark.webp`
 - [ ] `build/woocommerce-webhook-url-light.webp` + `build/woocommerce-webhook-url-dark.webp`
 - [ ] `build/woocommerce-webhook-dashboard-light.webp` + `build/woocommerce-webhook-dashboard-dark.webp`
-- [ ] `build/woocommerce-checkout-light.webp` + `build/woocommerce-checkout-dark.webp`
+- [x] `build/woocommerce-checkout-light.webp` + `build/woocommerce-checkout-dark.webp`
 
 ---
 

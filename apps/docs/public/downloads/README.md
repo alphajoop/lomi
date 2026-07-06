@@ -7,7 +7,7 @@ Merchant-facing zips served at `/downloads/*` — linked from docs, **not** from
 | Field | Value |
 | --- | --- |
 | File | `woo-lomi.zip` |
-| Version | 1.003.0 |
+| Version | 1.003.1 |
 | Source | `apps/plugins/woo` after `pnpm run build && pnpm run i18n && ./scripts/release.sh` |
 | Docs button | [WooCommerce guide](/build/ecommerce-extensions/woocommerce) |
 
