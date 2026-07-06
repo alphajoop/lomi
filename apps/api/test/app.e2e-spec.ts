@@ -5,9 +5,12 @@ import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
 import { SupabaseService } from '../src/utils/supabase/supabase.service';
 
+const E2E_CHECKOUT_FOUND = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+const E2E_CHECKOUT_MISSING = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
+
 function createSupabaseE2eMock() {
   const rpc = jest.fn(async (fn: string, args: Record<string, unknown>) => {
-    if (fn === 'verify_api_key') {
+    if (fn === 'verify_api_key_context' || fn === 'verify_api_key') {
       const key = args.p_api_key as string;
       if (key !== 'valid_e2e_key') {
         return {
@@ -21,6 +24,8 @@ function createSupabaseE2eMock() {
             is_valid: true,
             merchant_id: 'merch_e2e',
             organization_id: 'org_e2e',
+            actor_organization_id: 'org_e2e',
+            target_organization_id: 'org_e2e',
             environment: 'test',
           },
         ],
@@ -104,6 +109,23 @@ function createSupabaseE2eMock() {
         ],
         error: null,
       };
+    }
+
+    if (fn === 'get_checkout_session_api') {
+      const sessionId = args.p_checkout_session_id as string;
+      if (sessionId === E2E_CHECKOUT_FOUND) {
+        return {
+          data: [
+            {
+              checkout_session_id: E2E_CHECKOUT_FOUND,
+              organization_id: 'org_e2e',
+              currency_code: 'XOF',
+            },
+          ],
+          error: null,
+        };
+      }
+      return { data: [], error: null };
     }
 
     return { data: null, error: null };
@@ -451,19 +473,19 @@ describe('App (e2e)', () => {
 
   it('GET /checkout-sessions/:id returns session when found', async () => {
     const res = await request(app.getHttpServer())
-      .get('/checkout-sessions/cs_found')
+      .get(`/checkout-sessions/${E2E_CHECKOUT_FOUND}`)
       .set('X-API-KEY', 'valid_e2e_key')
       .expect(200);
 
     expect(res.body).toMatchObject({
-      checkout_session_id: 'cs_found',
+      checkout_session_id: E2E_CHECKOUT_FOUND,
       organization_id: 'org_e2e',
     });
   });
 
   it('GET /checkout-sessions/:id returns 404 when not found', async () => {
     const res = await request(app.getHttpServer())
-      .get('/checkout-sessions/missing-id')
+      .get(`/checkout-sessions/${E2E_CHECKOUT_MISSING}`)
       .set('X-API-KEY', 'valid_e2e_key')
       .expect(404);
 

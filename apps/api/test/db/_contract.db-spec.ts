@@ -53,6 +53,19 @@ const REQUIRED_FUNCTIONS = [
   'create_checkout_session',
   'get_checkout_session',
   'validate_coupon_for_checkout',
+  // checkout confirmation
+  'create_wave_checkout_transaction',
+  'update_wave_checkout_status',
+  'create_mtn_transaction',
+  'update_mtn_transaction_status',
+  'create_stripe_checkout_transaction',
+  'update_stripe_checkout_status',
+  'create_gim_transaction',
+  'finalize_gim_payment',
+  // wave partial refund / payout
+  'create_beneficiary_payout_with_wave',
+  'apply_beneficiary_payout_debit',
+  'apply_wave_partial_refund_charges',
 ] as const;
 
 dbDescribe('DB integration harness :: connectivity + RPC contract', () => {

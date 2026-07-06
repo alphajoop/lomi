@@ -82,6 +82,20 @@ export async function accountBalance(
   return res.rows.length ? Number(res.rows[0].balance) : null;
 }
 
+/** Test-mode payments credit organization_test_balances, not accounts. */
+export async function testModeBalance(
+  client: Db,
+  organizationId: string,
+  currency = 'XOF',
+): Promise<number | null> {
+  const res = await client.query(
+    `SELECT balance FROM public.organization_test_balances
+      WHERE organization_id = $1 AND currency_code = $2`,
+    [organizationId, currency],
+  );
+  return res.rows.length ? Number(res.rows[0].balance) : null;
+}
+
 /**
  * Create a live payment, complete it, and credit the merchant account so the
  * refund-reversal paths have a real balance to debit.
