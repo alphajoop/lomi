@@ -631,7 +631,8 @@ export function createSandboxChecks(): CheckDefinition[] {
       method: 'GET',
       path: (ctx) => `/usage-events/${ctx.usageEventId}`,
       expectStatus: 200,
-      retry: { attempts: 8, delayMs: 1500 },
+      // BullMQ pickup can lag under full-suite load; match subscription retry budget.
+      retry: { attempts: 15, delayMs: 2000 },
       skipIf: (ctx) =>
         ctx.usageEventId ? null : 'usageEventId not captured from ingest',
       validate: (_ctx, res) => validateUsageEventProcessed(res.data),
@@ -643,7 +644,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       path: (ctx) =>
         `/meters/${ctx.meterId}/balances/${ctx.customerId}`,
       expectStatus: 200,
-      retry: { attempts: 5, delayMs: 1000 },
+      retry: { attempts: 15, delayMs: 2000 },
       skipIf: (ctx) => {
         if (!ctx.meterId) return 'meterId not captured from create meter';
         if (!ctx.customerId) return 'customerId required for meter balance';

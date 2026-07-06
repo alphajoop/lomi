@@ -382,9 +382,9 @@ describe('CardChargeService', () => {
       );
 
       const result = await service.findOne('pi_meta', user);
-      expect(
-        (result.data as { client_secret: string }).client_secret,
-      ).toBe('pi_meta_secret');
+      expect((result.data as { client_secret: string }).client_secret).toBe(
+        'pi_meta_secret',
+      );
     });
 
     it('denies cross-tenant access when transaction belongs to another org', async () => {

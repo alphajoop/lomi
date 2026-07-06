@@ -92,7 +92,11 @@ export class OAuthController {
   @ApiOperation({ summary: 'Token introspection (RFC 7662)' })
   introspect(
     @Body()
-    body: { token?: string; client_id?: string; client_secret?: string },
+    body: {
+      token?: string;
+      client_id?: string;
+      client_secret?: string;
+    },
   ) {
     return this.service.introspect(body);
   }

@@ -9,7 +9,12 @@ import { OAuthService } from './oauth.service';
 @Module({
   imports: [SupabaseModule],
   controllers: [OAuthController],
-  providers: [OAuthService, OAuthRepository, SupabaseSessionGuard, InternalApiKeyGuard],
+  providers: [
+    OAuthService,
+    OAuthRepository,
+    SupabaseSessionGuard,
+    InternalApiKeyGuard,
+  ],
   exports: [OAuthService, OAuthRepository],
 })
 export class OAuthModule {}
