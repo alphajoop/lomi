@@ -1,103 +1,226 @@
 ---
 title: WooCommerce
 description:
-  Install and configure lomi. WooCommerce gateway, hosted checkout
-  sessions, return handler, and signed webhooks.
+  Download the lomi. WooCommerce plugin and connect your store in a few steps —
+  no GitHub account required.
 ---
+
+import { Callout } from '@/components/docs/docs-callout';
 
 # WooCommerce
 
-WordPress plugin that redirects shoppers to **lomi. hosted checkout** and confirms payment via the WooCommerce REST listener plus merchant webhooks.
+Connect your **WordPress / WooCommerce** store to **lomi. hosted checkout**. Customers pay on a secure lomi. page; orders update automatically when payment succeeds.
 
-## Requirements
+<Callout type="info" title="Who this guide is for">
+  **Store owners and admins** — you only need WordPress, a lomi. account, and this page. You do **not** need GitHub or command-line tools.
+</Callout>
 
-- WordPress **6.2+**, PHP **7.4+**
-- WooCommerce **9.6+** (see plugin header in source)
-- Store currency **XOF**, **USD**, or **EUR** (gateway validates supported currencies)
-- HTTPS recommended for production
+## Before you start
 
-Source: [plugin header / readme](https://github.com/lomiafrica/woo/blob/main/woo-lomi.php)
-
-## Install
-
-### GitHub release (recommended)
-
-Official zips are published on the [lomi. monorepo releases](https://github.com/lomiafrica/lomi./releases) when maintainers push a **`woo-v*`** tag (for example `woo-v1.002.0`). The asset name is always **`woo-lomi.zip`**.
-
-- Browse [releases tagged `woo-v*`](https://github.com/lomiafrica/lomi./releases?q=woo-v&expanded=true) and download `woo-lomi.zip` from the release you need.
-- Direct URL pattern: `https://github.com/lomiafrica/lomi./releases/download/<tag>/woo-lomi.zip` (example: `.../woo-v1.002.0/woo-lomi.zip`).
-
-If no `woo-v*` release is listed yet, use **build from source** below or contact your lomi. representative for a current zip.
-
-Source and release tooling live in the [woo repository](https://github.com/lomiafrica/woo); CI packages the zip from that repo when a `woo-v*` tag is pushed on `lomiafrica/lomi.`.
-
-### Build from source
-
-```bash
-git clone https://github.com/lomiafrica/woo.git
-cd woo
-npm ci
-npm run release
-```
-
-Upload `dist/woo-lomi.zip` (versioned copy: `dist/woo-lomi-{version}.zip`).
-
-### Upload in WordPress
-
-1. **Plugins → Add New → Upload Plugin** → choose `woo-lomi.zip`.
-2. **Activate** lomi. for WooCommerce.
-
-## Setup checklist
-
-1. Install **lomi. for WooCommerce** and activate WooCommerce.
-2. Go to **WooCommerce → Settings → Payments → lomi.** (or **Set up**).
-3. Review the **Setup health** panel (API key, currency, webhook secret, HTTPS, test mode, `GET /me`).
-4. Enable the gateway; choose **Test mode** while integrating.
-5. Paste **Test/Live secret API keys** and matching **webhook signing secrets** from [dashboard.lomi.africa](https://dashboard.lomi.africa).
-6. Copy the **webhook URL** shown at the top of the settings page into **Dashboard → Webhooks** (same signing secret as configured in Woo).
-7. Enable webhook events **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**.
-
-## Payment flow
-
-1. Customer selects **lomi.** and places the order.
-2. Plugin calls `POST /v1/checkout-sessions` with success/cancel URLs and metadata (`wc_order_id`, etc.).
-3. Customer completes payment on lomi. Checkout.
-4. **Return URL** hits the WooCommerce API listener (`WC_Gateway_Lomi`), which loads `GET /v1/checkout-sessions/{id}` and completes the order when status is `completed`.
-5. **Webhook** `PAYMENT_SUCCEEDED` can finalize the order if the return URL is delayed; signature verified with `X-Lomi-Signature` over the raw body.
-6. On success the plugin stores **`_lomi_transaction_id`**, **`_lomi_subscription_id`** (subscriptions), and **`_lomi_price_id`** on the Woo order.
-
-Implementation reference: [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/woo/blob/main/includes/class-wc-gateway-lomi.php)
-
-## Refunds
-
-- **From WooCommerce:** order screen → Refund when `_lomi_transaction_id` is present → `POST /refunds`.
-- **From dashboard:** payouts, balance, and fallback refunds stay in [dashboard.lomi.africa](https://dashboard.lomi.africa).
-- **`REFUND_COMPLETED` webhook:** adds an order note when a refund was initiated outside Woo (no double refund).
-
-## WooCommerce Subscriptions
-
-1. On each subscription product (or variation), set **lomi price ID** in the product editor **lomi.** tab (`_lomi_price_id`).
-2. Checkout is **blocked** if a subscription line has no mapping.
-3. First payment sends `price_id` / `product_id` to `POST /checkout-sessions` so lomi creates a subscription.
-4. **Renewals** are billed by lomi. subscription engine, WooCommerce does not auto-charge renewals with hosted checkout.
-
-## Webhooks
-
-| Header | Role |
+| Requirement | Details |
 | --- | --- |
-| `X-Lomi-Event` | `PAYMENT_SUCCEEDED` completes orders; `REFUND_COMPLETED` adds refund notes |
-| `X-Lomi-Signature` | HMAC-SHA256 hex of raw body, secret = dashboard webhook secret |
+| WordPress | **6.2+** |
+| WooCommerce | **9.6+** (install from **Plugins → Add New** if needed) |
+| Store currency | **XOF**, **USD**, or **EUR** |
+| lomi. account | [Create one free](https://dashboard.lomi.africa/onboarding) |
+| HTTPS | Required in production (for webhooks and checkout return URLs) |
 
-Always verify on the **exact raw bytes** received, do not re-stringify JSON.
+---
 
-## Go-live and QA
+## Step 1 — Get your lomi. API keys
 
-Use the shared checklist before production:
+1. Sign in to [dashboard.lomi.africa](https://dashboard.lomi.africa).
+2. Open **Settings → Access tokens** (or **Developers → API keys**).
+3. Copy your **Test secret key** (`lomi_sk_test_…`) — you will paste it in WooCommerce in step 4.
 
-- [Verify payments](/build/guides/verify-payments)
-- [Shared technical contract](/build/ecommerce-extensions)
+<DocsScreenshot name="start/api-keys" alt="Test and live API keys in the lomi. dashboard" />
 
-## More docs
+Keep **Test mode** on in the dashboard while setting up. See [API keys](/start/api-keys) for details.
 
-- [E‑commerce hub](/build/ecommerce-extensions)
-- Merchant-facing readme (WordPress.org format): [readme.txt](https://github.com/lomiafrica/woo/blob/main/readme.txt)
+---
+
+## Step 2 — Download the plugin
+
+<DocsDownloadButton
+  href="/downloads/woo-lomi.zip"
+  label="Download lomi. for WooCommerce"
+  version="1.003.1"
+  filename="woo-lomi.zip"
+/>
+
+The file is **`woo-lomi.zip`**. Save it on your computer (Downloads folder is fine). You will upload it in the next step.
+
+<Callout type="warn" title="Download not working?">
+  If the button returns an error, contact [lomi. support](https://lomi.africa/contact) or your account manager — we will send you the current zip. Maintainers also publish the same file on [GitHub Releases](https://github.com/lomiafrica/lomi./releases) (`woo-v*` tags).
+</Callout>
+
+---
+
+## Step 3 — Install in WordPress
+
+<Steps>
+
+### Open the upload screen
+
+In WordPress admin: **Plugins → Add New → Upload Plugin**.
+
+<DocsScreenshot name="build/woocommerce-upload" alt="WordPress Plugins screen with Upload Plugin selected" />
+
+### Upload the zip
+
+1. Click **Choose File** and select **`woo-lomi.zip`**.
+2. Click **Install Now**, then **Activate Plugin**.
+
+You should see **lomi. for WooCommerce** in your plugins list as **Active**.
+
+</Steps>
+
+---
+
+## Step 4 — Enable lomi. in WooCommerce
+
+<Steps>
+
+### Open payment settings
+
+Go to **WooCommerce → Settings → Payments → lomi.** (click **Manage** or **Set up**).
+
+<DocsScreenshot name="build/woocommerce-payments" alt="WooCommerce lomi. payment settings with Setup health panel" />
+
+### Configure test mode
+
+1. Turn **Enable lomi.** on.
+2. Turn **Test mode** on while testing.
+3. Paste your **Test secret key** from step 1.
+4. Click **Save changes**.
+
+### Check Setup health
+
+The **Setup health** panel should show:
+
+- **API secret key** — Configured
+- **API connection** — `GET /me` succeeded
+- **Store currency** — XOF, USD, or EUR
+
+Fix any row marked **Action required** before continuing.
+
+</Steps>
+
+---
+
+## Step 5 — Connect webhooks
+
+Webhooks tell WooCommerce when a customer has paid (even if they close the browser before returning to your shop).
+
+<Steps>
+
+### Copy the webhook URL from WooCommerce
+
+At the top of **WooCommerce → Settings → Payments → lomi.**, copy the **Webhook URL** (use the **Copy URL** button).
+
+<DocsScreenshot name="build/woocommerce-webhook-url" alt="lomi. WooCommerce settings showing webhook URL and copy button" />
+
+### Create the endpoint in lomi.
+
+1. Open [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Developers → Webhooks** (or **Settings → Webhooks**).
+2. **Add endpoint** — paste the URL from WooCommerce.
+3. Enable events **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**.
+4. Copy the **signing secret** (`whsec_…`).
+
+<DocsScreenshot name="build/woocommerce-webhook-dashboard" alt="lomi. dashboard webhook endpoint with PAYMENT_SUCCEEDED enabled" />
+
+### Paste the webhook secret in WooCommerce
+
+Back in **WooCommerce → Payments → lomi.**, paste the signing secret into **Test webhook secret**, then **Save changes**.
+
+The **Webhook signing secret** row in Setup health should show **Configured**.
+
+</Steps>
+
+---
+
+## Step 6 — Run a test payment
+
+1. Add a product to your store and go to **Checkout**.
+2. Select **lomi.** as the payment method — you should see the **lomi. branding card** (pay-with image and payment icons).
+
+<DocsScreenshot name="build/woocommerce-checkout" alt="WooCommerce checkout with lomi. branding card selected" />
+
+3. Place the order — you are redirected to **lomi. Checkout** (sandbox while test mode is on).
+4. Pay with test card **`4242 4242 4242 4242`** (any future expiry, any CVC). See [Sandbox payments](/start/sandbox-payments).
+5. Confirm the WooCommerce order status is **Processing** or **Completed**.
+
+If the order stays **Pending payment**, check the webhook secret and that **`PAYMENT_SUCCEEDED`** is enabled on your dashboard endpoint.
+
+---
+
+## Go live
+
+When you are ready for real payments:
+
+1. In WooCommerce, turn **Test mode** **off**.
+2. Paste your **Live secret key** and **Live webhook secret** (create a **live** webhook endpoint in the dashboard with the same WooCommerce URL).
+3. Run one small real payment and confirm the order completes.
+
+See also [Verify payments](/build/guides/verify-payments).
+
+---
+
+## Refunds, subscriptions, and webhooks (reference)
+
+**Refunds** — From the WooCommerce order screen when the payment is linked; otherwise from the [dashboard](https://dashboard.lomi.africa).
+
+**WooCommerce Subscriptions** — Map each subscription product to a **lomi price ID** in the product editor **lomi.** tab. Renewals are billed by lomi., not WooCommerce.
+
+**Webhook headers** — `X-Lomi-Event`, `X-Lomi-Signature` (HMAC-SHA256 hex of the raw body). Details: [Handling webhooks](/build/advanced-guides/handling-webhooks).
+
+---
+
+## Theme and checkout compatibility
+
+The lomi. **branding card** (pay-with image, payment icons, secure-checkout hint) is rendered by the plugin. The **payment option row** around it (radio button, border, spacing) is controlled by WooCommerce and your WordPress theme.
+
+<Callout type="info" title="Recommended setup">
+  Use the **WooCommerce Checkout block** (not the legacy `[woocommerce_checkout]` shortcode). Block checkout is more consistent across themes and is what we test most often.
+</Callout>
+
+### What we support
+
+| Checkout type | Support level | Notes |
+| --- | --- | --- |
+| **WooCommerce Blocks** checkout | **Recommended** | WC 9.6–10.x; plugin ships layout fixes for the payment radio row |
+| **Classic** WooCommerce checkout | Supported | Uses `.payment_method_lomi` styles in the plugin CSS |
+
+### Themes tested before release
+
+We smoke-test the branding card on:
+
+| Theme | Checkout | Status |
+| --- | --- | --- |
+| **Storefront** (WooCommerce default) | Blocks + classic | Tested |
+| **Twenty Twenty-Four** | Blocks | Tested |
+| **Block themes** (FSE) | Blocks | Generally compatible |
+
+Popular builder themes (Astra, Divi, Elementor, etc.) may add checkout CSS that shifts spacing. The plugin uses namespaced classes (`.wc-lomi-checkout-branding`) and targeted overrides so the card stays readable in most cases.
+
+### If the payment row looks wrong
+
+1. **Hard-refresh** checkout (or clear cache) after updating the plugin — styles are versioned (`checkout-branding.css?ver=…`).
+2. Confirm you are on **block checkout** (**Pages → Checkout** should use the Checkout block).
+3. Temporarily switch to **Storefront** or **Twenty Twenty-Four** — if lomi. looks correct there, the issue is theme-specific CSS.
+4. Check **Appearance → Customize → Additional CSS** for rules targeting `.wc-block-checkout` or `.payment_method_*`.
+5. Contact [lomi. support](https://lomi.africa/contact) with your theme name, WooCommerce version, and a screenshot — include whether you use Blocks or classic checkout.
+
+<Callout type="warn" title="Theme changes">
+  Switching themes can change payment-option layout. That is expected in the WordPress ecosystem — not a sign that lomi. is misconfigured. Re-test checkout after any theme or WooCommerce major update.
+</Callout>
+
+---
+
+## For developers
+
+GitHub, source builds, and API internals are documented separately:
+
+- [E‑commerce hub](/build/ecommerce-extensions) — shared API contract
+- [woo repository](https://github.com/lomiafrica/woo) — plugin source
+- Build zip locally: `pnpm run release` in the woo package (contributors only)

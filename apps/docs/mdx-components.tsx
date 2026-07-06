@@ -18,12 +18,14 @@ import { DocsScreenshot } from '@/components/docs/docs-screenshot';
 import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 import { InlineCommand } from '@/components/docs/inline-command';
 import { Callout } from '@/components/docs/docs-callout';
+import { DocsDownloadButton } from '@/components/docs/docs-download-button';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...(icons as unknown as MDXComponents),
     ...defaultMdxComponents,
     Callout,
+    DocsDownloadButton,
     ...TabsComponents,
     ...FilesComponents,
     Accordion,
