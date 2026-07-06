@@ -1,19 +1,17 @@
+import { callScalar, dbDescribe, withRollback } from './support/client';
 import {
-  callScalar,
-  dbDescribe,
-  withRollback,
-  type Db,
-} from './support/client';
-import {
-  createCustomer,
-  createOrgWithAdmin,
   createProduct,
   createPrice,
   createSubscription,
-  ensureReferenceData,
   getSubscription,
   getTransaction,
 } from './support/seed';
+import {
+  accountBalance,
+  completedCreditedLiveTx,
+  createTx,
+  seedPaymentCtx as seedCtx,
+} from './support/payments';
 
 /**
  * Core payment-processing logic that the earlier transactions suite did not
@@ -21,93 +19,6 @@ import {
  * triggers (subscription activation), and the refund ledger / balance-reversal
  * paths (generic + Stripe card).
  */
-
-interface Ctx {
-  organizationId: string;
-  merchantId: string;
-  customerId: string;
-}
-
-async function seedCtx(
-  client: Db,
-  environment: 'test' | 'live' = 'live',
-): Promise<Ctx> {
-  await ensureReferenceData(client);
-  const { organizationId, merchantId } = await createOrgWithAdmin(client);
-  const customerId = await createCustomer(client, organizationId, {
-    environment,
-  });
-  return { organizationId, merchantId, customerId };
-}
-
-interface TxOverrides {
-  amount?: number;
-  provider?: string;
-  method?: string;
-  environment?: 'test' | 'live';
-  subscriptionId?: string | null;
-}
-
-async function createTx(
-  client: Db,
-  ctx: Ctx,
-  o: TxOverrides = {},
-): Promise<string> {
-  return callScalar<string>(client, 'public.create_transaction', {
-    p_merchant_id: ctx.merchantId,
-    p_organization_id: ctx.organizationId,
-    p_customer_id: ctx.customerId,
-    p_amount: o.amount ?? 5000,
-    p_currency_code: 'XOF',
-    p_provider_code: o.provider ?? 'WAVE',
-    p_payment_method_code: o.method ?? 'MOBILE_MONEY',
-    p_description: 'payment-processing harness txn',
-    p_product_id: null,
-    p_subscription_id: o.subscriptionId ?? null,
-    p_metadata: {},
-    p_quantity: 1,
-    p_environment: o.environment ?? 'live',
-    p_price_id: null,
-    p_is_pos: false,
-  });
-}
-
-async function accountBalance(
-  client: Db,
-  organizationId: string,
-  currency = 'XOF',
-): Promise<number | null> {
-  const res = await client.query(
-    `SELECT balance FROM public.accounts
-      WHERE organization_id = $1 AND currency_code = $2`,
-    [organizationId, currency],
-  );
-  return res.rows.length ? Number(res.rows[0].balance) : null;
-}
-
-/**
- * Create a live payment, complete it, and credit the merchant account so the
- * refund-reversal paths have a real balance to debit. Returns the transaction
- * id plus the net amount that was credited (XOF).
- */
-async function completedCreditedLiveTx(
-  client: Db,
-  ctx: Ctx,
-  o: TxOverrides = {},
-): Promise<{ txId: string; net: number; gross: number }> {
-  const gross = o.amount ?? 5000;
-  const txId = await createTx(client, ctx, { ...o, environment: 'live' });
-  await callScalar<boolean>(client, 'public.update_transaction_status', {
-    p_transaction_id: txId,
-    p_status: 'completed',
-    p_metadata: {},
-  });
-  await callScalar<boolean>(client, 'public.update_balances_for_transaction', {
-    p_transaction_id: txId,
-  });
-  const tx = await getTransaction(client, txId);
-  return { txId, net: Number(tx?.net_amount), gross };
-}
 
 dbDescribe('Payment processing :: process_payment', () => {
   it('creates a pending payment transaction', async () => {
