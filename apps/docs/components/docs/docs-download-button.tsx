@@ -10,6 +10,8 @@ type DocsDownloadButtonProps = {
   version?: string;
   /** Suggested filename for the browser save dialog */
   filename?: string;
+  /** Optional in-page anchor for cross-doc links (doctool / lint fragment validation) */
+  id?: string;
   className?: string;
 };
 
@@ -19,10 +21,12 @@ export function DocsDownloadButton({
   label,
   version,
   filename,
+  id,
   className,
 }: DocsDownloadButtonProps) {
   return (
     <div
+      id={id}
       className={cn(
         'not-prose my-6 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-fd-muted/30 p-4',
         className,

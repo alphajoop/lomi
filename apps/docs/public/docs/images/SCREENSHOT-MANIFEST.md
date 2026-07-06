@@ -1,6 +1,8 @@
 # Docs screenshots — manual capture guide
 
-You need **28 files** (12 screens × light + dark). Drop them in this folder; docs pages pick them up automatically — **no MDX edits** if filenames match.
+You need **34 files** (17 screens × light + dark). Drop them in this folder; docs pages pick them up automatically — **no MDX edits** if filenames match.
+
+**CI:** `dt check` (monorepo root) runs `pnpm lint`, `pnpm docs:drift`, and `pnpm screenshots:verify` in `apps/docs`.
 
 ```
 apps/docs/public/docs/images/
@@ -47,10 +49,10 @@ Copy this list and tick as you go:
 - [ ] `build/subscriptions-light.webp` + `build/subscriptions-dark.webp`
 - [ ] `build/customer-portal-light.webp` + `build/customer-portal-dark.webp`
 - [ ] `build/lomi-ui-light.webp` + `build/lomi-ui-dark.webp`
-- [ ] `build/woocommerce-upload-light.webp` + `build/woocommerce-upload-dark.webp`
-- [ ] `build/woocommerce-payments-light.webp` + `build/woocommerce-payments-dark.webp`
-- [ ] `build/woocommerce-webhook-url-light.webp` + `build/woocommerce-webhook-url-dark.webp`
-- [ ] `build/woocommerce-webhook-dashboard-light.webp` + `build/woocommerce-webhook-dashboard-dark.webp`
+- [x] `build/woocommerce-upload-light.webp` + `build/woocommerce-upload-dark.webp`
+- [x] `build/woocommerce-payments-light.webp` + `build/woocommerce-payments-dark.webp`
+- [x] `build/woocommerce-webhook-url-light.webp` + `build/woocommerce-webhook-url-dark.webp`
+- [x] `build/woocommerce-webhook-dashboard-light.webp` + `build/woocommerce-webhook-dashboard-dark.webp`
 - [x] `build/woocommerce-checkout-light.webp` + `build/woocommerce-checkout-dark.webp`
 
 ---
