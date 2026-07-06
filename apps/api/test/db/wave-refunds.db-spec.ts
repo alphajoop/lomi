@@ -139,13 +139,18 @@ dbDescribe('Wave refunds :: create_wave_refund_request_api', () => {
 });
 
 dbDescribe('Wave refunds :: rollback + provider confirmation', () => {
-  it('rollback_wave_refund restores the exact pre-refund balance', async () => {
+  it('rollback_wave_refund restores the exact pre-refund balance (fee not double-credited)', async () => {
     await withRollback(async (client) => {
       const ctx = await seedPaymentCtx(client, 'live');
-      const { txId, gross } = await completedCreditedLiveTx(client, ctx, {
+      // gross 5000, net 4900 => a real 100 XOF original fee. The rollback must
+      // credit back only the net that was debited (4900), NOT net + original fee.
+      const { txId, gross, net } = await completedCreditedLiveTx(client, ctx, {
         provider: 'WAVE',
         method: 'MOBILE_MONEY',
+        amount: 5000,
+        netAmount: 4900,
       });
+      expect(net).toBeLessThan(gross);
       const beforeRefund = await accountBalance(client, ctx.organizationId);
 
       const refund = await requestWaveRefund(client, {

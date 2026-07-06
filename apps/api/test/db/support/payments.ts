@@ -37,6 +37,12 @@ export interface TxOverrides {
   method?: string;
   environment?: 'test' | 'live';
   subscriptionId?: string | null;
+  /**
+   * Force the stored net_amount (< gross) to model a real provider fee. The DB
+   * seed carries no Wave fee config, so without this net == gross and the
+   * fee-sensitive reversal math cannot be exercised.
+   */
+  netAmount?: number;
 }
 
 export async function createTx(
@@ -87,6 +93,13 @@ export async function completedCreditedLiveTx(
 ): Promise<{ txId: string; net: number; gross: number }> {
   const gross = o.amount ?? 5000;
   const txId = await createTx(client, ctx, { ...o, environment: 'live' });
+  if (o.netAmount !== undefined) {
+    await client.query(
+      `UPDATE public.transactions SET net_amount = $2, fee_amount = $3
+        WHERE transaction_id = $1`,
+      [txId, o.netAmount, gross - o.netAmount],
+    );
+  }
   await callScalar<boolean>(client, 'public.update_transaction_status', {
     p_transaction_id: txId,
     p_status: 'completed',

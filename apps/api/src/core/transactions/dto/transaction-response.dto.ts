@@ -122,6 +122,14 @@ export class TransactionResponseDto {
   net_amount: number;
 
   @ApiProperty({
+    example: 2500.0,
+    description:
+      'Cumulative amount refunded to the customer across completed refunds on this transaction',
+    type: Number,
+  })
+  refunded_amount: number;
+
+  @ApiProperty({
     example: 'XOF',
     description: 'Currency code',
     type: String,
