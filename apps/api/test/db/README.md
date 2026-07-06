@@ -49,10 +49,14 @@ pnpm test:db -- transactions      # a single suite
 | `support/seed.ts` | dependency-ordered seed helpers (org, merchant, customer, product, price, account, subscription, meter) + read helpers |
 | `_contract.db-spec.ts` | connectivity + verifies every targeted RPC exists |
 | `transactions.db-spec.ts` | creation, status transitions, balance crediting, expiry, refunds |
-| `subscriptions.db-spec.ts` | create / activate / cancel (added after harness validation) |
-| `renewal.db-spec.ts` | billing-date advance, dunning/retries (added after harness validation) |
-| `usage-billing.db-spec.ts` | enqueue/process events, meter aggregation, period close (added after harness validation) |
-| `other.db-spec.ts` | refunds ledger, checkout sessions, payouts, discounts (added after harness validation) |
+| `payment-processing.db-spec.ts` | `process_payment`, completion triggers, refund balance reversal, Stripe card refunds |
+| `checkout-confirmation.db-spec.ts` | Wave / MTN / Stripe / GIM checkout confirm → credit |
+| `wave-refunds.db-spec.ts` | Wave refund request, rollback, provider confirmation |
+| `payouts-wave-refunds.db-spec.ts` | Wave partial refund via beneficiary payout + fee charges |
+| `subscriptions.db-spec.ts` | first charge / signup terms, trial conversion, cancel, update |
+| `renewal.db-spec.ts` | billing-date advance, dunning/retries, renewal dedup, cancel-at-period-end |
+| `usage-billing.db-spec.ts` | enqueue/process events, charge calculation, period close |
+| `discounts.db-spec.ts` | `validate_coupon_for_checkout` happy path + rejection cases |
 
 ## Writing a test
 

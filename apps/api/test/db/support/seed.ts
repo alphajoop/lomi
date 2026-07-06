@@ -364,3 +364,75 @@ export async function getEvent(
   );
   return res.rows[0];
 }
+
+export interface CouponOptions {
+  code?: string;
+  discountType?: 'percentage' | 'fixed';
+  discountPercentage?: number;
+  discountFixedAmount?: number;
+  customerType?: 'all' | 'new' | 'returning';
+  isActive?: boolean;
+  maxUses?: number | null;
+  maxQuantityPerUse?: number | null;
+  expiresAt?: string | null;
+  validFrom?: string | null;
+  environment?: Environment;
+  scopeType?: 'organization_wide' | 'specific_products' | 'specific_prices';
+}
+
+export async function createCoupon(
+  client: Db,
+  organizationId: string,
+  options: CouponOptions = {},
+): Promise<string> {
+  const suffix = randomUUID().slice(0, 8);
+  const discountType = options.discountType ?? 'percentage';
+  const res = await client.query(
+    `INSERT INTO public.discount_coupons
+       (organization_id, code, discount_type, discount_percentage, discount_fixed_amount,
+        customer_type, is_active, max_uses, max_quantity_per_use, expires_at, valid_from,
+        scope_type, environment)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+     RETURNING coupon_id`,
+    [
+      organizationId,
+      options.code ?? `SAVE${suffix}`.toUpperCase(),
+      discountType,
+      discountType === 'percentage' ? (options.discountPercentage ?? 10) : null,
+      discountType === 'fixed' ? (options.discountFixedAmount ?? 500) : null,
+      options.customerType ?? 'all',
+      options.isActive ?? true,
+      options.maxUses ?? null,
+      options.maxQuantityPerUse ?? null,
+      options.expiresAt ?? null,
+      options.validFrom ?? null,
+      options.scopeType ?? 'organization_wide',
+      options.environment ?? 'live',
+    ],
+  );
+  return res.rows[0].coupon_id as string;
+}
+
+export async function linkCouponToProduct(
+  client: Db,
+  couponId: string,
+  productId: string,
+): Promise<void> {
+  await client.query(
+    `INSERT INTO public.coupon_product_links (coupon_id, product_id)
+     VALUES ($1, $2)
+     ON CONFLICT (coupon_id, product_id) DO NOTHING`,
+    [couponId, productId],
+  );
+}
+
+export async function getCoupon(
+  client: Db,
+  couponId: string,
+): Promise<Record<string, unknown> | undefined> {
+  const res = await client.query(
+    `SELECT * FROM public.discount_coupons WHERE coupon_id = $1`,
+    [couponId],
+  );
+  return res.rows[0];
+}

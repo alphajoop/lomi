@@ -47,6 +47,7 @@ const REQUIRED_FUNCTIONS = [
   'enqueue_usage_event',
   'process_usage_event',
   'create_meter',
+  'create_usage_subscription',
   'close_usage_billing_period',
   'calculate_usage_charge',
   // other
