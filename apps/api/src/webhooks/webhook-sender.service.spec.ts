@@ -152,4 +152,80 @@ describe('WebhookSenderService', () => {
       expect(mockedDeliverMerchantWebhook).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('prepareWebhookPayload', () => {
+    it('uses a stable outbox id when provided', () => {
+      const payload = service.prepareWebhookPayload(
+        'PAYMENT_SUCCEEDED',
+        { id: 'tx_123' },
+        'outbox_stable_id',
+      );
+
+      expect(payload.id).toBe('outbox_stable_id');
+      expect(payload.event).toBe('PAYMENT_SUCCEEDED');
+      expect(payload.data).toEqual({ id: 'tx_123' });
+    });
+
+    it('generates a random id when no stable outbox id is provided', () => {
+      const first = service.prepareWebhookPayload('PAYMENT_SUCCEEDED', {
+        id: 'tx_123',
+      });
+      const second = service.prepareWebhookPayload('PAYMENT_SUCCEEDED', {
+        id: 'tx_123',
+      });
+
+      expect(first.id).toBeTruthy();
+      expect(second.id).toBeTruthy();
+      expect(first.id).not.toBe(second.id);
+    });
+  });
+
+  describe('sendWebhookWithContext', () => {
+    const webhook: Webhook = {
+      id: 'wh_123',
+      url: 'https://example.com/webhook',
+      events: ['PAYMENT_SUCCEEDED'],
+      secret: 'secret_123',
+      active: true,
+      organization_id: 'org_123',
+    };
+    const event = 'PAYMENT_SUCCEEDED';
+    const data = { id: 'tx_123', organization_id: 'org_123' };
+
+    it('calls record_webhook_delivery_attempt when dispatchId is set', async () => {
+      mockedDeliverMerchantWebhook.mockResolvedValue({
+        status: 200,
+        data: 'OK',
+        deliveredUrl: webhook.url,
+        usedAlternateHost: false,
+      });
+      mockSupabaseService.rpc.mockResolvedValue({ data: null, error: null });
+
+      const result = await service.sendWebhookWithContext(
+        webhook,
+        event,
+        data,
+        {
+          dispatchId: 'dispatch_123',
+          outboxId: 'outbox_123',
+          attemptNumber: 1,
+          merchantId: 'merchant_123',
+        },
+      );
+
+      expect(result.success).toBe(true);
+      expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+        'record_webhook_delivery_attempt',
+        expect.objectContaining({
+          p_dispatch_id: 'dispatch_123',
+          p_attempt_number: 1,
+          p_response_status: 200,
+        }),
+      );
+      expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+        'mark_webhook_dispatch_delivered',
+        { p_dispatch_id: 'dispatch_123' },
+      );
+    });
+  });
 });

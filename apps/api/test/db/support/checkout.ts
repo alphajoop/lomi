@@ -1,6 +1,48 @@
 import { randomUUID } from 'node:crypto';
-import { type Db } from './client';
+import { callScalar, type Db } from './client';
 import { type Environment } from './seed';
+
+export type WebhookEventName =
+  | 'PAYMENT_SUCCEEDED'
+  | 'PAYMENT_FAILED'
+  | 'SUBSCRIPTION_RENEWED'
+  | 'SUBSCRIPTION_UPDATED';
+
+export interface OrganizationWebhookOptions {
+  url?: string;
+  events?: WebhookEventName[];
+  verificationToken?: string;
+  environment?: Environment;
+  isActive?: boolean;
+}
+
+/** Insert an organization webhook row for outbox / delivery RPC tests. */
+export async function createOrganizationWebhook(
+  client: Db,
+  organizationId: string,
+  merchantId: string,
+  options: OrganizationWebhookOptions = {},
+): Promise<string> {
+  const suffix = randomUUID().slice(0, 8);
+  const res = await client.query(
+    `INSERT INTO public.webhooks
+       (created_by, organization_id, url, authorized_events, verification_token,
+        environment, is_active)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING webhook_id`,
+    [
+      merchantId,
+      organizationId,
+      options.url ?? `https://example.test/webhook/${suffix}`,
+      options.events ?? ['PAYMENT_SUCCEEDED'],
+      options.verificationToken ??
+        `whsec_${suffix}${randomUUID().replace(/-/g, '')}`,
+      options.environment ?? 'live',
+      options.isActive ?? true,
+    ],
+  );
+  return res.rows[0].webhook_id as string;
+}
 
 /**
  * Checkout / provider-connection seed helpers for DB integration suites.
@@ -20,6 +62,22 @@ export interface ConnectProviderOptions {
   phoneNumber?: string;
   providerMerchantId?: string;
   metadata?: Record<string, unknown>;
+}
+
+/** Connect SPI with default spi account metadata for integration suites. */
+export async function connectSpi(
+  client: Db,
+  organizationId: string,
+  options: ConnectProviderOptions = {},
+): Promise<void> {
+  const suffix = randomUUID().slice(0, 8);
+  await connectProvider(client, organizationId, 'SPI', {
+    ...options,
+    metadata: {
+      spi_account_number: `SN08SPI${suffix.replace(/\D/g, '0').slice(0, 8).padEnd(8, '0')}`,
+      ...options.metadata,
+    },
+  });
 }
 
 export async function connectProvider(
@@ -59,6 +117,66 @@ export interface CheckoutSessionOptions {
   customerId?: string | null;
   status?: 'open' | 'completed' | 'expired';
   expiresInMinutes?: number;
+}
+
+export interface CheckoutSessionRpcOptions {
+  amount?: number;
+  currency?: 'XOF' | 'USD' | 'EUR';
+  environment?: Environment;
+  customerId?: string | null;
+}
+
+/** Call `public.create_checkout_session` with the minimal required RPC args. */
+export async function createCheckoutSessionRpc(
+  client: Db,
+  organizationId: string,
+  merchantId: string,
+  options: CheckoutSessionRpcOptions = {},
+): Promise<Record<string, unknown>> {
+  return callScalar<Record<string, unknown>>(
+    client,
+    'public.create_checkout_session',
+    {
+      p_organization_id: organizationId,
+      p_amount: options.amount ?? 5000,
+      p_currency_code: options.currency ?? 'XOF',
+      p_environment: options.environment ?? 'live',
+      p_created_by: merchantId,
+      p_customer_id: options.customerId ?? null,
+    },
+  );
+}
+
+export interface OrganizationWebhookOptions {
+  url?: string;
+  environment?: Environment;
+  verificationToken?: string;
+}
+
+/** Insert an active org webhook subscribed to PAYMENT_SUCCEEDED. */
+export async function createOrganizationWebhook(
+  client: Db,
+  organizationId: string,
+  merchantId: string,
+  options: OrganizationWebhookOptions = {},
+): Promise<string> {
+  const suffix = randomUUID().slice(0, 8);
+  const res = await client.query(
+    `INSERT INTO public.webhooks
+       (organization_id, url, authorized_events, is_active,
+        verification_token, environment, created_by)
+     VALUES ($1, $2, $3, true, $4, $5, $6)
+     RETURNING webhook_id`,
+    [
+      organizationId,
+      options.url ?? `https://example.test/hooks/${suffix}`,
+      ['PAYMENT_SUCCEEDED'],
+      options.verificationToken ?? `vt_${suffix}`,
+      options.environment ?? 'live',
+      merchantId,
+    ],
+  );
+  return res.rows[0].webhook_id as string;
 }
 
 export async function createCheckoutSession(
@@ -164,14 +282,26 @@ export async function ensureProviderTransaction(
   organizationId: string,
   provider: ProviderCode,
   status: 'processing' | 'succeeded' = 'succeeded',
+  options: { providerCheckoutId?: string } = {},
 ): Promise<void> {
   await client.query(
     `INSERT INTO public.providers_transactions
-       (transaction_id, organization_id, provider_code, provider_payment_status)
-     VALUES ($1, $2, $3, $4)
+       (transaction_id, organization_id, provider_code, provider_payment_status,
+        provider_checkout_id)
+     VALUES ($1, $2, $3, $4, $5)
      ON CONFLICT (transaction_id) DO UPDATE
        SET provider_payment_status = EXCLUDED.provider_payment_status,
+           provider_checkout_id = COALESCE(
+             EXCLUDED.provider_checkout_id,
+             providers_transactions.provider_checkout_id
+           ),
            updated_at = NOW()`,
-    [transactionId, organizationId, provider, status],
+    [
+      transactionId,
+      organizationId,
+      provider,
+      status,
+      options.providerCheckoutId ?? `prov_${randomUUID().slice(0, 12)}`,
+    ],
   );
 }

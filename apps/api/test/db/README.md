@@ -46,17 +46,27 @@ pnpm test:db -- transactions      # a single suite
 | File | Scope |
 | --- | --- |
 | `support/client.ts` | pool, per-test `withRollback`, `callFn`/`callScalar`, `expectRpcError`, service_role claim injection |
-| `support/seed.ts` | dependency-ordered seed helpers (org, merchant, customer, product, price, account, subscription, meter) + read helpers |
+| `support/seed.ts` | dependency-ordered seed helpers (org, merchant, customer, product, price, account, subscription, meter, Stripe card tx, disputes) + read helpers |
+| `support/checkout.ts` | checkout/provider seed helpers (connect, sessions, webhooks, payouts) |
+| `support/payments.ts` | payment ctx, transaction creation, balance reads |
 | `_contract.db-spec.ts` | connectivity + verifies every targeted RPC exists |
 | `transactions.db-spec.ts` | creation, status transitions, balance crediting, expiry, refunds |
 | `payment-processing.db-spec.ts` | `process_payment`, completion triggers, refund balance reversal, Stripe card refunds |
+| `disputes.db-spec.ts` | Stripe dispute create/update/lost effects, lookup helpers |
 | `checkout-confirmation.db-spec.ts` | Wave / MTN / Stripe / GIM checkout confirm → credit |
+| `checkout-sessions.db-spec.ts` | `create_checkout_session`, `get_checkout_session`, line items, free checkout |
 | `wave-refunds.db-spec.ts` | Wave refund request, rollback, provider confirmation |
+| `mtn-refunds.db-spec.ts` | MTN refund request, rollback, provider confirmation |
 | `payouts-wave-refunds.db-spec.ts` | Wave partial refund via beneficiary payout + fee charges |
+| `merchant-payouts.db-spec.ts` | payout fee calculation, Wave payout tx, PIN verification |
+| `stripe-payments.db-spec.ts` | Stripe amount helpers, manual refund, payment failure handler |
+| `spi-checkout.db-spec.ts` | SPI account provision, POS/checkout prepare, `get_pos_transactions` |
+| `pos-fees.db-spec.ts` | `create_transaction` with `p_is_pos` fee path |
 | `subscriptions.db-spec.ts` | first charge / signup terms, trial conversion, cancel, update |
 | `renewal.db-spec.ts` | billing-date advance, dunning/retries, renewal dedup, cancel-at-period-end |
 | `usage-billing.db-spec.ts` | enqueue/process events, charge calculation, period close |
 | `discounts.db-spec.ts` | `validate_coupon_for_checkout` happy path + rejection cases |
+| `webhook-outbox.db-spec.ts` | outbox enqueue, dispatch idempotency, state transitions, pending job fetch |
 
 ## Writing a test
 

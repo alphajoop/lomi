@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { type Db } from './client';
+import { callScalar, type Db } from './client';
 
 /**
  * Minimal, dependency-ordered seed helpers for the DB integration suite.
@@ -433,6 +433,95 @@ export async function getCoupon(
   const res = await client.query(
     `SELECT * FROM public.discount_coupons WHERE coupon_id = $1`,
     [couponId],
+  );
+  return res.rows[0];
+}
+
+export interface StripeCardTxCtx {
+  organizationId: string;
+  merchantId: string;
+  customerId: string;
+}
+
+export interface StripeCardTxOptions {
+  amount?: number;
+  netAmount?: number;
+  stripePaymentIntentId?: string;
+  environment?: Environment;
+}
+
+/**
+ * Completed, balance-credited live Stripe card transaction with
+ * `stripe_payment_intent_id` set for dispute / webhook lookup tests.
+ */
+export async function createStripeCardTransaction(
+  client: Db,
+  ctx: StripeCardTxCtx,
+  options: StripeCardTxOptions = {},
+): Promise<{
+  txId: string;
+  net: number;
+  gross: number;
+  paymentIntentId: string;
+}> {
+  const gross = options.amount ?? 5000;
+  const paymentIntentId =
+    options.stripePaymentIntentId ??
+    `pi_test_${randomUUID().replace(/-/g, '').slice(0, 16)}`;
+
+  const txId = await callScalar<string>(client, 'public.create_transaction', {
+    p_merchant_id: ctx.merchantId,
+    p_organization_id: ctx.organizationId,
+    p_customer_id: ctx.customerId,
+    p_amount: gross,
+    p_currency_code: 'XOF',
+    p_provider_code: 'STRIPE',
+    p_payment_method_code: 'CARDS',
+    p_description: 'stripe card harness txn',
+    p_product_id: null,
+    p_subscription_id: null,
+    p_metadata: {},
+    p_quantity: 1,
+    p_environment: options.environment ?? 'live',
+    p_price_id: null,
+    p_is_pos: false,
+  });
+
+  await client.query(
+    `UPDATE public.transactions
+        SET stripe_payment_intent_id = $2
+      WHERE transaction_id = $1`,
+    [txId, paymentIntentId],
+  );
+
+  if (options.netAmount !== undefined) {
+    await client.query(
+      `UPDATE public.transactions SET net_amount = $2, fee_amount = $3
+        WHERE transaction_id = $1`,
+      [txId, options.netAmount, gross - options.netAmount],
+    );
+  }
+
+  await callScalar<boolean>(client, 'public.update_transaction_status', {
+    p_transaction_id: txId,
+    p_status: 'completed',
+    p_metadata: {},
+  });
+  await callScalar<boolean>(client, 'public.update_balances_for_transaction', {
+    p_transaction_id: txId,
+  });
+
+  const tx = await getTransaction(client, txId);
+  return { txId, net: Number(tx?.net_amount), gross, paymentIntentId };
+}
+
+export async function getDispute(
+  client: Db,
+  disputeId: string,
+): Promise<Record<string, unknown> | undefined> {
+  const res = await client.query(
+    `SELECT * FROM public.disputes WHERE dispute_id = $1`,
+    [disputeId],
   );
   return res.rows[0];
 }

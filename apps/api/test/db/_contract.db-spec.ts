@@ -30,6 +30,8 @@ const REQUIRED_FUNCTIONS = [
   'expire_pending_transactions_with_custom_status',
   'create_refund',
   'update_organization_balance_for_refund',
+  'transaction_has_pending_dispute',
+  'get_dispute_by_stripe_id',
   // subscriptions
   'compute_subscription_next_billing_date',
   'calculate_subscription_first_charge_amount',
@@ -50,9 +52,13 @@ const REQUIRED_FUNCTIONS = [
   'create_usage_subscription',
   'close_usage_billing_period',
   'calculate_usage_charge',
-  // other
+  // payment processing
+  'process_payment',
+  // checkout sessions
   'create_checkout_session',
   'get_checkout_session',
+  'create_checkout_session_with_line_items',
+  'record_free_transaction',
   'validate_coupon_for_checkout',
   // checkout confirmation
   'create_wave_checkout_transaction',
@@ -63,10 +69,38 @@ const REQUIRED_FUNCTIONS = [
   'update_stripe_checkout_status',
   'create_gim_transaction',
   'finalize_gim_payment',
+  // stripe payments / disputes
+  'round_xof_amount',
+  'convert_amount_for_stripe',
+  'prepare_stripe_payment_amount',
+  'create_manual_refund_request_api',
+  'handle_stripe_payment_failure',
+  'handle_stripe_dispute_created',
+  'handle_stripe_dispute_updated',
+  'apply_stripe_dispute_lost_effects',
+  'create_stripe_card_refund',
+  // wave refunds
+  'create_wave_refund_request_api',
+  'rollback_wave_refund',
+  'complete_wave_refund_provider',
+  // mtn refunds
+  'create_mtn_refund_request_api',
+  'rollback_mtn_refund',
+  'complete_mtn_refund_provider',
+  // spi checkout / pos
+  'provision_spi_account',
+  'prepare_checkout_spi_payment',
+  'prepare_pos_spi_payment',
+  'get_pos_transactions',
   // wave partial refund / payout
   'create_beneficiary_payout_with_wave',
   'apply_beneficiary_payout_debit',
   'apply_wave_partial_refund_charges',
+  // merchant payouts
+  'calculate_payout_fee',
+  'create_wave_payout_transaction',
+  'verify_payout_pin',
+  'update_organization_pin_code',
 ] as const;
 
 dbDescribe('DB integration harness :: connectivity + RPC contract', () => {
