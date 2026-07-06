@@ -24,9 +24,20 @@ export async function introspectOAuthAccessToken(
   }
 
   const baseUrl = getLomiApiBaseUrl();
-  const response = await fetch(`${baseUrl}/oauth/introspect`, {
+  const internalKey =
+    process.env.INTERNAL_API_KEY?.trim() ||
+    process.env.CRON_SECRET?.trim() ||
+    '';
+  if (!internalKey) {
+    return { active: false };
+  }
+
+  const response = await fetch(`${baseUrl}/oauth/introspect/mcp`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-internal-key': internalKey,
+    },
     body: JSON.stringify({ token: trimmed }),
   });
 

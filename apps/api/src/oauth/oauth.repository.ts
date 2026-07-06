@@ -176,6 +176,21 @@ export class OAuthRepository {
     > | null;
   }
 
+  async verifyClientSecret(
+    clientId: string,
+    clientSecret: string,
+  ): Promise<boolean> {
+    const { data, error } = await this.supabase.rpc(
+      'oauth_verify_client_secret' as never,
+      {
+        p_client_id: clientId,
+        p_client_secret: clientSecret,
+      } as never,
+    );
+    if (error) throw error;
+    return data === true;
+  }
+
   async revokeToken(token: string) {
     const { data, error } = await this.supabase.rpc(
       'oauth_revoke_token' as never,

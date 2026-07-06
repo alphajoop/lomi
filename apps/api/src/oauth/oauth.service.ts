@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { OAuthRepository } from './oauth.repository';
 
@@ -196,7 +197,42 @@ export class OAuthService {
     throw new BadRequestException('Unsupported grant_type');
   }
 
-  async introspect(body: { token?: string }) {
+  async introspect(body: {
+    token?: string;
+    client_id?: string;
+    client_secret?: string;
+  }) {
+    if (!body.token) {
+      throw new BadRequestException('token is required');
+    }
+    if (!body.client_id) {
+      throw new BadRequestException('client_id is required');
+    }
+
+    await this.assertClientAuthenticated(body.client_id, body.client_secret);
+
+    const row = await this.repository.introspectToken(body.token);
+    if (!row?.active) {
+      return { active: false };
+    }
+
+    if (row.client_id !== body.client_id) {
+      throw new ForbiddenException('client_id does not match token');
+    }
+
+    return {
+      active: true,
+      scope: row.scope,
+      exp: row.exp,
+      client_id: row.client_id,
+      sub: row.sub,
+      provisioning_key_id: row.provisioning_key_id,
+      token_type: row.token_type,
+    };
+  }
+
+  /** Trusted MCP server only — returns provisioning_key for active tokens. */
+  async introspectMcp(body: { token?: string }) {
     if (!body.token) {
       throw new BadRequestException('token is required');
     }
@@ -205,6 +241,33 @@ export class OAuthService {
       return { active: false };
     }
     return row;
+  }
+
+  private async assertClientAuthenticated(
+    clientId: string,
+    clientSecret?: string,
+  ): Promise<void> {
+    const client = await this.repository.getClient(clientId);
+    if (!client) {
+      throw new UnauthorizedException('Invalid client credentials');
+    }
+
+    const authMethod = String(client.token_endpoint_auth_method ?? 'none');
+    if (authMethod === 'none') {
+      return;
+    }
+
+    if (!clientSecret) {
+      throw new UnauthorizedException('client_secret is required');
+    }
+
+    const valid = await this.repository.verifyClientSecret(
+      clientId,
+      clientSecret,
+    );
+    if (!valid) {
+      throw new UnauthorizedException('Invalid client credentials');
+    }
   }
 
   async revoke(body: { token?: string }) {

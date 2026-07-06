@@ -291,6 +291,7 @@ export class CardChargeService {
         payment_intent_id: paymentIntentId,
         error: txError.message,
       });
+      throw new NotFoundException('Payment intent not found');
     }
 
     const transaction =
@@ -319,6 +320,11 @@ export class CardChargeService {
         if (merchantId !== memberMerchantId) {
           throw new ForbiddenException('Access denied to this payment intent');
         }
+      }
+    } else {
+      const metaOrgId = paymentIntent.metadata?.organization_id;
+      if (!metaOrgId || metaOrgId !== user.organizationId) {
+        throw new NotFoundException('Payment intent not found');
       }
     }
 

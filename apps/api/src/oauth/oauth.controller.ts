@@ -11,6 +11,7 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { SupabaseSessionGuard } from '../core/common/guards/supabase-session.guard';
+import { InternalApiKeyGuard } from '../core/common/guards/internal-api-key.guard';
 import { OAuthConsentDto, OAuthRegisterClientDto } from './dto/oauth.dto';
 import { OAuthService } from './oauth.service';
 
@@ -89,8 +90,20 @@ export class OAuthController {
 
   @Post('oauth/introspect')
   @ApiOperation({ summary: 'Token introspection (RFC 7662)' })
-  introspect(@Body() body: { token?: string }) {
+  introspect(
+    @Body()
+    body: { token?: string; client_id?: string; client_secret?: string },
+  ) {
     return this.service.introspect(body);
+  }
+
+  @Post('oauth/introspect/mcp')
+  @UseGuards(InternalApiKeyGuard)
+  @ApiOperation({
+    summary: 'MCP-internal token introspection (includes provisioning_key)',
+  })
+  introspectMcp(@Body() body: { token?: string }) {
+    return this.service.introspectMcp(body);
   }
 
   @Post('oauth/revoke')
