@@ -475,24 +475,27 @@ export class CardChargeService {
         createDto.appearance_billing_address;
     }
 
+    const merchantMetadata: Record<string, string> = {};
     if (createDto.metadata) {
       for (const [key, value] of Object.entries(createDto.metadata)) {
         if (value === null || value === undefined) continue;
         if (typeof value === 'string') {
-          baseMetadata[key] = value;
+          merchantMetadata[key] = value;
         } else if (
           typeof value === 'number' ||
           typeof value === 'boolean' ||
           typeof value === 'bigint'
         ) {
-          baseMetadata[key] = String(value);
+          merchantMetadata[key] = String(value);
         } else {
-          baseMetadata[key] = JSON.stringify(value);
+          merchantMetadata[key] = JSON.stringify(value);
         }
       }
     }
 
-    return baseMetadata;
+    // System-controlled keys take precedence: merchant metadata can never override
+    // reconciliation keys like organization_id, merchant_id, source or the Stripe conversion fields.
+    return { ...merchantMetadata, ...baseMetadata };
   }
 
   private async createPendingTransaction(

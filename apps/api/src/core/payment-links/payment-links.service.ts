@@ -43,6 +43,7 @@ export class PaymentLinksService {
       p_price_id: createDto.price_id || null,
       p_created_by: user.merchantId,
       p_environment: environmentFromAuth(user),
+      p_metadata: createDto.metadata ?? null,
     } as never);
 
     if (error) throw new Error(error.message);

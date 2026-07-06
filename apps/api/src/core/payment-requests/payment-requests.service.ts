@@ -54,6 +54,7 @@ export class PaymentRequestsService {
       p_payment_reference: createDto.payment_reference || null,
       p_created_by: user.merchantId,
       p_environment: user.environment || 'live',
+      p_metadata: createDto.metadata ?? null,
       ...(idempotency
         ? {
             p_idempotency_key: idempotency.key,
