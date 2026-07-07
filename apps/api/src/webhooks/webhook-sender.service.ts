@@ -341,7 +341,7 @@ export class WebhookSenderService {
       const clientErr = delivery.status >= 400 && delivery.status < 500;
       if (clientErr && delivery.status === 404) {
         this.logger.warn(
-          `Webhook ${webhook.id} returned 404 for URL ${webhook.url} (org ${webhook.organization_id}) — endpoint not found; verify registered webhook URL`,
+          `Webhook ${webhook.id} returned 404 for URL ${webhook.url} (org ${webhook.organization_id}), endpoint not found; verify registered webhook URL`,
         );
       }
       return {

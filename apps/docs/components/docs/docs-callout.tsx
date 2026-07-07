@@ -27,7 +27,7 @@ type DocsCalloutProps = {
   children?: ReactNode;
 } & Omit<ComponentProps<'div'>, 'title'>;
 
-/** Minimal callout for MDX — no default icon, discreet tinted surface. */
+/** Minimal callout for MDX: no default icon, discreet tinted surface. */
 export function DocsCallout({
   title,
   type: inputType = 'info',

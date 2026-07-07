@@ -197,7 +197,7 @@ function normalizePublicOperationTags(document: OpenAPIObject): OpenAPIObject {
   };
 }
 
-/** Provider ingress — must never ship in the public merchant OpenAPI artifact. */
+/** Provider ingress, must never ship in the public merchant OpenAPI artifact. */
 const FORBIDDEN_PROVIDER_INGRESS_PATHS = [
   '/webhooks/stripe',
   '/webhooks/wave',

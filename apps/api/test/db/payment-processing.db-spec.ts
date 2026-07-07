@@ -41,7 +41,7 @@ dbDescribe('Payment processing :: process_payment', () => {
     });
   });
 
-  it('does NOT compute a fee (net == gross) — the simplified path', async () => {
+  it('does NOT compute a fee (net == gross), the simplified path', async () => {
     await withRollback(async (client) => {
       const ctx = await seedCtx(client);
       const txId = await callScalar<string>(client, 'public.process_payment', {

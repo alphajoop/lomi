@@ -58,7 +58,7 @@ _No query parameters._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Request body
 
@@ -69,21 +69,21 @@ Schema: `CreateSwitchChargeDto`
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
 | `amount` | Yes | `number` | Amount in XOF francs |
-| `currency_code` | No | `enum ("XOF")` | — |
-| `pan` | Yes | `string` | — |
+| `currency_code` | No | `enum ("XOF")` | - |
+| `pan` | Yes | `string` | - |
 | `expiry` | Yes | `string` | MM/YY or YYMM |
-| `cvv` | Yes | `string` | — |
-| `customer_id` | No | `string` | — |
-| `customer_email` | No | `string` | — |
-| `customer_name` | No | `string` | — |
-| `customer_phone` | No | `string` | — |
-| `description` | No | `string` | — |
-| `payment_reference` | No | `string` | — |
-| `product_id` | No | `string` | — |
-| `subscription_id` | No | `string` | — |
-| `checkout_session_id` | No | `string` | — |
-| `quantity` | No | `number` | — |
-| `metadata` | No | `object` | — |
+| `cvv` | Yes | `string` | - |
+| `customer_id` | No | `string` | - |
+| `customer_email` | No | `string` | - |
+| `customer_name` | No | `string` | - |
+| `customer_phone` | No | `string` | - |
+| `description` | No | `string` | - |
+| `payment_reference` | No | `string` | - |
+| `product_id` | No | `string` | - |
+| `subscription_id` | No | `string` | - |
+| `checkout_session_id` | No | `string` | - |
+| `quantity` | No | `number` | - |
+| `metadata` | No | `object` | - |
 | `ecom_ip` | No | `string` | Customer IP for EComIp |
 
 Example body:

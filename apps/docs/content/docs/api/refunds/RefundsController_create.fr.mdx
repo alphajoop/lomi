@@ -20,7 +20,7 @@ Pour annuler tout ou partie d’un paiement éligible déjà terminé (rembourse
 
 ### À savoir
 
-**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable — pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
+**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable; pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
 
 ### Voir aussi
 
@@ -56,7 +56,7 @@ _Aucun paramètre de requête._
 
 | Nom | Emplacement | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | Non | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Corps de la requête
 

@@ -33,7 +33,7 @@ async function bootstrap() {
   });
 
   // Raw body capture for inbound provider webhook signature verification only.
-  // Do not mount on `/webhooks` root — that path serves merchant webhook CRUD (JSON body).
+  // Do not mount on `/webhooks` root, that path serves merchant webhook CRUD (JSON body).
   const providerWebhookPaths = [
     '/webhooks/stripe',
     '/webhooks/wave',

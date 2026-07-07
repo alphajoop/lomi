@@ -56,7 +56,7 @@ _No query parameters._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Request body
 
@@ -66,16 +66,16 @@ Schema: `CreateMtnChargeDto`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `amount` | Yes | `number` | — |
-| `currency` | Yes | `string` | — |
-| `organizationId` | No | `string` | — |
-| `merchantId` | No | `string` | — |
-| `customer` | Yes | `CustomerDto` | — |
-| `description` | No | `string` | — |
-| `countryCode` | No | `string` | — |
-| `productId` | No | `string` | — |
-| `subscriptionId` | No | `string` | — |
-| `quantity` | No | `number` | — |
+| `amount` | Yes | `number` | - |
+| `currency` | Yes | `string` | - |
+| `organizationId` | No | `string` | - |
+| `merchantId` | No | `string` | - |
+| `customer` | Yes | `CustomerDto` | - |
+| `description` | No | `string` | - |
+| `countryCode` | No | `string` | - |
+| `productId` | No | `string` | - |
+| `subscriptionId` | No | `string` | - |
+| `quantity` | No | `number` | - |
 
 Example body:
 

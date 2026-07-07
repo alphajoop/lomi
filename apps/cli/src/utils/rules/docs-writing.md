@@ -12,7 +12,7 @@ Condensed rules for AI assistants authoring or editing **docs.lomi.africa** cont
 
 1. Fetch https://docs.lomi.africa/llms.txt for the page map.
 2. Pick **docType**: `tutorial` | `how-to` | `explanation` | `reference`.
-3. Reuse canonical pages — do not duplicate sandbox tables or state-machine semantics.
+3. Reuse canonical pages, do not duplicate sandbox tables or state-machine semantics.
 
 ## Voice
 
@@ -24,8 +24,8 @@ Condensed rules for AI assistants authoring or editing **docs.lomi.africa** cont
 
 - **Amounts**: XOF uses **centimes** (integer minor units) unless a page documents otherwise.
 - **Keys**: `lomi_sk_test_…` / `lomi_sk_live_…`; environment follows the **key**, not hostname alone.
-- **Mobile money (live)**: async — verify with webhooks + `GET /transactions/{id}` before fulfilling.
-- **Never trust client-only success** — server-side verification required.
+- **Mobile money (live)**: async, verify with webhooks + `GET /transactions/{id}` before fulfilling.
+- **Never trust client-only success**: server-side verification required.
 
 ## EN + FR
 

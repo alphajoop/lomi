@@ -1188,7 +1188,7 @@ export class RefundsService {
     return customer;
   }
 
-  /** Records refund row only — balance already handled by beneficiary payout. */
+  /** Records refund row only, balance already handled by beneficiary payout. */
   private async recordRefundOnly(params: {
     transactionId: string;
     amount: number;

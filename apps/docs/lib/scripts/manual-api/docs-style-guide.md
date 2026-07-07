@@ -4,9 +4,9 @@
 
 ## Voice and tone
 
-- **Direct and practical** — lead with what the merchant or developer can do, not platform internals.
-- **Confident but not salesy** — state capabilities plainly; avoid superlatives and filler.
-- **Bilingual parity** — French pages mirror English structure; translate `title` and `description`, keep API paths and code samples aligned.
+- **Direct and practical**: lead with what the merchant or developer can do, not platform internals.
+- **Confident but not salesy**: state capabilities plainly; avoid superlatives and filler.
+- **Bilingual parity**: French pages mirror English structure; translate `title` and `description`, keep API paths and code samples aligned.
 
 ## Structure
 
@@ -22,8 +22,8 @@
 
 Frontmatter must include (non-translatable):
 
-- `method`, `path`, `operationId` — must match OpenAPI exactly.
-- `title`, `description` — translatable; French siblings use natural French titles.
+- `method`, `path`, `operationId`: must match OpenAPI exactly.
+- `title`, `description`: translatable; French siblings use natural French titles.
 
 Body sections typically include: overview, request, response, errors, related links.
 
@@ -48,6 +48,6 @@ When drafting or reviewing, compare against:
 
 ## CI and tooling
 
-- `dt check` — lint + TypeScript drift.
-- `dt drift` — Rust drift categories + optional TS script.
-- `dt sync-i18n --check` — locale gap, stale EN segments (lock file), structure mismatch, orphan FR pages.
+- `dt check`: lint + TypeScript drift.
+- `dt drift`: Rust drift categories + optional TS script.
+- `dt sync-i18n --check`: locale gap, stale EN segments (lock file), structure mismatch, orphan FR pages.

@@ -51,7 +51,7 @@ export async function GET() {
   lines.push('# lomi.');
   lines.push('');
   lines.push(
-    "> Francophone West Africa's payment platform: Mobile Money (Wave, MTN, SPI), cards (Visa, Mastercard, Apple Pay, Google Pay), bank transfers across eight UEMOA markets. Use this file as a **map**—then read the linked pages for schemas and examples.",
+    "> Francophone West Africa's payment platform: Mobile Money (Wave, MTN, SPI), cards (Visa, Mastercard, Apple Pay, Google Pay), bank transfers across eight UEMOA markets. Use this file as a **map**: then read the linked pages for schemas and examples.",
   );
   lines.push('');
 
@@ -74,7 +74,7 @@ export async function GET() {
     '- **Amounts (XOF):** integer **centimes** (minor units) unless a field documents otherwise.',
   );
   lines.push(
-    '- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…` — the **API key selects sandbox vs live**, not the hostname alone.',
+    '- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…`, the **API key selects sandbox vs live**, not the hostname alone.',
   );
   lines.push(
     '- **Verify server-side before fulfill:** never trust client-only success; use webhooks + `GET /transactions/{id}`.',
@@ -90,7 +90,7 @@ export async function GET() {
     '3. **Default integration path:** hosted checkout sessions or payment links before direct `/charge/*` calls unless you need a custom server-initiated flow.',
   );
   lines.push(
-    '4. **Environment is determined by the API key**, not the hostname alone—sandbox keys only work against sandbox; live keys only against live.',
+    '4. **Environment is determined by the API key**, not the hostname alone; sandbox keys only work against sandbox; live keys only against live.',
   );
   lines.push(
     '5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.',
@@ -110,12 +110,12 @@ export async function GET() {
   }
   if (verifyPayments) {
     lines.push(
-      `- [${verifyPayments.data.title ?? 'Verify payments'}](${docsOrigin}${verifyPayments.url}) — confirm status before fulfilling.`,
+      `- [${verifyPayments.data.title ?? 'Verify payments'}](${docsOrigin}${verifyPayments.url}), confirm status before fulfilling.`,
     );
   }
   if (paymentLifecycle) {
     lines.push(
-      `- [${paymentLifecycle.data.title ?? 'Payment lifecycle'}](${docsOrigin}${paymentLifecycle.url}) — merchant-facing lifecycle hub.`,
+      `- [${paymentLifecycle.data.title ?? 'Payment lifecycle'}](${docsOrigin}${paymentLifecycle.url}), merchant-facing lifecycle hub.`,
     );
   }
   if (paymentMethodsHub) {
@@ -133,7 +133,7 @@ export async function GET() {
   lines.push('## Authentication and environments');
   lines.push('');
   lines.push(
-    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live—not the request URL alone.**',
+    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live; not the request URL alone.**',
   );
   lines.push('');
   lines.push('- **Sandbox base URL**: `https://sandbox.api.lomi.africa`');
@@ -156,7 +156,7 @@ export async function GET() {
   lines.push('## Payment flows (pick one)');
   lines.push('');
   lines.push(
-    'Choose the path that matches your UX—not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.',
+    'Choose the path that matches your UX, not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.',
   );
   lines.push('');
   const hostedCheckout = pages.find(
@@ -164,7 +164,7 @@ export async function GET() {
   );
   if (hostedCheckout) {
     lines.push(
-      `- **Hosted checkout** — buyer completes payment on the hosted experience: [Create checkout session](${docsOrigin}${hostedCheckout.url}).`,
+      `- **Hosted checkout**: buyer completes payment on the hosted experience: [Create checkout session](${docsOrigin}${hostedCheckout.url}).`,
     );
   }
   const plCreate = pages.find(
@@ -211,7 +211,7 @@ export async function GET() {
   );
   if (usageBillingGuide && metersCreate) {
     lines.push(
-      `- **Usage billing (metered products)** → [${usageBillingGuide.data.title ?? 'Usage billing'}](${docsOrigin}${usageBillingGuide.url}) — meters, usage events, billing periods ([Create meter](${docsOrigin}${metersCreate.url})).`,
+      `- **Usage billing (metered products)** → [${usageBillingGuide.data.title ?? 'Usage billing'}](${docsOrigin}${usageBillingGuide.url}), meters, usage events, billing periods ([Create meter](${docsOrigin}${metersCreate.url})).`,
     );
   }
   const payouts = firstApiPageInFolder(pages, 'payouts');
@@ -253,13 +253,13 @@ export async function GET() {
   lines.push('**Credential types:**');
   lines.push('');
   lines.push(
-    '- **`lomi_partner_*`** — platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.',
+    '- **`lomi_partner_*`**, platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.',
   );
   lines.push(
-    '- **`lomi_prov_*`** — provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).',
+    '- **`lomi_prov_*`**, provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).',
   );
   lines.push(
-    '- **`lomi_oat_*`** — OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.',
+    '- **`lomi_oat_*`**, OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.',
   );
   lines.push('');
   lines.push(
@@ -267,11 +267,11 @@ export async function GET() {
   );
   lines.push('');
   lines.push(
-    '- `POST /partners/v1/provisioning-keys` — mint scoped `lomi_prov_*` for `external_user_ref`',
+    '- `POST /partners/v1/provisioning-keys`, mint scoped `lomi_prov_*` for `external_user_ref`',
   );
-  lines.push('- `GET /partners/v1/provisioning-keys` — list keys');
-  lines.push('- `DELETE /partners/v1/provisioning-keys/{id}` — revoke');
-  lines.push('- `GET /partners/v1/usage` — usage summary');
+  lines.push('- `GET /partners/v1/provisioning-keys`, list keys');
+  lines.push('- `DELETE /partners/v1/provisioning-keys/{id}`, revoke');
+  lines.push('- `GET /partners/v1/usage`, usage summary');
   lines.push('');
   lines.push(
     '**OAuth self-service** (MCP clients with authorization support):',
@@ -292,10 +292,10 @@ export async function GET() {
   lines.push('**Test → live (human-gated):**');
   lines.push('');
   lines.push(
-    '- `POST /provisioning/v1/merchants/{id}/live-activation/request` — agent requests go-live; share `merchant_approval_path` with the human merchant.',
+    '- `POST /provisioning/v1/merchants/{id}/live-activation/request`, agent requests go-live; share `merchant_approval_path` with the human merchant.',
   );
   lines.push(
-    '- `GET /provisioning/v1/merchants/{id}/live-activation/status` — poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).',
+    '- `GET /provisioning/v1/merchants/{id}/live-activation/status`, poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).',
   );
   lines.push(
     '- Merchant approves at `https://dashboard.lomi.africa/connect/go-live` and retrieves `lomi_sk_*` live secret (never via provisioning API). Starter: AI KYC review; registered: admin approval.',
@@ -304,7 +304,7 @@ export async function GET() {
   const mcpPage = pageBySlugPath(pages, 'build/mcp');
   if (mcpPage) {
     lines.push(
-      `- [${mcpPage.data.title ?? 'MCP'}](${docsOrigin}${mcpPage.url}) — tools, prompts, hosted server config`,
+      `- [${mcpPage.data.title ?? 'MCP'}](${docsOrigin}${mcpPage.url}), tools, prompts, hosted server config`,
     );
   }
   lines.push('');
@@ -340,11 +340,11 @@ export async function GET() {
   const psm = pageBySlugPath(pages, 'api/payment-state-machine');
   if (psm) {
     lines.push(
-      `- [${psm.data.title ?? 'Payment state machine'}](${docsOrigin}${psm.url}) — status transitions and balances`,
+      `- [${psm.data.title ?? 'Payment state machine'}](${docsOrigin}${psm.url}), status transitions and balances`,
     );
   } else {
     lines.push(
-      `- [Payment state machine](${docsOrigin}/api/payment-state-machine) — status transitions and balances`,
+      `- [Payment state machine](${docsOrigin}/api/payment-state-machine), status transitions and balances`,
     );
   }
   const mcp = pageBySlugPath(pages, 'build/mcp');
@@ -381,7 +381,7 @@ export async function GET() {
     lines.push(`### ${cat}`);
     for (const entry of sample) {
       lines.push(
-        `- [${entry.title}](${entry.url})${entry.description ? ` — ${entry.description}` : ''}`,
+        `- [${entry.title}](${entry.url})${entry.description ? `, ${entry.description}` : ''}`,
       );
     }
     if (list.length > sample.length) {
@@ -397,7 +397,7 @@ export async function GET() {
     lines.push(`### ${category}`);
     for (const entry of sample) {
       lines.push(
-        `- [${entry.title}](${entry.url})${entry.description ? ` — ${entry.description}` : ''}`,
+        `- [${entry.title}](${entry.url})${entry.description ? `, ${entry.description}` : ''}`,
       );
     }
     if (list.length > sample.length) {

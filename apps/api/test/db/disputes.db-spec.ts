@@ -173,7 +173,7 @@ dbDescribe('Disputes :: dispute lost end-to-end', () => {
 
       // Real entry point: updating to 'lost' transitions the dispute to
       // 'closed' AND applies lost effects (refund + balance debit) in one
-      // call. No manual status patch needed — driving the actual webhook path.
+      // call. No manual status patch needed, driving the actual webhook path.
       const updated = await callScalar<{
         success: boolean;
         status: string;

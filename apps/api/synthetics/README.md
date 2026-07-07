@@ -6,8 +6,8 @@ Daily and on-demand smoke tests against the deployed lomi. API. Catches broken s
 
 - Node 20+ and pnpm (from `apps/api`)
 - Merchant API keys for a dedicated canary account:
-  - `LOMI_TEST_KEY` — `lomi_sk_test_...` (sandbox)
-  - `LOMI_LIVE_KEY` — `lomi_sk_live_...` (live, read-only probes)
+  - `LOMI_TEST_KEY`: `lomi_sk_test_...` (sandbox)
+  - `LOMI_LIVE_KEY`: `lomi_sk_live_...` (live, read-only probes)
 
 ## Run locally
 
@@ -42,7 +42,7 @@ Exit code `0` = all checks passed. Exit code `1` = at least one failure, skip wi
 ## Output
 
 - Console table grouped by service
-- `synthetics/last-run.json` — machine-readable report (uploaded as a CI artifact)
+- `synthetics/last-run.json`: machine-readable report (uploaded as a CI artifact)
 - GitHub Actions step summary when `GITHUB_STEP_SUMMARY` is set
 
 ## What is checked

@@ -12,7 +12,7 @@ export class CreateUsageEventDto {
   @ApiProperty({
     type: String,
     example: 'evt_abc123',
-    description: 'Idempotency key — unique per organization',
+    description: 'Idempotency key, unique per organization',
   })
   @IsString()
   transaction_id: string;

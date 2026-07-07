@@ -16,12 +16,12 @@ const EN_STANDARD_HTTP_RESPONSES: Record<string, string> = {
   '201': 'Created successfully',
   '202': 'Accepted',
   '204': 'No content',
-  '400': 'Bad request — invalid or missing parameters',
+  '400': 'Bad request, invalid or missing parameters',
   '401': 'Invalid or missing API key',
-  '403': 'Forbidden — insufficient permissions',
+  '403': 'Forbidden, insufficient permissions',
   '404': 'Resource not found',
-  '409': 'Conflict — resource state prevents this action',
-  '422': 'Unprocessable entity — validation failed',
+  '409': 'Conflict, resource state prevents this action',
+  '422': 'Unprocessable entity, validation failed',
   '429': 'Too many requests',
   '500': 'Internal server error',
   '502': 'Bad gateway',
@@ -34,7 +34,7 @@ export function englishResponseDescription(
 ): string {
   const desc = openApiDescription?.trim() ?? '';
   if (!desc || isLikelyFrench(desc)) {
-    return EN_STANDARD_HTTP_RESPONSES[statusCode] ?? (desc || '—');
+    return EN_STANDARD_HTTP_RESPONSES[statusCode] ?? (desc || ', ');
   }
   return desc;
 }

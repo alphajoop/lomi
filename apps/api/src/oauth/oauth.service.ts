@@ -231,7 +231,7 @@ export class OAuthService {
     };
   }
 
-  /** Trusted MCP server only — returns provisioning_key for active tokens. */
+  /** Trusted MCP server only, returns provisioning_key for active tokens. */
   async introspectMcp(body: { token?: string }) {
     if (!body.token) {
       throw new BadRequestException('token is required');

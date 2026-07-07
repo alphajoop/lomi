@@ -37,8 +37,8 @@ LOMI_PUBLISHABLE_KEY=lomi_pk_test_...
 LOMI_WEBHOOK_SECRET=whsec_...
 ```
 
-- **`LOMI_SECRET_KEY`** — secret key, server-side only (`X-API-KEY` header).
-- **`LOMI_PUBLISHABLE_KEY`** — publishable key for `@lomi./sdk` on the client (`lomi_pk_...`). Also accepts `LOMI_PUBLIC_KEY`.
+- **`LOMI_SECRET_KEY`**: secret key, server-side only (`X-API-KEY` header).
+- **`LOMI_PUBLISHABLE_KEY`**: publishable key for `@lomi./sdk` on the client (`lomi_pk_...`). Also accepts `LOMI_PUBLIC_KEY`.
 - Use **sandbox** URLs and **test** keys while integrating.
 
 ## Card charge flow (end-to-end)
@@ -92,9 +92,9 @@ Or hit this demo server's proxy routes (after `pnpm run dev`):
 ## Production notes
 
 - Keep `LOMI_SECRET_KEY` server-side only.
-- Treat `client_secret` as a short-lived capability — never log it or expose it in URLs.
+- Treat `client_secret` as a short-lived capability, never log it or expose it in URLs.
 - Confirm final payment state via **webhooks** or `GET /charge/card/{id}`.
-- Wave/MTN responses are **async** — show pending UI until webhook or status poll.
+- Wave/MTN responses are **async**: show pending UI until webhook or status poll.
 
 ## Related docs
 

@@ -1,6 +1,6 @@
 # @lomi./embed
 
-Embed lomi. checkout on your site via iframe — modal overlay or inline container.
+Embed lomi. checkout on your site via iframe, modal overlay or inline container.
 
 ## Install
 
@@ -19,7 +19,7 @@ curl -X POST https://api.lomi.africa/v1/checkout-sessions \
   -d '{"amount": 5000, "currency": "XOF", "success_url": "https://yoursite.com/success"}'
 ```
 
-The SDK adds `embedded=true` and `embed_origin` automatically — do not append them yourself.
+The SDK adds `embedded=true` and `embed_origin` automatically, do not append them yourself.
 
 ## Modal (bundler)
 
@@ -74,7 +74,7 @@ Copy `node_modules/@lomi./embed/dist/lomi.js` to your static assets and load it:
 </script>
 ```
 
-There is no CDN — host the file yourself or use npm + your bundler.
+There is no CDN, host the file yourself or use npm + your bundler.
 
 ## Options
 

@@ -2,7 +2,7 @@
 
 MCP server that exposes the **lomi. merchant API** to AI clients (Cursor, Claude Desktop, etc.); same public API as the REST docs, as MCP tools.
 
-**For developers building integrations** — not for lomi. platform admin or self-hosted payment ops.
+**For developers building integrations**: not for lomi. platform admin or self-hosted payment ops.
 
 Integration guide: [docs.lomi.africa/build/mcp](https://docs.lomi.africa/build/mcp)
 
@@ -17,7 +17,7 @@ Most teams use lomi.’s hosted server at `https://mcp.lomi.africa/mcp`.
 | Transport access (hosted server) | `Authorization: Bearer <transport secret from dashboard snippet>` |
 | Your merchant secret key (required for tool calls) | `x-lomi-api-key: <key>` or `x-api-key: <key>` |
 
-The transport secret gates access to the shared MCP endpoint. It is **not** your merchant key — never put your API key in `Authorization` when a transport secret is required.
+The transport secret gates access to the shared MCP endpoint. It is **not** your merchant key, never put your API key in `Authorization` when a transport secret is required.
 
 **Checks (optional):** `GET /health`, `GET /ready` on the same host.
 
@@ -56,7 +56,7 @@ MCP **resources** (`lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://
 
 ## Get a secret key
 
-1. **Dashboard (recommended):** **Developers → API keys → Connect MCP** — device flow or copy a secret key.
+1. **Dashboard (recommended):** **Developers → API keys → Connect MCP**: device flow or copy a secret key.
 2. **Manual:** any secret API key from **Developers → API keys** in the dashboard, used as **`LOMI_SECRET_KEY`** (stdio) or **`x-lomi-api-key`** (HTTP).
 
 ## Contributing

@@ -235,13 +235,13 @@ export class SpiWebhookService {
     if (!webhookSecret) {
       if (isSpiWebhookSecretRequired()) {
         this.logger.error(
-          'SPI_WEBHOOK_SECRET is required in production — rejecting webhook',
+          'SPI_WEBHOOK_SECRET is required in production, rejecting webhook',
         );
         return false;
       }
 
       this.logger.warn(
-        'SPI_WEBHOOK_SECRET not set — accepting unsigned webhooks (development only)',
+        'SPI_WEBHOOK_SECRET not set, accepting unsigned webhooks (development only)',
       );
       return true;
     }

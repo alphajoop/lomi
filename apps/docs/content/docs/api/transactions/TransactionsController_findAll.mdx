@@ -47,22 +47,22 @@ _No path parameters beyond the URL pattern._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `isPos` | query | No | — | Uniquement les transactions points de vente (TPV) |
-| `endDate` | query | No | — | Jusqu'à cette date (format ISO 8601) |
-| `startDate` | query | No | — | À partir de cette date (format ISO 8601) |
-| `pageSize` | query | No | — | Nombre d'éléments par page |
-| `page` | query | No | — | Numéro de page |
-| `paymentMethod` | query | No | — | Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs) |
-| `currency` | query | No | — | Filtrer par code devise (séparés par des virgules pour plusieurs valeurs) |
-| `type` | query | No | — | Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs) |
-| `status` | query | No | — | Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs) |
-| `provider` | query | No | — | Filtrer par code de fournisseur de paiement |
+| `isPos` | query | No | - | Uniquement les transactions points de vente (TPV) |
+| `endDate` | query | No | - | Jusqu'à cette date (format ISO 8601) |
+| `startDate` | query | No | - | À partir de cette date (format ISO 8601) |
+| `pageSize` | query | No | - | Nombre d'éléments par page |
+| `page` | query | No | - | Numéro de page |
+| `paymentMethod` | query | No | - | Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs) |
+| `currency` | query | No | - | Filtrer par code devise (séparés par des virgules pour plusieurs valeurs) |
+| `type` | query | No | - | Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs) |
+| `status` | query | No | - | Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs) |
+| `provider` | query | No | - | Filtrer par code de fournisseur de paiement |
 
 ### Headers
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 
 

@@ -1,6 +1,6 @@
 /* @proprietary license */
 
-/** OpenAPI export graph — no BullMQ workers. */
+/** OpenAPI export graph; no BullMQ workers. */
 import { Module } from '@nestjs/common';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { SupabaseModule } from '../../utils/supabase/supabase.module';

@@ -56,24 +56,24 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `link_type` | Yes | `enum ("product", "instant")` | — |
-| `title` | Yes | `string` | — |
-| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | — |
-| `description` | No | `string` | — |
-| `amount` | No | `number` | — |
-| `product_id` | No | `string` | — |
-| `price_id` | No | `string` | — |
-| `allow_coupon_code` | No | `boolean` | — |
-| `allow_quantity` | No | `boolean` | — |
+| `link_type` | Yes | `enum ("product", "instant")` | - |
+| `title` | Yes | `string` | - |
+| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | - |
+| `description` | No | `string` | - |
+| `amount` | No | `number` | - |
+| `product_id` | No | `string` | - |
+| `price_id` | No | `string` | - |
+| `allow_coupon_code` | No | `boolean` | - |
+| `allow_quantity` | No | `boolean` | - |
 | `require_billing_address` | No | `boolean` | When `true`, show and require billing address on checkout. Default when unset follows org settings, then `false`. See [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields). |
 | `require_name` | No | `boolean` | When `true`, show and require customer name. When `false`, hide the name field (display name falls back to email or phone). Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_name). |
 | `require_email` | No | `boolean` | When `true`, show and require email. When `false`, hide email. Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_email). |
 | `require_phone` | No | `boolean` | When `true`, show and require phone. When `false`, phone is optional if email is visible, or hidden if email is hidden. Default when unset: `false`. See [Checkout form fields](/build/payments/checkout-behavior#require_phone). |
 | `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides `require_*` booleans. |
-| `expires_at` | No | `string` | — |
-| `success_url` | No | `string` | — |
-| `cancel_url` | No | `string` | — |
-| `metadata` | No | `object` | — |
+| `expires_at` | No | `string` | - |
+| `success_url` | No | `string` | - |
+| `cancel_url` | No | `string` | - |
+| `metadata` | No | `object` | - |
 
 Example body:
 
@@ -91,7 +91,7 @@ Example body:
 | Status | Description |
 | --- | --- |
 | `201` | Created successfully |
-| `400` | Bad request — invalid or missing parameters |
+| `400` | Bad request, invalid or missing parameters |
 | `401` | Invalid or missing API key |
 
 ## Errors

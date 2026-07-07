@@ -20,7 +20,7 @@ Wave is the primary mobile-money rail for **UEMOA (XOF)** merchants. Most teams 
 
 ## Direct charge
 
-`POST /charge/wave` requires **XOF** and a nested `customer` object with `name` and `phoneNumber` in E.164 format. The response includes `wave_launch_url` or `checkout_url` — redirect or deep-link the customer.
+`POST /charge/wave` requires **XOF** and a nested `customer` object with `name` and `phoneNumber` in E.164 format. The response includes `wave_launch_url` or `checkout_url`: redirect or deep-link the customer.
 
 <Callout type="warn">
   Wave must be connected in the dashboard with an **Aggregated Merchant ID**. If it is missing, the API returns `400` with `Wave provider not configured for this organization (missing Aggregated Merchant ID)`.

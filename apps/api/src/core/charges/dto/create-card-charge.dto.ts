@@ -42,7 +42,7 @@ export class CreateCardChargeDto {
     type: String,
     example: 'john@example.com',
     description:
-      'Customer email — required together with customer_name when customer_id is omitted.',
+      'Customer email, required together with customer_name when customer_id is omitted.',
   })
   customer_email?: string;
 
@@ -50,7 +50,7 @@ export class CreateCardChargeDto {
     type: String,
     example: 'John Doe',
     description:
-      'Customer display name — required together with customer_email when customer_id is omitted.',
+      'Customer display name, required together with customer_email when customer_id is omitted.',
   })
   customer_name?: string;
 

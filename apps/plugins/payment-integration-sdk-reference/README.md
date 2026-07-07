@@ -1,6 +1,6 @@
 # lomi Hosted Checkout Integration Reference
 
-Minimal Node + Express example for **hosted checkout sessions** (`POST /checkout-sessions`) and webhooks. This is the default merchant integration path—use [direct-charge-integration-reference](../direct-charge-integration-reference) only when you need server-initiated `/charge/*` flows.
+Minimal Node + Express example for **hosted checkout sessions** (`POST /checkout-sessions`) and webhooks. This is the default merchant integration path; use [direct-charge-integration-reference](../direct-charge-integration-reference) only when you need server-initiated `/charge/*` flows.
 
 ## What is included
 
@@ -59,5 +59,5 @@ Use this local route from the demo frontend instead of hardcoding external scrip
 
 ## Docs
 
-- [First payment](/docs/start/first-payment) — sandbox walkthrough
-- [Usage billing](/docs/build/usage-billing) — metered products (separate from hosted checkout)
+- [First payment](/docs/start/first-payment), sandbox walkthrough
+- [Usage billing](/docs/build/usage-billing), metered products (separate from hosted checkout)

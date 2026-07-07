@@ -187,7 +187,7 @@ export function isWwwApexHostnamePair(a: string, b: string): boolean {
   return left === `www.${right}` || right === `www.${left}`;
 }
 
-/** Same path/query, HTTPS only — toggles www. on the hostname. */
+/** Same path/query, HTTPS only, toggles www. on the hostname. */
 export function getWwwApexAlternateUrl(url: string): string | null {
   let parsed: URL;
   try {
@@ -249,7 +249,7 @@ export interface MerchantWebhookDeliveryResult {
 /**
  * POST a webhook payload. If the registered URL redirects apex ↔ www (common),
  * automatically retries the paired hostname once. Redirects are never followed
- * blindly — only pre-approved www/apex variants after SSRF checks.
+ * blindly, only pre-approved www/apex variants after SSRF checks.
  */
 export async function deliverMerchantWebhook(
   webhookUrl: string,
@@ -374,7 +374,7 @@ function buildUnresolvedHostnameMessage(hostname: string): string {
   if (isDevTunnelHostname(hostname)) {
     return (
       `Webhook URL hostname could not be resolved from our delivery network: ${hostname}. ` +
-      'If the tunnel responds locally, ensure it is still running — webhook delivery ' +
+      'If the tunnel responds locally, ensure it is still running, webhook delivery ' +
       'must be able to resolve the hostname on public DNS (e.g. Cloudflare Tunnel / ngrok).'
     );
   }

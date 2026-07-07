@@ -56,7 +56,7 @@ _No query parameters._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Request body
 
@@ -66,9 +66,9 @@ Schema: `UpdateRadarSettingsDto`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `enabled` | No | `boolean` | — |
-| `mode` | No | `enum ("monitor", "block")` | — |
-| `stripe_radar_passthrough` | No | `boolean` | — |
+| `enabled` | No | `boolean` | - |
+| `mode` | No | `enum ("monitor", "block")` | - |
+| `stripe_radar_passthrough` | No | `boolean` | - |
 
 Example body:
 

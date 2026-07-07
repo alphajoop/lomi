@@ -1,6 +1,6 @@
 # Plugin downloads (docs.lomi.africa)
 
-Merchant-facing zips served at `/downloads/*` — linked from docs, **not** from GitHub.
+Merchant-facing zips served at `/downloads/*`: linked from docs, **not** from GitHub.
 
 ## woo-lomi.zip
 

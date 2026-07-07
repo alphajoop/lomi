@@ -17,7 +17,7 @@ import { CheckoutSpiRequestToPayDto } from './dto/checkout-spi-request-to-pay.dt
 
 /**
  * Public, unauthenticated SPI endpoints for the hosted checkout app
- * (checkout.lomi.africa). There is no payer JWT — the `checkoutSessionId`
+ * (checkout.lomi.africa). There is no payer JWT, the `checkoutSessionId`
  * (an unguessable UUID) is the capability. The amount is always derived
  * server-side from the session; the client amount is never trusted.
  */

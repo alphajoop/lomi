@@ -11,7 +11,7 @@ operationId: CustomersController_update
 
 Update a customer
 
-Partial update—send only fields that change (email, phone, metadata, etc.).
+Partial update; send only fields that change (email, phone, metadata, etc.).
 
 
 ### When to use this
@@ -38,7 +38,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | UUID du client |
+| `id` | Yes | - | UUID du client |
 
 ### Query parameters
 
@@ -49,7 +49,7 @@ _No query parameters._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Request body
 
@@ -59,16 +59,16 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `name` | No | `string` | — |
-| `email` | No | `string` | — |
-| `phone_number` | No | `string` | — |
-| `whatsapp_number` | No | `string` | — |
-| `country` | No | `string` | — |
-| `city` | No | `string` | — |
-| `address` | No | `string` | — |
-| `postal_code` | No | `string` | — |
-| `is_business` | No | `boolean` | — |
-| `metadata` | No | `object` | — |
+| `name` | No | `string` | - |
+| `email` | No | `string` | - |
+| `phone_number` | No | `string` | - |
+| `whatsapp_number` | No | `string` | - |
+| `country` | No | `string` | - |
+| `city` | No | `string` | - |
+| `address` | No | `string` | - |
+| `postal_code` | No | `string` | - |
+| `is_business` | No | `boolean` | - |
+| `metadata` | No | `object` | - |
 
 Example body:
 
@@ -86,7 +86,7 @@ Example body:
 | Status | Description |
 | --- | --- |
 | `200` | Success |
-| `400` | Bad request — invalid or missing parameters |
+| `400` | Bad request, invalid or missing parameters |
 | `401` | Invalid or missing API key |
 | `404` | Resource not found |
 

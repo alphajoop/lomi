@@ -156,11 +156,11 @@ After flags are resolved, hosted checkout applies these rules:
 | Goal | Flags |
 | --- | --- |
 | Phone-only checkout | `require_name: false`, `require_email: false`, `require_phone: true`, `require_billing_address: false` |
-| Email only (no phone) | `require_email: true`, `require_phone: false` (phone hidden when email hidden is false — phone stays optional) |
+| Email only (no phone) | `require_email: true`, `require_phone: false` (phone hidden when email hidden is false, phone stays optional) |
 | Hide name, collect email | `require_name: false`, `require_email: true` |
-| Minimal contact (email + optional phone) | Defaults — omit flags or set `require_phone: false` |
+| Minimal contact (email + optional phone) | Defaults, omit flags or set `require_phone: false` |
 
-Example — **phone-only** session:
+Example, **phone-only** session:
 
 ```json
 {
@@ -197,7 +197,7 @@ Organizations can define **custom checkout fields** (text, checkbox, terms, etc.
 
 ### Advanced: `fields` array
 
-On `POST /checkout-sessions` and `POST /payment-links`, you may pass a `fields` array — an ordered list of system and custom field definitions with `visibility` set to `hidden`, `optional`, or `required`. When present, it **overrides** the `require_*` booleans. Most integrations should use the boolean flags; use `fields` only when you need fine-grained ordering or mixed optional/required custom fields via API.
+On `POST /checkout-sessions` and `POST /payment-links`, you may pass a `fields` array, an ordered list of system and custom field definitions with `visibility` set to `hidden`, `optional`, or `required`. When present, it **overrides** the `require_*` booleans. Most integrations should use the boolean flags; use `fields` only when you need fine-grained ordering or mixed optional/required custom fields via API.
 
 ## Customer identity
 

@@ -13,7 +13,7 @@ import type { WorkerOptions } from 'bullmq';
  *
  * `drainDelay` (seconds) is how long the blocking fetch waits on an empty
  * queue. Newly added jobs wake the fetch immediately, so a larger value only
- * delays *delayed/retry* jobs — hence the split below.
+ * delays *delayed/retry* jobs, hence the split below.
  */
 const STALLED_INTERVAL_MS = 300_000;
 

@@ -67,7 +67,7 @@ Maintainer docs: [`apps/mcp/CONTRIBUTING.md`](https://github.com/lomiafrica/lomi
 | Regenerate tools | `pnpm run generate` → commit `src/generated/tools-manifest.json` |
 | Drift CI | `pnpm docs:drift` (OpenAPI ↔ MDX, MCP manifest, agent contracts) |
 | Agent OpenAPI | `cd apps/api && pnpm run openapi:export:agent` → `apps/docs/agent-openapi.json` (agent, provisioning, partners) |
-| OAuth / agent connect env | API: `LOMI_OAUTH_ISSUER`, `LOMI_DASHBOARD_BASE_URL` — MCP: `LOMI_OAUTH_ISSUER`, `LOMI_MCP_RESOURCE_URL` |
+| OAuth / agent connect env | API: `LOMI_OAUTH_ISSUER`, `LOMI_DASHBOARD_BASE_URL`: MCP: `LOMI_OAUTH_ISSUER`, `LOMI_MCP_RESOURCE_URL` |
 | Deploy | `.env.example`, `railway.json` |
 | Tests | `pnpm test` |
 

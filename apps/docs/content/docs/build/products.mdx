@@ -18,8 +18,8 @@ Create a product with one or more prices. At least one price is required.
 
 - `name`, `product_type` (`one_time`, `recurring`, `usage_based`), and a `prices` array are required.
 - Each price needs `amount` and `currency_code`. Recurring products also need `billing_interval` on the price.
-- Recurring-only fields: `trial_enabled`, `trial_period_days`, `failed_payment_action`, `charge_day`, `first_payment_type` — see the API page.
-- Usage-based products: `usage_aggregation`, `usage_unit` — see the API page.
+- Recurring-only fields: `trial_enabled`, `trial_period_days`, `failed_payment_action`, `charge_day`, `first_payment_type`: see the API page.
+- Usage-based products: `usage_aggregation`, `usage_unit`: see the API page.
 
 <Callout type="info">
   **Optional metadata** for recurring products (via `metadata` on create/update): `subscription_length` (`"automatic"` by default) and `fixed_charges` (integer number of billing cycles before expiry). These are not top-level API fields; store them in `metadata`.
@@ -184,7 +184,7 @@ curl -X POST "https://api.lomi.africa/products" \
 
 ## List products
 
-**API reference:** [List products](/api/products/ProductsController_findAll) — supports `isActive`, `limit`, and `offset`.
+**API reference:** [List products](/api/products/ProductsController_findAll), supports `isActive`, `limit`, and `offset`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -216,7 +216,7 @@ curl -X GET "https://api.lomi.africa/products?isActive=true&limit=20" \
 
 ## Get a product
 
-**API reference:** [Get product](/api/products/ProductsController_findOne) — returns the product with all prices.
+**API reference:** [Get product](/api/products/ProductsController_findOne), returns the product with all prices.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 

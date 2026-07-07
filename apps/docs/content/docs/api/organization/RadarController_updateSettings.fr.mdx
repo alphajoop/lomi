@@ -45,7 +45,7 @@ _Aucun paramètre de requête._
 
 | Nom | Emplacement | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | Non | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | Non | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Corps de la requête
 
@@ -55,9 +55,9 @@ Schéma: `UpdateRadarSettingsDto`
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
-| `enabled` | Non | `boolean` | — |
-| `mode` | Non | `enum ("monitor", "block")` | — |
-| `stripe_radar_passthrough` | Non | `boolean` | — |
+| `enabled` | Non | `boolean` | - |
+| `mode` | Non | `enum ("monitor", "block")` | - |
+| `stripe_radar_passthrough` | Non | `boolean` | - |
 
 Exemple de corps :
 
@@ -74,7 +74,7 @@ Exemple de corps :
 
 | Statut | Description |
 | --- | --- |
-| `200` | — |
+| `200` | - |
 
 ## Erreurs
 

@@ -148,9 +148,9 @@ Une fois les indicateurs résolus, le tunnel hébergé applique ces règles :
 | Checkout téléphone seul | `require_name: false`, `require_email: false`, `require_phone: true`, `require_billing_address: false` |
 | E-mail seul (sans téléphone) | `require_email: true`, `require_phone: false` (téléphone optionnel tant que l’e-mail est visible) |
 | Masquer le nom, collecter l’e-mail | `require_name: false`, `require_email: true` |
-| Contact minimal (e-mail + téléphone optionnel) | Défauts — omettre les indicateurs ou `require_phone: false` |
+| Contact minimal (e-mail + téléphone optionnel) | Défauts, omettre les indicateurs ou `require_phone: false` |
 
-Exemple — session **téléphone seul** :
+Exemple, session **téléphone seul** :
 
 ```json
 {
@@ -187,7 +187,7 @@ Les organisations peuvent définir des **champs checkout personnalisés** (texte
 
 ### Avancé : tableau `fields`
 
-Sur `POST /checkout-sessions` et `POST /payment-links`, vous pouvez passer un tableau `fields` — liste ordonnée de champs système et personnalisés avec `visibility` à `hidden`, `optional` ou `required`. S’il est présent, il **remplace** les booléens `require_*`. La plupart des intégrations utilisent les booléens ; réservez `fields` à un ordre fin ou des champs personnalisés mixtes optionnels/obligatoires via l’API.
+Sur `POST /checkout-sessions` et `POST /payment-links`, vous pouvez passer un tableau `fields`: liste ordonnée de champs système et personnalisés avec `visibility` à `hidden`, `optional` ou `required`. S’il est présent, il **remplace** les booléens `require_*`. La plupart des intégrations utilisent les booléens ; réservez `fields` à un ordre fin ou des champs personnalisés mixtes optionnels/obligatoires via l’API.
 
 ## Identité client
 

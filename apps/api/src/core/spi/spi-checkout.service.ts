@@ -42,7 +42,7 @@ type PrepareRpcResult = {
  *
  * Public surface: the payer has no JWT, so this is driven entirely by the
  * `checkout_session_id` (the capability). The session is the source of truth for
- * org / amount / currency / customer — the client amount is never trusted.
+ * org / amount / currency / customer, the client amount is never trusted.
  *
  * Mirrors {@link SpiPosService} but against an existing checkout session
  * (e-commerce category `521`, non-POS). Completion flows through the shared

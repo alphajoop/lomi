@@ -4,8 +4,8 @@ Parent epic: [lomi. #45](https://github.com/lomiafrica/lomi./issues/45).
 
 Use this checklist after plugin changes or before a release. Pair with:
 
-- [DEV-ENV.md](./DEV-ENV.md) — local stacks, tunnels, sandbox keys
-- `./scripts/run-plugin-tests.sh` — automated static + webhook contract checks (CI runs the same)
+- [DEV-ENV.md](./DEV-ENV.md), local stacks, tunnels, sandbox keys
+- `./scripts/run-plugin-tests.sh`: automated static + webhook contract checks (CI runs the same)
 
 **Credentials:** lomi. **sandbox** org only. Never commit API keys or `whsec_…` secrets.
 
@@ -20,10 +20,10 @@ Use this checklist after plugin changes or before a release. Pair with:
 | Public HTTPS | Cloudflare Tunnel or ngrok exposes your local shop (webhooks require a reachable URL) |
 | Store URL | WordPress / PrestaShop / Magento **base URL** matches the tunnel hostname (not `localhost`) when testing redirects |
 | Webhook endpoint | Registered in dashboard → **Developers → Webhooks** with events **`PAYMENT_SUCCEEDED`** (+ **`REFUND_COMPLETED`** on Woo) |
-| Test webhook | Dashboard “Send test webhook” → **HTTP 200** (no order created — expected) |
+| Test webhook | Dashboard “Send test webhook” → **HTTP 200** (no order created, expected) |
 | Currency | Shop currency **XOF**, **USD**, or **EUR** |
 
-**Test card (sandbox):** `4242 4242 4242 4242` — any future expiry, any CVC. More: [Sandbox payments](https://docs.lomi.africa/start/sandbox-payments).
+**Test card (sandbox):** `4242 4242 4242 4242`: any future expiry, any CVC. More: [Sandbox payments](https://docs.lomi.africa/start/sandbox-payments).
 
 ---
 
@@ -42,10 +42,10 @@ docker compose up -d
 2. Install and activate **WooCommerce** (9.6+)
 3. Activate **lomi. for WooCommerce**
 4. Start tunnel: `cloudflared tunnel --url http://localhost:8080`
-5. **Settings → General** — set **Site Address (URL)** to the tunnel HTTPS URL
-6. **WooCommerce → Settings → Payments → lomi.** — enable gateway, **test mode**, paste test secret key + test webhook secret
+5. **Settings → General**: set **Site Address (URL)** to the tunnel HTTPS URL
+6. **WooCommerce → Settings → Payments → lomi.**: enable gateway, **test mode**, paste test secret key + test webhook secret
 7. Copy **Webhook URL** from the settings page → dashboard webhook (events above)
-8. **Setup health** panel — API connection **OK**, webhook secret **Configured**
+8. **Setup health** panel, API connection **OK**, webhook secret **Configured**
 
 ### Checkout branding (#40)
 
@@ -98,7 +98,7 @@ docker compose up -d --build
 
 1. Complete PrestaShop installer → http://localhost:8000
 2. Enable currency **EUR** / **USD** / **XOF**; configure a **shipping carrier**
-3. **Modules → lomi.** → Configure — test mode, keys, webhook secret
+3. **Modules → lomi.** → Configure, test mode, keys, webhook secret
 4. Tunnel HTTPS → update shop URL in **Shop parameters → Traffic & SEO** (or hosts file + tunnel)
 5. Register webhook URL from module config in dashboard
 
@@ -119,7 +119,7 @@ docker compose up -d --build
 | 3 | Order status | **Paid via lomi.** |
 | 4 | Webhook | `PAYMENT_SUCCEEDED` → **200** |
 
-**Logs:** Advanced parameters → Logs — filter `lomi`.
+**Logs:** Advanced parameters → Logs, filter `lomi`.
 
 ---
 
@@ -136,10 +136,10 @@ docker compose up -d --build
 bash setup.sh
 ```
 
-1. Storefront http://localhost:8080 — admin `admin` / `Admin12345!`
+1. Storefront http://localhost:8080, admin `admin` / `Admin12345!`
 2. Tunnel → set `web/unsecure/base_url` and `web/secure/base_url` to tunnel HTTPS URL
-3. **Stores → Configuration → Sales → Payment Methods → lomi.** — test mode + secrets
-4. Dashboard webhook: `https://YOUR-TUNNEL/lomi/payment/webhook` — `PAYMENT_SUCCEEDED`
+3. **Stores → Configuration → Sales → Payment Methods → lomi.**: test mode + secrets
+4. Dashboard webhook: `https://YOUR-TUNNEL/lomi/payment/webhook`: `PAYMENT_SUCCEEDED`
 
 ```bash
 docker compose exec --user www-data magento php app/code/Lomi/Payments/dev/check-webhook-config.php
@@ -203,7 +203,7 @@ Copy into PR or release notes:
 ```
 Platform: Woo / PrestaShop / Magento
 Commit: <submodule SHA>
-Tunnel URL: <ephemeral — do not commit>
+Tunnel URL: <ephemeral; do not commit>
 Date:
 
 [ ] Pre-flight checklist

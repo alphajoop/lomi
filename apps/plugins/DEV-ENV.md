@@ -2,14 +2,14 @@
 
 Documents what contributors need to run and test lomi. e-commerce plugins locally. Parent epic: [lomi. #45](https://github.com/lomiafrica/lomi./issues/45) · issue **#44**.
 
-No production store is required — use **lomi. sandbox (test mode)** and a local or staging shop.
+No production store is required, use **lomi. sandbox (test mode)** and a local or staging shop.
 
 ## Access checklist
 
 | Item | Who provides | Notes |
 | --- | --- | --- |
 | GitHub org access | lomi. team | Required for private submodules: `shopify`, `bubble` |
-| lomi. sandbox org | You or team | [dashboard.lomi.africa](https://dashboard.lomi.africa) — **test** secret key + webhook signing secret |
+| lomi. sandbox org | You or team | [dashboard.lomi.africa](https://dashboard.lomi.africa), **test** secret key + webhook signing secret |
 | HTTPS tunnel | You | Cloudflare Tunnel (or ngrok) so lomi. can POST webhooks to your machine |
 | Submodule clone | You | `git clone --recursive` or `git submodule update --init --recursive` |
 
@@ -80,7 +80,7 @@ CI runs the same script on pull requests.
 
 ## PrestaShop
 
-- Module folder: `prestashop/lomi/` — zip **`lomi/`** only (root of archive = `lomi/`).
+- Module folder: `prestashop/lomi/`: zip **`lomi/`** only (root of archive = `lomi/`).
 - Local: Docker or native PrestaShop 1.7+ / 8.x, currency EUR/USD/XOF, HTTPS for webhooks.
 - See [prestashop/lomi/README.md](prestashop/lomi/README.md) and [E2E.md](./E2E.md).
 
@@ -88,7 +88,7 @@ CI runs the same script on pull requests.
 
 ## Magento 2
 
-- Package: `lomi/magento2-payments` — **not on Packagist**; use Composer VCS or copy to `app/code/Lomi/Payments/`.
+- Package: `lomi/magento2-payments`: **not on Packagist**; use Composer VCS or copy to `app/code/Lomi/Payments/`.
 - Docker dev stack: [`magento/dev`](magento/dev) (see submodule README).
 - Webhooks need a public HTTPS URL (Cloudflare Tunnel or ngrok).
 - See [E2E.md](./E2E.md).
@@ -97,7 +97,7 @@ CI runs the same script on pull requests.
 
 ## Shopify
 
-- Custom install app — no zip. Enable in dashboard → **Settings → Payment channels → Integrations**.
+- Custom install app; no zip. Enable in dashboard → **Settings → Payment channels → Integrations**.
 - Requires org access to private `shopify` submodule.
 - See [docs: Shopify](https://docs.lomi.africa/build/ecommerce-extensions/shopify).
 
@@ -117,12 +117,12 @@ If you are blocked, ask for:
 
 1. **Sandbox** lomi. org with test API key and webhook secret confirmed.
 2. **GitHub** access to private plugin repos you need (Shopify, Bubble).
-3. **Shared staging** shop (optional) — not required if Docker + tunnel works for Woo.
+3. **Shared staging** shop (optional); not required if Docker + tunnel works for Woo.
 
 ---
 
 ## Related docs
 
-- [E2E.md](./E2E.md) — manual smoke matrix per platform
-- [docs.lomi.africa — E‑commerce](https://docs.lomi.africa/build/ecommerce-extensions)
-- [verify-lomi-plugins.sh](./scripts/verify-lomi-plugins.sh) — static contract gate
+- [E2E.md](./E2E.md), manual smoke matrix per platform
+- [docs.lomi.africa, E‑commerce](https://docs.lomi.africa/build/ecommerce-extensions)
+- [verify-lomi-plugins.sh](./scripts/verify-lomi-plugins.sh), static contract gate

@@ -132,7 +132,7 @@ export class ProvisioningController {
   @ApiOperation({
     summary: 'Get live activation request status',
     description:
-      'Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard — not via this API.',
+      'Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard; not via this API.',
   })
   @ApiParam({ name: 'merchantId', type: 'string', format: 'uuid' })
   getLiveActivationStatus(

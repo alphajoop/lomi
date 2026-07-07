@@ -59,7 +59,7 @@ Les webhooks sont essentiels pour les moyens de paiement et les événements hor
 2. Suivez [Configurer les webhooks](/build/webhooks) et [Traiter les webhooks](/build/advanced-guides/handling-webhooks).
 3. Vérifiez la signature sur le corps brut avant de parser le JSON.
 
-**Renouvellements d’abonnement :** les abonnements carte se renouvellent hors session ; écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` de renouvellement. **Wave et MTN** utilisent un **lien checkout de renouvellement manuel** envoyé avant chaque échéance — le client doit payer ce lien ; pas de débit wallet silencieux. Voir [Abonnements : renouvellements](/build/subscriptions#renewals-and-failed-payments).
+**Renouvellements d’abonnement :** les abonnements carte se renouvellent hors session ; écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` de renouvellement. **Wave et MTN** utilisent un **lien checkout de renouvellement manuel** envoyé avant chaque échéance, le client doit payer ce lien ; pas de débit wallet silencieux. Voir [Abonnements : renouvellements](/build/subscriptions#renewals-and-failed-payments).
 
 ## Étape 5: Passer en live
 

@@ -29,7 +29,7 @@ git submodule update --init apps/plugins/woo
 These live alongside the platform plugins (not submodules). Use them as copy-paste examples for merchants and partners:
 
 - **[direct-charge-integration-reference](./direct-charge-integration-reference)**: Direct charges (`POST /charge/*`) with Payment Elements for cards.
-- **[lomi-edupay-connector](./lomi-edupay-connector)**: EduPay (Yele Group) partner connector — direct charges for school fees.
+- **[lomi-edupay-connector](./lomi-edupay-connector)**: EduPay (Yele Group) partner connector, direct charges for school fees.
 - **[payment-integration-reference](./payment-integration-reference)**: Hosted checkout sessions via the raw HTTP API.
 - **[payment-integration-sdk-reference](./payment-integration-sdk-reference)**: Hosted checkout sessions with `@lomi./sdk` and `@lomi./embed`.
 
@@ -49,13 +49,13 @@ For all platform plugins (including private repos you have access to):
 git submodule update --init apps/plugins/woo apps/plugins/prestashop apps/plugins/magento apps/plugins/shopify apps/plugins/bubble
 ```
 
-If a submodule fails with "repository not found", that platform repo is private — request access from the lomi. team. WooCommerce, PrestaShop, and Magento submodules are public.
+If a submodule fails with "repository not found", that platform repo is private, request access from the lomi. team. WooCommerce, PrestaShop, and Magento submodules are public.
 
 ## End-to-end tests and scripts
 
-- **[DEV-ENV.md](./DEV-ENV.md)**: Local dev setup (Docker, Cloudflare Tunnel, sandbox keys) — **start here for new contributors**.
+- **[DEV-ENV.md](./DEV-ENV.md)**: Local dev setup (Docker, Cloudflare Tunnel, sandbox keys), **start here for new contributors**.
 - **[E2E.md](./E2E.md)**: Manual smoke matrix per platform (checkout, webhooks, abandon flows, release tags).
-- **[scripts/run-plugin-tests.sh](./scripts/run-plugin-tests.sh)**: **Automated CI suite** — static parity, webhook contract, Bubble JSON, Woo build + release zip.
+- **[scripts/run-plugin-tests.sh](./scripts/run-plugin-tests.sh)**: **Automated CI suite**: static parity, webhook contract, Bubble JSON, Woo build + release zip.
 - **[scripts/verify-lomi-plugins.sh](./scripts/verify-lomi-plugins.sh)**: Static compliance gate (also run as step 1 of `run-plugin-tests.sh`).
 - **[scripts/scan_broken_images.py](./scripts/scan_broken_images.py)**: Scans Magento, PrestaShop, and Woo trees for broken image path references.
 

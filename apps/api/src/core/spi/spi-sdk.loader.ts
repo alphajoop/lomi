@@ -88,7 +88,7 @@ export async function isPiSpiAuthError(error: unknown): Promise<boolean> {
       return true;
     }
   } catch {
-    // SDK not installed — fall through to status checks
+    // SDK not installed, fall through to status checks
   }
 
   return candidate.status === 401 || candidate.statusCode === 401;

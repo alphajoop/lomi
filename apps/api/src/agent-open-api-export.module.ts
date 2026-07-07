@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 /**
- * Minimal Nest graph for `openapi:export:agent` — Agent surface only.
+ * Minimal Nest graph for `openapi:export:agent`: Agent surface only.
  */
 
 import { Module } from '@nestjs/common';

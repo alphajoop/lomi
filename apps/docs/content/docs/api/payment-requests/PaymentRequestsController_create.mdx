@@ -56,13 +56,13 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `amount` | Yes | `number` | — |
-| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | — |
-| `description` | No | `string` | — |
-| `customer_id` | No | `string` | — |
-| `expiry_date` | Yes | `string` | — |
-| `payment_reference` | No | `string` | — |
-| `metadata` | No | `object` | — |
+| `amount` | Yes | `number` | - |
+| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | - |
+| `description` | No | `string` | - |
+| `customer_id` | No | `string` | - |
+| `expiry_date` | Yes | `string` | - |
+| `payment_reference` | No | `string` | - |
+| `metadata` | No | `object` | - |
 
 Example body:
 
@@ -80,7 +80,7 @@ Example body:
 | Status | Description |
 | --- | --- |
 | `201` | Created successfully |
-| `400` | Bad request — invalid or missing parameters |
+| `400` | Bad request, invalid or missing parameters |
 | `401` | Invalid or missing API key |
 
 ## Errors

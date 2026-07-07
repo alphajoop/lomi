@@ -415,7 +415,7 @@ export class StripeWebhookService {
   }
 
   /**
-   * Handle setup_intent.succeeded — trial or deferred subscription card save (no charge).
+   * Handle setup_intent.succeeded, trial or deferred subscription card save (no charge).
    */
   private async handleSetupIntentSucceeded(setupIntent: Stripe.SetupIntent) {
     const metadata = setupIntent.metadata || {};

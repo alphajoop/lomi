@@ -1,6 +1,6 @@
 /**
  * Deterministic JSON.stringify for object keys (array order preserved).
- * Used for request fingerprints (idempotency) — avoids key-order collisions.
+ * Used for request fingerprints (idempotency), avoids key-order collisions.
  */
 export function stableStringify(value: unknown): string {
   if (value === null || typeof value !== 'object') {

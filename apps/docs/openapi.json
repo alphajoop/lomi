@@ -1765,7 +1765,7 @@
                   "value": {
                     "amount": 25000,
                     "currency_code": "XOF",
-                    "description": "Honoraires conseil — mars",
+                    "description": "Honoraires conseil, mars",
                     "expiry_date": "2026-12-31T23:59:59.000Z",
                     "payment_reference": "INV-2026-042"
                   }
@@ -3790,7 +3790,7 @@
     },
     "/logs": {
       "get": {
-        "description": "Returns paginated logs for the organization. The `type` query parameter selects which log stream to read:\n\n- **api_request** — every authenticated API call (any HTTP status), including request/response payloads\n- **api_error** — server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)\n- **webhook_delivery** — outbound webhook delivery attempts and retries\n- **activity** — organization audit events (configuration changes, security events)",
+        "description": "Returns paginated logs for the organization. The `type` query parameter selects which log stream to read:\n\n- **api_request**: every authenticated API call (any HTTP status), including request/response payloads\n- **api_error**: server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)\n- **webhook_delivery**: outbound webhook delivery attempts and retries\n- **activity**: organization audit events (configuration changes, security events)",
         "operationId": "LogsController_findAll",
         "parameters": [
           {
@@ -7907,12 +7907,12 @@
           "customer_email": {
             "type": "string",
             "example": "john@example.com",
-            "description": "Customer email — required together with customer_name when customer_id is omitted."
+            "description": "Customer email, required together with customer_name when customer_id is omitted."
           },
           "customer_name": {
             "type": "string",
             "example": "John Doe",
-            "description": "Customer display name — required together with customer_email when customer_id is omitted."
+            "description": "Customer display name, required together with customer_email when customer_id is omitted."
           },
           "customer_phone": {
             "type": "string",

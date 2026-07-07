@@ -21,7 +21,7 @@ const QUOTA_ERROR =
  * BullMQ's connection-level `retryStrategy` only reacts when the socket drops.
  * When a provider like Upstash keeps the connection open but rejects every
  * command (e.g. `ReplyError: max requests limit exceeded`), the worker's fetch
- * loop fails instantly and retries with no delay — burning commands and
+ * loop fails instantly and retries with no delay, burning commands and
  * flooding logs. This attaches:
  *   1. Throttled error logging so an outage can't blow the log/cost budget.
  *   2. Exponential backoff via pause/resume so the worker stops hammering Redis

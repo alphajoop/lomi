@@ -91,7 +91,7 @@ export class PaymentRequestsController {
         value: {
           amount: 25000,
           currency_code: 'XOF',
-          description: 'Honoraires conseil — mars',
+          description: 'Honoraires conseil, mars',
           expiry_date: '2026-12-31T23:59:59.000Z',
           payment_reference: 'INV-2026-042',
         },

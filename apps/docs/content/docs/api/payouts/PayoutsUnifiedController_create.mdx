@@ -20,7 +20,7 @@ Use for treasury movements from your lomi. balance.
 
 ### Good to know
 
-Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys—live keys only. MTN returns 400 until supported.
+Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys; live keys only. MTN returns 400 until supported.
 
 ### See also
 
@@ -62,7 +62,7 @@ _No application/json body for this operation._
 | Status | Description |
 | --- | --- |
 | `201` | Created successfully |
-| `400` | Bad request — invalid or missing parameters |
+| `400` | Bad request, invalid or missing parameters |
 
 ## Errors
 

@@ -251,7 +251,7 @@ export function validateWebhookCreateResponse(body: unknown): string | null {
   return null;
 }
 
-/** Validates POST /webhooks/:id/test — sender reached the merchant URL and logged delivery. */
+/** Validates POST /webhooks/:id/test, sender reached the merchant URL and logged delivery. */
 export function validateWebhookTestDeliveryResponse(body: unknown): string | null {
   if (!body || typeof body !== 'object') {
     return 'Expected webhook test delivery response object';

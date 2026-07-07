@@ -248,7 +248,7 @@ const charge = await lomi.charges.createCardCharge({
 console.log(charge.data?.client_secret);
 ```
 
-### Switch charge — server-side card authorization (`POST /charge/switch`)
+### Switch charge, server-side card authorization (`POST /charge/switch`)
 
 For PCI-compliant fintech integrations that authorize cards server-side (not hosted checkout):
 
@@ -319,7 +319,7 @@ try {
   } else if (error instanceof LomiValidationError) {
     console.error('Invalid request:', error.details);
   } else if (error instanceof LomiRateLimitError) {
-    console.error('Rate limited — retry later');
+    console.error('Rate limited, retry later');
   } else if (error instanceof LomiAuthError) {
     console.error(`Auth error [${error.statusCode}]: ${error.message}`);
   }
@@ -331,7 +331,7 @@ try {
 
 ## Configuration Options
 
-Each `LomiSDK` instance is isolated — safe for multi-tenant workers and tests:
+Each `LomiSDK` instance is isolated, safe for multi-tenant workers and tests:
 
 ```typescript
 const lomi = new LomiSDK({

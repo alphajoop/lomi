@@ -33,4 +33,4 @@ Use sandbox test numbers from https://docs.lomi.africa/start/sandbox-payments
 
 ## Confirming payment
 
-Poll charge status or handle `payment.succeeded` (and related) webhooks. Never trust client-side confirmation alone — always verify server-side.
+Poll charge status or handle `payment.succeeded` (and related) webhooks. Never trust client-side confirmation alone, always verify server-side.

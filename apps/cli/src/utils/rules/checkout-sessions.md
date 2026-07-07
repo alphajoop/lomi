@@ -20,11 +20,11 @@ Redirect the customer to `session.url` to complete payment.
 
 ## Key fields
 
-- `merchant_id` — Your lomi. merchant ID
-- `line_items` — Array of `{ price, quantity }` using price IDs from your products
-- `success_url` / `cancel_url` — Redirect URLs after payment
-- `customer_email` — Optional pre-filled email
-- `metadata` — Optional key-value pairs attached to the session
+- `merchant_id`: Your lomi. merchant ID
+- `line_items`: Array of `{ price, quantity }` using price IDs from your products
+- `success_url` / `cancel_url`: Redirect URLs after payment
+- `customer_email`: Optional pre-filled email
+- `metadata`: Optional key-value pairs attached to the session
 
 ## Sandbox testing
 

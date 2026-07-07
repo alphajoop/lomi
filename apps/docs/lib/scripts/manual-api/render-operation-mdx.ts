@@ -299,7 +299,7 @@ function paramRow(
       ? escapeMdxText(p.description)
       : '';
   const nameCell = '`' + (p.name ?? '') + '`';
-  const schemaCell = schema ? `\`${schema}\`` : '—';
+  const schemaCell = schema ? `\`${schema}\`` : ', ';
   return `| ${nameCell} | ${String(p.in)} | ${required} | ${schemaCell} | ${desc} |`;
 }
 
@@ -335,7 +335,7 @@ function responseRows(
           ? escapeMdxText(englishResponseDescription(code, openApiDesc))
           : escapeMdxText(openApiDesc);
     }
-    rows.push(`| \`${code}\` | ${desc || '—'} |`);
+    rows.push(`| \`${code}\` | ${desc || ', '} |`);
   }
   return rows;
 }
@@ -403,7 +403,7 @@ function buildRequestBodySection(
         ? escapeMdxText(fieldSchema.description)
         : '';
       lines.push(
-        `| \`${field}\` | ${required.has(field) ? labels.yes : labels.no} | \`${fieldType}\` | ${fieldDesc || '—'} |`,
+        `| \`${field}\` | ${required.has(field) ? labels.yes : labels.no} | \`${fieldType}\` | ${fieldDesc || ', '} |`,
       );
     }
     lines.push('');
@@ -536,7 +536,7 @@ export function renderOperationPageMdx(input: {
                 'description' in p && typeof p.description === 'string'
                   ? escapeMdxText(p.description)
                   : '';
-              return `| \`${p.name}\` | ${req} | ${schema ? `\`${schema}\`` : '—'} | ${desc} |`;
+              return `| \`${p.name}\` | ${req} | ${schema ? `\`${schema}\`` : ', '} | ${desc} |`;
             }),
           )
           .join('\n');
@@ -584,7 +584,7 @@ export function renderOperationPageMdx(input: {
     enCopy
       ? titleSource
       : (operation.summary ??
-          `${method.toUpperCase()} ${path} — see REST API reference`),
+          `${method.toUpperCase()} ${path}, see REST API reference`),
   );
 
   const pathSample = new Map(

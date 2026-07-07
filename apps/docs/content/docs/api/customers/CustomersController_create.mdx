@@ -52,7 +52,7 @@ _No query parameters._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Request body
 
@@ -62,16 +62,16 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `name` | Yes | `string` | — |
-| `email` | No | `string` | — |
-| `phone_number` | No | `string` | — |
-| `whatsapp_number` | No | `string` | — |
-| `country` | No | `string` | — |
-| `city` | No | `string` | — |
-| `address` | No | `string` | — |
-| `postal_code` | No | `string` | — |
-| `is_business` | No | `boolean` | — |
-| `metadata` | No | `object` | — |
+| `name` | Yes | `string` | - |
+| `email` | No | `string` | - |
+| `phone_number` | No | `string` | - |
+| `whatsapp_number` | No | `string` | - |
+| `country` | No | `string` | - |
+| `city` | No | `string` | - |
+| `address` | No | `string` | - |
+| `postal_code` | No | `string` | - |
+| `is_business` | No | `boolean` | - |
+| `metadata` | No | `object` | - |
 
 Example body:
 
@@ -87,7 +87,7 @@ Example body:
 | Status | Description |
 | --- | --- |
 | `201` | Created successfully |
-| `400` | Bad request — invalid or missing parameters |
+| `400` | Bad request, invalid or missing parameters |
 | `401` | Invalid or missing API key |
 
 ## Errors

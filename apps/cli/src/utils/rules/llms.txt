@@ -1,6 +1,6 @@
 # lomi.
 
-> Francophone West Africa's payment platform: Mobile Money (Wave, MTN, SPI), cards (Visa, Mastercard, Apple Pay, Google Pay), bank transfers across eight UEMOA markets. Use this file as a **map**—then read the linked pages for schemas and examples.
+> Francophone West Africa's payment platform: Mobile Money (Wave, MTN, SPI), cards (Visa, Mastercard, Apple Pay, Google Pay), bank transfers across eight UEMOA markets. Use this file as a **map**: then read the linked pages for schemas and examples.
 
 ## How to use this briefing
 
@@ -11,23 +11,23 @@
 ## Integration quickstart
 
 - **Amounts (XOF):** integer **centimes** (minor units) unless a field documents otherwise.
-- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…` — the **API key selects sandbox vs live**, not the hostname alone.
+- **Keys:** `lomi_sk_test_…` / `lomi_sk_live_…`, the **API key selects sandbox vs live**, not the hostname alone.
 - **Verify server-side before fulfill:** never trust client-only success; use webhooks + `GET /transactions/{id}`.
 
 1. Create a merchant account and API keys in the [dashboard](https://dashboard.lomi.africa).
 2. Build against **sandbox** first (`https://sandbox.api.lomi.africa`), then switch to **live** (`https://api.lomi.africa`) with live keys.
 3. **Default integration path:** hosted checkout sessions or payment links before direct `/charge/*` calls unless you need a custom server-initiated flow.
-4. **Environment is determined by the API key**, not the hostname alone—sandbox keys only work against sandbox; live keys only against live.
+4. **Environment is determined by the API key**, not the hostname alone; sandbox keys only work against sandbox; live keys only against live.
 5. **Mobile money (live) is asynchronous:** the customer approves on device; confirm final status via webhooks and `GET /transactions/{id}` before fulfilling.
 6. Follow the [integration journey](https://docs.lomi.africa/start/integration-journey) for sandbox → webhooks → go-live.
-- [Verify payments](https://docs.lomi.africa/build/guides/verify-payments) — confirm status before fulfilling.
-- [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle) — merchant-facing lifecycle hub.
+- [Verify payments](https://docs.lomi.africa/build/guides/verify-payments), confirm status before fulfilling.
+- [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle), merchant-facing lifecycle hub.
 - Supported countries and rails: [Payment channels](https://docs.lomi.africa/build/payment-channels).
 - Test cards and MoMo sandbox behavior: [Sandbox payments](https://docs.lomi.africa/start/sandbox-payments).
 
 ## Authentication and environments
 
-Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live—not the request URL alone.**
+Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**. **The key determines sandbox vs live; not the request URL alone.**
 
 - **Sandbox base URL**: `https://sandbox.api.lomi.africa`
 - **Live base URL**: `https://api.lomi.africa`
@@ -40,9 +40,9 @@ For **creates** that must not double-charge (payments, payouts), send an idempot
 
 ## Payment flows (pick one)
 
-Choose the path that matches your UX—not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.
+Choose the path that matches your UX, not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.
 
-- **Hosted checkout** — buyer completes payment on the hosted experience: [Create checkout session](https://docs.lomi.africa/api/checkout-sessions/CheckoutSessionsController_create).
+- **Hosted checkout**: buyer completes payment on the hosted experience: [Create checkout session](https://docs.lomi.africa/api/checkout-sessions/CheckoutSessionsController_create).
 - **Shareable payment links** → [Create payment link](https://docs.lomi.africa/api/payment-links/PaymentLinksController_create).
 - **Direct mobile-money charge (server-initiated)** → [Wave charge](https://docs.lomi.africa/api/charge/ChargesController_createWaveCharge) when you are not using hosted checkout.
 - **Embedded card charge** → [Card charge](https://docs.lomi.africa/api/charge/ChargesController_createCardCharge).
@@ -57,16 +57,16 @@ Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the `
 
 **Credential types:**
 
-- **`lomi_partner_*`** — platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.
-- **`lomi_prov_*`** — provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).
-- **`lomi_oat_*`** — OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.
+- **`lomi_partner_*`**, platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.
+- **`lomi_prov_*`**, provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).
+- **`lomi_oat_*`**, OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.
 
 **Partner API** (header `x-lomi-partner-key` or `Authorization: Bearer lomi_partner_*`):
 
-- `POST /partners/v1/provisioning-keys` — mint scoped `lomi_prov_*` for `external_user_ref`
-- `GET /partners/v1/provisioning-keys` — list keys
-- `DELETE /partners/v1/provisioning-keys/{id}` — revoke
-- `GET /partners/v1/usage` — usage summary
+- `POST /partners/v1/provisioning-keys`, mint scoped `lomi_prov_*` for `external_user_ref`
+- `GET /partners/v1/provisioning-keys`, list keys
+- `DELETE /partners/v1/provisioning-keys/{id}`, revoke
+- `GET /partners/v1/usage`, usage summary
 
 **OAuth self-service** (MCP clients with authorization support):
 
@@ -78,11 +78,11 @@ Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the `
 
 **Test → live (human-gated):**
 
-- `POST /provisioning/v1/merchants/{id}/live-activation/request` — agent requests go-live; share `merchant_approval_path` with the human merchant.
-- `GET /provisioning/v1/merchants/{id}/live-activation/status` — poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).
+- `POST /provisioning/v1/merchants/{id}/live-activation/request`, agent requests go-live; share `merchant_approval_path` with the human merchant.
+- `GET /provisioning/v1/merchants/{id}/live-activation/status`, poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).
 - Merchant approves at `https://dashboard.lomi.africa/connect/go-live` and retrieves `lomi_sk_*` live secret (never via provisioning API). Starter: AI KYC review; registered: admin approval.
 
-- [MCP for AI clients](https://docs.lomi.africa/build/mcp) — tools, prompts, hosted server config
+- [MCP for AI clients](https://docs.lomi.africa/build/mcp), tools, prompts, hosted server config
 
 ## Guides to read next
 
@@ -91,7 +91,7 @@ Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the `
 - [Verify payments](https://docs.lomi.africa/build/guides/verify-payments)
 - [Payment lifecycle](https://docs.lomi.africa/build/guides/payment-lifecycle)
 - [Payment channels](https://docs.lomi.africa/build/payment-channels)
-- [Payment state machine](https://docs.lomi.africa/api/payment-state-machine) — status transitions and balances
+- [Payment state machine](https://docs.lomi.africa/api/payment-state-machine), status transitions and balances
 - [MCP for AI clients](https://docs.lomi.africa/build/mcp)
 
 ## Contact and support

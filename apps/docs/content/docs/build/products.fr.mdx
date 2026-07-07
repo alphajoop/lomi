@@ -18,8 +18,8 @@ Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
 
 - `name`, `product_type` (`one_time`, `recurring`, `usage_based`) et un tableau `prices` sont obligatoires.
 - Chaque tarif exige `amount` et `currency_code`. Pour un produit récurrent, ajoutez `billing_interval` sur le tarif.
-- Champs réservés au récurrent : `trial_enabled`, `trial_period_days`, `failed_payment_action`, `charge_day`, `first_payment_type` — voir la page API.
-- Produits à l’usage : `usage_aggregation`, `usage_unit` — voir la page API.
+- Champs réservés au récurrent : `trial_enabled`, `trial_period_days`, `failed_payment_action`, `charge_day`, `first_payment_type`: voir la page API.
+- Produits à l’usage : `usage_aggregation`, `usage_unit`: voir la page API.
 
 <Callout type="info">
   **Métadonnées optionnelles** pour les produits récurrents (via `metadata` à la création / mise à jour) : `subscription_length` (`"automatic"` par défaut) et `fixed_charges` (nombre entier de cycles avant expiration). Ce ne sont pas des champs API de premier niveau ; stockez-les dans `metadata`.
@@ -184,7 +184,7 @@ curl -X POST "https://api.lomi.africa/products" \
 
 ## Lister les produits
 
-**Référence API :** [Lister les produits](/api/products/ProductsController_findAll) — `isActive`, `limit` et `offset`.
+**Référence API :** [Lister les produits](/api/products/ProductsController_findAll), `isActive`, `limit` et `offset`.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -216,7 +216,7 @@ curl -X GET "https://api.lomi.africa/products?isActive=true&limit=20" \
 
 ## Obtenir un produit
 
-**Référence API :** [Obtenir un produit](/api/products/ProductsController_findOne) — renvoie le produit et tous ses tarifs.
+**Référence API :** [Obtenir un produit](/api/products/ProductsController_findOne), renvoie le produit et tous ses tarifs.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 

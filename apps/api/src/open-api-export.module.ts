@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 /**
- * Application graph used only by `openapi:export` — no BullMQ / Redis bootstrap.
+ * Application graph used only by `openapi:export`: no BullMQ / Redis bootstrap.
  */
 
 import { Module } from '@nestjs/common';

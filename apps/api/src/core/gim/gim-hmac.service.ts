@@ -17,7 +17,7 @@ export function gimSecureHash(
     .toUpperCase();
 }
 
-/** Appendix A — request signing (DateTimeLocalTrxn, MerchantId, TerminalId). */
+/** Appendix A, request signing (DateTimeLocalTrxn, MerchantId, TerminalId). */
 export function signGimRequest(
   params: {
     DateTimeLocalTrxn: string;
@@ -36,7 +36,7 @@ export function signGimRequest(
   );
 }
 
-/** Appendix C — return-URL verification. Pass ALL query params except SecureHash. */
+/** Appendix C, return-URL verification. Pass ALL query params except SecureHash. */
 export function verifyGimReturn(
   query: Record<string, string>,
   receivedSecureHash: string,

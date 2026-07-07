@@ -382,7 +382,7 @@ async function main() {
 
   if (!metaAppSecret) {
     console.warn(
-      '\nMETA_APP_SECRET not set — inbound whatsapp-webhook will skip Meta signature verification until you add it.',
+      '\nMETA_APP_SECRET not set, inbound whatsapp-webhook will skip Meta signature verification until you add it.',
     );
   }
 }

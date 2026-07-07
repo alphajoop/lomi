@@ -65,7 +65,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
-    body: 'Creates a hosted checkout session so the buyer completes payment on the hosted checkout experience. Sessions expire—create a fresh session if the link lapses.',
+    body: 'Creates a hosted checkout session so the buyer completes payment on the hosted checkout experience. Sessions expire; create a fresh session if the link lapses.',
     requestBodyIntro:
       'Session payload: provide `amount` (and optional product fields) or `line_items` for a multi-product cart.',
     whenToUse:
@@ -131,7 +131,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   CustomersController_update: {
     summary: 'Update a customer',
-    body: 'Partial update—send only fields that change (email, phone, metadata, etc.).',
+    body: 'Partial update; send only fields that change (email, phone, metadata, etc.).',
     whenToUse:
       'Use when buyers edit their profile or when syncing CRM changes into lomi.',
   },
@@ -155,7 +155,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'List customer subscriptions',
     body: 'Returns subscriptions across customers with filters as exposed by the API.',
     whenToUse:
-      'Use for billing ops dashboards and exports—not the same as org-level [subscriptions](/api/subscriptions/SubscriptionsController_findAll).',
+      'Use for billing ops dashboards and exports; not the same as org-level [subscriptions](/api/subscriptions/SubscriptionsController_findAll).',
     related:
       '[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)',
   },
@@ -298,7 +298,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Withdraw to a registered payout method (self) or pay a beneficiary on mobile rails (wave/SPI).',
     whenToUse: 'Use for treasury movements from your lomi. balance.',
     caveats:
-      'Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys—live keys only. MTN returns 400 until supported.',
+      'Self payouts require payout_method_id; beneficiary wave requires recipient.name and recipient.phone (any mobile number, not payout_method_id). Wave rails (self or beneficiary) return 400 on test API keys; live keys only. MTN returns 400 until supported.',
     related:
       '[List payouts](/api/payouts/PayoutsUnifiedController_findAll) · [Check available balance](/api/balances/AccountsController_checkAvailableBalance)',
   },
@@ -354,7 +354,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for buyer reversals on eligible completed transactions; supports full and partial amounts.',
     caveats:
-      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only—no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.',
+      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only; no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.',
     related:
       '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/refunds)',
   },
@@ -466,7 +466,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Update subscription',
     body: 'Patches an organization subscription (metadata, price, or fields supported by the API).',
     whenToUse:
-      'Use for plan changes initiated from your admin tools—not the customer-portal-scoped [customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_update) API.',
+      'Use for plan changes initiated from your admin tools; not the customer-portal-scoped [customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_update) API.',
     related:
       '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)',
   },
@@ -544,7 +544,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Retry webhook delivery',
     body: 'Re-sends a single failed delivery attempt for debugging after you fix your receiver.',
     whenToUse:
-      'Use from support tools—not a substitute for idempotent handling on your server.',
+      'Use from support tools; not a substitute for idempotent handling on your server.',
     related:
       '[Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findOne)',
   },
@@ -647,7 +647,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Update a meter',
     body: 'Updates filter, aggregation, or active status on an existing meter.',
     whenToUse:
-      'Use when billing rules change—deactivate meters instead of deleting when historical usage must remain.',
+      'Use when billing rules change; deactivate meters instead of deleting when historical usage must remain.',
     related: '[Get meter](/api/meters/MetersController_findOne)',
   },
   MetersController_getBalance: {
@@ -678,7 +678,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Record a usage event',
     body: 'Idempotent usage ingest. Events are processed asynchronously and update meter balances when matched.',
     whenToUse:
-      'Call from your app whenever billable usage occurs—use a stable `transaction_id` per logical event.',
+      'Call from your app whenever billable usage occurs; use a stable `transaction_id` per logical event.',
     caveats:
       'Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage-events/{id}`.',
     related:
@@ -688,7 +688,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Create a usage subscription',
     body: 'Enrolls a customer on a `usage_based` product without an upfront charge. Required before billing metered usage to that customer.',
     whenToUse:
-      'After creating a usage-based product and meter—enroll each customer before sending usage events tied to a subscription.',
+      'After creating a usage-based product and meter; enroll each customer before sending usage events tied to a subscription.',
     related:
       '[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage)',
   },

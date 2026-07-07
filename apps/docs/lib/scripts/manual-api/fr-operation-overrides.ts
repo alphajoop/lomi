@@ -125,7 +125,7 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     whenToUse:
       'Utilisez pour les mouvements de trésorerie depuis votre solde lomi.',
     caveats:
-      'Les retraits self exigent payout_method_id ; les bénéficiaires Wave exigent recipient.name et recipient.phone (pas payout_method_id). Les rails Wave renvoient 400 avec une clé test — clés live uniquement. MTN renvoie 400 tant que non pris en charge.',
+      'Les retraits self exigent payout_method_id ; les bénéficiaires Wave exigent recipient.name et recipient.phone (pas payout_method_id). Les rails Wave renvoient 400 avec une clé test, clés live uniquement. MTN renvoie 400 tant que non pris en charge.',
     related:
       '[Lister les retraits](/api/payouts/PayoutsUnifiedController_findAll) · [Vérifier le solde disponible](/api/balances/AccountsController_checkAvailableBalance)',
   },
@@ -159,7 +159,7 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     whenToUse:
       'Pour annuler tout ou partie d’un paiement éligible déjà terminé (remboursement total ou partiel).',
     caveats:
-      '**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable — pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.',
+      '**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable; pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.',
     related:
       '[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Remboursements](/build/refunds)',
   },

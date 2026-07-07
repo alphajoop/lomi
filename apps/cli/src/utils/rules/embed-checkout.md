@@ -45,7 +45,7 @@ loadLomiCheckout({
 
 ## Rules
 
-- Do **not** append `embedded=true` or `embed_origin` — the SDK adds them.
-- Do **not** use a CDN — host `node_modules/@lomi./embed/dist/lomi.js` or use npm + bundler.
+- Do **not** append `embedded=true` or `embed_origin`: the SDK adds them.
+- Do **not** use a CDN, host `node_modules/@lomi./embed/dist/lomi.js` or use npm + bundler.
 - Reconcile with webhooks; `onComplete` is UX only.
 - Docs: https://docs.lomi.africa/build/embed-widget

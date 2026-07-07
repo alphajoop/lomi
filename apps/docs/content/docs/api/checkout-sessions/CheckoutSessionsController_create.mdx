@@ -11,7 +11,7 @@ operationId: CheckoutSessionsController_create
 
 Create checkout session
 
-Creates a hosted checkout session so the buyer completes payment on the hosted checkout experience. Sessions expire—create a fresh session if the link lapses.
+Creates a hosted checkout session so the buyer completes payment on the hosted checkout experience. Sessions expire; create a fresh session if the link lapses.
 
 
 ### When to use this
@@ -56,7 +56,7 @@ _No query parameters._
 
 | Name | In | Required | Schema | Description |
 | --- | --- | --- | --- | --- |
-| `Lomi-Account` | header | No | — | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
 
 ### Request body
 
@@ -66,34 +66,34 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `amount` | No | `number` | — |
-| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | — |
-| `title` | No | `string` | — |
-| `description` | No | `string` | — |
-| `customer_id` | No | `string` | — |
-| `customer_email` | No | `string` | — |
-| `customer_name` | No | `string` | — |
-| `customer_phone` | No | `string` | — |
-| `customer_city` | No | `string` | — |
-| `customer_country` | No | `string` | — |
-| `customer_address` | No | `string` | — |
-| `customer_postal_code` | No | `string` | — |
-| `product_id` | No | `string` | — |
-| `price_id` | No | `string` | — |
-| `subscription_id` | No | `string` | — |
-| `allow_quantity` | No | `boolean` | — |
-| `quantity` | No | `number` | — |
-| `success_url` | No | `string` | — |
-| `cancel_url` | No | `string` | — |
-| `allow_coupon_code` | No | `boolean` | — |
+| `amount` | No | `number` | - |
+| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | - |
+| `title` | No | `string` | - |
+| `description` | No | `string` | - |
+| `customer_id` | No | `string` | - |
+| `customer_email` | No | `string` | - |
+| `customer_name` | No | `string` | - |
+| `customer_phone` | No | `string` | - |
+| `customer_city` | No | `string` | - |
+| `customer_country` | No | `string` | - |
+| `customer_address` | No | `string` | - |
+| `customer_postal_code` | No | `string` | - |
+| `product_id` | No | `string` | - |
+| `price_id` | No | `string` | - |
+| `subscription_id` | No | `string` | - |
+| `allow_quantity` | No | `boolean` | - |
+| `quantity` | No | `number` | - |
+| `success_url` | No | `string` | - |
+| `cancel_url` | No | `string` | - |
+| `allow_coupon_code` | No | `boolean` | - |
 | `require_billing_address` | No | `boolean` | When `true`, show and require billing address fields. Default when unset follows org checkout settings, then `false`. See [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields). |
 | `require_name` | No | `boolean` | When `true`, show and require customer name. When `false`, hide the name field (display name falls back to email or phone). Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_name). |
 | `require_email` | No | `boolean` | When `true`, show and require email. When `false`, hide email. Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_email). |
 | `require_phone` | No | `boolean` | When `true`, show and require phone. When `false`, phone is optional if email is visible, or hidden if email is hidden. Default when unset: `false`. See [Checkout form fields](/build/payments/checkout-behavior#require_phone). |
 | `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides `require_*` booleans. |
-| `payment_link_id` | No | `string` | — |
-| `metadata` | No | `object` | — |
-| `line_items` | No | `array<object>` | — |
+| `payment_link_id` | No | `string` | - |
+| `metadata` | No | `object` | - |
+| `line_items` | No | `array<object>` | - |
 
 Example body:
 
@@ -109,7 +109,7 @@ Example body:
 | Status | Description |
 | --- | --- |
 | `201` | Created successfully |
-| `400` | Bad request — invalid or missing parameters |
+| `400` | Bad request, invalid or missing parameters |
 | `401` | Invalid or missing API key |
 
 ## Errors

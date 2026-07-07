@@ -137,7 +137,7 @@ function createLomiMcpExpressApp(hostOpts: ReturnType<typeof listenHostOptions>)
       app.use(localhostHostValidation());
     } else if (host === '0.0.0.0' || host === '::') {
       console.warn(
-        `[lomi-mcp] Binding to ${host} without LOMI_MCP_ALLOWED_HOSTS — ensure TLS and auth (LOMI_MCP_BEARER_TOKEN) in production.`,
+        `[lomi-mcp] Binding to ${host} without LOMI_MCP_ALLOWED_HOSTS, ensure TLS and auth (LOMI_MCP_BEARER_TOKEN) in production.`,
       );
     }
   }
