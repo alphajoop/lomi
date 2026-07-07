@@ -76,7 +76,10 @@ dbDescribe('Usage billing :: enqueue + process', () => {
   it('processes a usage event and records meter balance', async () => {
     await withRollback(async (client) => {
       const ctx = await seedUsageCtx(client);
-      const { productId, priceId } = await usageProduct(client, ctx.organizationId);
+      const { productId, priceId } = await usageProduct(
+        client,
+        ctx.organizationId,
+      );
       const subscriptionId = await seedUsageSubscription(
         client,
         ctx,
@@ -136,7 +139,10 @@ dbDescribe('Usage billing :: enqueue + process', () => {
   it('is idempotent when process_usage_event is called twice', async () => {
     await withRollback(async (client) => {
       const ctx = await seedUsageCtx(client);
-      const { productId, priceId } = await usageProduct(client, ctx.organizationId);
+      const { productId, priceId } = await usageProduct(
+        client,
+        ctx.organizationId,
+      );
       const subscriptionId = await seedUsageSubscription(
         client,
         ctx,
@@ -200,7 +206,10 @@ dbDescribe('Usage billing :: close_usage_billing_period', () => {
   it('closes an open billing period for a usage subscription', async () => {
     await withRollback(async (client) => {
       const ctx = await seedUsageCtx(client);
-      const { productId, priceId } = await usageProduct(client, ctx.organizationId);
+      const { productId, priceId } = await usageProduct(
+        client,
+        ctx.organizationId,
+      );
       const subscriptionId = await seedUsageSubscription(
         client,
         ctx,

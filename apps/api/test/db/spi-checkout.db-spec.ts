@@ -6,10 +6,7 @@ import {
   withRollback,
   type Db,
 } from './support/client';
-import {
-  connectSpi,
-  createCheckoutSessionRpc,
-} from './support/checkout';
+import { connectSpi, createCheckoutSessionRpc } from './support/checkout';
 import {
   createOrgWithAdmin,
   createCustomer,

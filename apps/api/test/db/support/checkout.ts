@@ -49,13 +49,7 @@ export async function createOrganizationWebhook(
  * All inserts run inside the caller's rolled-back transaction.
  */
 
-export type ProviderCode =
-  | 'WAVE'
-  | 'MTN'
-  | 'STRIPE'
-  | 'GIM'
-  | 'SPI'
-  | 'FREE';
+export type ProviderCode = 'WAVE' | 'MTN' | 'STRIPE' | 'GIM' | 'SPI' | 'FREE';
 
 export interface ConnectProviderOptions {
   isConnected?: boolean;
@@ -103,7 +97,8 @@ export async function connectProvider(
       organizationId,
       provider,
       options.isConnected ?? true,
-      options.phoneNumber ?? `+22177${suffix.replace(/\D/g, '0').slice(0, 7).padEnd(7, '0')}`,
+      options.phoneNumber ??
+        `+22177${suffix.replace(/\D/g, '0').slice(0, 7).padEnd(7, '0')}`,
       options.providerMerchantId ?? `prov_${suffix}`,
       options.metadata ? JSON.stringify(options.metadata) : null,
     ],

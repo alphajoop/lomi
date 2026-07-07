@@ -1,18 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import {
-  callFn,
-  callScalar,
-  dbDescribe,
-  withRollback,
-} from './support/client';
+import { callFn, callScalar, dbDescribe, withRollback } from './support/client';
 import {
   createCheckoutSession,
   createCheckoutSessionRpc,
 } from './support/checkout';
-import {
-  createStripeCardTransaction,
-  getTransaction,
-} from './support/seed';
+import { createStripeCardTransaction, getTransaction } from './support/seed';
 import {
   accountBalance,
   completedCreditedLiveTx,
@@ -140,15 +132,19 @@ dbDescribe('Stripe payments :: handle_stripe_payment_failure', () => {
       );
 
       const paymentIntentId = `pi_fail_${randomUUID().slice(0, 12)}`;
-      await callScalar<string>(client, 'public.create_stripe_checkout_transaction', {
-        p_merchant_id: ctx.merchantId,
-        p_organization_id: ctx.organizationId,
-        p_customer_id: ctx.customerId,
-        p_amount_xof: 8000,
-        p_stripe_payment_intent_id: paymentIntentId,
-        p_checkout_session_id: checkoutSessionId,
-        p_environment: 'live',
-      });
+      await callScalar<string>(
+        client,
+        'public.create_stripe_checkout_transaction',
+        {
+          p_merchant_id: ctx.merchantId,
+          p_organization_id: ctx.organizationId,
+          p_customer_id: ctx.customerId,
+          p_amount_xof: 8000,
+          p_stripe_payment_intent_id: paymentIntentId,
+          p_checkout_session_id: checkoutSessionId,
+          p_environment: 'live',
+        },
+      );
 
       const result = await callScalar<{
         success: boolean;

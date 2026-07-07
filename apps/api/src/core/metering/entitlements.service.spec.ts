@@ -55,7 +55,10 @@ describe('EntitlementsService', () => {
   });
 
   it('propagates RPC errors from check', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'check failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'check failed' },
+    });
 
     await expect(service.check('cust-1', 'api_access')).rejects.toThrow(
       'check failed',

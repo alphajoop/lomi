@@ -25,7 +25,10 @@ describe('AccountsService', () => {
   });
 
   it('calls list_accounts with organization scope', async () => {
-    mock.rpc.mockResolvedValue({ data: [{ account_id: 'acct-1' }], error: null });
+    mock.rpc.mockResolvedValue({
+      data: [{ account_id: 'acct-1' }],
+      error: null,
+    });
 
     const result = await service.findAll(user);
 

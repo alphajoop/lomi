@@ -57,13 +57,18 @@ describe('CustomerSubscriptionsService', () => {
   });
 
   it('propagates RPC errors from findAll', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'list failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'list failed' },
+    });
 
     await expect(service.findAll(user)).rejects.toThrow('list failed');
   });
 
   it('delegates findOne to SubscriptionsService', async () => {
-    subscriptionsService.findOne.mockResolvedValue({ subscription_id: 'sub-1' });
+    subscriptionsService.findOne.mockResolvedValue({
+      subscription_id: 'sub-1',
+    });
 
     const result = await service.findOne('sub-1', user);
 

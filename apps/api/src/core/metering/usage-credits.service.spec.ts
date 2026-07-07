@@ -67,7 +67,10 @@ describe('UsageCreditsService', () => {
 
   it('propagates credit_usage_wallet RPC errors', async () => {
     metersService.findOne.mockResolvedValue({ meter_id: 'meter-1' });
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'credit failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'credit failed' },
+    });
 
     await expect(
       service.credit(user, {

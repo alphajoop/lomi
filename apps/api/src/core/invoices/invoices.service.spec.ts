@@ -25,7 +25,10 @@ describe('InvoicesService', () => {
   });
 
   it('calls list_customer_invoices_api with organization scope', async () => {
-    mock.rpc.mockResolvedValue({ data: [{ invoice_id: 'inv-1' }], error: null });
+    mock.rpc.mockResolvedValue({
+      data: [{ invoice_id: 'inv-1' }],
+      error: null,
+    });
 
     const result = await service.findAll(user, 'draft', 'cust-1', 10, 0, 'INV');
 
@@ -53,7 +56,10 @@ describe('InvoicesService', () => {
   });
 
   it('propagates RPC errors from findAll', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'invoice list failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'invoice list failed' },
+    });
 
     await expect(service.findAll(user)).rejects.toThrow('invoice list failed');
   });

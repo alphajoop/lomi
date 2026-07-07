@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Job } from 'bullmq';
 import { WebhookQueueProcessor } from './webhook.processor';
-import {
-  WebhookSenderService,
-  type Webhook,
-} from '../webhook-sender.service';
+import { WebhookSenderService, type Webhook } from '../webhook-sender.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 
 describe('WebhookQueueProcessor', () => {

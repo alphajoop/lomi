@@ -67,10 +67,7 @@ export function trackCleanup(
 }
 
 export async function cleanupTrackedOrganizations(): Promise<void> {
-  if (
-    cleanupOrganizationIds.size === 0 &&
-    cleanupMerchantIds.size === 0
-  ) {
+  if (cleanupOrganizationIds.size === 0 && cleanupMerchantIds.size === 0) {
     return;
   }
   const client = await getPool().connect();
@@ -124,9 +121,10 @@ export async function cleanupTrackedOrganizations(): Promise<void> {
       await client.query(`DELETE FROM public.logs WHERE merchant_id = $1`, [
         merchantId,
       ]);
-      await client.query(`DELETE FROM public.merchants WHERE merchant_id = $1`, [
-        merchantId,
-      ]);
+      await client.query(
+        `DELETE FROM public.merchants WHERE merchant_id = $1`,
+        [merchantId],
+      );
       cleanupMerchantIds.delete(merchantId);
     }
   } finally {

@@ -52,7 +52,10 @@ describe('ProvidersService', () => {
   });
 
   it('propagates RPC errors', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'providers failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'providers failed' },
+    });
 
     await expect(service.findAll(user)).rejects.toThrow('providers failed');
   });

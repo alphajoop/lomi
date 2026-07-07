@@ -36,11 +36,14 @@ describe('BillingService', () => {
   });
 
   it('throws when billing cycle RPC errors', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'cycle failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'cycle failed' },
+    });
 
-    await expect(service.executeUsageBillingCycle('2026-07-06')).rejects.toThrow(
-      'cycle failed',
-    );
+    await expect(
+      service.executeUsageBillingCycle('2026-07-06'),
+    ).rejects.toThrow('cycle failed');
   });
 
   it('throws NotFoundException when subscription usage is missing', async () => {

@@ -25,7 +25,10 @@ describe('ProductsService', () => {
   });
 
   it('calls fetch_products with merchant scope', async () => {
-    mock.rpc.mockResolvedValue({ data: [{ product_id: 'prod-1' }], error: null });
+    mock.rpc.mockResolvedValue({
+      data: [{ product_id: 'prod-1' }],
+      error: null,
+    });
 
     const result = await service.findAll(user, true, 10, 0);
 
@@ -52,7 +55,10 @@ describe('ProductsService', () => {
   });
 
   it('propagates RPC errors from findAll', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'products failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'products failed' },
+    });
 
     await expect(service.findAll(user)).rejects.toThrow('products failed');
   });

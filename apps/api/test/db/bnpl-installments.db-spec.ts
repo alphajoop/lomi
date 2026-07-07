@@ -235,10 +235,14 @@ dbDescribe('BNPL installments :: schedule and fees', () => {
       });
       const planId = (planRes.rows[0] as Record<string, unknown>).plan_id;
 
-      const schedule = await callFn(client, 'public.get_customer_bnpl_schedule', {
-        p_customer_id: ctx.customerId,
-        p_plan_id: planId,
-      });
+      const schedule = await callFn(
+        client,
+        'public.get_customer_bnpl_schedule',
+        {
+          p_customer_id: ctx.customerId,
+          p_plan_id: planId,
+        },
+      );
       expect(schedule.rows.length).toBe(3);
 
       const fees = await callFn(client, 'public.get_bnpl_plan_fees', {

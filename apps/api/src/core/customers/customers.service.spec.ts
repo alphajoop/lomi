@@ -52,7 +52,10 @@ describe('CustomersService', () => {
   });
 
   it('propagates RPC errors from findAll', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'list failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'list failed' },
+    });
 
     await expect(service.findAll(user)).rejects.toThrow('list failed');
   });

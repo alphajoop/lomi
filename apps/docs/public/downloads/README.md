@@ -4,12 +4,12 @@ Merchant-facing zips served at `/downloads/*` — linked from docs, **not** from
 
 ## woo-lomi.zip
 
-| Field | Value |
-| --- | --- |
-| File | `woo-lomi.zip` |
-| Version | 1.003.1 |
-| Source | `apps/plugins/woo` after `pnpm run build && pnpm run i18n && ./scripts/release.sh` |
-| Docs button | [WooCommerce guide](/build/ecommerce-extensions/woocommerce) |
+| Field       | Value                                                                              |
+| ----------- | ---------------------------------------------------------------------------------- |
+| File        | `woo-lomi.zip`                                                                     |
+| Version     | 1.003.1                                                                            |
+| Source      | `apps/plugins/woo` after `pnpm run build && pnpm run i18n && ./scripts/release.sh` |
+| Docs button | [WooCommerce guide](/build/ecommerce-extensions/woocommerce)                       |
 
 ### Verify before opening a docs PR
 

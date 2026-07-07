@@ -267,11 +267,9 @@ dbDescribe('Renewal :: subscription_renewal_already_processed', () => {
         nextBillingDate: '2025-03-01',
       });
 
-      await callScalar(
-        client,
-        'public.update_subscription_next_billing_date',
-        { p_subscription_id: subscriptionId },
-      );
+      await callScalar(client, 'public.update_subscription_next_billing_date', {
+        p_subscription_id: subscriptionId,
+      });
 
       const billingDate = '2025-03-01';
       const processed = await callScalar<boolean>(

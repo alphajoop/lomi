@@ -44,7 +44,10 @@ describe('CustomerPortalService', () => {
   });
 
   it('maps list payment methods RPC errors to BadRequestException', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'invalid session' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'invalid session' },
+    });
 
     await expect(service.listPaymentMethods(session)).rejects.toThrow(
       BadRequestException,

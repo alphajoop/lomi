@@ -65,7 +65,10 @@ describe('SpiBalanceSyncService', () => {
   });
 
   it('throws when list_orgs_missing_spi_account RPC errors', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'rpc failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'rpc failed' },
+    });
 
     await expect(service.listOrgsMissingSpiAccount()).rejects.toEqual({
       message: 'rpc failed',

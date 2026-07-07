@@ -31,13 +31,10 @@ describe('SpiPayoutExecutionService', () => {
       .mockResolvedValueOnce({ data: null, error: null });
 
     await expect(
-      service.executeAfterInitiation(
-        'org-1',
-        'pm-1',
-        1000,
-        'XOF',
-        { payout_id: 'payout-1', spi_tx_id: 'SPI-1' },
-      ),
+      service.executeAfterInitiation('org-1', 'pm-1', 1000, 'XOF', {
+        payout_id: 'payout-1',
+        spi_tx_id: 'SPI-1',
+      }),
     ).rejects.toThrow('Payout method not found');
 
     expect(mock.rpc).toHaveBeenCalledWith('fail_spi_payout', {
@@ -50,27 +47,36 @@ describe('SpiPayoutExecutionService', () => {
   it('fails payout when SPI aliases are missing', async () => {
     mock.rpc
       .mockResolvedValueOnce({
-        data: [{ spi_alias_shid: null, spi_alias_mbno: null, spi_account_number: null }],
+        data: [
+          {
+            spi_alias_shid: null,
+            spi_alias_mbno: null,
+            spi_account_number: null,
+          },
+        ],
         error: null,
       })
       .mockResolvedValueOnce({ data: 'payer-alias', error: null })
       .mockResolvedValueOnce({ data: null, error: null });
 
     await expect(
-      service.executeAfterInitiation(
-        'org-1',
-        'pm-1',
-        1000,
-        'XOF',
-        { payout_id: 'payout-1', spi_tx_id: 'SPI-1' },
-      ),
+      service.executeAfterInitiation('org-1', 'pm-1', 1000, 'XOF', {
+        payout_id: 'payout-1',
+        spi_tx_id: 'SPI-1',
+      }),
     ).rejects.toThrow('SPI account or destination alias missing');
   });
 
   it('executes SPI payout and returns status', async () => {
     mock.rpc
       .mockResolvedValueOnce({
-        data: [{ spi_alias_shid: 'payee-alias', spi_alias_mbno: null, spi_account_number: null }],
+        data: [
+          {
+            spi_alias_shid: 'payee-alias',
+            spi_alias_mbno: null,
+            spi_account_number: null,
+          },
+        ],
         error: null,
       })
       .mockResolvedValueOnce({ data: 'payer-alias', error: null })

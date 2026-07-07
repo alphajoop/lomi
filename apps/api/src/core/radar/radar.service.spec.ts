@@ -29,9 +29,18 @@ describe('RadarService', () => {
   });
 
   it('calls fetch_risk_assessments with organization scope', async () => {
-    mock.rpc.mockResolvedValue({ data: [{ assessment_id: 'ra-1' }], error: null });
+    mock.rpc.mockResolvedValue({
+      data: [{ assessment_id: 'ra-1' }],
+      error: null,
+    });
 
-    const result = await service.listAssessments(user, 'blocked', 'card', 1, 25);
+    const result = await service.listAssessments(
+      user,
+      'blocked',
+      'card',
+      1,
+      25,
+    );
 
     expect(result.success).toBe(true);
     expect(mock.rpc).toHaveBeenCalledWith(

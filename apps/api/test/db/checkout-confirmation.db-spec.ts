@@ -13,7 +13,11 @@ import {
   getProviderTransaction,
 } from './support/checkout';
 import { getTransaction } from './support/seed';
-import { accountBalance, seedPaymentCtx, testModeBalance } from './support/payments';
+import {
+  accountBalance,
+  seedPaymentCtx,
+  testModeBalance,
+} from './support/payments';
 
 /**
  * Provider checkout → confirmation → balance credit flows.
@@ -133,7 +137,9 @@ dbDescribe('Checkout confirmation :: WAVE test auto-credit', () => {
 
       const tx = await getTransaction(client, txId);
       expect(tx?.status).toBe('completed');
-      expect(await testModeBalance(client, ctx.organizationId)).toBeGreaterThan(0);
+      expect(await testModeBalance(client, ctx.organizationId)).toBeGreaterThan(
+        0,
+      );
     });
   });
 });

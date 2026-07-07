@@ -112,37 +112,40 @@ dbDescribe('Checkout sessions :: get_checkout_session', () => {
   });
 });
 
-dbDescribe('Checkout sessions :: create_checkout_session_with_line_items', () => {
-  it('creates a session from product line items', async () => {
-    await withRollback(async (client) => {
-      const { organizationId, merchantId, customerId } =
-        await seedCheckoutCtx(client);
-      const productId = await createProduct(client, organizationId, {
-        environment: 'live',
-      });
-      const priceId = await createPrice(client, productId, organizationId, {
-        amount: 2500,
-        environment: 'live',
-      });
+dbDescribe(
+  'Checkout sessions :: create_checkout_session_with_line_items',
+  () => {
+    it('creates a session from product line items', async () => {
+      await withRollback(async (client) => {
+        const { organizationId, merchantId, customerId } =
+          await seedCheckoutCtx(client);
+        const productId = await createProduct(client, organizationId, {
+          environment: 'live',
+        });
+        const priceId = await createPrice(client, productId, organizationId, {
+          amount: 2500,
+          environment: 'live',
+        });
 
-      const result = await callScalar<Record<string, unknown>>(
-        client,
-        'public.create_checkout_session_with_line_items',
-        {
-          p_organization_id: organizationId,
-          p_created_by: merchantId,
-          p_currency_code: 'XOF',
-          p_line_items: [{ price_id: priceId, quantity: 2 }],
-          p_environment: 'live',
-          p_customer_id: customerId,
-        },
-      );
+        const result = await callScalar<Record<string, unknown>>(
+          client,
+          'public.create_checkout_session_with_line_items',
+          {
+            p_organization_id: organizationId,
+            p_created_by: merchantId,
+            p_currency_code: 'XOF',
+            p_line_items: [{ price_id: priceId, quantity: 2 }],
+            p_environment: 'live',
+            p_customer_id: customerId,
+          },
+        );
 
-      expect(result.checkout_session_id).toBeTruthy();
-      expect(Number(result.amount)).toBe(5000);
+        expect(result.checkout_session_id).toBeTruthy();
+        expect(Number(result.amount)).toBe(5000);
+      });
     });
-  });
-});
+  },
+);
 
 dbDescribe('Checkout sessions :: record_free_transaction', () => {
   it('records a zero-amount free checkout completion', async () => {

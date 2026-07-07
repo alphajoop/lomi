@@ -1,9 +1,4 @@
-import {
-  callFn,
-  callScalar,
-  dbDescribe,
-  withRollback,
-} from './support/client';
+import { callFn, callScalar, dbDescribe, withRollback } from './support/client';
 import { createPayoutMethod } from './support/checkout';
 import { ensureAccount } from './support/seed';
 import { accountBalance, seedPaymentCtx } from './support/payments';
@@ -21,10 +16,14 @@ dbDescribe('Withdrawals :: initiate_withdrawal_api', () => {
         currency: 'XOF',
         balance: 100_000,
       });
-      const payoutMethodId = await createPayoutMethod(client, ctx.organizationId, {
-        provider: 'WAVE',
-        isDefault: true,
-      });
+      const payoutMethodId = await createPayoutMethod(
+        client,
+        ctx.organizationId,
+        {
+          provider: 'WAVE',
+          isDefault: true,
+        },
+      );
 
       const res = await callFn(client, 'public.initiate_withdrawal_api', {
         p_merchant_id: ctx.merchantId,
@@ -63,9 +62,13 @@ dbDescribe('Withdrawals :: initiate_withdrawal_api', () => {
         currency: 'XOF',
         balance: 100,
       });
-      const payoutMethodId = await createPayoutMethod(client, ctx.organizationId, {
-        provider: 'WAVE',
-      });
+      const payoutMethodId = await createPayoutMethod(
+        client,
+        ctx.organizationId,
+        {
+          provider: 'WAVE',
+        },
+      );
 
       const res = await callFn(client, 'public.initiate_withdrawal_api', {
         p_merchant_id: ctx.merchantId,
@@ -114,9 +117,13 @@ dbDescribe('Withdrawals :: get_payout_api', () => {
         currency: 'XOF',
         balance: 50_000,
       });
-      const payoutMethodId = await createPayoutMethod(client, ctx.organizationId, {
-        provider: 'WAVE',
-      });
+      const payoutMethodId = await createPayoutMethod(
+        client,
+        ctx.organizationId,
+        {
+          provider: 'WAVE',
+        },
+      );
 
       await callFn(client, 'public.initiate_withdrawal_api', {
         p_merchant_id: ctx.merchantId,
@@ -153,13 +160,17 @@ dbDescribe('Withdrawals :: convert_currency', () => {
   it('returns the input amount unchanged for same-currency conversion', async () => {
     await withRollback(async (client) => {
       const ctx = await seedPaymentCtx(client, 'live');
-      const converted = await callScalar<number>(client, 'public.convert_currency', {
-        p_amount: 7500,
-        p_from_currency: 'XOF',
-        p_to_currency: 'XOF',
-        p_merchant_id: ctx.merchantId,
-        p_organization_id: ctx.organizationId,
-      });
+      const converted = await callScalar<number>(
+        client,
+        'public.convert_currency',
+        {
+          p_amount: 7500,
+          p_from_currency: 'XOF',
+          p_to_currency: 'XOF',
+          p_merchant_id: ctx.merchantId,
+          p_organization_id: ctx.organizationId,
+        },
+      );
       expect(Number(converted)).toBe(7500);
     });
   });

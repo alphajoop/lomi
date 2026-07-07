@@ -77,7 +77,6 @@ const REQUIRED_FUNCTIONS = [
   'handle_stripe_payment_failure',
   'create_stripe_transaction',
   'record_pending_stripe_transaction',
-  'handle_stripe_payment_success',
   'link_stripe_payment_intent_to_transaction',
   'get_transaction_by_stripe_intent',
   'handle_stripe_dispute_created',

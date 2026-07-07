@@ -11,10 +11,7 @@ import {
   getDispute,
   getTransaction,
 } from './support/seed';
-import {
-  accountBalance,
-  seedPaymentCtx,
-} from './support/payments';
+import { accountBalance, seedPaymentCtx } from './support/payments';
 
 /**
  * Stripe dispute lifecycle (service_role handlers):

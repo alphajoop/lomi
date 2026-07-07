@@ -25,9 +25,19 @@ describe('SettlementsService', () => {
   });
 
   it('calls fetch_settlement_periods with merchant and environment', async () => {
-    mock.rpc.mockResolvedValue({ data: [{ settlement_id: 'XOF:2026-06-01' }], error: null });
+    mock.rpc.mockResolvedValue({
+      data: [{ settlement_id: 'XOF:2026-06-01' }],
+      error: null,
+    });
 
-    const result = await service.findAll(user, 1, 50, '2026-06-01', '2026-06-30', 'XOF');
+    const result = await service.findAll(
+      user,
+      1,
+      50,
+      '2026-06-01',
+      '2026-06-30',
+      'XOF',
+    );
 
     expect(result).toHaveLength(1);
     expect(mock.rpc).toHaveBeenCalledWith(
@@ -48,7 +58,10 @@ describe('SettlementsService', () => {
   });
 
   it('maps fetch_settlement_periods RPC errors to BadRequestException', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'bad request' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'bad request' },
+    });
 
     await expect(service.findAll(user)).rejects.toThrow(BadRequestException);
   });

@@ -1,8 +1,4 @@
-import {
-  callScalar,
-  dbDescribe,
-  withRollback,
-} from './support/client';
+import { callScalar, dbDescribe, withRollback } from './support/client';
 import {
   createCustomer,
   createOrgWithAdmin,

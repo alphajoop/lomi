@@ -11,7 +11,11 @@ export function createMockSupabase() {
     rpc,
     from,
     getClient: () => ({ rpc, from }),
-    mockRpc: (name: string, data: unknown, error: null | { message: string } = null) => {
+    mockRpc: (
+      name: string,
+      data: unknown,
+      error: null | { message: string } = null,
+    ) => {
       rpc.mockImplementation(async (fn: string) => {
         if (fn === name) return { data, error };
         return { data: null, error: null };

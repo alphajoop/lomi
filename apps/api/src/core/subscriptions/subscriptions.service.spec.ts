@@ -25,7 +25,10 @@ describe('SubscriptionsService', () => {
   });
 
   it('calls fetch_subscriptions with organization and environment', async () => {
-    mock.rpc.mockResolvedValue({ data: [{ subscription_id: 'sub-1' }], error: null });
+    mock.rpc.mockResolvedValue({
+      data: [{ subscription_id: 'sub-1' }],
+      error: null,
+    });
 
     const result = await service.findAll(user, 2, 25);
 

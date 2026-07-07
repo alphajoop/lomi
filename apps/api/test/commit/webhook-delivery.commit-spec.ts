@@ -41,10 +41,7 @@ function startWebhookReceiver(): Promise<{
     { stdio: 'ignore' },
   );
 
-  const handler = (
-    req: http.IncomingMessage,
-    res: http.ServerResponse,
-  ) => {
+  const handler = (req: http.IncomingMessage, res: http.ServerResponse) => {
     const chunks: Buffer[] = [];
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => {
@@ -125,7 +122,9 @@ commitDescribe('Webhook HTTP delivery :: committing harness', () => {
 
       const client = await getPool().connect();
       try {
-        await client.query("SELECT set_config('request.jwt.claim.role', 'service_role', true)");
+        await client.query(
+          "SELECT set_config('request.jwt.claim.role', 'service_role', true)",
+        );
         const supabase = createPgSupabase(client);
         const sender = new WebhookSenderService(supabase);
 

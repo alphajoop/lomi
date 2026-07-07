@@ -65,7 +65,10 @@ describe('LogsService', () => {
   });
 
   it('propagates RPC errors from list', async () => {
-    mock.rpc.mockResolvedValue({ data: null, error: { message: 'logs failed' } });
+    mock.rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'logs failed' },
+    });
 
     await expect(
       service.list(user, {

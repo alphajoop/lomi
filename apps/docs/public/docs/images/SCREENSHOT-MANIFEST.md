@@ -197,76 +197,76 @@ Copy this list and tick as you go:
 
 ## Which docs pages use each image?
 
-| Files                      | MDX pages                                |
-| -------------------------- | ---------------------------------------- |
-| `start/create-account`     | `start/create-account` (EN + FR)         |
-| `start/api-keys`           | `start/api-keys` (EN + FR)               |
-| `start/hosted-checkout`    | `start/first-payment` (EN + FR)          |
-| `build/choose-integration` | `build/choose-integration` (EN + FR)     |
-| `build/payment-links`      | `build/payment-links` (EN + FR)          |
-| `build/mobile-money`       | `build/mobile-money` (EN + FR)           |
-| `build/cards`              | `build/cards` (EN + FR)                  |
-| `build/balance`            | `build/balance-and-settlement` (EN + FR) |
-| `build/payouts`            | `build/payouts` (EN + FR)                |
-| `build/subscriptions`      | `build/subscriptions` (EN + FR)          |
-| `build/customer-portal`    | `build/customer-portal` (EN + FR)        |
-| `build/lomi-ui`            | `build/lomi-ui/index`                    |
-| `build/woocommerce-upload` | `build/ecommerce-extensions/woocommerce` |
-| `build/woocommerce-payments` | `build/ecommerce-extensions/woocommerce` |
-| `build/woocommerce-webhook-url` | `build/ecommerce-extensions/woocommerce` |
+| Files                                 | MDX pages                                |
+| ------------------------------------- | ---------------------------------------- |
+| `start/create-account`                | `start/create-account` (EN + FR)         |
+| `start/api-keys`                      | `start/api-keys` (EN + FR)               |
+| `start/hosted-checkout`               | `start/first-payment` (EN + FR)          |
+| `build/choose-integration`            | `build/choose-integration` (EN + FR)     |
+| `build/payment-links`                 | `build/payment-links` (EN + FR)          |
+| `build/mobile-money`                  | `build/mobile-money` (EN + FR)           |
+| `build/cards`                         | `build/cards` (EN + FR)                  |
+| `build/balance`                       | `build/balance-and-settlement` (EN + FR) |
+| `build/payouts`                       | `build/payouts` (EN + FR)                |
+| `build/subscriptions`                 | `build/subscriptions` (EN + FR)          |
+| `build/customer-portal`               | `build/customer-portal` (EN + FR)        |
+| `build/lomi-ui`                       | `build/lomi-ui/index`                    |
+| `build/woocommerce-upload`            | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-payments`          | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-webhook-url`       | `build/ecommerce-extensions/woocommerce` |
 | `build/woocommerce-webhook-dashboard` | `build/ecommerce-extensions/woocommerce` |
-| `build/woocommerce-checkout` | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-checkout`          | `build/ecommerce-extensions/woocommerce` |
 
 ---
 
 ## 13. WooCommerce — upload plugin
 
-|                 |                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------- |
-| **Save as**     | `build/woocommerce-upload-light.webp` and `build/woocommerce-upload-dark.webp`     |
-| **Open**        | WordPress admin → **Plugins → Add New → Upload Plugin**                            |
-| **Show**        | Upload form with **Choose File** / **Install Now** visible.                        |
-| **Do not show** | Plugin list without upload UI.                                                     |
+|                 |                                                                                |
+| --------------- | ------------------------------------------------------------------------------ |
+| **Save as**     | `build/woocommerce-upload-light.webp` and `build/woocommerce-upload-dark.webp` |
+| **Open**        | WordPress admin → **Plugins → Add New → Upload Plugin**                        |
+| **Show**        | Upload form with **Choose File** / **Install Now** visible.                    |
+| **Do not show** | Plugin list without upload UI.                                                 |
 
 ---
 
 ## 14. WooCommerce — payment settings
 
-|                 |                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------- |
-| **Save as**     | `build/woocommerce-payments-light.webp` and `build/woocommerce-payments-dark.webp` |
-| **Open**        | **WooCommerce → Settings → Payments → lomi.** (Manage)                             |
-| **Show**        | **Setup health** table + **Test mode** enabled + gateway enabled.                  |
-| **Secrets**     | Blur or use test keys only.                                                        |
+|             |                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------- |
+| **Save as** | `build/woocommerce-payments-light.webp` and `build/woocommerce-payments-dark.webp` |
+| **Open**    | **WooCommerce → Settings → Payments → lomi.** (Manage)                             |
+| **Show**    | **Setup health** table + **Test mode** enabled + gateway enabled.                  |
+| **Secrets** | Blur or use test keys only.                                                        |
 
 ---
 
 ## 15. WooCommerce — webhook URL (Woo admin)
 
-|                 |                                                                                         |
-| --------------- | --------------------------------------------------------------------------------------- |
-| **Save as**     | `build/woocommerce-webhook-url-light.webp` and `build/woocommerce-webhook-url-dark.webp` |
-| **Open**        | Same lomi. gateway settings — top **Webhook URL** box with **Copy URL** button.         |
+|             |                                                                                          |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| **Save as** | `build/woocommerce-webhook-url-light.webp` and `build/woocommerce-webhook-url-dark.webp` |
+| **Open**    | Same lomi. gateway settings — top **Webhook URL** box with **Copy URL** button.          |
 
 ---
 
 ## 16. WooCommerce — webhook (lomi. dashboard)
 
-|                 |                                                                                                    |
-| --------------- | -------------------------------------------------------------------------------------------------- |
-| **Save as**     | `build/woocommerce-webhook-dashboard-light.webp` and `build/woocommerce-webhook-dashboard-dark.webp` |
-| **Open**        | dashboard.lomi.africa → **Developers → Webhooks** → endpoint with Woo store URL                    |
-| **Show**        | `PAYMENT_SUCCEEDED` and `REFUND_COMPLETED` enabled (or event checklist visible).                   |
+|             |                                                                                                      |
+| ----------- | ---------------------------------------------------------------------------------------------------- |
+| **Save as** | `build/woocommerce-webhook-dashboard-light.webp` and `build/woocommerce-webhook-dashboard-dark.webp` |
+| **Open**    | dashboard.lomi.africa → **Developers → Webhooks** → endpoint with Woo store URL                      |
+| **Show**    | `PAYMENT_SUCCEEDED` and `REFUND_COMPLETED` enabled (or event checklist visible).                     |
 
 ---
 
 ## 17. WooCommerce — checkout branding
 
-|                 |                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------ |
-| **Save as**     | `build/woocommerce-checkout-light.webp` and `build/woocommerce-checkout-dark.webp`   |
+|                 |                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------- |
+| **Save as**     | `build/woocommerce-checkout-light.webp` and `build/woocommerce-checkout-dark.webp` |
 | **Open**        | Store checkout with **lomi.** payment method selected                              |
-| **Show**        | Branding card (pay-with image, method icons, secure hint).                           |
-| **Do not show** | Empty cart or payment method not selected.                                           |
+| **Show**        | Branding card (pay-with image, method icons, secure hint).                         |
+| **Do not show** | Empty cart or payment method not selected.                                         |
 
 Component in docs: `<DocsScreenshot name="start/create-account" alt="…" />` — `name` matches the path **without** `-light`/`-dark`.

@@ -22,9 +22,7 @@ function withTransactionDisplayStatus<
   const gross = Number(tx.gross_amount ?? 0);
   const refunded = Number(tx.refunded_amount ?? 0);
   const display_status =
-    status === 'completed' &&
-    refunded > 0.01 &&
-    refunded < gross - 0.01
+    status === 'completed' && refunded > 0.01 && refunded < gross - 0.01
       ? 'partially_refunded'
       : status;
   return { ...tx, display_status };

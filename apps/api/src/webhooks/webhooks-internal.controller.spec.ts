@@ -63,6 +63,8 @@ describe('WebhooksInternalController', () => {
     const result = await controller.processOutbox({});
 
     expect(result).toEqual({ queued: 0, error: 'outbox_id required' });
-    expect(mockWebhookSender.queuePendingOutboxDispatches).not.toHaveBeenCalled();
+    expect(
+      mockWebhookSender.queuePendingOutboxDispatches,
+    ).not.toHaveBeenCalled();
   });
 });

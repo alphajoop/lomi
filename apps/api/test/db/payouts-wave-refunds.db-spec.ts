@@ -12,7 +12,10 @@ import {
   completedCreditedLiveTx,
   seedPaymentCtx,
 } from './support/payments';
-import { platformFeeBalance, ensureProviderTransaction } from './support/checkout';
+import {
+  platformFeeBalance,
+  ensureProviderTransaction,
+} from './support/checkout';
 
 /**
  * Wave partial refund via beneficiary payout:
@@ -45,20 +48,24 @@ async function recordWaveBeneficiaryPayout(
     feeAmount?: number;
   },
 ): Promise<BeneficiaryPayoutRow> {
-  const res = await callFn(client, 'public.create_beneficiary_payout_with_wave', {
-    p_merchant_id: args.merchantId,
-    p_amount: args.amount,
-    p_currency_code: 'XOF',
-    p_wave_payout_id: `wave_po_${randomUUID().slice(0, 12)}`,
-    p_metadata: {
-      fee_amount: args.feeAmount ?? args.totalDeduction - args.amount,
-      total_deduction: args.totalDeduction,
-      is_partial_refund: true,
-      source: 'harness',
+  const res = await callFn(
+    client,
+    'public.create_beneficiary_payout_with_wave',
+    {
+      p_merchant_id: args.merchantId,
+      p_amount: args.amount,
+      p_currency_code: 'XOF',
+      p_wave_payout_id: `wave_po_${randomUUID().slice(0, 12)}`,
+      p_metadata: {
+        fee_amount: args.feeAmount ?? args.totalDeduction - args.amount,
+        total_deduction: args.totalDeduction,
+        is_partial_refund: true,
+        source: 'harness',
+      },
+      p_status: 'completed',
+      p_bypass_payout_pin: true,
     },
-    p_status: 'completed',
-    p_bypass_payout_pin: true,
-  });
+  );
   return res.rows[0] as BeneficiaryPayoutRow;
 }
 
@@ -101,19 +108,23 @@ dbDescribe('Wave partial refund :: beneficiary payout + fee charges', () => {
       const afterPayout = await accountBalance(client, ctx.organizationId);
       expect(afterPayout!).toBeCloseTo(before! - totalDeduction, 2);
 
-      const refundId = await callScalar<string>(client, 'public.create_refund', {
-        p_transaction_id: txId,
-        p_amount: refundAmount,
-        p_reason: 'partial refund via payout (harness)',
-        p_provider_code: 'WAVE',
-        p_metadata: {
-          refund_method: 'partial_beneficiary_payout',
-          is_partial_refund: true,
-          source: 'harness',
+      const refundId = await callScalar<string>(
+        client,
+        'public.create_refund',
+        {
+          p_transaction_id: txId,
+          p_amount: refundAmount,
+          p_reason: 'partial refund via payout (harness)',
+          p_provider_code: 'WAVE',
+          p_metadata: {
+            refund_method: 'partial_beneficiary_payout',
+            is_partial_refund: true,
+            source: 'harness',
+          },
+          p_created_by: ctx.merchantId,
+          p_subscription_action: 'default',
         },
-        p_created_by: ctx.merchantId,
-        p_subscription_action: 'default',
-      });
+      );
       expect(refundId).toBeTruthy();
 
       const platformBefore = await platformFeeBalance(client, 'XOF');
@@ -132,17 +143,13 @@ dbDescribe('Wave partial refund :: beneficiary payout + fee charges', () => {
       const chargeRow = charges.rows[0] as PartialChargesRow;
       expect(chargeRow.success).toBe(true);
 
-      const proportionalOriginalFee = Math.round(
-        ((gross - net) * refundAmount) / gross * 100,
-      ) / 100; // 50
+      const proportionalOriginalFee =
+        Math.round((((gross - net) * refundAmount) / gross) * 100) / 100; // 50
       const processingFee = Math.round(refundAmount * refundFeePct) / 100; // 25
       const expectedChargeDebit = proportionalOriginalFee + processingFee;
 
       const afterCharges = await accountBalance(client, ctx.organizationId);
-      expect(afterCharges!).toBeCloseTo(
-        afterPayout! - expectedChargeDebit,
-        2,
-      );
+      expect(afterCharges!).toBeCloseTo(afterPayout! - expectedChargeDebit, 2);
 
       const platformAfter = await platformFeeBalance(client, 'XOF');
       expect(platformAfter).toBeCloseTo(platformBefore + processingFee, 2);

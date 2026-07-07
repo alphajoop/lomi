@@ -146,9 +146,13 @@ dbDescribe('Discounts :: validate_coupon_for_checkout', () => {
       });
 
       const txId = await createTx(client, ctx, { environment: 'test' });
-      await callScalar<boolean>(client, 'public.update_balances_for_transaction', {
-        p_transaction_id: txId,
-      });
+      await callScalar<boolean>(
+        client,
+        'public.update_balances_for_transaction',
+        {
+          p_transaction_id: txId,
+        },
+      );
 
       const code = `NEWONLY_${randomUUID().slice(0, 6)}`;
       await createCoupon(client, ctx.organizationId, {
@@ -189,7 +193,9 @@ dbDescribe('Discounts :: validate_coupon_for_checkout', () => {
       });
 
       expect(row.is_valid).toBe(false);
-      expect(String(row.message)).toMatch(/does not apply|not applicable|product/i);
+      expect(String(row.message)).toMatch(
+        /does not apply|not applicable|product/i,
+      );
     });
   });
 

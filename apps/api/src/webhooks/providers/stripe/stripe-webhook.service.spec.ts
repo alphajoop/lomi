@@ -39,7 +39,9 @@ describe('StripeWebhookService', () => {
         },
         {
           provide: StripeClientsService,
-          useValue: { getClientForStripeLivemode: jest.fn().mockReturnValue(null) },
+          useValue: {
+            getClientForStripeLivemode: jest.fn().mockReturnValue(null),
+          },
         },
         {
           provide: WideEventService,
