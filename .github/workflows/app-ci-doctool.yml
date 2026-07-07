@@ -18,6 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Initialize website submodule for agent contract checks
+        env:
+          TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+          git submodule update --init apps/website
       - uses: actions/checkout@v5
         with:
           repository: lomiafrica/doctool

@@ -39,13 +39,13 @@ jobs:
         working-directory: ./apps/api
     steps:
       - uses: actions/checkout@v5
-      - name: Initialize dashboard submodule for SQL contract tests
+      - name: Initialize submodules for contract checks
         working-directory: .
         env:
           TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
         run: |
           git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
-          git submodule update --init apps/dashboard
+          git submodule update --init apps/dashboard apps/website
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -74,6 +74,13 @@ jobs:
         working-directory: ./apps/docs
     steps:
       - uses: actions/checkout@v5
+      - name: Initialize website submodule for agent contract checks
+        working-directory: .
+        env:
+          TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+          git submodule update --init apps/website
       - uses: pnpm/action-setup@v4
         with:
           version: 8
