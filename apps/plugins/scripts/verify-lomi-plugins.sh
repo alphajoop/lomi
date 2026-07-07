@@ -312,7 +312,7 @@ else
 Runtime checks skipped. Run end-to-end in each stack:
   - Magento:  apps/plugins/magento/dev (Docker) — place order, webhook, abandon flow
   - PrestaShop: docker-compose in apps/plugins/prestashop
-  - Woo: wp-env or staging store with test + live keys
+  - Woo: apps/plugins/woo/dev (Docker) or staging store with test + live keys
 
 Optional Magento runtime:
   ./verify-lomi-plugins.sh --run-runtime --magento-root /absolute/path/to/magento

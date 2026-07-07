@@ -24,14 +24,25 @@ Initialize a plugin from the monorepo root, for example:
 git submodule update --init apps/plugins/woo
 ```
 
-### Integration references (in this folder)
+### Integration references
 
-These live alongside the platform plugins (not submodules). Use them as copy-paste examples for merchants and partners:
+Runnable examples for merchants and partners live under [`references/`](./references):
 
-- **[direct-charge-integration-reference](./direct-charge-integration-reference)**: Direct charges (`POST /charge/*`) with Payment Elements for cards.
-- **[lomi-edupay-connector](./lomi-edupay-connector)**: EduPay (Yele Group) partner connector, direct charges for school fees.
-- **[payment-integration-reference](./payment-integration-reference)**: Hosted checkout sessions via the raw HTTP API.
-- **[payment-integration-sdk-reference](./payment-integration-sdk-reference)**: Hosted checkout sessions with `@lomi./sdk` and `@lomi./embed`.
+- **[direct-charge-integration-reference](./references/direct-charge-integration-reference)**: Direct charges (`POST /charge/*`) with Payment Elements for cards.
+- **[payment-integration-sdk-reference](./references/payment-integration-sdk-reference)**: Hosted checkout sessions with `@lomi./sdk` and `@lomi./embed`.
+
+### Local dev stacks (per platform repo)
+
+Each platform keeps its own Docker/dev tooling in its submodule — not in this folder:
+
+| Platform | Dev stack | Merchant docs |
+| --- | --- | --- |
+| WooCommerce | [woo/dev](./woo/dev/docker-compose.yml) | [docs.lomi.africa](https://docs.lomi.africa/build/ecommerce-extensions/woocommerce) |
+| PrestaShop | [prestashop/docker-compose.yml](./prestashop/docker-compose.yml) | [docs.lomi.africa](https://docs.lomi.africa/build/ecommerce-extensions/prestashop) |
+| Magento | [magento/dev](./magento/dev) | [docs.lomi.africa](https://docs.lomi.africa/build/ecommerce-extensions/magento) |
+| Shopify | [shopify](./shopify) README | [docs.lomi.africa](https://docs.lomi.africa/build/ecommerce-extensions/shopify) |
+
+Use **lomi. sandbox** keys and a **Cloudflare Tunnel** (or ngrok) for webhook testing. Never commit API keys or webhook secrets.
 
 ## Installation and cloning
 
@@ -49,35 +60,26 @@ For all platform plugins (including private repos you have access to):
 git submodule update --init apps/plugins/woo apps/plugins/prestashop apps/plugins/magento apps/plugins/shopify apps/plugins/bubble
 ```
 
-If a submodule fails with "repository not found", that platform repo is private, request access from the lomi. team. WooCommerce, PrestaShop, and Magento submodules are public.
+If a submodule fails with "repository not found", that platform repo is private — request access from the lomi. team. WooCommerce, PrestaShop, and Magento submodules are public.
 
-## End-to-end tests and scripts
+## Automated tests
 
-- **[DEV-ENV.md](./DEV-ENV.md)**: Local dev setup (Docker, Cloudflare Tunnel, sandbox keys), **start here for new contributors**.
-- **[E2E.md](./E2E.md)**: Manual smoke matrix per platform (checkout, webhooks, abandon flows, release tags).
-- **[scripts/run-plugin-tests.sh](./scripts/run-plugin-tests.sh)**: **Automated CI suite**: static parity, webhook contract, Bubble JSON, Woo build + release zip.
-- **[scripts/verify-lomi-plugins.sh](./scripts/verify-lomi-plugins.sh)**: Static compliance gate (also run as step 1 of `run-plugin-tests.sh`).
-- **[scripts/scan_broken_images.py](./scripts/scan_broken_images.py)**: Scans Magento, PrestaShop, and Woo trees for broken image path references.
-
-Run the full automated suite from `apps/plugins` (requires Node 22+, pnpm 9+, `unzip`):
+- **[scripts/run-plugin-tests.sh](./scripts/run-plugin-tests.sh)**: CI suite — static parity, webhook contract, Bubble JSON, Woo build + release zip.
+- **[scripts/verify-lomi-plugins.sh](./scripts/verify-lomi-plugins.sh)**: Static compliance gate (step 1 of `run-plugin-tests.sh`).
+- **[scripts/scan_broken_images.py](./scripts/scan_broken_images.py)**: Scans Magento, PrestaShop, and Woo for broken image path references.
 
 ```bash
 cd apps/plugins
-./scripts/run-plugin-tests.sh
+./scripts/run-plugin-tests.sh          # full suite
+./scripts/run-plugin-tests.sh --fast   # static checks only
 ```
 
-Static checks only (no Woo `pnpm build`):
-
-```bash
-./scripts/run-plugin-tests.sh --fast
-```
+Requires Node 22+, pnpm 9+, `unzip`.
 
 ## Contributing
 
-Pull requests and issue reports are welcome.
-
 - **Platform plugin changes**: work inside the relevant submodule, push to that submodule's repo, then update the submodule pointer in the monorepo root if needed.
-- **Reference app or shared script changes**: edit files directly under `apps/plugins/` (`direct-charge-integration-reference`, `payment-integration-reference`, `payment-integration-sdk-reference`, `scripts/`, `E2E.md`).
+- **Reference app or shared script changes**: edit files under `references/` or `scripts/`.
 - Run `./scripts/run-plugin-tests.sh` before opening a PR (`--fast` if Woo assets are unchanged).
 
 ## License

@@ -2,7 +2,7 @@
 
 Minimal Node + Express example for **direct charges** (`POST /charge/*`) without hosted checkout sessions. Card payments use **`@lomi./sdk` Payment Elements** on the client; Wave and MTN are server-only API calls. Includes cURL scripts.
 
-For hosted checkout sessions, see [`../payment-integration-sdk-reference`](../payment-integration-sdk-reference).
+For hosted checkout sessions, see [`../payment-integration-sdk-reference`](../payment-integration-sdk-reference) in the same `references/` folder.
 
 ## What is included
 

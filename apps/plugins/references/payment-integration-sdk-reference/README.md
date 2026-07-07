@@ -50,6 +50,19 @@ The server serves `@lomi./embed` from:
 
 Use this local route from the demo frontend instead of hardcoding external script URLs.
 
+## cURL examples
+
+With `pnpm run dev` running:
+
+```bash
+chmod +x curl/*.sh
+./curl/create-dynamic-session.sh
+PRICE_ID=your-price-id ./curl/create-price-session.sh
+PRICE_ID_1=price-1 PRICE_ID_2=price-2 ./curl/create-line-items-session.sh
+LOMI_SECRET_KEY=your-key ./curl/direct-lomi-checkout-session.sh
+WEBHOOK_SECRET=whsec_your_webhook_signing_secret ./curl/send-signed-webhook.sh
+```
+
 ## Production notes
 
 - Keep `LOMI_SECRET_KEY` server-side only

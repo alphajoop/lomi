@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-API_BASE_URL="${API_BASE_URL:-http://localhost:3000}"
+API_BASE_URL="${API_BASE_URL:-http://localhost:3001}"
 WEBHOOK_SECRET="${WEBHOOK_SECRET:-replace-with-verification-token}"
 
 PAYLOAD='{

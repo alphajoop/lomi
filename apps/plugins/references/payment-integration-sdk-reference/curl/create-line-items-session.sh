@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-API_BASE_URL="${API_BASE_URL:-http://localhost:3000}"
+API_BASE_URL="${API_BASE_URL:-http://localhost:3001}"
 PRICE_ID_1="${PRICE_ID_1:-replace-with-price-id-1}"
 PRICE_ID_2="${PRICE_ID_2:-replace-with-price-id-2}"
 

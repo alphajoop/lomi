@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-API_BASE_URL="${API_BASE_URL:-http://localhost:3000}"
+API_BASE_URL="${API_BASE_URL:-http://localhost:3001}"
 
 curl -sS -X POST "${API_BASE_URL}/api/checkout/dynamic" \
   -H "Content-Type: application/json" \
