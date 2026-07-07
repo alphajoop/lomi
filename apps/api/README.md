@@ -38,7 +38,7 @@ pnpm run start:dev
 | Setting | Value |
 |---------|--------|
 | Root directory | `apps/api` |
-| Builder | Nixpacks (default — no Docker) |
+| Builder | Nixpacks (default; no Docker) |
 | Start command | `pnpm run start:prod` (see [`railway.json`](railway.json)) |
 | Health check path | `/health` |
 | Health check timeout | 120s |
