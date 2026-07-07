@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "lomi.",
+  "version": "1.0.0",
+  "description": "Agent-to-agent and AI integration surface for lomi. payment infrastructure (West Africa).",
+  "url": "https://lomi.africa",
+  "contact": {
+    "email": "hello@lomi.africa",
+    "url": "https://lomi.africa"
+  },
+  "documentation": "https://docs.lomi.africa",
+  "endpoints": {
+    "site": "https://lomi.africa",
+    "api": "https://api.lomi.africa",
+    "openapi": "https://lomi.africa/openapi.json",
+    "agent_openapi": "https://lomi.africa/agent-openapi.json",
+    "llms_txt": "https://lomi.africa/llms.txt",
+    "webhooks": "https://docs.lomi.africa/build/advanced-guides/handling-webhooks",
+    "idempotency": "https://docs.lomi.africa/build/advanced-guides/idempotency-keys"
+  },
+  "authentication": {
+    "type": "apiKey",
+    "headerName": "X-API-KEY",
+    "alternative": {
+      "type": "bearer",
+      "headerName": "Authorization",
+      "format": "Bearer <secret>"
+    }
+  },
+  "capabilities": [
+    "payments",
+    "payouts",
+    "subscriptions",
+    "refunds",
+    "webhooks",
+    "idempotent_writes",
+    "rest_api"
+  ],
+  "agent": {
+    "version": "1",
+    "sse": "https://api.lomi.africa/agent/events",
+    "capabilities": "https://api.lomi.africa/agent/capabilities",
+    "subscriptions": "https://api.lomi.africa/agent/subscriptions",
+    "workflows": "https://api.lomi.africa/agent/workflows",
+    "handoff": "https://api.lomi.africa/agent/handoff"
+  }
+}
