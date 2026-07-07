@@ -8,9 +8,10 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const docsRoot = join(__dirname, '..', '..');
+const monorepoRoot = join(__dirname, '..', '..', '..', '..');
 
 const paths = {
-  agentCard: join(__dirname, 'fixtures', 'agent.json'),
+  agentCard: join(monorepoRoot, 'apps/website/public/.well-known/agent.json'),
   merchantOpenApi: join(docsRoot, 'openapi.json'),
   agentOpenApi: join(docsRoot, 'agent-openapi.json'),
   expectedPartnerOps: join(
@@ -31,14 +32,22 @@ function mustParseJson(label, filePath) {
   return JSON.parse(raw);
 }
 
-const agent = mustParseJson('agent card', paths.agentCard);
-if (typeof agent.name !== 'string' || !agent.endpoints?.openapi) {
-  throw new Error('agent.json: expected name and endpoints.openapi');
-}
-
-if (!agent.endpoints.agent_openapi) {
-  throw new Error(
-    'agent.json: expected endpoints.agent_openapi (re-run agent OpenAPI export)',
+// The agent card lives in the private `apps/website` submodule, which is not
+// available on fork PRs (no PAT to clone a private repo). Validate it when the
+// submodule is checked out; skip gracefully otherwise so docs CI still runs.
+if (existsSync(paths.agentCard)) {
+  const agent = mustParseJson('agent card', paths.agentCard);
+  if (typeof agent.name !== 'string' || !agent.endpoints?.openapi) {
+    throw new Error('agent.json: expected name and endpoints.openapi');
+  }
+  if (!agent.endpoints.agent_openapi) {
+    throw new Error(
+      'agent.json: expected endpoints.agent_openapi (re-run agent OpenAPI export)',
+    );
+  }
+} else {
+  globalThis.console.warn(
+    `verify-agent-contracts: skipping agent card checks (apps/website submodule not present at ${paths.agentCard})`,
   );
 }
 
