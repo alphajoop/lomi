@@ -1,6 +1,8 @@
 # Docs screenshots — manual capture guide
 
-You need **28 files** (12 screens × light + dark). Drop them in this folder; docs pages pick them up automatically — **no MDX edits** if filenames match.
+You need **34 files** (17 screens × light + dark). Drop them in this folder; docs pages pick them up automatically — **no MDX edits** if filenames match.
+
+**CI:** `dt check` (monorepo root) runs `pnpm lint`, `pnpm docs:drift`, and `pnpm screenshots:verify` in `apps/docs`.
 
 ```
 apps/docs/public/docs/images/
@@ -47,6 +49,11 @@ Copy this list and tick as you go:
 - [ ] `build/subscriptions-light.webp` + `build/subscriptions-dark.webp`
 - [ ] `build/customer-portal-light.webp` + `build/customer-portal-dark.webp`
 - [ ] `build/lomi-ui-light.webp` + `build/lomi-ui-dark.webp`
+- [x] `build/woocommerce-upload-light.webp` + `build/woocommerce-upload-dark.webp`
+- [x] `build/woocommerce-payments-light.webp` + `build/woocommerce-payments-dark.webp`
+- [x] `build/woocommerce-webhook-url-light.webp` + `build/woocommerce-webhook-url-dark.webp`
+- [x] `build/woocommerce-webhook-dashboard-light.webp` + `build/woocommerce-webhook-dashboard-dark.webp`
+- [x] `build/woocommerce-checkout-light.webp` + `build/woocommerce-checkout-dark.webp`
 
 ---
 
@@ -204,5 +211,62 @@ Copy this list and tick as you go:
 | `build/subscriptions`      | `build/subscriptions` (EN + FR)          |
 | `build/customer-portal`    | `build/customer-portal` (EN + FR)        |
 | `build/lomi-ui`            | `build/lomi-ui/index`                    |
+| `build/woocommerce-upload` | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-payments` | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-webhook-url` | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-webhook-dashboard` | `build/ecommerce-extensions/woocommerce` |
+| `build/woocommerce-checkout` | `build/ecommerce-extensions/woocommerce` |
+
+---
+
+## 13. WooCommerce — upload plugin
+
+|                 |                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------- |
+| **Save as**     | `build/woocommerce-upload-light.webp` and `build/woocommerce-upload-dark.webp`     |
+| **Open**        | WordPress admin → **Plugins → Add New → Upload Plugin**                            |
+| **Show**        | Upload form with **Choose File** / **Install Now** visible.                        |
+| **Do not show** | Plugin list without upload UI.                                                     |
+
+---
+
+## 14. WooCommerce — payment settings
+
+|                 |                                                                                    |
+| --------------- | ---------------------------------------------------------------------------------- |
+| **Save as**     | `build/woocommerce-payments-light.webp` and `build/woocommerce-payments-dark.webp` |
+| **Open**        | **WooCommerce → Settings → Payments → lomi.** (Manage)                             |
+| **Show**        | **Setup health** table + **Test mode** enabled + gateway enabled.                  |
+| **Secrets**     | Blur or use test keys only.                                                        |
+
+---
+
+## 15. WooCommerce — webhook URL (Woo admin)
+
+|                 |                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------- |
+| **Save as**     | `build/woocommerce-webhook-url-light.webp` and `build/woocommerce-webhook-url-dark.webp` |
+| **Open**        | Same lomi. gateway settings — top **Webhook URL** box with **Copy URL** button.         |
+
+---
+
+## 16. WooCommerce — webhook (lomi. dashboard)
+
+|                 |                                                                                                    |
+| --------------- | -------------------------------------------------------------------------------------------------- |
+| **Save as**     | `build/woocommerce-webhook-dashboard-light.webp` and `build/woocommerce-webhook-dashboard-dark.webp` |
+| **Open**        | dashboard.lomi.africa → **Developers → Webhooks** → endpoint with Woo store URL                    |
+| **Show**        | `PAYMENT_SUCCEEDED` and `REFUND_COMPLETED` enabled (or event checklist visible).                   |
+
+---
+
+## 17. WooCommerce — checkout branding
+
+|                 |                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------ |
+| **Save as**     | `build/woocommerce-checkout-light.webp` and `build/woocommerce-checkout-dark.webp`   |
+| **Open**        | Store checkout with **lomi.** payment method selected                              |
+| **Show**        | Branding card (pay-with image, method icons, secure hint).                           |
+| **Do not show** | Empty cart or payment method not selected.                                           |
 
 Component in docs: `<DocsScreenshot name="start/create-account" alt="…" />` — `name` matches the path **without** `-light`/`-dark`.

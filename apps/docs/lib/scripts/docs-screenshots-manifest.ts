@@ -20,6 +20,11 @@ export const DOCS_SCREENSHOT_SCREENS = [
   'build/subscriptions',
   'build/customer-portal',
   'build/lomi-ui',
+  'build/woocommerce-upload',
+  'build/woocommerce-payments',
+  'build/woocommerce-webhook-url',
+  'build/woocommerce-webhook-dashboard',
+  'build/woocommerce-checkout',
 ] as const;
 
 export type DocsScreenshotTheme = 'light' | 'dark';

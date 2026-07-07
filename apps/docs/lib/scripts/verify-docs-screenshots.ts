@@ -1,8 +1,8 @@
 /* @proprietary license */
 
 /**
- * Verifies manual docs screenshots: 28 WebP files (12 screens × light/dark),
- * each exactly 1280×720. See SCREENSHOT-MANIFEST.md for capture instructions.
+ * Verifies manual docs screenshots: WebP files (each screen × light/dark),
+ * each exactly 1280×720. See SCREENSHOT-MANIFEST.md and `pnpm screenshots:verify`.
  */
 
 import { readFile } from 'node:fs/promises';
