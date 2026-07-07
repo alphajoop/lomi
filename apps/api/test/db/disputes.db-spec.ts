@@ -9,6 +9,7 @@ import {
 import {
   createStripeCardTransaction,
   getDispute,
+  getTransaction,
 } from './support/seed';
 import {
   accountBalance,
@@ -155,10 +156,11 @@ dbDescribe('Disputes :: handle_stripe_dispute_updated', () => {
   });
 });
 
-dbDescribe('Disputes :: apply_stripe_dispute_lost_effects', () => {
-  it('debits merchant balance when a dispute is lost', async () => {
+dbDescribe('Disputes :: dispute lost end-to-end', () => {
+  it('handle_stripe_dispute_updated(lost) closes the dispute, refunds the tx, and debits the balance once', async () => {
     await withRollback(async (client) => {
-      const { ctx, paymentIntentId, net } = await seedDisputedStripeTx(client);
+      const { ctx, txId, paymentIntentId, net } =
+        await seedDisputedStripeTx(client);
       const stripeDispute = stripeDisputeId();
       const before = await accountBalance(client, ctx.organizationId);
       expect(before).toBeCloseTo(net, 2);
@@ -172,30 +174,58 @@ dbDescribe('Disputes :: apply_stripe_dispute_lost_effects', () => {
         p_reason: 'product_not_received',
       });
 
-      // Close the dispute first — create_refund rejects pending disputes.
-      await client.query(
-        `UPDATE public.disputes SET status = 'closed'
-          WHERE stripe_dispute_id = $1`,
-        [stripeDispute],
-      );
+      // Real entry point: updating to 'lost' transitions the dispute to
+      // 'closed' AND applies lost effects (refund + balance debit) in one
+      // call. No manual status patch needed — driving the actual webhook path.
+      const updated = await callScalar<{
+        success: boolean;
+        status: string;
+        lost_effects?: { success?: boolean; idempotent?: boolean };
+      }>(client, 'public.handle_stripe_dispute_updated', {
+        p_stripe_dispute_id: stripeDispute,
+        p_status: 'lost',
+        p_dispute_data: { outcome: 'lost' },
+      });
 
-      const lost = await callScalar<{ success: boolean; idempotent?: boolean }>(
+      expect(updated.success).toBe(true);
+      expect(updated.status).toBe('closed');
+      expect(updated.lost_effects?.success).toBe(true);
+
+      const lookup = await callFn(client, 'public.get_dispute_by_stripe_id', {
+        p_stripe_dispute_id: stripeDispute,
+      });
+      const dispute = await getDispute(
         client,
-        'public.apply_stripe_dispute_lost_effects',
-        { p_stripe_dispute_id: stripeDispute },
+        lookup.rows[0].dispute_id as string,
       );
-      expect(lost.success).toBe(true);
+      expect(dispute?.status).toBe('closed');
+      expect(dispute?.resolution_details).toBe('lost');
+      expect(
+        (dispute?.evidence_details as Record<string, unknown>)
+          ?.dispute_lost_applied,
+      ).toBe(true);
 
-      const after = await accountBalance(client, ctx.organizationId);
-      expect(after!).toBeLessThan(before!);
+      const tx = await getTransaction(client, txId);
+      expect(tx?.status).toBe('refunded');
 
-      const replay = await callScalar<{ success: boolean; idempotent: boolean }>(
-        client,
-        'public.apply_stripe_dispute_lost_effects',
-        { p_stripe_dispute_id: stripeDispute },
-      );
+      const afterLost = await accountBalance(client, ctx.organizationId);
+      expect(afterLost!).toBeLessThan(before!);
+
+      // Replaying the same 'lost' update must be idempotent: the lost-effects
+      // hook short-circuits and the balance is not debited a second time.
+      const replay = await callScalar<{
+        success: boolean;
+        lost_effects?: { idempotent?: boolean };
+      }>(client, 'public.handle_stripe_dispute_updated', {
+        p_stripe_dispute_id: stripeDispute,
+        p_status: 'lost',
+        p_dispute_data: { outcome: 'lost' },
+      });
       expect(replay.success).toBe(true);
-      expect(replay.idempotent).toBe(true);
+      expect(replay.lost_effects?.idempotent).toBe(true);
+
+      const afterReplay = await accountBalance(client, ctx.organizationId);
+      expect(afterReplay!).toBeCloseTo(afterLost!, 2);
     });
   });
 });

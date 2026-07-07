@@ -220,6 +220,13 @@ dbDescribe('Stripe success :: handle_stripe_payment_success', () => {
       expect(second.transaction_id).toBe(first.transaction_id);
       const tx = await getTransaction(client, first.transaction_id);
       expect(tx?.status).toBe('completed');
+
+      // NOTE (known DB-layer idempotency gap): handle_stripe_payment_success
+      // guards the transaction-completion UPDATE but INSERTs a payout on every
+      // call, so a raw replay schedules a duplicate payout. Replay safety is
+      // currently enforced by app-layer Stripe webhook dedup, not the RPC.
+      // Asserting the transaction stays completed here; do NOT assert payout
+      // count until the RPC gates the payout insert (see summary).
     });
   });
 });

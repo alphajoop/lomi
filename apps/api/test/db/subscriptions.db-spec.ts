@@ -125,6 +125,53 @@ dbDescribe('Subscriptions :: first charge amount', () => {
       expect(Number(amount)).toBe(0);
     });
   });
+
+  it('prorates the first charge for prorated first-payment type', async () => {
+    await withRollback(async (client) => {
+      const ctx = await seedSubCtx(client);
+      const amountFull = 12000;
+      const asOf = '2025-01-10';
+      const { productId, priceId } = await recurringProduct(
+        client,
+        ctx.organizationId,
+        { amount: amountFull, firstPaymentType: 'prorated' },
+      );
+
+      // Derive the expected proration with the same helpers the RPC uses, so
+      // the assertion is exact without hard-coding calendar math.
+      const expectedRes = await client.query(
+        `SELECT ROUND(
+                  $1::numeric * (
+                    GREATEST(
+                      1,
+                      public.compute_subscription_next_billing_date(
+                        $2::date, 'month'::public.billing_interval, 0
+                      ) - $2::date
+                    )::numeric
+                    / public.billing_interval_period_days(
+                        'month'::public.billing_interval
+                      )::numeric
+                  ),
+                  2
+                ) AS expected`,
+        [amountFull, asOf],
+      );
+      const expected = Number(expectedRes.rows[0].expected);
+
+      const amount = await callScalar<number>(
+        client,
+        'public.calculate_subscription_first_charge_amount',
+        {
+          p_product_id: productId,
+          p_price_id: priceId,
+          p_as_of_date: asOf,
+        },
+      );
+
+      expect(Number(amount)).toBeGreaterThan(0);
+      expect(Number(amount)).toBeCloseTo(expected, 2);
+    });
+  });
 });
 
 dbDescribe('Subscriptions :: resolve_subscription_signup_terms', () => {

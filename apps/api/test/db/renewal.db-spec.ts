@@ -96,6 +96,48 @@ dbDescribe('Renewal :: update_subscription_next_billing_date', () => {
       expect(nextBilling).toBe('2025-02-15');
     });
   });
+
+  it('advances a yearly subscription by one year', async () => {
+    await withRollback(async (client) => {
+      const ctx = await seedRenewalCtx(client);
+      const productId = await createProduct(client, ctx.organizationId, {
+        type: 'recurring',
+        environment: 'live',
+        failedPaymentAction: 'cancel',
+      });
+      const priceId = await createPrice(client, productId, ctx.organizationId, {
+        amount: 5000,
+        billingInterval: 'year',
+        environment: 'live',
+      });
+      const subscriptionId = await createSubscription(
+        client,
+        ctx.organizationId,
+        productId,
+        ctx.customerId,
+        {
+          status: 'active',
+          environment: 'live',
+          priceId,
+          nextBillingDate: '2025-03-01',
+          createdBy: ctx.merchantId,
+        },
+      );
+
+      await callScalar(client, 'public.update_subscription_next_billing_date', {
+        p_subscription_id: subscriptionId,
+      });
+
+      const sub = await getSubscription(client, subscriptionId);
+      const meta = sub?.metadata as Record<string, unknown>;
+      expect(meta?.last_billing_date).toBe('2025-03-01');
+      expect(Number(meta?.current_charges)).toBe(1);
+      const nextBilling = new Date(String(sub?.next_billing_date))
+        .toISOString()
+        .slice(0, 10);
+      expect(nextBilling).toBe('2026-03-01');
+    });
+  });
 });
 
 dbDescribe('Renewal :: handle_subscription_failed_payment', () => {
@@ -177,6 +219,42 @@ dbDescribe('Renewal :: handle_subscription_renewal_payment_failure', () => {
       expect(Number(meta?.renewal_failure_count)).toBe(1);
       expect(meta?.next_renewal_retry_at).toBeTruthy();
       expect(sub?.status).toBe('past_due');
+    });
+  });
+
+  it('flags retries_exhausted once the retry budget is spent', async () => {
+    await withRollback(async (client) => {
+      const ctx = await seedRenewalCtx(client);
+      const { subscriptionId } = await activeMonthlySub(client, ctx);
+
+      const first = await callScalar<Record<string, unknown>>(
+        client,
+        'public.handle_subscription_renewal_payment_failure',
+        { p_subscription_id: subscriptionId, p_error: 'card_declined' },
+      );
+      const totalRetries = Number(first.total_retries);
+      expect(totalRetries).toBeGreaterThanOrEqual(1);
+
+      // Fast-forward the counter to one below the budget so the next failure
+      // deterministically exhausts the retries regardless of the configured
+      // total_retries value.
+      await client.query(
+        `UPDATE public.subscriptions
+            SET metadata = COALESCE(metadata, '{}'::jsonb)
+              || jsonb_build_object('renewal_failure_count', $2::int)
+          WHERE subscription_id = $1`,
+        [subscriptionId, totalRetries - 1],
+      );
+
+      const last = await callScalar<Record<string, unknown>>(
+        client,
+        'public.handle_subscription_renewal_payment_failure',
+        { p_subscription_id: subscriptionId, p_error: 'card_declined' },
+      );
+
+      expect(last.retries_exhausted).toBe(true);
+      expect(Number(last.renewal_failure_count)).toBe(totalRetries);
+      expect(last.next_renewal_retry_at).toBeNull();
     });
   });
 });

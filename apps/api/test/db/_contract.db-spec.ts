@@ -111,6 +111,18 @@ const REQUIRED_FUNCTIONS = [
   'create_wave_payout_transaction',
   'verify_payout_pin',
   'update_organization_pin_code',
+  // webhook outbox + delivery
+  'enqueue_merchant_webhook_outbox',
+  'webhook_outbox_upsert_event',
+  'fetch_active_webhooks_for_organization',
+  'webhook_dispatch_ensure',
+  'webhook_dispatch_should_process',
+  'mark_webhook_dispatch_delivered',
+  'record_webhook_delivery_attempt',
+  'fetch_pending_webhook_outbox_jobs',
+  'notify_webhook_outbox_via_api',
+  // network webhooks
+  'enqueue_network_webhook_event',
 ] as const;
 
 dbDescribe('DB integration harness :: connectivity + RPC contract', () => {

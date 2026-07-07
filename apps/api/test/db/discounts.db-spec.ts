@@ -192,4 +192,77 @@ dbDescribe('Discounts :: validate_coupon_for_checkout', () => {
       expect(String(row.message)).toMatch(/does not apply|not applicable|product/i);
     });
   });
+
+  it('accepts a valid fixed-amount coupon', async () => {
+    await withRollback(async (client) => {
+      await ensureReferenceData(client);
+      const { organizationId } = await createOrgWithAdmin(client);
+      const customerId = await createCustomer(client, organizationId);
+      const productId = await createProduct(client, organizationId, {
+        type: 'one_time',
+      });
+      const code = `FIXED500_${randomUUID().slice(0, 6)}`;
+      const couponId = await createCoupon(client, organizationId, {
+        code,
+        discountType: 'fixed',
+        discountFixedAmount: 500,
+      });
+
+      const row = await validateCoupon(client, {
+        organizationId,
+        code,
+        productId,
+        customerId,
+      });
+
+      expect(row.is_valid).toBe(true);
+      expect(row.coupon_id).toBe(couponId);
+      expect(row.discount_type).toBe('fixed');
+      expect(Number(row.discount_fixed_amount)).toBe(500);
+    });
+  });
+
+  it('accepts a product-scoped coupon for a linked product', async () => {
+    await withRollback(async (client) => {
+      await ensureReferenceData(client);
+      const { organizationId } = await createOrgWithAdmin(client);
+      const linkedProduct = await createProduct(client, organizationId);
+      const code = `SCOPEOK_${randomUUID().slice(0, 6)}`;
+      const couponId = await createCoupon(client, organizationId, {
+        code,
+        scopeType: 'specific_products',
+      });
+      await linkCouponToProduct(client, couponId, linkedProduct);
+
+      const row = await validateCoupon(client, {
+        organizationId,
+        code,
+        productId: linkedProduct,
+      });
+
+      expect(row.is_valid).toBe(true);
+      expect(row.coupon_id).toBe(couponId);
+    });
+  });
+
+  it('rejects a coupon that has reached its maximum uses', async () => {
+    await withRollback(async (client) => {
+      await ensureReferenceData(client);
+      const { organizationId } = await createOrgWithAdmin(client);
+      const code = `MAXED_${randomUUID().slice(0, 6)}`;
+      const couponId = await createCoupon(client, organizationId, {
+        code,
+        maxUses: 1,
+      });
+      await client.query(
+        `UPDATE public.discount_coupons SET current_uses = max_uses
+          WHERE coupon_id = $1`,
+        [couponId],
+      );
+
+      const row = await validateCoupon(client, { organizationId, code });
+      expect(row.is_valid).toBe(false);
+      expect(String(row.message)).toMatch(/maximum uses/i);
+    });
+  });
 });

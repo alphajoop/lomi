@@ -1,25 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import {
-  callScalar,
-  dbDescribe,
-  withRollback,
-  type Db,
-} from './support/client';
+import { callScalar, dbDescribe, withRollback } from './support/client';
 import { createOrganizationWebhook } from './support/checkout';
 import { createOrgWithAdmin, ensureReferenceData } from './support/seed';
-
-async function rpcExists(client: Db, fnName: string): Promise<boolean> {
-  const res = await client.query(
-    `SELECT 1
-       FROM pg_proc p
-       JOIN pg_namespace n ON n.oid = p.pronamespace
-      WHERE n.nspname = 'public'
-        AND p.proname = $1
-      LIMIT 1`,
-    [fnName],
-  );
-  return res.rows.length > 0;
-}
 
 dbDescribe('Network webhooks :: merchant outbox enqueue', () => {
   it('enqueues NETWORK_PAYMENT_CREATED into webhook outbox with dispatch row', async () => {
@@ -66,18 +48,12 @@ dbDescribe('Network webhooks :: merchant outbox enqueue', () => {
         [outboxId, webhookId],
       );
       expect(dispatch.rows.length).toBe(1);
+      expect(dispatch.rows[0].status).toBe('pending');
     });
   });
 
-  it('calls enqueue_network_webhook_event when deployed on the test database', async () => {
+  it('enqueues NETWORK_PAYMENT_CREATED via enqueue_network_webhook_event', async () => {
     await withRollback(async (client) => {
-      if (!(await rpcExists(client, 'enqueue_network_webhook_event'))) {
-        console.warn(
-          '[network-webhooks] skipping enqueue_network_webhook_event: RPC not deployed on test DB',
-        );
-        return;
-      }
-
       await ensureReferenceData(client);
       const { organizationId } = await createOrgWithAdmin(client);
       const operatorOrgId = organizationId;
