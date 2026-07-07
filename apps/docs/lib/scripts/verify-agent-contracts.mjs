@@ -8,10 +8,9 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const docsRoot = join(__dirname, '..', '..');
-const monorepoRoot = join(__dirname, '..', '..', '..', '..');
 
 const paths = {
-  agentCard: join(monorepoRoot, 'apps/website/public/.well-known/agent.json'),
+  agentCard: join(__dirname, 'fixtures', 'agent.json'),
   merchantOpenApi: join(docsRoot, 'openapi.json'),
   agentOpenApi: join(docsRoot, 'agent-openapi.json'),
   expectedPartnerOps: join(
