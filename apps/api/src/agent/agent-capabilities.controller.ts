@@ -36,6 +36,7 @@ export class AgentCapabilitiesController {
         rest_api: true,
         webhooks: true,
         idempotency_keys: true,
+        provisioning_api: '/provisioning/v1',
         server_sent_events: '/agent/events',
         agent_subscriptions: '/agent/subscriptions',
         workflow_runs: '/agent/workflows',

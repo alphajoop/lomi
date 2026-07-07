@@ -51,7 +51,11 @@ export class LogsController {
   @ApiOperation({
     summary: 'List logs',
     description:
-      'Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.',
+      'Returns paginated logs for the organization. The `type` query parameter selects which log stream to read:\n\n' +
+      '- **api_request** — every authenticated API call (any HTTP status), including request/response payloads\n' +
+      '- **api_error** — server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)\n' +
+      '- **webhook_delivery** — outbound webhook delivery attempts and retries\n' +
+      '- **activity** — organization audit events (configuration changes, security events)',
   })
   @ApiQuery({
     name: 'type',

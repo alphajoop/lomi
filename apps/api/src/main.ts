@@ -6,6 +6,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { randomUUID } from 'node:crypto';
 import { buildSwaggerDocumentBase } from './swagger.config';
+import { printConsoleBrand } from './utils/console-brand';
 
 async function bootstrap() {
   const expressApp = express();
@@ -31,15 +32,25 @@ async function bootstrap() {
     next();
   });
 
-  // Middleware to capture raw body for webhook signature verification
-  expressApp.use(
-    '/webhooks',
-    express.raw({ type: 'application/json', limit: '10mb' }),
-    (req, res, next) => {
-      (req as any).rawBody = req.body;
-      next();
-    },
-  );
+  // Raw body capture for inbound provider webhook signature verification only.
+  // Do not mount on `/webhooks` root — that path serves merchant webhook CRUD (JSON body).
+  const providerWebhookPaths = [
+    '/webhooks/stripe',
+    '/webhooks/wave',
+    '/webhooks/mtn',
+    '/webhooks/spi',
+  ];
+  for (const path of providerWebhookPaths) {
+    expressApp.use(
+      path,
+      express.raw({ type: 'application/json', limit: '10mb' }),
+      (req, res, next) => {
+        (req as express.Request & { rawBody?: Buffer }).rawBody =
+          req.body as Buffer;
+        next();
+      },
+    );
+  }
 
   // Regular JSON body parser for API routes
   expressApp.use(express.json({ limit: '10mb' }));
@@ -70,7 +81,7 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders:
-      'X-API-KEY,X-Lomi-API-Key,Lomi-Account,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization,X-Organization-Id,X-Environment',
+      'X-API-KEY,X-Lomi-API-Key,X-Lomi-Provisioning-Key,Lomi-Account,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization,X-Organization-Id,X-Environment',
     exposedHeaders:
       'X-Request-Id,Retry-After,X-RateLimit-Limit,X-RateLimit-Policy,X-RateLimit-Window-Seconds',
   });
@@ -90,7 +101,10 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  printConsoleBrand();
+  console.log(`→ API listening on http://0.0.0.0:${port}`);
 }
 bootstrap().catch((err) => {
   console.error('Failed to start application:', err);

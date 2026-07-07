@@ -1,10 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateWebhookBodyDto {
   @ApiProperty({
     example: 'https://example.com/webhooks/lomi',
     type: String,
   })
+  @IsString()
   url: string;
 
   @ApiProperty({
@@ -16,14 +24,21 @@ export class CreateWebhookBodyDto {
     ],
     type: [String],
   })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
   authorized_events: string[];
 
   @ApiPropertyOptional({
     example: 'Webhook for payment events',
     type: String,
   })
+  @IsString()
+  @IsOptional()
   description?: string;
 
   @ApiPropertyOptional({ type: Object })
+  @IsObject()
+  @IsOptional()
   metadata?: Record<string, unknown>;
 }

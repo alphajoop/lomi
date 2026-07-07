@@ -111,7 +111,7 @@ export class DashboardSpiStatusService {
     const referenceLabel = (body.referenceLabel ?? 'LOMI').substring(0, 25);
 
     const sdk = await this.spiClient.getSdk(organizationId);
-    const qrPayload = sdk.qr.payload({
+    const qrInput = {
       alias,
       countryCode: country,
       qrType,
@@ -120,13 +120,20 @@ export class DashboardSpiStatusService {
         qrType === 'DYNAMIC' && body.amount
           ? Math.round(body.amount * 100)
           : undefined,
-    });
+    };
+
+    const qrPayload = sdk.qr.payload(qrInput);
+    const qrSvg = await sdk.qr.svg(qrInput, { size: 240, margin: 0 });
 
     return {
       spiAccountNumber: status.spiAccountNumber,
       alias,
       qrPayload,
+      qrSvg,
       qrType,
+      countryCode: country,
+      referenceLabel,
+      amount: qrInput.amount,
     };
   }
 }

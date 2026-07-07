@@ -2630,6 +2630,11 @@
                     "description": "When true, show and require customer phone. Default false when unset.",
                     "default": false
                   },
+                  "require_name": {
+                    "type": "boolean",
+                    "description": "When true, show and require customer name. Default true when unset.",
+                    "default": true
+                  },
                   "fields": {
                     "type": "array",
                     "description": "Optional ordered checkout field schema. When provided, overrides require_* booleans.",
@@ -2905,6 +2910,11 @@
                     "type": "boolean",
                     "description": "When true, show and require customer phone. Default false when unset.",
                     "default": false
+                  },
+                  "require_name": {
+                    "type": "boolean",
+                    "description": "When true, show and require customer name. Default true when unset.",
+                    "default": true
                   },
                   "fields": {
                     "type": "array",
@@ -3780,7 +3790,7 @@
     },
     "/logs": {
       "get": {
-        "description": "Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.",
+        "description": "Returns paginated logs for the organization. The `type` query parameter selects which log stream to read:\n\n- **api_request** — every authenticated API call (any HTTP status), including request/response payloads\n- **api_error** — server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)\n- **webhook_delivery** — outbound webhook delivery attempts and retries\n- **activity** — organization audit events (configuration changes, security events)",
         "operationId": "LogsController_findAll",
         "parameters": [
           {
@@ -6879,6 +6889,10 @@
             "type": "boolean",
             "example": false
           },
+          "require_name": {
+            "type": "boolean",
+            "example": true
+          },
           "spi_account_number": {
             "type": "string",
             "example": "string"
@@ -6940,6 +6954,7 @@
           "require_billing_address",
           "require_email",
           "require_phone",
+          "require_name",
           "spi_account_number",
           "spi_qr_code_id",
           "status",
@@ -7036,6 +7051,10 @@
             "type": "boolean",
             "example": false
           },
+          "require_name": {
+            "type": "boolean",
+            "example": true
+          },
           "success_url": {
             "type": "string",
             "example": "string"
@@ -7075,6 +7094,7 @@
           "require_billing_address",
           "require_email",
           "require_phone",
+          "require_name",
           "success_url",
           "title",
           "updated_at",

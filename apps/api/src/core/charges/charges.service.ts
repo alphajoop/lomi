@@ -365,6 +365,13 @@ export class ChargesService {
       },
     });
 
+    if (paymentEnvironment === 'test' && scenarioKey === 'failed') {
+      throw new BadRequestException('Charge failed (test scenario)');
+    }
+
+    const deferTestSettlement =
+      paymentEnvironment === 'test' && scenarioKey === 'pending';
+
     const { data: txRows, error: txError } = await this.supabaseService
       .getClient()
       .rpc(
@@ -378,10 +385,16 @@ export class ChargesService {
           p_product_id: productId ?? null,
           p_subscription_id: subscriptionId ?? null,
           p_description: description ?? 'API MTN charge',
-          p_metadata: { source: 'api_direct_charge' },
+          p_metadata: {
+            source: 'api_direct_charge',
+            ...(deferTestSettlement
+              ? { defer_test_settlement: true, test_scenario: 'pending' }
+              : {}),
+          },
           p_quantity: quantity,
           p_checkout_session_id: null,
           p_environment: paymentEnvironment,
+          p_defer_test_settlement: deferTestSettlement,
         } as never,
       );
 
@@ -397,10 +410,6 @@ export class ChargesService {
       txRow as { transaction_id: string; external_id: string };
 
     if (paymentEnvironment === 'test') {
-      if (scenarioKey === 'failed') {
-        throw new BadRequestException('Charge failed (test scenario)');
-      }
-
       if (scenarioKey === 'pending') {
         const pendingData = {
           transaction_id: transactionId,

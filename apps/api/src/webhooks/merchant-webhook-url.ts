@@ -38,6 +38,10 @@ function parseIpv4Octets(ip: string): number[] | null {
   return parts.length === 4 ? parts : null;
 }
 
+function isLoopbackAllowedForCommitTests(): boolean {
+  return process.env.WEBHOOK_COMMIT_TEST_ALLOW_LOOPBACK === 'true';
+}
+
 function isBlockedIpv4(ip: string): boolean {
   const octets = parseIpv4Octets(ip);
   if (!octets) {
@@ -46,6 +50,7 @@ function isBlockedIpv4(ip: string): boolean {
 
   const [a, b] = octets;
 
+  if (a === 127 && isLoopbackAllowedForCommitTests()) return false;
   if (a === 127) return true; // 127.0.0.0/8
   if (a === 10) return true; // 10.0.0.0/8
   if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
@@ -559,9 +564,11 @@ function createPinnedLookup(
 
 function createPinnedHttpsAgent(
   target: SafeMerchantWebhookTarget,
+  options?: { insecure?: boolean },
 ): https.Agent {
   return new https.Agent({
     lookup: createPinnedLookup(target),
+    rejectUnauthorized: options?.insecure ? false : true,
   });
 }
 
@@ -569,7 +576,9 @@ export function buildSafeMerchantWebhookAxiosConfig(
   target: SafeMerchantWebhookTarget,
 ): AxiosRequestConfig {
   return {
-    httpsAgent: createPinnedHttpsAgent(target),
+    httpsAgent: createPinnedHttpsAgent(target, {
+      insecure: isLoopbackAllowedForCommitTests(),
+    }),
     maxRedirects: 0,
   };
 }

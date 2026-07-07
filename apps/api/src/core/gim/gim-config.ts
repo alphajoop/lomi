@@ -14,6 +14,17 @@ export type GimPlatformConfig = {
 
 const isProduction = (): boolean => process.env.NODE_ENV === 'production';
 
+/** Production NODE_ENV on the sandbox API host should still allow GIM UAT. */
+const isStrictProductionGim = (): boolean => {
+  if (!isProduction()) {
+    return false;
+  }
+  const apiEnv = (process.env.LOMI_API_ENV || process.env.API_ENV || '')
+    .trim()
+    .toLowerCase();
+  return apiEnv !== 'sandbox' && apiEnv !== 'test';
+};
+
 function requireProductionEnv(name: string, value?: string): string {
   if (!value?.trim()) {
     throw new Error(
@@ -66,7 +77,7 @@ export function loadGimPlatformConfig(): GimPlatformConfig {
     process.env.GIM_RETURN_URL?.trim() ??
     'https://api.lomi.africa/payments/gim/return';
 
-  if (isProduction()) {
+  if (isStrictProductionGim()) {
     if (
       payByCardUrl.includes('omni-uat.gimpay.org') ||
       payByCardUrl === GIM_UAT_PAY_BY_CARD_URL

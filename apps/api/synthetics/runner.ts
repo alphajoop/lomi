@@ -45,6 +45,10 @@ function resolveExpected(
   return typeof expectStatus === 'function' ? expectStatus(ctx) : expectStatus;
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function runSuite(
   suite: SuiteName,
   baseUrl: string,
@@ -76,20 +80,45 @@ export async function runSuite(
     }
 
     try {
-      const res = await client.request(check.method, path, {
-        body: resolveBody(check.body, ctx),
-        headers: resolveHeaders(check.headers, ctx),
-        auth: check.auth,
-      });
-
       const expected = resolveExpected(check.expectStatus, ctx);
-      const anomalies = analyzeResponse(res, expected);
+      const maxAttempts = Math.max(1, check.retry?.attempts ?? 1);
+      const retryDelayMs = check.retry?.delayMs ?? 0;
 
-      if (check.validate) {
-        const validationError = check.validate(ctx, res);
-        if (validationError) {
-          anomalies.push({ kind: 'validation', message: validationError });
+      let res: Awaited<ReturnType<typeof client.request>> | undefined;
+      let anomalies: ReturnType<typeof analyzeResponse> = [];
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        res = await client.request(check.method, path, {
+          body: resolveBody(check.body, ctx),
+          headers: resolveHeaders(check.headers, ctx),
+          auth: check.auth,
+        });
+
+        anomalies = analyzeResponse(res, expected);
+
+        if (check.validate && anomalies.length === 0) {
+          const validationError = check.validate(ctx, res);
+          if (validationError) {
+            anomalies.push({ kind: 'validation', message: validationError });
+          }
         }
+
+        const shouldRetry =
+          check.retry &&
+          attempt < maxAttempts &&
+          anomalies.some((a) => a.kind === 'validation');
+
+        if (!shouldRetry) {
+          break;
+        }
+
+        if (retryDelayMs > 0) {
+          await sleep(retryDelayMs);
+        }
+      }
+
+      if (!res) {
+        throw new Error('Request did not run');
       }
 
       if (check.capture && anomalies.length === 0) {

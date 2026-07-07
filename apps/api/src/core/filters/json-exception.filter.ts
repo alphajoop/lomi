@@ -103,6 +103,19 @@ type RequestWithContext = Request & {
   apiKey?: string;
 };
 
+function isHttpExceptionLoggingEnabled(): boolean {
+  const raw = process.env.LOG_HTTP_EXCEPTIONS?.trim().toLowerCase();
+  return raw === 'true' || raw === '1' || raw === 'yes';
+}
+
+function shouldPersistHttpException(status: number): boolean {
+  if (!isHttpExceptionLoggingEnabled()) return false;
+  return (
+    status === HttpStatus.SERVICE_UNAVAILABLE ||
+    status === HttpStatus.TOO_MANY_REQUESTS
+  );
+}
+
 @Catch()
 export class GlobalJsonExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalJsonExceptionFilter.name);
@@ -140,6 +153,18 @@ export class GlobalJsonExceptionFilter implements ExceptionFilter {
         },
         request_id: requestId,
       });
+      if (shouldPersistHttpException(HttpStatus.TOO_MANY_REQUESTS)) {
+        this.persistHttpException(
+          req,
+          requestId,
+          HttpStatus.TOO_MANY_REQUESTS,
+          {
+            code: 'rate_limit_exceeded',
+            message: 'Too many requests',
+            details: { retry_after_seconds: retryAfter, limit: limitCap },
+          },
+        );
+      }
       return;
     }
 
@@ -147,6 +172,9 @@ export class GlobalJsonExceptionFilter implements ExceptionFilter {
       const status = exception.getStatus();
       const body = exception.getResponse();
       const n = normalizeHttpResponse(status, body);
+      if (shouldPersistHttpException(status)) {
+        this.persistHttpException(req, requestId, status, n);
+      }
       this.send(res, requestId, status, {
         error: {
           code: n.code,
@@ -221,6 +249,63 @@ export class GlobalJsonExceptionFilter implements ExceptionFilter {
       .catch((persistErr: Error) => {
         this.logger.error(
           `Exception persisting API error log: ${persistErr.message}`,
+          persistErr,
+        );
+      });
+  }
+
+  private persistHttpException(
+    req: RequestWithContext,
+    requestId: string,
+    status: number,
+    normalized: { code: string; message: string; details: unknown },
+  ): void {
+    const user = req.user;
+    if (!user?.organizationId) return;
+
+    const apiKey =
+      (typeof req.apiKey === 'string' && req.apiKey) ||
+      user.apiKey ||
+      (typeof req.headers['x-api-key'] === 'string'
+        ? req.headers['x-api-key']
+        : null) ||
+      (typeof req.headers['x-lomi-api-key'] === 'string'
+        ? req.headers['x-lomi-api-key']
+        : null);
+
+    const endpoint = (req.path ?? req.url ?? '').split('?')[0];
+
+    void this.supabase
+      .rpc(
+        'log_api_error' as never,
+        {
+          p_error_type: normalized.code,
+          p_error_message: normalized.message,
+          p_stack_trace: null,
+          p_context: {
+            request_id: requestId,
+            organization_id: user.organizationId,
+            details: normalized.details,
+          },
+          p_organization_id: user.organizationId,
+          p_api_key: apiKey,
+          p_endpoint: endpoint,
+          p_request_method: req.method,
+          p_request_id: requestId,
+          p_response_status: status,
+        } as never,
+      )
+      .then(({ error }) => {
+        if (error) {
+          this.logger.error(
+            `Failed to persist HTTP exception log: ${error.message}`,
+            error,
+          );
+        }
+      })
+      .catch((persistErr: Error) => {
+        this.logger.error(
+          `Exception persisting HTTP exception log: ${persistErr.message}`,
           persistErr,
         );
       });

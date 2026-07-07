@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { resolveSupabaseEdgeInvocation } from '../../utils/supabase/resolve-supabase-edge';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import {
   isNetworkRequest,
@@ -21,6 +22,7 @@ import {
   refundFeePercentageForBalanceRpc,
   type RefundFeeConfig,
 } from './refund-fees';
+import { logStructured } from '../../utils/logging/structured-console-logger';
 
 import {
   createStripeClient,
@@ -493,25 +495,50 @@ export class RefundsService {
     }
 
     const stripe = createStripeClient(stripeSecret);
-    const refundCents = this.computeStripeRefundCents(
-      dto.amount,
-      Number(tx.gross_amount),
-      tx.metadata,
-    );
+
+    // Source of truth for the refund amount + currency: the actual Stripe charge.
+    let charge;
+    try {
+      charge = await stripe.charges.retrieve(chargeId);
+    } catch (error) {
+      if (useManualFallback) {
+        return this.createManualCardRefund(
+          dto,
+          user,
+          feePercentage,
+          refundMerchantId,
+        );
+      }
+      throw this.mapStripeRefundError(error);
+    }
+
+    const { cents: refundCents, alreadyRefunded } =
+      this.resolveStripeRefundCents(
+        dto.amount,
+        Number(tx.gross_amount),
+        charge.amount,
+        charge.amount_refunded ?? 0,
+      );
 
     let stripeRefund;
     try {
-      stripeRefund = await stripe.refunds.create({
-        charge: chargeId,
-        amount: refundCents,
-        reason: 'requested_by_customer',
-        metadata: {
-          refund_id: '',
-          transaction_id: dto.transaction_id,
-          organization_id: user.organizationId,
-          refunded_by: 'merchant_api',
+      stripeRefund = await stripe.refunds.create(
+        {
+          charge: chargeId,
+          amount: refundCents,
+          reason: 'requested_by_customer',
+          metadata: {
+            refund_id: '',
+            transaction_id: dto.transaction_id,
+            organization_id: user.organizationId,
+            refunded_by: 'merchant_api',
+          },
         },
-      });
+        {
+          // Collapse rapid duplicate submissions into a single Stripe refund.
+          idempotencyKey: `refund:${dto.transaction_id}:${refundCents}:${alreadyRefunded}`,
+        },
+      );
     } catch (error) {
       if (useManualFallback) {
         return this.createManualCardRefund(
@@ -675,31 +702,37 @@ export class RefundsService {
     return typeof chargeId === 'string' && chargeId ? chargeId : null;
   }
 
-  private computeStripeRefundCents(
-    refundAmountXof: number,
-    grossAmountXof: number,
-    metadata?: Record<string, unknown> | null,
-  ): number {
-    const raw = metadata?.stripe_amount_cents;
-    const stripeAmountCents =
-      typeof raw === 'string'
-        ? parseInt(raw, 10)
-        : typeof raw === 'number'
-          ? raw
-          : null;
-
-    if (
-      stripeAmountCents != null &&
-      stripeAmountCents > 0 &&
-      grossAmountXof > 0
-    ) {
-      return Math.max(
-        1,
-        Math.round((refundAmountXof / grossAmountXof) * stripeAmountCents),
+  /**
+   * Resolve the amount to refund on Stripe, in the minor units of the ACTUAL
+   * charge currency. The charge is the single source of truth: cards settle in
+   * the card's presentment currency (often different from the stored gross /
+   * display currency). Never infer minor units from the display amount - doing
+   * so once refunded 9.93 -> 10 cents = EUR 0.10 instead of the full charge.
+   */
+  private resolveStripeRefundCents(
+    refundAmount: number,
+    grossAmount: number,
+    chargeAmount: number,
+    chargeAmountRefunded: number,
+  ): { cents: number; alreadyRefunded: number } {
+    const remaining = chargeAmount - chargeAmountRefunded;
+    if (!Number.isFinite(remaining) || remaining <= 0) {
+      throw new BadRequestException(
+        'This charge has already been fully refunded',
       );
     }
 
-    return Math.max(1, Math.round(refundAmountXof));
+    let cents: number;
+    if (grossAmount > 0 && refundAmount < grossAmount - 0.01) {
+      // Partial refund: scale by the proportion of the original gross amount.
+      cents = Math.round((refundAmount / grossAmount) * chargeAmount);
+    } else {
+      // Full (remaining) refund: refund exactly what is left to avoid drift.
+      cents = remaining;
+    }
+
+    cents = Math.min(Math.max(1, cents), remaining);
+    return { cents, alreadyRefunded: chargeAmountRefunded };
   }
 
   private mapStripeRefundError(error: unknown): BadRequestException {
@@ -823,10 +856,7 @@ export class RefundsService {
       );
     }
 
-    const customer = await this.loadCustomer(
-      tx.customer_id,
-      user.organizationId,
-    );
+    const customer = await this.loadCustomer(tx.customer_id, user.merchantId);
     const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
       throw new BadRequestException(
@@ -1000,10 +1030,7 @@ export class RefundsService {
       );
     }
 
-    const customer = await this.loadCustomer(
-      tx.customer_id,
-      user.organizationId,
-    );
+    const customer = await this.loadCustomer(tx.customer_id, user.merchantId);
     const phone = customer.phone_number || customer.whatsapp_number;
     if (!phone) {
       throw new BadRequestException(
@@ -1134,12 +1161,12 @@ export class RefundsService {
     }
   }
 
-  private async loadCustomer(customerId: string, organizationId: string) {
+  private async loadCustomer(customerId: string, merchantId: string) {
     const { data, error } = await this.supabaseService.getClient().rpc(
       'get_customer' as never,
       {
         p_customer_id: customerId,
-        p_organization_id: organizationId,
+        p_merchant_id: merchantId,
       } as never,
     );
 
@@ -1203,20 +1230,18 @@ export class RefundsService {
     path: string,
     body: Record<string, unknown>,
   ): Promise<unknown> {
-    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
-    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
-
-    if (!projectRef || !anonKey) {
+    const edge = resolveSupabaseEdgeInvocation(this.configService);
+    if (!edge) {
       throw new InternalServerErrorException('Payment configuration missing');
     }
 
-    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/wave`;
+    const edgeFunctionUrl = `${edge.functionsBaseUrl}/wave`;
 
     const response = await fetch(edgeFunctionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${anonKey}`,
+        Authorization: `Bearer ${edge.publishableKey}`,
       },
       body: JSON.stringify({
         path,
@@ -1228,6 +1253,15 @@ export class RefundsService {
     if (!response.ok) {
       const errorText = await response.text();
       this.logger.error(`Payment edge ${path} failed: ${errorText}`);
+      logStructured({
+        event: 'refund_payment_edge_failed',
+        organization_id:
+          typeof body.organization_id === 'string'
+            ? body.organization_id
+            : undefined,
+        message: errorText,
+        path,
+      });
       throw new BadRequestException(`Refund processing failed: ${errorText}`);
     }
 
@@ -1239,10 +1273,8 @@ export class RefundsService {
     user: AuthContext,
     body: Record<string, unknown>,
   ): Promise<unknown> {
-    const projectRef = this.configService.get<string>('SUPABASE_PROJECT_REF');
-    const anonKey = this.configService.get<string>('SUPABASE_PUBLISHABLE_KEY');
-
-    if (!projectRef || !anonKey) {
+    const edge = resolveSupabaseEdgeInvocation(this.configService);
+    if (!edge) {
       throw new InternalServerErrorException('Payment configuration missing');
     }
 
@@ -1254,13 +1286,13 @@ export class RefundsService {
     const targetEnvironment =
       mtnApiEnvironment === 'development' ? 'sandbox' : countryTarget;
 
-    const edgeFunctionUrl = `https://${projectRef}.supabase.co/functions/v1/mtn`;
+    const edgeFunctionUrl = `${edge.functionsBaseUrl}/mtn`;
 
     const response = await fetch(edgeFunctionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${anonKey}`,
+        Authorization: `Bearer ${edge.publishableKey}`,
       },
       body: JSON.stringify({
         path,

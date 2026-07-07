@@ -8,6 +8,7 @@ import {
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { sanitizeLogPayload } from './api-log-payload';
 
 @Injectable()
 export class ApiLoggingInterceptor implements NestInterceptor {
@@ -71,17 +72,8 @@ export class ApiLoggingInterceptor implements NestInterceptor {
         const rpcName = 'log_api_interaction_context' as any;
 
         const endpointPath = urlWithoutQuery(request.url);
-        const heavyPayloadPaths = isCheckoutSessionsPath(endpointPath);
-        const requestPayload = heavyPayloadPaths
-          ? truncateLogPayload(request.body)
-          : request.body
-            ? request.body
-            : {};
-        const responsePayload = heavyPayloadPaths
-          ? truncateLogPayload(responseBody)
-          : responseBody
-            ? responseBody
-            : {};
+        const requestPayload = sanitizeLogPayload(endpointPath, request.body);
+        const responsePayload = sanitizeLogPayload(endpointPath, responseBody);
 
         // Don't await this to avoid blocking the response
         this.supabase
@@ -99,6 +91,10 @@ export class ApiLoggingInterceptor implements NestInterceptor {
             p_response_time: durationMs,
             p_network_account_id: user.networkAccountId || null,
             p_network_membership_id: user.networkMembershipId || null,
+            p_request_id:
+              typeof request.id === 'string' && request.id.length > 0
+                ? request.id
+                : null,
           })
           .then(({ error }) => {
             if (error) {
@@ -145,37 +141,4 @@ export class ApiLoggingInterceptor implements NestInterceptor {
 
 function urlWithoutQuery(url: string): string {
   return url.split('?')[0];
-}
-
-/** Checkout routes can carry large line_items / metadata; keep logs small. */
-function isCheckoutSessionsPath(path: string): boolean {
-  return (
-    path === '/checkout-sessions' || path.startsWith('/checkout-sessions/')
-  );
-}
-
-const CHECKOUT_LOG_PAYLOAD_MAX_CHARS = 2048;
-
-function truncateLogPayload(value: unknown): Record<string, unknown> {
-  if (value === null || value === undefined) {
-    return {};
-  }
-  let text: string;
-  try {
-    text = typeof value === 'string' ? value : JSON.stringify(value);
-  } catch {
-    return { _log_serialization_failed: true };
-  }
-  if (text.length <= CHECKOUT_LOG_PAYLOAD_MAX_CHARS) {
-    try {
-      return JSON.parse(text) as Record<string, unknown>;
-    } catch {
-      return { preview: text };
-    }
-  }
-  return {
-    _truncated: true,
-    original_length: text.length,
-    preview: text.slice(0, CHECKOUT_LOG_PAYLOAD_MAX_CHARS),
-  };
 }

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lomi SDK checkout reference</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>lomi SDK Checkout Reference</h1>
+      <p>
+        This demo creates checkout sessions from your backend with <code>@lomi./sdk</code> and
+        lets you open, iframe-embed, or modal-embed checkout.
+      </p>
+
+      <section class="card">
+        <h2>1) Dynamic amount checkout session</h2>
+        <form id="dynamic-form">
+          <label>
+            Amount
+            <input type="number" name="amount" value="10000" min="100" required />
+          </label>
+          <label>
+            Currency
+            <input type="text" name="currency_code" value="XOF" required />
+          </label>
+          <label>
+            Customer email
+            <input type="email" name="customer_email" value="customer@example.com" />
+          </label>
+          <button type="submit">Create dynamic session</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>2) Price-based checkout session</h2>
+        <form id="price-form">
+          <label>
+            Price ID
+            <input type="text" name="price_id" placeholder="price_xxx" required />
+          </label>
+          <label>
+            Quantity
+            <input type="number" name="quantity" value="1" min="1" />
+          </label>
+          <label>
+            Customer email
+            <input type="email" name="customer_email" value="customer@example.com" />
+          </label>
+          <button type="submit">Create price session</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Checkout actions</h2>
+        <div class="button-row">
+          <button id="open-last-session" type="button">Open hosted checkout</button>
+          <button id="embed-last-session" type="button">Embed as iframe</button>
+          <button id="embed-sdk-modal" type="button">Open embed SDK modal</button>
+          <button id="clear-embed" type="button">Clear iframe</button>
+        </div>
+        <label>
+          Public key for embed SDK
+          <input id="public-key" type="text" placeholder="lomi_pk_xxx" />
+        </label>
+        <iframe id="checkout-embed" title="Embedded checkout preview"></iframe>
+      </section>
+
+      <section class="card">
+        <h2>Webhook debug</h2>
+        <button id="refresh-events" type="button">Refresh webhook events</button>
+        <pre id="events-output">[]</pre>
+      </section>
+
+      <section class="card">
+        <h2>Last API response</h2>
+        <pre id="output">{}</pre>
+      </section>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

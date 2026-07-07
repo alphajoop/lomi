@@ -1,11 +1,19 @@
 const stripeMockGlobal = globalThis as {
-  __paymentIntentsStripeMock?: { paymentIntents: { create: jest.Mock } };
+  __paymentIntentsStripeMock?: {
+    paymentIntents: {
+      create: jest.Mock;
+      retrieve: jest.Mock;
+      cancel: jest.Mock;
+    };
+  };
 };
 
 jest.mock('stripe', () => {
   stripeMockGlobal.__paymentIntentsStripeMock = {
     paymentIntents: {
       create: jest.fn(),
+      retrieve: jest.fn(),
+      cancel: jest.fn(),
     },
   };
   return jest.fn(() => stripeMockGlobal.__paymentIntentsStripeMock);
@@ -14,6 +22,8 @@ jest.mock('stripe', () => {
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BadRequestException,
+  ForbiddenException,
+  NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { CardChargeService } from './card-charge.service';
@@ -35,6 +45,10 @@ describe('CardChargeService', () => {
 
   beforeEach(async () => {
     process.env.STRIPE_SECRET_KEY = 'sk_test_fixture';
+    // Direct card charges are muted by default; enable so these tests can
+    // validate the underlying Stripe path. The muted default is covered
+    // separately in the "muted by default" test below.
+    process.env.LOMI_DIRECT_CARD_CHARGES_ENABLED = 'true';
 
     rpcMock = jest.fn();
     const supabase = {
@@ -88,6 +102,8 @@ describe('CardChargeService', () => {
     });
 
     stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.create.mockReset();
+    stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.retrieve.mockReset();
+    stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.cancel.mockReset();
     stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.create.mockResolvedValue(
       {
         id: 'pi_test',
@@ -101,6 +117,25 @@ describe('CardChargeService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    delete process.env.LOMI_DIRECT_CARD_CHARGES_ENABLED;
+  });
+
+  it('is muted with 503 by default (LOMI_DIRECT_CARD_CHARGES_ENABLED unset)', async () => {
+    delete process.env.LOMI_DIRECT_CARD_CHARGES_ENABLED;
+
+    const dto = {
+      amount: 5000,
+      currency_code: 'XOF',
+      customer_id: '550e8400-e29b-41d4-a716-446655440000',
+    } as CreateCardChargeDto;
+
+    await expect(service.create(dto, user)).rejects.toBeInstanceOf(
+      ServiceUnavailableException,
+    );
+    expect(rpcMock).not.toHaveBeenCalled();
+    expect(
+      stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.create,
+    ).not.toHaveBeenCalled();
   });
 
   it('throws when reconciliation identifiers are incomplete', async () => {
@@ -278,9 +313,121 @@ describe('CardChargeService', () => {
     );
   });
 
+  describe('findOne', () => {
+    it('returns 404 when transaction lookup fails', async () => {
+      rpcMock.mockImplementation((fnName: string) => {
+        if (fnName === 'get_transaction_by_stripe_intent') {
+          return Promise.resolve({
+            data: null,
+            error: { message: 'db down' },
+          });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
+      stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.retrieve.mockResolvedValue(
+        {
+          id: 'pi_orphan',
+          client_secret: 'pi_orphan_secret',
+          amount: 100,
+          currency: 'xof',
+          status: 'requires_payment_method',
+          metadata: { organization_id: 'org_1' },
+        },
+      );
+
+      await expect(service.findOne('pi_orphan', user)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
+
+    it('returns 404 when transaction is missing and metadata org mismatches', async () => {
+      rpcMock.mockImplementation((fnName: string) => {
+        if (fnName === 'get_transaction_by_stripe_intent') {
+          return Promise.resolve({ data: null, error: null });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
+      stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.retrieve.mockResolvedValue(
+        {
+          id: 'pi_other',
+          client_secret: 'pi_other_secret',
+          amount: 100,
+          currency: 'xof',
+          status: 'requires_payment_method',
+          metadata: { organization_id: 'org_other' },
+        },
+      );
+
+      await expect(service.findOne('pi_other', user)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
+
+    it('allows metadata org fallback when transaction row is missing', async () => {
+      rpcMock.mockImplementation((fnName: string) => {
+        if (fnName === 'get_transaction_by_stripe_intent') {
+          return Promise.resolve({ data: null, error: null });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
+      stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.retrieve.mockResolvedValue(
+        {
+          id: 'pi_meta',
+          client_secret: 'pi_meta_secret',
+          amount: 100,
+          currency: 'xof',
+          status: 'requires_payment_method',
+          metadata: { organization_id: 'org_1' },
+        },
+      );
+
+      const result = await service.findOne('pi_meta', user);
+      expect((result.data as { client_secret: string }).client_secret).toBe(
+        'pi_meta_secret',
+      );
+    });
+
+    it('denies cross-tenant access when transaction belongs to another org', async () => {
+      rpcMock.mockImplementation((fnName: string) => {
+        if (fnName === 'get_transaction_by_stripe_intent') {
+          return Promise.resolve({
+            data: {
+              organization_id: 'org_other',
+              merchant_id: 'merch_other',
+              transaction_id: 'tx_1',
+              status: 'pending',
+            },
+            error: null,
+          });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
+      stripeMockGlobal.__paymentIntentsStripeMock!.paymentIntents.retrieve.mockResolvedValue(
+        {
+          id: 'pi_cross',
+          client_secret: 'pi_cross_secret',
+          amount: 100,
+          currency: 'xof',
+          status: 'requires_payment_method',
+          metadata: {},
+        },
+      );
+
+      await expect(service.findOne('pi_cross', user)).rejects.toBeInstanceOf(
+        ForbiddenException,
+      );
+    });
+  });
+
   describe('Stripe not configured', () => {
     it('throws ServiceUnavailableException', async () => {
+      // Feature flag is enabled by the outer beforeEach, so the mute guard is
+      // bypassed and this genuinely exercises the "no Stripe credentials" path.
+      // Clear both keys: test mode falls back to STRIPE_SECRET_KEY_TEST.
+      const priorLive = process.env.STRIPE_SECRET_KEY;
+      const priorTest = process.env.STRIPE_SECRET_KEY_TEST;
       delete process.env.STRIPE_SECRET_KEY;
+      delete process.env.STRIPE_SECRET_KEY_TEST;
 
       const supabaseOnly = {
         getClient: jest.fn(() => ({ rpc: rpcMock })),
@@ -311,7 +458,9 @@ describe('CardChargeService', () => {
         ),
       ).rejects.toBeInstanceOf(ServiceUnavailableException);
 
-      process.env.STRIPE_SECRET_KEY = 'sk_test_fixture';
+      if (priorLive !== undefined) process.env.STRIPE_SECRET_KEY = priorLive;
+      if (priorTest !== undefined)
+        process.env.STRIPE_SECRET_KEY_TEST = priorTest;
     });
   });
 });

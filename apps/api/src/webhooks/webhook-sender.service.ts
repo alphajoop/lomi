@@ -12,6 +12,7 @@ import { CliListenerService } from '../cli/cli-listener.service';
 import { CliStreamService } from '../cli/cli-stream.service';
 import { sanitizeMerchantWebhookTransactionPayload } from './sanitize-merchant-webhook-transaction-payload';
 import { safeBullJobId } from '../utils/bullmq/job-id';
+import { logStructured } from '../utils/logging/structured-console-logger';
 
 export interface Webhook {
   id: string;
@@ -458,6 +459,11 @@ export class WebhookSenderService {
     this.logger.error(
       `Webhook ${webhook.id} delivery failed after ${maxRetries} local retries`,
     );
+    logStructured({
+      event: 'webhook_delivery_exhausted_retries',
+      message: `Webhook ${webhook.id} delivery failed after ${maxRetries} local retries`,
+      webhook_id: webhook.id,
+    });
     return false;
   }
 

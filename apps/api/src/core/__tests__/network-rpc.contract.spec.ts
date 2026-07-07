@@ -109,12 +109,27 @@ describe('Network Supabase RPC identifiers (contract)', () => {
     );
   });
 
-  it('defines direct-charge payment completion webhook trigger', () => {
-    expect(networkFunctionsSql).toContain(
-      'enqueue_network_payment_webhooks_on_transaction_complete',
-    );
-    expect(networkFunctionsSql).toContain(
-      'trigger_enqueue_network_payment_webhooks_on_transaction_complete',
-    );
+  it('includes refunded_amount on Network transaction RPC return types', () => {
+    for (const rpcName of [
+      'fetch_network_transactions_for_api',
+      'get_network_transaction_for_api',
+      'fetch_network_transactions',
+      'fetch_network_customer_transactions_for_api',
+    ] as const) {
+      const start = networkFunctionsSql.indexOf(
+        `CREATE OR REPLACE FUNCTION public.${rpcName}(`,
+      );
+      expect(start).toBeGreaterThanOrEqual(0);
+      const nextCreate = networkFunctionsSql.indexOf(
+        '\nCREATE OR REPLACE FUNCTION public.',
+        start + 1,
+      );
+      const body = networkFunctionsSql.slice(
+        start,
+        nextCreate === -1 ? undefined : nextCreate,
+      );
+      expect(body).toContain('refunded_amount NUMERIC');
+      expect(body).toContain('refund_totals.total_refunded');
+    }
   });
 });

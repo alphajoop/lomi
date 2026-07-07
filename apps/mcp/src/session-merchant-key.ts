@@ -16,6 +16,34 @@ export function looksLikeLomiApiCredential(token: string): boolean {
   return t.startsWith('lomi_') && t.length >= 16;
 }
 
+export function looksLikeProvisioningCredential(token: string): boolean {
+  return token.trim().startsWith('lomi_prov_');
+}
+
+export function extractSessionProvisioningKey(req: Request): string | null {
+  const headerKey = firstHeaderValue(req.headers['x-lomi-provisioning-key']);
+  if (headerKey && headerKey.length > 0) {
+    return headerKey;
+  }
+
+  const auth = firstHeaderValue(req.headers.authorization);
+  if (!auth?.startsWith('Bearer ')) return null;
+  const bearer = auth.slice('Bearer '.length).trim();
+  if (!bearer || isMcpTransportBearerToken(bearer)) return null;
+  if (looksLikeProvisioningCredential(bearer)) return bearer;
+  return null;
+}
+
+/** Bearer token that may be an OAuth access token (resolved via introspection in HTTP layer). */
+export function extractOAuthAccessToken(req: Request): string | null {
+  const auth = firstHeaderValue(req.headers.authorization);
+  if (!auth?.startsWith('Bearer ')) return null;
+  const bearer = auth.slice('Bearer '.length).trim();
+  if (!bearer || isMcpTransportBearerToken(bearer)) return null;
+  if (bearer.startsWith('lomi_oat_')) return bearer;
+  return null;
+}
+
 /**
  * Resolves the merchant REST credential for this MCP HTTP session.
  *

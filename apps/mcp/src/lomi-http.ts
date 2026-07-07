@@ -42,11 +42,15 @@ function fetchMaxRetries(): number {
 export async function callLomiRest(
   tool: ManifestTool,
   args: Record<string, unknown>,
-  options: { baseUrl: string; apiKey: string },
+  options: {
+    baseUrl: string;
+    apiKey: string;
+    authHeaderName?: string;
+  },
 ): Promise<LomiHttpResult> {
-  const { baseUrl, apiKey } = options;
+  const { baseUrl, apiKey, authHeaderName = 'X-API-KEY' } = options;
   const headers: Record<string, string> = {
-    'X-API-KEY': apiKey,
+    [authHeaderName]: apiKey,
     Accept: 'application/json',
   };
 

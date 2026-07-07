@@ -1,4 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class CreatePriceDto {
   @ApiProperty({
@@ -6,6 +14,8 @@ export class CreatePriceDto {
     description:
       'Price amount. For standard/tiered: fixed unit price. For pay_what_you_want: suggested unit price pre-filled at checkout (defaults to minimum_amount if omitted).',
   })
+  @IsNumber()
+  @Min(0)
   amount: number;
 
   @ApiProperty({
@@ -13,53 +23,62 @@ export class CreatePriceDto {
     description: 'Currency code',
     enum: ['XOF', 'USD', 'EUR'],
   })
+  @IsIn(['XOF', 'USD', 'EUR'])
   currency_code: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'month',
     description: 'Billing interval (required for recurring products)',
     enum: ['day', 'week', 'month', 'year'],
-    required: false,
   })
+  @IsIn(['day', 'week', 'month', 'year'])
+  @IsOptional()
   billing_interval?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'standard',
     description: 'Pricing model',
     enum: ['standard', 'pay_what_you_want', 'tiered'],
     default: 'standard',
-    required: false,
   })
+  @IsIn(['standard', 'pay_what_you_want', 'tiered'])
+  @IsOptional()
   pricing_model?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 5000.0,
     description:
       'Lowest unit price the customer may pay. Required when pricing_model is pay_what_you_want.',
-    required: false,
   })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
   minimum_amount?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 50000.0,
     description:
       'Optional upper bound on unit price when pricing_model is pay_what_you_want.',
-    required: false,
   })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
   maximum_amount?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: true,
     description: 'Whether this is the default price',
     default: false,
-    required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   is_default?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: { notes: 'Early bird pricing' },
     description: 'Additional metadata',
-    required: false,
   })
-  metadata?: Record<string, any>;
+  @IsObject()
+  @IsOptional()
+  metadata?: Record<string, unknown>;
 }

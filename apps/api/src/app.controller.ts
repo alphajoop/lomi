@@ -25,6 +25,7 @@ export class AppController {
   ) {}
 
   @Get()
+  @Header('Content-Type', 'text/plain; charset=utf-8')
   getHello(): string {
     return this.appService.getHello();
   }

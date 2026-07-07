@@ -30,12 +30,13 @@ type SpiWebhookPayload = {
 };
 
 type CompleteRpcResult = {
-  completion_type?: 'checkout' | 'invoice' | 'payout';
+  completion_type?: 'checkout' | 'invoice' | 'payout' | 'bnpl_installment';
   organization_id: string;
   transaction_id: string | null;
   checkout_session_id: string | null;
   invoice_id?: string | null;
   payout_id?: string | null;
+  payment_request_id?: string | null;
   already_completed: boolean;
   status: string;
 };
@@ -144,6 +145,41 @@ export class SpiWebhookService {
         payout_id: result.payout_id,
         status: result.status,
         completion_type: 'payout',
+      };
+    }
+
+    if (result.completion_type === 'bnpl_installment') {
+      this.wideEvent.logEvent({
+        eventName: 'spi_bnpl_installment_completed',
+        organizationId: result.organization_id,
+        attributes: {
+          'payment.transaction_id': result.transaction_id ?? undefined,
+          'payment.provider': 'SPI',
+          'spi.tx_id': spiTxId,
+          'spi.payment_request_id': result.payment_request_id ?? undefined,
+          'telemetry.source_layer': 'api:webhook',
+        },
+      });
+
+      if (
+        result.transaction_id &&
+        !result.already_completed &&
+        spiPaymentStatus === 'IRREVOCABLE'
+      ) {
+        await this.triggerMerchantWebhook(
+          result.transaction_id,
+          result.organization_id,
+          'PAYMENT_SUCCEEDED',
+        );
+      }
+
+      return {
+        event: eventCode,
+        tx_id: spiTxId,
+        transaction_id: result.transaction_id,
+        payment_request_id: result.payment_request_id,
+        status: result.status,
+        completion_type: 'bnpl_installment',
       };
     }
 

@@ -2,13 +2,17 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { InternalCronGuard } from '../common/guards/internal-cron.guard';
 import { BillingService } from './billing.service';
+import { UsageEventsService } from './usage-events.service';
 
 @ApiExcludeController()
 @ApiTags('Internal')
 @UseGuards(InternalCronGuard)
 @Controller('internal/usage-billing')
 export class UsageBillingInternalController {
-  constructor(private readonly billingService: BillingService) {}
+  constructor(
+    private readonly billingService: BillingService,
+    private readonly usageEventsService: UsageEventsService,
+  ) {}
 
   @Post('run-cycle')
   @ApiOperation({
@@ -27,5 +31,20 @@ export class UsageBillingInternalController {
   })
   runDunning(@Body() body: { grace_days?: number }) {
     return this.billingService.runDunning(body?.grace_days ?? 3);
+  }
+
+  @Post('reconcile-pending-events')
+  @ApiOperation({
+    summary: 'Re-queue stale pending usage events (internal)',
+    description:
+      'Ops-only. Requires x-cron-secret header. Normally handled by pg_cron every 2 minutes.',
+  })
+  reconcilePendingEvents(
+    @Body() body: { stale_after_seconds?: number; limit?: number },
+  ) {
+    return this.usageEventsService.reconcileStalePendingEvents({
+      staleAfterSeconds: body?.stale_after_seconds,
+      limit: body?.limit,
+    });
   }
 }

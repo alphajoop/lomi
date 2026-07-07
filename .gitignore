@@ -2,3 +2,5 @@
 .cursor/
 .vscode/
 package.json
+.vercel
+.env*

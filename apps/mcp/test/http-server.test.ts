@@ -113,6 +113,48 @@ describe('createHttpApplication', () => {
     expect(body.ready).toBe(false);
   });
 
+  it('GET /.well-known/oauth-protected-resource returns metadata', async () => {
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(
+      `http://127.0.0.1:${ctx.port}/.well-known/oauth-protected-resource`,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.resource).toBeTruthy();
+  });
+
+  it('POST /mcp without session credentials returns WWW-Authenticate challenge', async () => {
+    delete process.env.LOMI_MCP_BEARER_TOKEN;
+    delete process.env.LOMI_PROVISIONING_KEY;
+    delete process.env.LOMI_SECRET_KEY;
+    delete process.env.X_API_KEY;
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'initialize',
+        id: 1,
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test', version: '0' },
+        },
+      }),
+    });
+    expect(res.status).toBe(401);
+    const wwwAuth = res.headers.get('www-authenticate');
+    expect(wwwAuth).toMatch(/Bearer/);
+    expect(wwwAuth).toMatch(/resource_metadata/);
+  });
+
   it('rate limits MCP routes when LOMI_MCP_RATE_LIMIT_RPM is low', async () => {
     process.env.LOMI_MCP_RATE_LIMIT_RPM = '2';
     const manifest = parseManifest(manifestJson);

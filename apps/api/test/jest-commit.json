@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".commit-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "setupFiles": ["<rootDir>/commit/support/setup-env.ts"],
+  "globalTeardown": "<rootDir>/commit/support/global-teardown.ts",
+  "testTimeout": 60000,
+  "forceExit": true,
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/../src/$1",
+    "^@core/(.*)$": "<rootDir>/../src/core/$1",
+    "^@utils/(.*)$": "<rootDir>/../src/utils/$1"
+  }
+}

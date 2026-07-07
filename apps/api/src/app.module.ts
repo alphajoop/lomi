@@ -42,6 +42,9 @@ import { CustomerPortalModule } from './core/customer-portal/customer-portal.mod
 import { HealthModule } from './health/health.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { CheckoutModule } from './checkout/checkout.module';
+import { ProvisioningModule } from './provisioning/provisioning.module';
+import { PartnersModule } from './partners/partners.module';
+import { OAuthModule } from './oauth/oauth.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -161,6 +164,9 @@ const logger = new Logger('RedisConfig');
     HealthModule,
     DashboardModule,
     CheckoutModule,
+    ProvisioningModule,
+    PartnersModule,
+    OAuthModule,
   ],
 
   controllers: [AppController],

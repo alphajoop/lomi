@@ -15,13 +15,27 @@ export interface SuiteContext {
   customerId?: string;
   productId?: string;
   transactionId?: string;
+  pendingTransactionId?: string;
   checkoutSessionId?: string;
   paymentLinkId?: string;
   paymentRequestId?: string;
   refundId?: string;
   couponId?: string;
   meterName?: string;
+  meterId?: string;
+  usageEventId?: string;
+  usageQuantity?: number;
+  usageProductId?: string;
+  usageMeterCode?: string;
+  usageSubscriptionId?: string;
+  usageSubQuantity?: number;
+  usageSubEventId?: string;
+  paymentWebhookId?: string;
   webhookId?: string;
+  webhookSecret?: string;
+  webhookDeliveryLogId?: string;
+  apiLogEntryId?: string;
+  correlatedRequestId?: string;
   [key: string]: unknown;
 }
 
@@ -42,6 +56,8 @@ export interface CheckDefinition {
   capture?: (ctx: SuiteContext, res: HttpResponse) => void;
   /** Return skip reason to skip this check */
   skipIf?: (ctx: SuiteContext) => string | null;
+  /** Re-run the HTTP request when validate fails (e.g. async log indexing). */
+  retry?: { attempts: number; delayMs: number };
 }
 
 export interface Anomaly {

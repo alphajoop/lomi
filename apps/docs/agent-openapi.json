@@ -46,7 +46,7 @@
             "api-key": []
           }
         ],
-        "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
+        "summary": "S'inscrire aux notifications adaptées à l'agent (persistant + relais SSE Redis)",
         "tags": ["Agent"]
       },
       "get": {
@@ -119,7 +119,7 @@
             "api-key": []
           }
         ],
-        "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
+        "summary": "Démarrer un workflow multi-étapes (idempotence sur idempotency_key, persistant)",
         "tags": ["Agent"]
       }
     },
@@ -241,6 +241,306 @@
         "summary": "Récupérer un enregistrement de transfert",
         "tags": ["Agent"]
       }
+    },
+    "/provisioning/v1/accounts": {
+      "post": {
+        "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
+        "operationId": "ProvisioningController_createAccount",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Create a merchant account for agent-driven onboarding",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/documents": {
+      "post": {
+        "operationId": "ProvisioningController_uploadDocument",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Upload a KYC document for onboarding",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/extract": {
+      "post": {
+        "operationId": "ProvisioningController_extractOnboarding",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Extract onboarding data from website or uploaded documents",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/complete": {
+      "post": {
+        "description": "Atomically creates the organization, provisions test API keys, and queues KYC review.",
+        "operationId": "ProvisioningController_completeOnboarding",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Complete merchant onboarding and submit KYC",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/onboarding/status": {
+      "get": {
+        "operationId": "ProvisioningController_getOnboardingStatus",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Get onboarding, KYC, and verification status",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/api-keys": {
+      "get": {
+        "description": "Returns test secret keys and publishable keys after onboarding completes.",
+        "operationId": "ProvisioningController_getApiKeys",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Retrieve provisioned test API keys for the merchant",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/live-activation/request": {
+      "post": {
+        "description": "Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.",
+        "operationId": "ProvisioningController_requestLiveActivation",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Request live mode activation (requires merchant approval)",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/provisioning/v1/merchants/{merchantId}/live-activation/status": {
+      "get": {
+        "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard — not via this API.",
+        "operationId": "ProvisioningController_getLiveActivationStatus",
+        "parameters": [
+          {
+            "name": "merchantId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "provisioning-key": []
+          }
+        ],
+        "summary": "Get live activation request status",
+        "tags": ["Provisioning"]
+      }
+    },
+    "/partners/v1/provisioning-keys": {
+      "post": {
+        "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning/v1 for agent onboarding.",
+        "operationId": "PartnersController_mintProvisioningKey",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "Mint a per-user provisioning key",
+        "tags": ["Partners"]
+      },
+      "get": {
+        "operationId": "PartnersController_listProvisioningKeys",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "List provisioning keys minted by this partner",
+        "tags": ["Partners"]
+      }
+    },
+    "/partners/v1/provisioning-keys/{provisioningKeyId}": {
+      "delete": {
+        "operationId": "PartnersController_revokeProvisioningKey",
+        "parameters": [
+          {
+            "name": "provisioningKeyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "Revoke a provisioning key",
+        "tags": ["Partners"]
+      }
+    },
+    "/partners/v1/usage": {
+      "get": {
+        "operationId": "PartnersController_getUsage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner-key": []
+          }
+        ],
+        "summary": "Partner provisioning usage summary",
+        "tags": ["Partners"]
+      }
     }
   },
   "info": {
@@ -252,6 +552,12 @@
   "tags": [
     {
       "name": "Agent"
+    },
+    {
+      "name": "Provisioning"
+    },
+    {
+      "name": "Partners"
     }
   ],
   "servers": [
@@ -270,6 +576,16 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
+      },
+      "provisioning-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Lomi-Provisioning-Key"
+      },
+      "partner-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Lomi-Partner-Key"
       }
     },
     "schemas": {

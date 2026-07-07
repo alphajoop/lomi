@@ -4,6 +4,7 @@ export type SessionRegistryEntry = {
   transport: StreamableHTTPServerTransport;
   lastActivity: number;
   merchantApiKey: string | null;
+  provisioningApiKey: string | null;
 };
 
 /**
@@ -61,6 +62,16 @@ export class McpSessionRegistry {
     e.merchantApiKey = apiKey;
   }
 
+  updateProvisioningApiKey(sessionId: string, apiKey: string | null): void {
+    const e = this.sessions.get(sessionId);
+    if (!e || !apiKey) return;
+    e.provisioningApiKey = apiKey;
+  }
+
+  getProvisioningApiKey(sessionId: string): string | null {
+    return this.sessions.get(sessionId)?.provisioningApiKey ?? null;
+  }
+
   getMerchantApiKey(sessionId: string): string | null {
     return this.sessions.get(sessionId)?.merchantApiKey ?? null;
   }
@@ -88,11 +99,13 @@ export class McpSessionRegistry {
     sessionId: string,
     transport: StreamableHTTPServerTransport,
     merchantApiKey: string | null,
+    provisioningApiKey: string | null = null,
   ): void {
     this.sessions.set(sessionId, {
       transport,
       lastActivity: Date.now(),
       merchantApiKey,
+      provisioningApiKey,
     });
     transport.onclose = () => {
       this.sessions.delete(sessionId);

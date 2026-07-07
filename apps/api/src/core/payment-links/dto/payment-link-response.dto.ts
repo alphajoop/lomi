@@ -65,6 +65,9 @@ export class PaymentLinkResponseDto {
   @ApiProperty({ example: false, type: Boolean })
   require_phone: boolean;
 
+  @ApiProperty({ example: true, type: Boolean })
+  require_name: boolean;
+
   @ApiProperty({ example: 'string', type: String })
   success_url: string;
 

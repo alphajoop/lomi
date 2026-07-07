@@ -1,0 +1,10 @@
+[
+  "POST /provisioning/v1/accounts",
+  "POST /provisioning/v1/merchants/{merchantId}/onboarding/documents",
+  "POST /provisioning/v1/merchants/{merchantId}/onboarding/extract",
+  "POST /provisioning/v1/merchants/{merchantId}/onboarding/complete",
+  "GET /provisioning/v1/merchants/{merchantId}/onboarding/status",
+  "GET /provisioning/v1/merchants/{merchantId}/api-keys",
+  "POST /provisioning/v1/merchants/{merchantId}/live-activation/request",
+  "GET /provisioning/v1/merchants/{merchantId}/live-activation/status"
+]

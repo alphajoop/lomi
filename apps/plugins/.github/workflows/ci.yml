@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Initialize public plugin submodules
+        run: git submodule update --init woo prestashop magento
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: woo/pnpm-lock.yaml
+
+      - name: Run automated plugin test suite
+        run: ./scripts/run-plugin-tests.sh

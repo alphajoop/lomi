@@ -84,6 +84,21 @@ export function getOptionalMerchantApiKey(): string | null {
   return cachedPositiveMerchantKey;
 }
 
+let cachedPositiveProvisioningKey: string | undefined;
+
+/** Reads platform provisioning key from env (empty/absent returns null). */
+export function getOptionalProvisioningKey(): string | null {
+  if (cachedPositiveProvisioningKey !== undefined) {
+    return cachedPositiveProvisioningKey;
+  }
+  const key = process.env.LOMI_PROVISIONING_KEY?.trim() ?? null;
+  if (!key) {
+    return null;
+  }
+  cachedPositiveProvisioningKey = key;
+  return cachedPositiveProvisioningKey;
+}
+
 export type McpTransportMode = 'stdio' | 'http';
 
 export function getTransportMode(): McpTransportMode {

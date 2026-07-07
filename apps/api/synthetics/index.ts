@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { loadSyntheticsEnv } from './load-env';
 import { createLiveChecks } from './checks/live';
 import { createSandboxChecks } from './checks/sandbox';
 import { buildReport, printReport, writeReport } from './report';
@@ -37,6 +38,7 @@ function resolveBaseUrl(
 }
 
 async function main(): Promise<void> {
+  loadSyntheticsEnv();
   const only = parseArgs(process.argv.slice(2));
   const runId = randomUUID();
   const ctx: SuiteContext = { runId };

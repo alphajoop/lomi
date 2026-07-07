@@ -11,6 +11,25 @@ function buildLomiCustomerQr(alias: string) {
   };
 }
 
+function withTransactionDisplayStatus<
+  T extends {
+    status?: string | null;
+    gross_amount?: number | null;
+    refunded_amount?: number | null;
+  },
+>(tx: T) {
+  const status = tx.status ?? '';
+  const gross = Number(tx.gross_amount ?? 0);
+  const refunded = Number(tx.refunded_amount ?? 0);
+  const display_status =
+    status === 'completed' &&
+    refunded > 0.01 &&
+    refunded < gross - 0.01
+      ? 'partially_refunded'
+      : status;
+  return { ...tx, display_status };
+}
+
 @Injectable()
 export class CustomerPortalService {
   constructor(private readonly supabase: SupabaseService) {}
@@ -40,7 +59,12 @@ export class CustomerPortalService {
       } as never,
     );
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const rows = (data ?? []) as Array<{
+      status?: string | null;
+      gross_amount?: number | null;
+      refunded_amount?: number | null;
+    }>;
+    return rows.map(withTransactionDisplayStatus);
   }
 
   async listSubscriptions(

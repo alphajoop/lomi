@@ -1,0 +1,6 @@
+[
+  "POST /partners/v1/provisioning-keys",
+  "GET /partners/v1/provisioning-keys",
+  "DELETE /partners/v1/provisioning-keys/{provisioningKeyId}",
+  "GET /partners/v1/usage"
+]

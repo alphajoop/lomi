@@ -39,13 +39,13 @@ jobs:
         working-directory: ./apps/api
     steps:
       - uses: actions/checkout@v5
-      - name: Initialize dashboard submodule for SQL contract tests
+      - name: Initialize submodules for contract checks
         working-directory: .
         env:
           TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
         run: |
           git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
-          git submodule update --init apps/dashboard
+          git submodule update --init apps/dashboard apps/website
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -57,10 +57,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - run: pnpm test
-      - name: Export OpenAPI and verify committed spec
+      - name: Export OpenAPI and verify committed specs
         run: |
           pnpm run openapi:export
           git diff --exit-code ../docs/openapi.json
+          pnpm run openapi:export:agent
+          git diff --exit-code ../docs/agent-openapi.json
+          node ../docs/lib/scripts/verify-agent-contracts.mjs
 
   build-docs:
     needs: detect-changes
@@ -71,6 +74,13 @@ jobs:
         working-directory: ./apps/docs
     steps:
       - uses: actions/checkout@v5
+      - name: Initialize website submodule for agent contract checks
+        working-directory: .
+        env:
+          TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+          git submodule update --init apps/website
       - uses: pnpm/action-setup@v4
         with:
           version: 8
@@ -81,6 +91,7 @@ jobs:
           cache-dependency-path: "./apps/docs/pnpm-lock.yaml"
       - run: pnpm install
       - run: pnpm lint
+      - run: pnpm docs:drift
       - run: pnpm build
 
   build-cli:

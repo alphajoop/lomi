@@ -21,8 +21,7 @@ jobs:
 
       - name: Initialize plugin submodules
         run: |
-          git submodule update --init apps/plugins
-          git -C apps/plugins submodule update --init woo prestashop magento
+          git submodule update --init apps/plugins/woo apps/plugins/prestashop apps/plugins/magento
 
       - uses: pnpm/action-setup@v4
         with:

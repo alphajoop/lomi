@@ -37,6 +37,7 @@ Exit code `0` = all checks passed. Exit code `1` = at least one failure, skip wi
 | `LOMI_LIVE_KEY` | Live suite | Live merchant secret key (read-only checks) |
 | `SANDBOX_API_URL` | No | Default `https://sandbox.api.lomi.africa` |
 | `LIVE_API_URL` | No | Default `https://api.lomi.africa` |
+| `LOMI_SYNTHETICS_FULL_PROVISIONING` | No | Set to `1` to run mutating agent/partner provisioning flows (creates auth users). Off by default to avoid daily orphan merchants and Resend noise. |
 
 ## Output
 
@@ -48,9 +49,22 @@ Exit code `0` = all checks passed. Exit code `1` = at least one failure, skip wi
 
 **Sandbox** (mutating): health, identity, providers, customers, products, Wave/MTN/Switch/card charges, refunds, checkout sessions, payment links/requests, transactions, subscriptions, coupons, metering, webhooks, radar, logs, accounts.
 
+Usage billing coverage proves the async path end to end (not just that ingest returns 202):
+
+- Standalone meter: create meter, ingest usage event, poll `GET /usage-events/:id` until `processed`, assert meter balance reflects the quantity.
+- Subscription-tied metering: create a `usage_based` product, discover its auto-created meter, create a usage subscription, ingest an event with `subscription_id` (exercising the `active_usage_subscription_required` path), poll until `processed`, and assert `GET /usage-billing/subscriptions/:id/usage` reflects the balance.
+
+Real domain webhook: a `PAYMENT_SUCCEEDED` webhook is registered before the charges and, after the MTN auto-complete charge, delivery logs are polled to confirm a successful `PAYMENT_SUCCEEDED` delivery (not just the `test.webhook` plumbing).
+
+Billing cycle / invoice generation is intentionally not exercised here (it requires the internal `x-cron-secret` endpoint and a due subscription); it is a candidate for a future integration slice.
+
 **Live** (read-only): health, identity, providers, balances, and list endpoints across transactions, customers, checkout, links, requests, subscriptions, refunds, payouts, disputes, products, webhooks, logs.
 
 Every error response is scanned for internal leak patterns (Stripe/Supabase/env var names, stack traces, etc.).
+
+**Agent / partner (default):** OAuth metadata, DCR, unauthenticated 401 smoke, partner key mint/list/revoke, agent capabilities. No merchant accounts are created.
+
+**Agent / partner (optional, `LOMI_SYNTHETICS_FULL_PROVISIONING=1`):** Full provisioning onboarding (account → KYC → complete → live activation) and partner-minted account creation. Use manually when validating provisioning changes; not run in daily CI.
 
 ## CI
 

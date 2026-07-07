@@ -34,6 +34,8 @@ import {
 } from '../../utils/api-idempotency';
 import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
+import { assertDirectCardChargesAvailable } from './direct-card-charge-guard';
+import { logStructured } from '../../utils/logging/structured-console-logger';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
@@ -85,6 +87,7 @@ export class CardChargeService {
     createDto: CreateCardChargeDto,
     user: AuthContext,
   ) {
+    assertDirectCardChargesAvailable();
     const stripe = this.stripeClients.getClient(user.environment);
     const paymentEnv = normalizePaymentEnvironment(user.environment);
 
@@ -176,6 +179,12 @@ export class CardChargeService {
         message: 'prepare_stripe_payment_amount_failed',
         organization_id: user.organizationId,
         error: conversionError?.message || null,
+      });
+      logStructured({
+        event: 'prepare_stripe_payment_amount_failed',
+        organization_id: user.organizationId,
+        message:
+          conversionError?.message ?? 'prepare_stripe_payment_amount_failed',
       });
       throw new BadRequestException('Failed to prepare Stripe payment amount');
     }
@@ -282,6 +291,7 @@ export class CardChargeService {
         payment_intent_id: paymentIntentId,
         error: txError.message,
       });
+      throw new NotFoundException('Payment intent not found');
     }
 
     const transaction =
@@ -310,6 +320,11 @@ export class CardChargeService {
         if (merchantId !== memberMerchantId) {
           throw new ForbiddenException('Access denied to this payment intent');
         }
+      }
+    } else {
+      const metaOrgId = paymentIntent.metadata?.organization_id;
+      if (!metaOrgId || metaOrgId !== user.organizationId) {
+        throw new NotFoundException('Payment intent not found');
       }
     }
 
@@ -460,24 +475,27 @@ export class CardChargeService {
         createDto.appearance_billing_address;
     }
 
+    const merchantMetadata: Record<string, string> = {};
     if (createDto.metadata) {
       for (const [key, value] of Object.entries(createDto.metadata)) {
         if (value === null || value === undefined) continue;
         if (typeof value === 'string') {
-          baseMetadata[key] = value;
+          merchantMetadata[key] = value;
         } else if (
           typeof value === 'number' ||
           typeof value === 'boolean' ||
           typeof value === 'bigint'
         ) {
-          baseMetadata[key] = String(value);
+          merchantMetadata[key] = String(value);
         } else {
-          baseMetadata[key] = JSON.stringify(value);
+          merchantMetadata[key] = JSON.stringify(value);
         }
       }
     }
 
-    return baseMetadata;
+    // System-controlled keys take precedence: merchant metadata can never override
+    // reconciliation keys like organization_id, merchant_id, source or the Stripe conversion fields.
+    return { ...merchantMetadata, ...baseMetadata };
   }
 
   private async createPendingTransaction(

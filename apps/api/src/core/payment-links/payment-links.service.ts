@@ -19,6 +19,7 @@ export class PaymentLinksService {
       require_billing_address: createDto.require_billing_address,
       require_email: createDto.require_email,
       require_phone: createDto.require_phone,
+      require_name: createDto.require_name,
       fields: createDto.fields,
     });
 
@@ -34,6 +35,7 @@ export class PaymentLinksService {
       p_require_billing_address: contactFlags.require_billing_address ?? true,
       p_require_email: contactFlags.require_email ?? true,
       p_require_phone: contactFlags.require_phone ?? false,
+      p_require_name: contactFlags.require_name ?? true,
       p_expires_at: createDto.expires_at || null,
       p_success_url: createDto.success_url || null,
       p_cancel_url: createDto.cancel_url || null,
@@ -41,6 +43,7 @@ export class PaymentLinksService {
       p_price_id: createDto.price_id || null,
       p_created_by: user.merchantId,
       p_environment: environmentFromAuth(user),
+      p_metadata: createDto.metadata ?? null,
     } as never);
 
     if (error) throw new Error(error.message);

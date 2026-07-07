@@ -20,12 +20,20 @@ function resolveDocsAgentOpenApiPath(): string {
   return path.resolve(process.cwd(), '../docs/agent-openapi.json');
 }
 
-function stripNonAgentPaths(document: OpenAPIObject): OpenAPIObject {
+function stripAgentAndProvisioningPaths(
+  document: OpenAPIObject,
+): OpenAPIObject {
   if (!document.paths) return document;
   const paths: OpenAPIObject['paths'] = {};
 
   for (const [pathKey, pathItem] of Object.entries(document.paths)) {
-    if (!pathKey.startsWith('/agent')) continue;
+    if (
+      !pathKey.startsWith('/agent') &&
+      !pathKey.startsWith('/provisioning') &&
+      !pathKey.startsWith('/partners')
+    ) {
+      continue;
+    }
     paths[pathKey] = pathItem;
   }
 
@@ -98,14 +106,20 @@ async function exportAgentOpenApi(): Promise<void> {
 
   const builderResult = buildSwaggerDocumentBase();
   const document = pruneUnusedOpenApiComponentSchemas(
-    stripNonAgentPaths(SwaggerModule.createDocument(app, builderResult)),
+    stripAgentAndProvisioningPaths(
+      SwaggerModule.createDocument(app, builderResult),
+    ),
   );
 
   document.servers = [
     { url: 'https://api.lomi.africa', description: 'Live' },
     { url: 'https://sandbox.api.lomi.africa', description: 'Test' },
   ];
-  document.tags = [{ name: 'Agent' }];
+  document.tags = [
+    { name: 'Agent' },
+    { name: 'Provisioning' },
+    { name: 'Partners' },
+  ];
 
   const outPath = resolveDocsAgentOpenApiPath();
   writeFileSync(outPath, `${JSON.stringify(document, null, 2)}\n`, 'utf-8');
