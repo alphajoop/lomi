@@ -147,38 +147,6 @@ export async function createCheckoutSessionRpc(
   );
 }
 
-export interface OrganizationWebhookOptions {
-  url?: string;
-  environment?: Environment;
-  verificationToken?: string;
-}
-
-/** Insert an active org webhook subscribed to PAYMENT_SUCCEEDED. */
-export async function createOrganizationWebhook(
-  client: Db,
-  organizationId: string,
-  merchantId: string,
-  options: OrganizationWebhookOptions = {},
-): Promise<string> {
-  const suffix = randomUUID().slice(0, 8);
-  const res = await client.query(
-    `INSERT INTO public.webhooks
-       (organization_id, url, authorized_events, is_active,
-        verification_token, environment, created_by)
-     VALUES ($1, $2, $3, true, $4, $5, $6)
-     RETURNING webhook_id`,
-    [
-      organizationId,
-      options.url ?? `https://example.test/hooks/${suffix}`,
-      ['PAYMENT_SUCCEEDED'],
-      options.verificationToken ?? `vt_${suffix}`,
-      options.environment ?? 'live',
-      merchantId,
-    ],
-  );
-  return res.rows[0].webhook_id as string;
-}
-
 export async function createCheckoutSession(
   client: Db,
   organizationId: string,
@@ -232,6 +200,7 @@ export async function createPayoutMethod(
       organizationId,
       options.accountNumber ?? `+22177${suffix.slice(0, 7)}`,
       options.accountName ?? 'Test Recipient',
+      provider,
       provider,
       options.isDefault ?? false,
     ],

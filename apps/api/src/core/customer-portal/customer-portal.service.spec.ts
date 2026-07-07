@@ -12,7 +12,6 @@ describe('CustomerPortalService', () => {
     sessionToken: 'session-token',
     customerId: 'cust-1',
     organizationId: 'org-1',
-    merchantId: 'merchant-1',
     environment: 'live',
   };
 

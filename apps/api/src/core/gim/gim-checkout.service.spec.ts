@@ -68,6 +68,9 @@ describe('GimCheckoutService', () => {
       cvv: '123',
     });
 
+    if (!('alreadyInitiated' in result)) {
+      throw new Error('expected already initiated early return');
+    }
     expect(result.alreadyInitiated).toBe(true);
     expect(gimCharge.executePayByCard).not.toHaveBeenCalled();
   });

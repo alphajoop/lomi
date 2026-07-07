@@ -86,4 +86,53 @@ describe('SpiWebhookService', () => {
       ),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
+
+  it('completes BNPL installment on PAIEMENT_RECU', async () => {
+    rpcMock
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({
+        data: {
+          completion_type: 'bnpl_installment',
+          organization_id: 'org-bnpl',
+          transaction_id: 'tx-bnpl-1',
+          checkout_session_id: null,
+          payment_request_id: 'pr-1',
+          already_completed: false,
+          status: 'completed',
+        },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: [{ transaction_id: 'tx-bnpl-1', gross_amount: 500 }],
+        error: null,
+      });
+
+    const result = await service.handleWebhook(
+      {},
+      { event: 'PAIEMENT_RECU', txId: 'BNPL-inst-1' },
+      JSON.stringify({ event: 'PAIEMENT_RECU', txId: 'BNPL-inst-1' }),
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        completion_type: 'bnpl_installment',
+        transaction_id: 'tx-bnpl-1',
+        payment_request_id: 'pr-1',
+      }),
+    );
+    expect(rpcMock).toHaveBeenCalledWith(
+      'complete_spi_payment',
+      expect.objectContaining({
+        p_spi_tx_id: 'BNPL-inst-1',
+        p_spi_payment_status: 'IRREVOCABLE',
+      }),
+    );
+    expect(rpcMock).toHaveBeenCalledWith(
+      'get_transaction',
+      expect.objectContaining({
+        p_transaction_id: 'tx-bnpl-1',
+        p_organization_id: 'org-bnpl',
+      }),
+    );
+  });
 });

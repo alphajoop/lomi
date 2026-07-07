@@ -60,6 +60,8 @@ pnpm test:db -- transactions      # a single suite
 | `payouts-wave-refunds.db-spec.ts` | Wave partial refund via beneficiary payout + fee charges |
 | `merchant-payouts.db-spec.ts` | payout fee calculation, Wave payout tx, PIN verification |
 | `stripe-payments.db-spec.ts` | Stripe amount helpers, manual refund, payment failure handler |
+| `stripe-success.db-spec.ts` | Stripe tx create/record, payment success handler, intent linking |
+| `withdrawals.db-spec.ts` | `initiate_withdrawal_api`, balance breakdown, payout lookup, currency convert |
 | `spi-checkout.db-spec.ts` | SPI account provision, POS/checkout prepare, `get_pos_transactions` |
 | `pos-fees.db-spec.ts` | `create_transaction` with `p_is_pos` fee path |
 | `subscriptions.db-spec.ts` | first charge / signup terms, trial conversion, cancel, update |

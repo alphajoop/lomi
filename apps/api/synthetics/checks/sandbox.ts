@@ -810,6 +810,22 @@ export function createSandboxChecks(): CheckDefinition[] {
       },
     },
 
+    // --- Payouts (list smoke; mass batch API not exposed yet) ---
+    {
+      name: 'list payouts',
+      service: 'payouts',
+      method: 'GET',
+      path: '/payouts?pageSize=1',
+      expectStatus: 200,
+      validate: (_ctx, res) => {
+        const root = unwrapData(res.data) ?? res.data;
+        if (!root || typeof root !== 'object') {
+          return 'Expected payouts list payload';
+        }
+        return null;
+      },
+    },
+
     // --- Webhooks (CRUD + send + delivery logs + receiver-safe URL rejection) ---
     {
       name: 'reject unsafe webhook URL',
