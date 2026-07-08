@@ -4,9 +4,9 @@
  * This file contains only the types exposed through the API.
  * 
  * Generated from database.types.ts - only includes:
- * - Exposed enums (62 enums)
+ * - Exposed enums (61 enums)
  * - Exposed tables (20 tables)
- * - Exposed functions (291 functions)
+ * - Exposed functions (285 functions)
  * 
  * DO NOT EDIT MANUALLY - This file is auto-generated
  * Run: npm run generate:api-types
@@ -2690,19 +2690,6 @@ export type Database = {
         };
         Returns: string;
       };
-      customer_portal_attach_payment_method: {
-        Args: {
-          p_card_details?: Json | null;
-          p_session_token: string;
-          p_set_default?: boolean | null;
-          p_stripe_payment_method_id: string;
-        };
-        Returns: Json;
-      };
-      customer_portal_detach_payment_method: {
-        Args: { p_payment_method_id: string; p_session_token: string };
-        Returns: Json;
-      };
       customer_portal_list_payment_methods: {
         Args: { p_session_token: string };
         Returns: {
@@ -2768,35 +2755,9 @@ export type Database = {
         };
         Returns: Json;
       };
-      customer_portal_resolve_stripe_context: {
-        Args: { p_session_token: string };
-        Returns: {
-          customer_email: string;
-          customer_id: string;
-          customer_name: string;
-          environment: string;
-          organization_id: string;
-          provider_customer_id: string;
-        }[];
-      };
       customer_portal_set_default_payment_method: {
         Args: { p_payment_method_id: string; p_session_token: string };
         Returns: Json;
-      };
-      customer_portal_validate_retry_payment: {
-        Args: { p_session_token: string; p_subscription_id: string };
-        Returns: {
-          customer_id: string;
-          environment: string;
-          next_billing_date: string;
-          organization_id: string;
-          price_amount: number;
-          price_currency_code: string;
-          provider_customer_id: string;
-          provider_payment_method_id: string;
-          status: APIEnums["subscription_status"];
-          subscription_id: string;
-        }[];
       };
       customer_portal_validate_session: {
         Args: { p_session_token: string };
@@ -3273,10 +3234,6 @@ export type Database = {
           transaction_id: string;
           updated_at: string;
         }[];
-      };
-      mark_invoice_paid_from_transaction: {
-        Args: { p_transaction_id: string };
-        Returns: string;
       };
       create_payment_link: {
         Args: {
@@ -4057,10 +4014,6 @@ export type Database = {
           percentage: number;
           tier_name: string;
         }[];
-      };
-      get_mtn_refund_provider_ids: {
-        Args: { p_transaction_id: string };
-        Returns: Json;
       };
       get_mtn_transaction_by_external_id: {
         Args: { p_external_id: string };
@@ -6474,7 +6427,6 @@ export type Database = {
         | "invoiced"
         | "void"
 ;
-      bnpl_status: "pending" | "collected" | "waived" | "refunded";
       checkout_session_status: "open" | "completed" | "expired";
       currency_code: "XOF" | "USD" | "EUR";
       customer_type: "all" | "new" | "returning";
@@ -6812,7 +6764,6 @@ export type APIEnums = Database["public"]["Enums"];
 
 export type BillingInterval = APIEnums["billing_interval"];
 export type BillingPeriodStatus = APIEnums["billing_period_status"];
-export type BnplStatus = APIEnums["bnpl_status"];
 export type CheckoutSessionStatus = APIEnums["checkout_session_status"];
 export type CurrencyCode = APIEnums["currency_code"];
 export type CustomerType = APIEnums["customer_type"];
