@@ -101,7 +101,8 @@ export class CheckoutSessionsController {
         require_billing_address: {
           type: 'boolean',
           description:
-            'When true, show and require billing address on checkout.',
+            'When true, show and require billing address on checkout. Default false when unset.',
+          default: false,
         },
         require_email: {
           type: 'boolean',
@@ -112,8 +113,8 @@ export class CheckoutSessionsController {
         require_phone: {
           type: 'boolean',
           description:
-            'When true, show and require customer phone. Default false when unset.',
-          default: false,
+            'When true, show and require customer phone. Default true when unset.',
+          default: true,
         },
         require_name: {
           type: 'boolean',

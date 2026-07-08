@@ -150,7 +150,10 @@ function extractTableDefinition(
  */
 function extractEnums(databaseTypesContent: string): Record<string, string> {
   const enums: Record<string, string> = {};
-  const enumsContent = extractPublicSchemaSection(databaseTypesContent, 'Enums');
+  const enumsContent = extractPublicSchemaSection(
+    databaseTypesContent,
+    'Enums',
+  );
 
   // Extract each enum - handle both single-line and multi-line enum values
   // Pattern: enumName: value; (where value can span multiple lines)

@@ -197,7 +197,7 @@ export function resolveCheckoutForm(
     sources.checkoutSession?.require_phone,
     sources.paymentLink?.require_phone,
     sources.organizationSettings?.require_phone,
-    false,
+    true,
   );
 
   const requireNameFlag = resolveBooleanFlag(

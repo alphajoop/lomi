@@ -104,7 +104,7 @@ export class CheckoutSessionsService {
         p_allow_coupon_code: createDto.allow_coupon_code ?? false,
         p_expiration_minutes: 60,
         p_require_billing_address:
-          contactFlagArgs.p_require_billing_address ?? true,
+          contactFlagArgs.p_require_billing_address ?? false,
         p_require_email: contactFlagArgs.p_require_email,
         p_require_phone: contactFlagArgs.p_require_phone,
         p_require_name: contactFlagArgs.p_require_name,
@@ -223,7 +223,7 @@ export class CheckoutSessionsService {
       p_customer_postal_code: createDto.customer_postal_code || null,
       p_allow_coupon_code: createDto.allow_coupon_code ?? false,
       p_require_billing_address:
-        contactFlagArgs.p_require_billing_address ?? true,
+        contactFlagArgs.p_require_billing_address ?? false,
       p_require_email: contactFlagArgs.p_require_email,
       p_require_phone: contactFlagArgs.p_require_phone,
       p_require_name: contactFlagArgs.p_require_name,
@@ -341,9 +341,9 @@ export class CheckoutSessionsService {
       p_require_billing_address:
         normalized.require_billing_address ??
         createDto.require_billing_address ??
-        true,
+        false,
       p_require_email: normalized.require_email ?? true,
-      p_require_phone: normalized.require_phone ?? false,
+      p_require_phone: normalized.require_phone ?? true,
       p_require_name: normalized.require_name ?? true,
     };
   }

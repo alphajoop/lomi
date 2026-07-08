@@ -7,7 +7,10 @@
  *   INTERNAL_API_KEY=... API_URL=https://api.lomi.africa pnpm exec ts-node scripts/list-spi-provisioning-gaps.ts
  */
 
-const apiUrl = (process.env.API_URL ?? 'http://localhost:3001').replace(/\/$/, '');
+const apiUrl = (process.env.API_URL ?? 'http://localhost:3001').replace(
+  /\/$/,
+  '',
+);
 const internalKey = process.env.INTERNAL_API_KEY?.trim();
 
 async function main() {
@@ -16,13 +19,16 @@ async function main() {
     process.exit(1);
   }
 
-  const response = await fetch(`${apiUrl}/internal/spi/list-orgs-missing-account`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Internal-Api-Key': internalKey,
+  const response = await fetch(
+    `${apiUrl}/internal/spi/list-orgs-missing-account`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Internal-Api-Key': internalKey,
+      },
     },
-  });
+  );
 
   const body = await response.json();
   if (!response.ok) {

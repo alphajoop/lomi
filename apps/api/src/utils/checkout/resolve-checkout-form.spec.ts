@@ -1,7 +1,19 @@
 import { resolveCheckoutForm } from './resolve-checkout-form';
 
 describe('resolveCheckoutForm', () => {
-  it('defaults to email required and phone optional but visible', () => {
+  it('defaults to email, name, and phone required; billing address hidden', () => {
+    const form = resolveCheckoutForm({});
+
+    expect(form.requireEmail).toBe(true);
+    expect(form.requirePhone).toBe(true);
+    expect(form.requireName).toBe(true);
+    expect(form.requireBillingAddress).toBe(false);
+    expect(form.showEmail).toBe(true);
+    expect(form.showPhone).toBe(true);
+    expect(form.showName).toBe(true);
+  });
+
+  it('allows phone to be optional when explicitly set off', () => {
     const form = resolveCheckoutForm({
       organizationSettings: {
         require_email: true,
@@ -11,10 +23,8 @@ describe('resolveCheckoutForm', () => {
 
     expect(form.requireEmail).toBe(true);
     expect(form.requirePhone).toBe(false);
-    expect(form.requireName).toBe(true);
     expect(form.showEmail).toBe(true);
     expect(form.showPhone).toBe(true);
-    expect(form.showName).toBe(true);
   });
 
   it('hides email and keeps phone required when email is off and phone is on', () => {

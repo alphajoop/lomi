@@ -65,19 +65,19 @@ Copy this list and tick as you go:
 | **Open**        | https://dashboard.lomi.africa/onboarding                                               |
 | **Show**        | The step with the **business profile form** (name, country, use case / business type). |
 | **Do not show** | Empty welcome splash with no form fields.                                              |
-| **Chrome**      | Full window, onboarding usually has **no sidebar**.                                   |
+| **Chrome**      | Full window, onboarding usually has **no sidebar**.                                    |
 
 ---
 
 ## 2. API keys
 
-|                 |                                                                                                                           |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **Save as**     | `start/api-keys-light.webp` and `start/api-keys-dark.webp`                                                                |
-| **Open**        | `https://dashboard.lomi.africa/{your-org-id}/settings/access-tokens`                                                      |
+|                 |                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Save as**     | `start/api-keys-light.webp` and `start/api-keys-dark.webp`                                                               |
+| **Open**        | `https://dashboard.lomi.africa/{your-org-id}/settings/access-tokens`                                                     |
 | **Show**        | **Access tokens** page, **Test** and **Live** sections both visible with `lomi_sk_test_…` / `lomi_pk_test_…` style keys. |
-| **Do not show** | Live secret keys unmasked (blur if needed).                                                                               |
-| **Chrome**      | Sidebar + top bar OK; crop to main panel.                                                                                 |
+| **Do not show** | Live secret keys unmasked (blur if needed).                                                                              |
+| **Chrome**      | Sidebar + top bar OK; crop to main panel.                                                                                |
 
 ---
 
@@ -87,7 +87,7 @@ Copy this list and tick as you go:
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Save as**     | `start/hosted-checkout-light.webp` and `start/hosted-checkout-dark.webp`                                                                   |
 | **Open**        | A **sandbox** checkout URL from `checkout_url` after creating a session ([sandbox guide](https://docs.lomi.africa/start/sandbox-payments)) |
-| **Show**        | Default **pay** step, org logo, product/amount, **Pay** button. Checkout card centered in the 16:9 frame.                                 |
+| **Show**        | Default **pay** step, org logo, product/amount, **Pay** button. Checkout card centered in the 16:9 frame.                                  |
 | **Do not show** | Success page, cancel page, or error state.                                                                                                 |
 
 **Get a URL:** `lomi checkout create` or `POST https://sandbox.api.lomi.africa/checkout-sessions` with your test key → open the `checkout_url`.
@@ -96,13 +96,13 @@ Copy this list and tick as you go:
 
 ## 4. Choose integration (provider picker)
 
-|                 |                                                                                                                             |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Save as**     | `build/choose-integration-light.webp` and `build/choose-integration-dark.webp`                                              |
-| **Open**        | Same sandbox checkout session as above                                                                                      |
+|                 |                                                                                                                            |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Save as**     | `build/choose-integration-light.webp` and `build/choose-integration-dark.webp`                                             |
+| **Open**        | Same sandbox checkout session as above                                                                                     |
 | **Show**        | Step where the customer **picks a payment method**: **Wave, MTN, SPI, Card** (or your enabled subset) as selectable tiles. |
 | **Do not show** | Card number / expiry / CVC fields, that is shot #7, not this one.                                                          |
-| **Framing**     | Crop tighter on the **provider picker** if needed.                                                                          |
+| **Framing**     | Crop tighter on the **provider picker** if needed.                                                                         |
 
 ---
 
@@ -123,7 +123,7 @@ Copy this list and tick as you go:
 |                 |                                                                                                                 |
 | --------------- | --------------------------------------------------------------------------------------------------------------- |
 | **Save as**     | `build/mobile-money-light.webp` and `build/mobile-money-dark.webp`                                              |
-| **Open**        | Sandbox checkout, after selecting **Wave** or **MTN**                                                          |
+| **Open**        | Sandbox checkout, after selecting **Wave** or **MTN**                                                           |
 | **Show**        | Phone number field, USSD/push instructions, or other MoMo-specific copy. Must read clearly as **mobile money**. |
 | **Do not show** | Generic checkout with no MoMo UI, or card form.                                                                 |
 
@@ -134,7 +134,7 @@ Copy this list and tick as you go:
 |                 |                                                                                                       |
 | --------------- | ----------------------------------------------------------------------------------------------------- |
 | **Save as**     | `build/cards-light.webp` and `build/cards-dark.webp`                                                  |
-| **Open**        | Sandbox checkout, after selecting **Card**                                                           |
+| **Open**        | Sandbox checkout, after selecting **Card**                                                            |
 | **Show**        | Card **number**, **expiry**, and **CVC** fields. Optional: `4242 4242 4242 4242` in the number field. |
 | **Do not show** | Provider picker only (that is shot #4).                                                               |
 
@@ -142,12 +142,12 @@ Copy this list and tick as you go:
 
 ## 8. Balance
 
-|             |                                                                                                     |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| **Save as** | `build/balance-light.webp` and `build/balance-dark.webp`                                            |
-| **Open**    | `https://dashboard.lomi.africa/{your-org-id}/balance`                                               |
+|             |                                                                                                    |
+| ----------- | -------------------------------------------------------------------------------------------------- |
+| **Save as** | `build/balance-light.webp` and `build/balance-dark.webp`                                           |
+| **Open**    | `https://dashboard.lomi.africa/{your-org-id}/balance`                                              |
 | **Show**    | **Test mode** ON, test balance amount visible + at least one **completed** credit line in history. |
-| **Chrome**  | Balance hero + first rows of history.                                                               |
+| **Chrome**  | Balance hero + first rows of history.                                                              |
 
 ---
 
@@ -178,7 +178,7 @@ Copy this list and tick as you go:
 |             |                                                                                            |
 | ----------- | ------------------------------------------------------------------------------------------ |
 | **Save as** | `build/customer-portal-light.webp` and `build/customer-portal-dark.webp`                   |
-| **Open**    | https://customers.lomi.africa, **after** launch-session login (not the OTP/email gate)    |
+| **Open**    | https://customers.lomi.africa, **after** launch-session login (not the OTP/email gate)     |
 | **Show**    | **Payments** or **Subscriptions** tab with **≥1 row** (invoice, payment, or subscription). |
 
 ---
@@ -190,7 +190,7 @@ Copy this list and tick as you go:
 | **Save as** | `build/lomi-ui-light.webp` and `build/lomi-ui-dark.webp`                                    |
 | **Open**    | https://docs.lomi.africa/build/lomi-ui/quick-start#payment-provider-selector                |
 | **Show**    | **“Preview”** heading + **Payment Provider Selector** demo (Wave, MTN, π-SPI, Card radios). |
-| **Theme**   | Use the **docs** theme toggle; not checkout theme.                                         |
+| **Theme**   | Use the **docs** theme toggle; not checkout theme.                                          |
 | **Framing** | Scroll so Preview block + heading fit the 16:9 crop.                                        |
 
 ---
@@ -246,7 +246,7 @@ Copy this list and tick as you go:
 |             |                                                                                          |
 | ----------- | ---------------------------------------------------------------------------------------- |
 | **Save as** | `build/woocommerce-webhook-url-light.webp` and `build/woocommerce-webhook-url-dark.webp` |
-| **Open**    | Same lomi. gateway settings, top **Webhook URL** box with **Copy URL** button.          |
+| **Open**    | Same lomi. gateway settings, top **Webhook URL** box with **Copy URL** button.           |
 
 ---
 

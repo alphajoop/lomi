@@ -89,7 +89,11 @@ export class RedisService implements OnModuleDestroy {
     }
   }
 
-  async setex(key: string, ttlSeconds: number, value: string): Promise<boolean> {
+  async setex(
+    key: string,
+    ttlSeconds: number,
+    value: string,
+  ): Promise<boolean> {
     const client = this.getClient();
     if (!client) {
       return false;
