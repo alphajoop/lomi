@@ -42,7 +42,7 @@ Exit code `0` = all checks passed. Exit code `1` = at least one failure, skip wi
 ## Output
 
 - Console table grouped by service
-- `synthetics/last-run.json`: machine-readable report (uploaded as a CI artifact)
+- `test/synthetics/last-run.json`: machine-readable report (uploaded as a CI artifact)
 - GitHub Actions step summary when `GITHUB_STEP_SUMMARY` is set
 
 ## What is checked

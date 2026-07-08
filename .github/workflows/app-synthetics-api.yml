@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-synthetics-report
-          path: apps/api/synthetics/last-run.json
+          path: apps/api/test/synthetics/last-run.json
           if-no-files-found: ignore
 
       - name: Notify Slack on failure
