@@ -211,6 +211,39 @@ describe('CheckoutSessionsService', () => {
         p_idempotency_body_hash: 'abc',
       }),
     );
+    // Pre-RPC idempotency lookup removed; RPC owns replay.
+    expect(mockSupabaseService.rpc).not.toHaveBeenCalledWith(
+      'lookup_api_idempotency_record',
+      expect.anything(),
+    );
+  });
+
+  it('forwards contact flags into create_checkout_session instead of post UPDATE', async () => {
+    const createDto: CreateCheckoutSessionDto = {
+      amount: 1000,
+      currency_code: 'XOF',
+      require_email: false,
+      require_phone: true,
+      require_name: false,
+      customer_name: 'Ada',
+    } as CreateCheckoutSessionDto;
+
+    mockSupabaseService.rpc.mockResolvedValue({
+      data: { checkout_session_id: 'flags-1' },
+      error: null,
+    });
+
+    await service.create(createDto, mockUser as AuthContext);
+
+    expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_require_email: false,
+        p_require_phone: true,
+        p_require_name: false,
+      }),
+    );
+    expect(mockSupabaseClient.from).not.toHaveBeenCalled();
   });
 
   it('forwards integration_source into checkout session metadata', async () => {

@@ -5,11 +5,20 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
+import { RedisService } from '../../../utils/redis/redis.service';
 import { normalizePaymentEnvironment } from '../../../utils/payment-environment';
+import {
+  readApiKeyAuthCache,
+  writeApiKeyAuthCache,
+  type ApiKeyAuthCachePayload,
+} from './api-key-auth-cache';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly redis: RedisService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -31,6 +40,18 @@ export class ApiKeyGuard implements CanActivate {
       );
     }
 
+    // Non-network identity can be served from Redis to skip a Supabase round-trip.
+    // Network (Lomi-Account) requests always hit Postgres for capability checks.
+    if (!lomiAccount) {
+      const cached = await readApiKeyAuthCache(this.redis, apiKey);
+      if (cached) {
+        this.attachUser(request, apiKey, null, cached);
+        // Usage accounting stays on the create/logging path; Nest Throttler
+        // still enforces request ceilings while the cache is hot.
+        return true;
+      }
+    }
+
     const { data, error } = await this.supabase.rpc(
       'verify_api_key_context' as any,
       {
@@ -48,34 +69,60 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     const row = data[0];
+    const payload = this.rowToCachePayload(row, lomiAccount);
+    this.attachUser(request, apiKey, lomiAccount, payload);
+
+    if (!payload.isNetworkRequest) {
+      void writeApiKeyAuthCache(this.redis, apiKey, payload);
+    }
+
+    return true;
+  }
+
+  private rowToCachePayload(
+    row: Record<string, any>,
+    lomiAccount: string | null,
+  ): ApiKeyAuthCachePayload {
     const actorOrganizationId =
       row.actor_organization_id || row.organization_id;
     const targetOrganizationId =
       row.target_organization_id || row.organization_id;
 
-    // Attach context to request
-    request.user = {
-      apiKey,
+    return {
       merchantId: row.merchant_id,
       actorOrganizationId,
       targetOrganizationId,
       organizationId: row.organization_id || targetOrganizationId,
       environment: normalizePaymentEnvironment(row.environment),
       isNetworkRequest: Boolean(row.is_network_request),
-      lomiAccount,
       networkAccountId: row.network_account_id || null,
       networkMembershipId: row.network_membership_id || null,
       publicAccountId: row.public_account_id || lomiAccount || null,
       networkCapabilityKey: row.network_capability_key || null,
     };
+  }
+
+  private attachUser(
+    request: any,
+    apiKey: string,
+    lomiAccount: string | null,
+    payload: ApiKeyAuthCachePayload,
+  ): void {
+    request.user = {
+      apiKey,
+      merchantId: payload.merchantId,
+      actorOrganizationId: payload.actorOrganizationId,
+      targetOrganizationId: payload.targetOrganizationId,
+      organizationId: payload.organizationId,
+      environment: payload.environment,
+      isNetworkRequest: payload.isNetworkRequest,
+      lomiAccount,
+      networkAccountId: payload.networkAccountId,
+      networkMembershipId: payload.networkMembershipId,
+      publicAccountId: payload.publicAccountId || lomiAccount || null,
+      networkCapabilityKey: payload.networkCapabilityKey,
+    };
     request.apiKey = apiKey;
-
-    // Validate Environment
-    // We trust the API key's environment. The user can use a test key on any host (e.g. localhost or api.lomi.africa)
-    // and it will be treated as a test request.
-    // The service layer will use this environment to scope data.
-
-    return true;
   }
 
   private extractApiKey(request: any): string | undefined {

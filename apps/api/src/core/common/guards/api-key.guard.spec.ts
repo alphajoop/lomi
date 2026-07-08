@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ExecutionContext } from '@nestjs/common';
 import { ApiKeyGuard } from './api-key.guard';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
+import { RedisService } from '../../../utils/redis/redis.service';
 
 function createMockContext(request: Record<string, any>): ExecutionContext {
   return {
@@ -14,10 +15,18 @@ function createMockContext(request: Record<string, any>): ExecutionContext {
 describe('ApiKeyGuard', () => {
   let guard: ApiKeyGuard;
   let supabase: { rpc: jest.Mock };
+  let redis: { get: jest.Mock; setex: jest.Mock };
 
   beforeEach(() => {
     supabase = { rpc: jest.fn() };
-    guard = new ApiKeyGuard(supabase as unknown as SupabaseService);
+    redis = {
+      get: jest.fn().mockResolvedValue(null),
+      setex: jest.fn().mockResolvedValue(true),
+    };
+    guard = new ApiKeyGuard(
+      supabase as unknown as SupabaseService,
+      redis as unknown as RedisService,
+    );
   });
 
   it('rejects when API key header is missing', async () => {
@@ -352,5 +361,104 @@ describe('ApiKeyGuard', () => {
     await expect(guard.canActivate(ctx)).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+  });
+
+  it('serves non-network auth from Redis cache and skips Supabase', async () => {
+    redis.get.mockResolvedValue(
+      JSON.stringify({
+        merchantId: 'm-cached',
+        actorOrganizationId: 'o-cached',
+        targetOrganizationId: 'o-cached',
+        organizationId: 'o-cached',
+        environment: 'live',
+        isNetworkRequest: false,
+        networkAccountId: null,
+        networkMembershipId: null,
+        publicAccountId: null,
+        networkCapabilityKey: null,
+      }),
+    );
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_cached' },
+      url: '/checkout-sessions',
+      method: 'POST',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).not.toHaveBeenCalled();
+    expect(req.user.merchantId).toBe('m-cached');
+    expect(req.user.organizationId).toBe('o-cached');
+  });
+
+  it('writes Redis cache after a successful non-network verify', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm2',
+          organization_id: 'o2',
+          environment: 'live',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_test_abc' },
+      url: '/me',
+      method: 'GET',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(redis.setex).toHaveBeenCalled();
+  });
+
+  it('does not use Redis cache for Network (Lomi-Account) requests', async () => {
+    redis.get.mockResolvedValue(
+      JSON.stringify({
+        merchantId: 'should-not-use',
+        actorOrganizationId: 'o',
+        targetOrganizationId: 'o',
+        organizationId: 'o',
+        environment: 'live',
+        isNetworkRequest: false,
+        networkAccountId: null,
+        networkMembershipId: null,
+        publicAccountId: null,
+        networkCapabilityKey: null,
+      }),
+    );
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm_operator',
+          actor_organization_id: 'org_operator',
+          target_organization_id: 'org_member',
+          organization_id: 'org_member',
+          environment: 'live',
+          is_network_request: true,
+          network_account_id: 'net_acct_1',
+          network_membership_id: 'net_mem_1',
+          public_account_id: 'acct_123',
+          network_capability_key: 'payment.create',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_live_network', 'lomi-account': 'acct_123' },
+      url: '/checkout-sessions',
+      method: 'POST',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(redis.get).not.toHaveBeenCalled();
+    expect(supabase.rpc).toHaveBeenCalled();
   });
 });

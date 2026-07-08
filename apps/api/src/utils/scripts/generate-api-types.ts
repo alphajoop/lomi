@@ -10,7 +10,47 @@ import {
  * Extract table names from API config
  */
 function getExposedTableNames(): string[] {
-  return API_RESOURCES.filter((r) => r.enabled).map((r) => r.tableName);
+  const names = API_RESOURCES.filter((r) => r.enabled).map(
+    (r) => r.typesTableName ?? r.tableName,
+  );
+  return [...new Set(names)];
+}
+
+/**
+ * Extract a top-level `public` schema section (Tables, Functions, or Enums).
+ * database.types.ts also defines graphql_public/storage schemas; the first
+ * `Tables`/`Functions`/`Enums` block is graphql_public, so we take the second.
+ */
+function extractPublicSchemaSection(
+  databaseTypesContent: string,
+  section: 'Tables' | 'Functions' | 'Enums',
+): string {
+  const marker = `${section}: {`;
+  const firstIdx = databaseTypesContent.indexOf(marker);
+  if (firstIdx === -1) {
+    throw new Error(`Could not find any ${section} section`);
+  }
+
+  const startIdx = databaseTypesContent.indexOf(marker, firstIdx + 1);
+  if (startIdx === -1) {
+    throw new Error(`Could not find public.${section} section`);
+  }
+
+  const braceIdx = startIdx + marker.length - 1;
+  let braceCount = 1;
+  let i = braceIdx + 1;
+
+  while (i < databaseTypesContent.length && braceCount > 0) {
+    if (databaseTypesContent[i] === '{') braceCount++;
+    if (databaseTypesContent[i] === '}') braceCount--;
+    i++;
+  }
+
+  if (braceCount !== 0) {
+    throw new Error(`Unbalanced braces while parsing public.${section}`);
+  }
+
+  return databaseTypesContent.substring(braceIdx + 1, i - 1);
 }
 
 /**
@@ -113,27 +153,7 @@ function extractTableDefinition(
  */
 function extractEnums(databaseTypesContent: string): Record<string, string> {
   const enums: Record<string, string> = {};
-
-  // Find the Enums section - look for "Enums: {" and find matching closing brace
-  const enumsStartRegex = /Enums:\s*\{/;
-  const startMatch = databaseTypesContent.match(enumsStartRegex);
-
-  if (!startMatch) {
-    throw new Error('Could not find Enums section');
-  }
-
-  const startIndex = startMatch.index! + startMatch[0].length - 1; // Position at opening brace
-  let braceCount = 1;
-  let i = startIndex + 1;
-
-  // Find matching closing brace
-  while (i < databaseTypesContent.length && braceCount > 0) {
-    if (databaseTypesContent[i] === '{') braceCount++;
-    if (databaseTypesContent[i] === '}') braceCount--;
-    i++;
-  }
-
-  const enumsContent = databaseTypesContent.substring(startIndex + 1, i - 1);
+  const enumsContent = extractPublicSchemaSection(databaseTypesContent, 'Enums');
 
   // Extract each enum - handle both single-line and multi-line enum values
   // Pattern: enumName: value; (where value can span multiple lines)
@@ -203,27 +223,10 @@ function extractTables(
   tableNames: string[],
 ): Record<string, string> {
   const tables: Record<string, string> = {};
-
-  // Find the Tables section
-  const tablesStartRegex = /Tables:\s*\{/;
-  const startMatch = databaseTypesContent.match(tablesStartRegex);
-
-  if (!startMatch) {
-    throw new Error('Could not find Tables section');
-  }
-
-  // Extract Tables section content
-  const startIndex = startMatch.index! + startMatch[0].length - 1;
-  let braceCount = 1;
-  let i = startIndex + 1;
-
-  while (i < databaseTypesContent.length && braceCount > 0) {
-    if (databaseTypesContent[i] === '{') braceCount++;
-    if (databaseTypesContent[i] === '}') braceCount--;
-    i++;
-  }
-
-  const tablesContent = databaseTypesContent.substring(startIndex + 1, i - 1);
+  const tablesContent = extractPublicSchemaSection(
+    databaseTypesContent,
+    'Tables',
+  );
 
   // Extract each table definition
   for (const tableName of tableNames) {
@@ -246,29 +249,9 @@ function extractFunctions(
   functionNames: string[],
 ): Record<string, string> {
   const functions: Record<string, string> = {};
-
-  // Find the Functions section
-  const functionsStartRegex = /Functions:\s*\{/;
-  const startMatch = databaseTypesContent.match(functionsStartRegex);
-
-  if (!startMatch) {
-    throw new Error('Could not find Functions section');
-  }
-
-  // Extract Functions section content
-  const startIndex = startMatch.index! + startMatch[0].length - 1;
-  let braceCount = 1;
-  let i = startIndex + 1;
-
-  while (i < databaseTypesContent.length && braceCount > 0) {
-    if (databaseTypesContent[i] === '{') braceCount++;
-    if (databaseTypesContent[i] === '}') braceCount--;
-    i++;
-  }
-
-  const functionsContent = databaseTypesContent.substring(
-    startIndex + 1,
-    i - 1,
+  const functionsContent = extractPublicSchemaSection(
+    databaseTypesContent,
+    'Functions',
   );
 
   // Extract each function definition
