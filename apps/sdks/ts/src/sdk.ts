@@ -9,7 +9,6 @@ import {
   AccountsService,
   ChargesService,
   CheckoutSessionsService,
-  CustomerSubscriptionsService,
   CustomersService,
   DiscountCouponsService,
   DisputesService,
@@ -41,7 +40,6 @@ export class LomiSDK {
   public readonly accounts: AccountsService;
   public readonly charges: ChargesService;
   public readonly checkoutSessions: CheckoutSessionsService;
-  public readonly customerSubscriptions: CustomerSubscriptionsService;
   public readonly customers: CustomersService;
   public readonly discountCoupons: DiscountCouponsService;
   public readonly disputes: DisputesService;
@@ -72,7 +70,6 @@ export class LomiSDK {
     this.accounts = new AccountsService(this.client);
     this.charges = new ChargesService(this.client);
     this.checkoutSessions = new CheckoutSessionsService(this.client);
-    this.customerSubscriptions = new CustomerSubscriptionsService(this.client);
     this.customers = new CustomersService(this.client);
     this.discountCoupons = new DiscountCouponsService(this.client);
     this.disputes = new DisputesService(this.client);

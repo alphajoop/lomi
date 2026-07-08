@@ -42,7 +42,6 @@ const PUBLIC_REST_API_OPERATIONS = [
   'POST /charge/wave',
   'checkout-sessions',
   'customers',
-  'customer-subscriptions',
   'discount-coupons',
   'payment-links',
   'payment-requests',
@@ -85,7 +84,6 @@ export function pathToFolder(route: string): string {
   const first = parts[0];
   if (!first) return 'general';
   if (first === 'accounts') return 'balances';
-  if (first === 'customer-subscriptions') return 'subscriptions';
   if (first === 'webhook-delivery-logs') return 'webhooks';
   if (first === 'logs') return 'logs';
   if (first === 'usage-subscriptions') return 'usage-events';

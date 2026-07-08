@@ -1,7 +1,5 @@
 export interface APIResourceConfig {
   tableName: string;
-  /** When set, API types are generated from this DB table instead of `tableName`. */
-  typesTableName?: string;
   path?: string;
   displayName?: string;
   idField?: string;
@@ -231,23 +229,6 @@ export const API_RESOURCES: APIResourceConfig[] = [
       create: false,
       update: false,
       delete: false,
-    },
-  },
-  {
-    tableName: 'customer_subscriptions',
-    typesTableName: 'subscriptions',
-    path: 'customer-subscriptions',
-    enabled: true,
-    tag: 'Customer Subscriptions',
-    idField: 'subscription_id',
-    description:
-      'Per-customer subscription management (alias of subscriptions RPCs)',
-    operations: {
-      list: true,
-      get: true,
-      create: false,
-      update: true,
-      delete: true,
     },
   },
   {

@@ -1,6 +1,6 @@
 ---
-title: "Get a log entry"
-description: "Get a log entry"
+title: "Retrieve log entry"
+description: "Retrieve log entry"
 full: true
 method: get
 path: /logs/{type}/{id}
@@ -9,14 +9,18 @@ operationId: LogsController_findOne
 
 ## Overview
 
-Get a log entry
+Retrieve log entry
 
-Returns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.
+Returns a single log entry by type and ID. Responds with **404** when the entry does not exist or is outside the API key organization scope.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /logs/&#123;type&#125;/&#123;id&#125;` (Get a log entry).
+Use when drilling into one failed request, webhook delivery, or activity event from a list view.
+
+### See also
+
+[List logs](/api/logs/LogsController_findAll)
 
 
 ## Authentication

@@ -17,7 +17,6 @@ import { AccountsModule } from './core/accounts/accounts.module';
 import { OrganizationsModule } from './core/organizations/organizations.module';
 import { MerchantsModule } from './core/merchants/merchants.module';
 import { ProvidersModule } from './core/providers/providers.module';
-import { CustomerSubscriptionsOpenApiModule } from './core/customer-subscriptions/customer-subscriptions-open-api.module';
 import { CustomersModule } from './core/customers/customers.module';
 import { PaymentRequestsModule } from './core/payment-requests/payment-requests.module';
 import { RefundsModule } from './core/refunds/refunds.module';
@@ -56,7 +55,6 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     OrganizationsModule,
     MerchantsModule,
     ProvidersModule,
-    CustomerSubscriptionsOpenApiModule,
     TransactionsModule,
     CustomersModule,
     PaymentRequestsModule,

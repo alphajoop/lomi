@@ -11,7 +11,7 @@ export class LogsService {
     constructor(private readonly client: LomiClient) {}
 
     /**
-     * Get a log entry
+     * Retrieve log entry
      * @see OpenAPI `LogsController_findOne`
      */
     public async get(type: string, id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['LogEntryResponseDto']> {

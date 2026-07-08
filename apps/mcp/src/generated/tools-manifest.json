@@ -2,46 +2,8 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "API lomi.",
-  "toolCount": 96,
+  "toolCount": 92,
   "tools": [
-    {
-      "name": "lomi_delete_customer_subscriptions_subscription_id",
-      "operationKey": "DELETE /customer-subscriptions/{subscription_id}",
-      "method": "delete",
-      "pathTemplate": "/customer-subscriptions/{subscription_id}",
-      "pathParamNames": [
-        "subscription_id"
-      ],
-      "queryParamNames": [],
-      "title": "Delete Subscriptions",
-      "description": "Cancel customer subscription\n\nREST: DELETE /customer-subscriptions/{subscription_id}",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "CustomerSubscriptionsController_remove",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "subscription_id": {
-            "type": "string",
-            "description": "Path parameter \"subscription_id\" for `/customer-subscriptions/{subscription_id}`."
-          }
-        },
-        "required": [
-          "subscription_id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": true,
-      "alwaysLoad": false,
-      "searchHint": "customer delete id subscription subscriptions"
-    },
     {
       "name": "lomi_delete_customers_id",
       "operationKey": "DELETE /customers/{id}",
@@ -342,83 +304,6 @@
       "destructive": false,
       "alwaysLoad": false,
       "searchHint": "checkout get id sessions"
-    },
-    {
-      "name": "lomi_get_customer_subscriptions",
-      "operationKey": "GET /customer-subscriptions",
-      "method": "get",
-      "pathTemplate": "/customer-subscriptions",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "status",
-        "customer_id"
-      ],
-      "title": "List Subscriptions",
-      "description": "List customer subscriptions\n\nREST: GET /customer-subscriptions",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "CustomerSubscriptionsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "customer_id": {
-            "description": "Customer Id"
-          },
-          "limit": {
-            "type": "number",
-            "description": "Limit"
-          },
-          "offset": {
-            "type": "number",
-            "description": "Offset"
-          },
-          "status": {
-            "description": "Status"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customer get subscriptions"
-    },
-    {
-      "name": "lomi_get_customer_subscriptions_subscription_id",
-      "operationKey": "GET /customer-subscriptions/{subscription_id}",
-      "method": "get",
-      "pathTemplate": "/customer-subscriptions/{subscription_id}",
-      "pathParamNames": [
-        "subscription_id"
-      ],
-      "queryParamNames": [],
-      "title": "Get Subscriptions",
-      "description": "Get customer subscription\n\nREST: GET /customer-subscriptions/{subscription_id}",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "CustomerSubscriptionsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "subscription_id": {
-            "description": "Subscription UUID"
-          }
-        },
-        "required": [
-          "subscription_id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customer get id subscription subscriptions"
     },
     {
       "name": "lomi_get_customers",
@@ -824,7 +709,7 @@
         "type"
       ],
       "title": "List Logs",
-      "description": "List logs\n\nReturns paginated logs for the organization. The `type` query parameter selects which log stream to read:\n\n- **api_request** — every authenticated API call (any HTTP status), including request/response payloads\n- **api_error** — server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)\n- **webhook_delivery** — outbound webhook delivery attempts and retries\n- **activity** — organization audit events (configuration changes, security events)\n\nREST: GET /logs",
+      "description": "List logs\n\nReturns paginated logs for the organization. The `type` query parameter selects which log stream to read:\n\n- **api_request**: every authenticated API call (any HTTP status), including request/response payloads\n- **api_error**: server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)\n- **webhook_delivery**: outbound webhook delivery attempts and retries\n- **activity**: organization audit events (configuration changes, security events)\n\nREST: GET /logs",
       "tags": [
         "Logs"
       ],
@@ -1990,6 +1875,8 @@
       "pathTemplate": "/subscriptions",
       "pathParamNames": [],
       "queryParamNames": [
+        "status",
+        "customer_id",
         "pageSize",
         "page"
       ],
@@ -2004,6 +1891,10 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "customer_id": {
+            "type": "string",
+            "description": "Filtrer par UUID client"
+          },
           "page": {
             "example": 1,
             "type": "number",
@@ -2013,6 +1904,10 @@
             "example": 50,
             "type": "number",
             "description": "PageSize (see lomi. API docs)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Filtrer par statut (active, cancelled, past_due, etc.)"
           }
         }
       },
@@ -2593,44 +2488,6 @@
       "searchHint": "get id webhooks"
     },
     {
-      "name": "lomi_patch_customer_subscriptions_subscription_id",
-      "operationKey": "PATCH /customer-subscriptions/{subscription_id}",
-      "method": "patch",
-      "pathTemplate": "/customer-subscriptions/{subscription_id}",
-      "pathParamNames": [
-        "subscription_id"
-      ],
-      "queryParamNames": [],
-      "title": "Update Subscriptions",
-      "description": "Update customer subscription\n\nREST: PATCH /customer-subscriptions/{subscription_id}",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "CustomerSubscriptionsController_update",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "subscription_id": {
-            "type": "string",
-            "description": "Path parameter \"subscription_id\" for `/customer-subscriptions/{subscription_id}`."
-          }
-        },
-        "required": [
-          "subscription_id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customer id patch subscription subscriptions"
-    },
-    {
       "name": "lomi_patch_customers_id",
       "operationKey": "PATCH /customers/{id}",
       "method": "patch",
@@ -2977,7 +2834,7 @@
               "customer_email": {
                 "type": "string",
                 "example": "john@example.com",
-                "description": "Customer email — required together with customer_name when customer_id is omitted."
+                "description": "Customer email, required together with customer_name when customer_id is omitted."
               },
               "customer_id": {
                 "type": "string",
@@ -2987,7 +2844,7 @@
               "customer_name": {
                 "type": "string",
                 "example": "John Doe",
-                "description": "Customer display name — required together with customer_email when customer_id is omitted."
+                "description": "Customer display name, required together with customer_email when customer_id is omitted."
               },
               "customer_phone": {
                 "type": "string",

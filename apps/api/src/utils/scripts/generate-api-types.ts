@@ -10,10 +10,7 @@ import {
  * Extract table names from API config
  */
 function getExposedTableNames(): string[] {
-  const names = API_RESOURCES.filter((r) => r.enabled).map(
-    (r) => r.typesTableName ?? r.tableName,
-  );
-  return [...new Set(names)];
+  return API_RESOURCES.filter((r) => r.enabled).map((r) => r.tableName);
 }
 
 /**

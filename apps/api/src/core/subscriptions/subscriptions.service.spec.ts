@@ -45,6 +45,46 @@ describe('SubscriptionsService', () => {
     );
   });
 
+  it('calls list_customer_subscriptions when customer_id or status filter is set', async () => {
+    mock.rpc.mockResolvedValue({
+      data: [
+        {
+          subscription_id: 'sub-2',
+          product_id: 'prod-1',
+          plan_name: 'Pro',
+          customer_id: 'cust-1',
+          customer_name: 'Jane',
+          status: 'active',
+          plan_amount: 5000,
+          plan_currency_code: 'XOF',
+        },
+      ],
+      error: null,
+    });
+
+    const result = await service.findAll(user, 1, 20, 'cust-1', 'active');
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        subscription_id: 'sub-2',
+        product_name: 'Pro',
+        customer_id: 'cust-1',
+        amount: 5000,
+        currency_code: 'XOF',
+      }),
+    ]);
+    expect(mock.rpc).toHaveBeenCalledWith(
+      'list_customer_subscriptions',
+      expect.objectContaining({
+        p_merchant_id: user.merchantId,
+        p_customer_id: 'cust-1',
+        p_status: 'active',
+        p_limit: 20,
+        p_offset: 0,
+      }),
+    );
+  });
+
   it('throws when RPC returns an error', async () => {
     mock.rpc.mockResolvedValue({ data: null, error: { message: 'db down' } });
 

@@ -11,7 +11,7 @@ operationId: SubscriptionsController_findAll
 
 List subscriptions
 
-Returns subscriptions for your organization with filters as supported by the API.
+Returns subscriptions for your organization. Optional `customer_id` and `status` query filters narrow the list.
 
 
 ### When to use this
@@ -62,7 +62,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/subscriptions?pageSize=1&page=1" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/subscriptions?status=value&customer_id=value" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 

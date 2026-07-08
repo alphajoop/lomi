@@ -34,7 +34,6 @@ import { ApiLoggingInterceptor } from './core/interceptors/api-logging.intercept
 import { ChargesModule } from './core/charges/charges.module';
 import { MerchantsModule } from './core/merchants/merchants.module';
 import { ProvidersModule } from './core/providers/providers.module';
-import { CustomerSubscriptionsModule } from './core/customer-subscriptions/customer-subscriptions.module';
 import { InvoicesModule } from './core/invoices/invoices.module';
 import { MeteringModule } from './core/metering/metering.module';
 import { MeModule } from './core/me/me.module';
@@ -156,7 +155,6 @@ const logger = new Logger('RedisConfig');
     ChargesModule,
     MerchantsModule,
     ProvidersModule,
-    CustomerSubscriptionsModule,
     InvoicesModule,
     MeteringModule,
     AgentModule,

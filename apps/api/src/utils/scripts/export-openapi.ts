@@ -133,7 +133,6 @@ function getPublicOperationTag(pathKey: string): string | undefined {
   if (pathKey.startsWith('/customers')) return 'Customers';
   if (pathKey.startsWith('/products')) return 'Products';
   if (pathKey.startsWith('/subscriptions')) return 'Subscriptions';
-  if (pathKey.startsWith('/customer-subscriptions')) return 'Subscriptions';
   if (pathKey.startsWith('/discount-coupons')) return 'Discount Coupons';
   if (pathKey.startsWith('/refunds')) return 'Refunds';
   if (pathKey.startsWith('/payouts')) return 'Payouts';

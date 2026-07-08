@@ -471,7 +471,6 @@ async function main() {
       resource.tableName === 'transactions' ||
       resource.tableName === 'webhook_delivery_logs' ||
       resource.tableName === 'subscriptions' ||
-      resource.tableName === 'customer_subscriptions' ||
       resource.tableName === 'products' ||
       resource.tableName === 'prices' ||
       resource.tableName === 'payment_links' ||

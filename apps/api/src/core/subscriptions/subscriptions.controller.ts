@@ -57,6 +57,18 @@ export class SubscriptionsController {
     type: Number,
     example: 50,
   })
+  @ApiQuery({
+    name: 'customer_id',
+    required: false,
+    description: 'Filtrer par UUID client',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: 'Filtrer par statut (active, cancelled, past_due, etc.)',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'Liste des abonnements',
@@ -72,8 +84,16 @@ export class SubscriptionsController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('pageSize', new DefaultValuePipe(50), ParseIntPipe)
     pageSize?: number,
+    @Query('customer_id') customerId?: string,
+    @Query('status') status?: string,
   ) {
-    return this.subscriptionsService.findAll(user, page, pageSize);
+    return this.subscriptionsService.findAll(
+      user,
+      page,
+      pageSize,
+      customerId,
+      status,
+    );
   }
 
   @Get('customer/:customerId')

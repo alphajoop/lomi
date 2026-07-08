@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T11:42:12.512Z",
+  "generatedAt": "2026-07-08T16:57:23.635Z",
   "language": "go",
   "sdk": {
     "accounts": [
@@ -28,13 +28,6 @@
       "get",
       "getPortalAudit",
       "getTransactions",
-      "list",
-      "listAll",
-      "update"
-    ],
-    "customerSubscriptions": [
-      "delete",
-      "get",
       "list",
       "listAll",
       "update"

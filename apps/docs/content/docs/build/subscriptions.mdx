@@ -11,7 +11,7 @@ The Subscriptions API lists and retrieves **subscription instances** (a customer
 <DocsScreenshot name="build/subscriptions" alt="Subscription detail in lomi. dashboard" />
 
 <Callout type="info">
-  SDKs may expose both **`/subscriptions`** helpers and dedicated **`/customer-subscriptions`** methods. For route-specific examples and status transitions, see **[Subscriptions](/api/subscriptions)**. Immutable fields and cancel-only rules follow the OpenAPI descriptions for each operation.
+  SDKs expose **`/subscriptions`** helpers for listing, retrieving, updating, and canceling subscriptions. For route-specific examples and status transitions, see **[Subscriptions](/api/subscriptions)**. Immutable fields and cancel-only rules follow the OpenAPI descriptions for each operation.
 </Callout>
 
 <Callout type="info">
@@ -58,7 +58,7 @@ Your integration should:
 
 1. **Listen for `SUBSCRIPTION_RENEWED`**: successful billing cycle; extend access or send a receipt.
 2. **Listen for `PAYMENT_FAILED`** on renewal transactions, customer may need to pay the renewal checkout link or update a card in the [customer portal](/build/customer-portal).
-3. **Poll or list subscriptions** via `GET /subscriptions` or `GET /customer-subscriptions` when webhooks are delayed, use `status` and `next_billing_date` from the API response only.
+3. **Poll or list subscriptions** via `GET /subscriptions` (optionally with `customer_id` or `status` filters) when webhooks are delayed; use `status` and `next_billing_date` from the API response only.
 
 Cancel or pause via `POST /subscriptions/{id}/cancel` or `PATCH /subscriptions/{id}` as documented in the [Subscriptions API](/api/subscriptions).
 

@@ -11,12 +11,16 @@ operationId: LogsController_findAll
 
 List logs
 
-Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.
+Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: `api_request`, `api_error`, `webhook_delivery`, or `activity`.
 
 
 ### When to use this
 
-Use this endpoint when your flow needs `GET /logs` (List logs).
+Use when debugging API errors, auditing webhook deliveries, or building support dashboards.
+
+### See also
+
+[Retrieve log entry](/api/logs/LogsController_findOne) · [Webhook delivery logs](/api/webhooks/WebhookDeliveryLogsController_findAll)
 
 
 ## Authentication

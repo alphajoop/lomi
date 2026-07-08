@@ -421,479 +421,6 @@
         ]
       }
     },
-    "/customer-subscriptions": {
-      "get": {
-        "operationId": "CustomerSubscriptionsController_findAll",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "status",
-            "required": false,
-            "in": "query",
-            "schema": {}
-          },
-          {
-            "name": "customer_id",
-            "required": false,
-            "in": "query",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "List customer subscriptions",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/customer-subscriptions/{subscription_id}": {
-      "get": {
-        "operationId": "CustomerSubscriptionsController_findOne",
-        "parameters": [
-          {
-            "name": "subscription_id",
-            "required": true,
-            "in": "path",
-            "description": "Subscription UUID",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Get customer subscription",
-        "tags": [
-          "Subscriptions"
-        ]
-      },
-      "patch": {
-        "operationId": "CustomerSubscriptionsController_update",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Update customer subscription",
-        "tags": [
-          "Subscriptions"
-        ]
-      },
-      "delete": {
-        "operationId": "CustomerSubscriptionsController_remove",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Cancel customer subscription",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/subscriptions": {
-      "get": {
-        "description": "Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.",
-        "operationId": "SubscriptionsController_findAll",
-        "parameters": [
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "description": "Nombre d'éléments par page",
-            "schema": {
-              "example": 50,
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "description": "Numéro de page",
-            "schema": {
-              "example": 1,
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des abonnements",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Lister les abonnements",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/subscriptions/customer/{customerId}": {
-      "get": {
-        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
-        "operationId": "SubscriptionsController_findByCustomer",
-        "parameters": [
-          {
-            "name": "customerId",
-            "required": true,
-            "in": "path",
-            "description": "UUID du client",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Liste des abonnements du client",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Client introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Abonnements d’un client",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/subscriptions/{id}": {
-      "get": {
-        "description": "Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
-        "operationId": "SubscriptionsController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Détails de l’abonnement",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Abonnement introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Obtenir un abonnement par ID",
-        "tags": [
-          "Subscriptions"
-        ]
-      },
-      "patch": {
-        "description": "Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.",
-        "operationId": "SubscriptionsController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Abonnement mis à jour",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Mettre à jour un abonnement",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/subscriptions/{id}/uncancel": {
-      "post": {
-        "description": "Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).",
-        "operationId": "SubscriptionsController_uncancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Annuler une résiliation planifiée",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/subscriptions/{id}/change-plan": {
-      "post": {
-        "description": "Met à jour le price_id d’un abonnement actif.",
-        "operationId": "SubscriptionsController_changePlan",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "price_id"
-                ],
-                "properties": {
-                  "price_id": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              },
-              "examples": {
-                "upgrade": {
-                  "summary": "Passer à un autre tarif",
-                  "value": {
-                    "price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Changer le plan tarifaire",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
-    "/subscriptions/{id}/cancel": {
-      "post": {
-        "description": "Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).",
-        "operationId": "SubscriptionsController_cancel",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "UUID de l’abonnement",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cancel_at_period_end": {
-                    "type": "boolean"
-                  },
-                  "cancellation_reason": {
-                    "type": "string"
-                  }
-                }
-              },
-              "examples": {
-                "immediate": {
-                  "summary": "Résiliation immédiate",
-                  "value": {
-                    "cancellation_reason": "Demande du client"
-                  }
-                },
-                "atPeriodEnd": {
-                  "summary": "Résiliation en fin de période",
-                  "value": {
-                    "cancel_at_period_end": true,
-                    "cancellation_reason": "Demande du client"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Abonnement résilié avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Abonnement introuvable ou accès refusé"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Résilier un abonnement",
-        "tags": [
-          "Subscriptions"
-        ]
-      }
-    },
     "/transactions": {
       "get": {
         "description": "Renvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.",
@@ -2341,6 +1868,384 @@
         "summary": "Définir le prix par défaut",
         "tags": [
           "Products"
+        ]
+      }
+    },
+    "/subscriptions": {
+      "get": {
+        "description": "Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.",
+        "operationId": "SubscriptionsController_findAll",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par statut (active, cancelled, past_due, etc.)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "customer_id",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par UUID client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Nombre d'éléments par page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Numéro de page",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Lister les abonnements",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/customer/{customerId}": {
+      "get": {
+        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
+        "operationId": "SubscriptionsController_findByCustomer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements du client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Client introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Abonnements d’un client",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}": {
+      "get": {
+        "description": "Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
+        "operationId": "SubscriptionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de l’abonnement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Abonnement introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Obtenir un abonnement par ID",
+        "tags": [
+          "Subscriptions"
+        ]
+      },
+      "patch": {
+        "description": "Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.",
+        "operationId": "SubscriptionsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Abonnement mis à jour",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Mettre à jour un abonnement",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}/uncancel": {
+      "post": {
+        "description": "Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).",
+        "operationId": "SubscriptionsController_uncancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Annuler une résiliation planifiée",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}/change-plan": {
+      "post": {
+        "description": "Met à jour le price_id d’un abonnement actif.",
+        "operationId": "SubscriptionsController_changePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "price_id"
+                ],
+                "properties": {
+                  "price_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              },
+              "examples": {
+                "upgrade": {
+                  "summary": "Passer à un autre tarif",
+                  "value": {
+                    "price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Changer le plan tarifaire",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}/cancel": {
+      "post": {
+        "description": "Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).",
+        "operationId": "SubscriptionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID de l’abonnement",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cancel_at_period_end": {
+                    "type": "boolean"
+                  },
+                  "cancellation_reason": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "immediate": {
+                  "summary": "Résiliation immédiate",
+                  "value": {
+                    "cancellation_reason": "Demande du client"
+                  }
+                },
+                "atPeriodEnd": {
+                  "summary": "Résiliation en fin de période",
+                  "value": {
+                    "cancel_at_period_end": true,
+                    "cancellation_reason": "Demande du client"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Abonnement résilié avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Abonnement introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Résilier un abonnement",
+        "tags": [
+          "Subscriptions"
         ]
       }
     },
@@ -5051,6 +4956,16 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
+      },
+      "provisioning-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Lomi-Provisioning-Key"
+      },
+      "partner-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Lomi-Partner-Key"
       }
     },
     "schemas": {
@@ -5494,110 +5409,6 @@
           "as_of_date"
         ]
       },
-      "SubscriptionResponseDto": {
-        "type": "object",
-        "properties": {
-          "subscription_id": {
-            "type": "string",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
-            "description": "Unique subscription identifier"
-          },
-          "organization_id": {
-            "type": "string",
-            "example": "789e0123-e89b-12d3-a456-426614174000",
-            "description": "Organization ID"
-          },
-          "product_id": {
-            "type": "string",
-            "example": "456e7890-e89b-12d3-a456-426614174000",
-            "description": "Product ID (recurring product)"
-          },
-          "price_id": {
-            "type": "string",
-            "example": "321e4567-e89b-12d3-a456-426614174000",
-            "description": "Price ID used for this subscription",
-            "nullable": true
-          },
-          "customer_id": {
-            "type": "string",
-            "example": "654e7890-e89b-12d3-a456-426614174000",
-            "description": "Customer ID"
-          },
-          "status": {
-            "type": "string",
-            "example": "active",
-            "description": "Subscription status",
-            "enum": [
-              "pending",
-              "active",
-              "past_due",
-              "cancelled",
-              "trial",
-              "paused",
-              "expired"
-            ]
-          },
-          "start_date": {
-            "type": "string",
-            "example": "2024-01-15",
-            "description": "Subscription start date"
-          },
-          "end_date": {
-            "type": "string",
-            "example": "2024-12-31",
-            "description": "Subscription end date (set when cancelled)",
-            "nullable": true
-          },
-          "next_billing_date": {
-            "type": "string",
-            "example": "2024-02-15",
-            "description": "Next billing date (system-managed)",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "example": {
-              "notes": "Premium plan"
-            },
-            "description": "Additional metadata as JSON",
-            "nullable": true
-          },
-          "environment": {
-            "type": "string",
-            "example": "live",
-            "description": "Environment (test or live)",
-            "enum": [
-              "test",
-              "live"
-            ]
-          },
-          "created_at": {
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z",
-            "description": "When the subscription was created"
-          },
-          "updated_at": {
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z",
-            "description": "When the subscription was last updated"
-          }
-        },
-        "required": [
-          "subscription_id",
-          "organization_id",
-          "product_id",
-          "price_id",
-          "customer_id",
-          "status",
-          "start_date",
-          "end_date",
-          "next_billing_date",
-          "metadata",
-          "environment",
-          "created_at",
-          "updated_at"
-        ]
-      },
       "TransactionResponseDto": {
         "type": "object",
         "properties": {
@@ -5696,6 +5507,11 @@
             "example": 9300,
             "description": "Net amount (received after fees)"
           },
+          "refunded_amount": {
+            "type": "number",
+            "example": 2500,
+            "description": "Cumulative amount refunded to the customer across completed refunds on this transaction"
+          },
           "currency_code": {
             "type": "string",
             "example": "XOF",
@@ -5793,6 +5609,7 @@
           "discount_amount",
           "fee_amount",
           "net_amount",
+          "refunded_amount",
           "currency_code",
           "provider_code",
           "payment_method_code",
@@ -6587,6 +6404,110 @@
           "environment",
           "prices",
           "fees",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "SubscriptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique subscription identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "456e7890-e89b-12d3-a456-426614174000",
+            "description": "Product ID (recurring product)"
+          },
+          "price_id": {
+            "type": "string",
+            "example": "321e4567-e89b-12d3-a456-426614174000",
+            "description": "Price ID used for this subscription",
+            "nullable": true
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "654e7890-e89b-12d3-a456-426614174000",
+            "description": "Customer ID"
+          },
+          "status": {
+            "type": "string",
+            "example": "active",
+            "description": "Subscription status",
+            "enum": [
+              "pending",
+              "active",
+              "past_due",
+              "cancelled",
+              "trial",
+              "paused",
+              "expired"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "example": "2024-01-15",
+            "description": "Subscription start date"
+          },
+          "end_date": {
+            "type": "string",
+            "example": "2024-12-31",
+            "description": "Subscription end date (set when cancelled)",
+            "nullable": true
+          },
+          "next_billing_date": {
+            "type": "string",
+            "example": "2024-02-15",
+            "description": "Next billing date (system-managed)",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "notes": "Premium plan"
+            },
+            "description": "Additional metadata as JSON",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was last updated"
+          }
+        },
+        "required": [
+          "subscription_id",
+          "organization_id",
+          "product_id",
+          "price_id",
+          "customer_id",
+          "status",
+          "start_date",
+          "end_date",
+          "next_billing_date",
+          "metadata",
+          "environment",
           "created_at",
           "updated_at"
         ]

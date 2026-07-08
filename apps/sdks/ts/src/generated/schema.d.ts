@@ -216,166 +216,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/customer-subscriptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List customer subscriptions */
-        get: operations["CustomerSubscriptionsController_findAll"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/customer-subscriptions/{subscription_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get customer subscription */
-        get: operations["CustomerSubscriptionsController_findOne"];
-        put?: never;
-        post?: never;
-        /** Cancel customer subscription */
-        delete: operations["CustomerSubscriptionsController_remove"];
-        options?: never;
-        head?: never;
-        /** Update customer subscription */
-        patch: operations["CustomerSubscriptionsController_update"];
-        trace?: never;
-    };
-    "/subscriptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Lister les abonnements
-         * @description Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.
-         */
-        get: operations["SubscriptionsController_findAll"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/subscriptions/customer/{customerId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Abonnements d’un client
-         * @description Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
-         */
-        get: operations["SubscriptionsController_findByCustomer"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/subscriptions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Obtenir un abonnement par ID
-         * @description Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.
-         */
-        get: operations["SubscriptionsController_findOne"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Mettre à jour un abonnement
-         * @description Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.
-         */
-        patch: operations["SubscriptionsController_update"];
-        trace?: never;
-    };
-    "/subscriptions/{id}/uncancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Annuler une résiliation planifiée
-         * @description Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).
-         */
-        post: operations["SubscriptionsController_uncancel"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/subscriptions/{id}/change-plan": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Changer le plan tarifaire
-         * @description Met à jour le price_id d’un abonnement actif.
-         */
-        post: operations["SubscriptionsController_changePlan"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/subscriptions/{id}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Résilier un abonnement
-         * @description Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).
-         */
-        post: operations["SubscriptionsController_cancel"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/transactions": {
         parameters: {
             query?: never;
@@ -688,6 +528,130 @@ export interface paths {
          * @description Indique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.
          */
         post: operations["ProductsController_setDefaultPrice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lister les abonnements
+         * @description Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.
+         */
+        get: operations["SubscriptionsController_findAll"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subscriptions/customer/{customerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Abonnements d’un client
+         * @description Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+         */
+        get: operations["SubscriptionsController_findByCustomer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subscriptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtenir un abonnement par ID
+         * @description Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.
+         */
+        get: operations["SubscriptionsController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Mettre à jour un abonnement
+         * @description Met à jour le statut ou les métadonnées (ex. pause). Les champs tarifaires restent gérés par le système.
+         */
+        patch: operations["SubscriptionsController_update"];
+        trace?: never;
+    };
+    "/subscriptions/{id}/uncancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Annuler une résiliation planifiée
+         * @description Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).
+         */
+        post: operations["SubscriptionsController_uncancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subscriptions/{id}/change-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Changer le plan tarifaire
+         * @description Met à jour le price_id d’un abonnement actif.
+         */
+        post: operations["SubscriptionsController_changePlan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/subscriptions/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Résilier un abonnement
+         * @description Résilie un abonnement actif immédiatement ou en fin de période (`cancel_at_period_end`).
+         */
+        post: operations["SubscriptionsController_cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1059,7 +1023,12 @@ export interface paths {
         };
         /**
          * List logs
-         * @description Returns paginated logs for the organization. The `type` query parameter selects which log stream to read: api_request, api_error, webhook_delivery, or activity.
+         * @description Returns paginated logs for the organization. The `type` query parameter selects which log stream to read:
+         *
+         *     - **api_request**: every authenticated API call (any HTTP status), including request/response payloads
+         *     - **api_error**: server-side failures with diagnostic detail (unhandled 500s; optional 503/429 when `LOG_HTTP_EXCEPTIONS` is enabled on the API host)
+         *     - **webhook_delivery**: outbound webhook delivery attempts and retries
+         *     - **activity**: organization audit events (configuration changes, security events)
          */
         get: operations["LogsController_findAll"];
         put?: never;
@@ -1782,77 +1751,6 @@ export interface components {
             balance: number;
             as_of_date: string;
         };
-        SubscriptionResponseDto: {
-            /**
-             * @description Unique subscription identifier
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            subscription_id: string;
-            /**
-             * @description Organization ID
-             * @example 789e0123-e89b-12d3-a456-426614174000
-             */
-            organization_id: string;
-            /**
-             * @description Product ID (recurring product)
-             * @example 456e7890-e89b-12d3-a456-426614174000
-             */
-            product_id: string;
-            /**
-             * @description Price ID used for this subscription
-             * @example 321e4567-e89b-12d3-a456-426614174000
-             */
-            price_id: string | null;
-            /**
-             * @description Customer ID
-             * @example 654e7890-e89b-12d3-a456-426614174000
-             */
-            customer_id: string;
-            /**
-             * @description Subscription status
-             * @example active
-             * @enum {string}
-             */
-            status: "pending" | "active" | "past_due" | "cancelled" | "trial" | "paused" | "expired";
-            /**
-             * @description Subscription start date
-             * @example 2024-01-15
-             */
-            start_date: string;
-            /**
-             * @description Subscription end date (set when cancelled)
-             * @example 2024-12-31
-             */
-            end_date: string | null;
-            /**
-             * @description Next billing date (system-managed)
-             * @example 2024-02-15
-             */
-            next_billing_date: string | null;
-            /**
-             * @description Additional metadata as JSON
-             * @example {
-             *       "notes": "Premium plan"
-             *     }
-             */
-            metadata: Record<string, never> | null;
-            /**
-             * @description Environment (test or live)
-             * @example live
-             * @enum {string}
-             */
-            environment: "test" | "live";
-            /**
-             * @description When the subscription was created
-             * @example 2024-01-15T10:30:00Z
-             */
-            created_at: string;
-            /**
-             * @description When the subscription was last updated
-             * @example 2024-01-15T10:30:00Z
-             */
-            updated_at: string;
-        };
         TransactionResponseDto: {
             /**
              * @description Unique transaction identifier
@@ -1933,6 +1831,11 @@ export interface components {
              * @example 9300
              */
             net_amount: number;
+            /**
+             * @description Cumulative amount refunded to the customer across completed refunds on this transaction
+             * @example 2500
+             */
+            refunded_amount: number;
             /**
              * @description Currency code
              * @example XOF
@@ -2447,6 +2350,77 @@ export interface components {
              */
             updated_at: string;
         };
+        SubscriptionResponseDto: {
+            /**
+             * @description Unique subscription identifier
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            subscription_id: string;
+            /**
+             * @description Organization ID
+             * @example 789e0123-e89b-12d3-a456-426614174000
+             */
+            organization_id: string;
+            /**
+             * @description Product ID (recurring product)
+             * @example 456e7890-e89b-12d3-a456-426614174000
+             */
+            product_id: string;
+            /**
+             * @description Price ID used for this subscription
+             * @example 321e4567-e89b-12d3-a456-426614174000
+             */
+            price_id: string | null;
+            /**
+             * @description Customer ID
+             * @example 654e7890-e89b-12d3-a456-426614174000
+             */
+            customer_id: string;
+            /**
+             * @description Subscription status
+             * @example active
+             * @enum {string}
+             */
+            status: "pending" | "active" | "past_due" | "cancelled" | "trial" | "paused" | "expired";
+            /**
+             * @description Subscription start date
+             * @example 2024-01-15
+             */
+            start_date: string;
+            /**
+             * @description Subscription end date (set when cancelled)
+             * @example 2024-12-31
+             */
+            end_date: string | null;
+            /**
+             * @description Next billing date (system-managed)
+             * @example 2024-02-15
+             */
+            next_billing_date: string | null;
+            /**
+             * @description Additional metadata as JSON
+             * @example {
+             *       "notes": "Premium plan"
+             *     }
+             */
+            metadata: Record<string, never> | null;
+            /**
+             * @description Environment (test or live)
+             * @example live
+             * @enum {string}
+             */
+            environment: "test" | "live";
+            /**
+             * @description When the subscription was created
+             * @example 2024-01-15T10:30:00Z
+             */
+            created_at: string;
+            /**
+             * @description When the subscription was last updated
+             * @example 2024-01-15T10:30:00Z
+             */
+            updated_at: string;
+        };
         DiscountCouponResponseDto: {
             /**
              * @description Unique coupon identifier
@@ -2625,6 +2599,8 @@ export interface components {
             require_email: boolean;
             /** @example false */
             require_phone: boolean;
+            /** @example true */
+            require_name: boolean;
             /** @example string */
             spi_account_number: string;
             /** @example string */
@@ -2683,6 +2659,8 @@ export interface components {
             require_email: boolean;
             /** @example false */
             require_phone: boolean;
+            /** @example true */
+            require_name: boolean;
             /** @example string */
             success_url: string;
             /** @example string */
@@ -3091,12 +3069,12 @@ export interface components {
              */
             customer_id?: string;
             /**
-             * @description Customer email — required together with customer_name when customer_id is omitted.
+             * @description Customer email, required together with customer_name when customer_id is omitted.
              * @example john@example.com
              */
             customer_email?: string;
             /**
-             * @description Customer display name — required together with customer_email when customer_id is omitted.
+             * @description Customer display name, required together with customer_email when customer_id is omitted.
              * @example John Doe
              */
             customer_name?: string;
@@ -3512,306 +3490,6 @@ export interface operations {
         responses: {
             /** @description Provider settings */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CustomerSubscriptionsController_findAll: {
-        parameters: {
-            query?: {
-                offset?: number;
-                limit?: number;
-                status?: unknown;
-                customer_id?: unknown;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CustomerSubscriptionsController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Subscription UUID */
-                subscription_id: unknown;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CustomerSubscriptionsController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    CustomerSubscriptionsController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SubscriptionsController_findAll: {
-        parameters: {
-            query?: {
-                /** @description Nombre d'éléments par page */
-                pageSize?: number;
-                /** @description Numéro de page */
-                page?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Liste des abonnements */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"][];
-                };
-            };
-            /** @description Clé API invalide ou manquante */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SubscriptionsController_findByCustomer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description UUID du client */
-                customerId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Liste des abonnements du client */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"][];
-                };
-            };
-            /** @description Clé API invalide ou manquante */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client introuvable ou accès refusé */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SubscriptionsController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description UUID de l’abonnement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Détails de l’abonnement */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"];
-                };
-            };
-            /** @description Clé API invalide ou manquante */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Abonnement introuvable ou accès refusé */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SubscriptionsController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description UUID de l’abonnement */
-                id: unknown;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Abonnement mis à jour */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"];
-                };
-            };
-        };
-    };
-    SubscriptionsController_uncancel: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description UUID de l’abonnement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"];
-                };
-            };
-        };
-    };
-    SubscriptionsController_changePlan: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description UUID de l’abonnement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: uuid */
-                    price_id: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"];
-                };
-            };
-        };
-    };
-    SubscriptionsController_cancel: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description UUID de l’abonnement */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    cancel_at_period_end?: boolean;
-                    cancellation_reason?: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Abonnement résilié avec succès */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"];
-                };
-            };
-            /** @description Clé API invalide ou manquante */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Abonnement introuvable ou accès refusé */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4684,6 +4362,234 @@ export interface operations {
             };
         };
     };
+    SubscriptionsController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Filtrer par statut (active, cancelled, past_due, etc.) */
+                status?: string;
+                /** @description Filtrer par UUID client */
+                customer_id?: string;
+                /** @description Nombre d'éléments par page */
+                pageSize?: number;
+                /** @description Numéro de page */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des abonnements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"][];
+                };
+            };
+            /** @description Clé API invalide ou manquante */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SubscriptionsController_findByCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID du client */
+                customerId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des abonnements du client */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"][];
+                };
+            };
+            /** @description Clé API invalide ou manquante */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Client introuvable ou accès refusé */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SubscriptionsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID de l’abonnement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Détails de l’abonnement */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"];
+                };
+            };
+            /** @description Clé API invalide ou manquante */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Abonnement introuvable ou accès refusé */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SubscriptionsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID de l’abonnement */
+                id: unknown;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Abonnement mis à jour */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"];
+                };
+            };
+        };
+    };
+    SubscriptionsController_uncancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID de l’abonnement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"];
+                };
+            };
+        };
+    };
+    SubscriptionsController_changePlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID de l’abonnement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    price_id: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"];
+                };
+            };
+        };
+    };
+    SubscriptionsController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID de l’abonnement */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cancel_at_period_end?: boolean;
+                    cancellation_reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Abonnement résilié avec succès */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"];
+                };
+            };
+            /** @description Clé API invalide ou manquante */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Abonnement introuvable ou accès refusé */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     DiscountCouponsController_findAll: {
         parameters: {
             query?: never;
@@ -4920,6 +4826,11 @@ export interface operations {
                      * @default false
                      */
                     require_phone?: boolean;
+                    /**
+                     * @description When true, show and require customer name. Default true when unset.
+                     * @default true
+                     */
+                    require_name?: boolean;
                     /** @description Optional ordered checkout field schema. When provided, overrides require_* booleans. */
                     fields?: {
                         [key: string]: unknown;
@@ -5079,6 +4990,11 @@ export interface operations {
                      * @default false
                      */
                     require_phone?: boolean;
+                    /**
+                     * @description When true, show and require customer name. Default true when unset.
+                     * @default true
+                     */
+                    require_name?: boolean;
                     /** @description Optional ordered checkout field schema. When provided, overrides require_* booleans. */
                     fields?: {
                         [key: string]: unknown;

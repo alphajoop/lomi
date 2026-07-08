@@ -14,10 +14,36 @@ export class SubscriptionsService {
   constructor(private readonly supabase: SupabaseService) {}
 
   /**
-   * List all subscriptions for merchant's organization
-   * Uses RPC: fetch_subscriptions
+   * List all subscriptions for merchant's organization.
+   * Uses RPC: fetch_subscriptions (org-wide) or list_customer_subscriptions when filtered.
    */
-  async findAll(user: AuthContext, page: number = 1, pageSize: number = 50) {
+  async findAll(
+    user: AuthContext,
+    page: number = 1,
+    pageSize: number = 50,
+    customerId?: string,
+    status?: string,
+  ) {
+    if (customerId || status) {
+      const limit = pageSize;
+      const offset = (page - 1) * pageSize;
+      const { data, error } = await this.supabase.getClient().rpc(
+        'list_customer_subscriptions' as never,
+        {
+          p_merchant_id: user.merchantId,
+          p_customer_id: customerId ?? null,
+          p_status: status ?? null,
+          p_limit: limit,
+          p_offset: offset,
+        } as never,
+      );
+
+      if (error) throw new Error(error.message);
+
+      const rows = Array.isArray(data) ? data : [];
+      return rows.map((row) => this.normalizeFilteredSubscriptionRow(row));
+    }
+
     const { data, error } = await this.supabase.getClient().rpc(
       'fetch_subscriptions' as any,
       {
@@ -32,6 +58,26 @@ export class SubscriptionsService {
     if (error) throw new Error(error.message);
 
     return data || [];
+  }
+
+  /** Align list_customer_subscriptions rows with fetch_subscriptions list shape. */
+  private normalizeFilteredSubscriptionRow(row: Record<string, unknown>) {
+    return {
+      subscription_id: row.subscription_id,
+      product_id: row.product_id,
+      product_name: row.plan_name ?? row.product_name,
+      customer_id: row.customer_id,
+      customer_name: row.customer_name,
+      status: row.status,
+      start_date: row.start_date,
+      end_date: row.end_date,
+      next_billing_date: row.next_billing_date,
+      metadata: row.metadata,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      amount: row.plan_amount ?? row.amount,
+      currency_code: row.plan_currency_code ?? row.currency_code,
+    };
   }
 
   /**

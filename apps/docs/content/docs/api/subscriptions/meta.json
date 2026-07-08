@@ -1,10 +1,6 @@
 {
   "title": "Subscriptions",
   "pages": [
-    "CustomerSubscriptionsController_findAll",
-    "CustomerSubscriptionsController_findOne",
-    "CustomerSubscriptionsController_remove",
-    "CustomerSubscriptionsController_update",
     "SubscriptionsController_cancel",
     "SubscriptionsController_changePlan",
     "SubscriptionsController_findAll",

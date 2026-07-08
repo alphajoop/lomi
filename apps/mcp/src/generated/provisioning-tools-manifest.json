@@ -277,7 +277,7 @@
       ],
       "queryParamNames": [],
       "title": "Get live activation request status",
-      "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard — not via this API.",
+      "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard; not via this API.",
       "tags": [
         "Provisioning"
       ],

@@ -11,7 +11,6 @@ export { AccountsService } from './services/AccountsService.js';
 export { ChargesService } from './services/ChargesService.js';
 export { CheckoutSessionsService } from './services/CheckoutSessionsService.js';
 export { CustomersService } from './services/CustomersService.js';
-export { CustomerSubscriptionsService } from './services/CustomerSubscriptionsService.js';
 export { DiscountCouponsService } from './services/DiscountCouponsService.js';
 export { DisputesService } from './services/DisputesService.js';
 export { LogsService } from './services/LogsService.js';

@@ -1,5 +1,4 @@
 [
-  "DELETE /customer-subscriptions/{subscription_id}",
   "DELETE /customers/{id}",
   "DELETE /webhooks/{id}",
   "GET /accounts/balance",
@@ -8,8 +7,6 @@
   "GET /charge/card/{id}",
   "GET /checkout-sessions",
   "GET /checkout-sessions/{id}",
-  "GET /customer-subscriptions",
-  "GET /customer-subscriptions/{subscription_id}",
   "GET /customers",
   "GET /customers/{id}",
   "GET /customers/{id}/portal-audit",
@@ -62,7 +59,6 @@
   "GET /webhook-delivery-logs/{id}",
   "GET /webhooks",
   "GET /webhooks/{id}",
-  "PATCH /customer-subscriptions/{subscription_id}",
   "PATCH /customers/{id}",
   "PATCH /meters/{id}",
   "PATCH /organization/radar-settings",

@@ -141,7 +141,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use from your app when a logged-in buyer opens “Manage billing” without building portal UI yourself.',
     related:
-      '[Portal audit log](/api/customers/CustomersController_getPortalAudit) · [Customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_findAll)',
+      '[Portal audit log](/api/customers/CustomersController_getPortalAudit) · [List subscriptions](/api/subscriptions/SubscriptionsController_findAll)',
   },
   CustomersController_getPortalAudit: {
     summary: 'Customer portal audit log',
@@ -150,36 +150,6 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use when investigating billing disputes or verifying what the customer changed in the portal.',
     related:
       '[Create portal session](/api/customers/CustomersController_createPortalLaunchSession)',
-  },
-  CustomerSubscriptionsController_findAll: {
-    summary: 'List customer subscriptions',
-    body: 'Returns subscriptions across customers with filters as exposed by the API.',
-    whenToUse:
-      'Use for billing ops dashboards and exports; not the same as org-level [subscriptions](/api/subscriptions/SubscriptionsController_findAll).',
-    related:
-      '[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)',
-  },
-  CustomerSubscriptionsController_findOne: {
-    summary: 'Retrieve customer subscription',
-    body: 'Returns one customer-scoped subscription by ID. Responds with **404** when unknown or inaccessible.',
-    whenToUse:
-      'Use on portal backends or before patching/canceling a single buyer plan.',
-  },
-  CustomerSubscriptionsController_remove: {
-    summary: 'Cancel customer subscription',
-    body: 'Ends a customer subscription according to platform cancelation rules.',
-    whenToUse:
-      'Use when the buyer cancels via your UI or support cancels on their behalf.',
-    related:
-      '[Update customer subscription](/api/subscriptions/CustomerSubscriptionsController_update)',
-  },
-  CustomerSubscriptionsController_update: {
-    summary: 'Update customer subscription',
-    body: 'Patches a customer subscription (plan, metadata, or lifecycle fields supported by the API).',
-    whenToUse:
-      'Use for upgrades, downgrades, or syncing subscription state from your billing system.',
-    related:
-      '[Retrieve customer subscription](/api/subscriptions/CustomerSubscriptionsController_findOne)',
   },
   DiscountCouponsController_create: {
     summary: 'Create discount coupon',
@@ -447,7 +417,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   SubscriptionsController_findAll: {
     summary: 'List subscriptions',
-    body: 'Returns subscriptions for your organization with filters as supported by the API.',
+    body: 'Returns subscriptions for your organization. Optional `customer_id` and `status` query filters narrow the list.',
     whenToUse:
       'Use for billing ops, dunning dashboards, and revenue reporting.',
   },
@@ -466,7 +436,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     summary: 'Update subscription',
     body: 'Patches an organization subscription (metadata, price, or fields supported by the API).',
     whenToUse:
-      'Use for plan changes initiated from your admin tools; not the customer-portal-scoped [customer subscriptions](/api/subscriptions/CustomerSubscriptionsController_update) API.',
+      'Use for plan changes initiated from your admin tools or customer portal backends.',
     related:
       '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne) · [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)',
   },

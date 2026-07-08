@@ -118,7 +118,6 @@ All SDKs provide access to these services:
 - `checkoutSessions` - Checkout creation
 - `paymentLinks` - Payment links
 - `payouts` - Payouts (self withdrawals and beneficiary payouts via `destination`)
-- `customerSubscriptions` - Per-customer subscription management
 - `merchants` - Partner/sub-merchant metrics
 - `providers` - Enabled payment providers
 - `webhooks` - Webhook configuration
