@@ -43,13 +43,15 @@ export class CreatePaymentLinkDto {
   @IsString()
   title: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'XOF',
-    description: 'Currency code',
+    description:
+      'Currency code for instant links. When omitted, uses organization default_currency.',
     enum: ['XOF', 'USD', 'EUR'],
   })
+  @IsOptional()
   @IsIn(['XOF', 'USD', 'EUR'])
-  currency_code: string;
+  currency_code?: string;
 
   @ApiPropertyOptional({
     example: 'Monthly subscription to premium features',

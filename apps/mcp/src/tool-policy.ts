@@ -74,3 +74,16 @@ export function loadAlwaysLoadKeys(
 ): Set<string> {
   return new Set(policyJson.alwaysLoadOperationKeys ?? []);
 }
+
+/**
+ * Operation keys deliberately kept out of the MCP surface even though they
+ * remain in the shared SDK allowlist. Used to drop operations that make no
+ * sense for an autonomous agent (e.g. direct charges that require client-side
+ * PCI card collection or push an interactive payment prompt to an end user).
+ * Agents should request money via checkout-sessions / payment-links instead.
+ */
+export function loadExcludedOperationKeys(
+  policyJson: { mcpExcludedOperationKeys?: string[] },
+): Set<string> {
+  return new Set(policyJson.mcpExcludedOperationKeys ?? []);
+}

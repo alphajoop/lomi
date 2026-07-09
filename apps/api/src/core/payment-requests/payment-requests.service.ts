@@ -48,7 +48,7 @@ export class PaymentRequestsService {
       p_organization_id: user.organizationId,
       p_customer_id: createDto.customer_id || null,
       p_amount: createDto.amount,
-      p_currency_code: createDto.currency_code,
+      p_currency_code: (createDto.currency_code ?? null) as never,
       p_description: createDto.description || null,
       p_expiry_date: createDto.expiry_date,
       p_payment_reference: createDto.payment_reference || null,

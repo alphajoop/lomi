@@ -13,9 +13,9 @@ describe('resolveCheckoutForm', () => {
     expect(form.showName).toBe(true);
   });
 
-  it('allows phone to be optional when explicitly set off', () => {
+  it('allows phone to be optional when explicitly set off on payment link', () => {
     const form = resolveCheckoutForm({
-      organizationSettings: {
+      paymentLink: {
         require_email: true,
         require_phone: false,
       },
@@ -29,7 +29,7 @@ describe('resolveCheckoutForm', () => {
 
   it('hides email and keeps phone required when email is off and phone is on', () => {
     const form = resolveCheckoutForm({
-      organizationSettings: {
+      paymentLink: {
         require_email: false,
         require_phone: true,
       },
@@ -43,7 +43,7 @@ describe('resolveCheckoutForm', () => {
 
   it('hides both contact fields when email and phone are off', () => {
     const form = resolveCheckoutForm({
-      organizationSettings: {
+      paymentLink: {
         require_email: false,
         require_phone: false,
       },
@@ -55,13 +55,13 @@ describe('resolveCheckoutForm', () => {
     expect(form.showPhone).toBe(false);
   });
 
-  it('prefers checkout session flags over org settings', () => {
+  it('prefers checkout session flags over payment link', () => {
     const form = resolveCheckoutForm({
       checkoutSession: {
         require_email: false,
         require_phone: true,
       },
-      organizationSettings: {
+      paymentLink: {
         require_email: true,
         require_phone: false,
       },
@@ -73,15 +73,11 @@ describe('resolveCheckoutForm', () => {
     expect(form.showPhone).toBe(true);
   });
 
-  it('prefers payment link flags over org settings when session is unset', () => {
+  it('uses payment link flags when session is unset', () => {
     const form = resolveCheckoutForm({
       paymentLink: {
         require_email: true,
         require_phone: true,
-      },
-      organizationSettings: {
-        require_email: true,
-        require_phone: false,
       },
     });
 

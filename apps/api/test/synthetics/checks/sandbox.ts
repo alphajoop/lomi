@@ -455,6 +455,25 @@ export function createSandboxChecks(): CheckDefinition[] {
       },
     },
     {
+      name: 'create checkout session without currency uses org default',
+      service: 'checkout-sessions',
+      method: 'POST',
+      path: '/checkout-sessions',
+      headers: () => ({ 'Idempotency-Key': newIdempotencyKey() }),
+      body: () => ({
+        amount: 1000,
+        title: 'API synthetics checkout default currency',
+      }),
+      expectStatus: [200, 201],
+      validate: (_ctx, res) => {
+        const currency =
+          (res.data as { currency_code?: string } | null)?.currency_code ??
+          (res.data as { data?: { currency_code?: string } })?.data
+            ?.currency_code;
+        return currency ? null : 'expected resolved currency_code on create';
+      },
+    },
+    {
       name: 'get checkout session',
       service: 'checkout-sessions',
       method: 'GET',

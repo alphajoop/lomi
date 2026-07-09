@@ -72,13 +72,15 @@ export class CheckoutSessionsController {
       'Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.',
     schema: {
       type: 'object',
-      required: ['currency_code'],
+      required: ['amount'],
       properties: {
         amount: { type: 'number', example: 10000 },
         currency_code: {
           type: 'string',
           enum: ['XOF', 'USD', 'EUR'],
           example: 'XOF',
+          description:
+            'Optional. Falls back to organization default_currency when omitted.',
         },
         title: { type: 'string' },
         description: { type: 'string' },

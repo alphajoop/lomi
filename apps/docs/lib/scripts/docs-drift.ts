@@ -166,13 +166,29 @@ async function checkMcpManifestParity(errors: string[]): Promise<void> {
   const expectedRaw = await fs.readFile(expectedPath, 'utf-8');
   const expected = JSON.parse(expectedRaw) as string[];
 
+  // MCP intentionally drops some allowlisted operations (e.g. direct charges
+  // that need client-side PCI collection). Those exclusions live in the
+  // MCP-only policy file and never affect the shared SDK allowlist.
+  const policyPath = path.resolve(
+    DOCS_ROOT,
+    '..',
+    'mcp',
+    'src/scripts/mcp-tool-policy.json',
+  );
+  const policyRaw = await fs.readFile(policyPath, 'utf-8');
+  const policy = JSON.parse(policyRaw) as {
+    mcpExcludedOperationKeys?: string[];
+  };
+  const excluded = new Set(policy.mcpExcludedOperationKeys ?? []);
+  const expectedMcpCount = expected.filter((op) => !excluded.has(op)).length;
+
   const manifestRaw = await fs.readFile(manifestPath, 'utf-8');
   const manifest = JSON.parse(manifestRaw) as { tools?: unknown[] };
   const toolCount = manifest.tools?.length ?? 0;
 
-  if (expected.length !== toolCount) {
+  if (expectedMcpCount !== toolCount) {
     errors.push(
-      `MCP manifest tool count (${toolCount}) does not match _expected-public-operations.json (${expected.length}). Run apps/mcp: pnpm run generate`,
+      `MCP manifest tool count (${toolCount}) does not match _expected-public-operations.json minus MCP exclusions (${expectedMcpCount}). Run apps/mcp: pnpm run generate`,
     );
   }
 

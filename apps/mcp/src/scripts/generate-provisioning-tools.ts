@@ -1,7 +1,7 @@
 /**
  * Generates src/generated/provisioning-tools-manifest.json from agent-openapi.json.
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -9,6 +9,7 @@ import {
   buildInputJsonSchema,
   toolNameFromOperation,
 } from '../generator/openapi-helpers.js';
+import type { EnglishCopyOverride } from '../generator/mcp-english-copy.js';
 import { readSpecAndAllowlist } from '../../../sdks/scripts/public-sdk-operations.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -18,6 +19,7 @@ const allowlistPath = join(
   mcpRoot,
   '../docs/lib/scripts/manual-api/_expected-provisioning-operations.json',
 );
+const copyOverridesPath = join(__dirname, 'mcp-provisioning-copy.en.json');
 const outDir = join(mcpRoot, 'src/generated');
 const outFile = join(outDir, 'provisioning-tools-manifest.json');
 
@@ -35,6 +37,25 @@ function pathParamNames(template: string): string[] {
 function main(): void {
   const { spec, allowed } = readSpecAndAllowlist(openapiPath, allowlistPath);
   const apiSpec = spec as OpenAPISpec;
+
+  // Gap-filler copy for tools whose generated OpenAPI summary/description is too
+  // thin for an agent. API-authored copy stays the source of truth when present.
+  const copyOverrides = JSON.parse(
+    readFileSync(copyOverridesPath, 'utf-8'),
+  ) as Record<string, EnglishCopyOverride>;
+  const allowedKeys = new Set(
+    allowed.map((entry) => {
+      const [method, ...pathParts] = String(entry).split(/\s+/);
+      return `${method.toUpperCase()} ${pathParts.join(' ')}`;
+    }),
+  );
+  for (const key of Object.keys(copyOverrides)) {
+    if (!allowedKeys.has(key)) {
+      throw new Error(
+        `mcp-provisioning-copy.en.json has copy for "${key}" which is not a provisioning tool. Fix the key or remove the entry.`,
+      );
+    }
+  }
 
   const tools = allowed.map((entry) => {
     const [method, ...pathParts] = String(entry).split(/\s+/);
@@ -64,14 +85,17 @@ function main(): void {
       includeIdempotencyKey: write,
     });
 
+    const override = copyOverrides[operationKey];
     const summary =
-      typeof openApiOp.summary === 'string' && openApiOp.summary.length > 0
+      override?.title ??
+      (typeof openApiOp.summary === 'string' && openApiOp.summary.length > 0
         ? openApiOp.summary
-        : name;
+        : name);
     const description =
-      typeof openApiOp.description === 'string'
+      override?.description ??
+      (typeof openApiOp.description === 'string'
         ? openApiOp.description
-        : summary;
+        : summary);
 
     return {
       name,

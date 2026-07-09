@@ -74,11 +74,9 @@ export interface CheckoutFormSource extends CheckoutFormFieldFlags {
 }
 
 export interface CheckoutFormSources {
-  organizationSettings?:
-    | (CheckoutFormFieldFlags & {
-        custom_fields?: CustomFieldDefinition[];
-      })
-    | null;
+  organizationSettings?: {
+    custom_fields?: CustomFieldDefinition[];
+  } | null;
   paymentLink?: CheckoutFormSource | null;
   checkoutSession?: CheckoutFormSource | null;
 }
@@ -94,12 +92,10 @@ const SYSTEM_FIELD_ORDER: Record<SystemCheckoutFieldKey, number> = {
 function resolveBooleanFlag(
   sessionValue: boolean | null | undefined,
   linkValue: boolean | null | undefined,
-  orgValue: boolean | null | undefined,
   fallback: boolean,
 ): boolean {
   if (sessionValue != null) return sessionValue;
   if (linkValue != null) return linkValue;
-  if (orgValue != null) return orgValue;
   return fallback;
 }
 
@@ -182,28 +178,24 @@ export function resolveCheckoutForm(
   const requireBillingAddress = resolveBooleanFlag(
     sources.checkoutSession?.require_billing_address,
     sources.paymentLink?.require_billing_address,
-    sources.organizationSettings?.require_billing_address,
     false,
   );
 
   const requireEmailFlag = resolveBooleanFlag(
     sources.checkoutSession?.require_email,
     sources.paymentLink?.require_email,
-    sources.organizationSettings?.require_email,
     true,
   );
 
   const requirePhoneFlag = resolveBooleanFlag(
     sources.checkoutSession?.require_phone,
     sources.paymentLink?.require_phone,
-    sources.organizationSettings?.require_phone,
     true,
   );
 
   const requireNameFlag = resolveBooleanFlag(
     sources.checkoutSession?.require_name,
     sources.paymentLink?.require_name,
-    sources.organizationSettings?.require_name,
     true,
   );
 

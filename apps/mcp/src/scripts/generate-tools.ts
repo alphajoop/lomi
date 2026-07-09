@@ -16,6 +16,7 @@ import {
 } from '../generator/mcp-english-copy.js';
 import {
   loadAlwaysLoadKeys,
+  loadExcludedOperationKeys,
   resolveToolPolicy,
 } from '../tool-policy.js';
 import { validateManifestToolEntry } from './validate-manifest-entry.js';
@@ -57,14 +58,41 @@ function main(): void {
   const { spec, allowed } = readSpecAndAllowlist(openapiPath, allowlistPath);
   const apiSpec = spec as OpenAPISpec;
   const { operations } = getNormalizedOperations(spec, allowed);
-  const alwaysLoadKeys = loadAlwaysLoadKeys(
-    JSON.parse(readFileSync(policyPath, 'utf-8')) as {
-      alwaysLoadOperationKeys?: string[];
-    },
-  );
+  const policyJson = JSON.parse(readFileSync(policyPath, 'utf-8')) as {
+    alwaysLoadOperationKeys?: string[];
+    mcpExcludedOperationKeys?: string[];
+  };
+  const alwaysLoadKeys = loadAlwaysLoadKeys(policyJson);
+  const excludedKeys = loadExcludedOperationKeys(policyJson);
   const copyOverrides = loadCopyOverrides();
 
-  const tools = operations.map((op) => {
+  // MCP-only exclusions must reference operations that are still in the shared
+  // SDK allowlist, otherwise the exclusion is stale and silently does nothing.
+  const allowedKeys = new Set(operations.map((op) => op.operationKey));
+  for (const key of excludedKeys) {
+    if (!allowedKeys.has(key)) {
+      throw new Error(
+        `mcpExcludedOperationKeys references "${key}" which is not in the allowlist. Remove the stale exclusion from mcp-tool-policy.json.`,
+      );
+    }
+  }
+
+  const includedOperations = operations.filter(
+    (op) => !excludedKeys.has(op.operationKey),
+  );
+
+  // Copy overrides must target a tool that is actually generated, otherwise the
+  // curated title/description silently does nothing (typo or removed operation).
+  const includedKeys = new Set(includedOperations.map((op) => op.operationKey));
+  for (const key of Object.keys(copyOverrides)) {
+    if (!includedKeys.has(key)) {
+      throw new Error(
+        `mcp-tool-copy.en.json has copy for "${key}" which is not a generated MCP tool (excluded or unknown). Fix the key or remove the entry.`,
+      );
+    }
+  }
+
+  const tools = includedOperations.map((op) => {
     const name = toolNameFromOperation(op.httpMethodLower, op.pathTemplate);
     const tags = op.openApiOp.tags ?? [];
 

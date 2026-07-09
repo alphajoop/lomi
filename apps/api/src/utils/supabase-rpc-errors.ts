@@ -49,5 +49,11 @@ export function throwMappedSupabaseRpcError(message: string): never {
     }
   }
 
+  if (message.includes('currency_not_allowed')) {
+    throw new BadRequestException(
+      'Currency is not allowed for this organization',
+    );
+  }
+
   throw new Error(message);
 }

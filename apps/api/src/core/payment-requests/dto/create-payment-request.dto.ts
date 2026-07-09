@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsIn,
   IsNumber,
   IsObject,
   IsOptional,
@@ -17,13 +18,16 @@ export class CreatePaymentRequestDto {
   @Min(0)
   amount: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'XOF',
-    description: 'Currency code',
+    description:
+      'Currency code. When omitted, uses the organization default_currency.',
     enum: ['XOF', 'USD', 'EUR'],
   })
+  @IsOptional()
   @IsString()
-  currency_code: string;
+  @IsIn(['XOF', 'USD', 'EUR'])
+  currency_code?: string;
 
   @ApiPropertyOptional({
     example: 'Invoice #INV-2024-001',

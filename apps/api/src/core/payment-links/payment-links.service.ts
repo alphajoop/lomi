@@ -27,7 +27,7 @@ export class PaymentLinksService {
       p_organization_id: user.organizationId,
       p_link_type: createDto.link_type as LinkType,
       p_title: createDto.title,
-      p_currency_code: createDto.currency_code as CurrencyCode,
+      p_currency_code: (createDto.currency_code ?? null) as CurrencyCode,
       p_description: createDto.description || null,
       p_price: createDto.amount || null,
       p_allow_coupon_code: createDto.allow_coupon_code ?? false,

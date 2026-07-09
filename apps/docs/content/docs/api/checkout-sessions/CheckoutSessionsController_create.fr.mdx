@@ -20,7 +20,7 @@ Utilisez pour l’e-commerce, les factures ou tout flux où lomi. héberge l’e
 
 ### À savoir
 
-Préférez les sessions checkout aux encaissements ad hoc pour une expérience acheteur cohérente. Pour les produits pay_what_you_want, le montant doit respecter minimum_amount et maximum_amount du prix lié (unité × quantité).
+Préférez les sessions checkout aux encaissements ad hoc pour une expérience acheteur cohérente. Pour les produits pay_what_you_want, le montant doit respecter minimum_amount et maximum_amount du prix lié (unité × quantité). `currency_code` est optionnel et reprend la devise par défaut de l’organisation (**Paramètres → Paiements**).
 
 ### Voir aussi
 
@@ -67,7 +67,7 @@ Schéma: `object`
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
 | `amount` | Non | `number` | - |
-| `currency_code` | Oui | `enum ("XOF", "USD", "EUR")` | - |
+| `currency_code` | Non | `enum ("XOF", "USD", "EUR")` | Optionnel. S’il est omis, utilise la `default_currency` de l’organisation (**Paramètres → Paiements**). Doit figurer dans `allowed_currencies`. |
 | `title` | Non | `string` | - |
 | `description` | Non | `string` | - |
 | `customer_id` | Non | `string` | - |

@@ -44,17 +44,7 @@ export class CheckoutSessionsService {
   ): Promise<IdempotentCreateResult<unknown>> {
     const scopedIdempotency = namespaceNetworkIdempotency(user, idempotency);
 
-    // currency_code maps to a non-defaulted RPC arg (p_currency_code). When it
-    // is absent, supabase-js drops the undefined key and PostgREST can no longer
-    // match the function overload, surfacing a confusing "Could not find the
-    // function public.create_checkout_session(...) in the schema cache" 500.
-    // Fail fast with a clear 400 so the caller knows what to fix.
-    if (!createDto.currency_code) {
-      throw new BadRequestException(
-        'currency_code is required and must be one of XOF, USD, EUR.',
-      );
-    }
-
+    // currency_code is optional: Postgres RPC resolves organization default.
     const normalizedContactFlags = normalizeCheckoutFieldFlags({
       require_billing_address: createDto.require_billing_address,
       require_email: createDto.require_email,
@@ -82,7 +72,7 @@ export class CheckoutSessionsService {
       const rpcArgs = {
         p_organization_id: user.organizationId,
         p_created_by: user.merchantId,
-        p_currency_code: createDto.currency_code as CurrencyCode,
+        p_currency_code: (createDto.currency_code ?? null) as CurrencyCode,
         p_line_items: createDto.line_items as unknown as Json,
         p_environment: user.environment,
         p_customer_id: createDto.customer_id || null,
@@ -199,7 +189,7 @@ export class CheckoutSessionsService {
       p_environment: user.environment,
       p_created_by: user.merchantId,
       p_amount: amount,
-      p_currency_code: createDto.currency_code as CurrencyCode,
+      p_currency_code: (createDto.currency_code ?? null) as CurrencyCode,
       p_customer_id: createDto.customer_id || null,
       p_metadata: mergeCheckoutMetadata(
         createDto.metadata,

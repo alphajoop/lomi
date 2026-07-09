@@ -36,6 +36,10 @@ import type { IdempotentCreateResult } from '../../utils/idempotency-cache';
 import { environmentFromAuth } from '../common/auth-environment';
 import { assertDirectCardChargesAvailable } from './direct-card-charge-guard';
 import { logStructured } from '../../utils/logging/structured-console-logger';
+import {
+  fetchOrganizationPaymentParameters,
+  resolveCardCurrency,
+} from '../../utils/payment-parameters/resolve-payment-parameters';
 
 type StripeTheme = 'stripe' | 'night' | 'flat';
 type LomiTheme = 'light' | 'dark' | 'flat';
@@ -100,22 +104,29 @@ export class CardChargeService {
       throw new BadRequestException('amount must be a positive number');
     }
 
-    const sourceCurrency = (
-      createDto.currency_code ||
-      createDto.currency ||
-      'XOF'
-    ).toUpperCase();
-    if (!['XOF', 'USD', 'EUR'].includes(sourceCurrency)) {
-      throw new BadRequestException(
-        `Unsupported currency '${sourceCurrency}'. Use XOF, USD, or EUR.`,
-      );
-    }
+    const paymentParameters = await fetchOrganizationPaymentParameters(
+      this.supabase,
+      user.organizationId,
+    );
+    const sourceCurrency = resolveCardCurrency(
+      createDto.currency_code,
+      createDto.currency,
+      paymentParameters,
+    );
+
+    const appearanceTheme =
+      createDto.appearance_theme ??
+      (paymentParameters.appearance_theme as CreateCardChargeDto['appearance_theme']);
+    const appearanceBorderRadius =
+      createDto.appearance_border_radius ??
+      Number.parseFloat(paymentParameters.appearance_border_radius);
+    const appearanceBillingAddress =
+      createDto.appearance_billing_address ??
+      (paymentParameters.appearance_billing_address as CreateCardChargeDto['appearance_billing_address']);
 
     if (
-      createDto.appearance_theme &&
-      !['light', 'dark', 'flat', 'stripe', 'night'].includes(
-        createDto.appearance_theme,
-      )
+      appearanceTheme &&
+      !['light', 'dark', 'flat', 'stripe', 'night'].includes(appearanceTheme)
     ) {
       throw new BadRequestException(
         "appearance_theme must be one of 'light', 'dark', or 'flat'",
@@ -123,9 +134,9 @@ export class CardChargeService {
     }
 
     if (
-      createDto.appearance_border_radius !== undefined &&
-      (!Number.isFinite(Number(createDto.appearance_border_radius)) ||
-        Number(createDto.appearance_border_radius) < 0)
+      appearanceBorderRadius !== undefined &&
+      (!Number.isFinite(Number(appearanceBorderRadius)) ||
+        Number(appearanceBorderRadius) < 0)
     ) {
       throw new BadRequestException(
         'appearance_border_radius must be a non-negative number',
@@ -133,8 +144,8 @@ export class CardChargeService {
     }
 
     if (
-      createDto.appearance_billing_address !== undefined &&
-      !['auto', 'never'].includes(createDto.appearance_billing_address)
+      appearanceBillingAddress !== undefined &&
+      !['auto', 'never'].includes(appearanceBillingAddress)
     ) {
       throw new BadRequestException(
         "appearance_billing_address must be one of 'auto' or 'never'",
@@ -245,16 +256,16 @@ export class CardChargeService {
       original_currency: sourceCurrency,
       status: paymentIntent.status,
       appearance:
-        createDto.appearance_theme !== undefined ||
-        createDto.appearance_border_radius !== undefined ||
-        createDto.appearance_billing_address !== undefined
+        appearanceTheme !== undefined ||
+        appearanceBorderRadius !== undefined ||
+        appearanceBillingAddress !== undefined
           ? {
-              theme: toLomiTheme(createDto.appearance_theme),
+              theme: toLomiTheme(appearanceTheme),
               border_radius:
-                createDto.appearance_border_radius !== undefined
-                  ? Number(createDto.appearance_border_radius)
+                appearanceBorderRadius !== undefined
+                  ? Number(appearanceBorderRadius)
                   : undefined,
-              billing_address: createDto.appearance_billing_address,
+              billing_address: appearanceBillingAddress,
             }
           : undefined,
     };

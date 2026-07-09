@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -62,15 +62,16 @@ export class CreateCheckoutSessionDto {
   @IsNumber()
   amount?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'XOF',
-    description: 'Currency code',
+    description:
+      'Currency code. When omitted, uses the organization default_currency.',
     enum: ['XOF', 'USD', 'EUR'],
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @IsIn(['XOF', 'USD', 'EUR'])
-  currency_code: string;
+  currency_code?: string;
 
   @ApiProperty({
     example: 'Premium Subscription',

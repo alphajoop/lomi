@@ -20,7 +20,7 @@ Use for e-commerce, invoices, or any flow where you want lomi. to host payment c
 
 ### Good to know
 
-Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods. For pay_what_you_want products, amount must fall within the linked price minimum_amount and maximum_amount bounds (unit × quantity).
+Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods. For pay_what_you_want products, amount must fall within the linked price minimum_amount and maximum_amount bounds (unit × quantity). `currency_code` is optional and falls back to your organization default configured under **Settings → Payments**.
 
 ### See also
 
@@ -67,7 +67,7 @@ Schema: `object`
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
 | `amount` | No | `number` | - |
-| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | - |
+| `currency_code` | No | `enum ("XOF", "USD", "EUR")` | Optional. When omitted, uses the organization `default_currency` from **Settings → Payments**. Must be in the organization's `allowed_currencies` list. |
 | `title` | No | `string` | - |
 | `description` | No | `string` | - |
 | `customer_id` | No | `string` | - |

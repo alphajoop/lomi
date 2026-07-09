@@ -44,8 +44,8 @@
         "merchantId"
       ],
       "queryParamNames": [],
-      "title": "Upload a KYC document for onboarding",
-      "description": "Upload a KYC document for onboarding",
+      "title": "Upload a KYC document",
+      "description": "Upload a KYC/identity document (ID, business registration, proof of address) for a merchant's onboarding. Pass the merchantId and the document; submit required documents before calling onboarding/complete.",
       "tags": [
         "Provisioning"
       ],
@@ -84,8 +84,8 @@
         "merchantId"
       ],
       "queryParamNames": [],
-      "title": "Extract onboarding data from website or uploaded documents",
-      "description": "Extract onboarding data from website or uploaded documents",
+      "title": "Extract onboarding data",
+      "description": "Auto-extract onboarding details from the merchant's website or uploaded documents to pre-fill their profile. Pass the merchantId; review the extracted fields before completing onboarding.",
       "tags": [
         "Provisioning"
       ],
@@ -164,8 +164,8 @@
         "merchantId"
       ],
       "queryParamNames": [],
-      "title": "Get onboarding, KYC, and verification status",
-      "description": "Get onboarding, KYC, and verification status",
+      "title": "Get onboarding status",
+      "description": "Return the merchant's onboarding progress plus KYC and verification state. Poll this to see what remains before calling onboarding/complete.",
       "tags": [
         "Provisioning"
       ],

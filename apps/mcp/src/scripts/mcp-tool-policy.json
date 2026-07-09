@@ -8,5 +8,14 @@
     "GET /transactions",
     "GET /webhooks",
     "POST /customers"
+  ],
+  "mcpExcludedOperationKeys": [
+    "POST /charge/card",
+    "POST /charge/card/{id}/cancel",
+    "GET /charge/card/{id}",
+    "POST /charge/wave",
+    "POST /charge/mtn",
+    "POST /charge/switch",
+    "POST /usage-events"
   ]
 }
