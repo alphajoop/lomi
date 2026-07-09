@@ -3,9 +3,15 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { ToolsManifest } from './manifest.js';
 import type { ProvisioningToolsManifest } from './register-provisioning-tools.js';
 
-function findToolName(manifest: ToolsManifest, substring: string): string {
+/**
+ * Resolve a tool name by its stable OpenAPI operation key (e.g. "POST /products"),
+ * so prompts keep working regardless of how the tool is named in the manifest.
+ * Falls back to the passed key if the operation is not exposed.
+ */
+function toolNameByOperation(manifest: ToolsManifest, operationKey: string): string {
   return (
-    manifest.tools.find((x) => x.name.includes(substring))?.name ?? substring
+    manifest.tools.find((t) => t.operationKey === operationKey)?.name ??
+    operationKey
   );
 }
 
@@ -14,17 +20,17 @@ export function registerLomiPrompts(
   manifest: ToolsManifest,
   provisioningManifest?: ProvisioningToolsManifest,
 ): void {
-  const createProduct = findToolName(manifest, 'lomi_post_products');
-  const createCheckout = findToolName(manifest, 'lomi_post_checkout_sessions');
-  const createPaymentLink = findToolName(manifest, 'lomi_post_payment_links');
-  const createWebhook = findToolName(manifest, 'lomi_post_webhooks');
-  const listTransactions = findToolName(manifest, 'lomi_get_transactions');
-  const getTransaction = findToolName(manifest, 'lomi_get_transactions_');
-  const testWebhook =
-    manifest.tools.find(
-      (t) => t.name.includes('webhooks') && t.name.includes('test'),
-    )?.name ?? 'lomi_post_webhooks_id_test';
-  const listWebhookLogs = findToolName(manifest, 'lomi_get_webhook_delivery_logs');
+  const createProduct = toolNameByOperation(manifest, 'POST /products');
+  const createCheckout = toolNameByOperation(manifest, 'POST /checkout-sessions');
+  const createPaymentLink = toolNameByOperation(manifest, 'POST /payment-links');
+  const createWebhook = toolNameByOperation(manifest, 'POST /webhooks');
+  const listTransactions = toolNameByOperation(manifest, 'GET /transactions');
+  const getTransaction = toolNameByOperation(manifest, 'GET /transactions/{id}');
+  const testWebhook = toolNameByOperation(manifest, 'POST /webhooks/{id}/test');
+  const listWebhookLogs = toolNameByOperation(
+    manifest,
+    'GET /webhook-delivery-logs',
+  );
 
   const createAccount =
     provisioningManifest?.tools.find((t) => t.name.includes('post_provisioning_v1_accounts'))

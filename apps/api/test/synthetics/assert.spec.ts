@@ -15,7 +15,8 @@ describe('synthetics assert', () => {
     const leaks = scanForLeaks({
       error: {
         code: 'service_unavailable',
-        message: 'Stripe test mode is not configured (set STRIPE_SECRET_KEY_TEST)',
+        message:
+          'Stripe test mode is not configured (set STRIPE_SECRET_KEY_TEST)',
       },
     });
     expect(leaks.length).toBeGreaterThan(0);
@@ -76,7 +77,12 @@ describe('synthetics assert', () => {
 
   it('detects unexpected status', () => {
     const anomalies = analyzeResponse(
-      { status: 503, data: { error: { message: 'unavailable' } }, latencyMs: 1, headers: {} },
+      {
+        status: 503,
+        data: { error: { message: 'unavailable' } },
+        latencyMs: 1,
+        headers: {},
+      },
       [200, 201],
     );
     expect(anomalies.some((a) => a.kind === 'status')).toBe(true);

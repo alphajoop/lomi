@@ -27,10 +27,10 @@ describe('resolveRequestedCurrency', () => {
 
   it('rejects currencies outside allowed list', () => {
     expect(() =>
-      resolveRequestedCurrency(
-        'USD',
-        { ...baseParams, allowed_currencies: ['XOF'] },
-      ),
+      resolveRequestedCurrency('USD', {
+        ...baseParams,
+        allowed_currencies: ['XOF'],
+      }),
     ).toThrow("Currency 'USD' is not allowed");
   });
 });

@@ -1,9 +1,5 @@
 import { ApiClient } from './client';
-import {
-  analyzeResponse,
-  previewResponse,
-  scanForLeaks,
-} from './assert';
+import { analyzeResponse, previewResponse, scanForLeaks } from './assert';
 import type {
   CheckDefinition,
   CheckResult,

@@ -3,8 +3,14 @@ import type { Anomaly, HttpResponse } from './types';
 /** Patterns that must never appear in merchant-facing error messages. */
 const LEAK_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /STRIPE_SECRET_KEY/i, label: 'Stripe secret env var name' },
-  { pattern: /\bstripe\b.*\bnot configured\b/i, label: 'Stripe configuration hint' },
-  { pattern: /\bnot configured for this api\b/i, label: 'API instance config hint' },
+  {
+    pattern: /\bstripe\b.*\bnot configured\b/i,
+    label: 'Stripe configuration hint',
+  },
+  {
+    pattern: /\bnot configured for this api\b/i,
+    label: 'API instance config hint',
+  },
   { pattern: /\bset\s+STRIPE/i, label: 'Stripe setup instruction' },
   { pattern: /\bsupabase\b/i, label: 'Supabase reference' },
   { pattern: /\bDB_SECRET_KEY\b/i, label: 'DB secret key name' },
@@ -19,7 +25,10 @@ const LEAK_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /GIM_MERCHANT_ID|GIM_SECRET_KEY/i, label: 'GIM credential hint' },
   { pattern: /CRON_SECRET/i, label: 'Cron secret env name' },
   { pattern: /schema cache/i, label: 'Database schema hint' },
-  { pattern: /Could not find the function public\./i, label: 'RPC signature leak' },
+  {
+    pattern: /Could not find the function public\./i,
+    label: 'RPC signature leak',
+  },
 ];
 
 function collectErrorStrings(data: unknown): string[] {
@@ -216,7 +225,9 @@ export function validateMerchantFacingError(
 }
 
 /** Validates intentional 503 responses for muted direct card / switch endpoints. */
-export function validateUnavailableChargeResponse(body: unknown): string | null {
+export function validateUnavailableChargeResponse(
+  body: unknown,
+): string | null {
   const codeError = validateMerchantFacingError(body, {
     expectCode: 'service_unavailable',
   });
@@ -252,7 +263,9 @@ export function validateWebhookCreateResponse(body: unknown): string | null {
 }
 
 /** Validates POST /webhooks/:id/test, sender reached the merchant URL and logged delivery. */
-export function validateWebhookTestDeliveryResponse(body: unknown): string | null {
+export function validateWebhookTestDeliveryResponse(
+  body: unknown,
+): string | null {
   if (!body || typeof body !== 'object') {
     return 'Expected webhook test delivery response object';
   }
@@ -366,7 +379,10 @@ export function validateLogsListResponse(
 
     switch (expectedType) {
       case 'api_request':
-        if (typeof entry.method !== 'string' || typeof entry.endpoint !== 'string') {
+        if (
+          typeof entry.method !== 'string' ||
+          typeof entry.endpoint !== 'string'
+        ) {
           return 'api_request log should include method and endpoint for debugging';
         }
         if (entry.data && typeof entry.data === 'object') {

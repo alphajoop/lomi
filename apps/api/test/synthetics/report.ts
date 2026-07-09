@@ -73,7 +73,7 @@ function markdownSummary(report: RunReport): string {
     for (const check of suite.checks) {
       const notes =
         check.status === 'skip'
-          ? check.skipReason ?? ''
+          ? (check.skipReason ?? '')
           : check.anomalies.map((a) => a.message).join('; ');
       lines.push(
         `| ${statusIcon(check.status)} | ${check.service} | \`${check.method} ${check.path}\` | ${check.httpStatus ?? '-'} | ${notes.replace(/\|/g, '\\|')} |`,

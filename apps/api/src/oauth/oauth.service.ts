@@ -134,7 +134,9 @@ export class OAuthService {
 
     if (merchantGrant) {
       if (!isMerchantOAuthEnabled()) {
-        throw new BadRequestException('Merchant OAuth connections are disabled');
+        throw new BadRequestException(
+          'Merchant OAuth connections are disabled',
+        );
       }
       if (!params.organizationId) {
         throw new BadRequestException('organization_id is required');

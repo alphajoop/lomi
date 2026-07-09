@@ -87,3 +87,15 @@ export function loadExcludedOperationKeys(
 ): Set<string> {
   return new Set(policyJson.mcpExcludedOperationKeys ?? []);
 }
+
+/**
+ * Curated `operationKey -> tool name` overrides. Lets us expose short,
+ * task-oriented names (e.g. `lomi_create_customer`) instead of the mechanical
+ * `lomi_{method}_{path}` fallback. Keys must reference an included operation
+ * (validated in the generator); missing entries fall back to the derived name.
+ */
+export function loadToolNameOverrides(
+  policyJson: { toolNameOverrides?: Record<string, string> },
+): Map<string, string> {
+  return new Map(Object.entries(policyJson.toolNameOverrides ?? {}));
+}

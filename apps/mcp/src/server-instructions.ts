@@ -29,7 +29,8 @@ export function buildServerInstructions(mode: InstructionMode): string {
     '- Pass idempotency_key on all write operations for safe retries.',
     '- Prefer list/filter tools before destructive operations.',
     '- Use lomi_search_tools to discover tools by keyword.',
-    '- Read lomi://docs/getting-started and lomi://tools/index resources for context.',
+    '- To collect money, prefer checkout-sessions / payment-links; direct charge tools are intentionally not exposed.',
+    '- Resources: lomi://docs/recipes (workflows), lomi://docs/authentication, lomi://docs/idempotency, lomi://docs/pagination, lomi://docs/webhooks, lomi://docs/money, lomi://docs/errors, lomi://tools/index.',
     '- Tool results use { ok, status, body } JSON; errors include an error object when ok is false.',
   ].filter(Boolean);
 

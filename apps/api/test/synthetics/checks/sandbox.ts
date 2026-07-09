@@ -415,12 +415,9 @@ export function createSandboxChecks(): CheckDefinition[] {
       }),
       expectStatus: [200, 201],
       skipIf: (ctx) =>
-        ctx.transactionId
-          ? null
-          : 'transactionId not captured from MTN charge',
+        ctx.transactionId ? null : 'transactionId not captured from MTN charge',
       capture: (ctx, res) => {
-        ctx.refundId =
-          pickString(res.data, 'refund_id', 'id') ?? ctx.refundId;
+        ctx.refundId = pickString(res.data, 'refund_id', 'id') ?? ctx.refundId;
       },
     },
     {
@@ -581,8 +578,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       }),
       expectStatus: [200, 201],
       capture: (ctx, res) => {
-        ctx.couponId =
-          pickString(res.data, 'coupon_id', 'id') ?? ctx.couponId;
+        ctx.couponId = pickString(res.data, 'coupon_id', 'id') ?? ctx.couponId;
       },
     },
     {
@@ -660,8 +656,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       name: 'meter balance reflects usage',
       service: 'metering',
       method: 'GET',
-      path: (ctx) =>
-        `/meters/${ctx.meterId}/balances/${ctx.customerId}`,
+      path: (ctx) => `/meters/${ctx.meterId}/balances/${ctx.customerId}`,
       expectStatus: 200,
       retry: { attempts: 15, delayMs: 2000 },
       skipIf: (ctx) => {
@@ -744,7 +739,8 @@ export function createSandboxChecks(): CheckDefinition[] {
       }),
       expectStatus: [200, 201],
       skipIf: (ctx) => {
-        if (!ctx.customerId) return 'customerId required for usage subscription';
+        if (!ctx.customerId)
+          return 'customerId required for usage subscription';
         if (!ctx.usageProductId) return 'usageProductId not captured';
         return null;
       },
@@ -789,9 +785,7 @@ export function createSandboxChecks(): CheckDefinition[] {
       expectStatus: 200,
       retry: { attempts: 12, delayMs: 2000 },
       skipIf: (ctx) =>
-        ctx.usageSubEventId
-          ? null
-          : 'usageSubEventId not captured from ingest',
+        ctx.usageSubEventId ? null : 'usageSubEventId not captured from ingest',
       validate: (_ctx, res) => validateUsageEventProcessed(res.data),
     },
     {

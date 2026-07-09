@@ -46,7 +46,9 @@ export interface CheckDefinition {
   /** Path or builder from context */
   path: string | ((ctx: SuiteContext) => string);
   body?: unknown | ((ctx: SuiteContext) => unknown);
-  headers?: Record<string, string> | ((ctx: SuiteContext) => Record<string, string>);
+  headers?:
+    | Record<string, string>
+    | ((ctx: SuiteContext) => Record<string, string>);
   /** When false, no X-API-KEY header (health probes). Default true. */
   auth?: boolean;
   expectStatus?: number | number[] | ((ctx: SuiteContext) => number | number[]);

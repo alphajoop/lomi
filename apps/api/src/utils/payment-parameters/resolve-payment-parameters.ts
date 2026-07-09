@@ -24,10 +24,12 @@ export async function fetchOrganizationPaymentParameters(
   supabase: SupabaseService,
   organizationId: string,
 ): Promise<OrganizationPaymentParameters> {
-  const { data, error } = await supabase.getClient().rpc(
-    'fetch_organization_payment_parameters' as never,
-    { p_organization_id: organizationId } as never,
-  );
+  const { data, error } = await supabase
+    .getClient()
+    .rpc(
+      'fetch_organization_payment_parameters' as never,
+      { p_organization_id: organizationId } as never,
+    );
 
   if (error || !data || typeof data !== 'object') {
     throw new BadRequestException(

@@ -5,20 +5,20 @@
   "toolCount": 85,
   "tools": [
     {
-      "name": "lomi_delete_customers_id",
-      "operationKey": "DELETE /customers/{id}",
-      "method": "delete",
-      "pathTemplate": "/customers/{id}",
+      "name": "lomi_add_product_price",
+      "operationKey": "POST /products/{id}/prices",
+      "method": "post",
+      "pathTemplate": "/products/{id}/prices",
       "pathParamNames": [
         "id"
       ],
       "queryParamNames": [],
-      "title": "Delete customer",
-      "description": "Permanently delete a customer by id. Destructive: past transactions are kept, but the customer can no longer be charged or subscribed.",
+      "title": "Add price to product",
+      "description": "Add a new price (amount, currency, interval) to an existing product. A product can hold several prices.",
       "tags": [
-        "Customers"
+        "Products"
       ],
-      "operationId": "CustomersController_remove",
+      "operationId": "ProductsController_addPrice",
       "write": true,
       "wantsBody": false,
       "inputSchema": {
@@ -26,7 +26,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "UUID du client"
+            "description": "UUID du produit"
           },
           "idempotency_key": {
             "type": "string",
@@ -38,32 +38,45 @@
         ]
       },
       "readOnly": false,
-      "destructive": true,
+      "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "customers delete id"
+      "searchHint": "post price prices product products"
     },
     {
-      "name": "lomi_delete_webhooks_id",
-      "operationKey": "DELETE /webhooks/{id}",
-      "method": "delete",
-      "pathTemplate": "/webhooks/{id}",
+      "name": "lomi_cancel_subscription",
+      "operationKey": "POST /subscriptions/{id}/cancel",
+      "method": "post",
+      "pathTemplate": "/subscriptions/{id}/cancel",
       "pathParamNames": [
         "id"
       ],
       "queryParamNames": [],
-      "title": "Delete webhook endpoint",
-      "description": "Remove a webhook endpoint by id so lomi. stops sending event notifications to its URL. Destructive and immediate.",
+      "title": "Cancel subscription",
+      "description": "Cancel a subscription immediately or at period end. Pass the id; stops future recurring charges.",
       "tags": [
-        "Webhooks"
+        "Subscriptions"
       ],
-      "operationId": "WebhooksController_remove",
+      "operationId": "SubscriptionsController_cancel",
       "write": true,
-      "wantsBody": false,
+      "wantsBody": true,
       "inputSchema": {
         "type": "object",
         "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "cancel_at_period_end": {
+                "type": "boolean"
+              },
+              "cancellation_reason": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
           "id": {
-            "description": "Webhook UUID"
+            "type": "string",
+            "description": "UUID de l’abonnement"
           },
           "idempotency_key": {
             "type": "string",
@@ -71,88 +84,69 @@
           }
         },
         "required": [
+          "body",
           "id"
         ]
       },
       "readOnly": false,
       "destructive": true,
       "alwaysLoad": false,
-      "searchHint": "delete id webhooks"
+      "searchHint": "cancel post subscription subscriptions"
     },
     {
-      "name": "lomi_get_accounts_balance",
-      "operationKey": "GET /accounts/balance",
-      "method": "get",
-      "pathTemplate": "/accounts/balance",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "currency"
+      "name": "lomi_change_subscription_plan",
+      "operationKey": "POST /subscriptions/{id}/change-plan",
+      "method": "post",
+      "pathTemplate": "/subscriptions/{id}/change-plan",
+      "pathParamNames": [
+        "id"
       ],
-      "title": "Get account balance",
-      "description": "Return your current available and pending balances per currency. Use to see how much can be paid out right now.",
+      "queryParamNames": [],
+      "title": "Change subscription plan",
+      "description": "Move a subscription to a different price/plan with proration. Pass the id and the new price. Use for upgrades and downgrades.",
       "tags": [
-        "Balances"
+        "Subscriptions"
       ],
-      "operationId": "AccountsController_getBalance",
-      "write": false,
-      "wantsBody": false,
+      "operationId": "SubscriptionsController_changePlan",
+      "write": true,
+      "wantsBody": true,
       "inputSchema": {
         "type": "object",
         "properties": {
-          "currency": {
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
+          "body": {
+            "type": "object",
+            "required": [
+              "price_id"
             ],
+            "properties": {
+              "price_id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
             "type": "string",
-            "description": "Filtrer par code devise (XOF, USD, EUR)"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": true,
-      "searchHint": "accounts balance balances get"
-    },
-    {
-      "name": "lomi_get_accounts_balance_breakdown",
-      "operationKey": "GET /accounts/balance/breakdown",
-      "method": "get",
-      "pathTemplate": "/accounts/balance/breakdown",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "target_currency"
-      ],
-      "title": "Get balance breakdown",
-      "description": "Break the balance into available, pending, and reserved components per currency. Use for reconciliation and cash-flow reporting.",
-      "tags": [
-        "Balances"
-      ],
-      "operationId": "AccountsController_getBalanceBreakdown",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "target_currency": {
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ],
+            "description": "UUID de l’abonnement"
+          },
+          "idempotency_key": {
             "type": "string",
-            "description": "Devise cible pour la conversion (XOF, USD, EUR)"
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           }
-        }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
       },
-      "readOnly": true,
+      "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "accounts balance balances breakdown get"
+      "searchHint": "change plan post subscription subscriptions"
     },
     {
-      "name": "lomi_get_accounts_balance_check_currency",
+      "name": "lomi_check_balance",
       "operationKey": "GET /accounts/balance/check/{currency}",
       "method": "get",
       "pathTemplate": "/accounts/balance/check/{currency}",
@@ -183,1901 +177,10 @@
       "readOnly": true,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "accounts balance balances check currency get"
+      "searchHint": "accounts balance balances check get"
     },
     {
-      "name": "lomi_get_checkout_sessions",
-      "operationKey": "GET /checkout-sessions",
-      "method": "get",
-      "pathTemplate": "/checkout-sessions",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "status"
-      ],
-      "title": "List checkout sessions",
-      "description": "List hosted checkout sessions with status (open, completed, expired). Filter to find a session or audit conversion.",
-      "tags": [
-        "Checkout Sessions"
-      ],
-      "operationId": "CheckoutSessionsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "limit": {
-            "example": 20,
-            "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
-          },
-          "status": {
-            "enum": [
-              "open",
-              "completed",
-              "expired"
-            ],
-            "type": "string",
-            "description": "Filtrer par statut de session (valeur checkout_session_status)"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": true,
-      "searchHint": "checkout get sessions"
-    },
-    {
-      "name": "lomi_get_checkout_sessions_id",
-      "operationKey": "GET /checkout-sessions/{id}",
-      "method": "get",
-      "pathTemplate": "/checkout-sessions/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get checkout session",
-      "description": "Retrieve one checkout session by id, including status, amount, and resulting transaction. Use to verify whether a customer completed payment.",
-      "tags": [
-        "Checkout Sessions"
-      ],
-      "operationId": "CheckoutSessionsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID de la session"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "checkout get id sessions"
-    },
-    {
-      "name": "lomi_get_customers",
-      "operationKey": "GET /customers",
-      "method": "get",
-      "pathTemplate": "/customers",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "pageSize",
-        "page",
-        "status",
-        "type",
-        "search"
-      ],
-      "title": "List customers",
-      "description": "List customers with pagination and search. Use to find a customer before charging, refunding, or inspecting their history.",
-      "tags": [
-        "Customers"
-      ],
-      "operationId": "CustomersController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "page": {
-            "example": 1,
-            "type": "number",
-            "description": "Page (see lomi. API docs)"
-          },
-          "pageSize": {
-            "example": 50,
-            "type": "number",
-            "description": "PageSize (see lomi. API docs)"
-          },
-          "search": {
-            "type": "string",
-            "description": "Recherche par nom ou e-mail"
-          },
-          "status": {
-            "enum": [
-              "active",
-              "inactive",
-              "all"
-            ],
-            "type": "string",
-            "description": "Status (see lomi. API docs)"
-          },
-          "type": {
-            "enum": [
-              "business",
-              "individual",
-              "all"
-            ],
-            "type": "string",
-            "description": "Filtrer par type de client"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": true,
-      "searchHint": "customers get"
-    },
-    {
-      "name": "lomi_get_customers_id",
-      "operationKey": "GET /customers/{id}",
-      "method": "get",
-      "pathTemplate": "/customers/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get customer",
-      "description": "Retrieve one customer's profile (email, name, metadata) by id.",
-      "tags": [
-        "Customers"
-      ],
-      "operationId": "CustomersController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "type": "string",
-            "description": "UUID du client"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customers get id"
-    },
-    {
-      "name": "lomi_get_customers_id_portal_audit",
-      "operationKey": "GET /customers/{id}/portal-audit",
-      "method": "get",
-      "pathTemplate": "/customers/{id}/portal-audit",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [
-        "eventType",
-        "pageSize",
-        "page"
-      ],
-      "title": "Get customer portal audit log",
-      "description": "Return the audit trail of a customer's self-service actions in the billing portal (plan changes, payment-method updates). Use for support investigations.",
-      "tags": [
-        "Customers"
-      ],
-      "operationId": "CustomersController_getPortalAudit",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "eventType": {
-            "type": "string",
-            "description": "Filtre sur customer_portal_audit_events.event_type"
-          },
-          "id": {
-            "type": "string",
-            "description": "UUID du client"
-          },
-          "page": {
-            "example": 1,
-            "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "example": 50,
-            "type": "number",
-            "description": "PageSize"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "audit customers get id portal"
-    },
-    {
-      "name": "lomi_get_customers_id_transactions",
-      "operationKey": "GET /customers/{id}/transactions",
-      "method": "get",
-      "pathTemplate": "/customers/{id}/transactions",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "List a customer's transactions",
-      "description": "List every payment made by one customer. Use to review payment history or investigate a disputed charge.",
-      "tags": [
-        "Customers"
-      ],
-      "operationId": "CustomersController_getTransactions",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "type": "string",
-            "description": "UUID du client"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customers get id transactions"
-    },
-    {
-      "name": "lomi_get_discount_coupons",
-      "operationKey": "GET /discount-coupons",
-      "method": "get",
-      "pathTemplate": "/discount-coupons",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "List discount coupons",
-      "description": "List discount coupons with their value, limits, and status. Use to find a coupon or audit active promotions.",
-      "tags": [
-        "Discount Coupons"
-      ],
-      "operationId": "DiscountCouponsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "coupons discount get"
-    },
-    {
-      "name": "lomi_get_discount_coupons_id",
-      "operationKey": "GET /discount-coupons/{id}",
-      "method": "get",
-      "pathTemplate": "/discount-coupons/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get discount coupon",
-      "description": "Retrieve one coupon by id, including discount value, currency, and redemption limits.",
-      "tags": [
-        "Discount Coupons"
-      ],
-      "operationId": "DiscountCouponsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du coupon"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "coupons discount get id"
-    },
-    {
-      "name": "lomi_get_discount_coupons_id_performance",
-      "operationKey": "GET /discount-coupons/{id}/performance",
-      "method": "get",
-      "pathTemplate": "/discount-coupons/{id}/performance",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get coupon performance",
-      "description": "Return redemption count and revenue impact for a coupon. Use to measure how a promotion is performing.",
-      "tags": [
-        "Discount Coupons"
-      ],
-      "operationId": "DiscountCouponsController_getPerformance",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du coupon"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "coupons discount get id performance"
-    },
-    {
-      "name": "lomi_get_disputes",
-      "operationKey": "GET /disputes",
-      "method": "get",
-      "pathTemplate": "/disputes",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "pageSize",
-        "page",
-        "endDate",
-        "startDate",
-        "status"
-      ],
-      "title": "List disputes",
-      "description": "List chargebacks and disputes raised against your payments, with status, reason, and deadline. Use to triage disputes needing evidence.",
-      "tags": [
-        "Litiges"
-      ],
-      "operationId": "DisputesController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "endDate": {
-            "type": "string",
-            "description": "EndDate"
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
-          },
-          "startDate": {
-            "type": "string",
-            "description": "StartDate"
-          },
-          "status": {
-            "type": "string",
-            "description": "Status"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "disputes get litiges"
-    },
-    {
-      "name": "lomi_get_disputes_id",
-      "operationKey": "GET /disputes/{id}",
-      "method": "get",
-      "pathTemplate": "/disputes/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get dispute",
-      "description": "Retrieve one dispute by id with its status, reason, amount, and response deadline.",
-      "tags": [
-        "Litiges"
-      ],
-      "operationId": "DisputesController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "description": "Dispute ID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "disputes get id litiges"
-    },
-    {
-      "name": "lomi_get_logs",
-      "operationKey": "GET /logs",
-      "method": "get",
-      "pathTemplate": "/logs",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "event",
-        "failed",
-        "success",
-        "webhook_id",
-        "severity",
-        "status",
-        "end_date",
-        "start_date",
-        "offset",
-        "limit",
-        "type"
-      ],
-      "title": "List logs",
-      "description": "List organization logs. Set the `type` query param to pick a stream: api_request, api_error, webhook_delivery, or activity (audit). Use to debug API calls or trace events.",
-      "tags": [
-        "Logs"
-      ],
-      "operationId": "LogsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "end_date": {
-            "type": "string",
-            "description": "ISO 8601 end timestamp (inclusive)"
-          },
-          "event": {
-            "type": "string",
-            "description": "Filter activity logs by event type"
-          },
-          "failed": {
-            "type": "boolean",
-            "description": "Only failed webhook deliveries"
-          },
-          "limit": {
-            "example": 25,
-            "type": "number",
-            "description": "Limit"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset"
-          },
-          "severity": {
-            "enum": [
-              "info",
-              "warning",
-              "error",
-              "critical"
-            ],
-            "type": "string",
-            "description": "Severity"
-          },
-          "start_date": {
-            "type": "string",
-            "description": "ISO 8601 start timestamp (inclusive)"
-          },
-          "status": {
-            "type": "string",
-            "description": "Comma-separated HTTP status codes (api_request, api_error). Example: 400,500"
-          },
-          "success": {
-            "type": "boolean",
-            "description": "Only successful webhook deliveries"
-          },
-          "type": {
-            "enum": [
-              "api_request",
-              "api_error",
-              "webhook_delivery",
-              "activity"
-            ],
-            "type": "string",
-            "description": "Log stream to query"
-          },
-          "webhook_id": {
-            "type": "string",
-            "description": "Filter webhook_delivery logs by webhook ID"
-          }
-        },
-        "required": [
-          "type"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get logs"
-    },
-    {
-      "name": "lomi_get_logs_type_id",
-      "operationKey": "GET /logs/{type}/{id}",
-      "method": "get",
-      "pathTemplate": "/logs/{type}/{id}",
-      "pathParamNames": [
-        "type",
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get a log entry",
-      "description": "Retrieve one log entry by its type and id. Returns 404 if it doesn't exist or is outside your organization scope.",
-      "tags": [
-        "Logs"
-      ],
-      "operationId": "LogsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Log entry UUID"
-          },
-          "type": {
-            "enum": [
-              "api_request",
-              "api_error",
-              "webhook_delivery",
-              "activity"
-            ],
-            "type": "string",
-            "description": "Type"
-          }
-        },
-        "required": [
-          "id",
-          "type"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id logs type"
-    },
-    {
-      "name": "lomi_get_merchants_id",
-      "operationKey": "GET /merchants/{id}",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get merchant details",
-      "description": "Return the merchant profile plus headline metrics (MRR, ARR, LTV). Metrics refresh daily and on subscription changes.",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getDetails",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id merchants"
-    },
-    {
-      "name": "lomi_get_merchants_id_arr",
-      "operationKey": "GET /merchants/{id}/arr",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}/arr",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get merchant ARR",
-      "description": "Return the merchant's annual recurring revenue. Use for subscription revenue reporting.",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getArr",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "arr get id merchants"
-    },
-    {
-      "name": "lomi_get_merchants_id_balance",
-      "operationKey": "GET /merchants/{id}/balance",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}/balance",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [
-        "currency_code"
-      ],
-      "title": "Get merchant balance",
-      "description": "Return the merchant's account balance for a currency, scoped to a merchant id.",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getBalance",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "currency_code": {
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ],
-            "type": "string",
-            "description": "Currency Code"
-          },
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "currency_code",
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "balance get id merchants"
-    },
-    {
-      "name": "lomi_get_merchants_id_mrr",
-      "operationKey": "GET /merchants/{id}/mrr",
-      "method": "get",
-      "pathTemplate": "/merchants/{id}/mrr",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get merchant MRR",
-      "description": "Return the merchant's monthly recurring revenue. Use for subscription revenue reporting.",
-      "tags": [
-        "Merchants"
-      ],
-      "operationId": "MerchantsController_getMrr",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Merchant UUID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id merchants mrr"
-    },
-    {
-      "name": "lomi_get_meters",
-      "operationKey": "GET /meters",
-      "method": "get",
-      "pathTemplate": "/meters",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "isActive",
-        "productId"
-      ],
-      "title": "List meters",
-      "description": "List usage meters (billable metrics) defined for usage-based products.",
-      "tags": [
-        "Meters"
-      ],
-      "operationId": "MetersController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean",
-            "description": "IsActive"
-          },
-          "productId": {
-            "description": "ProductId"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get meters"
-    },
-    {
-      "name": "lomi_get_meters_id",
-      "operationKey": "GET /meters/{id}",
-      "method": "get",
-      "pathTemplate": "/meters/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get meter",
-      "description": "Retrieve one usage meter by id, including its event code and aggregation method.",
-      "tags": [
-        "Meters"
-      ],
-      "operationId": "MetersController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Meter ID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id meters"
-    },
-    {
-      "name": "lomi_get_meters_id_balances_customerId",
-      "operationKey": "GET /meters/{id}/balances/{customerId}",
-      "method": "get",
-      "pathTemplate": "/meters/{id}/balances/{customerId}",
-      "pathParamNames": [
-        "id",
-        "customerId"
-      ],
-      "queryParamNames": [],
-      "title": "Get a customer's meter balance",
-      "description": "Return aggregated consumed units for a meter and customer. Use to see current usage before billing.",
-      "tags": [
-        "Meters"
-      ],
-      "operationId": "MetersController_getBalance",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "customerId": {
-            "type": "string",
-            "description": "Path parameter \"customerId\" for `/meters/{id}/balances/{customerId}`."
-          },
-          "id": {
-            "type": "string",
-            "description": "Path parameter \"id\" for `/meters/{id}/balances/{customerId}`."
-          }
-        },
-        "required": [
-          "customerId",
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "balances customerId get id meters"
-    },
-    {
-      "name": "lomi_get_organization_radar_settings",
-      "operationKey": "GET /organization/radar-settings",
-      "method": "get",
-      "pathTemplate": "/organization/radar-settings",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Get fraud (Radar) settings",
-      "description": "Return your organization's Radar fraud-protection rules and thresholds.",
-      "tags": [
-        "Radar"
-      ],
-      "operationId": "RadarController_getSettings",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get organization radar settings"
-    },
-    {
-      "name": "lomi_get_organizations",
-      "operationKey": "GET /organizations",
-      "method": "get",
-      "pathTemplate": "/organizations",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "List organizations",
-      "description": "List the organizations accessible to your API key.",
-      "tags": [
-        "Organisations"
-      ],
-      "operationId": "OrganizationsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get organisations organizations"
-    },
-    {
-      "name": "lomi_get_organizations_id",
-      "operationKey": "GET /organizations/{id}",
-      "method": "get",
-      "pathTemplate": "/organizations/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get organization",
-      "description": "Retrieve one organization's profile and settings by id.",
-      "tags": [
-        "Organisations"
-      ],
-      "operationId": "OrganizationsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Path parameter \"id\" for `/organizations/{id}`."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id organisations organizations"
-    },
-    {
-      "name": "lomi_get_organizations_metrics",
-      "operationKey": "GET /organizations/metrics",
-      "method": "get",
-      "pathTemplate": "/organizations/metrics",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Get organization metrics",
-      "description": "Return aggregate business metrics (volume, revenue, customers) for your organization. Use for dashboards and reporting.",
-      "tags": [
-        "Organisations"
-      ],
-      "operationId": "OrganizationsController_getMetrics",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get metrics organisations organizations"
-    },
-    {
-      "name": "lomi_get_payment_links",
-      "operationKey": "GET /payment-links",
-      "method": "get",
-      "pathTemplate": "/payment-links",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "isActive",
-        "linkType"
-      ],
-      "title": "List payment links",
-      "description": "List reusable payment links with status. Use to find or audit shareable payment URLs.",
-      "tags": [
-        "Payment Links"
-      ],
-      "operationId": "PaymentLinksController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean",
-            "description": "Filtrer par statut actif"
-          },
-          "limit": {
-            "example": 20,
-            "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "linkType": {
-            "enum": [
-              "product",
-              "instant"
-            ],
-            "type": "string",
-            "description": "Filtrer par type de lien"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get links payment"
-    },
-    {
-      "name": "lomi_get_payment_links_id",
-      "operationKey": "GET /payment-links/{id}",
-      "method": "get",
-      "pathTemplate": "/payment-links/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get payment link",
-      "description": "Retrieve one payment link by id, including its URL, amount, and status.",
-      "tags": [
-        "Payment Links"
-      ],
-      "operationId": "PaymentLinksController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du lien de paiement"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id links payment"
-    },
-    {
-      "name": "lomi_get_payment_requests",
-      "operationKey": "GET /payment-requests",
-      "method": "get",
-      "pathTemplate": "/payment-requests",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "customerId",
-        "status"
-      ],
-      "title": "List payment requests",
-      "description": "List one-off payment requests (invoices) sent to customers, with status and amount.",
-      "tags": [
-        "Payment Requests"
-      ],
-      "operationId": "PaymentRequestsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "customerId": {
-            "type": "string",
-            "description": "Filtrer par ID client"
-          },
-          "limit": {
-            "example": 20,
-            "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
-          },
-          "status": {
-            "enum": [
-              "pending",
-              "completed",
-              "failed",
-              "expired"
-            ],
-            "type": "string",
-            "description": "Filtrer par statut"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get payment requests"
-    },
-    {
-      "name": "lomi_get_payment_requests_id",
-      "operationKey": "GET /payment-requests/{id}",
-      "method": "get",
-      "pathTemplate": "/payment-requests/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get payment request",
-      "description": "Retrieve one payment request by id, including amount, customer, and whether it has been paid.",
-      "tags": [
-        "Payment Requests"
-      ],
-      "operationId": "PaymentRequestsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID de la demande"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id payment requests"
-    },
-    {
-      "name": "lomi_get_payouts",
-      "operationKey": "GET /payouts",
-      "method": "get",
-      "pathTemplate": "/payouts",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "pageSize",
-        "page",
-        "endDate",
-        "startDate",
-        "status"
-      ],
-      "title": "List payouts",
-      "description": "List payouts (funds moved out to your bank/mobile account) with status and amount.",
-      "tags": [
-        "Payouts"
-      ],
-      "operationId": "PayoutsUnifiedController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "endDate": {
-            "type": "string",
-            "description": "EndDate"
-          },
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
-          },
-          "startDate": {
-            "type": "string",
-            "description": "StartDate"
-          },
-          "status": {
-            "type": "string",
-            "description": "Status"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get payouts"
-    },
-    {
-      "name": "lomi_get_payouts_id",
-      "operationKey": "GET /payouts/{id}",
-      "method": "get",
-      "pathTemplate": "/payouts/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get payout",
-      "description": "Retrieve one payout by id, including status, destination, and amount.",
-      "tags": [
-        "Payouts"
-      ],
-      "operationId": "PayoutsUnifiedController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Payout ID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id payouts"
-    },
-    {
-      "name": "lomi_get_products",
-      "operationKey": "GET /products",
-      "method": "get",
-      "pathTemplate": "/products",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "isActive"
-      ],
-      "title": "List products",
-      "description": "List catalog products with their prices. Use to find a product before creating a checkout or subscription.",
-      "tags": [
-        "Products"
-      ],
-      "operationId": "ProductsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean",
-            "description": "Filtrer par statut actif"
-          },
-          "limit": {
-            "example": 15,
-            "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": true,
-      "searchHint": "get products"
-    },
-    {
-      "name": "lomi_get_products_id",
-      "operationKey": "GET /products/{id}",
-      "method": "get",
-      "pathTemplate": "/products/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get product",
-      "description": "Retrieve one product by id, including its prices and metadata.",
-      "tags": [
-        "Products"
-      ],
-      "operationId": "ProductsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du produit"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id products"
-    },
-    {
-      "name": "lomi_get_providers",
-      "operationKey": "GET /providers",
-      "method": "get",
-      "pathTemplate": "/providers",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "provider_code"
-      ],
-      "title": "List payment providers",
-      "description": "Return connection status for each payment provider (Wave, MTN, Orange, card) configured for your organization.",
-      "tags": [
-        "Providers"
-      ],
-      "operationId": "ProvidersController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "provider_code": {
-            "enum": [
-              "CARD",
-              "WAVE",
-              "MTN",
-              "SPI"
-            ],
-            "type": "string",
-            "description": "Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay)."
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get providers"
-    },
-    {
-      "name": "lomi_get_refunds",
-      "operationKey": "GET /refunds",
-      "method": "get",
-      "pathTemplate": "/refunds",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "endDate",
-        "startDate",
-        "status"
-      ],
-      "title": "List refunds",
-      "description": "List refunds issued against your payments, with status and amount.",
-      "tags": [
-        "Refunds"
-      ],
-      "operationId": "RefundsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "endDate": {
-            "type": "string",
-            "description": "EndDate"
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "limit": {
-            "type": "number",
-            "description": "Limit"
-          },
-          "offset": {
-            "type": "number",
-            "description": "Offset"
-          },
-          "startDate": {
-            "type": "string",
-            "description": "StartDate"
-          },
-          "status": {
-            "type": "string",
-            "description": "Status"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get refunds"
-    },
-    {
-      "name": "lomi_get_refunds_id",
-      "operationKey": "GET /refunds/{id}",
-      "method": "get",
-      "pathTemplate": "/refunds/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get refund",
-      "description": "Retrieve one refund by id, including status, amount, and the original transaction.",
-      "tags": [
-        "Refunds"
-      ],
-      "operationId": "RefundsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "description": "Refund ID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id refunds"
-    },
-    {
-      "name": "lomi_get_risk_assessments",
-      "operationKey": "GET /risk-assessments",
-      "method": "get",
-      "pathTemplate": "/risk-assessments",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "pageSize",
-        "page",
-        "endDate",
-        "startDate",
-        "rail",
-        "decision"
-      ],
-      "title": "List risk assessments",
-      "description": "List Radar fraud risk assessments for payments, with score and outcome. Use to review flagged transactions.",
-      "tags": [
-        "Radar"
-      ],
-      "operationId": "RadarController_listAssessments",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "decision": {
-            "enum": [
-              "allow",
-              "flag",
-              "block"
-            ],
-            "type": "string",
-            "description": "Decision"
-          },
-          "endDate": {
-            "type": "string",
-            "description": "EndDate"
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
-          },
-          "rail": {
-            "enum": [
-              "card",
-              "mtn",
-              "wave"
-            ],
-            "type": "string",
-            "description": "Rail"
-          },
-          "startDate": {
-            "type": "string",
-            "description": "StartDate"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "assessments get radar risk"
-    },
-    {
-      "name": "lomi_get_risk_assessments_id",
-      "operationKey": "GET /risk-assessments/{id}",
-      "method": "get",
-      "pathTemplate": "/risk-assessments/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get risk assessment",
-      "description": "Retrieve one payment's fraud risk assessment by id, including score and triggered rules.",
-      "tags": [
-        "Radar"
-      ],
-      "operationId": "RadarController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "description": "Risk assessment ID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "assessments get id radar risk"
-    },
-    {
-      "name": "lomi_get_settlements",
-      "operationKey": "GET /settlements",
-      "method": "get",
-      "pathTemplate": "/settlements",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "pageSize",
-        "page",
-        "currency",
-        "end_date",
-        "start_date"
-      ],
-      "title": "List settlement periods",
-      "description": "List settlement periods: completed payment totals grouped by availability date and currency. Each settlement_id is {currency}:{YYYY-MM-DD} (UTC).",
-      "tags": [
-        "Settlements"
-      ],
-      "operationId": "SettlementsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "type": "string",
-            "description": "Currency"
-          },
-          "end_date": {
-            "type": "string",
-            "description": "End Date"
-          },
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
-          },
-          "start_date": {
-            "type": "string",
-            "description": "Start Date"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get settlements"
-    },
-    {
-      "name": "lomi_get_settlements_id_transactions",
-      "operationKey": "GET /settlements/{id}/transactions",
-      "method": "get",
-      "pathTemplate": "/settlements/{id}/transactions",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [
-        "pageSize",
-        "page"
-      ],
-      "title": "List transactions in a settlement",
-      "description": "List the transactions included in one settlement period (settlement_id {currency}:{date}). Use to reconcile a payout against underlying payments.",
-      "tags": [
-        "Settlements"
-      ],
-      "operationId": "SettlementsController_findTransactions",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "example": "XOF:2026-06-01",
-            "description": "Settlement id, format {currency}:{YYYY-MM-DD}"
-          },
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id settlements transactions"
-    },
-    {
-      "name": "lomi_get_subscriptions",
-      "operationKey": "GET /subscriptions",
-      "method": "get",
-      "pathTemplate": "/subscriptions",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "status",
-        "customer_id",
-        "pageSize",
-        "page"
-      ],
-      "title": "List subscriptions",
-      "description": "List subscriptions with status (active, canceled, past_due). Filter to audit recurring billing.",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "SubscriptionsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "customer_id": {
-            "type": "string",
-            "description": "Filtrer par UUID client"
-          },
-          "page": {
-            "example": 1,
-            "type": "number",
-            "description": "Page (see lomi. API docs)"
-          },
-          "pageSize": {
-            "example": 50,
-            "type": "number",
-            "description": "PageSize (see lomi. API docs)"
-          },
-          "status": {
-            "type": "string",
-            "description": "Filtrer par statut (active, cancelled, past_due, etc.)"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get subscriptions"
-    },
-    {
-      "name": "lomi_get_subscriptions_customer_customerId",
-      "operationKey": "GET /subscriptions/customer/{customerId}",
-      "method": "get",
-      "pathTemplate": "/subscriptions/customer/{customerId}",
-      "pathParamNames": [
-        "customerId"
-      ],
-      "queryParamNames": [],
-      "title": "List a customer's subscriptions",
-      "description": "List all subscriptions for one customer. Use before changing or canceling their plan.",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "SubscriptionsController_findByCustomer",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "customerId": {
-            "type": "string",
-            "description": "UUID du client"
-          }
-        },
-        "required": [
-          "customerId"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customer customerId get subscriptions"
-    },
-    {
-      "name": "lomi_get_subscriptions_id",
-      "operationKey": "GET /subscriptions/{id}",
-      "method": "get",
-      "pathTemplate": "/subscriptions/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get subscription",
-      "description": "Retrieve one subscription by id, including plan, status, and current period.",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "SubscriptionsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID de l’abonnement"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id subscriptions"
-    },
-    {
-      "name": "lomi_get_transactions",
-      "operationKey": "GET /transactions",
-      "method": "get",
-      "pathTemplate": "/transactions",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "isPos",
-        "endDate",
-        "startDate",
-        "pageSize",
-        "page",
-        "paymentMethod",
-        "currency",
-        "type",
-        "status",
-        "provider"
-      ],
-      "title": "List transactions",
-      "description": "List payments across all channels (Wave, MTN, Orange, card). Filter by status, customer, date, or currency to reconcile revenue or find a charge.",
-      "tags": [
-        "Transactions"
-      ],
-      "operationId": "TransactionsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "example": "XOF,USD",
-            "type": "string",
-            "description": "Currency (see lomi. API docs)"
-          },
-          "endDate": {
-            "example": "2024-12-31T23:59:59Z",
-            "type": "string",
-            "description": "EndDate (see lomi. API docs)"
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "isPos": {
-            "example": false,
-            "type": "boolean",
-            "description": "Uniquement les transactions points de vente (TPV)"
-          },
-          "page": {
-            "example": 1,
-            "type": "number",
-            "description": "Page (see lomi. API docs)"
-          },
-          "pageSize": {
-            "example": 50,
-            "type": "number",
-            "description": "PageSize (see lomi. API docs)"
-          },
-          "paymentMethod": {
-            "example": "MOBILE_MONEY,CARDS",
-            "type": "string",
-            "description": "PaymentMethod (see lomi. API docs)"
-          },
-          "provider": {
-            "example": "WAVE",
-            "type": "string",
-            "description": "Filtrer par code de fournisseur de paiement"
-          },
-          "startDate": {
-            "example": "2024-01-01T00:00:00Z",
-            "type": "string",
-            "description": "StartDate (see lomi. API docs)"
-          },
-          "status": {
-            "example": "completed,pending",
-            "type": "string",
-            "description": "Status (see lomi. API docs)"
-          },
-          "type": {
-            "example": "payment,refund",
-            "type": "string",
-            "description": "Type (see lomi. API docs)"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": true,
-      "searchHint": "get transactions"
-    },
-    {
-      "name": "lomi_get_transactions_id",
-      "operationKey": "GET /transactions/{id}",
-      "method": "get",
-      "pathTemplate": "/transactions/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get transaction",
-      "description": "Retrieve one payment by id, including status, amount, channel, customer, and fees.",
-      "tags": [
-        "Transactions"
-      ],
-      "operationId": "TransactionsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "type": "string",
-            "description": "UUID de la transaction"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id transactions"
-    },
-    {
-      "name": "lomi_get_usage_billing_entitlements_check",
+      "name": "lomi_check_entitlement",
       "operationKey": "GET /usage-billing/entitlements/check",
       "method": "get",
       "pathTemplate": "/usage-billing/entitlements/check",
@@ -2098,633 +201,10 @@
       "readOnly": true,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "billing check entitlements get usage"
+      "searchHint": "billing check entitlement entitlements get usage"
     },
     {
-      "name": "lomi_get_usage_billing_periods",
-      "operationKey": "GET /usage-billing/periods",
-      "method": "get",
-      "pathTemplate": "/usage-billing/periods",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "page_size",
-        "page",
-        "subscription_id"
-      ],
-      "title": "List usage billing periods",
-      "description": "List billing periods for usage-based subscriptions, with accrued charges.",
-      "tags": [
-        "Usage billing"
-      ],
-      "operationId": "UsageBillingController_listPeriods",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "page_size": {
-            "type": "number",
-            "description": "Page Size"
-          },
-          "subscription_id": {
-            "description": "Subscription Id"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "billing get periods usage"
-    },
-    {
-      "name": "lomi_get_usage_billing_revenue",
-      "operationKey": "GET /usage-billing/revenue",
-      "method": "get",
-      "pathTemplate": "/usage-billing/revenue",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "end_date",
-        "start_date"
-      ],
-      "title": "Get usage billing revenue",
-      "description": "Return revenue from usage-based billing over time. Use for metered-revenue reporting.",
-      "tags": [
-        "Usage billing"
-      ],
-      "operationId": "UsageBillingController_getRevenue",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "end_date": {
-            "description": "End Date"
-          },
-          "start_date": {
-            "description": "Start Date"
-          }
-        },
-        "required": [
-          "end_date",
-          "start_date"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "billing get revenue usage"
-    },
-    {
-      "name": "lomi_get_usage_billing_subscriptions_subscriptionId_usage",
-      "operationKey": "GET /usage-billing/subscriptions/{subscriptionId}/usage",
-      "method": "get",
-      "pathTemplate": "/usage-billing/subscriptions/{subscriptionId}/usage",
-      "pathParamNames": [
-        "subscriptionId"
-      ],
-      "queryParamNames": [],
-      "title": "Get subscription usage",
-      "description": "Return metered usage for one usage-based subscription in the current period. Use to preview the upcoming invoice.",
-      "tags": [
-        "Usage billing"
-      ],
-      "operationId": "UsageBillingController_getSubscriptionUsage",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "subscriptionId": {
-            "type": "string",
-            "description": "Path parameter \"subscriptionId\" for `/usage-billing/subscriptions/{subscriptionId}/usage`."
-          }
-        },
-        "required": [
-          "subscriptionId"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "billing get subscriptionId subscriptions usage"
-    },
-    {
-      "name": "lomi_get_usage_events",
-      "operationKey": "GET /usage-events",
-      "method": "get",
-      "pathTemplate": "/usage-events",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "status",
-        "code",
-        "customer_id",
-        "page_size",
-        "page"
-      ],
-      "title": "List usage events",
-      "description": "List recorded metered usage events. Filter by meter or customer to audit what was billed.",
-      "tags": [
-        "Usage events"
-      ],
-      "operationId": "UsageEventsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "description": "Code"
-          },
-          "customer_id": {
-            "description": "Customer Id"
-          },
-          "page": {
-            "type": "number",
-            "description": "Page"
-          },
-          "page_size": {
-            "type": "number",
-            "description": "Page Size"
-          },
-          "status": {
-            "enum": [
-              "pending",
-              "processed",
-              "failed"
-            ],
-            "type": "string",
-            "description": "Status"
-          }
-        }
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "events get usage"
-    },
-    {
-      "name": "lomi_get_usage_events_id",
-      "operationKey": "GET /usage-events/{id}",
-      "method": "get",
-      "pathTemplate": "/usage-events/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get usage event",
-      "description": "Retrieve one metered usage event by id.",
-      "tags": [
-        "Usage events"
-      ],
-      "operationId": "UsageEventsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Event ID"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "events get id usage"
-    },
-    {
-      "name": "lomi_get_webhook_delivery_logs",
-      "operationKey": "GET /webhook-delivery-logs",
-      "method": "get",
-      "pathTemplate": "/webhook-delivery-logs",
-      "pathParamNames": [],
-      "queryParamNames": [
-        "offset",
-        "limit",
-        "failedOnly",
-        "successOnly",
-        "webhookId"
-      ],
-      "title": "List webhook deliveries",
-      "description": "List outbound webhook delivery attempts with response status and retries. Use to debug why an endpoint didn't receive events.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhookDeliveryLogsController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "failedOnly": {
-            "example": false,
-            "type": "boolean",
-            "description": "FailedOnly (see lomi. API docs)"
-          },
-          "limit": {
-            "example": 25,
-            "type": "number",
-            "description": "Nombre maximal de journaux"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
-          },
-          "successOnly": {
-            "example": false,
-            "type": "boolean",
-            "description": "SuccessOnly (see lomi. API docs)"
-          },
-          "webhookId": {
-            "type": "string",
-            "description": "Filtrer par identifiant de webhook"
-          }
-        },
-        "required": [
-          "webhookId"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "delivery get logs webhook webhooks"
-    },
-    {
-      "name": "lomi_get_webhook_delivery_logs_id",
-      "operationKey": "GET /webhook-delivery-logs/{id}",
-      "method": "get",
-      "pathTemplate": "/webhook-delivery-logs/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get webhook delivery",
-      "description": "Retrieve one webhook delivery attempt by id, including request/response and status. Use to debug a specific failed delivery.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhookDeliveryLogsController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du journal"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "delivery get id logs webhook webhooks"
-    },
-    {
-      "name": "lomi_get_webhooks",
-      "operationKey": "GET /webhooks",
-      "method": "get",
-      "pathTemplate": "/webhooks",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "List webhook endpoints",
-      "description": "List configured webhook endpoints with their subscribed events and status.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhooksController_findAll",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {}
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": true,
-      "searchHint": "get webhooks"
-    },
-    {
-      "name": "lomi_get_webhooks_id",
-      "operationKey": "GET /webhooks/{id}",
-      "method": "get",
-      "pathTemplate": "/webhooks/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Get webhook endpoint",
-      "description": "Retrieve one webhook endpoint by id, including URL and subscribed events.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhooksController_findOne",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Path parameter \"id\" for `/webhooks/{id}`."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "get id webhooks"
-    },
-    {
-      "name": "lomi_patch_customers_id",
-      "operationKey": "PATCH /customers/{id}",
-      "method": "patch",
-      "pathTemplate": "/customers/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Update customer",
-      "description": "Update a customer's fields (email, name, metadata). Pass the id and only the fields to change in body.",
-      "tags": [
-        "Customers"
-      ],
-      "operationId": "CustomersController_update",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "address": {
-                "type": "string"
-              },
-              "city": {
-                "type": "string"
-              },
-              "country": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string",
-                "format": "email"
-              },
-              "is_business": {
-                "type": "boolean"
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "name": {
-                "type": "string"
-              },
-              "phone_number": {
-                "type": "string"
-              },
-              "postal_code": {
-                "type": "string"
-              },
-              "whatsapp_number": {
-                "type": "string"
-              }
-            },
-            "description": "JSON request body for this operation."
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "id": {
-            "type": "string",
-            "description": "UUID du client"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "body",
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customers id patch"
-    },
-    {
-      "name": "lomi_patch_meters_id",
-      "operationKey": "PATCH /meters/{id}",
-      "method": "patch",
-      "pathTemplate": "/meters/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Update meter",
-      "description": "Update a usage meter's configuration (name, aggregation). Pass the id and changed fields.",
-      "tags": [
-        "Meters"
-      ],
-      "operationId": "MetersController_update",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Meter ID"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "id meters patch"
-    },
-    {
-      "name": "lomi_patch_organization_radar_settings",
-      "operationKey": "PATCH /organization/radar-settings",
-      "method": "patch",
-      "pathTemplate": "/organization/radar-settings",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Update fraud (Radar) settings",
-      "description": "Update your organization's Radar fraud rules and thresholds. Pass only the settings to change.",
-      "tags": [
-        "Radar"
-      ],
-      "operationId": "RadarController_updateSettings",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "enabled": {
-                "type": "boolean"
-              },
-              "mode": {
-                "type": "string",
-                "enum": [
-                  "monitor",
-                  "block"
-                ]
-              },
-              "stripe_radar_passthrough": {
-                "type": "boolean"
-              }
-            },
-            "description": "JSON request body for this operation."
-          },
-          "header_Lomi-Account": {
-            "type": "string",
-            "example": "acct_1234567890",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "body"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "organization patch radar settings"
-    },
-    {
-      "name": "lomi_patch_subscriptions_id",
-      "operationKey": "PATCH /subscriptions/{id}",
-      "method": "patch",
-      "pathTemplate": "/subscriptions/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Update subscription",
-      "description": "Update a subscription's mutable fields (metadata, quantity). To switch plans use change-plan; to end it use cancel.",
-      "tags": [
-        "Subscriptions"
-      ],
-      "operationId": "SubscriptionsController_update",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "UUID de l’abonnement"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "id patch subscriptions"
-    },
-    {
-      "name": "lomi_patch_webhooks_id",
-      "operationKey": "PATCH /webhooks/{id}",
-      "method": "patch",
-      "pathTemplate": "/webhooks/{id}",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Update webhook endpoint",
-      "description": "Update a webhook endpoint's URL or subscribed events. Pass the id and changed fields.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhooksController_update",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "authorized_events": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "is_active": {
-                "type": "boolean"
-              },
-              "metadata": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "url": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "description": "JSON request body for this operation."
-          },
-          "id": {
-            "type": "string",
-            "description": "Path parameter \"id\" for `/webhooks/{id}`."
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "body",
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "id patch webhooks"
-    },
-    {
-      "name": "lomi_post_checkout_sessions",
+      "name": "lomi_create_checkout_session",
       "operationKey": "POST /checkout-sessions",
       "method": "post",
       "pathTemplate": "/checkout-sessions",
@@ -2898,10 +378,40 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": true,
-      "searchHint": "checkout post sessions"
+      "searchHint": "checkout post session sessions"
     },
     {
-      "name": "lomi_post_customers",
+      "name": "lomi_create_coupon",
+      "operationKey": "POST /discount-coupons",
+      "method": "post",
+      "pathTemplate": "/discount-coupons",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create discount coupon",
+      "description": "Create a fixed or percentage discount coupon with optional limits. Use to run a promotion; the code is applied at checkout.",
+      "tags": [
+        "Discount Coupons"
+      ],
+      "operationId": "DiscountCouponsController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupon coupons discount post"
+    },
+    {
+      "name": "lomi_create_customer",
       "operationKey": "POST /customers",
       "method": "post",
       "pathTemplate": "/customers",
@@ -2977,105 +487,10 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": true,
-      "searchHint": "customers post"
+      "searchHint": "customer customers post"
     },
     {
-      "name": "lomi_post_customers_id_portal_launch_session",
-      "operationKey": "POST /customers/{id}/portal-launch-session",
-      "method": "post",
-      "pathTemplate": "/customers/{id}/portal-launch-session",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Launch customer portal session",
-      "description": "Create a short-lived URL letting a customer manage their own subscriptions and payment methods. Share the returned link with the customer.",
-      "tags": [
-        "Customers"
-      ],
-      "operationId": "CustomersController_createPortalLaunchSession",
-      "write": true,
-      "wantsBody": true,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "flow_after_completion_url": {
-                "type": "string",
-                "format": "uri"
-              },
-              "flow_subscription_id": {
-                "type": "string",
-                "format": "uuid"
-              },
-              "flow_type": {
-                "type": "string",
-                "enum": [
-                  "portal_home",
-                  "subscription_cancel",
-                  "subscription_manage"
-                ]
-              },
-              "return_url": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "description": "JSON request body for this operation."
-          },
-          "id": {
-            "type": "string",
-            "description": "UUID du client"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "body",
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "customers id launch portal post session"
-    },
-    {
-      "name": "lomi_post_discount_coupons",
-      "operationKey": "POST /discount-coupons",
-      "method": "post",
-      "pathTemplate": "/discount-coupons",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Create discount coupon",
-      "description": "Create a fixed or percentage discount coupon with optional limits. Use to run a promotion; the code is applied at checkout.",
-      "tags": [
-        "Discount Coupons"
-      ],
-      "operationId": "DiscountCouponsController_create",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": []
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "coupons discount post"
-    },
-    {
-      "name": "lomi_post_meters",
+      "name": "lomi_create_meter",
       "operationKey": "POST /meters",
       "method": "post",
       "pathTemplate": "/meters",
@@ -3102,10 +517,10 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "meters post"
+      "searchHint": "meter meters post"
     },
     {
-      "name": "lomi_post_payment_links",
+      "name": "lomi_create_payment_link",
       "operationKey": "POST /payment-links",
       "method": "post",
       "pathTemplate": "/payment-links",
@@ -3225,11 +640,11 @@
       },
       "readOnly": false,
       "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "links payment post"
+      "alwaysLoad": true,
+      "searchHint": "link links payment post"
     },
     {
-      "name": "lomi_post_payment_requests",
+      "name": "lomi_create_payment_request",
       "operationKey": "POST /payment-requests",
       "method": "post",
       "pathTemplate": "/payment-requests",
@@ -3298,10 +713,10 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "payment post requests"
+      "searchHint": "payment post request requests"
     },
     {
-      "name": "lomi_post_payouts",
+      "name": "lomi_create_payout",
       "operationKey": "POST /payouts",
       "method": "post",
       "pathTemplate": "/payouts",
@@ -3328,10 +743,10 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "payouts post"
+      "searchHint": "payout payouts post"
     },
     {
-      "name": "lomi_post_products",
+      "name": "lomi_create_product",
       "operationKey": "POST /products",
       "method": "post",
       "pathTemplate": "/products",
@@ -3358,92 +773,10 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "post products"
+      "searchHint": "post product products"
     },
     {
-      "name": "lomi_post_products_id_prices",
-      "operationKey": "POST /products/{id}/prices",
-      "method": "post",
-      "pathTemplate": "/products/{id}/prices",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Add price to product",
-      "description": "Add a new price (amount, currency, interval) to an existing product. A product can hold several prices.",
-      "tags": [
-        "Products"
-      ],
-      "operationId": "ProductsController_addPrice",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du produit"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "id post prices products"
-    },
-    {
-      "name": "lomi_post_products_id_prices_priceId_set_default",
-      "operationKey": "POST /products/{id}/prices/{priceId}/set-default",
-      "method": "post",
-      "pathTemplate": "/products/{id}/prices/{priceId}/set-default",
-      "pathParamNames": [
-        "id",
-        "priceId"
-      ],
-      "queryParamNames": [],
-      "title": "Set default product price",
-      "description": "Mark one price as the product's default, used when no price is specified. Pass product id and price id.",
-      "tags": [
-        "Products"
-      ],
-      "operationId": "ProductsController_setDefaultPrice",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID du produit"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "priceId": {
-            "type": "string",
-            "description": "UUID du prix"
-          }
-        },
-        "required": [
-          "id",
-          "priceId"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "default id post priceId prices products set"
-    },
-    {
-      "name": "lomi_post_refunds",
+      "name": "lomi_create_refund",
       "operationKey": "POST /refunds",
       "method": "post",
       "pathTemplate": "/refunds",
@@ -3518,43 +851,91 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "post refunds"
+      "searchHint": "post refund refunds"
     },
     {
-      "name": "lomi_post_subscriptions_id_cancel",
-      "operationKey": "POST /subscriptions/{id}/cancel",
+      "name": "lomi_create_usage_subscription",
+      "operationKey": "POST /usage-subscriptions",
       "method": "post",
-      "pathTemplate": "/subscriptions/{id}/cancel",
+      "pathTemplate": "/usage-subscriptions",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create usage subscription",
+      "description": "Enroll a customer on a usage-based product with no upfront charge. Required before metered usage can be billed.",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_createUsageSubscription",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "events post subscription subscriptions usage"
+    },
+    {
+      "name": "lomi_create_webhook",
+      "operationKey": "POST /webhooks",
+      "method": "post",
+      "pathTemplate": "/webhooks",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create webhook endpoint",
+      "description": "Register a URL to receive event notifications (payments, subscriptions, disputes). Specify the URL and events to subscribe to; returns a signing secret.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "post webhook webhooks"
+    },
+    {
+      "name": "lomi_delete_customer",
+      "operationKey": "DELETE /customers/{id}",
+      "method": "delete",
+      "pathTemplate": "/customers/{id}",
       "pathParamNames": [
         "id"
       ],
       "queryParamNames": [],
-      "title": "Cancel subscription",
-      "description": "Cancel a subscription immediately or at period end. Pass the id; stops future recurring charges.",
+      "title": "Delete customer",
+      "description": "Permanently delete a customer by id. Destructive: past transactions are kept, but the customer can no longer be charged or subscribed.",
       "tags": [
-        "Subscriptions"
+        "Customers"
       ],
-      "operationId": "SubscriptionsController_cancel",
+      "operationId": "CustomersController_remove",
       "write": true,
-      "wantsBody": true,
+      "wantsBody": false,
       "inputSchema": {
         "type": "object",
         "properties": {
-          "body": {
-            "type": "object",
-            "properties": {
-              "cancel_at_period_end": {
-                "type": "boolean"
-              },
-              "cancellation_reason": {
-                "type": "string"
-              }
-            },
-            "description": "JSON request body for this operation."
-          },
           "id": {
             "type": "string",
-            "description": "UUID de l’abonnement"
+            "description": "UUID du client"
           },
           "idempotency_key": {
             "type": "string",
@@ -3562,30 +943,1207 @@
           }
         },
         "required": [
-          "body",
           "id"
         ]
       },
       "readOnly": false,
       "destructive": true,
       "alwaysLoad": false,
-      "searchHint": "cancel id post subscriptions"
+      "searchHint": "customer customers delete"
     },
     {
-      "name": "lomi_post_subscriptions_id_change_plan",
-      "operationKey": "POST /subscriptions/{id}/change-plan",
-      "method": "post",
-      "pathTemplate": "/subscriptions/{id}/change-plan",
+      "name": "lomi_delete_webhook",
+      "operationKey": "DELETE /webhooks/{id}",
+      "method": "delete",
+      "pathTemplate": "/webhooks/{id}",
       "pathParamNames": [
         "id"
       ],
       "queryParamNames": [],
-      "title": "Change subscription plan",
-      "description": "Move a subscription to a different price/plan with proration. Pass the id and the new price. Use for upgrades and downgrades.",
+      "title": "Delete webhook endpoint",
+      "description": "Remove a webhook endpoint by id so lomi. stops sending event notifications to its URL. Destructive and immediate.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_remove",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Webhook UUID"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": true,
+      "alwaysLoad": false,
+      "searchHint": "delete webhook webhooks"
+    },
+    {
+      "name": "lomi_get_balance",
+      "operationKey": "GET /accounts/balance",
+      "method": "get",
+      "pathTemplate": "/accounts/balance",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "currency"
+      ],
+      "title": "Get account balance",
+      "description": "Return your current available and pending balances per currency. Use to see how much can be paid out right now.",
+      "tags": [
+        "Balances"
+      ],
+      "operationId": "AccountsController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string",
+            "description": "Filtrer par code devise (XOF, USD, EUR)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "accounts balance balances get"
+    },
+    {
+      "name": "lomi_get_balance_breakdown",
+      "operationKey": "GET /accounts/balance/breakdown",
+      "method": "get",
+      "pathTemplate": "/accounts/balance/breakdown",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "target_currency"
+      ],
+      "title": "Get balance breakdown",
+      "description": "Break the balance into available, pending, and reserved components per currency. Use for reconciliation and cash-flow reporting.",
+      "tags": [
+        "Balances"
+      ],
+      "operationId": "AccountsController_getBalanceBreakdown",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target_currency": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string",
+            "description": "Devise cible pour la conversion (XOF, USD, EUR)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "accounts balance balances breakdown get"
+    },
+    {
+      "name": "lomi_get_checkout_session",
+      "operationKey": "GET /checkout-sessions/{id}",
+      "method": "get",
+      "pathTemplate": "/checkout-sessions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get checkout session",
+      "description": "Retrieve one checkout session by id, including status, amount, and resulting transaction. Use to verify whether a customer completed payment.",
+      "tags": [
+        "Checkout Sessions"
+      ],
+      "operationId": "CheckoutSessionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de la session"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "checkout get session sessions"
+    },
+    {
+      "name": "lomi_get_coupon",
+      "operationKey": "GET /discount-coupons/{id}",
+      "method": "get",
+      "pathTemplate": "/discount-coupons/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get discount coupon",
+      "description": "Retrieve one coupon by id, including discount value, currency, and redemption limits.",
+      "tags": [
+        "Discount Coupons"
+      ],
+      "operationId": "DiscountCouponsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du coupon"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupon coupons discount get"
+    },
+    {
+      "name": "lomi_get_coupon_performance",
+      "operationKey": "GET /discount-coupons/{id}/performance",
+      "method": "get",
+      "pathTemplate": "/discount-coupons/{id}/performance",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get coupon performance",
+      "description": "Return redemption count and revenue impact for a coupon. Use to measure how a promotion is performing.",
+      "tags": [
+        "Discount Coupons"
+      ],
+      "operationId": "DiscountCouponsController_getPerformance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du coupon"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupon coupons discount get performance"
+    },
+    {
+      "name": "lomi_get_customer",
+      "operationKey": "GET /customers/{id}",
+      "method": "get",
+      "pathTemplate": "/customers/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get customer",
+      "description": "Retrieve one customer's profile (email, name, metadata) by id.",
+      "tags": [
+        "Customers"
+      ],
+      "operationId": "CustomersController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer customers get"
+    },
+    {
+      "name": "lomi_get_customer_portal_audit",
+      "operationKey": "GET /customers/{id}/portal-audit",
+      "method": "get",
+      "pathTemplate": "/customers/{id}/portal-audit",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "eventType",
+        "pageSize",
+        "page"
+      ],
+      "title": "Get customer portal audit log",
+      "description": "Return the audit trail of a customer's self-service actions in the billing portal (plan changes, payment-method updates). Use for support investigations.",
+      "tags": [
+        "Customers"
+      ],
+      "operationId": "CustomersController_getPortalAudit",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "description": "Filtre sur customer_portal_audit_events.event_type"
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          },
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Page"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "PageSize"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "audit customer customers get portal"
+    },
+    {
+      "name": "lomi_get_dispute",
+      "operationKey": "GET /disputes/{id}",
+      "method": "get",
+      "pathTemplate": "/disputes/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get dispute",
+      "description": "Retrieve one dispute by id with its status, reason, amount, and response deadline.",
+      "tags": [
+        "Litiges"
+      ],
+      "operationId": "DisputesController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "description": "Dispute ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "dispute disputes get litiges"
+    },
+    {
+      "name": "lomi_get_log",
+      "operationKey": "GET /logs/{type}/{id}",
+      "method": "get",
+      "pathTemplate": "/logs/{type}/{id}",
+      "pathParamNames": [
+        "type",
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get a log entry",
+      "description": "Retrieve one log entry by its type and id. Returns 404 if it doesn't exist or is outside your organization scope.",
+      "tags": [
+        "Logs"
+      ],
+      "operationId": "LogsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Log entry UUID"
+          },
+          "type": {
+            "enum": [
+              "api_request",
+              "api_error",
+              "webhook_delivery",
+              "activity"
+            ],
+            "type": "string",
+            "description": "Type"
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get log logs"
+    },
+    {
+      "name": "lomi_get_merchant",
+      "operationKey": "GET /merchants/{id}",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get merchant details",
+      "description": "Return the merchant profile plus headline metrics (MRR, ARR, LTV). Metrics refresh daily and on subscription changes.",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getDetails",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get merchant merchants"
+    },
+    {
+      "name": "lomi_get_merchant_arr",
+      "operationKey": "GET /merchants/{id}/arr",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/arr",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get merchant ARR",
+      "description": "Return the merchant's annual recurring revenue. Use for subscription revenue reporting.",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getArr",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "arr get merchant merchants"
+    },
+    {
+      "name": "lomi_get_merchant_balance",
+      "operationKey": "GET /merchants/{id}/balance",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/balance",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "currency_code"
+      ],
+      "title": "Get merchant balance",
+      "description": "Return the merchant's account balance for a currency, scoped to a merchant id.",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency_code": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string",
+            "description": "Currency Code"
+          },
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "currency_code",
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "balance get merchant merchants"
+    },
+    {
+      "name": "lomi_get_merchant_mrr",
+      "operationKey": "GET /merchants/{id}/mrr",
+      "method": "get",
+      "pathTemplate": "/merchants/{id}/mrr",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get merchant MRR",
+      "description": "Return the merchant's monthly recurring revenue. Use for subscription revenue reporting.",
+      "tags": [
+        "Merchants"
+      ],
+      "operationId": "MerchantsController_getMrr",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Merchant UUID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get merchant merchants mrr"
+    },
+    {
+      "name": "lomi_get_meter",
+      "operationKey": "GET /meters/{id}",
+      "method": "get",
+      "pathTemplate": "/meters/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get meter",
+      "description": "Retrieve one usage meter by id, including its event code and aggregation method.",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Meter ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get meter meters"
+    },
+    {
+      "name": "lomi_get_meter_balance",
+      "operationKey": "GET /meters/{id}/balances/{customerId}",
+      "method": "get",
+      "pathTemplate": "/meters/{id}/balances/{customerId}",
+      "pathParamNames": [
+        "id",
+        "customerId"
+      ],
+      "queryParamNames": [],
+      "title": "Get a customer's meter balance",
+      "description": "Return aggregated consumed units for a meter and customer. Use to see current usage before billing.",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Path parameter \"customerId\" for `/meters/{id}/balances/{customerId}`."
+          },
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/meters/{id}/balances/{customerId}`."
+          }
+        },
+        "required": [
+          "customerId",
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "balance balances get meter meters"
+    },
+    {
+      "name": "lomi_get_organization",
+      "operationKey": "GET /organizations/{id}",
+      "method": "get",
+      "pathTemplate": "/organizations/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get organization",
+      "description": "Retrieve one organization's profile and settings by id.",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/organizations/{id}`."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get organisations organization organizations"
+    },
+    {
+      "name": "lomi_get_organization_metrics",
+      "operationKey": "GET /organizations/metrics",
+      "method": "get",
+      "pathTemplate": "/organizations/metrics",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Get organization metrics",
+      "description": "Return aggregate business metrics (volume, revenue, customers) for your organization. Use for dashboards and reporting.",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_getMetrics",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get metrics organisations organization organizations"
+    },
+    {
+      "name": "lomi_get_payment_link",
+      "operationKey": "GET /payment-links/{id}",
+      "method": "get",
+      "pathTemplate": "/payment-links/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get payment link",
+      "description": "Retrieve one payment link by id, including its URL, amount, and status.",
+      "tags": [
+        "Payment Links"
+      ],
+      "operationId": "PaymentLinksController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du lien de paiement"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get link links payment"
+    },
+    {
+      "name": "lomi_get_payment_request",
+      "operationKey": "GET /payment-requests/{id}",
+      "method": "get",
+      "pathTemplate": "/payment-requests/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get payment request",
+      "description": "Retrieve one payment request by id, including amount, customer, and whether it has been paid.",
+      "tags": [
+        "Payment Requests"
+      ],
+      "operationId": "PaymentRequestsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de la demande"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get payment request requests"
+    },
+    {
+      "name": "lomi_get_payout",
+      "operationKey": "GET /payouts/{id}",
+      "method": "get",
+      "pathTemplate": "/payouts/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get payout",
+      "description": "Retrieve one payout by id, including status, destination, and amount.",
+      "tags": [
+        "Payouts"
+      ],
+      "operationId": "PayoutsUnifiedController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Payout ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get payout payouts"
+    },
+    {
+      "name": "lomi_get_product",
+      "operationKey": "GET /products/{id}",
+      "method": "get",
+      "pathTemplate": "/products/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get product",
+      "description": "Retrieve one product by id, including its prices and metadata.",
+      "tags": [
+        "Products"
+      ],
+      "operationId": "ProductsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du produit"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get product products"
+    },
+    {
+      "name": "lomi_get_radar_settings",
+      "operationKey": "GET /organization/radar-settings",
+      "method": "get",
+      "pathTemplate": "/organization/radar-settings",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Get fraud (Radar) settings",
+      "description": "Return your organization's Radar fraud-protection rules and thresholds.",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_getSettings",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get organization radar settings"
+    },
+    {
+      "name": "lomi_get_refund",
+      "operationKey": "GET /refunds/{id}",
+      "method": "get",
+      "pathTemplate": "/refunds/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get refund",
+      "description": "Retrieve one refund by id, including status, amount, and the original transaction.",
+      "tags": [
+        "Refunds"
+      ],
+      "operationId": "RefundsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "description": "Refund ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get refund refunds"
+    },
+    {
+      "name": "lomi_get_risk_assessment",
+      "operationKey": "GET /risk-assessments/{id}",
+      "method": "get",
+      "pathTemplate": "/risk-assessments/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get risk assessment",
+      "description": "Retrieve one payment's fraud risk assessment by id, including score and triggered rules.",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "description": "Risk assessment ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "assessment assessments get radar risk"
+    },
+    {
+      "name": "lomi_get_subscription",
+      "operationKey": "GET /subscriptions/{id}",
+      "method": "get",
+      "pathTemplate": "/subscriptions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get subscription",
+      "description": "Retrieve one subscription by id, including plan, status, and current period.",
       "tags": [
         "Subscriptions"
       ],
-      "operationId": "SubscriptionsController_changePlan",
+      "operationId": "SubscriptionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de l’abonnement"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get subscription subscriptions"
+    },
+    {
+      "name": "lomi_get_subscription_usage",
+      "operationKey": "GET /usage-billing/subscriptions/{subscriptionId}/usage",
+      "method": "get",
+      "pathTemplate": "/usage-billing/subscriptions/{subscriptionId}/usage",
+      "pathParamNames": [
+        "subscriptionId"
+      ],
+      "queryParamNames": [],
+      "title": "Get subscription usage",
+      "description": "Return metered usage for one usage-based subscription in the current period. Use to preview the upcoming invoice.",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_getSubscriptionUsage",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "description": "Path parameter \"subscriptionId\" for `/usage-billing/subscriptions/{subscriptionId}/usage`."
+          }
+        },
+        "required": [
+          "subscriptionId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing get subscription subscriptions usage"
+    },
+    {
+      "name": "lomi_get_transaction",
+      "operationKey": "GET /transactions/{id}",
+      "method": "get",
+      "pathTemplate": "/transactions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get transaction",
+      "description": "Retrieve one payment by id, including status, amount, channel, customer, and fees.",
+      "tags": [
+        "Transactions"
+      ],
+      "operationId": "TransactionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID de la transaction"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get transaction transactions"
+    },
+    {
+      "name": "lomi_get_usage_billing_revenue",
+      "operationKey": "GET /usage-billing/revenue",
+      "method": "get",
+      "pathTemplate": "/usage-billing/revenue",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "end_date",
+        "start_date"
+      ],
+      "title": "Get usage billing revenue",
+      "description": "Return revenue from usage-based billing over time. Use for metered-revenue reporting.",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_getRevenue",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "description": "End Date"
+          },
+          "start_date": {
+            "description": "Start Date"
+          }
+        },
+        "required": [
+          "end_date",
+          "start_date"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing get revenue usage"
+    },
+    {
+      "name": "lomi_get_usage_event",
+      "operationKey": "GET /usage-events/{id}",
+      "method": "get",
+      "pathTemplate": "/usage-events/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get usage event",
+      "description": "Retrieve one metered usage event by id.",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Event ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "event events get usage"
+    },
+    {
+      "name": "lomi_get_webhook",
+      "operationKey": "GET /webhooks/{id}",
+      "method": "get",
+      "pathTemplate": "/webhooks/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get webhook endpoint",
+      "description": "Retrieve one webhook endpoint by id, including URL and subscribed events.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/webhooks/{id}`."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get webhook webhooks"
+    },
+    {
+      "name": "lomi_get_webhook_delivery",
+      "operationKey": "GET /webhook-delivery-logs/{id}",
+      "method": "get",
+      "pathTemplate": "/webhook-delivery-logs/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Get webhook delivery",
+      "description": "Retrieve one webhook delivery attempt by id, including request/response and status. Use to debug a specific failed delivery.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhookDeliveryLogsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du journal"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "delivery get logs webhook webhooks"
+    },
+    {
+      "name": "lomi_grant_usage_credits",
+      "operationKey": "POST /usage-billing/credits",
+      "method": "post",
+      "pathTemplate": "/usage-billing/credits",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Grant usage credits",
+      "description": "Grant prepaid credits to a customer that offset future usage-based charges. Use for trials, goodwill, or top-ups.",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_creditWallet",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing credits post usage"
+    },
+    {
+      "name": "lomi_launch_customer_portal",
+      "operationKey": "POST /customers/{id}/portal-launch-session",
+      "method": "post",
+      "pathTemplate": "/customers/{id}/portal-launch-session",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Launch customer portal session",
+      "description": "Create a short-lived URL letting a customer manage their own subscriptions and payment methods. Share the returned link with the customer.",
+      "tags": [
+        "Customers"
+      ],
+      "operationId": "CustomersController_createPortalLaunchSession",
       "write": true,
       "wantsBody": true,
       "inputSchema": {
@@ -3593,20 +2151,33 @@
         "properties": {
           "body": {
             "type": "object",
-            "required": [
-              "price_id"
-            ],
             "properties": {
-              "price_id": {
+              "flow_after_completion_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "flow_subscription_id": {
                 "type": "string",
                 "format": "uuid"
+              },
+              "flow_type": {
+                "type": "string",
+                "enum": [
+                  "portal_home",
+                  "subscription_cancel",
+                  "subscription_manage"
+                ]
+              },
+              "return_url": {
+                "type": "string",
+                "format": "uri"
               }
             },
             "description": "JSON request body for this operation."
           },
           "id": {
             "type": "string",
-            "description": "UUID de l’abonnement"
+            "description": "UUID du client"
           },
           "idempotency_key": {
             "type": "string",
@@ -3621,10 +2192,1211 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "change id plan post subscriptions"
+      "searchHint": "customer customers launch portal post session"
     },
     {
-      "name": "lomi_post_subscriptions_id_uncancel",
+      "name": "lomi_list_checkout_sessions",
+      "operationKey": "GET /checkout-sessions",
+      "method": "get",
+      "pathTemplate": "/checkout-sessions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "status"
+      ],
+      "title": "List checkout sessions",
+      "description": "List hosted checkout sessions with status (open, completed, expired). Filter to find a session or audit conversion.",
+      "tags": [
+        "Checkout Sessions"
+      ],
+      "operationId": "CheckoutSessionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Limit (see lomi. API docs)"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset (see lomi. API docs)"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "completed",
+              "expired"
+            ],
+            "type": "string",
+            "description": "Filtrer par statut de session (valeur checkout_session_status)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "checkout get sessions"
+    },
+    {
+      "name": "lomi_list_coupons",
+      "operationKey": "GET /discount-coupons",
+      "method": "get",
+      "pathTemplate": "/discount-coupons",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "List discount coupons",
+      "description": "List discount coupons with their value, limits, and status. Use to find a coupon or audit active promotions.",
+      "tags": [
+        "Discount Coupons"
+      ],
+      "operationId": "DiscountCouponsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "coupons discount get"
+    },
+    {
+      "name": "lomi_list_customer_subscriptions",
+      "operationKey": "GET /subscriptions/customer/{customerId}",
+      "method": "get",
+      "pathTemplate": "/subscriptions/customer/{customerId}",
+      "pathParamNames": [
+        "customerId"
+      ],
+      "queryParamNames": [],
+      "title": "List a customer's subscriptions",
+      "description": "List all subscriptions for one customer. Use before changing or canceling their plan.",
+      "tags": [
+        "Subscriptions"
+      ],
+      "operationId": "SubscriptionsController_findByCustomer",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "UUID du client"
+          }
+        },
+        "required": [
+          "customerId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer get subscriptions"
+    },
+    {
+      "name": "lomi_list_customer_transactions",
+      "operationKey": "GET /customers/{id}/transactions",
+      "method": "get",
+      "pathTemplate": "/customers/{id}/transactions",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "List a customer's transactions",
+      "description": "List every payment made by one customer. Use to review payment history or investigate a disputed charge.",
+      "tags": [
+        "Customers"
+      ],
+      "operationId": "CustomersController_getTransactions",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer customers get transactions"
+    },
+    {
+      "name": "lomi_list_customers",
+      "operationKey": "GET /customers",
+      "method": "get",
+      "pathTemplate": "/customers",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "status",
+        "type",
+        "search"
+      ],
+      "title": "List customers",
+      "description": "List customers with pagination and search. Use to find a customer before charging, refunding, or inspecting their history.",
+      "tags": [
+        "Customers"
+      ],
+      "operationId": "CustomersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Page (see lomi. API docs)"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "PageSize (see lomi. API docs)"
+          },
+          "search": {
+            "type": "string",
+            "description": "Recherche par nom ou e-mail"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "inactive",
+              "all"
+            ],
+            "type": "string",
+            "description": "Status (see lomi. API docs)"
+          },
+          "type": {
+            "enum": [
+              "business",
+              "individual",
+              "all"
+            ],
+            "type": "string",
+            "description": "Filtrer par type de client"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "customers get"
+    },
+    {
+      "name": "lomi_list_disputes",
+      "operationKey": "GET /disputes",
+      "method": "get",
+      "pathTemplate": "/disputes",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "endDate",
+        "startDate",
+        "status"
+      ],
+      "title": "List disputes",
+      "description": "List chargebacks and disputes raised against your payments, with status, reason, and deadline. Use to triage disputes needing evidence.",
+      "tags": [
+        "Litiges"
+      ],
+      "operationId": "DisputesController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endDate": {
+            "type": "string",
+            "description": "EndDate"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "PageSize"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "StartDate"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "disputes get litiges"
+    },
+    {
+      "name": "lomi_list_logs",
+      "operationKey": "GET /logs",
+      "method": "get",
+      "pathTemplate": "/logs",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "event",
+        "failed",
+        "success",
+        "webhook_id",
+        "severity",
+        "status",
+        "end_date",
+        "start_date",
+        "offset",
+        "limit",
+        "type"
+      ],
+      "title": "List logs",
+      "description": "List organization logs. Set the `type` query param to pick a stream: api_request, api_error, webhook_delivery, or activity (audit). Use to debug API calls or trace events.",
+      "tags": [
+        "Logs"
+      ],
+      "operationId": "LogsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "end_date": {
+            "type": "string",
+            "description": "ISO 8601 end timestamp (inclusive)"
+          },
+          "event": {
+            "type": "string",
+            "description": "Filter activity logs by event type"
+          },
+          "failed": {
+            "type": "boolean",
+            "description": "Only failed webhook deliveries"
+          },
+          "limit": {
+            "example": 25,
+            "type": "number",
+            "description": "Limit"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning",
+              "error",
+              "critical"
+            ],
+            "type": "string",
+            "description": "Severity"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "ISO 8601 start timestamp (inclusive)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Comma-separated HTTP status codes (api_request, api_error). Example: 400,500"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Only successful webhook deliveries"
+          },
+          "type": {
+            "enum": [
+              "api_request",
+              "api_error",
+              "webhook_delivery",
+              "activity"
+            ],
+            "type": "string",
+            "description": "Log stream to query"
+          },
+          "webhook_id": {
+            "type": "string",
+            "description": "Filter webhook_delivery logs by webhook ID"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get logs"
+    },
+    {
+      "name": "lomi_list_meters",
+      "operationKey": "GET /meters",
+      "method": "get",
+      "pathTemplate": "/meters",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "isActive",
+        "productId"
+      ],
+      "title": "List meters",
+      "description": "List usage meters (billable metrics) defined for usage-based products.",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "IsActive"
+          },
+          "productId": {
+            "description": "ProductId"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get meters"
+    },
+    {
+      "name": "lomi_list_organizations",
+      "operationKey": "GET /organizations",
+      "method": "get",
+      "pathTemplate": "/organizations",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "List organizations",
+      "description": "List the organizations accessible to your API key.",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get organisations organizations"
+    },
+    {
+      "name": "lomi_list_payment_links",
+      "operationKey": "GET /payment-links",
+      "method": "get",
+      "pathTemplate": "/payment-links",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "isActive",
+        "linkType"
+      ],
+      "title": "List payment links",
+      "description": "List reusable payment links with status. Use to find or audit shareable payment URLs.",
+      "tags": [
+        "Payment Links"
+      ],
+      "operationId": "PaymentLinksController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "Filtrer par statut actif"
+          },
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Limit (see lomi. API docs)"
+          },
+          "linkType": {
+            "enum": [
+              "product",
+              "instant"
+            ],
+            "type": "string",
+            "description": "Filtrer par type de lien"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset (see lomi. API docs)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get links payment"
+    },
+    {
+      "name": "lomi_list_payment_requests",
+      "operationKey": "GET /payment-requests",
+      "method": "get",
+      "pathTemplate": "/payment-requests",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "customerId",
+        "status"
+      ],
+      "title": "List payment requests",
+      "description": "List one-off payment requests (invoices) sent to customers, with status and amount.",
+      "tags": [
+        "Payment Requests"
+      ],
+      "operationId": "PaymentRequestsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Filtrer par ID client"
+          },
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Limit (see lomi. API docs)"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset (see lomi. API docs)"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "completed",
+              "failed",
+              "expired"
+            ],
+            "type": "string",
+            "description": "Filtrer par statut"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get payment requests"
+    },
+    {
+      "name": "lomi_list_payouts",
+      "operationKey": "GET /payouts",
+      "method": "get",
+      "pathTemplate": "/payouts",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "endDate",
+        "startDate",
+        "status"
+      ],
+      "title": "List payouts",
+      "description": "List payouts (funds moved out to your bank/mobile account) with status and amount.",
+      "tags": [
+        "Payouts"
+      ],
+      "operationId": "PayoutsUnifiedController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endDate": {
+            "type": "string",
+            "description": "EndDate"
+          },
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "PageSize"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "StartDate"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get payouts"
+    },
+    {
+      "name": "lomi_list_products",
+      "operationKey": "GET /products",
+      "method": "get",
+      "pathTemplate": "/products",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "isActive"
+      ],
+      "title": "List products",
+      "description": "List catalog products with their prices. Use to find a product before creating a checkout or subscription.",
+      "tags": [
+        "Products"
+      ],
+      "operationId": "ProductsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "Filtrer par statut actif"
+          },
+          "limit": {
+            "example": 15,
+            "type": "number",
+            "description": "Limit (see lomi. API docs)"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset (see lomi. API docs)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "get products"
+    },
+    {
+      "name": "lomi_list_providers",
+      "operationKey": "GET /providers",
+      "method": "get",
+      "pathTemplate": "/providers",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "provider_code"
+      ],
+      "title": "List payment providers",
+      "description": "Return connection status for each payment provider (Wave, MTN, Orange, card) configured for your organization.",
+      "tags": [
+        "Providers"
+      ],
+      "operationId": "ProvidersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "provider_code": {
+            "enum": [
+              "CARD",
+              "WAVE",
+              "MTN",
+              "SPI"
+            ],
+            "type": "string",
+            "description": "Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay)."
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get providers"
+    },
+    {
+      "name": "lomi_list_refunds",
+      "operationKey": "GET /refunds",
+      "method": "get",
+      "pathTemplate": "/refunds",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "endDate",
+        "startDate",
+        "status"
+      ],
+      "title": "List refunds",
+      "description": "List refunds issued against your payments, with status and amount.",
+      "tags": [
+        "Refunds"
+      ],
+      "operationId": "RefundsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "endDate": {
+            "type": "string",
+            "description": "EndDate"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "limit": {
+            "type": "number",
+            "description": "Limit"
+          },
+          "offset": {
+            "type": "number",
+            "description": "Offset"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "StartDate"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get refunds"
+    },
+    {
+      "name": "lomi_list_risk_assessments",
+      "operationKey": "GET /risk-assessments",
+      "method": "get",
+      "pathTemplate": "/risk-assessments",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "endDate",
+        "startDate",
+        "rail",
+        "decision"
+      ],
+      "title": "List risk assessments",
+      "description": "List Radar fraud risk assessments for payments, with score and outcome. Use to review flagged transactions.",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_listAssessments",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "enum": [
+              "allow",
+              "flag",
+              "block"
+            ],
+            "type": "string",
+            "description": "Decision"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "EndDate"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "PageSize"
+          },
+          "rail": {
+            "enum": [
+              "card",
+              "mtn",
+              "wave"
+            ],
+            "type": "string",
+            "description": "Rail"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "StartDate"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "assessments get radar risk"
+    },
+    {
+      "name": "lomi_list_settlement_transactions",
+      "operationKey": "GET /settlements/{id}/transactions",
+      "method": "get",
+      "pathTemplate": "/settlements/{id}/transactions",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [
+        "pageSize",
+        "page"
+      ],
+      "title": "List transactions in a settlement",
+      "description": "List the transactions included in one settlement period (settlement_id {currency}:{date}). Use to reconcile a payout against underlying payments.",
+      "tags": [
+        "Settlements"
+      ],
+      "operationId": "SettlementsController_findTransactions",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "example": "XOF:2026-06-01",
+            "description": "Settlement id, format {currency}:{YYYY-MM-DD}"
+          },
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "PageSize"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get settlement settlements transactions"
+    },
+    {
+      "name": "lomi_list_settlements",
+      "operationKey": "GET /settlements",
+      "method": "get",
+      "pathTemplate": "/settlements",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "currency",
+        "end_date",
+        "start_date"
+      ],
+      "title": "List settlement periods",
+      "description": "List settlement periods: completed payment totals grouped by availability date and currency. Each settlement_id is {currency}:{YYYY-MM-DD} (UTC).",
+      "tags": [
+        "Settlements"
+      ],
+      "operationId": "SettlementsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "End Date"
+          },
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "PageSize"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "Start Date"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get settlements"
+    },
+    {
+      "name": "lomi_list_subscriptions",
+      "operationKey": "GET /subscriptions",
+      "method": "get",
+      "pathTemplate": "/subscriptions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "status",
+        "customer_id",
+        "pageSize",
+        "page"
+      ],
+      "title": "List subscriptions",
+      "description": "List subscriptions with status (active, canceled, past_due). Filter to audit recurring billing.",
+      "tags": [
+        "Subscriptions"
+      ],
+      "operationId": "SubscriptionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "description": "Filtrer par UUID client"
+          },
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Page (see lomi. API docs)"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "PageSize (see lomi. API docs)"
+          },
+          "status": {
+            "type": "string",
+            "description": "Filtrer par statut (active, cancelled, past_due, etc.)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "get subscriptions"
+    },
+    {
+      "name": "lomi_list_transactions",
+      "operationKey": "GET /transactions",
+      "method": "get",
+      "pathTemplate": "/transactions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "isPos",
+        "endDate",
+        "startDate",
+        "pageSize",
+        "page",
+        "paymentMethod",
+        "currency",
+        "type",
+        "status",
+        "provider"
+      ],
+      "title": "List transactions",
+      "description": "List payments across all channels (Wave, MTN, Orange, card). Filter by status, customer, date, or currency to reconcile revenue or find a charge.",
+      "tags": [
+        "Transactions"
+      ],
+      "operationId": "TransactionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "example": "XOF,USD",
+            "type": "string",
+            "description": "Currency (see lomi. API docs)"
+          },
+          "endDate": {
+            "example": "2024-12-31T23:59:59Z",
+            "type": "string",
+            "description": "EndDate (see lomi. API docs)"
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "isPos": {
+            "example": false,
+            "type": "boolean",
+            "description": "Uniquement les transactions points de vente (TPV)"
+          },
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Page (see lomi. API docs)"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "PageSize (see lomi. API docs)"
+          },
+          "paymentMethod": {
+            "example": "MOBILE_MONEY,CARDS",
+            "type": "string",
+            "description": "PaymentMethod (see lomi. API docs)"
+          },
+          "provider": {
+            "example": "WAVE",
+            "type": "string",
+            "description": "Filtrer par code de fournisseur de paiement"
+          },
+          "startDate": {
+            "example": "2024-01-01T00:00:00Z",
+            "type": "string",
+            "description": "StartDate (see lomi. API docs)"
+          },
+          "status": {
+            "example": "completed,pending",
+            "type": "string",
+            "description": "Status (see lomi. API docs)"
+          },
+          "type": {
+            "example": "payment,refund",
+            "type": "string",
+            "description": "Type (see lomi. API docs)"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "get transactions"
+    },
+    {
+      "name": "lomi_list_usage_billing_periods",
+      "operationKey": "GET /usage-billing/periods",
+      "method": "get",
+      "pathTemplate": "/usage-billing/periods",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "page_size",
+        "page",
+        "subscription_id"
+      ],
+      "title": "List usage billing periods",
+      "description": "List billing periods for usage-based subscriptions, with accrued charges.",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_listPeriods",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "page_size": {
+            "type": "number",
+            "description": "Page Size"
+          },
+          "subscription_id": {
+            "description": "Subscription Id"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing get periods usage"
+    },
+    {
+      "name": "lomi_list_usage_events",
+      "operationKey": "GET /usage-events",
+      "method": "get",
+      "pathTemplate": "/usage-events",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "status",
+        "code",
+        "customer_id",
+        "page_size",
+        "page"
+      ],
+      "title": "List usage events",
+      "description": "List recorded metered usage events. Filter by meter or customer to audit what was billed.",
+      "tags": [
+        "Usage events"
+      ],
+      "operationId": "UsageEventsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "Code"
+          },
+          "customer_id": {
+            "description": "Customer Id"
+          },
+          "page": {
+            "type": "number",
+            "description": "Page"
+          },
+          "page_size": {
+            "type": "number",
+            "description": "Page Size"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "processed",
+              "failed"
+            ],
+            "type": "string",
+            "description": "Status"
+          }
+        }
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "events get usage"
+    },
+    {
+      "name": "lomi_list_webhook_deliveries",
+      "operationKey": "GET /webhook-delivery-logs",
+      "method": "get",
+      "pathTemplate": "/webhook-delivery-logs",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "failedOnly",
+        "successOnly",
+        "webhookId"
+      ],
+      "title": "List webhook deliveries",
+      "description": "List outbound webhook delivery attempts with response status and retries. Use to debug why an endpoint didn't receive events.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhookDeliveryLogsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "failedOnly": {
+            "example": false,
+            "type": "boolean",
+            "description": "FailedOnly (see lomi. API docs)"
+          },
+          "limit": {
+            "example": 25,
+            "type": "number",
+            "description": "Nombre maximal de journaux"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Offset (see lomi. API docs)"
+          },
+          "successOnly": {
+            "example": false,
+            "type": "boolean",
+            "description": "SuccessOnly (see lomi. API docs)"
+          },
+          "webhookId": {
+            "type": "string",
+            "description": "Filtrer par identifiant de webhook"
+          }
+        },
+        "required": [
+          "webhookId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "deliveries delivery get logs webhook webhooks"
+    },
+    {
+      "name": "lomi_list_webhooks",
+      "operationKey": "GET /webhooks",
+      "method": "get",
+      "pathTemplate": "/webhooks",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "List webhook endpoints",
+      "description": "List configured webhook endpoints with their subscribed events and status.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "get webhooks"
+    },
+    {
+      "name": "lomi_resume_subscription",
       "operationKey": "POST /subscriptions/{id}/uncancel",
       "method": "post",
       "pathTemplate": "/subscriptions/{id}/uncancel",
@@ -3659,167 +3431,10 @@
       "readOnly": false,
       "destructive": true,
       "alwaysLoad": false,
-      "searchHint": "id post subscriptions uncancel"
+      "searchHint": "post subscription subscriptions uncancel"
     },
     {
-      "name": "lomi_post_usage_billing_credits",
-      "operationKey": "POST /usage-billing/credits",
-      "method": "post",
-      "pathTemplate": "/usage-billing/credits",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Grant usage credits",
-      "description": "Grant prepaid credits to a customer that offset future usage-based charges. Use for trials, goodwill, or top-ups.",
-      "tags": [
-        "Usage billing"
-      ],
-      "operationId": "UsageBillingController_creditWallet",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": []
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "billing credits post usage"
-    },
-    {
-      "name": "lomi_post_usage_billing_entitlements",
-      "operationKey": "POST /usage-billing/entitlements",
-      "method": "post",
-      "pathTemplate": "/usage-billing/entitlements",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Set plan entitlement",
-      "description": "Create or update a feature entitlement (limit/quota) on a plan. Use to define what usage-based plans include.",
-      "tags": [
-        "Usage billing"
-      ],
-      "operationId": "UsageBillingController_createEntitlement",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": []
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "billing entitlements post usage"
-    },
-    {
-      "name": "lomi_post_usage_subscriptions",
-      "operationKey": "POST /usage-subscriptions",
-      "method": "post",
-      "pathTemplate": "/usage-subscriptions",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Create usage subscription",
-      "description": "Enroll a customer on a usage-based product with no upfront charge. Required before metered usage can be billed.",
-      "tags": [
-        "Usage events"
-      ],
-      "operationId": "UsageEventsController_createUsageSubscription",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": []
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "events post subscriptions usage"
-    },
-    {
-      "name": "lomi_post_webhooks",
-      "operationKey": "POST /webhooks",
-      "method": "post",
-      "pathTemplate": "/webhooks",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Create webhook endpoint",
-      "description": "Register a URL to receive event notifications (payments, subscriptions, disputes). Specify the URL and events to subscribe to; returns a signing secret.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhooksController_create",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": []
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "post webhooks"
-    },
-    {
-      "name": "lomi_post_webhooks_id_test",
-      "operationKey": "POST /webhooks/{id}/test",
-      "method": "post",
-      "pathTemplate": "/webhooks/{id}/test",
-      "pathParamNames": [
-        "id"
-      ],
-      "queryParamNames": [],
-      "title": "Send test webhook",
-      "description": "Send a sample event to a webhook endpoint to verify it is reachable and handling payloads. Pass the id.",
-      "tags": [
-        "Webhooks"
-      ],
-      "operationId": "WebhooksController_test",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Webhook UUID"
-          },
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "id post test webhooks"
-    },
-    {
-      "name": "lomi_post_webhooks_webhookId_logs_logId_retry",
+      "name": "lomi_retry_webhook_delivery",
       "operationKey": "POST /webhooks/{webhookId}/logs/{logId}/retry",
       "method": "post",
       "pathTemplate": "/webhooks/{webhookId}/logs/{logId}/retry",
@@ -3858,7 +3473,392 @@
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "logId logs post retry webhookId webhooks"
+      "searchHint": "delivery logs post retry webhook webhooks"
+    },
+    {
+      "name": "lomi_set_default_price",
+      "operationKey": "POST /products/{id}/prices/{priceId}/set-default",
+      "method": "post",
+      "pathTemplate": "/products/{id}/prices/{priceId}/set-default",
+      "pathParamNames": [
+        "id",
+        "priceId"
+      ],
+      "queryParamNames": [],
+      "title": "Set default product price",
+      "description": "Mark one price as the product's default, used when no price is specified. Pass product id and price id.",
+      "tags": [
+        "Products"
+      ],
+      "operationId": "ProductsController_setDefaultPrice",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du produit"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "priceId": {
+            "type": "string",
+            "description": "UUID du prix"
+          }
+        },
+        "required": [
+          "id",
+          "priceId"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "default post price prices products set"
+    },
+    {
+      "name": "lomi_set_entitlement",
+      "operationKey": "POST /usage-billing/entitlements",
+      "method": "post",
+      "pathTemplate": "/usage-billing/entitlements",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Set plan entitlement",
+      "description": "Create or update a feature entitlement (limit/quota) on a plan. Use to define what usage-based plans include.",
+      "tags": [
+        "Usage billing"
+      ],
+      "operationId": "UsageBillingController_createEntitlement",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "billing entitlement entitlements post usage"
+    },
+    {
+      "name": "lomi_test_webhook",
+      "operationKey": "POST /webhooks/{id}/test",
+      "method": "post",
+      "pathTemplate": "/webhooks/{id}/test",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Send test webhook",
+      "description": "Send a sample event to a webhook endpoint to verify it is reachable and handling payloads. Pass the id.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_test",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Webhook UUID"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "post test webhook webhooks"
+    },
+    {
+      "name": "lomi_update_customer",
+      "operationKey": "PATCH /customers/{id}",
+      "method": "patch",
+      "pathTemplate": "/customers/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Update customer",
+      "description": "Update a customer's fields (email, name, metadata). Pass the id and only the fields to change in body.",
+      "tags": [
+        "Customers"
+      ],
+      "operationId": "CustomersController_update",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "is_business": {
+                "type": "boolean"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone_number": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              },
+              "whatsapp_number": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "customer customers patch"
+    },
+    {
+      "name": "lomi_update_meter",
+      "operationKey": "PATCH /meters/{id}",
+      "method": "patch",
+      "pathTemplate": "/meters/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Update meter",
+      "description": "Update a usage meter's configuration (name, aggregation). Pass the id and changed fields.",
+      "tags": [
+        "Meters"
+      ],
+      "operationId": "MetersController_update",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Meter ID"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "meter meters patch"
+    },
+    {
+      "name": "lomi_update_radar_settings",
+      "operationKey": "PATCH /organization/radar-settings",
+      "method": "patch",
+      "pathTemplate": "/organization/radar-settings",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Update fraud (Radar) settings",
+      "description": "Update your organization's Radar fraud rules and thresholds. Pass only the settings to change.",
+      "tags": [
+        "Radar"
+      ],
+      "operationId": "RadarController_updateSettings",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "monitor",
+                  "block"
+                ]
+              },
+              "stripe_radar_passthrough": {
+                "type": "boolean"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "organization patch radar settings"
+    },
+    {
+      "name": "lomi_update_subscription",
+      "operationKey": "PATCH /subscriptions/{id}",
+      "method": "patch",
+      "pathTemplate": "/subscriptions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Update subscription",
+      "description": "Update a subscription's mutable fields (metadata, quantity). To switch plans use change-plan; to end it use cancel.",
+      "tags": [
+        "Subscriptions"
+      ],
+      "operationId": "SubscriptionsController_update",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "UUID de l’abonnement"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "patch subscription subscriptions"
+    },
+    {
+      "name": "lomi_update_webhook",
+      "operationKey": "PATCH /webhooks/{id}",
+      "method": "patch",
+      "pathTemplate": "/webhooks/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Update webhook endpoint",
+      "description": "Update a webhook endpoint's URL or subscribed events. Pass the id and changed fields.",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_update",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "authorized_events": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/webhooks/{id}`."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "patch webhook webhooks"
     }
   ]
 }

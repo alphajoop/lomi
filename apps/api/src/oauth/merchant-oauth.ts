@@ -1,4 +1,7 @@
-export const MERCHANT_OAUTH_SCOPES = ['merchant.read', 'merchant.write'] as const;
+export const MERCHANT_OAUTH_SCOPES = [
+  'merchant.read',
+  'merchant.write',
+] as const;
 
 export type MerchantOAuthScope = (typeof MERCHANT_OAUTH_SCOPES)[number];
 

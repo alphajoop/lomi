@@ -193,7 +193,9 @@ export function createAgentOnboardingChecks(): CheckDefinition[] {
       validate: (_ctx, res) => {
         const body = res.data as Record<string, unknown>;
         const features = body?.features as Record<string, unknown> | undefined;
-        return features?.provisioning_api ? null : 'Expected features.provisioning_api';
+        return features?.provisioning_api
+          ? null
+          : 'Expected features.provisioning_api';
       },
     },
   ];
@@ -215,7 +217,9 @@ export function createPartnerFlowChecks(options?: {
       expectStatus: 200,
       validate: (_ctx, res) => {
         const data = unwrapData(res.data) as Record<string, unknown>;
-        return data && typeof data === 'object' ? null : 'Expected usage summary object';
+        return data && typeof data === 'object'
+          ? null
+          : 'Expected usage summary object';
       },
     },
     {
@@ -310,22 +314,22 @@ export function createPartnerFlowChecks(options?: {
   }
 
   checks.push({
-      name: 'partner revoke minted provisioning key',
-      service: 'partners',
-      method: 'DELETE',
-      path: (ctx) =>
-        `/partners/v1/provisioning-keys/${ctx.mintedProvisioningKeyId}`,
-      auth: false,
-      headers: partnerHeaders,
-      skipIf: (ctx) => {
-        const partnerSkip = skipWithoutPartnerKey();
-        if (partnerSkip) return partnerSkip;
-        return typeof ctx.mintedProvisioningKeyId === 'string'
-          ? null
-          : 'mintedProvisioningKeyId not captured';
-      },
-      expectStatus: 200,
-    });
+    name: 'partner revoke minted provisioning key',
+    service: 'partners',
+    method: 'DELETE',
+    path: (ctx) =>
+      `/partners/v1/provisioning-keys/${ctx.mintedProvisioningKeyId}`,
+    auth: false,
+    headers: partnerHeaders,
+    skipIf: (ctx) => {
+      const partnerSkip = skipWithoutPartnerKey();
+      if (partnerSkip) return partnerSkip;
+      return typeof ctx.mintedProvisioningKeyId === 'string'
+        ? null
+        : 'mintedProvisioningKeyId not captured';
+    },
+    expectStatus: 200,
+  });
 
   return checks;
 }
@@ -361,7 +365,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
         const merchantId = pickString(res.data, 'merchant_id');
         const env = pickString(res.data, 'environment');
         if (!merchantId) return 'Expected merchant_id';
-        return env === 'test' ? null : 'Expected test environment for provisioning account';
+        return env === 'test'
+          ? null
+          : 'Expected test environment for provisioning account';
       },
     },
     {
@@ -393,7 +399,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
         if (path) ctx.provisionedIdentityPath = path;
       },
       validate: (_ctx, res) =>
-        pickString(res.data, 'public_url') ? null : 'Expected public_url for uploaded document',
+        pickString(res.data, 'public_url')
+          ? null
+          : 'Expected public_url for uploaded document',
     },
     {
       name: 'provisioning complete onboarding',
@@ -406,8 +414,10 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       skipIf: (ctx) => {
         const keySkip = skipWithoutProvisioningKey();
         if (keySkip) return keySkip;
-        if (!ctx.provisionedMerchantId) return 'provisionedMerchantId not captured';
-        if (!ctx.provisionedIdentityUrl) return 'provisionedIdentityUrl not captured';
+        if (!ctx.provisionedMerchantId)
+          return 'provisionedMerchantId not captured';
+        if (!ctx.provisionedIdentityUrl)
+          return 'provisionedIdentityUrl not captured';
         return null;
       },
       expectStatus: 201,
@@ -435,7 +445,8 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       validate: (_ctx, res) => {
         const status = pickString(res.data, 'onboarding_status');
         const testKey = pickString(res.data, 'test_secret_key');
-        if (status !== 'completed') return 'Expected onboarding_status completed';
+        if (status !== 'completed')
+          return 'Expected onboarding_status completed';
         if (!testKey?.startsWith('lomi_sk_test_')) {
           return 'Expected lomi_sk_test_* from complete onboarding';
         }
@@ -453,7 +464,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       skipIf: (ctx) => {
         const keySkip = skipWithoutProvisioningKey();
         if (keySkip) return keySkip;
-        return ctx.provisionedMerchantId ? null : 'provisionedMerchantId not captured';
+        return ctx.provisionedMerchantId
+          ? null
+          : 'provisionedMerchantId not captured';
       },
       expectStatus: 200,
       validate: (_ctx, res) => {
@@ -476,7 +489,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       skipIf: (ctx) => {
         const keySkip = skipWithoutProvisioningKey();
         if (keySkip) return keySkip;
-        return ctx.provisionedMerchantId ? null : 'provisionedMerchantId not captured';
+        return ctx.provisionedMerchantId
+          ? null
+          : 'provisionedMerchantId not captured';
       },
       expectStatus: 200,
       validate: (_ctx, res) => assertNoLiveSecretsInKeys(res.data),
@@ -509,7 +524,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
           return 'Expected /me to return provisioned merchant_id';
         }
         const env = pickString(res.data, 'environment');
-        return env === 'test' ? null : 'Expected test environment on provisioned /me';
+        return env === 'test'
+          ? null
+          : 'Expected test environment on provisioned /me';
       },
     },
     {
@@ -523,7 +540,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       skipIf: (ctx) => {
         const keySkip = skipWithoutProvisioningKey();
         if (keySkip) return keySkip;
-        return ctx.provisionedMerchantId ? null : 'provisionedMerchantId not captured';
+        return ctx.provisionedMerchantId
+          ? null
+          : 'provisionedMerchantId not captured';
       },
       expectStatus: 201,
       body: (ctx) => ({
@@ -556,7 +575,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       skipIf: (ctx) => {
         const keySkip = skipWithoutProvisioningKey();
         if (keySkip) return keySkip;
-        return ctx.provisionedMerchantId ? null : 'provisionedMerchantId not captured';
+        return ctx.provisionedMerchantId
+          ? null
+          : 'provisionedMerchantId not captured';
       },
       expectStatus: 200,
       validate: (_ctx, res) => {
@@ -595,7 +616,9 @@ export function createAgentProvisioningFlowChecks(): CheckDefinition[] {
       validate: (_ctx, res) => {
         const already = (unwrapData(res.data) as Record<string, unknown>)
           ?.already_pending;
-        return already === true ? null : 'Expected already_pending on duplicate request';
+        return already === true
+          ? null
+          : 'Expected already_pending on duplicate request';
       },
     },
   ];

@@ -51,7 +51,7 @@ Use `https://sandbox.api.lomi.africa` for sandbox.
 
 Clients that support deferred loading can call **`lomi_search_tools`** with a keyword query.
 
-MCP **resources** (`lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`) and **prompts** (`onboard_merchant`, `debug_failed_payment`, `setup_webhook`) ship with the server.
+MCP **resources** (`lomi://docs/getting-started`, `lomi://docs/authentication`, `lomi://docs/idempotency`, `lomi://docs/pagination`, `lomi://docs/webhooks`, `lomi://docs/money`, `lomi://docs/recipes`, `lomi://docs/errors`, `lomi://tools/index`) and **prompts** (`onboard_merchant`, `debug_failed_payment`, `setup_webhook`) ship with the server.
 
 ## Get a secret key
 

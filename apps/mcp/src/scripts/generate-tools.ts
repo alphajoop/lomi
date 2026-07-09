@@ -17,6 +17,7 @@ import {
 import {
   loadAlwaysLoadKeys,
   loadExcludedOperationKeys,
+  loadToolNameOverrides,
   resolveToolPolicy,
 } from '../tool-policy.js';
 import { validateManifestToolEntry } from './validate-manifest-entry.js';
@@ -61,9 +62,11 @@ function main(): void {
   const policyJson = JSON.parse(readFileSync(policyPath, 'utf-8')) as {
     alwaysLoadOperationKeys?: string[];
     mcpExcludedOperationKeys?: string[];
+    toolNameOverrides?: Record<string, string>;
   };
   const alwaysLoadKeys = loadAlwaysLoadKeys(policyJson);
   const excludedKeys = loadExcludedOperationKeys(policyJson);
+  const nameOverrides = loadToolNameOverrides(policyJson);
   const copyOverrides = loadCopyOverrides();
 
   // MCP-only exclusions must reference operations that are still in the shared
@@ -92,8 +95,26 @@ function main(): void {
     }
   }
 
+  // Name overrides must target a generated tool and use the lomi_ namespace so
+  // the surface stays consistent. Uniqueness is enforced later across all names.
+  const nameOverridePattern = /^lomi_[a-z0-9]+(?:_[a-z0-9]+)*$/;
+  for (const [key, override] of nameOverrides) {
+    if (!includedKeys.has(key)) {
+      throw new Error(
+        `mcp-tool-policy.json toolNameOverrides has "${key}" which is not a generated MCP tool (excluded or unknown). Fix the key or remove the entry.`,
+      );
+    }
+    if (!nameOverridePattern.test(override)) {
+      throw new Error(
+        `mcp-tool-policy.json toolNameOverrides value "${override}" for "${key}" must match ${nameOverridePattern}.`,
+      );
+    }
+  }
+
   const tools = includedOperations.map((op) => {
-    const name = toolNameFromOperation(op.httpMethodLower, op.pathTemplate);
+    const name =
+      nameOverrides.get(op.operationKey) ??
+      toolNameFromOperation(op.httpMethodLower, op.pathTemplate);
     const tags = op.openApiOp.tags ?? [];
 
     const write = WRITE_METHODS.has(op.httpMethodLower);
