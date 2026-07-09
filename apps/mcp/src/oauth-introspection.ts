@@ -14,8 +14,27 @@ export type OAuthIntrospectionResult = {
 
 const cache = new Map<string, { result: OAuthIntrospectionResult; expiresAt: number }>();
 
+let warnedMissingInternalKey = false;
+
 export function looksLikeOAuthAccessToken(token: string): boolean {
   return token.trim().startsWith('lomi_oat_');
+}
+
+export function getOAuthIntrospectionInternalKey(): string {
+  return (
+    process.env.INTERNAL_API_KEY?.trim() ||
+    process.env.CRON_SECRET?.trim() ||
+    ''
+  );
+}
+
+/** RFC 9728 path-scoped protected-resource metadata URL for this MCP deployment. */
+export function getProtectedResourceMetadataUrl(): string {
+  const resource = getMcpResourceUrl();
+  const url = new URL(resource);
+  const resourcePath = url.pathname.replace(/\/$/, '');
+  const suffix = resourcePath ? resourcePath : '';
+  return `${url.origin}/.well-known/oauth-protected-resource${suffix}`;
 }
 
 export async function introspectOAuthAccessToken(
@@ -28,11 +47,14 @@ export async function introspectOAuthAccessToken(
   }
 
   const baseUrl = getLomiApiBaseUrl();
-  const internalKey =
-    process.env.INTERNAL_API_KEY?.trim() ||
-    process.env.CRON_SECRET?.trim() ||
-    '';
+  const internalKey = getOAuthIntrospectionInternalKey();
   if (!internalKey) {
+    if (!warnedMissingInternalKey) {
+      console.warn(
+        '[lomi-mcp] OAuth introspection skipped: set INTERNAL_API_KEY or CRON_SECRET on the MCP service to validate lomi_oat_* tokens.',
+      );
+      warnedMissingInternalKey = true;
+    }
     return { active: false };
   }
 

@@ -13,8 +13,14 @@ export function buildServerInstructions(mode: InstructionMode): string {
     '',
     'Authentication:',
     mode === 'http'
-      ? '- Merchant key: x-lomi-api-key or x-api-key on MCP session initialize (required for tool calls).'
+      ? '- Browser OAuth (recommended): add the hosted MCP URL with no headers; OAuth-capable clients open Connect with lomi. automatically.'
+      : '',
+    mode === 'http'
+      ? '- Merchant key: x-lomi-api-key or x-api-key on MCP session initialize (alternative to OAuth).'
       : '- Merchant key: LOMI_SECRET_KEY or X_API_KEY in server environment.',
+    mode === 'http'
+      ? '- OAuth access tokens (lomi_oat_*) are accepted as Authorization: Bearer after browser consent.'
+      : '',
     mode === 'http'
       ? '- Your API key alone unlocks the hosted endpoint; a shared transport secret (Authorization Bearer LOMI_MCP_BEARER_TOKEN) is optional/legacy.'
       : '',

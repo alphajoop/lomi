@@ -28,7 +28,10 @@ export class ApiClient {
       auth?: boolean;
     },
   ): Promise<HttpResponse> {
-    const url = `${this.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
+    const url =
+      path.startsWith('http://') || path.startsWith('https://')
+        ? path
+        : `${this.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
     const auth = options?.auth !== false;
     const headers: Record<string, string> = {
       Accept: 'application/json',

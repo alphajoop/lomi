@@ -50,6 +50,13 @@ function skipWithoutPartnerKey(): string | null {
     : 'LOMI_PARTNER_KEY not set (lomi_partner_* for partner flow synthetics)';
 }
 
+function mcpPublicBaseUrl(): string {
+  return (
+    process.env.LOMI_MCP_URL?.trim()?.replace(/\/$/, '') ||
+    'https://mcp.lomi.africa'
+  );
+}
+
 function assertNoLiveSecretsInKeys(body: unknown): string | null {
   const data = unwrapData(body);
   const items = Array.isArray(data) ? data : [];
@@ -117,6 +124,46 @@ export function createAgentOnboardingChecks(): CheckDefinition[] {
       expectStatus: [400, 401],
       body: {},
       validate: (_ctx, res) => validateMerchantFacingError(res.data),
+    },
+    {
+      name: 'mcp oauth protected resource metadata',
+      service: 'mcp',
+      method: 'GET',
+      path: `${mcpPublicBaseUrl()}/.well-known/oauth-protected-resource/mcp`,
+      auth: false,
+      expectStatus: 200,
+      validate: (_ctx, res) => {
+        const body = res.data as Record<string, unknown>;
+        const servers = body?.authorization_servers;
+        return body?.resource && Array.isArray(servers) && servers.length > 0
+          ? null
+          : 'Expected MCP protected-resource metadata with authorization_servers';
+      },
+    },
+    {
+      name: 'mcp transport oauth discovery challenge',
+      service: 'mcp',
+      method: 'POST',
+      path: `${mcpPublicBaseUrl()}/mcp`,
+      auth: false,
+      expectStatus: 401,
+      body: {
+        jsonrpc: '2.0',
+        method: 'initialize',
+        id: 1,
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'api-synthetics', version: '0' },
+        },
+      },
+      validate: (_ctx, res) => {
+        const challenge = res.headers['www-authenticate'];
+        if (!challenge || !challenge.includes('resource_metadata')) {
+          return 'Expected WWW-Authenticate Bearer resource_metadata challenge on unauthenticated MCP';
+        }
+        return null;
+      },
     },
     {
       name: 'provisioning rejects missing key',

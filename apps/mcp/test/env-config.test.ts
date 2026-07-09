@@ -65,4 +65,27 @@ describe('env-config validation', () => {
     const cfg = await loadEnvConfig();
     expect(() => cfg.mcpHttpBasePath()).toThrow(/Use a URL path like "\/mcp"/);
   });
+
+  it('requires oauth introspection key on hosted deployments', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    delete process.env.INTERNAL_API_KEY;
+    delete process.env.CRON_SECRET;
+    const cfg = await loadEnvConfig();
+    const readiness = cfg.getMcpReadinessChecks();
+    const oauthCheck = readiness.checks.find((c) => c.name === 'oauth_introspection');
+    expect(oauthCheck?.ok).toBe(false);
+    expect(readiness.ok).toBe(false);
+  });
+
+  it('allows missing oauth introspection key for local dev', async () => {
+    delete process.env.LOMI_MCP_RESOURCE_URL;
+    delete process.env.LOMI_OAUTH_ISSUER;
+    delete process.env.INTERNAL_API_KEY;
+    delete process.env.CRON_SECRET;
+    const cfg = await loadEnvConfig();
+    const readiness = cfg.getMcpReadinessChecks();
+    const oauthCheck = readiness.checks.find((c) => c.name === 'oauth_introspection');
+    expect(oauthCheck?.ok).toBe(true);
+    expect(oauthCheck?.detail).toMatch(/optional for local dev/);
+  });
 });

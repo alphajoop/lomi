@@ -16,16 +16,46 @@ Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude 
 </Callout>
 
 <Callout type="info" title="Le plus rapide">
-  Dans le [tableau de bord](https://dashboard.lomi.africa) : **Paramètres → Intégrations → MCP** pour une introduction rapide, puis **Développeurs → Clés API → Connecter MCP** pour les extraits et la gestion des tokens. Copiez l'extrait, collez vos clés, puis redémarrez votre client MCP.
+  Dans le [tableau de bord](https://dashboard.lomi.africa) : **Paramètres → Intégrations → MCP** pour une introduction rapide, puis **Développeurs → Clés API → Connecter MCP** pour les extraits et la gestion des tokens.
+
+  **Recommandé pour Cursor / Claude / VS Code :** ajoutez l’URL MCP hébergée **sans clé API** — les clients compatibles OAuth ouvrent **Connect with lomi.** dans le navigateur automatiquement.
 </Callout>
 
-## Ce dont vous avez besoin (une valeur)
+## Connexion OAuth (recommandé — sans clé API)
+
+Les clients MCP compatibles OAuth (Cursor, Claude Desktop, VS Code, etc.) peuvent se connecter sans coller de clé secrète. C’est le moyen le plus simple de configurer ou déboguer l’intégration MCP dans votre IDE.
+
+1. Ajoutez le serveur MCP hébergé **sans** en-têtes :
+
+```json
+{
+  "mcpServers": {
+    "lomi": {
+      "url": "https://mcp.lomi.africa/mcp"
+    }
+  }
+}
+```
+
+2. Redémarrez votre client MCP. À la première connexion, il reçoit un `401` avec une invite de découverte OAuth, récupère `https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp`, puis ouvre **Connect with lomi.** dans le navigateur.
+3. Connectez-vous au tableau de bord, choisissez votre organisation et approuvez l’accès (lecture seule par défaut).
+4. Le client reçoit un jeton limité (`lomi_oat_*`) et peut appeler les outils MCP.
+
+Révoquez une application depuis **Développeurs → Clés API → Connecter MCP → Applications connectées**.
+
+<Callout type="info" title="Feature flag">
+  Les connexions OAuth marchandes nécessitent `LOMI_MERCHANT_OAUTH_ENABLED=true` sur l’API et `VITE_LOMI_MERCHANT_OAUTH_ENABLED=true` dans le dashboard.
+</Callout>
+
+Modèles supplémentaires dans le dépôt : [`apps/mcp/examples/`](https://github.com/lomiafrica/lomi./tree/master/apps/mcp/examples) (`cursor-http-oauth.mcp.json`, `claude-desktop-http-oauth.mcp.json`, plus les variantes avec clé API).
+
+## Connexion avec une clé API (alternative)
 
 | Valeur | En-tête / variable d’env | Où l’obtenir |
 | --- | --- | --- |
 | **Clé secrète (`LOMI_SECRET_KEY`)** | `x-lomi-api-key` (HTTP) ou `LOMI_SECRET_KEY` (stdio) | [Tableau de bord](https://dashboard.lomi.africa) → **Développeurs → Clés API**: toute clé **secrète** (`lomi_sk_…`) ou clé MCP (`lomi_mcp_…`) depuis **Connecter MCP** |
 
-Votre **`LOMI_SECRET_KEY`** suffit : elle ouvre l’accès au point de terminaison MCP hébergé par lomi. et limite chaque appel d’outil à votre organisation.
+Votre **`LOMI_SECRET_KEY`** ouvre l’accès au point de terminaison MCP hébergé par lomi. et limite chaque appel d’outil à votre organisation.
 
 <Callout type="info" title="Le secret de transport est optionnel">
   Un secret de transport partagé (`Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>`) reste accepté pour les anciens déploiements des opérateurs, mais les marchands n’en ont pas besoin. Envoyez votre clé API dans `x-lomi-api-key` et laissez `Authorization` de côté.
@@ -57,34 +87,6 @@ Exemple de config **Cursor** / **Claude Desktop** :
 ```
 
 Remplacez `YOUR_LOMI_SECRET_KEY` par votre vraie clé API, puis redémarrez votre client MCP.
-
-## Connexion OAuth (sans clé API)
-
-Les clients MCP compatibles OAuth (VS Code, Claude Desktop, etc.) peuvent se connecter sans coller de clé secrète :
-
-1. Ajoutez le serveur MCP hébergé **sans** en-tête `x-lomi-api-key` :
-
-```json
-{
-  "mcpServers": {
-    "lomi": {
-      "url": "https://mcp.lomi.africa/mcp"
-    }
-  }
-}
-```
-
-2. À la connexion, le client ouvre **Connect with lomi.** dans le navigateur.
-3. Connectez-vous au tableau de bord, choisissez votre organisation et approuvez l’accès (lecture seule par défaut).
-4. Le client reçoit un jeton limité et peut appeler les outils MCP.
-
-Révoquez une application depuis **Développeurs → Clés API → Connecter MCP → Applications connectées**.
-
-<Callout type="info" title="Feature flag">
-  Les connexions OAuth marchandes nécessitent `LOMI_MERCHANT_OAUTH_ENABLED=true` sur l’API et `VITE_LOMI_MERCHANT_OAUTH_ENABLED=true` dans le dashboard.
-</Callout>
-
-Modèles supplémentaires dans le dépôt : [`apps/mcp/examples/`](https://github.com/lomiafrica/lomi./tree/master/apps/mcp/examples).
 
 ## Connexion stdio (local)
 
@@ -158,7 +160,7 @@ Après l’onboarding, ajoutez `x-lomi-api-key` (ou passez `LOMI_SECRET_KEY` en 
 
 Les clients MCP compatibles [l’autorisation MCP](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization) peuvent se connecter sans coller de clé de provisioning :
 
-1. Découverte : `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`
+1. Découverte : `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp` (également renvoyé dans l’en-tête `WWW-Authenticate` lors d’une connexion sans identifiants)
 2. Enregistrement (DCR optionnel) : `POST https://api.lomi.africa/oauth/register`
 3. Autorisation : `GET https://api.lomi.africa/oauth/authorize` (PKCE + paramètre `resource`)
 4. Connexion sur `https://dashboard.lomi.africa/connect/agent-connect` et approbation

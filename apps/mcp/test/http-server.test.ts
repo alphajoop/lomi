@@ -1,6 +1,6 @@
 import http from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { afterEach, describe, expect, it, beforeEach } from 'vitest';
+import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
 
 import manifestJson from '../src/generated/tools-manifest.json' with { type: 'json' };
 import { createHttpApplication } from '../src/http.js';
@@ -73,6 +73,9 @@ describe('createHttpApplication', () => {
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error_code).toBe('missing_credentials');
+    const wwwAuth = res.headers.get('www-authenticate');
+    expect(wwwAuth).toMatch(/Bearer/);
+    expect(wwwAuth).toMatch(/resource_metadata/);
   });
 
   it('GET /mcp with a non-credential bearer returns invalid_credentials', async () => {
@@ -153,11 +156,26 @@ describe('createHttpApplication', () => {
     expect(body.resource).toBeTruthy();
   });
 
+  it('GET path-scoped /.well-known/oauth-protected-resource/mcp returns metadata', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(
+      `http://127.0.0.1:${ctx.port}/.well-known/oauth-protected-resource/mcp`,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.resource).toBe('https://mcp.lomi.africa/mcp');
+  });
+
   it('POST /mcp without session credentials returns WWW-Authenticate challenge', async () => {
     delete process.env.LOMI_MCP_BEARER_TOKEN;
     delete process.env.LOMI_PROVISIONING_KEY;
     delete process.env.LOMI_SECRET_KEY;
     delete process.env.X_API_KEY;
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
     const manifest = parseManifest(manifestJson);
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
@@ -180,6 +198,68 @@ describe('createHttpApplication', () => {
     const wwwAuth = res.headers.get('www-authenticate');
     expect(wwwAuth).toMatch(/Bearer/);
     expect(wwwAuth).toMatch(/resource_metadata/);
+    expect(wwwAuth).toMatch(/oauth-protected-resource\/mcp/);
+  });
+
+  it('GET /mcp with lomi_oat_* bearer passes transport gate when gated', async () => {
+    process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      headers: { Authorization: 'Bearer lomi_oat_synth_test_token' },
+    });
+    expect(res.status).not.toBe(401);
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /mcp initialize with introspected lomi_oat_* opens a session', async () => {
+    process.env.INTERNAL_API_KEY = 'test-internal-key';
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(
+      async (input) => {
+        const url = String(input);
+        if (url.includes('/oauth/introspect/mcp')) {
+          return new Response(
+            JSON.stringify({
+              active: true,
+              grant_type: 'merchant',
+              connection_key: 'lomi_sk_test_oauth_connection_key',
+              access_level: 'read',
+              scope: 'merchant.read',
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        }
+        return new Response('not found', { status: 404 });
+      },
+    );
+
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+        Authorization: 'Bearer lomi_oat_test_session_token',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'initialize',
+        id: 1,
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test', version: '0' },
+        },
+      }),
+    });
+    fetchMock.mockRestore();
+    expect(res.status).not.toBe(401);
   });
 
   it('rate limits MCP routes when LOMI_MCP_RATE_LIMIT_RPM is low', async () => {

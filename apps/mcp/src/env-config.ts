@@ -320,6 +320,30 @@ export function getMcpReadinessChecks(): {
     }
   });
 
+  const introspectionKey =
+    process.env.INTERNAL_API_KEY?.trim() || process.env.CRON_SECRET?.trim() || '';
+  const oauthDeploymentHint = [
+    process.env.LOMI_OAUTH_ISSUER?.trim(),
+    process.env.LOMI_MCP_RESOURCE_URL?.trim(),
+    process.env.LOMI_API_URL?.trim(),
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const hostedOAuthDeployment =
+    oauthDeploymentHint.length > 0 &&
+    !/localhost|127\.0\.0\.1/i.test(oauthDeploymentHint);
+  if (!introspectionKey) {
+    checks.push({
+      name: 'oauth_introspection',
+      ok: !hostedOAuthDeployment,
+      detail: hostedOAuthDeployment
+        ? 'INTERNAL_API_KEY or CRON_SECRET required for OAuth token introspection on hosted MCP'
+        : 'not configured (optional for local dev)',
+    });
+  } else {
+    checks.push({ name: 'oauth_introspection', ok: true });
+  }
+
   return {
     ok: checks.every((c) => c.ok),
     checks,

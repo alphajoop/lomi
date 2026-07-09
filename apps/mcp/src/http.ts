@@ -38,7 +38,7 @@ import { mcpLog, mcpRequestAls } from './mcp-request-context.js';
 import { wireMcpServer } from './wire-mcp-server.js';
 import {
   buildProtectedResourceMetadata,
-  getMcpResourceUrl,
+  getProtectedResourceMetadataUrl,
   introspectOAuthAccessToken,
 } from './oauth-introspection.js';
 
@@ -85,10 +85,11 @@ async function resolveMerchantGrantFromRequest(
   };
 }
 
+const TRANSPORT_UNAUTHORIZED_MESSAGE =
+  'Missing credentials: complete OAuth in your browser (recommended), send x-lomi-api-key / x-api-key, or Authorization: Bearer <lomi_sk_…>. See https://docs.lomi.africa/build/mcp';
+
 function oauthUnauthorizedChallenge(): string {
-  const resource = getMcpResourceUrl();
-  const origin = new URL(resource).origin;
-  const metadataUrl = `${origin}/.well-known/oauth-protected-resource`;
+  const metadataUrl = getProtectedResourceMetadataUrl();
   return `Bearer resource_metadata="${metadataUrl}"`;
 }
 
@@ -224,11 +225,11 @@ function bearerAuthMiddleware(
     return;
   }
 
+  res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge());
   res.status(401).json({
     error: 'Unauthorized',
     error_code: presented ? 'invalid_credentials' : 'missing_credentials',
-    message:
-      'Provide your lomi. API key via the x-lomi-api-key header (or Authorization: Bearer <lomi_… key>). See https://docs.lomi.africa/build/mcp',
+    message: TRANSPORT_UNAUTHORIZED_MESSAGE,
   });
 }
 
@@ -300,9 +301,14 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
     });
   }
 
-  app.get('/.well-known/oauth-protected-resource', (_req, res) => {
+  const protectedResourceMetadataPattern =
+    /^\/\.well-known\/oauth-protected-resource(\/.*)?$/;
+
+  function serveProtectedResourceMetadata(_req: Request, res: Response): void {
     res.status(200).json(buildProtectedResourceMetadata());
-  });
+  }
+
+  app.get(protectedResourceMetadataPattern, serveProtectedResourceMetadata);
 
   app.get('/health', (_req, res) => {
     res.status(200).json({
