@@ -158,9 +158,9 @@ curl -X GET "https://api.lomi.africa/organizations/metrics" \
 
 | Champ | Type | Description |
 |-------|------|-------------|
-| `mrr` | `number` | Revenu récurrent mensuel |
-| `arr` | `number` | Revenu récurrent annuel |
-| `total_revenue` | `number` | Chiffre d’affaires total |
+| `mrr` | `number` | Revenu récurrent mensuel (abonnements actifs, devise par défaut de l’org) |
+| `arr` | `number` | Revenu récurrent annuel (`mrr` × 12) |
+| `total_revenue` | `number` | Volume total des paiements complétés, converti dans la devise par défaut de l’org |
 | `total_transactions` | `number` | Nombre de transactions |
 | `total_customers` | `number` | Nombre de clients |
 | `currency_code` | `string` | Devise des montants |
@@ -189,9 +189,9 @@ Ces champs correspondent à la ressource **organization** renvoyée par `GET /or
 | `total_transactions` | `number` \| `null` | Nombre de transactions |
 | `total_merchants` | `number` \| `null` | Nombre de marchands |
 | `total_customers` | `number` \| `null` | Nombre de clients |
-| `mrr` | `number` | MRR |
-| `arr` | `number` | ARR |
-| `merchant_lifetime_value` | `number` | Valeur vie client moyenne |
+| `mrr` | `number` | MRR (abonnements actifs, devise par défaut de l’org) |
+| `arr` | `number` | ARR (`mrr` × 12) |
+| `merchant_lifetime_value` | `number` | LTV prédictive par client (valeur client x durée de vie moyenne) |
 | `employee_number` | `string` \| `null` | Tranche d’effectifs |
 | `industry` | `string` \| `null` | Secteur |
 | `has_payout_pin` | `boolean` | Whether org requires PIN for manual payouts |

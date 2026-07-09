@@ -16,7 +16,7 @@ See [`railway.json`](./railway.json) for Railway deployment.
 
 Key operator settings:
 
-- `LOMI_MCP_BEARER_TOKEN`: transport gate for HTTP MCP
+- `LOMI_MCP_BEARER_TOKEN`: optional/legacy shared transport gate for HTTP MCP. Merchants authenticate with their API key alone (`x-lomi-api-key`); a valid lomi. credential gates the transport on its own. Keep this set only for legacy operator setups.
 - `LOMI_API_URL`: default merchant API base URL for tool calls
 
 ## Regenerate tools

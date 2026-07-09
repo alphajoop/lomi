@@ -137,6 +137,9 @@ export class OAuthController {
       userId: req.merchantId,
       email: req.supabaseUserEmail,
       approved: dto.approved,
+      organizationId: dto.organization_id,
+      accessLevel: dto.access_level,
+      environment: dto.environment,
     });
   }
 }

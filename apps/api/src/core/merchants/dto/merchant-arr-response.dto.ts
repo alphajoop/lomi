@@ -4,7 +4,12 @@ export class MerchantArrResponseDto {
   @ApiProperty({ type: String })
   merchant_id: string;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({
+    example: 600000,
+    description:
+      'Annual Recurring Revenue (MRR × 12) for the organization linked to the API key, in org default currency',
+    type: Number,
+  })
   arr: number;
 
   @ApiProperty({ example: 'XOF', type: String })

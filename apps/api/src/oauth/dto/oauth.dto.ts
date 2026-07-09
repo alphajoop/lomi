@@ -41,6 +41,21 @@ export class OAuthConsentDto {
   @ApiProperty()
   @IsBoolean()
   approved!: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  organization_id?: string;
+
+  @ApiPropertyOptional({ enum: ['read', 'write'] })
+  @IsOptional()
+  @IsString()
+  access_level?: 'read' | 'write';
+
+  @ApiPropertyOptional({ enum: ['test', 'live'] })
+  @IsOptional()
+  @IsString()
+  environment?: 'test' | 'live';
 }
 
 export class OAuthRegisterClientDto {

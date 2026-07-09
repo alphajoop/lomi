@@ -33,7 +33,7 @@ import {
   mcpTrustProxy,
 } from './env-config.js';
 import { extractSessionMerchantApiKey, extractSessionProvisioningKey, extractOAuthAccessToken } from './session-merchant-key.js';
-import { McpSessionRegistry } from './session-registry.js';
+import { McpSessionRegistry, type MerchantAccessLevel } from './session-registry.js';
 import { mcpLog, mcpRequestAls } from './mcp-request-context.js';
 import { wireMcpServer } from './wire-mcp-server.js';
 import {
@@ -55,8 +55,34 @@ async function resolveProvisioningKeyFromRequest(
   const oauthToken = extractOAuthAccessToken(req);
   if (!oauthToken) return null;
   const introspected = await introspectOAuthAccessToken(oauthToken);
-  if (!introspected.active || !introspected.provisioning_key) return null;
+  if (
+    !introspected.active ||
+    introspected.grant_type === 'merchant' ||
+    !introspected.provisioning_key
+  ) {
+    return null;
+  }
   return introspected.provisioning_key;
+}
+
+async function resolveMerchantGrantFromRequest(
+  req: Request,
+): Promise<{ connectionKey: string; accessLevel: MerchantAccessLevel } | null> {
+  const headerMerchantKey = extractSessionMerchantApiKey(req);
+  if (headerMerchantKey) {
+    return { connectionKey: headerMerchantKey, accessLevel: 'full' };
+  }
+
+  const oauthToken = extractOAuthAccessToken(req);
+  if (!oauthToken) return null;
+  const introspected = await introspectOAuthAccessToken(oauthToken);
+  if (!introspected.active || !introspected.connection_key) return null;
+  const accessLevel: MerchantAccessLevel =
+    introspected.access_level === 'write' ? 'write' : 'read';
+  return {
+    connectionKey: introspected.connection_key,
+    accessLevel,
+  };
 }
 
 function oauthUnauthorizedChallenge(): string {
@@ -153,37 +179,57 @@ function ensureProductionBearer(): void {
   }
 }
 
+/**
+ * True when the request carries any lomi. credential we can act on: a merchant
+ * API key (`x-lomi-api-key` / `x-api-key` or a `lomi_*` bearer), a provisioning
+ * key, or an OAuth access token. These credentials gate the transport on their
+ * own, so merchants only need their API key — no shared transport secret.
+ */
+function requestPresentsLomiCredential(req: Request): boolean {
+  return Boolean(
+    extractSessionMerchantApiKey(req) ||
+      extractSessionProvisioningKey(req) ||
+      extractOAuthAccessToken(req),
+  );
+}
+
 function bearerAuthMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
 ): void {
   const tokens = getMcpHttpBearerTokens();
+  const auth = req.headers.authorization;
+  const presented =
+    auth && auth.startsWith('Bearer ')
+      ? auth.slice('Bearer '.length).trim()
+      : null;
+
+  // Legacy path: a shared transport secret still unlocks the endpoint.
+  if (presented && tokens.length > 0 && bearerTokenMatches(presented, tokens)) {
+    next();
+    return;
+  }
+
+  // Primary path: a valid lomi. credential (merchant key, provisioning key, or
+  // OAuth token) is sufficient. This is what merchants use — API key only.
+  if (requestPresentsLomiCredential(req)) {
+    next();
+    return;
+  }
+
+  // No transport secret configured and no credential presented: open (local/dev).
   if (tokens.length === 0) {
     next();
     return;
   }
-  const auth = req.headers.authorization;
-  if (!auth || !auth.startsWith('Bearer ')) {
-    res.status(401).json({
-      error: 'Unauthorized',
-      error_code: 'missing_bearer',
-      message:
-        'Missing Authorization header. Send Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>.',
-    });
-    return;
-  }
-  const presented = auth.slice('Bearer '.length).trim();
-  if (!bearerTokenMatches(presented, tokens)) {
-    res.status(401).json({
-      error: 'Unauthorized',
-      error_code: 'invalid_bearer',
-      message:
-        'Invalid transport bearer token. Use a value from LOMI_MCP_BEARER_TOKEN (supports comma-separated rotation set).',
-    });
-    return;
-  }
-  next();
+
+  res.status(401).json({
+    error: 'Unauthorized',
+    error_code: presented ? 'invalid_credentials' : 'missing_credentials',
+    message:
+      'Provide your lomi. API key via the x-lomi-api-key header (or Authorization: Bearer <lomi_… key>). See https://docs.lomi.africa/build/mcp',
+  });
 }
 
 function resolveMerchantKey(
@@ -213,6 +259,7 @@ function hasSessionCredential(
   sessionId: string | undefined,
   headerMerchantKey: string | null,
   headerProvisioningKey: string | null,
+  oauthMerchantGrant: boolean,
 ): boolean {
   const merchant =
     headerMerchantKey ??
@@ -222,7 +269,7 @@ function hasSessionCredential(
     headerProvisioningKey ??
     (sessionId ? registry.getProvisioningApiKey(sessionId) : null) ??
     getOptionalProvisioningKey();
-  return Boolean(merchant || provisioning);
+  return Boolean(merchant || provisioning || oauthMerchantGrant);
 }
 
 export function createHttpApplication(manifest: ToolsManifest): Express {
@@ -317,11 +364,24 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
         const headerMerchantKey = extractSessionMerchantApiKey(req);
         const headerProvisioningKey = extractSessionProvisioningKey(req);
+        const merchantGrant = await resolveMerchantGrantFromRequest(req);
+        const resolvedMerchantKey =
+          merchantGrant?.connectionKey ?? headerMerchantKey;
         const resolvedProvisioningKey =
           (await resolveProvisioningKeyFromRequest(req, headerProvisioningKey)) ??
           headerProvisioningKey;
-        if (sessionId && registry.has(sessionId) && headerMerchantKey) {
-          registry.updateMerchantApiKey(sessionId, headerMerchantKey);
+        if (sessionId && registry.has(sessionId) && resolvedMerchantKey) {
+          registry.updateMerchantApiKey(sessionId, resolvedMerchantKey);
+        }
+        if (
+          sessionId &&
+          registry.has(sessionId) &&
+          merchantGrant?.accessLevel
+        ) {
+          registry.updateMerchantAccessLevel(
+            sessionId,
+            merchantGrant.accessLevel,
+          );
         }
         if (sessionId && registry.has(sessionId) && resolvedProvisioningKey) {
           registry.updateProvisioningApiKey(sessionId, resolvedProvisioningKey);
@@ -359,8 +419,9 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
             !hasSessionCredential(
               registry,
               undefined,
-              headerMerchantKey,
+              resolvedMerchantKey,
               resolvedProvisioningKey,
+              Boolean(merchantGrant?.connectionKey),
             )
           ) {
             res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge());
@@ -382,8 +443,10 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
           const sessionState = {
             sessionId: null as string | null,
-            merchantApiKey: headerMerchantKey,
+            merchantApiKey: resolvedMerchantKey,
             provisioningApiKey: resolvedProvisioningKey,
+            merchantAccessLevel:
+              merchantGrant?.accessLevel ?? ('full' as MerchantAccessLevel),
           };
 
           transport = new StreamableHTTPServerTransport({
@@ -395,6 +458,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
                 transport!,
                 sessionState.merchantApiKey,
                 sessionState.provisioningApiKey,
+                sessionState.merchantAccessLevel,
               );
               store.sessionId = sid;
             },
@@ -403,6 +467,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           const server = wireMcpServer({
             manifest,
             mode: 'http',
+            merchantAccessLevel: sessionState.merchantAccessLevel,
             getApiKey: () =>
               resolveMerchantKey(
                 registry,

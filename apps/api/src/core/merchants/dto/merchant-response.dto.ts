@@ -20,13 +20,28 @@ export class MerchantResponseDto {
   @ApiPropertyOptional({ example: 'SN', type: String })
   country?: string | null;
 
-  @ApiProperty({ example: 50000, type: Number })
+  @ApiProperty({
+    example: 50000,
+    description:
+      'Monthly Recurring Revenue for the organization linked to the API key, in org default currency',
+    type: Number,
+  })
   mrr: number;
 
-  @ApiProperty({ example: 600000, type: Number })
+  @ApiProperty({
+    example: 600000,
+    description:
+      'Annual Recurring Revenue (MRR × 12) for the organization linked to the API key, in org default currency',
+    type: Number,
+  })
   arr: number;
 
-  @ApiProperty({ example: 1200000, type: Number })
+  @ApiProperty({
+    example: 14250,
+    description:
+      'Predicted per-customer lifetime value (Customer Value x Avg Lifespan) for the linked organization, in org default currency',
+    type: Number,
+  })
   merchant_lifetime_value: number;
 
   @ApiPropertyOptional({ example: 3, type: Number })

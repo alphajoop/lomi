@@ -2,8 +2,12 @@ import { getLomiApiBaseUrl } from './env-config.js';
 
 export type OAuthIntrospectionResult = {
   active: boolean;
+  grant_type?: 'provisioning' | 'merchant';
   provisioning_key?: string;
   provisioning_key_id?: string;
+  organization_id?: string;
+  access_level?: 'read' | 'write' | 'full';
+  connection_key?: string;
   exp?: number;
   scope?: string;
 };
@@ -83,7 +87,11 @@ export function buildProtectedResourceMetadata() {
   return {
     resource,
     authorization_servers: [issuer],
-    scopes_supported: ['provisioning.onboard'],
+    scopes_supported: [
+      'provisioning.onboard',
+      'merchant.read',
+      'merchant.write',
+    ],
     bearer_methods_supported: ['header'],
   };
 }

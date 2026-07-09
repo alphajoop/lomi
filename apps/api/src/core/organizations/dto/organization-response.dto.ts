@@ -128,8 +128,9 @@ export class OrganizationResponseDto {
   arr: number;
 
   @ApiProperty({
-    example: 150000.0,
-    description: 'Average Customer Lifetime Value',
+    example: 14250.0,
+    description:
+      'Predicted per-customer lifetime value (Customer Value x Avg Lifespan), org default currency',
     type: Number,
   })
   merchant_lifetime_value: number;

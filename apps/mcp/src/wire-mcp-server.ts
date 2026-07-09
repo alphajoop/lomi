@@ -18,6 +18,8 @@ export type WireMcpServerOptions = {
   mode: InstructionMode;
   getApiKey: () => string | null;
   getProvisioningKey?: () => string | null;
+  /** When read, only register merchant tools marked readOnly. */
+  merchantAccessLevel?: 'read' | 'write' | 'full';
   /**
    * Invoked when a provisioning tool returns a usable merchant secret key.
    * Implementations should adopt it as the session's merchant credential so
@@ -34,6 +36,7 @@ export function wireMcpServer(options: WireMcpServerOptions): McpServer {
     mode,
     getApiKey,
     getProvisioningKey = getOptionalProvisioningKey,
+    merchantAccessLevel = 'full',
     onMerchantKeyDiscovered,
   } = options;
   const server = new McpServer(
@@ -46,7 +49,10 @@ export function wireMcpServer(options: WireMcpServerOptions): McpServer {
     getProvisioningKey,
     onMerchantKeyDiscovered,
   });
-  registerMerchantTools(server, manifest, { getApiKey });
+  registerMerchantTools(server, manifest, {
+    getApiKey,
+    readOnlyOnly: merchantAccessLevel === 'read',
+  });
   registerLomiResources(server, manifest);
   registerLomiPrompts(server, manifest, provisioningManifest);
   return server;

@@ -17,5 +17,7 @@ describe('oauth-introspection', () => {
     expect(metadata.resource).toBe('https://mcp.lomi.africa/mcp');
     expect(metadata.authorization_servers).toContain('https://api.lomi.africa');
     expect(metadata.scopes_supported).toContain('provisioning.onboard');
+    expect(metadata.scopes_supported).toContain('merchant.read');
+    expect(metadata.scopes_supported).toContain('merchant.write');
   });
 });

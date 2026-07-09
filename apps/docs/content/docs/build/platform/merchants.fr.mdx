@@ -35,7 +35,7 @@ Récupère le détail d’un compte marchand.
     "country": "SN",
     "mrr": 50000, // In smallest currency unit
     "arr": 600000, // In smallest currency unit
-    "merchant_lifetime_value": 1200000, // In smallest currency unit
+    "merchant_lifetime_value": 14250, // LTV prédictive par client, devise par défaut de l'org
     "retry_payment_every": 3,
     "total_retries": 5,
     "metadata": {
@@ -170,6 +170,9 @@ Récupère le solde courant d’un marchand pour une devise donnée.
 
 ## Notes d’implémentation
 
-- Les montants (`` `mrr` ``, `` `arr` ``, `` `merchant_lifetime_value` ``, `` `balance` ``) sont exprimés dans la plus petite unité monétaire (ex. centimes pour l’USD ; XOF en unité de base).
+- **Périmètre organisation :** les détails marchand, le MRR et l’ARR portent toujours sur **l’organisation liée à votre clé API**. Si un marchand appartient à plusieurs organisations, vous ne voyez que les métriques de l’org de votre clé — jamais de données cross-org.
+- Les métriques en cache (`` `mrr` ``, `` `arr` ``, `` `merchant_lifetime_value` ``, volumes clients/transactions) sont **rafraîchies chaque jour à 03:00 UTC** en live, et **à nouveau lors des changements d’abonnement**. `` `as_of_date` `` sur les réponses MRR/ARR reflète le dernier rafraîchissement ; pour le solde, c’est le `` `updated_at` `` du compte.
+- `` `mrr` `` / `` `arr` `` sont le revenu récurrent mensuel / annuel de l’organisation liée (abonnements actifs), dans la devise par défaut de l’org.
+- `` `merchant_lifetime_value` `` est une **LTV prédictive par client** pour l’organisation liée (environnement live) : valeur client (revenu net par client payeur) multipliée par la durée de vie moyenne (dérivée des achats répétés, plafonnée à 5x). Ce n’est **pas** le profit plateforme tiré du marchand (réservé aux admins).
 - Les dates sont au format ISO 8601 (`` `YYYY-MM-DDTHH:mm:ssZ` ``).
 - Voir [Erreurs](/api/errors) pour la gestion d’erreurs générale.

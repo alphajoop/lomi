@@ -11,6 +11,7 @@ import { registerSearchToolsMetaTool } from './register-search-tools.js';
 export type ToolRegistrationContext = {
   baseUrl: string;
   getApiKey: () => string | null;
+  readOnlyOnly?: boolean;
 };
 
 function registerOneTool(
@@ -105,11 +106,13 @@ export function registerMerchantTools(
 ): void {
   const baseUrl = ctx?.baseUrl ?? getLomiApiBaseUrl();
   const getApiKey = ctx?.getApiKey ?? getOptionalMerchantApiKey;
-  const fullCtx: ToolRegistrationContext = { baseUrl, getApiKey };
+  const readOnlyOnly = ctx?.readOnlyOnly ?? false;
+  const fullCtx: ToolRegistrationContext = { baseUrl, getApiKey, readOnlyOnly };
 
   registerSearchToolsMetaTool(server, manifest);
 
   for (const tool of manifest.tools) {
+    if (readOnlyOnly && !tool.readOnly) continue;
     registerOneTool(server, tool, fullCtx);
   }
 }

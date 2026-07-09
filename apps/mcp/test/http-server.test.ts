@@ -63,7 +63,7 @@ describe('createHttpApplication', () => {
     expect(body.ready).toBe(true);
   });
 
-  it('GET /mcp without bearer returns 401 with error_code when gated', async () => {
+  it('GET /mcp without any credential returns 401 missing_credentials when gated', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
     const manifest = parseManifest(manifestJson);
     const app = createHttpApplication(manifest);
@@ -72,10 +72,10 @@ describe('createHttpApplication', () => {
     const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`);
     expect(res.status).toBe(401);
     const body = await res.json();
-    expect(body.error_code).toBe('missing_bearer');
+    expect(body.error_code).toBe('missing_credentials');
   });
 
-  it('GET /mcp with wrong bearer returns invalid_bearer', async () => {
+  it('GET /mcp with a non-credential bearer returns invalid_credentials', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
     const manifest = parseManifest(manifestJson);
     const app = createHttpApplication(manifest);
@@ -86,7 +86,34 @@ describe('createHttpApplication', () => {
     });
     expect(res.status).toBe(401);
     const body = await res.json();
-    expect(body.error_code).toBe('invalid_bearer');
+    expect(body.error_code).toBe('invalid_credentials');
+  });
+
+  it('GET /mcp with only x-lomi-api-key passes the transport gate when gated', async () => {
+    process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      headers: { 'x-lomi-api-key': 'lomi_sk_test_1234567890abcd' },
+    });
+    // Gate passes (not 401); GET without a session id then yields 400.
+    expect(res.status).not.toBe(401);
+    expect(res.status).toBe(400);
+  });
+
+  it('GET /mcp with a lomi_ bearer passes the transport gate when gated', async () => {
+    process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      headers: { Authorization: 'Bearer lomi_sk_test_1234567890abcd' },
+    });
+    expect(res.status).not.toBe(401);
+    expect(res.status).toBe(400);
   });
 
   it('DELETE /mcp without session returns 400', async () => {

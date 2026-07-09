@@ -1,6 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../utils/supabase/supabase.service';
 
+export type MerchantConnectionRow = {
+  token_id: string;
+  client_id: string;
+  client_name: string;
+  scope: string;
+  access_level: string;
+  environment: string;
+  created_at: string;
+  expires_at: string;
+  is_active: boolean;
+};
+
 @Injectable()
 export class OAuthRepository {
   constructor(private readonly supabase: SupabaseService) {}
@@ -100,7 +112,10 @@ export class OAuthRepository {
     resource?: string;
     codeChallenge: string;
     codeChallengeMethod: string;
-    provisioningKeyId: string;
+    provisioningKeyId?: string;
+    grantType?: 'provisioning' | 'merchant';
+    organizationId?: string;
+    apiKey?: string;
   }) {
     const { data, error } = await this.supabase.rpc(
       'oauth_create_authorization_code' as never,
@@ -112,7 +127,10 @@ export class OAuthRepository {
         p_resource: input.resource ?? null,
         p_code_challenge: input.codeChallenge,
         p_code_challenge_method: input.codeChallengeMethod,
-        p_provisioning_key_id: input.provisioningKeyId,
+        p_provisioning_key_id: input.provisioningKeyId ?? null,
+        p_grant_type: input.grantType ?? 'provisioning',
+        p_organization_id: input.organizationId ?? null,
+        p_api_key: input.apiKey ?? null,
       } as never,
     );
     if (error) throw error;
@@ -217,5 +235,64 @@ export class OAuthRepository {
       .auth.admin.getUserById(userId);
     if (userError) return false;
     return Boolean(userData.user?.email_confirmed_at);
+  }
+
+  async mintMerchantConnectionKey(input: {
+    merchantId: string;
+    organizationId: string;
+    clientName: string;
+    accessLevel: 'read' | 'write';
+    environment: 'test' | 'live';
+  }): Promise<string> {
+    const { data, error } = await this.supabase.rpc(
+      'oauth_mint_merchant_connection_key' as never,
+      {
+        p_merchant_id: input.merchantId,
+        p_organization_id: input.organizationId,
+        p_client_name: input.clientName,
+        p_access_level: input.accessLevel,
+        p_environment: input.environment,
+      } as never,
+    );
+    if (error) throw error;
+    const row = (Array.isArray(data) ? data[0] : data) as unknown as
+      | { api_key: string }
+      | undefined;
+    if (!row?.api_key) {
+      throw new Error('Failed to mint merchant connection key');
+    }
+    return row.api_key;
+  }
+
+  async listMerchantConnections(
+    organizationId: string,
+    merchantId: string,
+  ): Promise<MerchantConnectionRow[]> {
+    const { data, error } = await this.supabase.rpc(
+      'fetch_oauth_merchant_connections' as never,
+      {
+        p_organization_id: organizationId,
+        p_merchant_id: merchantId,
+      } as never,
+    );
+    if (error) throw error;
+    return (Array.isArray(data) ? data : []) as MerchantConnectionRow[];
+  }
+
+  async revokeMerchantConnection(input: {
+    tokenId: string;
+    organizationId: string;
+    merchantId: string;
+  }): Promise<boolean> {
+    const { data, error } = await this.supabase.rpc(
+      'oauth_revoke_merchant_connection' as never,
+      {
+        p_token_id: input.tokenId,
+        p_organization_id: input.organizationId,
+        p_merchant_id: input.merchantId,
+      } as never,
+    );
+    if (error) throw error;
+    return data === true;
   }
 }

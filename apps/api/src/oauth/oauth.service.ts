@@ -5,6 +5,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { OAuthRepository } from './oauth.repository';
+import {
+  isMerchantOAuthEnabled,
+  isMerchantScopeRequest,
+  normalizeMerchantScope,
+  resolveMerchantAccessLevel,
+} from './merchant-oauth';
 
 export interface OAuthAuthorizeParams {
   clientId: string;
@@ -21,6 +27,9 @@ export interface OAuthConsentParams extends OAuthAuthorizeParams {
   userId: string;
   email?: string;
   approved: boolean;
+  organizationId?: string;
+  accessLevel?: 'read' | 'write';
+  environment?: 'test' | 'live';
 }
 
 @Injectable()
@@ -39,7 +48,9 @@ export class OAuthService {
       grant_types_supported: ['authorization_code', 'refresh_token'],
       code_challenge_methods_supported: ['S256'],
       token_endpoint_auth_methods_supported: ['none', 'client_secret_post'],
-      scopes_supported: ['provisioning.onboard'],
+      scopes_supported: isMerchantOAuthEnabled()
+        ? ['provisioning.onboard', 'merchant.read', 'merchant.write']
+        : ['provisioning.onboard'],
     };
   }
 
@@ -119,6 +130,51 @@ export class OAuthService {
       );
     }
 
+    const merchantGrant = isMerchantScopeRequest(params.scope);
+
+    if (merchantGrant) {
+      if (!isMerchantOAuthEnabled()) {
+        throw new BadRequestException('Merchant OAuth connections are disabled');
+      }
+      if (!params.organizationId) {
+        throw new BadRequestException('organization_id is required');
+      }
+
+      const client = await this.repository.getClient(params.clientId);
+      const clientName =
+        typeof client?.client_name === 'string'
+          ? client.client_name
+          : 'MCP client';
+      const accessLevel =
+        params.accessLevel ?? resolveMerchantAccessLevel(params.scope);
+      const environment = params.environment === 'live' ? 'live' : 'test';
+      const connectionKey = await this.repository.mintMerchantConnectionKey({
+        merchantId: params.userId,
+        organizationId: params.organizationId,
+        clientName,
+        accessLevel,
+        environment,
+      });
+
+      const codeRow = await this.repository.createAuthorizationCode({
+        clientId: params.clientId,
+        userId: params.userId,
+        redirectUri: params.redirectUri,
+        scope: normalizeMerchantScope(accessLevel),
+        resource: params.resource,
+        codeChallenge: params.codeChallenge,
+        codeChallengeMethod: params.codeChallengeMethod ?? 'S256',
+        grantType: 'merchant',
+        organizationId: params.organizationId,
+        apiKey: connectionKey,
+      });
+
+      const redirectUrl = new URL(params.redirectUri);
+      redirectUrl.searchParams.set('code', codeRow.code);
+      if (params.state) redirectUrl.searchParams.set('state', params.state);
+      return { redirect_url: redirectUrl.toString() };
+    }
+
     const partnerId = await this.repository.getOrCreateSelfServicePartner(
       params.userId,
       params.email ?? '',
@@ -144,6 +200,7 @@ export class OAuthService {
       codeChallenge: params.codeChallenge,
       codeChallengeMethod: params.codeChallengeMethod ?? 'S256',
       provisioningKeyId: provisioningKey.provisioning_key_id,
+      grantType: 'provisioning',
     });
 
     const redirectUrl = new URL(params.redirectUri);
@@ -231,7 +288,7 @@ export class OAuthService {
     };
   }
 
-  /** Trusted MCP server only, returns provisioning_key for active tokens. */
+  /** Trusted MCP server only, returns provisioning_key or merchant connection_key. */
   async introspectMcp(body: { token?: string }) {
     if (!body.token) {
       throw new BadRequestException('token is required');
@@ -240,7 +297,17 @@ export class OAuthService {
     if (!row?.active) {
       return { active: false };
     }
-    return row;
+    return {
+      active: true,
+      scope: row.scope,
+      exp: row.exp,
+      grant_type: row.grant_type,
+      organization_id: row.organization_id,
+      access_level: row.access_level,
+      connection_key: row.connection_key,
+      provisioning_key: row.provisioning_key,
+      provisioning_key_id: row.provisioning_key_id,
+    };
   }
 
   private async assertClientAuthenticated(

@@ -686,6 +686,7 @@ export const EXPOSED_FUNCTIONS = [
   'oauth_exchange_authorization_code',
   'oauth_get_client',
   'oauth_introspect_token',
+  'oauth_mint_merchant_connection_key',
   'oauth_refresh_access_token',
   'oauth_register_client',
   'oauth_revoke_token',

@@ -1,10 +1,13 @@
 import type { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 
+export type MerchantAccessLevel = 'read' | 'write' | 'full';
+
 export type SessionRegistryEntry = {
   transport: StreamableHTTPServerTransport;
   lastActivity: number;
   merchantApiKey: string | null;
   provisioningApiKey: string | null;
+  merchantAccessLevel: MerchantAccessLevel;
 };
 
 /**
@@ -62,6 +65,19 @@ export class McpSessionRegistry {
     e.merchantApiKey = apiKey;
   }
 
+  updateMerchantAccessLevel(
+    sessionId: string,
+    accessLevel: MerchantAccessLevel,
+  ): void {
+    const e = this.sessions.get(sessionId);
+    if (!e) return;
+    e.merchantAccessLevel = accessLevel;
+  }
+
+  getMerchantAccessLevel(sessionId: string): MerchantAccessLevel {
+    return this.sessions.get(sessionId)?.merchantAccessLevel ?? 'full';
+  }
+
   updateProvisioningApiKey(sessionId: string, apiKey: string | null): void {
     const e = this.sessions.get(sessionId);
     if (!e || !apiKey) return;
@@ -100,12 +116,14 @@ export class McpSessionRegistry {
     transport: StreamableHTTPServerTransport,
     merchantApiKey: string | null,
     provisioningApiKey: string | null = null,
+    merchantAccessLevel: MerchantAccessLevel = 'full',
   ): void {
     this.sessions.set(sessionId, {
       transport,
       lastActivity: Date.now(),
       merchantApiKey,
       provisioningApiKey,
+      merchantAccessLevel,
     });
     transport.onclose = () => {
       this.sessions.delete(sessionId);

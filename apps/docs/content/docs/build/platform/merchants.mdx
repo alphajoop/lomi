@@ -35,7 +35,7 @@ Retrieves detailed information about a specific merchant account.
     "country": "SN",
     "mrr": 50000, // In smallest currency unit
     "arr": 600000, // In smallest currency unit
-    "merchant_lifetime_value": 1200000, // In smallest currency unit
+    "merchant_lifetime_value": 14250, // Predicted per-customer LTV in org default currency
     "retry_payment_every": 3,
     "total_retries": 5,
     "metadata": {
@@ -170,8 +170,10 @@ Retrieves the current account balance for a merchant in a specific currency.
 
 ## Implementation notes
 
+- **Organization scoping:** Merchant details, MRR, and ARR are always returned for the **organization bound to your API key**. If a merchant belongs to multiple organizations, you only see metrics for the org your key is linked to — never cross-org data.
 - Cached organization metrics (`` `mrr` ``, `` `arr` ``, `` `merchant_lifetime_value` ``, transaction and customer counts) are **refreshed daily at 03:00 UTC** for live data, and **again when subscriptions change**. `` `as_of_date` `` on MRR/ARR responses reflects the last refresh; balance `` `as_of_date` `` is the account `` `updated_at` ``.
-- `` `merchant_lifetime_value` `` is computed as **average customer LTV × total customers** for the linked organization (live environment).
+- `` `mrr` `` / `` `arr` `` are the linked organization's Monthly / Annual Recurring Revenue from active subscriptions, in the org default currency.
+- `` `merchant_lifetime_value` `` is a **predicted per-customer LTV** for the linked organization (live environment): Customer Value (net revenue per paying customer) multiplied by Average Lifespan (derived from repeat purchase behavior, capped at 5x). Refreshed with other cached metrics. This is **not** platform profit from the merchant (admin-only).
 - All monetary values are returned in the smallest currency unit (e.g., cents for USD, XOF represents the base unit directly).
 - Dates and times are returned in ISO 8601 format (`` `YYYY-MM-DDTHH:mm:ssZ` ``).
 - See the [Errors](/api/errors) guide for general error handling information.

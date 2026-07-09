@@ -44,10 +44,8 @@ export class ApiKeyGuard implements CanActivate {
     // Network (Lomi-Account) requests always hit Postgres for capability checks.
     if (!lomiAccount) {
       const cached = await readApiKeyAuthCache(this.redis, apiKey);
-      if (cached) {
+      if (cached && this.isSafeReadMethod(request.method)) {
         this.attachUser(request, apiKey, null, cached);
-        // Usage accounting stays on the create/logging path; Nest Throttler
-        // still enforces request ceilings while the cache is hot.
         return true;
       }
     }
@@ -150,6 +148,11 @@ export class ApiKeyGuard implements CanActivate {
       return header[0]?.trim() || null;
     }
     return typeof header === 'string' && header.trim() ? header.trim() : null;
+  }
+
+  /** Write requests bypass the identity cache so read-only keys are re-validated. */
+  private isSafeReadMethod(method: string): boolean {
+    return ['GET', 'HEAD', 'OPTIONS'].includes(method.toUpperCase());
   }
 
   private resolveNetworkCapability(method: string, url: string): string | null {

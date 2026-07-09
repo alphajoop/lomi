@@ -10,14 +10,13 @@ Integration guide: [docs.lomi.africa/build/mcp](https://docs.lomi.africa/build/m
 
 Most teams use lomi.’s hosted server at `https://mcp.lomi.africa/mcp`.
 
-**Headers on every MCP request:**
+**Header on every MCP request:**
 
 | What | Header |
 |------|--------|
-| Transport access (hosted server) | `Authorization: Bearer <transport secret from dashboard snippet>` |
-| Your merchant secret key (required for tool calls) | `x-lomi-api-key: <key>` or `x-api-key: <key>` |
+| Your merchant secret key | `x-lomi-api-key: <key>` or `x-api-key: <key>` |
 
-The transport secret gates access to the shared MCP endpoint. It is **not** your merchant key, never put your API key in `Authorization` when a transport secret is required.
+Your API key is all you need, it both unlocks the hosted endpoint and scopes every tool call. A shared transport secret (`Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>`) is still accepted for legacy operator setups, but merchants do not need one.
 
 **Checks (optional):** `GET /health`, `GET /ready` on the same host.
 

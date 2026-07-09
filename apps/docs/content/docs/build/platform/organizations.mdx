@@ -158,9 +158,9 @@ curl -X GET "https://api.lomi.africa/organizations/metrics" \
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `mrr` | `number` | Monthly Recurring Revenue |
-| `arr` | `number` | Annual Recurring Revenue |
-| `total_revenue` | `number` | Total revenue generated |
+| `mrr` | `number` | Monthly Recurring Revenue from active subscriptions (org default currency) |
+| `arr` | `number` | Annual Recurring Revenue (`mrr` × 12) |
+| `total_revenue` | `number` | Total completed payment volume, converted to org default currency |
 | `total_transactions` | `number` | Total transaction count |
 | `total_customers` | `number` | Total customer count |
 | `currency_code` | `string` | Currency for monetary values |
@@ -189,9 +189,9 @@ These fields align with the **organization** resource returned by `GET /organiza
 | `total_transactions` | `number` \| `null` | Transaction count |
 | `total_merchants` | `number` \| `null` | Merchant count |
 | `total_customers` | `number` \| `null` | Customer count |
-| `mrr` | `number` | Monthly recurring revenue |
-| `arr` | `number` | Annual recurring revenue |
-| `merchant_lifetime_value` | `number` | Average customer lifetime value |
+| `mrr` | `number` | Monthly recurring revenue (active subscriptions, org default currency) |
+| `arr` | `number` | Annual recurring revenue (`mrr` × 12) |
+| `merchant_lifetime_value` | `number` | Predicted per-customer lifetime value (Customer Value x Avg Lifespan) |
 | `employee_number` | `string` \| `null` | Employee range label |
 | `industry` | `string` \| `null` | Industry |
 | `has_payout_pin` | `boolean` | Whether org requires PIN for manual payouts |

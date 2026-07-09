@@ -30,7 +30,7 @@ export class MerchantsController {
   @ApiOperation({
     summary: 'Get merchant details',
     description:
-      'Returns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.',
+      'Returns merchant profile and metrics (MRR, ARR, predicted per-customer LTV) for the organization linked to the API key. Metrics are refreshed daily and on subscription changes.',
   })
   @ApiParam({ name: 'id', description: 'Merchant UUID' })
   @ApiResponse({ status: 200, type: MerchantResponseDto })
@@ -41,7 +41,11 @@ export class MerchantsController {
   }
 
   @Get(':id/mrr')
-  @ApiOperation({ summary: 'Get merchant MRR' })
+  @ApiOperation({
+    summary: 'Get merchant MRR',
+    description:
+      'Monthly Recurring Revenue for the organization linked to the API key (org default currency). Scoped to that org even if the merchant belongs to multiple organizations.',
+  })
   @ApiParam({ name: 'id', description: 'Merchant UUID' })
   @ApiResponse({ status: 200, type: MerchantMrrResponseDto })
   getMrr(@Param('id') id: string, @CurrentUser() user: AuthContext) {
@@ -49,7 +53,11 @@ export class MerchantsController {
   }
 
   @Get(':id/arr')
-  @ApiOperation({ summary: 'Get merchant ARR' })
+  @ApiOperation({
+    summary: 'Get merchant ARR',
+    description:
+      'Annual Recurring Revenue (MRR × 12) for the organization linked to the API key (org default currency). Scoped to that org even if the merchant belongs to multiple organizations.',
+  })
   @ApiParam({ name: 'id', description: 'Merchant UUID' })
   @ApiResponse({ status: 200, type: MerchantArrResponseDto })
   getArr(@Param('id') id: string, @CurrentUser() user: AuthContext) {

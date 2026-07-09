@@ -16,7 +16,7 @@ export function buildServerInstructions(mode: InstructionMode): string {
       ? '- Merchant key: x-lomi-api-key or x-api-key on MCP session initialize (required for tool calls).'
       : '- Merchant key: LOMI_SECRET_KEY or X_API_KEY in server environment.',
     mode === 'http'
-      ? '- Transport gate: Authorization Bearer LOMI_MCP_BEARER_TOKEN when configured on the host.'
+      ? '- Your API key alone unlocks the hosted endpoint; a shared transport secret (Authorization Bearer LOMI_MCP_BEARER_TOKEN) is optional/legacy.'
       : '',
     '',
     'Best practices:',

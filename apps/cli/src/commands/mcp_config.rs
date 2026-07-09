@@ -49,7 +49,6 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
                 "lomi": {
                     "url": format!("{}/mcp", args.url.trim_end_matches('/')),
                     "headers": {
-                        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
                         "x-lomi-api-key": api_key.clone().unwrap_or_else(|| key_placeholder.to_string())
                     }
                 }
@@ -61,7 +60,6 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
                     "type": "http",
                     "url": format!("{}/mcp", args.url.trim_end_matches('/')),
                     "headers": {
-                        "Authorization": "Bearer YOUR_TRANSPORT_SECRET",
                         "x-lomi-api-key": api_key.clone().unwrap_or_else(|| key_placeholder.to_string())
                     }
                 }
