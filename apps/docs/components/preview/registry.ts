@@ -83,7 +83,7 @@ export const registry: Registry = {
     },
     {
       name: 'og/mono',
-      description: 'Open graph image generation (mono-style)',
+      description: 'Open graph image generation',
       files: [
         {
           type: 'lib',
@@ -91,11 +91,11 @@ export const registry: Registry = {
         },
         {
           type: 'lib',
-          path: '../lib/og/JetBrainsMono-Bold.ttf',
+          path: '../lib/og/Inter-SemiBold.ttf',
         },
         {
           type: 'lib',
-          path: '../lib/og/JetBrainsMono-Regular.ttf',
+          path: '../lib/og/Inter-Regular.ttf',
         },
       ],
     },

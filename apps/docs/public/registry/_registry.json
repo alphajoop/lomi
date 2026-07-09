@@ -11,7 +11,7 @@
     },
     {
       "name": "og/mono",
-      "description": "Open graph image generation (mono-style)"
+      "description": "Open graph image generation"
     }
   ]
 }
