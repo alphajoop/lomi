@@ -18,10 +18,6 @@ describe('AppController', () => {
           useValue: { emit: jest.fn() },
         },
         {
-          provide: ApiKeyGuard,
-          useValue: { canActivate: jest.fn(() => true) },
-        },
-        {
           provide: SupabaseService,
           useValue: {
             rpc: jest.fn(),
@@ -29,7 +25,10 @@ describe('AppController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(ApiKeyGuard)
+      .useValue({ canActivate: jest.fn(() => true) })
+      .compile();
 
     appController = app.get<AppController>(AppController);
   });

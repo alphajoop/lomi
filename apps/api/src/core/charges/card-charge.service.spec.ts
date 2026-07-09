@@ -33,6 +33,32 @@ import { RadarService } from '../radar/radar.service';
 import { CreateCardChargeDto } from './dto/create-card-charge.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 
+const ORGANIZATION_PAYMENT_PARAMETERS = {
+  default_currency: 'XOF',
+  allowed_currencies: ['XOF', 'USD', 'EUR'],
+  default_card_currency: 'XOF',
+  require_email: true,
+  require_phone: true,
+  require_name: true,
+  require_billing_address: false,
+  default_success_url: '',
+  default_cancel_url: '',
+  display_coupon_field: true,
+  appearance_theme: 'stripe',
+  appearance_border_radius: '4px',
+  appearance_billing_address: 'auto',
+};
+
+function mockPaymentParametersRpc(fnName: string) {
+  if (fnName === 'fetch_organization_payment_parameters') {
+    return Promise.resolve({
+      data: ORGANIZATION_PAYMENT_PARAMETERS,
+      error: null,
+    });
+  }
+  return null;
+}
+
 describe('CardChargeService', () => {
   let service: CardChargeService;
   let rpcMock: jest.Mock;
@@ -77,6 +103,10 @@ describe('CardChargeService', () => {
     service = moduleRef.get(CardChargeService);
 
     rpcMock.mockImplementation((fnName: string) => {
+      const paymentParams = mockPaymentParametersRpc(fnName);
+      if (paymentParams) {
+        return paymentParams;
+      }
       if (fnName === 'prepare_stripe_payment_amount') {
         return Promise.resolve({
           data: [
@@ -230,6 +260,10 @@ describe('CardChargeService', () => {
 
   it('throws BadRequestException when amount preparation fails', async () => {
     rpcMock.mockImplementation((fnName: string) => {
+      const paymentParams = mockPaymentParametersRpc(fnName);
+      if (paymentParams) {
+        return paymentParams;
+      }
       if (fnName === 'prepare_stripe_payment_amount') {
         return Promise.resolve({ data: null, error: { message: 'conv' } });
       }
@@ -251,6 +285,10 @@ describe('CardChargeService', () => {
 
   it('throws BadRequestException when create_or_update_customer fails', async () => {
     rpcMock.mockImplementation((fnName: string) => {
+      const paymentParams = mockPaymentParametersRpc(fnName);
+      if (paymentParams) {
+        return paymentParams;
+      }
       if (fnName === 'prepare_stripe_payment_amount') {
         return Promise.resolve({
           data: [
@@ -282,7 +320,11 @@ describe('CardChargeService', () => {
 
   it('throws BadRequestException when create_stripe_transaction fails', async () => {
     rpcMock.mockImplementation((fnName: string) => {
-      if (fnName === 'create_stripe_payment_amount') {
+      const paymentParams = mockPaymentParametersRpc(fnName);
+      if (paymentParams) {
+        return paymentParams;
+      }
+      if (fnName === 'prepare_stripe_payment_amount') {
         return Promise.resolve({
           data: [
             {

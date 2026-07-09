@@ -12,8 +12,6 @@ import {
   createCustomer,
   ensureReferenceData,
 } from './support/seed';
-import { seedPaymentCtx } from './support/payments';
-
 /**
  * SPI checkout / POS RPCs. Provisions a local SPI account (no external BCEAO
  * credentials) and exercises prepare_* paths that only touch Postgres.

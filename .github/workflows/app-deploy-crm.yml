@@ -1,14 +1,9 @@
 name: lomi · deploy · crm
 
+# Manual-only: CRM is an unused Twenty fork. Do not auto-deploy on push.
 on:
   repository_dispatch:
     types: [lomi-deploy-crm]
-  push:
-    branches: [main]
-    paths:
-      - "apps/crm/**"
-      - ".github/workflows/app-deploy-crm.yml"
-      - ".github/actions/checkout-app-submodule/**"
   workflow_dispatch:
     inputs:
       ref:

@@ -1,14 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { callFn, callScalar, dbDescribe, withRollback } from './support/client';
-import {
-  createCheckoutSession,
-  createCheckoutSessionRpc,
-} from './support/checkout';
+import { createCheckoutSession } from './support/checkout';
 import { createStripeCardTransaction, getTransaction } from './support/seed';
 import {
   accountBalance,
   completedCreditedLiveTx,
-  createTx,
   seedPaymentCtx,
 } from './support/payments';
 

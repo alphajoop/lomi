@@ -363,7 +363,7 @@ describe('ApiKeyGuard', () => {
     );
   });
 
-  it('serves non-network auth from Redis cache and skips Supabase', async () => {
+  it('serves non-network GET auth from Redis cache and skips Supabase', async () => {
     redis.get.mockResolvedValue(
       JSON.stringify({
         merchantId: 'm-cached',
@@ -379,6 +379,48 @@ describe('ApiKeyGuard', () => {
       }),
     );
 
+    // Identity cache is only used for safe read methods so write paths
+    // always re-validate (e.g. revoked or read-only keys).
+    const req: any = {
+      headers: { 'x-api-key': 'sk_cached' },
+      url: '/me',
+      method: 'GET',
+      ip: '127.0.0.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).not.toHaveBeenCalled();
+    expect(req.user.merchantId).toBe('m-cached');
+    expect(req.user.organizationId).toBe('o-cached');
+  });
+
+  it('bypasses Redis identity cache for non-network POST requests', async () => {
+    redis.get.mockResolvedValue(
+      JSON.stringify({
+        merchantId: 'm-cached',
+        actorOrganizationId: 'o-cached',
+        targetOrganizationId: 'o-cached',
+        organizationId: 'o-cached',
+        environment: 'live',
+        isNetworkRequest: false,
+        networkAccountId: null,
+        networkMembershipId: null,
+        publicAccountId: null,
+        networkCapabilityKey: null,
+      }),
+    );
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm-fresh',
+          organization_id: 'o-fresh',
+          environment: 'live',
+        },
+      ],
+      error: null,
+    });
+
     const req: any = {
       headers: { 'x-api-key': 'sk_cached' },
       url: '/checkout-sessions',
@@ -387,9 +429,8 @@ describe('ApiKeyGuard', () => {
     };
 
     await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
-    expect(supabase.rpc).not.toHaveBeenCalled();
-    expect(req.user.merchantId).toBe('m-cached');
-    expect(req.user.organizationId).toBe('o-cached');
+    expect(supabase.rpc).toHaveBeenCalled();
+    expect(req.user.merchantId).toBe('m-fresh');
   });
 
   it('writes Redis cache after a successful non-network verify', async () => {

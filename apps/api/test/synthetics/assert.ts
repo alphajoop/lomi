@@ -325,14 +325,7 @@ export function validateWebhookListHasNoSecrets(body: unknown): string | null {
   return null;
 }
 
-const LOG_TYPES = [
-  'api_request',
-  'api_error',
-  'webhook_delivery',
-  'activity',
-] as const;
-
-type LogType = (typeof LOG_TYPES)[number];
+type LogType = 'api_request' | 'api_error' | 'webhook_delivery' | 'activity';
 
 /** Validates GET /logs list envelope and optional minimum useful entries. */
 export function validateLogsListResponse(
