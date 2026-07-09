@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { fromJSONSchema } from 'zod';
 
+import { toolNameFromOperation } from './generator/openapi-helpers.js';
 import type { ManifestTool, ToolsManifest } from './manifest.js';
 import { callLomiRest, formatHttpResult } from './lomi-http.js';
 import { getLomiApiBaseUrl, getOptionalMerchantApiKey } from './env-config.js';
@@ -13,6 +14,13 @@ export type ToolRegistrationContext = {
   getApiKey: () => string | null;
   readOnlyOnly?: boolean;
 };
+
+/** Pre-override mechanical name (lomi_{method}_{path}) kept for MCP client caches. */
+export function legacyToolName(tool: ManifestTool): string | null {
+  if (!tool.pathTemplate) return null;
+  const legacy = toolNameFromOperation(tool.method, tool.pathTemplate);
+  return legacy === tool.name ? null : legacy;
+}
 
 function registerOneTool(
   server: McpServer,
@@ -114,5 +122,9 @@ export function registerMerchantTools(
   for (const tool of manifest.tools) {
     if (readOnlyOnly && !tool.readOnly) continue;
     registerOneTool(server, tool, fullCtx);
+    const legacyName = legacyToolName(tool);
+    if (legacyName) {
+      registerOneTool(server, { ...tool, name: legacyName }, fullCtx);
+    }
   }
 }
