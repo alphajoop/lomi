@@ -24,6 +24,15 @@ function createWebhookBodyTestApp() {
   }
 
   app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+  app.post('/oauth/token', (req, res) => {
+    res.status(200).json({
+      bodyDefined: req.body !== undefined && req.body !== null,
+      grantType: (req.body as { grant_type?: string })?.grant_type,
+      code: (req.body as { code?: string })?.code,
+    });
+  });
 
   app.post('/webhooks', (req, res) => {
     res.status(201).json({
@@ -95,6 +104,18 @@ describe('webhook body parsing middleware', () => {
     expect(res.body.parsed.isBuffer).toBe(false);
     expect(res.body.parsed.url).toBe('https://example.com/hooks/test');
     expect(res.body.parsed.events).toEqual(['PAYMENT_SUCCEEDED']);
+  });
+
+  it('parses form-urlencoded POST /oauth/token (OAuth RFC 6749) into an object', async () => {
+    const res = await request(app)
+      .post('/oauth/token')
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .send('grant_type=authorization_code&code=abc123&client_id=lomi_oauth_x');
+
+    expect(res.status).toBe(200);
+    expect(res.body.bodyDefined).toBe(true);
+    expect(res.body.grantType).toBe('authorization_code');
+    expect(res.body.code).toBe('abc123');
   });
 
   it('keeps provider POST /webhooks/stripe as raw bytes for signature verify', async () => {

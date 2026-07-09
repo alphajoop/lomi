@@ -54,6 +54,10 @@ async function bootstrap() {
 
   // Regular JSON body parser for API routes
   expressApp.use(express.json({ limit: '10mb' }));
+  // Form-encoded parser: OAuth 2.0 token/revoke requests use
+  // application/x-www-form-urlencoded (RFC 6749). Without this the body is
+  // undefined and /oauth/token 500s for standard OAuth clients.
+  expressApp.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   const app = await NestFactory.create(
     AppModule,
