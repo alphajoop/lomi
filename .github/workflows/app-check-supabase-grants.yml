@@ -1,0 +1,66 @@
+name: lomi · check · supabase · grants
+
+on:
+  schedule:
+    # Daily 07:00 UTC — catch authenticated GRANT drift before merchants do
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/dashboard/**"
+      - ".github/workflows/app-check-supabase-grants.yml"
+      - ".github/actions/checkout-app-submodule/**"
+  pull_request:
+    paths:
+      - "apps/dashboard/**"
+      - ".github/workflows/app-check-supabase-grants.yml"
+      - ".github/actions/checkout-app-submodule/**"
+
+jobs:
+  grants-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load local actions
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/checkout-app-submodule
+
+      - name: Checkout dashboard source
+        uses: ./.github/actions/checkout-app-submodule
+        with:
+          repository: lomiafrica/dashboard
+          submodule-path: apps/dashboard
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          event-name: ${{ github.event_name }}
+
+      - name: Install psql client
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Check authenticated table grants
+        working-directory: ./apps/dashboard
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::SUPABASE_DB_URL secret is not set"
+            exit 1
+          fi
+          node src/lib/scripts/check-authenticated-grants.mjs
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "SLACK_WEBHOOK_URL not set; skipping notification"
+            exit 0
+          fi
+          curl -sS -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "{\"text\":\"Supabase authenticated GRANT drift detected on ${GITHUB_REPOSITORY} (${GITHUB_REF_NAME}). Merchants may see 403 / 42501 permission denied. See ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}"
