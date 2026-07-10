@@ -9,30 +9,29 @@ on:
     branches: [main, develop]
     paths:
       - "apps/dashboard/**"
+      - ".github/scripts/check-authenticated-grants.mjs"
       - ".github/workflows/app-check-supabase-grants.yml"
-      - ".github/actions/checkout-app-submodule/**"
   pull_request:
     paths:
       - "apps/dashboard/**"
+      - ".github/scripts/check-authenticated-grants.mjs"
       - ".github/workflows/app-check-supabase-grants.yml"
-      - ".github/actions/checkout-app-submodule/**"
 
 jobs:
   grants-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Load local actions
+      - name: Checkout monorepo (script)
+        uses: actions/checkout@v5
+
+      - name: Checkout dashboard (enable_rls.sql)
         uses: actions/checkout@v5
         with:
-          sparse-checkout: .github/actions/checkout-app-submodule
-
-      - name: Checkout dashboard source
-        uses: ./.github/actions/checkout-app-submodule
-        with:
           repository: lomiafrica/dashboard
-          submodule-path: apps/dashboard
+          # Always audit against dashboard main (canonical migrations live there)
+          ref: main
           token: ${{ secrets.REPO_CHECKOUT_PAT }}
-          event-name: ${{ github.event_name }}
+          path: apps/dashboard
 
       - name: Install psql client
         run: |
@@ -41,19 +40,29 @@ jobs:
           sudo apt-get install -y postgresql-client
 
       - name: Check authenticated table grants
-        working-directory: ./apps/dashboard
+        id: grants
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          ENABLE_RLS_SQL: apps/dashboard/supabase/migrations/20240828000040_enable_rls.sql
         run: |
           set -euo pipefail
           if [ -z "${SUPABASE_DB_URL:-}" ]; then
             echo "::error::SUPABASE_DB_URL secret is not set"
-            exit 1
+            exit 2
           fi
-          node src/lib/scripts/check-authenticated-grants.mjs
+          if [ ! -f "$ENABLE_RLS_SQL" ]; then
+            echo "::error::Missing $ENABLE_RLS_SQL after dashboard checkout (is REPO_CHECKOUT_PAT valid?)"
+            exit 2
+          fi
+          set +e
+          node .github/scripts/check-authenticated-grants.mjs
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit "$code"
 
-      - name: Notify Slack on failure
-        if: failure()
+      - name: Notify Slack on grant drift
+        if: failure() && steps.grants.outputs.exit_code == '1'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
