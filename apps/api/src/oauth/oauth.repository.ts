@@ -237,6 +237,23 @@ export class OAuthRepository {
     return Boolean(userData.user?.email_confirmed_at);
   }
 
+  async verifyDashboardOrgAccess(input: {
+    merchantId: string;
+    organizationId: string;
+    permissionKey?: string | null;
+  }): Promise<boolean> {
+    const { data, error } = await this.supabase.rpc(
+      'verify_dashboard_org_access' as never,
+      {
+        p_merchant_id: input.merchantId,
+        p_organization_id: input.organizationId,
+        p_permission_key: input.permissionKey ?? null,
+      } as never,
+    );
+    if (error) throw error;
+    return data === true;
+  }
+
   async mintMerchantConnectionKey(input: {
     merchantId: string;
     organizationId: string;

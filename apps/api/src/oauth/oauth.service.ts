@@ -142,6 +142,15 @@ export class OAuthService {
         throw new BadRequestException('organization_id is required');
       }
 
+      const hasOrgAccess = await this.repository.verifyDashboardOrgAccess({
+        merchantId: params.userId,
+        organizationId: params.organizationId,
+        permissionKey: 'api_key.manage',
+      });
+      if (!hasOrgAccess) {
+        throw new ForbiddenException('Access denied for organization');
+      }
+
       const client = await this.repository.getClient(params.clientId);
       const clientName =
         typeof client?.client_name === 'string'
