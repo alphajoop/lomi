@@ -1,6 +1,8 @@
 name: lomi · security · gitleaks
 
 # Cheap secret scan: every PR/push to protected branches + weekly catch-up.
+# Uses the OSS gitleaks binary (no GITLEAKS_LICENSE). The official
+# gitleaks/gitleaks-action@v2 requires a paid org license.
 on:
   push:
     branches: [main, develop]
@@ -20,10 +22,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run gitleaks
-        uses: gitleaks/gitleaks-action@v2
+      - name: Install gitleaks
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-path: .gitleaks.toml
-          redact: true
+          GITLEAKS_VERSION: "8.30.1"
+        run: |
+          set -euo pipefail
+          curl -sSL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Run gitleaks
+        run: |
+          set -euo pipefail
+          gitleaks detect \
+            --source . \
+            --config .gitleaks.toml \
+            --redact \
+            --verbose \
+            --exit-code 1
