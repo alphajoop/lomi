@@ -76,8 +76,7 @@ async function main(): Promise<void> {
 
     const { method, path: routePath, operation } = entry;
     const rawPathItem = spec.paths?.[routePath] as
-      | { parameters?: unknown[] }
-      | undefined;
+      { parameters?: unknown[] } | undefined;
 
     const mdxFr = renderOperationPageMdx({
       method,

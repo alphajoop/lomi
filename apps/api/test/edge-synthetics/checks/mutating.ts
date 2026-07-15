@@ -88,11 +88,13 @@ export async function runMutatingChecks(
   }
 
   const session = unwrapData(getRes.data) as Record<string, unknown>;
-  const organizationId = pickString(getRes.data, 'organization_id') ??
+  const organizationId =
+    pickString(getRes.data, 'organization_id') ??
     (typeof session.organization_id === 'string'
       ? session.organization_id
       : undefined);
-  const merchantId = pickString(getRes.data, 'merchant_id') ??
+  const merchantId =
+    pickString(getRes.data, 'merchant_id') ??
     (typeof session.merchant_id === 'string' ? session.merchant_id : undefined);
   const currency = pickString(getRes.data, 'currency_code') ?? 'XOF';
 
@@ -108,22 +110,18 @@ export async function runMutatingChecks(
   ctx.merchantId = merchantId;
 
   const started = Date.now();
-  const piRes = await edge.invoke(
-    'create-stripe-payment-intent',
-    'POST',
-    {
-      body: {
-        organization_id: organizationId,
-        merchant_id: merchantId,
-        amount: 1000,
-        currency,
-        checkoutSessionId,
-        customer_email: `synthetics+${ctx.runId}@lomi.test`,
-        customer_name: 'Edge Synthetics',
-        environment: 'test',
-      },
+  const piRes = await edge.invoke('create-stripe-payment-intent', 'POST', {
+    body: {
+      organization_id: organizationId,
+      merchant_id: merchantId,
+      amount: 1000,
+      currency,
+      checkoutSessionId,
+      customer_email: `synthetics+${ctx.runId}@lomi.test`,
+      customer_name: 'Edge Synthetics',
+      environment: 'test',
     },
-  );
+  });
   const latencyMs = Date.now() - started;
 
   if (piRes.status === 403 || piRes.status === 400) {

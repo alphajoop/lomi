@@ -4,9 +4,7 @@ export const GIM_CURRENCY_CODE = '952';
 export const GIM_AMOUNT_MAX_DIGITS = 15;
 
 export type GimActionOutcome =
-  | 'approved'
-  | 'declined_final'
-  | 'retry_other_rail';
+  'approved' | 'declined_final' | 'retry_other_rail';
 
 const APPROVED_ACTION_CODES = new Set(['000', '001', '003', '007']);
 

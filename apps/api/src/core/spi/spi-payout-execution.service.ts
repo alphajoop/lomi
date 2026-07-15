@@ -106,9 +106,9 @@ export class SpiPayoutExecutionService {
 
       return { payoutId, spiTxId, spiStatus: spiResponse.statut };
     } catch (error) {
-      if (
-        !(error instanceof Error && error.message === 'SPI rejected payout')
-      ) {
+      if (!(
+        error instanceof Error && error.message === 'SPI rejected payout'
+      )) {
         await this.failPayout(
           payoutId,
           spiTxId,

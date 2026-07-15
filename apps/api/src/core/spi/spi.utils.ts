@@ -1,14 +1,7 @@
 import { WebhookEvent } from '../../utils/types/api';
 
 export type UemoaCountryCode =
-  | 'BJ'
-  | 'BF'
-  | 'CI'
-  | 'ML'
-  | 'NE'
-  | 'SN'
-  | 'TG'
-  | 'GW';
+  'BJ' | 'BF' | 'CI' | 'ML' | 'NE' | 'SN' | 'TG' | 'GW';
 
 const UEMOA_COUNTRIES = new Set<string>([
   'BJ',

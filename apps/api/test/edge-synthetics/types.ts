@@ -25,8 +25,7 @@ export interface CheckDefinition {
   method: HttpMethod;
   body?: unknown | ((ctx: SuiteContext) => unknown);
   headers?:
-    | Record<string, string>
-    | ((ctx: SuiteContext) => Record<string, string>);
+    Record<string, string> | ((ctx: SuiteContext) => Record<string, string>);
   /** When false, omit Authorization (apikey still sent). Default true. */
   auth?: boolean;
   expectStatus?: number | number[] | ((ctx: SuiteContext) => number | number[]);

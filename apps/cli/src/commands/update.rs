@@ -79,9 +79,7 @@ async fn update_sdk(_common: &CommonOptions, path: &str) -> Result<()> {
         bail!("Failed to update @lomi./sdk");
     }
 
-    cli::output::print_success(&format!(
-        "Updated @lomi./sdk (CLI version {cli_version})"
-    ));
+    cli::output::print_success(&format!("Updated @lomi./sdk (CLI version {cli_version})"));
     cli::banner::print_outro("SDK update complete");
     Ok(())
 }

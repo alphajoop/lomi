@@ -220,7 +220,9 @@ mod tests {
             Some("test_token")
         );
         assert_eq!(
-            loaded.profile("sandbox").and_then(|p| p.token_suffix.as_deref()),
+            loaded
+                .profile("sandbox")
+                .and_then(|p| p.token_suffix.as_deref()),
             Some("oken")
         );
         Ok(())

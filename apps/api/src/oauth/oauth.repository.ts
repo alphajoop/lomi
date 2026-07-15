@@ -83,8 +83,7 @@ export class OAuthRepository {
     );
     if (error) throw error;
     const row = (Array.isArray(data) ? data[0] : data) as unknown as
-      | { provisioning_key_id: string; provisioning_key: string }
-      | undefined;
+      { provisioning_key_id: string; provisioning_key: string } | undefined;
     if (!row) throw new Error('Failed to mint self-service provisioning key');
     return row;
   }
@@ -99,8 +98,7 @@ export class OAuthRepository {
     );
     if (error) throw error;
     const row = (Array.isArray(data) ? data[0] : data) as unknown as
-      | { provisioning_key_id: string; provisioning_key: string }
-      | undefined;
+      { provisioning_key_id: string; provisioning_key: string } | undefined;
     return row ?? null;
   }
 
@@ -135,8 +133,7 @@ export class OAuthRepository {
     );
     if (error) throw error;
     const row = (Array.isArray(data) ? data[0] : data) as unknown as
-      | { code: string; expires_at: string }
-      | undefined;
+      { code: string; expires_at: string } | undefined;
     if (!row) throw new Error('Failed to create authorization code');
     return row;
   }
@@ -273,8 +270,7 @@ export class OAuthRepository {
     );
     if (error) throw error;
     const row = (Array.isArray(data) ? data[0] : data) as unknown as
-      | { api_key: string }
-      | undefined;
+      { api_key: string } | undefined;
     if (!row?.api_key) {
       throw new Error('Failed to mint merchant connection key');
     }

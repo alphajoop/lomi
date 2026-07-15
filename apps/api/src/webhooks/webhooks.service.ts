@@ -142,9 +142,8 @@ export class WebhooksService {
 
   async update(id: string, updateDto: UpdateWebhookDto, user: AuthContext) {
     let authorizedEvents:
-      | Database['public']['Enums']['webhook_event'][]
-      | null
-      | undefined = undefined;
+      Database['public']['Enums']['webhook_event'][] | null | undefined =
+      undefined;
     if (updateDto.authorized_events !== undefined) {
       authorizedEvents = this.normalizeEvents(updateDto.authorized_events);
     }

@@ -122,10 +122,7 @@ export class SpiCheckoutService {
       );
 
       const spiStatus = (spiResponse.statut ?? 'INITIE') as
-        | 'INITIE'
-        | 'ENVOYE'
-        | 'IRREVOCABLE'
-        | 'REJETE';
+        'INITIE' | 'ENVOYE' | 'IRREVOCABLE' | 'REJETE';
 
       const { error: finalizeError } = await this.supabase.rpc(
         'finalize_pos_spi_payment_initiated' as never,

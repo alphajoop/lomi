@@ -7,7 +7,14 @@ use crate::api::ApiClient;
 use crate::auth::session::ensure_authenticated;
 use crate::cli::{self, CommonOptions};
 
-type CheckoutFields = (Option<String>, Option<f64>, String, String, String, Option<String>);
+type CheckoutFields = (
+    Option<String>,
+    Option<f64>,
+    String,
+    String,
+    String,
+    Option<String>,
+);
 
 #[derive(Args, Debug)]
 pub struct CheckoutArgs {
@@ -22,7 +29,9 @@ pub enum CheckoutCommand {
 }
 
 #[derive(Args, Debug)]
-#[command(after_help = "Example:\n  lomi checkout create --amount 10000 --currency XOF \\\n    --success-url https://example.com/success \\\n    --cancel-url https://example.com/cancel --json")]
+#[command(
+    after_help = "Example:\n  lomi checkout create --amount 10000 --currency XOF \\\n    --success-url https://example.com/success \\\n    --cancel-url https://example.com/cancel --json"
+)]
 pub struct CheckoutCreateArgs {
     /// Checkout amount (omit when using --price-id)
     #[arg(long)]
@@ -74,10 +83,7 @@ pub async fn run(common: &CommonOptions, args: CheckoutArgs) -> Result<()> {
     }
 }
 
-async fn create_checkout_session(
-    common: &CommonOptions,
-    args: CheckoutCreateArgs,
-) -> Result<()> {
+async fn create_checkout_session(common: &CommonOptions, args: CheckoutCreateArgs) -> Result<()> {
     let json = cli::output::should_use_json(common);
     if !json {
         cli::banner::print_intro("Create a checkout session");
@@ -212,8 +218,7 @@ fn resolve_interactive(args: &CheckoutCreateArgs) -> Result<CheckoutFields> {
     let customer_email = if let Some(email) = &args.customer_email {
         Some(email.clone())
     } else {
-        let email: String =
-            cli::prompts::text("Customer email (optional, press Enter to skip):")?;
+        let email: String = cli::prompts::text("Customer email (optional, press Enter to skip):")?;
         if email.trim().is_empty() {
             None
         } else {
@@ -221,7 +226,14 @@ fn resolve_interactive(args: &CheckoutCreateArgs) -> Result<CheckoutFields> {
         }
     };
 
-    Ok((price_id, amount, currency, success_url, cancel_url, customer_email))
+    Ok((
+        price_id,
+        amount,
+        currency,
+        success_url,
+        cancel_url,
+        customer_email,
+    ))
 }
 
 fn print_embed_snippet(checkout_url: &str) {

@@ -85,10 +85,7 @@ async fn list_payouts(common: &CommonOptions, args: PayoutsListArgs) -> Result<(
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let mut path = format!(
-        "/payouts?page={}&pageSize={}",
-        args.page, args.page_size
-    );
+    let mut path = format!("/payouts?page={}&pageSize={}", args.page, args.page_size);
     if let Some(status) = &args.status {
         path.push_str(&format!("&status={status}"));
     }
@@ -98,7 +95,10 @@ async fn list_payouts(common: &CommonOptions, args: PayoutsListArgs) -> Result<(
         return cli::output::print_json(&rows);
     }
 
-    println!("{}", serde_json::to_string_pretty(&rows).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&rows).unwrap_or_default()
+    );
     Ok(())
 }
 
@@ -127,15 +127,17 @@ async fn create_payout(common: &CommonOptions, args: PayoutsCreateArgs) -> Resul
         Some(v) => v,
         None => bail!("--rail is required (wave|mtn|spi|bank)"),
     };
-    let amount = args.amount.ok_or_else(|| anyhow::anyhow!("--amount is required"))?;
+    let amount = args
+        .amount
+        .ok_or_else(|| anyhow::anyhow!("--amount is required"))?;
 
     let recipient = if destination == "beneficiary" {
-        let name = args
-            .recipient_name
-            .ok_or_else(|| anyhow::anyhow!("--recipient-name is required for beneficiary payouts"))?;
-        let phone = args
-            .recipient_phone
-            .ok_or_else(|| anyhow::anyhow!("--recipient-phone is required for beneficiary payouts"))?;
+        let name = args.recipient_name.ok_or_else(|| {
+            anyhow::anyhow!("--recipient-name is required for beneficiary payouts")
+        })?;
+        let phone = args.recipient_phone.ok_or_else(|| {
+            anyhow::anyhow!("--recipient-phone is required for beneficiary payouts")
+        })?;
         Some(Recipient { name, phone })
     } else {
         None
@@ -165,6 +167,9 @@ async fn create_payout(common: &CommonOptions, args: PayoutsCreateArgs) -> Resul
     }
 
     cli::output::print_success("Payout created");
-    println!("{}", serde_json::to_string_pretty(&response).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&response).unwrap_or_default()
+    );
     Ok(())
 }

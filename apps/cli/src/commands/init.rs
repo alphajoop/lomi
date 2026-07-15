@@ -12,7 +12,9 @@ use crate::commands::ui;
 use crate::config::{Environment, GlobalConfig, Language};
 
 #[derive(Args, Debug)]
-#[command(after_help = "Example:\n  lomi init\n  lomi init --yes --environment sandbox --language ts --api-key lomi_sk_test_xxx")]
+#[command(
+    after_help = "Example:\n  lomi init\n  lomi init --yes --environment sandbox --language ts --api-key lomi_sk_test_xxx"
+)]
 pub struct InitArgs {
     /// Project path (default: current directory)
     #[arg(default_value = ".")]
@@ -85,11 +87,7 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
         Language::from_str(args.language.as_ref().unwrap())?
     } else {
         let choices = vec![Language::TypeScript, Language::JavaScript];
-        cli::prompts::select(
-            "Generate example code in:",
-            choices,
-            Language::TypeScript,
-        )?
+        cli::prompts::select("Generate example code in:", choices, Language::TypeScript)?
     };
 
     let api_key = if args.yes {
@@ -193,10 +191,8 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
             )
             .await?;
         } else {
-            let install_rules_prompt = cli::prompts::confirm(
-                "Install lomi. agent rules for Cursor / Claude Code?",
-                true,
-            )?;
+            let install_rules_prompt =
+                cli::prompts::confirm("Install lomi. agent rules for Cursor / Claude Code?", true)?;
 
             if install_rules_prompt {
                 install_rules::run(
@@ -221,15 +217,12 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
             ui::install_for_init(&project_dir, component, args.yes, false).await?;
             cli::output::print_success(&format!("Installed lomi. UI component: {component}"));
         } else if !args.yes {
-            let install_ui = cli::prompts::confirm(
-                "Install a lomi. UI checkout component?",
-                false,
-            )?;
+            let install_ui =
+                cli::prompts::confirm("Install a lomi. UI checkout component?", false)?;
 
             if install_ui {
                 let index = crate::ui::registry::fetch_index().await?;
-                let names: Vec<String> =
-                    index.items.iter().map(|item| item.name.clone()).collect();
+                let names: Vec<String> = index.items.iter().map(|item| item.name.clone()).collect();
 
                 if names.is_empty() {
                     cli::output::print_dim("No lomi. UI components available in registry.");
@@ -241,14 +234,13 @@ pub async fn run(common: &CommonOptions, args: InitArgs) -> Result<()> {
                         .or_else(|| names.first().cloned())
                         .unwrap_or_default();
 
-                    let component = cli::prompts::select(
-                        "Which component should we install?",
-                        names,
-                        default,
-                    )?;
+                    let component =
+                        cli::prompts::select("Which component should we install?", names, default)?;
 
                     ui::install_for_init(&project_dir, &component, false, false).await?;
-                    cli::output::print_success(&format!("Installed lomi. UI component: {component}"));
+                    cli::output::print_success(&format!(
+                        "Installed lomi. UI component: {component}"
+                    ));
                 }
             }
         }

@@ -108,10 +108,7 @@ pub async fn login(options: LoginOptions) -> Result<String> {
             ));
         }
     } else if !options.silent {
-        println!(
-            "  Visit manually: {}",
-            device_auth.verification_uri.cyan()
-        );
+        println!("  Visit manually: {}", device_auth.verification_uri.cyan());
     }
 
     if !options.silent {

@@ -122,10 +122,7 @@ export class SpiPosService {
       );
 
       const spiStatus = (spiResponse.statut ?? 'INITIE') as
-        | 'INITIE'
-        | 'ENVOYE'
-        | 'IRREVOCABLE'
-        | 'REJETE';
+        'INITIE' | 'ENVOYE' | 'IRREVOCABLE' | 'REJETE';
 
       let qrPayload: string | null = null;
       if (options.mode === 'mpm') {

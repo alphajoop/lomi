@@ -24,9 +24,6 @@ pub async fn run(_common: &CommonOptions, args: SwitchArgs) -> Result<()> {
     config.current_profile = args.profile.clone();
     config.save()?;
 
-    cli::output::print_success(&format!(
-        "Switched default profile to `{}`",
-        args.profile
-    ));
+    cli::output::print_success(&format!("Switched default profile to `{}`", args.profile));
     Ok(())
 }

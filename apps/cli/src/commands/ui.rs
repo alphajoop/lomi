@@ -3,7 +3,7 @@ use clap::{Args, Subcommand};
 use colored::Colorize;
 use std::path::Path;
 
-use crate::cli::{self, CommonOptions, lomi_ui_registry_url};
+use crate::cli::{self, lomi_ui_registry_url, CommonOptions};
 use crate::ui::{
     installer::{self, InstallOptions},
     lockfile,
@@ -179,10 +179,7 @@ async fn run_add(args: AddArgs) -> Result<()> {
 
     if !args.dry_run {
         lockfile.save(project_dir)?;
-        cli::output::print_success(&format!(
-            "Installed {} component(s)",
-            names.len()
-        ));
+        cli::output::print_success(&format!("Installed {} component(s)", names.len()));
     }
 
     cli::banner::print_outro("lomi. UI install complete");
@@ -196,9 +193,7 @@ async fn run_update(args: UpdateArgs) -> Result<()> {
     let existing = lockfile::UiLockfile::load(project_dir)?;
     let existing = match existing {
         Some(lockfile) => lockfile,
-        None => bail!(
-            "No .lomi/ui-lock.json found. Run `lomi ui add <name>` first."
-        ),
+        None => bail!("No .lomi/ui-lock.json found. Run `lomi ui add <name>` first."),
     };
 
     let index = registry::fetch_index().await?;
@@ -270,19 +265,11 @@ pub async fn install_for_init(
         .unwrap_or_else(lomi_ui_registry_url);
     let registry_version = index.version.as_deref().unwrap_or("unknown");
 
-    prereqs::ensure_prereqs(
-        project_dir,
-        &PrereqOptions { yes, dry_run },
-    )?;
-    installer::install_component(
-        project_dir,
-        name,
-        &InstallOptions { yes: true, dry_run },
-    )?;
+    prereqs::ensure_prereqs(project_dir, &PrereqOptions { yes, dry_run })?;
+    installer::install_component(project_dir, name, &InstallOptions { yes: true, dry_run })?;
 
     if !dry_run {
-        let mut lockfile =
-            lockfile::load_or_create(registry_version, &registry_url, project_dir)?;
+        let mut lockfile = lockfile::load_or_create(registry_version, &registry_url, project_dir)?;
         lockfile.record_install(name, registry_version, &registry_url);
         lockfile.save(project_dir)?;
     }

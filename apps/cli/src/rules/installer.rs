@@ -143,13 +143,12 @@ fn merge_replace_section(path: &Path, section_name: &str, section: &str) -> Resu
     if path.exists() {
         let existing = fs::read_to_string(path)?;
         if existing.contains(&marker_start) {
-            let pattern_start = existing
-                .find(&marker_start)
-                .ok_or_else(|| anyhow::anyhow!("Missing LOMI rules start marker in {}", path.display()))?;
-            let pattern_end = existing
-                .find(&marker_end)
-                .ok_or_else(|| anyhow::anyhow!("Missing LOMI rules end marker in {}", path.display()))?
-                + marker_end.len();
+            let pattern_start = existing.find(&marker_start).ok_or_else(|| {
+                anyhow::anyhow!("Missing LOMI rules start marker in {}", path.display())
+            })?;
+            let pattern_end = existing.find(&marker_end).ok_or_else(|| {
+                anyhow::anyhow!("Missing LOMI rules end marker in {}", path.display())
+            })? + marker_end.len();
             let mut updated = String::new();
             updated.push_str(&existing[..pattern_start]);
             updated.push_str(section);
@@ -196,7 +195,10 @@ mod tests {
         let rules = crate::rules::manifest::load_current_rules().unwrap();
         let installed = install_rules(&[InstallTarget::Cursor], &rules).unwrap();
         assert!(!installed.is_empty());
-        assert!(project.path().join(".cursor/rules/lomi.sdk-basics.mdc").exists());
+        assert!(project
+            .path()
+            .join(".cursor/rules/lomi.sdk-basics.mdc")
+            .exists());
 
         env::set_current_dir(cwd).unwrap();
     }

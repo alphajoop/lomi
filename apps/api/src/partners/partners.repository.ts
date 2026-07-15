@@ -78,8 +78,7 @@ export class PartnersRepository {
     );
     if (error) throw error;
     const row = (Array.isArray(data) ? data[0] : data) as unknown as
-      | Record<string, unknown>
-      | undefined;
+      Record<string, unknown> | undefined;
     if (!row) throw new Error('Failed to load partner usage');
     return row;
   }

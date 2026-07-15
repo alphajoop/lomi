@@ -38,10 +38,7 @@ pub async fn run(common: &CommonOptions, args: RadarArgs) -> Result<()> {
     }
 }
 
-async fn list_assessments(
-    common: &CommonOptions,
-    args: RadarAssessmentsListArgs,
-) -> Result<()> {
+async fn list_assessments(common: &CommonOptions, args: RadarAssessmentsListArgs) -> Result<()> {
     let json = cli::output::should_use_json(common);
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
@@ -61,7 +58,10 @@ async fn list_assessments(
     if json {
         return cli::output::print_json(&rows);
     }
-    println!("{}", serde_json::to_string_pretty(&rows).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&rows).unwrap_or_default()
+    );
     Ok(())
 }
 
@@ -74,6 +74,9 @@ async fn get_settings(common: &CommonOptions) -> Result<()> {
     if json {
         return cli::output::print_json(&rows);
     }
-    println!("{}", serde_json::to_string_pretty(&rows).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&rows).unwrap_or_default()
+    );
     Ok(())
 }

@@ -71,8 +71,7 @@ function createSupabaseE2eMock() {
 
     if (fn === 'create_checkout_session_with_line_items') {
       const lineItems = args.p_line_items as
-        | Array<{ price_id?: string }>
-        | undefined;
+        Array<{ price_id?: string }> | undefined;
       if (
         lineItems?.some(
           (item) => item.price_id === '44444444-4444-4444-4444-444444444444',

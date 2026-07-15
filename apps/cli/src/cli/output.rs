@@ -52,7 +52,12 @@ pub fn print_step(message: &str) {
 }
 
 pub fn print_kv(key: &str, value: &str) {
-    println!("{}  {}  {}", "│".bright_black(), format!("{key}:").bright_black(), value);
+    println!(
+        "{}  {}  {}",
+        "│".bright_black(),
+        format!("{key}:").bright_black(),
+        value
+    );
 }
 
 pub fn print_list_item(index: usize, command: &str, description: &str) {
@@ -132,7 +137,11 @@ pub fn render_error(error: &anyhow::Error, common: &CommonOptions) -> i32 {
                 docs_url: crate::cli::DOCS_URL.to_string(),
             },
         };
-        let _ = writeln!(std::io::stdout(), "{}", serde_json::to_string_pretty(&payload).unwrap_or_default());
+        let _ = writeln!(
+            std::io::stdout(),
+            "{}",
+            serde_json::to_string_pretty(&payload).unwrap_or_default()
+        );
         return 1;
     }
 
@@ -160,7 +169,9 @@ pub fn render_error(error: &anyhow::Error, common: &CommonOptions) -> i32 {
     1
 }
 
-fn extract_error_details(error: &anyhow::Error) -> (String, Option<String>, Option<String>, Option<String>) {
+fn extract_error_details(
+    error: &anyhow::Error,
+) -> (String, Option<String>, Option<String>, Option<String>) {
     if let Some(api_error) = error.downcast_ref::<ApiError>() {
         return (
             api_error.to_string(),
@@ -181,12 +192,18 @@ fn extract_error_details(error: &anyhow::Error) -> (String, Option<String>, Opti
 
 pub fn print_not_logged_in(profile: &str) {
     print_error(&format!("You are not logged in to profile `{profile}`."));
-    print_hint(&format!("Run `lomi login --profile {profile}` to get started."));
+    print_hint(&format!(
+        "Run `lomi login --profile {profile}` to get started."
+    ));
 }
 
 pub fn print_auth_expired(profile: &str) {
-    print_error(&format!("Your CLI token for profile `{profile}` has expired."));
-    print_hint(&format!("Run `lomi login --profile {profile}` to refresh it."));
+    print_error(&format!(
+        "Your CLI token for profile `{profile}` has expired."
+    ));
+    print_hint(&format!(
+        "Run `lomi login --profile {profile}` to refresh it."
+    ));
 }
 
 pub fn print_update_available(current: &str, latest: &str) {
@@ -218,7 +235,10 @@ mod tests {
             quiet: false,
         };
         // When stdout is a TTY in tests it may vary; json flag always works
-        let with_json = CommonOptions { json: true, ..common.clone() };
+        let with_json = CommonOptions {
+            json: true,
+            ..common.clone()
+        };
         assert!(with_json.use_json());
     }
 }

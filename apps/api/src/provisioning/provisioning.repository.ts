@@ -22,9 +22,7 @@ export class ProvisioningRepository {
       throw error;
     }
     const row = (Array.isArray(data) ? data[0] : data) as
-      | QuotaRow
-      | null
-      | undefined;
+      QuotaRow | null | undefined;
     if (!row) {
       throw new Error('Failed to check provisioning quota');
     }

@@ -9,11 +9,7 @@ pub struct InstallOptions {
     pub dry_run: bool,
 }
 
-pub fn install_component(
-    project_dir: &Path,
-    name: &str,
-    options: &InstallOptions,
-) -> Result<()> {
+pub fn install_component(project_dir: &Path, name: &str, options: &InstallOptions) -> Result<()> {
     let item_url = lomi_ui_item_url(name);
     let mut args = vec!["shadcn@latest", "add", &item_url];
 

@@ -65,9 +65,7 @@ pub async fn run(common: &CommonOptions, args: DevArgs) -> Result<()> {
     );
     cli::output::divider();
 
-    let state = Arc::new(AppState {
-        verify_signature,
-    });
+    let state = Arc::new(AppState { verify_signature });
 
     let app = Router::new()
         .route("/webhook", post(handle_webhook))
@@ -181,7 +179,11 @@ async fn handle_webhook(
     let raw_body = String::from_utf8_lossy(&body);
     let header_pairs: Vec<(String, String)> = headers
         .iter()
-        .filter_map(|(k, v)| v.to_str().ok().map(|s| (k.as_str().to_string(), s.to_string())))
+        .filter_map(|(k, v)| {
+            v.to_str()
+                .ok()
+                .map(|s| (k.as_str().to_string(), s.to_string()))
+        })
         .collect();
 
     let event_type = headers
@@ -219,7 +221,10 @@ async fn handle_webhook(
                 }
             }
             println!("  {}:", "Payload".blue());
-            println!("{}", serde_json::to_string_pretty(&json).unwrap_or_default());
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&json).unwrap_or_default()
+            );
         }
         Err(_) => println!("  {}: {}", "Body".blue(), raw_body),
     }

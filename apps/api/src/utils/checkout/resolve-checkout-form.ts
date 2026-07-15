@@ -3,11 +3,7 @@ export type CheckoutFieldVisibility = 'hidden' | 'optional' | 'required';
 export type CheckoutFieldScope = 'system' | 'custom';
 
 export type SystemCheckoutFieldKey =
-  | 'name'
-  | 'email'
-  | 'phone'
-  | 'whatsapp'
-  | 'billing_address';
+  'name' | 'email' | 'phone' | 'whatsapp' | 'billing_address';
 
 export type CheckoutFieldType =
   | 'text'

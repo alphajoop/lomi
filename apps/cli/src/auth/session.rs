@@ -149,10 +149,7 @@ pub fn try_authenticated(common: &CommonOptions) -> AuthResult {
     }
 }
 
-pub async fn handle_auth_api_error(
-    common: &CommonOptions,
-    error: &anyhow::Error,
-) -> Result<()> {
+pub async fn handle_auth_api_error(common: &CommonOptions, error: &anyhow::Error) -> Result<()> {
     if let Some(api_error) = error.downcast_ref::<crate::api::ApiError>() {
         if api_error.is_unauthorized() {
             let profile = common.effective_profile()?;

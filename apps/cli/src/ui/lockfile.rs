@@ -43,12 +43,7 @@ impl UiLockfile {
         Ok(())
     }
 
-    pub fn record_install(
-        &mut self,
-        name: &str,
-        registry_version: &str,
-        registry_url: &str,
-    ) {
+    pub fn record_install(&mut self, name: &str, registry_version: &str, registry_url: &str) {
         self.registry_version = registry_version.to_string();
         self.registry_url = registry_url.to_string();
 
@@ -68,7 +63,11 @@ pub fn lockfile_path(project_dir: &Path) -> PathBuf {
     project_dir.join(".lomi").join("ui-lock.json")
 }
 
-pub fn load_or_create(registry_version: &str, registry_url: &str, project_dir: &Path) -> Result<UiLockfile> {
+pub fn load_or_create(
+    registry_version: &str,
+    registry_url: &str,
+    project_dir: &Path,
+) -> Result<UiLockfile> {
     match UiLockfile::load(project_dir)? {
         Some(lockfile) => Ok(lockfile),
         None => Ok(UiLockfile {

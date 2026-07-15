@@ -129,20 +129,12 @@ async fn handle_event(
             println!();
             cli::output::print_success("Stream connected");
             if let Some(org_id) = &event.organization_id {
-                println!(
-                    "{} {}",
-                    "Organization:".bright_black(),
-                    org_id.cyan()
-                );
+                println!("{} {}", "Organization:".bright_black(), org_id.cyan());
             }
             if let Some(secret) = &event.webhook_secret {
                 if !secret.is_empty() {
                     let masked = mask_secret(secret);
-                    println!(
-                        "{} {}",
-                        "Webhook secret:".bright_black(),
-                        masked.yellow()
-                    );
+                    println!("{} {}", "Webhook secret:".bright_black(), masked.yellow());
                     println!(
                         "{} Add to .env: LOMI_WEBHOOK_SECRET={}",
                         "○".bright_black(),
@@ -164,7 +156,10 @@ async fn handle_event(
             );
 
             if let Some(payload) = &event.payload {
-                println!("{}", serde_json::to_string_pretty(payload).unwrap_or_default());
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(payload).unwrap_or_default()
+                );
             }
 
             if let Some(url) = forward_url {

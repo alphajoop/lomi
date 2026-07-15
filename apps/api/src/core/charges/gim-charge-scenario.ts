@@ -1,8 +1,5 @@
 export type GimChargeScenarioKey =
-  | 'approved'
-  | 'declined'
-  | '3ds'
-  | 'retry_other_rail';
+  'approved' | 'declined' | '3ds' | 'retry_other_rail';
 
 /** Normalize X-Scenario-Key for sandbox GIM charge simulations. */
 export function normalizeGimScenarioKey(

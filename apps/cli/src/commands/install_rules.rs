@@ -65,12 +65,9 @@ fn resolve_targets(args: &InstallRulesArgs) -> Result<Vec<InstallTarget>> {
         .map(|target| format!("{} — {}", target.label(), target.hint()))
         .collect();
 
-    let selected = inquire::MultiSelect::new(
-        "Which AI coding setup are you using?",
-        choices,
-    )
-    .with_default(&[0, 4])
-    .prompt()?;
+    let selected = inquire::MultiSelect::new("Which AI coding setup are you using?", choices)
+        .with_default(&[0, 4])
+        .prompt()?;
 
     selected
         .iter()

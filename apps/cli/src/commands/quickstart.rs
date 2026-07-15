@@ -4,7 +4,9 @@ use colored::Colorize;
 use serde::Serialize;
 
 use crate::api::ApiClient;
-use crate::auth::session::{ensure_authenticated, try_authenticated, verify_and_refresh_metadata, AuthResult};
+use crate::auth::session::{
+    ensure_authenticated, try_authenticated, verify_and_refresh_metadata, AuthResult,
+};
 use crate::cli::{self, CommonOptions};
 use crate::commands::probe_checks::{ensure_probe_passed, run_core_checks};
 

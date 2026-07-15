@@ -31,8 +31,7 @@ export class OrganizationContextGuard implements CanActivate {
 
     const paramOrg = request.params?.organizationId as string | undefined;
     const headerOrg = request.headers['x-organization-id'] as
-      | string
-      | undefined;
+      string | undefined;
     const organizationId = paramOrg ?? headerOrg;
 
     if (!organizationId) {

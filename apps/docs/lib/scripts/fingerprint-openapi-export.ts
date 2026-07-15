@@ -55,7 +55,9 @@ function main(): void {
   }
 
   if (rows.length === 0) {
-    console.error('No files to fingerprint. Run pnpm docs:export-fr-book first.');
+    console.error(
+      'No files to fingerprint. Run pnpm docs:export-fr-book first.',
+    );
     process.exit(1);
   }
 

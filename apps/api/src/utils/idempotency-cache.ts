@@ -10,8 +10,7 @@ export type IdempotencyCacheLookup = {
 };
 
 export type IdempotencyCacheLookupResult =
-  | { kind: 'miss' }
-  | { kind: 'hit'; payload: unknown };
+  { kind: 'miss' } | { kind: 'hit'; payload: unknown };
 
 /** Read a cached idempotent response before invoking the create RPC. */
 export async function lookupIdempotencyCache(

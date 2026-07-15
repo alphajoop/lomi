@@ -3,13 +3,7 @@ import { DocsAside } from '@/components/docs/docs-aside';
 import type { DocsAsideVariant } from '@/components/docs/docs-aside';
 
 type CalloutType =
-  | 'info'
-  | 'warn'
-  | 'warning'
-  | 'error'
-  | 'success'
-  | 'idea'
-  | 'tip';
+  'info' | 'warn' | 'warning' | 'error' | 'success' | 'idea' | 'tip';
 
 type ResolvedCalloutType = 'info' | 'warning' | 'error' | 'success' | 'idea';
 

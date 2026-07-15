@@ -387,9 +387,7 @@ export class CustomersService {
     if (error) throw new Error(error.message);
 
     const row = (Array.isArray(data) ? data[0] : data) as
-      | { launch_token?: string }
-      | null
-      | undefined;
+      { launch_token?: string } | null | undefined;
     const launchToken = row?.launch_token;
 
     if (!launchToken) {

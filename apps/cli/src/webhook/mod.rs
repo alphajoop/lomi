@@ -6,8 +6,7 @@ pub fn verify_lomi_signature(raw_body: &str, signature: &str, secret: &str) -> R
     let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
         .map_err(|_| "Invalid webhook secret".to_string())?;
     mac.update(raw_body.as_bytes());
-    let sig_bytes = hex::decode(signature)
-        .map_err(|_| "Invalid signature encoding".to_string())?;
+    let sig_bytes = hex::decode(signature).map_err(|_| "Invalid signature encoding".to_string())?;
     mac.verify_slice(&sig_bytes)
         .map_err(|_| "Signature mismatch".to_string())?;
     Ok(())

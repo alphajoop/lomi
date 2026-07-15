@@ -386,8 +386,7 @@ export type Database = {
           spi_payeur_nom: string | null;
           spi_payeur_pays: string | null;
           spi_payment_request_category:
-            | APIEnums['spi_payment_request_category']
-            | null;
+            APIEnums['spi_payment_request_category'] | null;
           spi_payment_status: APIEnums['spi_payment_status'] | null;
           spi_ref_doc_numero: string | null;
           spi_ref_doc_type: APIEnums['spi_document_type'] | null;
@@ -426,8 +425,7 @@ export type Database = {
           spi_payeur_nom?: string | null;
           spi_payeur_pays?: string | null;
           spi_payment_request_category?:
-            | APIEnums['spi_payment_request_category']
-            | null;
+            APIEnums['spi_payment_request_category'] | null;
           spi_payment_status?: APIEnums['spi_payment_status'] | null;
           spi_ref_doc_numero?: string | null;
           spi_ref_doc_type?: APIEnums['spi_document_type'] | null;
@@ -466,8 +464,7 @@ export type Database = {
           spi_payeur_nom?: string | null;
           spi_payeur_pays?: string | null;
           spi_payment_request_category?:
-            | APIEnums['spi_payment_request_category']
-            | null;
+            APIEnums['spi_payment_request_category'] | null;
           spi_payment_status?: APIEnums['spi_payment_status'] | null;
           spi_ref_doc_numero?: string | null;
           spi_ref_doc_type?: APIEnums['spi_document_type'] | null;
@@ -6336,11 +6333,7 @@ export type Database = {
         | 'lifetime'
         | 'unit';
       billing_period_status:
-        | 'open'
-        | 'closing'
-        | 'closed'
-        | 'invoiced'
-        | 'void';
+        'open' | 'closing' | 'closed' | 'invoiced' | 'void';
       checkout_session_status: 'open' | 'completed' | 'expired';
       currency_code: 'XOF' | 'USD' | 'EUR';
       customer_type: 'all' | 'new' | 'returning';
@@ -6451,10 +6444,7 @@ export type Database = {
         | 'starter_business';
       link_type: 'instant' | 'product';
       network_capability_status:
-        | 'requested'
-        | 'active'
-        | 'restricted'
-        | 'revoked';
+        'requested' | 'active' | 'restricted' | 'revoked';
       network_enrollment_status:
         | 'created'
         | 'opened'
@@ -6476,19 +6466,11 @@ export type Database = {
         | 'terminated';
       network_operator_fee_type: 'fixed' | 'percentage' | 'blended';
       onboarding_status:
-        | 'pending'
-        | 'completed'
-        | 'skipped'
-        | 'failed'
-        | 'in_progress';
+        'pending' | 'completed' | 'skipped' | 'failed' | 'in_progress';
       organization_status: 'active' | 'inactive' | 'suspended';
       organization_verification_status: 'unverified' | 'starter' | 'verified';
       payment_method_code:
-        | 'CARDS'
-        | 'MOBILE_MONEY'
-        | 'BANK_TRANSFER'
-        | 'BNPL'
-        | 'FREE';
+        'CARDS' | 'MOBILE_MONEY' | 'BANK_TRANSFER' | 'BNPL' | 'FREE';
       payout_status: 'pending' | 'processing' | 'completed' | 'failed';
       platform_partner_status: 'pending' | 'active' | 'suspended';
       pricing_model: 'standard' | 'pay_what_you_want' | 'tiered' | 'volume';
@@ -6505,11 +6487,7 @@ export type Database = {
         | 'FREE'
         | 'GIM';
       provider_payment_status:
-        | 'processing'
-        | 'cancelled'
-        | 'succeeded'
-        | 'expired'
-        | 'refunded';
+        'processing' | 'cancelled' | 'succeeded' | 'expired' | 'refunded';
       provisioning_key_kind: 'platform' | 'partner_subkey' | 'self_service';
       qr_code_type: 'static' | 'dynamic';
       radar_decision: 'allow' | 'flag' | 'block';
@@ -6530,24 +6508,9 @@ export type Database = {
         | 'ULAA';
       spi_alias_type: 'SHID' | 'MBNO' | 'MCOD';
       spi_document_type:
-        | 'CINV'
-        | 'CMCN'
-        | 'DISP'
-        | 'PUOR'
-        | 'CONT'
-        | 'INVC'
-        | 'PMNT'
-        | 'TPMT';
+        'CINV' | 'CMCN' | 'DISP' | 'PUOR' | 'CONT' | 'INVC' | 'PMNT' | 'TPMT';
       spi_payment_category:
-        | '631'
-        | '000'
-        | '400'
-        | '733'
-        | '300'
-        | '999'
-        | '500'
-        | '521'
-        | '401';
+        '631' | '000' | '400' | '733' | '300' | '999' | '500' | '521' | '401';
       spi_payment_flow_type:
         | 'BANK_TO_BANK'
         | 'BANK_TO_WALLET'
@@ -6602,19 +6565,11 @@ export type Database = {
         | 'past_due'
         | 'trial';
       transaction_status:
-        | 'pending'
-        | 'completed'
-        | 'failed'
-        | 'refunded'
-        | 'expired';
+        'pending' | 'completed' | 'failed' | 'refunded' | 'expired';
       transaction_type: 'payment' | 'instalment';
       usage_aggregation: 'sum' | 'max' | 'last_during_period' | 'last_ever';
       usage_frequency:
-        | 'total'
-        | 'per_customer'
-        | 'per_day'
-        | 'per_week'
-        | 'per_month';
+        'total' | 'per_customer' | 'per_day' | 'per_week' | 'per_month';
       webhook_event:
         | 'PAYMENT_CREATED'
         | 'PAYMENT_SUCCEEDED'

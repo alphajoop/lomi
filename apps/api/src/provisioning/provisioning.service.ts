@@ -328,8 +328,7 @@ export class ProvisioningService {
       can_use_test_mode: Boolean(status.can_use_test_mode ?? true),
       can_use_live_mode: Boolean(status.can_use_live_mode),
       live_activation: status.live_activation as
-        | Record<string, unknown>
-        | undefined,
+        Record<string, unknown> | undefined,
     };
   }
 

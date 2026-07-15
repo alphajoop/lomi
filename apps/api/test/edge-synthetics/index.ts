@@ -85,15 +85,17 @@ async function main(): Promise<void> {
         httpStatus: mutating.httpStatus,
         latencyMs: mutating.latencyMs,
         skipReason: mutating.skipReason,
-        anomalies: mutating.status === 'fail'
-          ? [{
-            kind: 'validation',
-            message: mutating.message ?? 'Mutating check failed',
-          }]
-          : [],
-        responsePreview: mutating.status === 'fail'
-          ? mutating.message
-          : undefined,
+        anomalies:
+          mutating.status === 'fail'
+            ? [
+                {
+                  kind: 'validation',
+                  message: mutating.message ?? 'Mutating check failed',
+                },
+              ]
+            : [],
+        responsePreview:
+          mutating.status === 'fail' ? mutating.message : undefined,
       });
       if (mutating.status === 'pass') sandboxSuite.passed += 1;
       else if (mutating.status === 'fail') sandboxSuite.failed += 1;

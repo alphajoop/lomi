@@ -123,7 +123,11 @@ fn run_dt(root: &Path, args: &[String]) -> Result<()> {
         Command::new(release_bin)
     } else if debug_bin.is_file() {
         Command::new(debug_bin)
-    } else if Command::new("dt").arg("--version").output().is_ok_and(|o| o.status.success()) {
+    } else if Command::new("dt")
+        .arg("--version")
+        .output()
+        .is_ok_and(|o| o.status.success())
+    {
         Command::new("dt")
     } else {
         let mut cargo = Command::new("cargo");

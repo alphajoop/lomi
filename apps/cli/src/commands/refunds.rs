@@ -147,7 +147,10 @@ async fn create_refund(common: &CommonOptions, args: RefundsCreateArgs) -> Resul
     }
 
     cli::output::print_success("Refund created successfully!");
-    println!("{}", serde_json::to_string_pretty(&response).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&response).unwrap_or_default()
+    );
     Ok(())
 }
 

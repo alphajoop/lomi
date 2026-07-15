@@ -42,8 +42,7 @@ function mapSecurityRequirements(
  */
 export function normalizeOpenApiSecurity(document: Document): Document {
   const schemes = document.components?.securitySchemes as
-    | Record<string, unknown>
-    | undefined;
+    Record<string, unknown> | undefined;
 
   if (schemes) {
     if (schemes['X-API-KEY'] && !schemes['api-key']) {

@@ -1,4 +1,8 @@
-import { analyzeResponse, previewResponse, scanForLeaks } from '../synthetics/assert';
+import {
+  analyzeResponse,
+  previewResponse,
+  scanForLeaks,
+} from '../synthetics/assert';
 import { EdgeFunctionsClient } from './client';
 import type {
   CheckDefinition,

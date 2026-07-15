@@ -371,9 +371,7 @@ function buildRequestBodySection(
       : '';
   const jsonContent = rb.content?.['application/json'];
   const rawSchema = jsonContent?.schema as
-    | SchemaObject
-    | ReferenceObject
-    | undefined;
+    SchemaObject | ReferenceObject | undefined;
   const resolvedSchema = resolveSchema(rawSchema, components);
 
   const schemaLabel = rawSchema

@@ -29,7 +29,9 @@ pub async fn run(common: &CommonOptions, _args: HomeArgs) -> Result<()> {
         }
         crate::auth::session::AuthResult::Expired(_) => {
             cli::output::print_auth_expired(&profile);
-            cli::output::print_hint(&format!("Run `lomi login --profile {profile}` to continue."));
+            cli::output::print_hint(&format!(
+                "Run `lomi login --profile {profile}` to continue."
+            ));
         }
         crate::auth::session::AuthResult::Failed(_) => {
             cli::output::print_not_logged_in(&profile);

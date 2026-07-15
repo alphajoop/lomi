@@ -2,11 +2,7 @@ import type { ComponentProps, ReactNode } from 'react';
 import { cn } from '@/lib/utils/cn';
 
 export type DocsAsideVariant =
-  | 'info'
-  | 'warning'
-  | 'error'
-  | 'success'
-  | 'idea';
+  'info' | 'warning' | 'error' | 'success' | 'idea';
 
 type DocsAsideProps = {
   variant: DocsAsideVariant;

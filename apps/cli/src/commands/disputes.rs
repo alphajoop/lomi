@@ -41,10 +41,7 @@ async fn list_disputes(common: &CommonOptions, args: DisputesListArgs) -> Result
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let mut path = format!(
-        "/disputes?page={}&pageSize={}",
-        args.page, args.page_size
-    );
+    let mut path = format!("/disputes?page={}&pageSize={}", args.page, args.page_size);
     if let Some(status) = &args.status {
         path.push_str(&format!("&status={status}"));
     }
@@ -53,7 +50,10 @@ async fn list_disputes(common: &CommonOptions, args: DisputesListArgs) -> Result
     if json {
         return cli::output::print_json(&rows);
     }
-    println!("{}", serde_json::to_string_pretty(&rows).unwrap_or_default());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&rows).unwrap_or_default()
+    );
     Ok(())
 }
 

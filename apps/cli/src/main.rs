@@ -8,8 +8,8 @@ mod rules;
 mod ui;
 mod webhook;
 
-use cli::app::Cli;
 use clap::Parser;
+use cli::app::Cli;
 
 #[tokio::main]
 async fn main() {

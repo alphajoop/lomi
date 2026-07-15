@@ -102,16 +102,15 @@ async fn test_webhook(common: &CommonOptions, id: &str) -> Result<()> {
 
     cli::output::print_success("Test webhook sent");
     if !response.is_null() {
-        println!("{}", serde_json::to_string_pretty(&response).unwrap_or_default());
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&response).unwrap_or_default()
+        );
     }
     Ok(())
 }
 
-async fn resend_webhook(
-    common: &CommonOptions,
-    webhook_id: &str,
-    delivery_id: &str,
-) -> Result<()> {
+async fn resend_webhook(common: &CommonOptions, webhook_id: &str, delivery_id: &str) -> Result<()> {
     let json = cli::output::should_use_json(common);
     if !json {
         cli::banner::print_intro("Resend webhook delivery");
@@ -133,7 +132,10 @@ async fn resend_webhook(
 
     cli::output::print_success("Webhook delivery resent");
     if !response.is_null() {
-        println!("{}", serde_json::to_string_pretty(&response).unwrap_or_default());
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&response).unwrap_or_default()
+        );
     }
     Ok(())
 }

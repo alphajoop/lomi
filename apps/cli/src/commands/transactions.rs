@@ -93,7 +93,10 @@ fn print_transaction_row(row: &serde_json::Value) {
         .get("status")
         .and_then(|v| v.as_str())
         .unwrap_or("unknown");
-    let amount = row.get("gross_amount").and_then(|v| v.as_f64()).unwrap_or(0.0);
+    let amount = row
+        .get("gross_amount")
+        .and_then(|v| v.as_f64())
+        .unwrap_or(0.0);
     let currency = row
         .get("currency_code")
         .and_then(|v| v.as_str())

@@ -53,7 +53,9 @@ impl FromStr for OutputFormat {
         match value.to_lowercase().as_str() {
             "human" => Ok(Self::Human),
             "json" => Ok(Self::Json),
-            _ => Err(format!("Unknown output format: {value}. Use human or json.")),
+            _ => Err(format!(
+                "Unknown output format: {value}. Use human or json."
+            )),
         }
     }
 }

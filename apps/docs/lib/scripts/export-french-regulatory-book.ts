@@ -31,10 +31,7 @@ import { spawnSync } from 'node:child_process';
 import { REST_API_SECTION_ORDER } from '@/lib/scripts/manual-api/constants';
 
 const DOCS_ROOT = join(process.cwd(), 'content/docs');
-const DEFAULT_OUT_DIR = join(
-  process.cwd(),
-  '../../docs/compliance/exports',
-);
+const DEFAULT_OUT_DIR = join(process.cwd(), '../../docs/compliance/exports');
 const DEFAULT_OUT = join(DEFAULT_OUT_DIR, 'lomi-reference-api-fr.md');
 
 const API_CONCEPT_PAGES = [
