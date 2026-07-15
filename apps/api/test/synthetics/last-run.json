@@ -1,14 +1,14 @@
 {
-  "startedAt": "2026-07-14T22:44:16.167Z",
-  "finishedAt": "2026-07-14T22:45:06.513Z",
-  "durationMs": 50342,
+  "startedAt": "2026-07-15T23:10:43.253Z",
+  "finishedAt": "2026-07-15T23:11:25.504Z",
+  "durationMs": 42246,
   "suites": [
     {
       "suite": "sandbox",
       "baseUrl": "https://sandbox.api.lomi.africa",
-      "startedAt": "2026-07-14T22:44:16.167Z",
-      "finishedAt": "2026-07-14T22:45:01.359Z",
-      "durationMs": 45188,
+      "startedAt": "2026-07-15T23:10:43.253Z",
+      "finishedAt": "2026-07-15T23:11:25.504Z",
+      "durationMs": 42246,
       "checks": [
         {
           "suite": "sandbox",
@@ -18,7 +18,7 @@
           "path": "/.well-known/oauth-authorization-server",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 3787,
+          "latencyMs": 3667,
           "anomalies": []
         },
         {
@@ -29,7 +29,7 @@
           "path": "/oauth/register",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 989,
+          "latencyMs": 1021,
           "anomalies": []
         },
         {
@@ -40,7 +40,7 @@
           "path": "/oauth/introspect",
           "status": "pass",
           "httpStatus": 400,
-          "latencyMs": 265,
+          "latencyMs": 603,
           "anomalies": []
         },
         {
@@ -51,7 +51,7 @@
           "path": "https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 677,
+          "latencyMs": 682,
           "anomalies": []
         },
         {
@@ -62,7 +62,7 @@
           "path": "https://mcp.lomi.africa/mcp",
           "status": "pass",
           "httpStatus": 401,
-          "latencyMs": 121,
+          "latencyMs": 125,
           "anomalies": []
         },
         {
@@ -73,7 +73,7 @@
           "path": "/provisioning/v1/merchants/00000000-0000-0000-0000-000000000001/onboarding/status",
           "status": "pass",
           "httpStatus": 401,
-          "latencyMs": 577,
+          "latencyMs": 264,
           "anomalies": []
         },
         {
@@ -84,7 +84,7 @@
           "path": "/partners/v1/usage",
           "status": "pass",
           "httpStatus": 401,
-          "latencyMs": 256,
+          "latencyMs": 552,
           "anomalies": []
         },
         {
@@ -95,7 +95,7 @@
           "path": "/agent/capabilities",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 262,
+          "latencyMs": 308,
           "anomalies": []
         },
         {
@@ -106,7 +106,7 @@
           "path": "/partners/v1/usage",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 627,
+          "latencyMs": 519,
           "anomalies": []
         },
         {
@@ -128,7 +128,7 @@
           "path": "/partners/v1/provisioning-keys?limit=10",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 469,
+          "latencyMs": 390,
           "anomalies": []
         },
         {
@@ -136,10 +136,10 @@
           "name": "partner revoke minted provisioning key",
           "service": "partners",
           "method": "DELETE",
-          "path": "/partners/v1/provisioning-keys/8c587c80-b4db-4050-a43b-f68fb0510a88",
+          "path": "/partners/v1/provisioning-keys/0ccab808-2f97-4faf-a813-29aac811717f",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 463,
+          "latencyMs": 425,
           "anomalies": []
         },
         {
@@ -150,7 +150,7 @@
           "path": "/me",
           "status": "pass",
           "httpStatus": 401,
-          "latencyMs": 278,
+          "latencyMs": 252,
           "anomalies": []
         },
         {
@@ -161,7 +161,7 @@
           "path": "/internal/jobs/expire-pending",
           "status": "pass",
           "httpStatus": 404,
-          "latencyMs": 257,
+          "latencyMs": 258,
           "anomalies": []
         },
         {
@@ -172,7 +172,7 @@
           "path": "/checkout/v1/gim/pay",
           "status": "pass",
           "httpStatus": 400,
-          "latencyMs": 275,
+          "latencyMs": 258,
           "anomalies": []
         },
         {
@@ -183,7 +183,7 @@
           "path": "/charge/switch",
           "status": "pass",
           "httpStatus": 401,
-          "latencyMs": 262,
+          "latencyMs": 255,
           "anomalies": []
         },
         {
@@ -194,7 +194,7 @@
           "path": "/oauth/introspect",
           "status": "pass",
           "httpStatus": 400,
-          "latencyMs": 267,
+          "latencyMs": 258,
           "anomalies": []
         },
         {
@@ -205,7 +205,7 @@
           "path": "/health",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 257,
+          "latencyMs": 267,
           "anomalies": []
         },
         {
@@ -216,7 +216,7 @@
           "path": "/ready",
           "status": "pass",
           "httpStatus": 503,
-          "latencyMs": 437,
+          "latencyMs": 412,
           "anomalies": []
         },
         {
@@ -227,7 +227,7 @@
           "path": "/me",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 705,
+          "latencyMs": 652,
           "anomalies": []
         },
         {
@@ -238,7 +238,7 @@
           "path": "/logs?type=api_request&limit=50",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 1156,
+          "latencyMs": 1655,
           "anomalies": []
         },
         {
@@ -249,7 +249,7 @@
           "path": "/providers",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 492,
+          "latencyMs": 392,
           "anomalies": []
         },
         {
@@ -260,7 +260,7 @@
           "path": "/customers",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 749,
+          "latencyMs": 710,
           "anomalies": []
         },
         {
@@ -268,10 +268,10 @@
           "name": "get customer",
           "service": "customers",
           "method": "GET",
-          "path": "/customers/2fa4cfe4-b83c-40ad-8ca5-488f0b54db3d",
+          "path": "/customers/174c90da-7e5d-4da3-bb30-7556b9a8fbf4",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 399,
+          "latencyMs": 390,
           "anomalies": []
         },
         {
@@ -282,7 +282,7 @@
           "path": "/products",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 1669,
+          "latencyMs": 1611,
           "anomalies": []
         },
         {
@@ -290,10 +290,10 @@
           "name": "get product",
           "service": "products",
           "method": "GET",
-          "path": "/products/ff4bae5c-907a-4924-ba53-eafd70e50cb5",
+          "path": "/products/fe18b0e2-95b6-48ba-95d8-85312ba5c9be",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 421,
+          "latencyMs": 422,
           "anomalies": []
         },
         {
@@ -304,7 +304,7 @@
           "path": "/webhooks",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 557,
+          "latencyMs": 575,
           "anomalies": []
         },
         {
@@ -315,7 +315,7 @@
           "path": "/charge/wave",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 745,
+          "latencyMs": 983,
           "anomalies": []
         },
         {
@@ -326,7 +326,7 @@
           "path": "/charge/mtn",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 973,
+          "latencyMs": 1063,
           "anomalies": []
         },
         {
@@ -337,7 +337,7 @@
           "path": "/charge/mtn",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 588,
+          "latencyMs": 747,
           "anomalies": []
         },
         {
@@ -345,10 +345,10 @@
           "name": "get mtn pending transaction ledger status",
           "service": "transactions",
           "method": "GET",
-          "path": "/transactions/446efab2-55cb-4f8c-a62d-aef8b452b065",
+          "path": "/transactions/db8e8769-acc0-41c6-8b09-48650912749c",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 350,
+          "latencyMs": 349,
           "anomalies": []
         },
         {
@@ -359,7 +359,7 @@
           "path": "/charge/mtn",
           "status": "pass",
           "httpStatus": 400,
-          "latencyMs": 586,
+          "latencyMs": 686,
           "anomalies": []
         },
         {
@@ -370,7 +370,7 @@
           "path": "/charge/switch",
           "status": "pass",
           "httpStatus": 503,
-          "latencyMs": 345,
+          "latencyMs": 382,
           "anomalies": []
         },
         {
@@ -381,7 +381,7 @@
           "path": "/charge/card",
           "status": "pass",
           "httpStatus": 503,
-          "latencyMs": 638,
+          "latencyMs": 538,
           "anomalies": []
         },
         {
@@ -392,7 +392,7 @@
           "path": "/refunds",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 1027,
+          "latencyMs": 1209,
           "anomalies": []
         },
         {
@@ -400,10 +400,10 @@
           "name": "get refund",
           "service": "refunds",
           "method": "GET",
-          "path": "/refunds/137b5c7b-1e80-4052-ab1f-2bcbe0a3beab",
+          "path": "/refunds/943c1af3-a5b1-4d4d-ad46-a1faab04e18f",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 329,
+          "latencyMs": 389,
           "anomalies": []
         },
         {
@@ -414,7 +414,7 @@
           "path": "/checkout-sessions",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 435,
+          "latencyMs": 448,
           "anomalies": []
         },
         {
@@ -425,7 +425,7 @@
           "path": "/checkout-sessions",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 395,
+          "latencyMs": 384,
           "anomalies": []
         },
         {
@@ -433,10 +433,10 @@
           "name": "get checkout session",
           "service": "checkout-sessions",
           "method": "GET",
-          "path": "/checkout-sessions/7f9aafed-656a-4678-bbc3-34a06859ae11",
+          "path": "/checkout-sessions/179af381-7fb9-4521-8f3b-eb3ebba1f7ff",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 347,
+          "latencyMs": 370,
           "anomalies": []
         },
         {
@@ -447,7 +447,7 @@
           "path": "/payment-links",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 460,
+          "latencyMs": 551,
           "anomalies": []
         },
         {
@@ -455,10 +455,10 @@
           "name": "get payment link",
           "service": "payment-links",
           "method": "GET",
-          "path": "/payment-links/78092f20-9ac6-4a4f-aef0-2125aa2b0af6",
+          "path": "/payment-links/995c3905-2c0a-4630-af58-15451af3735e",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 331,
+          "latencyMs": 335,
           "anomalies": []
         },
         {
@@ -469,7 +469,7 @@
           "path": "/payment-requests",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 429,
+          "latencyMs": 496,
           "anomalies": []
         },
         {
@@ -477,10 +477,10 @@
           "name": "get payment request",
           "service": "payment-requests",
           "method": "GET",
-          "path": "/payment-requests/eabff48e-80d1-409f-acb5-8d40b48f6903",
+          "path": "/payment-requests/303ac9fc-462b-4fe4-975c-88663df3b1e1",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 337,
+          "latencyMs": 351,
           "anomalies": []
         },
         {
@@ -491,7 +491,7 @@
           "path": "/transactions?pageSize=1",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 492,
+          "latencyMs": 532,
           "anomalies": []
         },
         {
@@ -499,10 +499,10 @@
           "name": "get transaction",
           "service": "transactions",
           "method": "GET",
-          "path": "/transactions/7651f011-33c4-4489-8c31-e0d8abf66c28",
+          "path": "/transactions/d58be059-aa1a-4920-ac83-8d4d4fb7c31c",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 328,
+          "latencyMs": 325,
           "anomalies": []
         },
         {
@@ -513,7 +513,7 @@
           "path": "/subscriptions?pageSize=1",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 356,
+          "latencyMs": 341,
           "anomalies": []
         },
         {
@@ -524,7 +524,7 @@
           "path": "/discount-coupons",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 677,
+          "latencyMs": 687,
           "anomalies": []
         },
         {
@@ -532,10 +532,10 @@
           "name": "get discount coupon",
           "service": "discount-coupons",
           "method": "GET",
-          "path": "/discount-coupons/49a391cf-b01c-47e5-813d-87c1b65f2cd3",
+          "path": "/discount-coupons/d90a9ef8-d87c-4f5d-a016-09773d120a73",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 327,
+          "latencyMs": 326,
           "anomalies": []
         },
         {
@@ -546,7 +546,7 @@
           "path": "/meters",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 457,
+          "latencyMs": 461,
           "anomalies": []
         },
         {
@@ -557,7 +557,7 @@
           "path": "/meters",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 352,
+          "latencyMs": 326,
           "anomalies": []
         },
         {
@@ -568,7 +568,7 @@
           "path": "/usage-events",
           "status": "pass",
           "httpStatus": 202,
-          "latencyMs": 508,
+          "latencyMs": 417,
           "anomalies": []
         },
         {
@@ -576,10 +576,10 @@
           "name": "usage event processed",
           "service": "metering",
           "method": "GET",
-          "path": "/usage-events/1b933abe-b78f-4c40-8618-6756086f8e83",
+          "path": "/usage-events/9fb56d98-748d-4051-9e2b-37064c733fe4",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 487,
+          "latencyMs": 396,
           "anomalies": []
         },
         {
@@ -587,10 +587,10 @@
           "name": "meter balance reflects usage",
           "service": "metering",
           "method": "GET",
-          "path": "/meters/d87dab11-b1dd-4491-a85f-47f7620d4eae/balances/2fa4cfe4-b83c-40ad-8ca5-488f0b54db3d",
+          "path": "/meters/7172d5ef-1162-4547-8617-41dd0a42c277/balances/174c90da-7e5d-4da3-bb30-7556b9a8fbf4",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 371,
+          "latencyMs": 372,
           "anomalies": []
         },
         {
@@ -601,7 +601,7 @@
           "path": "/products",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 521,
+          "latencyMs": 704,
           "anomalies": []
         },
         {
@@ -609,10 +609,10 @@
           "name": "discover usage product meter",
           "service": "metering",
           "method": "GET",
-          "path": "/meters?productId=e06da61f-5abb-4669-baa4-7cdceb53c3ad",
+          "path": "/meters?productId=b88b94de-3ab6-48e4-87f4-212ba511440f",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 328,
+          "latencyMs": 407,
           "anomalies": []
         },
         {
@@ -623,7 +623,7 @@
           "path": "/usage-subscriptions",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 386,
+          "latencyMs": 705,
           "anomalies": []
         },
         {
@@ -634,7 +634,7 @@
           "path": "/usage-events",
           "status": "pass",
           "httpStatus": 202,
-          "latencyMs": 2959,
+          "latencyMs": 407,
           "anomalies": []
         },
         {
@@ -642,10 +642,10 @@
           "name": "subscription usage event processed",
           "service": "metering",
           "method": "GET",
-          "path": "/usage-events/c4a70b87-5c8c-4cdd-9084-ab26d3af4fb8",
+          "path": "/usage-events/47ea26bb-7497-47b9-ba30-009dfdd96509",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 398,
+          "latencyMs": 338,
           "anomalies": []
         },
         {
@@ -653,10 +653,10 @@
           "name": "subscription usage reflects balance",
           "service": "metering",
           "method": "GET",
-          "path": "/usage-billing/subscriptions/da281d61-1788-45c3-ad7d-6ec7a1a139f1/usage",
+          "path": "/usage-billing/subscriptions/a1ba9e1e-20e1-4670-9218-0f73b0b9bec0/usage",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 433,
+          "latencyMs": 377,
           "anomalies": []
         },
         {
@@ -664,10 +664,10 @@
           "name": "list usage billing periods",
           "service": "metering",
           "method": "GET",
-          "path": "/usage-billing/periods?subscription_id=da281d61-1788-45c3-ad7d-6ec7a1a139f1&page=1&page_size=5",
+          "path": "/usage-billing/periods?subscription_id=a1ba9e1e-20e1-4670-9218-0f73b0b9bec0&page=1&page_size=5",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 432,
+          "latencyMs": 423,
           "anomalies": []
         },
         {
@@ -678,7 +678,7 @@
           "path": "/payouts?pageSize=1",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 441,
+          "latencyMs": 387,
           "anomalies": []
         },
         {
@@ -689,7 +689,7 @@
           "path": "/webhooks",
           "status": "pass",
           "httpStatus": 400,
-          "latencyMs": 354,
+          "latencyMs": 409,
           "anomalies": []
         },
         {
@@ -700,7 +700,7 @@
           "path": "/webhooks",
           "status": "pass",
           "httpStatus": 201,
-          "latencyMs": 537,
+          "latencyMs": 608,
           "anomalies": []
         },
         {
@@ -711,7 +711,7 @@
           "path": "/webhooks",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 360,
+          "latencyMs": 456,
           "anomalies": []
         },
         {
@@ -719,10 +719,10 @@
           "name": "test webhook delivery (sender → postman-echo 2xx receiver)",
           "service": "webhooks",
           "method": "POST",
-          "path": "/webhooks/0568f3ce-869f-4408-ae44-43959a909a79/test",
+          "path": "/webhooks/9ce41dff-93dd-416d-b0fc-38c4101a5210/test",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 676,
+          "latencyMs": 808,
           "anomalies": []
         },
         {
@@ -730,10 +730,10 @@
           "name": "list webhook delivery logs",
           "service": "webhooks",
           "method": "GET",
-          "path": "/webhook-delivery-logs?webhookId=0568f3ce-869f-4408-ae44-43959a909a79&limit=5",
+          "path": "/webhook-delivery-logs?webhookId=9ce41dff-93dd-416d-b0fc-38c4101a5210&limit=5",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 354,
+          "latencyMs": 347,
           "anomalies": []
         },
         {
@@ -741,10 +741,10 @@
           "name": "logs webhook_delivery stream",
           "service": "logs",
           "method": "GET",
-          "path": "/logs?type=webhook_delivery&webhook_id=0568f3ce-869f-4408-ae44-43959a909a79&limit=5",
+          "path": "/logs?type=webhook_delivery&webhook_id=9ce41dff-93dd-416d-b0fc-38c4101a5210&limit=5",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 341,
+          "latencyMs": 351,
           "anomalies": []
         },
         {
@@ -752,10 +752,10 @@
           "name": "delete webhook cleanup",
           "service": "webhooks",
           "method": "DELETE",
-          "path": "/webhooks/0568f3ce-869f-4408-ae44-43959a909a79",
+          "path": "/webhooks/9ce41dff-93dd-416d-b0fc-38c4101a5210",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 429,
+          "latencyMs": 482,
           "anomalies": []
         },
         {
@@ -766,7 +766,7 @@
           "path": "/logs?type=api_request&limit=5",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 456,
+          "latencyMs": 806,
           "anomalies": []
         },
         {
@@ -774,10 +774,10 @@
           "name": "logs api_request entry by id",
           "service": "logs",
           "method": "GET",
-          "path": "/logs/api_request/e735dd50-48dc-4d1e-af23-0fd8c6009dea",
+          "path": "/logs/api_request/a0adc18e-9bde-4b6e-ab42-a6b7409eec74",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 378,
+          "latencyMs": 349,
           "anomalies": []
         },
         {
@@ -788,7 +788,7 @@
           "path": "/logs?type=api_error&limit=5",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 346,
+          "latencyMs": 378,
           "anomalies": []
         },
         {
@@ -799,7 +799,7 @@
           "path": "/logs?type=activity&limit=5",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 727,
+          "latencyMs": 551,
           "anomalies": []
         },
         {
@@ -807,10 +807,10 @@
           "name": "payment webhook delivered (PAYMENT_SUCCEEDED)",
           "service": "webhooks",
           "method": "GET",
-          "path": "/webhook-delivery-logs?webhookId=72ea1d81-b026-46f9-93c9-74a0f790fe91&limit=10",
+          "path": "/webhook-delivery-logs?webhookId=75c289ef-e70c-4090-a9d6-35865864794e&limit=10",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 543,
+          "latencyMs": 358,
           "anomalies": []
         },
         {
@@ -821,7 +821,7 @@
           "path": "/organization/radar-settings",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 2575,
+          "latencyMs": 345,
           "anomalies": []
         },
         {
@@ -832,7 +832,7 @@
           "path": "/accounts/balance",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 349,
+          "latencyMs": 356,
           "anomalies": []
         },
         {
@@ -840,10 +840,10 @@
           "name": "delete payment webhook cleanup",
           "service": "webhooks",
           "method": "DELETE",
-          "path": "/webhooks/72ea1d81-b026-46f9-93c9-74a0f790fe91",
+          "path": "/webhooks/75c289ef-e70c-4090-a9d6-35865864794e",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 505,
+          "latencyMs": 536,
           "anomalies": []
         },
         {
@@ -851,218 +851,19 @@
           "name": "delete customer cleanup",
           "service": "customers",
           "method": "DELETE",
-          "path": "/customers/2fa4cfe4-b83c-40ad-8ca5-488f0b54db3d",
+          "path": "/customers/174c90da-7e5d-4da3-bb30-7556b9a8fbf4",
           "status": "pass",
           "httpStatus": 200,
-          "latencyMs": 466,
+          "latencyMs": 435,
           "anomalies": []
         }
       ],
       "passed": 77,
       "failed": 0,
       "skipped": 0
-    },
-    {
-      "suite": "live",
-      "baseUrl": "https://api.lomi.africa",
-      "startedAt": "2026-07-14T22:45:01.360Z",
-      "finishedAt": "2026-07-14T22:45:06.513Z",
-      "durationMs": 5154,
-      "checks": [
-        {
-          "suite": "live",
-          "name": "health liveness",
-          "service": "health",
-          "method": "GET",
-          "path": "/health",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 1230,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "health readiness",
-          "service": "health",
-          "method": "GET",
-          "path": "/ready",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 303,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "me identity",
-          "service": "identity",
-          "method": "GET",
-          "path": "/me",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 295,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list providers",
-          "service": "providers",
-          "method": "GET",
-          "path": "/providers",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 201,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "accounts balance",
-          "service": "accounts",
-          "method": "GET",
-          "path": "/accounts/balance",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 194,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list transactions",
-          "service": "transactions",
-          "method": "GET",
-          "path": "/transactions?pageSize=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 489,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list customers",
-          "service": "customers",
-          "method": "GET",
-          "path": "/customers?pageSize=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 226,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list checkout sessions",
-          "service": "checkout-sessions",
-          "method": "GET",
-          "path": "/checkout-sessions?limit=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 221,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list payment links",
-          "service": "payment-links",
-          "method": "GET",
-          "path": "/payment-links?limit=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 207,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list payment requests",
-          "service": "payment-requests",
-          "method": "GET",
-          "path": "/payment-requests?limit=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 192,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list subscriptions",
-          "service": "subscriptions",
-          "method": "GET",
-          "path": "/subscriptions?pageSize=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 209,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list refunds",
-          "service": "refunds",
-          "method": "GET",
-          "path": "/refunds?pageSize=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 239,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list payouts",
-          "service": "payouts",
-          "method": "GET",
-          "path": "/payouts?pageSize=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 247,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list disputes",
-          "service": "disputes",
-          "method": "GET",
-          "path": "/disputes?pageSize=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 210,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list products",
-          "service": "products",
-          "method": "GET",
-          "path": "/products?limit=1",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 269,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "list webhooks",
-          "service": "webhooks",
-          "method": "GET",
-          "path": "/webhooks",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 222,
-          "anomalies": []
-        },
-        {
-          "suite": "live",
-          "name": "api request logs",
-          "service": "logs",
-          "method": "GET",
-          "path": "/logs?type=api_request&limit=5",
-          "status": "pass",
-          "httpStatus": 200,
-          "latencyMs": 198,
-          "anomalies": []
-        }
-      ],
-      "passed": 17,
-      "failed": 0,
-      "skipped": 0
     }
   ],
-  "totalPassed": 94,
+  "totalPassed": 77,
   "totalFailed": 0,
   "totalSkipped": 0,
   "ok": true

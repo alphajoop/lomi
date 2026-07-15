@@ -1,0 +1,167 @@
+{
+  "startedAt": "2026-07-15T23:11:34.368Z",
+  "finishedAt": "2026-07-15T23:11:47.919Z",
+  "durationMs": 13550,
+  "suites": [
+    {
+      "suite": "sandbox",
+      "baseUrl": "https://mdswvokxrnfggrujsfjd.supabase.co",
+      "startedAt": "2026-07-15T23:11:34.368Z",
+      "finishedAt": "2026-07-15T23:11:47.441Z",
+      "durationMs": 13072,
+      "checks": [
+        {
+          "suite": "sandbox",
+          "name": "create-stripe-payment-intent CORS preflight",
+          "service": "stripe-checkout",
+          "method": "OPTIONS",
+          "functionName": "create-stripe-payment-intent",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 1316,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create-stripe-payment-intent rejects missing checkout session",
+          "service": "stripe-checkout",
+          "method": "POST",
+          "functionName": "create-stripe-payment-intent",
+          "status": "pass",
+          "httpStatus": 400,
+          "latencyMs": 609,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "create-stripe-payment-intent rejects unknown checkout session",
+          "service": "stripe-checkout",
+          "method": "POST",
+          "functionName": "create-stripe-payment-intent",
+          "status": "pass",
+          "httpStatus": 400,
+          "latencyMs": 777,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "mtn CORS preflight",
+          "service": "mtn",
+          "method": "OPTIONS",
+          "functionName": "mtn",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 1417,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "mtn rejects missing authorization",
+          "service": "mtn",
+          "method": "POST",
+          "functionName": "mtn",
+          "status": "pass",
+          "httpStatus": 401,
+          "latencyMs": 1402,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "mtn rejects anon bearer without user session",
+          "service": "mtn",
+          "method": "POST",
+          "functionName": "mtn",
+          "status": "pass",
+          "httpStatus": 401,
+          "latencyMs": 509,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "mtn-sync rejects missing referenceId",
+          "service": "mtn-sync",
+          "method": "POST",
+          "functionName": "mtn-sync",
+          "status": "pass",
+          "httpStatus": 400,
+          "latencyMs": 1177,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "mtn-sync rejects unknown reference (read-only lookup)",
+          "service": "mtn-sync",
+          "method": "POST",
+          "functionName": "mtn-sync",
+          "status": "pass",
+          "httpStatus": 404,
+          "latencyMs": 1324,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "expire-pending-transactions rejects without internal auth",
+          "service": "expire-pending",
+          "method": "POST",
+          "functionName": "expire-pending-transactions",
+          "status": "pass",
+          "httpStatus": 401,
+          "latencyMs": 1345,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "send-transaction-email rejects without trusted caller",
+          "service": "send-transaction-email",
+          "method": "POST",
+          "functionName": "send-transaction-email",
+          "status": "pass",
+          "httpStatus": 403,
+          "latencyMs": 1469,
+          "anomalies": []
+        },
+        {
+          "suite": "sandbox",
+          "name": "send-transaction-email rejects partial internal header",
+          "service": "send-transaction-email",
+          "method": "POST",
+          "functionName": "send-transaction-email",
+          "status": "pass",
+          "httpStatus": 401,
+          "latencyMs": 1724,
+          "anomalies": []
+        }
+      ],
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "live",
+      "baseUrl": "https://mdswvokxrnfggrujsfjd.supabase.co",
+      "startedAt": "2026-07-15T23:11:47.441Z",
+      "finishedAt": "2026-07-15T23:11:47.919Z",
+      "durationMs": 478,
+      "checks": [
+        {
+          "suite": "live",
+          "name": "live create-stripe-payment-intent CORS preflight",
+          "service": "stripe-checkout",
+          "method": "OPTIONS",
+          "functionName": "create-stripe-payment-intent",
+          "status": "pass",
+          "httpStatus": 200,
+          "latencyMs": 478,
+          "anomalies": []
+        }
+      ],
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "totalPassed": 12,
+  "totalFailed": 0,
+  "totalSkipped": 0,
+  "ok": true
+}
