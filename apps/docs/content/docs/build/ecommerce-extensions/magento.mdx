@@ -5,9 +5,18 @@ description:
   signed webhooks, optional REST verify.
 ---
 
+import { Callout } from '@/components/docs/docs-callout';
+
 # Magento 2
 
 Extension **Lomi_Payments** for Magento Open Source / Adobe Commerce. Payment method code: **`lomi`**.
+
+<Callout type="info" title="Related products">
+  - **API keys**: [Dashboard → Developers → API keys](/start/api-keys)
+  - **Webhooks**: [Dashboard webhooks](/build/webhooks) — subscribe to **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**
+  - **Hosted checkout**: [Checkout](/build/checkout), where shoppers pay after redirect
+  - **Subscriptions**: [Subscriptions](/build/subscriptions), recurring products via checkout
+</Callout>
 
 ## Requirements
 
@@ -36,13 +45,53 @@ php bin/magento cache:flush
 
 Full instructions: [Magento plugin README](https://github.com/lomiafrica/magento/blob/main/README.md)
 
-## Configuration
+## Step 1, Get your lomi. API keys
+
+1. Sign in to [dashboard.lomi.africa](https://dashboard.lomi.africa).
+2. Open **Developers → API keys**.
+3. Copy your **Test secret key** (`lomi_sk_test_…`).
+
+See [API keys](/start/api-keys).
+
+## Step 2, Install the module
+
+Use Composer or manual install above, then enable **Lomi_Payments** and flush cache.
+
+## Step 3, Configure lomi. in Magento
 
 **Stores → Configuration → Sales → Payment Methods → lomi.**
 
-- Enable the method; toggle **Test mode** for sandbox.
-- Set **Test/Live API secret keys** and **webhook signing secrets** (must match lomi. dashboard endpoint secret).
-- Webhook URL pattern: `https://your-store.example/lomi/payment/webhook` (also shown in admin).
+1. Enable the method.
+2. Turn **Test mode** on while integrating.
+3. Paste **Test secret key** and **Test webhook secret**.
+4. Save config.
+
+## Step 4, Check Setup health
+
+The **Setup health** panel should show:
+
+- **API secret key**: Configured
+- **API connection**: `GET /me` succeeded
+- **Test mode**: Sandbox API active
+
+Fix any **Action required** row before continuing.
+
+## Step 5, Connect webhooks
+
+1. Copy the webhook URL shown in admin (`https://your-store.example/lomi/payment/webhook`).
+2. In [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Webhooks**, add the endpoint.
+3. Enable **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**.
+4. Paste the signing secret into Magento (**Test webhook secret**).
+
+## Step 6, Run a test payment
+
+1. Place an order and select **lomi.** as payment.
+2. Pay on hosted checkout (sandbox while test mode is on).
+3. Confirm the Magento order is paid.
+
+## Go live
+
+Turn **Test mode** off, paste live secret key + live webhook secret, and run one small real payment.
 
 ## Customer flow
 

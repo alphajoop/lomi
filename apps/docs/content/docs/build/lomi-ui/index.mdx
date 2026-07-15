@@ -53,6 +53,15 @@ export function Checkout() {
 
 The components do not call lomi. API directly. Use your backend or SDK integration to create checkout sessions, charge requests, and webhook handling.
 
+## When to use lomi-ui vs a store plugin
+
+| Situation | Use |
+| --- | --- |
+| WooCommerce, Magento, PrestaShop, Shopify, or Bubble store | Official [e-commerce extensions](/build/ecommerce-extensions) |
+| Custom site with minimal UI work | [Embed widget](/build/embed-widget) |
+| Full control over checkout UI in your React app | **lomi-ui** (this page) |
+| Backend-only integration | [Public API](/start/first-payment) or [SDKs](/build/sdks) |
+
 ## Asset paths
 
 Copy hosted checkout assets into your app public folder:

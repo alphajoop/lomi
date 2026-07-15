@@ -1,0 +1,82 @@
+name: lomi · ci · bubble
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/plugins/bubble/**"
+      - "apps/sdks/embed/**"
+      - ".github/workflows/app-ci-bubble.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/plugins/bubble/**"
+      - "apps/sdks/embed/**"
+      - ".github/workflows/app-ci-bubble.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          submodules: recursive
+
+      - name: Initialize Bubble plugin submodule
+        env:
+          TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+          fi
+          if ! git submodule update --init apps/plugins/bubble; then
+            echo "::warning::Bubble submodule not available — private repo needs REPO_CHECKOUT_PAT or org access"
+            exit 0
+          fi
+          if [ ! -f apps/plugins/bubble/meta_data.json ]; then
+            echo "::warning::Bubble submodule empty after init — skipping Bubble CI"
+            exit 0
+          fi
+
+      - name: Run Bubble parity checks
+        run: |
+          if [ ! -f apps/plugins/bubble/meta_data.json ]; then
+            echo "SKIP: Bubble submodule not checked out"
+            exit 0
+          fi
+          apps/plugins/scripts/verify-lomi-plugins.sh
+
+      - name: Validate Bubble plugin JSON
+        run: |
+          if [ ! -f apps/plugins/bubble/meta_data.json ]; then
+            echo "SKIP: Bubble submodule not checked out"
+            exit 0
+          fi
+          node apps/plugins/scripts/test_bubble_json.mjs
+
+      - name: Build embed asset
+        run: |
+          if [ ! -f apps/plugins/bubble/scripts/build-assets.mjs ]; then
+            echo "SKIP: Bubble submodule not checked out"
+            exit 0
+          fi
+          cd apps/sdks/embed
+          npm ci
+          npm run build:iife
+          node ../../plugins/bubble/scripts/build-assets.mjs
+
+      - name: API smoke test
+        env:
+          LOMI_SECRET_KEY: ${{ secrets.LOMI_SECRET_KEY }}
+        run: |
+          if [ ! -f apps/plugins/bubble/scripts/smoke-test.mjs ]; then
+            echo "SKIP: Bubble submodule not checked out"
+            exit 0
+          fi
+          if [ -z "$LOMI_SECRET_KEY" ]; then
+            echo "SKIP: LOMI_SECRET_KEY not set — API smoke test optional on PRs"
+            exit 0
+          fi
+          node apps/plugins/bubble/scripts/smoke-test.mjs

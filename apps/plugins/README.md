@@ -60,10 +60,22 @@ For all platform plugins (including private repos you have access to):
 git submodule update --init apps/plugins/woo apps/plugins/prestashop apps/plugins/magento apps/plugins/shopify apps/plugins/bubble
 ```
 
-If a submodule fails with "repository not found", that platform repo is private — request access from the lomi. team. WooCommerce, PrestaShop, and Magento submodules are public.
+If a submodule fails with "repository not found", that platform repo is private — request access from the lomi. team or configure `REPO_CHECKOUT_PAT` in CI. WooCommerce, PrestaShop, and Magento submodules are public.
+
+### Bubble / Shopify (private submodules)
+
+| Check | When submodule missing | When checked out |
+| --- | --- | --- |
+| `verify-lomi-plugins.sh` | Skips Bubble/Shopify sections | Full parity |
+| `test_bubble_json.mjs` | Skips with message | Parses all `*.json` |
+| `app-ci-bubble.yml` | Warns and skips job steps | Parity + embed build + optional API smoke |
+| API smoke (`smoke-test.mjs`) | N/A | Runs when `LOMI_SECRET_KEY` secret is set; otherwise prints skip message |
+
+PRs that only touch public plugin submodules do not require Bubble checkout. Bubble-specific CI runs on `apps/plugins/bubble/**` changes via `.github/workflows/app-ci-bubble.yml`.
 
 ## Automated tests
 
+- **[E2E.md](./E2E.md)**: Manual fresh-install matrix (dashboard credentials only).
 - **[scripts/run-plugin-tests.sh](./scripts/run-plugin-tests.sh)**: CI suite — static parity, webhook contract, Bubble JSON, Woo build + release zip.
 - **[scripts/verify-lomi-plugins.sh](./scripts/verify-lomi-plugins.sh)**: Static compliance gate (step 1 of `run-plugin-tests.sh`).
 - **[scripts/scan_broken_images.py](./scripts/scan_broken_images.py)**: Scans Magento, PrestaShop, and Woo for broken image path references.

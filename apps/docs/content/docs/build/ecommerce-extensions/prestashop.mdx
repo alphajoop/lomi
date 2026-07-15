@@ -5,25 +5,69 @@ description:
   signed webhooks.
 ---
 
+import { Callout } from '@/components/docs/docs-callout';
+
 # PrestaShop
 
 Module in the [`lomiafrica/prestashop`](https://github.com/lomiafrica/prestashop) repository under **`lomi/`**: hosted checkout via `POST /v1/checkout-sessions` and verification via `GET /v1/checkout-sessions/{id}`.
+
+<Callout type="info" title="Related products">
+  - **API keys**: [Dashboard → Developers → API keys](/start/api-keys)
+  - **Webhooks**: [Dashboard webhooks](/build/webhooks) — subscribe to **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**
+  - **Hosted checkout**: [Checkout](/build/checkout), where shoppers pay after redirect
+  - **Subscriptions**: [Subscriptions](/build/subscriptions), recurring products via checkout
+</Callout>
 
 ## Requirements
 
 - PrestaShop **1.7+**
 - Shop currency **EUR**, **USD**, or **XOF**
 
-## Install
+## Step 1, Get your lomi. API keys
 
-1. Open the **`lomi`** folder in [lomiafrica/prestashop](https://github.com/lomiafrica/prestashop/tree/main/lomi), the archive root must be `lomi/` and include `lomi.php`.
+1. Sign in to [dashboard.lomi.africa](https://dashboard.lomi.africa).
+2. Open **Developers → API keys** and copy your **Test secret key**.
+
+## Step 2, Install the module
+
+1. Open the **`lomi`** folder in [lomiafrica/prestashop](https://github.com/lomiafrica/prestashop/tree/main/lomi); the archive root must be `lomi/` and include `lomi.php`.
 2. Zip **only** that folder (not a parent directory).
 3. **Back office → Modules → Module Manager → Upload a module** → install, then **Enable** if needed.
-4. **International → Localization → Currencies**: activate **EUR**, **USD**, or **XOF** for your shop.
-5. **Payment → Preferences** (or **Payment methods**, depending on version), allow **lomi.** for those currencies.
-6. **Modules → lomi. → Configure**: paste test/live secret keys and webhook signing secrets; copy the **webhook URL** into [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Developers → Webhooks** (subscribe to **`PAYMENT_SUCCEEDED`** at minimum).
 
 Detailed steps: [PrestaShop module README](https://github.com/lomiafrica/prestashop/blob/main/lomi/README.md)
+
+## Step 3, Prepare currencies
+
+1. **International → Localization → Currencies**: activate **EUR**, **USD**, or **XOF**.
+2. **Payment → Preferences** (or **Payment methods**), allow **lomi.** for those currencies.
+
+## Step 4, Configure lomi.
+
+**Modules → lomi. → Configure**
+
+1. Turn **Test mode** on.
+2. Paste **Test secret key** and **Test webhook secret**.
+3. Save.
+
+## Step 5, Check Setup health
+
+The **Setup health** panel should show:
+
+- **API secret key**: Configured
+- **Store currency**: EUR, USD, or XOF
+- **API connection**: `GET /me` succeeded
+
+Copy the **webhook URL** from the panel into dashboard → **Webhooks**. Enable **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**.
+
+## Step 6, Run a test payment
+
+1. Add a product and go to checkout.
+2. Select **Pay with lomi.** and complete sandbox payment on hosted checkout.
+3. Confirm the PrestaShop order is validated.
+
+## Go live
+
+Turn **Test mode** off, paste live keys and live webhook secret, then run one real payment.
 
 ## Webhook URL
 

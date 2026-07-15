@@ -43,6 +43,7 @@ For **creates** that must not double-charge (payments, payouts), send an idempot
 Choose the path that matches your UX, not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.
 
 - **Hosted checkout**: buyer completes payment on the hosted experience: [Create checkout session](https://docs.lomi.africa/api/checkout-sessions/CheckoutSessionsController_create).
+- **Store plugins (Woo, Magento, PrestaShop, Shopify, Bubble)** → [E-commerce extensions](https://docs.lomi.africa/build/ecommerce-extensions).
 - **Shareable payment links** → [Create payment link](https://docs.lomi.africa/api/payment-links/PaymentLinksController_create).
 - **Direct mobile-money charge (server-initiated)** → [Wave charge](https://docs.lomi.africa/api/charge/ChargesController_createWaveCharge) when you are not using hosted checkout.
 - **Embedded card charge** → [Card charge](https://docs.lomi.africa/api/charge/ChargesController_createCardCharge).

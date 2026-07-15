@@ -32,12 +32,13 @@ jobs:
           npm run build:iife
           node ../../plugins/bubble/scripts/build-assets.mjs
 
-      - name: Smoke test (optional)
+      - name: API smoke test
         env:
           LOMI_SECRET_KEY: ${{ secrets.LOMI_SECRET_KEY }}
         run: |
           if [ -z "$LOMI_SECRET_KEY" ]; then
-            echo "LOMI_SECRET_KEY not set — skipping API smoke test"
+            echo "SKIP: LOMI_SECRET_KEY not set — API smoke test is optional for tag releases"
+            echo "Set the org secret to require GET /me + POST /checkout-sessions on every bubble-v* release"
             exit 0
           fi
           node apps/plugins/bubble/scripts/smoke-test.mjs
@@ -56,6 +57,13 @@ jobs:
         with:
           generate_release_notes: true
           body: |
-            Bubble plugin release. Sync this tag in the Bubble Plugin Editor (Version → Synchronize with GitHub).
+            ## Bubble plugin release
 
-            No zip artifact — Bubble pulls plugin files from the `lomiafrica/bubble` repository.
+            1. Open the Bubble Plugin Editor for **lomi.**
+            2. Go to **Version → Synchronize with GitHub**
+            3. Pull this tag (`bubble-v*`) from [`lomiafrica/bubble`](https://github.com/lomiafrica/bubble)
+            4. Test in a version-test app with sandbox keys before promoting to live
+
+            No zip artifact — Bubble pulls plugin files directly from GitHub.
+
+            Merchant setup: [docs.lomi.africa/build/ecommerce-extensions/bubble](https://docs.lomi.africa/build/ecommerce-extensions/bubble)

@@ -27,6 +27,13 @@
           "applyTo": "**/*.{ts,tsx,js,jsx,html}"
         },
         {
+          "name": "ecommerce-plugins",
+          "title": "E-commerce plugins",
+          "label": "Official WooCommerce, Magento, PrestaShop, Shopify, and Bubble extensions",
+          "path": "ecommerce-plugins.md",
+          "applyTo": "**/*"
+        },
+        {
           "name": "webhooks",
           "title": "Webhooks",
           "label": "Verify and handle lomi. webhook events",
@@ -85,6 +92,13 @@
           "label": "Iframe modal and inline checkout with @lomi./embed",
           "path": "embed-checkout.md",
           "applyTo": "**/*.{ts,tsx,js,jsx,html}"
+        },
+        {
+          "name": "ecommerce-plugins",
+          "title": "E-commerce plugins",
+          "label": "Official WooCommerce, Magento, PrestaShop, Shopify, and Bubble extensions",
+          "path": "ecommerce-plugins.md",
+          "applyTo": "**/*"
         },
         {
           "name": "webhooks",

@@ -96,9 +96,13 @@ bun install
 Variables locales :
 
 ```bash filename="Terminal"
-cp .env.example .env
-# Complétez les secrets nécessaires
+# Pas de .env.example à la racine — copiez celui de l'app concernée
+cp apps/api/.env.example apps/api/.env.local
+cp apps/docs/.env.example apps/docs/.env
+# Autres apps : voir le README de chaque app (ex. apps/dashboard/README.md)
 ```
+
+Complétez chaque fichier avec les secrets de votre équipe ou du tableau de bord sandbox.
 
 ### Commandes de développement locales
 

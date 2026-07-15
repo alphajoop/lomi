@@ -15,6 +15,13 @@ lomi. Shopify app lets merchants accept **Wave, mobile money, cards, and more** 
   This is a **cart bypass** integration distributed as a **custom install app**. It is not a native Shopify payment method in checkout and is not listed on the Shopify App Store for payments.
 </Callout>
 
+<Callout type="info" title="Related products">
+  - **API keys**: [Dashboard → Developers → API keys](/start/api-keys)
+  - **Webhooks**: [Dashboard webhooks](/build/webhooks) — subscribe to **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**
+  - **Hosted checkout**: [Checkout](/build/checkout), where shoppers pay after redirect
+  - **Integrations**: [Dashboard → Payment channels → Integrations](https://dashboard.lomi.africa) for OAuth install
+</Callout>
+
 ## Requirements
 
 - Shopify store with lomi.. app installed (custom install link from lomi.)
@@ -24,26 +31,56 @@ lomi. Shopify app lets merchants accept **Wave, mobile money, cards, and more** 
 
 Distribution is via **custom install** from the [lomi. dashboard](https://dashboard.lomi.africa) (not a public GitHub release).
 
-## Install (custom distribution)
+## Step 1, Install the app
 
-### from lomi.. dashboard (recommended)
+### From lomi. dashboard (recommended)
 
 1. Go to [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Settings → Payment channels → Integrations**.
 2. Toggle **Shopify** on and enter your store domain (e.g. `my-store.myshopify.com`).
-3. Click **Install on Shopify**: you are redirected to Shopify OAuth to authorize the app.
-4. After install, open the embedded app → **Settings** → paste your lomi. **secret key** and **webhook secret**.
+3. Click **Install on Shopify** and complete OAuth.
 
-Install URL pattern (also works without the dashboard):
+Install URL pattern: `https://connect.lomi.africa/install?shop={your-store}.myshopify.com`
 
-`https://connect.lomi.africa/install?shop={your-store}.myshopify.com`
+## Step 2, Connect API keys
 
-### Manual / team share
+1. Open the embedded app → **Settings**.
+2. Paste your **Test secret key** (`lomi_sk_test_…`) and **Test webhook secret** (`whsec_…`).
+3. Click **Connect to lomi.**
 
-Copy the install link from the dashboard modal and send it to a teammate, or open:
+The app uses the key prefix to select sandbox vs live API (test keys → sandbox).
 
-[https://connect.lomi.africa/install](https://connect.lomi.africa/install)
+## Step 3, Check Setup health
 
-## Setup checklist
+The **Setup health** panel should show:
+
+- **API secret key**: Configured
+- **API connection**: `GET /me` succeeded
+- **Test mode**: Sandbox API (test key)
+
+When switching to live, paste a **live** secret key and matching **live** webhook secret together.
+
+## Step 4, Connect webhooks
+
+1. Copy the **Webhook URL** from Settings (`{app_host}/api/webhooks/lomi/payment-success`).
+2. In dashboard → **Webhooks**, create the endpoint.
+3. Enable **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**.
+4. Paste the signing secret into app Settings.
+
+## Step 5, Add the cart block
+
+**Online Store → Themes → Customize → Cart** → add **Pay with lomi.** app block → save.
+
+## Step 6, Run a test payment
+
+1. Add items to cart and click **Pay with lomi.**
+2. Complete sandbox payment on hosted checkout.
+3. Confirm the Shopify draft order is completed.
+
+## Go live
+
+Replace test key + webhook secret with live credentials (same Settings screen) and run one small real payment.
+
+## Setup checklist (reference)
 
 1. In the app **Settings**, paste your lomi. **secret key** and **webhook secret**.
 2. In [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Webhooks**, create an endpoint:

@@ -5,9 +5,18 @@ description:
   webhooks signés, REST de vérification optionnelle.
 ---
 
+import { Callout } from '@/components/docs/docs-callout';
+
 # Magento 2
 
 Extension **Lomi_Payments** pour Magento Open Source / Adobe Commerce. Code du moyen de paiement : **`lomi`**.
+
+<Callout type="info" title="Produits associés">
+  - **Clés API** : [Tableau de bord → Développeurs → Clés API](/start/api-keys)
+  - **Webhooks** : [Webhooks du tableau de bord](/build/webhooks) — abonnez-vous à **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**
+  - **Checkout hébergé** : [Checkout](/build/checkout), où le client paie après redirection
+  - **Abonnements** : [Abonnements](/build/subscriptions), produits récurrents via checkout
+</Callout>
 
 ## Prérequis
 
@@ -36,13 +45,47 @@ php bin/magento cache:flush
 
 Détails : [README du plugin Magento](https://github.com/lomiafrica/magento/blob/main/README.md)
 
-## Configuration
+## Étape 1, Obtenir vos clés API lomi.
+
+1. Connectez-vous à [dashboard.lomi.africa](https://dashboard.lomi.africa).
+2. Ouvrez **Développeurs → Clés API**.
+3. Copiez votre **clé secrète de test** (`lomi_sk_test_…`).
+
+## Étape 2, Installer le module
+
+Utilisez Composer ou l’installation manuelle ci-dessus, puis activez **Lomi_Payments** et videz le cache.
+
+## Étape 3, Configurer lomi. dans Magento
 
 **Magasins → Configuration → Ventes → Moyens de paiement → lomi.**
 
-- Activer la méthode ; **Mode test** pour le bac à sable.
-- Renseigner les **clés secrètes** test / production et les **secrets de signature webhook** (identiques au secret de l’URL dans le tableau de bord lomi.).
-- URL webhook typique : `https://votre-boutique.example/lomi/payment/webhook` (également affichée dans l’admin).
+1. Activez la méthode.
+2. Activez le **Mode test** pendant l’intégration.
+3. Collez la **clé secrète de test** et le **secret webhook de test**.
+4. Enregistrez.
+
+## Étape 4, Vérifier Setup health
+
+Le panneau **Setup health** doit afficher :
+
+- **Clé secrète API** : Configurée
+- **Connexion API** : `GET /me` réussi
+- **Mode test** : API bac à sable active
+
+## Étape 5, Connecter les webhooks
+
+1. Copiez l’URL webhook affichée dans l’admin.
+2. Créez l’endpoint dans le tableau de bord lomi.
+3. Activez **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**.
+4. Collez le secret de signature dans Magento.
+
+## Étape 6, Faire un paiement test
+
+Passez une commande avec **lomi.** et payez sur le checkout hébergé (bac à sable tant que le mode test est actif).
+
+## Mise en production
+
+Désactivez le **Mode test**, collez les clés live et le secret webhook live, puis faites un petit paiement réel.
 
 ## Parcours client
 

@@ -95,12 +95,19 @@ Install the project dependencies using `bun` from the root of the monorepo:
 bun install
 ```
 
-Set up your local environment variables by copying the example file:
+There is no root `.env.example`. Copy the example file for the app you are working on:
 
 ```bash filename="Terminal"
-cp .env.example .env
-# Review the .env file and add any necessary secrets or configurations
+# API service
+cp apps/api/.env.example apps/api/.env.local
+
+# Documentation site
+cp apps/docs/.env.example apps/docs/.env
+
+# Other apps: see each app's README (e.g. apps/dashboard/README.md)
 ```
+
+Review each file and add secrets from your team or sandbox dashboard.
 
 ### Local development commands
 

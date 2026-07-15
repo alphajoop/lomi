@@ -15,6 +15,13 @@ L’app lomi. pour Shopify permet aux marchands d’accepter **Wave, mobile mone
   Il s’agit d’une intégration **contournement panier**, distribuée en **installation personnalisée**. Ce n’est pas un moyen de paiement natif au checkout Shopify et ce n’est pas une app de paiement sur l’App Store.
 </Callout>
 
+<Callout type="info" title="Produits associés">
+  - **Clés API** : [Tableau de bord → Développeurs → Clés API](/start/api-keys)
+  - **Webhooks** : [Webhooks du tableau de bord](/build/webhooks) — abonnez-vous à **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**
+  - **Checkout hébergé** : [Checkout](/build/checkout), où le client paie après redirection
+  - **Intégrations** : [Tableau de bord → Canaux de paiement → Intégrations](https://dashboard.lomi.africa) pour l’installation OAuth
+</Callout>
+
 ## Prérequis
 
 - Boutique Shopify avec l’app lomi. installée (lien d’installation personnalisé)
@@ -23,24 +30,36 @@ L’app lomi. pour Shopify permet aux marchands d’accepter **Wave, mobile mone
 
 Distribution en **installation personnalisée** depuis le [tableau de bord lomi.](https://dashboard.lomi.africa) (pas de release publique sur GitHub).
 
-## Installation
-
-### Depuis le tableau de bord lomi. (recommandé)
+## Étape 1, Installer l’app
 
 1. [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Paramètres → Canaux de paiement → Intégrations**.
-2. Activez **Shopify**, saisissez votre domaine (`ma-boutique.myshopify.com`).
-3. Cliquez **Installer sur Shopify** pour lancer OAuth.
-4. Après installation, ouvrez l’app → **Settings** → clés API lomi.
+2. Activez **Shopify**, saisissez votre domaine, puis **Installer sur Shopify**.
 
-URL d’installation : `https://connect.lomi.africa/install?shop={boutique}.myshopify.com`
+URL : `https://connect.lomi.africa/install?shop={boutique}.myshopify.com`
 
-### Installation manuelle / partage équipe
+## Étape 2, Connecter les clés API
 
-Copiez le lien d’installation depuis la modale du tableau de bord et envoyez-le à un collègue, ou ouvrez :
+Dans l’app → **Settings**, collez la **clé secrète de test** et le **secret webhook de test**, puis connectez.
 
-[https://connect.lomi.africa/install](https://connect.lomi.africa/install)
+L’app choisit le bac à sable ou la production selon le préfixe de la clé.
 
-## Checklist de configuration
+## Étape 3, Vérifier Setup health
+
+Le panneau **Setup health** doit afficher la clé configurée, `GET /me` réussi et le mode test (bac à sable).
+
+## Étape 4, Connecter les webhooks
+
+Créez l’endpoint dans le tableau de bord avec l’URL affichée dans Settings. Activez **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**.
+
+## Étape 5, Ajouter le bloc panier
+
+**Boutique en ligne → Thèmes → Personnaliser → Panier** → bloc **Pay with lomi.**
+
+## Étape 6, Faire un paiement test
+
+Payez depuis le panier sur le checkout hébergé et vérifiez la finalisation du brouillon Shopify.
+
+## Checklist de configuration (référence)
 
 1. Collez la **clé secrète** et le **secret webhook** dans les réglages de l’app.
 2. Dans [dashboard.lomi.africa](https://dashboard.lomi.africa) → **Webhooks**, créez un endpoint :
