@@ -1,38 +1,36 @@
 /* @proprietary license */
 
 /**
- * Concatenate French regulatory documentation into Markdown, HTML, and optional PDF.
- *
- * Default scope (BCEAO / audit friendly):
- * - API conceptual pages (auth, errors, data models, payment state machine)
- * - API reference overview + all public REST operation pages in sidebar order
- * - Organization radar settings pages
- * - Advanced integration guides (webhooks, idempotency, security, errors)
- *
- * Excludes onboarding fluff: Start, UI, ecommerce plugins, contributing, open-source.
+ * Export French regulatory documentation packs (3 books):
+ * 1. Merchant REST API reference
+ * 2. Services / product overview (Network, products, channels, platform, MoR)
+ * 3. Agent platform (MCP, OAuth, provisioning, partner API)
  *
  * Run from apps/docs:
- *   pnpm docs:export-fr-book
- *   pnpm docs:export-fr-book -- --out ../../docs/compliance/exports/lomi-reference-api-fr.md
  *   pnpm docs:export-fr-book -- --pdf
+ *   pnpm docs:export-fr-book -- --book api --pdf
+ *   pnpm docs:export-fr-book -- --book services --pdf
+ *   pnpm docs:export-fr-book -- --book agent --pdf
+ *   pnpm docs:export-fr-book -- --book all --pdf
  */
 
-import { createHash } from 'node:crypto';
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  writeFileSync,
-} from 'node:fs';
-import { basename, dirname, join, relative, resolve } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { REST_API_SECTION_ORDER } from '@/lib/scripts/manual-api/constants';
+import {
+  type BookSection,
+  existingFiles,
+  renderBook,
+  writeBookArtifacts,
+} from '@/lib/scripts/export-french-book-shared';
 
 const DOCS_ROOT = join(process.cwd(), 'content/docs');
 const DEFAULT_OUT_DIR = join(process.cwd(), '../../docs/compliance/exports');
-const DEFAULT_OUT = join(DEFAULT_OUT_DIR, 'lomi-reference-api-fr.md');
+
+const BOOK_IDS = ['api', 'services', 'agent', 'all'] as const;
+type BookId = (typeof BOOK_IDS)[number];
+type ConcreteBookId = Exclude<BookId, 'all'>;
 
 const API_CONCEPT_PAGES = [
   'authentication.fr.mdx',
@@ -54,53 +52,31 @@ const ADVANCED_GUIDE_ORDER = [
   'ci-cd.fr.mdx',
 ] as const;
 
-type BookSection = {
-  title: string;
-  files: string[];
-};
-
 type CliOptions = {
-  outPath: string;
+  book: BookId;
   pdf: boolean;
+  outDir: string;
 };
 
 function parseArgs(): CliOptions {
-  const args = process.argv.slice(2);
-  const outIdx = args.indexOf('--out');
-  const outPath =
+  const args = process.argv.slice(2).filter((arg) => arg !== '--');
+  const bookIdx = args.indexOf('--book');
+  const outIdx = args.indexOf('--out-dir');
+  const bookRaw = bookIdx === -1 ? 'all' : args[bookIdx + 1];
+  if (!bookRaw || !BOOK_IDS.includes(bookRaw as BookId)) {
+    throw new Error(
+      `Invalid --book value. Expected one of: ${BOOK_IDS.join(', ')}`,
+    );
+  }
+  const outDir =
     outIdx === -1
-      ? DEFAULT_OUT
+      ? DEFAULT_OUT_DIR
       : (() => {
           const value = args[outIdx + 1];
-          if (!value) throw new Error('Missing path after --out');
+          if (!value) throw new Error('Missing path after --out-dir');
           return value;
         })();
-  return { outPath, pdf: args.includes('--pdf') };
-}
-
-function stripFrontmatter(source: string): { title?: string; body: string } {
-  if (!source.startsWith('---')) {
-    return { body: source.trim() };
-  }
-  const end = source.indexOf('\n---', 3);
-  if (end === -1) {
-    return { body: source.trim() };
-  }
-  const frontmatter = source.slice(3, end).trim();
-  const titleMatch = frontmatter.match(/^title:\s*['"]?(.+?)['"]?\s*$/m);
-  const body = source.slice(end + 4).trim();
-  return { title: titleMatch?.[1], body };
-}
-
-function sanitizeMdxForPrint(body: string): string {
-  return body
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('import '))
-    .join('\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/\[([^\]]+)\]\((\/[^)]+)\)/g, '$1 ($2)')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+  return { book: bookRaw as BookId, pdf: args.includes('--pdf'), outDir };
 }
 
 function listSectionOperationPages(sectionDir: string): string[] {
@@ -113,12 +89,12 @@ function listSectionOperationPages(sectionDir: string): string[] {
     .map((name) => join(sectionDir, name));
 }
 
-function sha256File(path: string): string {
-  return createHash('sha256').update(readFileSync(path)).digest('hex');
+function docsPath(...parts: string[]): string {
+  return join(DOCS_ROOT, ...parts);
 }
 
-function buildSections(): BookSection[] {
-  const apiRoot = join(DOCS_ROOT, 'api');
+function buildApiSections(): BookSection[] {
+  const apiRoot = docsPath('api');
   const apiFiles: string[] = [];
 
   const overview = join(apiRoot, 'index.fr.mdx');
@@ -140,7 +116,7 @@ function buildSections(): BookSection[] {
   }
 
   const guideFiles = ADVANCED_GUIDE_ORDER.map((name) =>
-    join(DOCS_ROOT, 'build/advanced-guides', name),
+    docsPath('build/advanced-guides', name),
   ).filter((path) => existsSync(path));
 
   return [
@@ -149,366 +125,308 @@ function buildSections(): BookSection[] {
   ];
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
+function buildServicesSections(): BookSection[] {
+  return [
+    {
+      title: 'Vue d’ensemble plateforme',
+      files: existingFiles([
+        docsPath('start/overview.fr.mdx'),
+        docsPath('start/integration-journey.fr.mdx'),
+        docsPath('build/fundamentals/index.fr.mdx'),
+        docsPath('build/platform/organizations.fr.mdx'),
+        docsPath('build/platform/merchants.fr.mdx'),
+        docsPath('build/platform/customers.fr.mdx'),
+      ]),
+    },
+    {
+      title: 'lomi. Network',
+      files: existingFiles([
+        docsPath('resources/network/index.fr.mdx'),
+        docsPath('resources/network/onboarding-journey.fr.mdx'),
+      ]),
+    },
+    {
+      title: 'Produits et catalogue',
+      files: existingFiles([
+        docsPath('build/products.fr.mdx'),
+        docsPath('build/digital-products.fr.mdx'),
+        docsPath('build/subscriptions.fr.mdx'),
+        docsPath('build/usage-billing.fr.mdx'),
+        docsPath('build/discount-coupons.fr.mdx'),
+      ]),
+    },
+    {
+      title: 'Paiements et canaux',
+      files: existingFiles([
+        docsPath('build/payment-channels.fr.mdx'),
+        docsPath('build/payment-methods/cards.fr.mdx'),
+        docsPath('build/payment-methods/wave.fr.mdx'),
+        docsPath('build/payment-methods/mtn-momo.fr.mdx'),
+        docsPath('build/payment-methods/spi.fr.mdx'),
+        docsPath('build/mobile-money.fr.mdx'),
+        docsPath('build/checkout.fr.mdx'),
+        docsPath('build/payment-links.fr.mdx'),
+        docsPath('build/payment-requests.fr.mdx'),
+        docsPath('build/direct-charges.fr.mdx'),
+        docsPath('build/payments/charges.fr.mdx'),
+        docsPath('build/payments/checkout-behavior.fr.mdx'),
+        docsPath('build/payments/payout-lifecycle.fr.mdx'),
+      ]),
+    },
+    {
+      title: 'Cycle de vie et opérations',
+      files: existingFiles([
+        docsPath('build/guides/payment-lifecycle.fr.mdx'),
+        docsPath('build/guides/verify-payments.fr.mdx'),
+        docsPath('build/fundamentals/transactions.fr.mdx'),
+        docsPath('build/transactions.fr.mdx'),
+        docsPath('build/fundamentals/webhooks.fr.mdx'),
+        docsPath('build/webhooks.fr.mdx'),
+        docsPath('build/refunds.fr.mdx'),
+        docsPath('build/disputes.fr.mdx'),
+        docsPath('build/payouts.fr.mdx'),
+        docsPath('build/balance-and-settlement.fr.mdx'),
+        docsPath('build/radar.fr.mdx'),
+        docsPath('build/customer-portal.fr.mdx'),
+      ]),
+    },
+    {
+      title: 'Merchant of Record',
+      files: existingFiles([
+        docsPath('resources/merchant-of-record/index.fr.mdx'),
+        docsPath('resources/merchant-of-record/pricing.fr.mdx'),
+        docsPath('resources/merchant-of-record/acceptable-use.fr.mdx'),
+        docsPath('resources/merchant-of-record/account-reviews.fr.mdx'),
+      ]),
+    },
+  ].filter((section) => section.files.length > 0);
 }
 
-function markdownToHtml(markdown: string): string {
-  const lines = markdown.replace(/\r\n/g, '\n').split('\n');
-  const html: string[] = [];
-  let inCode = false;
-  let inUl = false;
-  let inOl = false;
-  let inTable = false;
-  let paragraph: string[] = [];
-
-  const closeLists = () => {
-    if (inUl) {
-      html.push('</ul>');
-      inUl = false;
-    }
-    if (inOl) {
-      html.push('</ol>');
-      inOl = false;
-    }
-  };
-
-  const flushParagraph = () => {
-    if (paragraph.length === 0) return;
-    const text = paragraph.join(' ').trim();
-    if (text) html.push(`<p>${inlineFormat(text)}</p>`);
-    paragraph = [];
-  };
-
-  const inlineFormat = (text: string): string => {
-    let out = escapeHtml(text);
-    out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
-    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    out = out.replace(/_([^_]+)_/g, '<em>$1</em>');
-    return out;
-  };
-
-  for (const rawLine of lines) {
-    const line = rawLine;
-
-    if (line.startsWith('```')) {
-      flushParagraph();
-      closeLists();
-      if (inTable) {
-        html.push('</table>');
-        inTable = false;
+type AgentOpenApi = {
+  paths?: Record<
+    string,
+    Record<
+      string,
+      {
+        summary?: string;
+        description?: string;
+        operationId?: string;
+        tags?: string[];
+        parameters?: Array<{
+          name?: string;
+          in?: string;
+          required?: boolean;
+          description?: string;
+        }>;
+        requestBody?: { description?: string };
+        responses?: Record<string, { description?: string }>;
+        security?: Array<Record<string, string[]>>;
       }
-      if (inCode) {
-        html.push('</code></pre>');
-        inCode = false;
-      } else {
-        html.push('<pre><code>');
-        inCode = true;
-      }
-      continue;
-    }
+    >
+  >;
+};
 
-    if (inCode) {
-      html.push(`${escapeHtml(line)}\n`);
-      continue;
-    }
-
-    if (/^\|.+\|$/.test(line.trim())) {
-      flushParagraph();
-      closeLists();
-      const cells = line
-        .trim()
-        .slice(1, -1)
-        .split('|')
-        .map((cell) => cell.trim());
-      if (/^\|?\s*:?-{3,}/.test(line.trim())) {
-        continue;
-      }
-      if (!inTable) {
-        html.push('<table>');
-        html.push(
-          `<thead><tr>${cells.map((c) => `<th>${inlineFormat(c)}</th>`).join('')}</tr></thead><tbody>`,
-        );
-        inTable = true;
-      } else {
-        html.push(
-          `<tr>${cells.map((c) => `<td>${inlineFormat(c)}</td>`).join('')}</tr>`,
-        );
-      }
-      continue;
-    }
-
-    if (inTable) {
-      html.push('</tbody></table>');
-      inTable = false;
-    }
-
-    if (line.trim() === '') {
-      flushParagraph();
-      closeLists();
-      continue;
-    }
-
-    const heading = line.match(/^(#{1,6})\s+(.+)$/);
-    if (heading) {
-      flushParagraph();
-      closeLists();
-      const level = heading[1].length;
-      html.push(`<h${level}>${inlineFormat(heading[2])}</h${level}>`);
-      continue;
-    }
-
-    if (line.trim() === '---') {
-      flushParagraph();
-      closeLists();
-      html.push('<hr />');
-      continue;
-    }
-
-    const ul = line.match(/^\s*[-*]\s+(.+)$/);
-    if (ul) {
-      flushParagraph();
-      if (inOl) {
-        html.push('</ol>');
-        inOl = false;
-      }
-      if (!inUl) {
-        html.push('<ul>');
-        inUl = true;
-      }
-      html.push(`<li>${inlineFormat(ul[1])}</li>`);
-      continue;
-    }
-
-    const ol = line.match(/^\s*\d+\.\s+(.+)$/);
-    if (ol) {
-      flushParagraph();
-      if (inUl) {
-        html.push('</ul>');
-        inUl = false;
-      }
-      if (!inOl) {
-        html.push('<ol>');
-        inOl = true;
-      }
-      html.push(`<li>${inlineFormat(ol[1])}</li>`);
-      continue;
-    }
-
-    if (line.trim().startsWith('>')) {
-      flushParagraph();
-      closeLists();
-      html.push(
-        `<blockquote><p>${inlineFormat(line.replace(/^\s*>\s?/, ''))}</p></blockquote>`,
-      );
-      continue;
-    }
-
-    paragraph.push(line.trim());
+function renderAgentOpenApiReference(): string {
+  const agentPath = join(process.cwd(), 'agent-openapi.json');
+  if (!existsSync(agentPath)) {
+    return '_Contrat agent-openapi.json introuvable._';
   }
 
-  flushParagraph();
-  closeLists();
-  if (inTable) html.push('</tbody></table>');
-  if (inCode) html.push('</code></pre>');
-  return html.join('\n');
-}
-
-function wrapHtmlDocument(title: string, bodyHtml: string): string {
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <title>${escapeHtml(title)}</title>
-  <style>
-    @page { margin: 18mm 14mm; }
-    body {
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: 11pt;
-      line-height: 1.45;
-      color: #111;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-    h1, h2, h3, h4 { page-break-after: avoid; }
-    h1 { font-size: 22pt; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
-    h2 { font-size: 16pt; margin-top: 28px; }
-    h3 { font-size: 13pt; }
-    code, pre {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 9.5pt;
-    }
-    pre {
-      background: #f6f6f6;
-      border: 1px solid #e5e5e5;
-      padding: 10px;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 12px 0;
-      font-size: 9.5pt;
-      page-break-inside: auto;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px 8px;
-      text-align: left;
-      vertical-align: top;
-    }
-    th { background: #f3f3f3; }
-    blockquote {
-      border-left: 3px solid #999;
-      margin-left: 0;
-      padding-left: 12px;
-      color: #333;
-    }
-    hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
-    @media print {
-      body { padding: 0; }
-      a { color: inherit; text-decoration: none; }
-    }
-  </style>
-</head>
-<body>
-${bodyHtml}
-</body>
-</html>
-`;
-}
-
-function renderBook(sections: BookSection[]): string {
-  const generatedAt = new Date().toISOString().slice(0, 10);
-  const openapiPath = join(process.cwd(), 'openapi.json');
-  const openapiHash = existsSync(openapiPath) ? sha256File(openapiPath) : 'n/a';
-
+  const spec = JSON.parse(readFileSync(agentPath, 'utf-8')) as AgentOpenApi;
+  const paths = spec.paths ?? {};
   const lines: string[] = [
-    '# lomi. - Documentation technique française (extrait réglementaire)',
-    '',
-    `> Généré le ${generatedAt} depuis \`apps/docs\`.`,
-    '> Périmètre : référence API marchande publique et guides avancés. Exclut Start, UI, plugins e-commerce et pages contributeur.',
-    '> Ce livre Markdown ne remplace pas le contrat OpenAPI ni les pièces juridiques du dossier BCEAO.',
-    `> Empreinte SHA-256 de \`apps/docs/openapi.json\` au moment de la génération : \`${openapiHash}\`.`,
-    '',
-    '## Table des matières',
+    'Référence machine des surfaces agent, partner et provisioning. Contrat source : `apps/docs/agent-openapi.json`.',
     '',
   ];
 
-  for (const section of sections) {
-    lines.push(`- **${section.title}** (${section.files.length} pages)`);
-    for (const file of section.files) {
-      const { title } = stripFrontmatter(readFileSync(file, 'utf-8'));
-      const slug = basename(file, '.fr.mdx');
-      lines.push(`  - ${title ?? slug}`);
+  for (const route of Object.keys(paths).sort()) {
+    const methods = paths[route] ?? {};
+    for (const method of Object.keys(methods).sort()) {
+      if (!['get', 'post', 'put', 'patch', 'delete'].includes(method)) continue;
+      const op = methods[method];
+      if (!op) continue;
+      const title = op.summary?.trim() || op.operationId || `${method} ${route}`;
+      lines.push(`### ${method.toUpperCase()} \`${route}\``, '');
+      lines.push(`**${title}**`, '');
+      if (op.description?.trim()) {
+        lines.push(op.description.trim(), '');
+      }
+      if (op.tags?.length) {
+        lines.push(`Tags : ${op.tags.join(', ')}`, '');
+      }
+      if (op.security?.length) {
+        const schemes = op.security
+          .flatMap((entry) => Object.keys(entry))
+          .join(', ');
+        lines.push(`Sécurité : ${schemes || 'déclarée'}`, '');
+      } else {
+        lines.push('Sécurité : non authentifiée ou selon contrat', '');
+      }
+      if (op.parameters?.length) {
+        lines.push('Paramètres :', '');
+        for (const param of op.parameters) {
+          const req = param.required ? 'requis' : 'optionnel';
+          lines.push(
+            `- \`${param.name ?? '?'}\` (${param.in ?? 'n/a'}, ${req})${param.description ? ` - ${param.description}` : ''}`,
+          );
+        }
+        lines.push('');
+      }
+      if (op.requestBody?.description) {
+        lines.push(`Corps : ${op.requestBody.description}`, '');
+      }
+      if (op.responses) {
+        const codes = Object.keys(op.responses).sort();
+        lines.push(
+          `Réponses : ${codes.map((code) => `${code}${op.responses?.[code]?.description ? ` (${op.responses[code].description})` : ''}`).join(', ')}`,
+          '',
+        );
+      }
     }
-    lines.push('');
   }
 
-  for (const section of sections) {
-    lines.push('---', '', `# ${section.title}`, '');
-    for (const file of section.files) {
-      const raw = readFileSync(file, 'utf-8');
-      const { title, body } = stripFrontmatter(raw);
-      const rel = relative(DOCS_ROOT, file);
-      lines.push(
-        `## ${title ?? basename(file, '.fr.mdx')}`,
-        '',
-        `_Source : ${rel}_`,
-        '',
-      );
-      lines.push(sanitizeMdxForPrint(body), '', '---', '');
-    }
-  }
-
-  lines.push(
-    '## Annexe - Contrat OpenAPI',
-    '',
-    'Le schéma machine-readable complet est disponible dans le dépôt : `apps/docs/openapi.json`.',
-    `Empreinte SHA-256 : \`${openapiHash}\`.`,
-    'Joindre cette empreinte au paquet transmis si la BCEAO ou un auditeur exige la traçabilité du contrat.',
-    '',
-  );
-
-  return `${lines.join('\n').trim()}\n`;
+  return lines.join('\n').trim();
 }
 
-function findChrome(): string | null {
-  const candidates = [
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
-    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+function buildAgentCredentialOverview(): string {
+  return [
+    'Cette section décrit les identifiants et flux utilisés pour l’onboarding agent (0→1), MCP et Partner API.',
+    '',
+    '### Types d’identifiants',
+    '',
+    '| Identifiant | Rôle |',
+    '| --- | --- |',
+    '| `lomi_partner_*` | Clé de gestion plateforme (émise par lomi.). Sert à créer des clés de provisioning par utilisateur externe. |',
+    '| `lomi_prov_*` | Clé de provisioning pour `/provisioning/v1/*` et les outils MCP d’onboarding (`x-lomi-provisioning-key`). |',
+    '| `lomi_oat_*` | Jeton OAuth MCP; introspecté vers une session scoped provisioning / marchande. |',
+    '| `lomi_sk_*` / `lomi_sk_test_*` | Clé secrète marchande (API REST publique et outils MCP marchands). |',
+    '',
+    '### Partner API',
+    '',
+    'En-tête : `x-lomi-partner-key` ou `Authorization: Bearer lomi_partner_*`.',
+    '',
+    '- `POST /partners/v1/provisioning-keys` : créer une clé `lomi_prov_*` pour un `external_user_ref`',
+    '- `GET /partners/v1/provisioning-keys` : lister',
+    '- `DELETE /partners/v1/provisioning-keys/{id}` : révoquer',
+    '- `GET /partners/v1/usage` : résumé d’usage',
+    '',
+    '### OAuth MCP (self-service)',
+    '',
+    '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`',
+    '2. `POST https://api.lomi.africa/oauth/register` (DCR optionnel)',
+    '3. `GET https://api.lomi.africa/oauth/authorize` (PKCE + `resource`); approbation humaine sur `https://dashboard.lomi.africa/connect/agent-connect`',
+    '4. `POST https://api.lomi.africa/oauth/token` → `lomi_oat_*`',
+    '5. Connexion MCP avec `Authorization: Bearer <access_token>`',
+    '',
+    '### Test → live (validation humaine)',
+    '',
+    '- `POST /provisioning/v1/merchants/{id}/live-activation/request` : l’agent demande le passage en live',
+    '- `GET /provisioning/v1/merchants/{id}/live-activation/status` : suivi jusqu’à approbation',
+    '- Le marchand approuve sur `https://dashboard.lomi.africa/connect/go-live` et récupère la clé live `lomi_sk_*` (jamais via l’API de provisioning)',
+    '',
+  ].join('\n');
+}
+
+function buildAgentSections(): BookSection[] {
+  return [
+    {
+      title: 'Identifiants et flux agent',
+      files: [],
+      inlinePages: [
+        {
+          title: 'Vue d’ensemble des identifiants agent',
+          body: buildAgentCredentialOverview(),
+        },
+      ],
+    },
+    {
+      title: 'MCP et accès développeur',
+      files: existingFiles([
+        docsPath('build/mcp/index.fr.mdx'),
+        docsPath('start/api-keys.fr.mdx'),
+        docsPath('start/go-live.fr.mdx'),
+      ]),
+    },
+    {
+      title: 'Contrat OpenAPI agent / partner / provisioning',
+      files: [],
+      inlinePages: [
+        {
+          title: 'Référence des opérations agent-openapi.json',
+          body: renderAgentOpenApiReference(),
+        },
+      ],
+    },
   ];
-  return candidates.find((path) => existsSync(path)) ?? null;
 }
 
-function exportPdfFromHtml(htmlPath: string, pdfPath: string): void {
-  const chrome = findChrome();
-  if (!chrome) {
-    throw new Error(
-      'No Chrome/Chromium/Edge found for PDF export. HTML was still written.',
-    );
+const BOOK_META: Record<
+  ConcreteBookId,
+  {
+    title: string;
+    fileStem: string;
+    build: () => BookSection[];
   }
-  const fileUrl = `file://${resolve(htmlPath)}`;
-  const result = spawnSync(
-    chrome,
-    [
-      '--headless=new',
-      '--disable-gpu',
-      '--no-pdf-header-footer',
-      `--print-to-pdf=${resolve(pdfPath)}`,
-      fileUrl,
-    ],
-    { encoding: 'utf-8' },
+> = {
+  api: {
+    title: 'Documentation technique lomi.',
+    fileStem: 'lomi-reference-api-fr',
+    build: buildApiSections,
+  },
+  services: {
+    title: 'Vue d’ensemble des services lomi.',
+    fileStem: 'lomi-services-overview-fr',
+    build: buildServicesSections,
+  },
+  agent: {
+    title: 'Plateforme agent lomi.',
+    fileStem: 'lomi-agent-platform-fr',
+    build: buildAgentSections,
+  },
+};
+
+function countPages(sections: BookSection[]): number {
+  return sections.reduce(
+    (sum, section) =>
+      sum + section.files.length + (section.inlinePages?.length ?? 0),
+    0,
   );
-  if (result.status !== 0 || !existsSync(pdfPath)) {
-    throw new Error(
-      `Chrome PDF export failed (status ${result.status}): ${result.stderr || result.stdout}`,
-    );
+}
+
+function exportBook(bookId: ConcreteBookId, outDir: string, pdf: boolean): void {
+  const meta = BOOK_META[bookId];
+  const sections = meta.build();
+  const total = countPages(sections);
+  if (total === 0) {
+    throw new Error(`No French pages found for book "${bookId}".`);
+  }
+
+  const markdown = renderBook({
+    title: meta.title,
+    sections,
+  });
+  const outPath = join(outDir, `${meta.fileStem}.md`);
+  writeBookArtifacts({ outPath, title: meta.title, markdown, pdf });
+
+  console.log(`Book ${bookId}: ${total} pages`);
+  for (const section of sections) {
+    const n = section.files.length + (section.inlinePages?.length ?? 0);
+    console.log(`  - ${section.title}: ${n}`);
   }
 }
 
 async function main(): Promise<void> {
-  const { outPath, pdf } = parseArgs();
-  const sections = buildSections();
-  const totalPages = sections.reduce((sum, s) => sum + s.files.length, 0);
+  const { book, pdf, outDir } = parseArgs();
+  const targets: ConcreteBookId[] =
+    book === 'all' ? ['api', 'services', 'agent'] : [book];
 
-  if (totalPages === 0) {
-    console.error('No French pages found for export.');
-    process.exit(1);
+  for (const target of targets) {
+    console.log(`\n=== Export ${target} ===`);
+    exportBook(target, outDir, pdf);
   }
 
-  const book = renderBook(sections);
-  mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, book, 'utf-8');
-
-  const htmlPath = outPath.replace(/\.md$/i, '.html');
-  const html = wrapHtmlDocument(
-    'lomi. - Documentation technique française',
-    markdownToHtml(book),
-  );
-  writeFileSync(htmlPath, html, 'utf-8');
-
-  console.log(`Wrote ${totalPages} pages to ${outPath}`);
-  console.log(`Wrote HTML to ${htmlPath}`);
-  for (const section of sections) {
-    console.log(`  - ${section.title}: ${section.files.length}`);
-  }
-
-  if (pdf) {
-    const pdfPath = outPath.replace(/\.md$/i, '.pdf');
-    exportPdfFromHtml(htmlPath, pdfPath);
-    console.log(`Wrote PDF to ${pdfPath}`);
-  } else {
-    console.log('Tip: add --pdf to also generate a Chrome headless PDF.');
+  if (!pdf) {
+    console.log('\nTip: add --pdf to also generate Chrome headless PDFs.');
   }
 }
 

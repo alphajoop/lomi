@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 /**
- * Compute SHA-256 fingerprints for OpenAPI and French regulatory book exports.
+ * Compute SHA-256 fingerprints for OpenAPI specs and French regulatory book exports.
  *
  * Run from apps/docs:
  *   pnpm docs:fingerprint-openapi
@@ -13,13 +13,21 @@ import { basename, join } from 'node:path';
 
 const EXPORT_DIR = join(process.cwd(), '../../docs/compliance/exports');
 const OPENAPI_PATH = join(process.cwd(), 'openapi.json');
+const AGENT_OPENAPI_PATH = join(process.cwd(), 'agent-openapi.json');
 const MANIFEST_PATH = join(EXPORT_DIR, 'MANIFEST-empreintes.md');
 
 const TRACKED_FILES = [
   OPENAPI_PATH,
+  AGENT_OPENAPI_PATH,
   join(EXPORT_DIR, 'lomi-reference-api-fr.md'),
   join(EXPORT_DIR, 'lomi-reference-api-fr.html'),
   join(EXPORT_DIR, 'lomi-reference-api-fr.pdf'),
+  join(EXPORT_DIR, 'lomi-services-overview-fr.md'),
+  join(EXPORT_DIR, 'lomi-services-overview-fr.html'),
+  join(EXPORT_DIR, 'lomi-services-overview-fr.pdf'),
+  join(EXPORT_DIR, 'lomi-agent-platform-fr.md'),
+  join(EXPORT_DIR, 'lomi-agent-platform-fr.html'),
+  join(EXPORT_DIR, 'lomi-agent-platform-fr.pdf'),
 ] as const;
 
 function sha256File(path: string): string {
@@ -56,7 +64,7 @@ function main(): void {
 
   if (rows.length === 0) {
     console.error(
-      'No files to fingerprint. Run pnpm docs:export-fr-book first.',
+      'No files to fingerprint. Run pnpm docs:export-fr-book -- --pdf first.',
     );
     process.exit(1);
   }
@@ -66,7 +74,13 @@ function main(): void {
     '',
     `Généré le ${generatedAt}.`,
     '',
-    'Ces empreintes SHA-256 permettent de relier le paquet transmis à un snapshot exact du contrat OpenAPI et du livre de référence française.',
+    'Paquet en 3 documents :',
+    '',
+    '1. `lomi-reference-api-fr` : référence API REST marchande',
+    '2. `lomi-services-overview-fr` : Network, produits, canaux, plateforme, MoR',
+    '3. `lomi-agent-platform-fr` : MCP, OAuth, provisioning, Partner API',
+    '',
+    'Ces empreintes SHA-256 relient le paquet transmis aux snapshots OpenAPI (`openapi.json`, `agent-openapi.json`) et aux livres exportés.',
     '',
     '| Artefact | Octets | SHA-256 |',
     '| --- | ---: | --- |',
@@ -80,7 +94,7 @@ function main(): void {
     '',
     '## Usage',
     '',
-    '1. Régénérer le livre : `cd apps/docs && pnpm docs:export-fr-book -- --pdf`',
+    '1. Régénérer les 3 livres : `cd apps/docs && pnpm docs:export-fr-book -- --pdf`',
     '2. Régénérer ce manifeste : `pnpm docs:fingerprint-openapi`',
     '3. Joindre `MANIFEST-empreintes.md` et les artefacts listés au dossier confidentiel.',
     '',
