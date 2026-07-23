@@ -344,7 +344,9 @@ export function renderBook(options: {
   for (const section of sections) {
     lines.push(`- **${section.title}**`);
     for (const file of section.files) {
-      const { title: pageTitle } = stripFrontmatter(readFileSync(file, 'utf-8'));
+      const { title: pageTitle } = stripFrontmatter(
+        readFileSync(file, 'utf-8'),
+      );
       const slug = basename(file).replace(/\.fr\.mdx$/i, '');
       lines.push(`  - ${pageTitle ?? slug}`);
     }

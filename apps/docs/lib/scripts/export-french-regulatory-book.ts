@@ -245,7 +245,8 @@ function renderAgentOpenApiReference(): string {
       if (!['get', 'post', 'put', 'patch', 'delete'].includes(method)) continue;
       const op = methods[method];
       if (!op) continue;
-      const title = op.summary?.trim() || op.operationId || `${method} ${route}`;
+      const title =
+        op.summary?.trim() || op.operationId || `${method} ${route}`;
       lines.push(`### ${method.toUpperCase()} \`${route}\``, '');
       lines.push(`**${title}**`, '');
       if (op.description?.trim()) {
@@ -393,7 +394,11 @@ function countPages(sections: BookSection[]): number {
   );
 }
 
-function exportBook(bookId: ConcreteBookId, outDir: string, pdf: boolean): void {
+function exportBook(
+  bookId: ConcreteBookId,
+  outDir: string,
+  pdf: boolean,
+): void {
   const meta = BOOK_META[bookId];
   const sections = meta.build();
   const total = countPages(sections);
