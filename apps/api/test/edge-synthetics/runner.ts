@@ -74,7 +74,7 @@ export async function runSuite(
         auth: check.auth,
       });
 
-      let anomalies = analyzeResponse(res, expected);
+      const anomalies = analyzeResponse(res, expected);
 
       if (check.validate && anomalies.length === 0) {
         const validationError = check.validate(ctx, res);
