@@ -3,8 +3,8 @@
 import { defineI18n } from 'fumadocs-core/i18n';
 
 /**
- * English + French. `hideLocale: 'always'` keeps public URLs free of a locale
- * segment; locale is selected via the `lomi.language` cookie in server components.
+ * English is the source-file fallback. Public routing is French at unprefixed URLs
+ * and English at `/en/...`; `proxy.ts` supplies the route locale to server components.
  */
 export const fumadocsI18n = defineI18n({
   defaultLanguage: 'en',

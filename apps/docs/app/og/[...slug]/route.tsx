@@ -3,6 +3,7 @@
 import { source } from '@/lib/utils/source';
 import { notFound } from 'next/navigation';
 import { generateOGImage } from '@/lib/og/mono';
+import type { Language } from '@/lib/i18n/config';
 
 export const revalidate = false;
 
@@ -11,8 +12,9 @@ export async function GET(
   { params }: { params: Promise<{ slug: string[] }> },
 ) {
   const { slug } = await params;
-  // OG images use default locale so crawlers without `lomi.language` see consistent branding.
-  const page = source.getPage(slug.slice(0, -1), 'en');
+  const [localeSegment, ...localizedSlug] = slug;
+  const locale: Language = localeSegment === 'fr' ? 'fr' : 'en';
+  const page = source.getPage(localizedSlug.slice(0, -1), locale);
   if (!page) notFound();
 
   return generateOGImage({
@@ -24,7 +26,9 @@ export async function GET(
 export function generateStaticParams(): {
   slug: string[];
 }[] {
-  return source.getPages('en').map((page) => ({
-    slug: [...page.slugs, 'image.png'],
-  }));
+  return (['fr', 'en'] as const).flatMap((locale) =>
+    source.getPages(locale).map((page) => ({
+      slug: [locale, ...page.slugs, 'image.png'],
+    })),
+  );
 }

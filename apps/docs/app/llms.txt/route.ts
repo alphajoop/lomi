@@ -278,7 +278,7 @@ export async function GET() {
   );
   lines.push('');
   lines.push(
-    '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`',
+    '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp`',
   );
   lines.push('2. `POST https://api.lomi.africa/oauth/register` (optional DCR)');
   lines.push(

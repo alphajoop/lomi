@@ -313,7 +313,7 @@ function buildAgentCredentialOverview(): string {
     '',
     '### OAuth MCP (self-service)',
     '',
-    '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource`',
+    '1. `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp`',
     '2. `POST https://api.lomi.africa/oauth/register` (DCR optionnel)',
     '3. `GET https://api.lomi.africa/oauth/authorize` (PKCE + `resource`); approbation humaine sur `https://dashboard.lomi.africa/connect/agent-connect`',
     '4. `POST https://api.lomi.africa/oauth/token` → `lomi_oat_*`',

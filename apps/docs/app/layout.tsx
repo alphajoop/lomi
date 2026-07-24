@@ -40,7 +40,6 @@ export const metadata: Metadata = {
     'subscriptions',
     'visa',
     'mastercard',
-    'orange',
     'mtn',
     'wave',
     'paiement en ligne',
@@ -84,21 +83,14 @@ export const metadata: Metadata = {
   },
   robots: 'index, follow',
   authors: [{ name: 'Babacar Diop', url: 'https://github.com/lomiafrica/' }],
-  alternates: {
-    canonical: docsOrigin,
-    languages: {
-      en: docsOrigin,
-      'x-default': docsOrigin,
-    },
-  },
   openGraph: {
     type: 'website',
-    url: `${docsOrigin}/`,
+    url: docsOrigin,
     title,
     description,
     siteName: 'lomi.',
-    locale: 'en_US',
-    alternateLocale: ['fr_FR'],
+    locale: 'fr_FR',
+    alternateLocale: ['en_US'],
     images: [
       {
         url: '/banner.webp',
@@ -119,14 +111,6 @@ export const metadata: Metadata = {
     creator: '@lomiafrica',
   },
   other: {
-    'og:title[fr]':
-      "lomi. | La meilleure façon d'accepter des paiements en Afrique de l'Ouest",
-    'og:description[fr]':
-      "lomi. est une suite d'APIs qui facilitent le traitement des paiements en ligne et les solutions de e-commerce en Afrique de l'Ouest. Acceptez des paiements, effectuez des versements et automatisez vos flux financiers en toute simplicité.",
-    'twitter:title[fr]':
-      "lomi. | La meilleure façon d'accepter des paiements en Afrique de l'Ouest",
-    'twitter:description[fr]':
-      "lomi. est une suite d'APIs qui facilitent le traitement des paiements en ligne et les solutions e-commerce en Afrique de l'Ouest. Acceptez des paiements, effectuez des versements et automatisez vos flux financiers en toute simplicité.",
     'msapplication-TileColor': '#da532c',
   },
 };

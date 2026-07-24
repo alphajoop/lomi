@@ -12,6 +12,16 @@ const monorepoRoot = join(__dirname, '..', '..', '..', '..');
 
 const paths = {
   agentCard: join(monorepoRoot, 'apps/website/public/.well-known/agent.json'),
+  websiteOpenApi: join(monorepoRoot, 'apps/website/public/openapi.json'),
+  websiteAgentOpenApi: join(
+    monorepoRoot,
+    'apps/website/public/agent-openapi.json',
+  ),
+  websiteLlmsMarketing: join(
+    monorepoRoot,
+    'apps/website/src/lib/seo/llms-marketing.ts',
+  ),
+  docsLlmsRoute: join(docsRoot, 'app/llms.txt/route.ts'),
   merchantOpenApi: join(docsRoot, 'openapi.json'),
   agentOpenApi: join(docsRoot, 'agent-openapi.json'),
   expectedPartnerOps: join(
@@ -24,6 +34,16 @@ const paths = {
   ),
 };
 
+function assertByteIdentical(sourcePath, destPath, label) {
+  const source = readFileSync(sourcePath);
+  const dest = readFileSync(destPath);
+  if (!source.equals(dest)) {
+    throw new Error(
+      `${label}: ${destPath} is not byte-identical to ${sourcePath}`,
+    );
+  }
+}
+
 function mustParseJson(label, filePath) {
   if (!existsSync(filePath)) {
     throw new Error(`Missing file: ${filePath} (${label})`);
@@ -35,14 +55,42 @@ function mustParseJson(label, filePath) {
 // The agent card lives in the private `apps/website` submodule, which is not
 // available on fork PRs (no PAT to clone a private repo). Validate it when the
 // submodule is checked out; skip gracefully otherwise so docs CI still runs.
+let agentCard = null;
 if (existsSync(paths.agentCard)) {
-  const agent = mustParseJson('agent card', paths.agentCard);
-  if (typeof agent.name !== 'string' || !agent.endpoints?.openapi) {
+  agentCard = mustParseJson('agent card', paths.agentCard);
+  if (typeof agentCard.name !== 'string' || !agentCard.endpoints?.openapi) {
     throw new Error('agent.json: expected name and endpoints.openapi');
   }
-  if (!agent.endpoints.agent_openapi) {
+  if (!agentCard.endpoints.agent_openapi) {
     throw new Error(
       'agent.json: expected endpoints.agent_openapi (re-run agent OpenAPI export)',
+    );
+  }
+  if (agentCard.$schema) {
+    throw new Error(
+      'agent.json: remove generic JSON Schema $schema unless a real agent-card schema is served',
+    );
+  }
+  if (!agentCard.endpoints.llms_txt?.includes('docs.lomi.africa/llms.txt')) {
+    throw new Error(
+      'agent.json: endpoints.llms_txt must point to docs.lomi.africa/llms.txt',
+    );
+  }
+  if (
+    !agentCard.endpoints.llms_full_txt?.includes('docs.lomi.africa/llms-full.txt')
+  ) {
+    throw new Error(
+      'agent.json: endpoints.llms_full_txt must point to docs.lomi.africa/llms-full.txt',
+    );
+  }
+  if (agentCard.endpoints.openapi !== 'https://lomi.africa/openapi.json') {
+    throw new Error(
+      'agent.json: endpoints.openapi must be https://lomi.africa/openapi.json',
+    );
+  }
+  if (agentCard.agent?.version && !agentCard.agent?.card_version) {
+    throw new Error(
+      'agent.json: use agent.card_version for card schema version, not agent.version',
     );
   }
 } else {
@@ -146,6 +194,69 @@ for (const entry of expectedProvisioningOps) {
   if (!op) {
     throw new Error(
       `agent-openapi.json missing provisioning operation ${entry} (re-run openapi:export:agent)`,
+    );
+  }
+}
+
+if (agentCard) {
+  for (const [key, url] of Object.entries(agentCard.agent ?? {})) {
+    if (key === 'card_version' || typeof url !== 'string') continue;
+    const pathKey = new URL(url).pathname;
+    if (!agentSpec.paths[pathKey]) {
+      throw new Error(
+        `agent.json: agent.${key} points to missing agent-openapi path ${pathKey}`,
+      );
+    }
+  }
+}
+
+if (
+  existsSync(paths.websiteOpenApi) &&
+  existsSync(paths.merchantOpenApi)
+) {
+  assertByteIdentical(
+    paths.merchantOpenApi,
+    paths.websiteOpenApi,
+    'website merchant OpenAPI mirror',
+  );
+}
+
+if (
+  existsSync(paths.websiteAgentOpenApi) &&
+  existsSync(paths.agentOpenApi)
+) {
+  assertByteIdentical(
+    paths.agentOpenApi,
+    paths.websiteAgentOpenApi,
+    'website agent OpenAPI mirror',
+  );
+}
+
+if (existsSync(paths.websiteLlmsMarketing)) {
+  const llmsMarketing = readFileSync(paths.websiteLlmsMarketing, 'utf-8');
+  const forbiddenLlmsPaths = [
+    '/build/guides/payment-links',
+    '/build/guides/subscriptions',
+    'Orange Money',
+  ];
+  for (const fragment of forbiddenLlmsPaths) {
+    if (llmsMarketing.includes(fragment)) {
+      throw new Error(
+        `llms-marketing.ts must not reference ${fragment} (stale link or unsupported claim)`,
+      );
+    }
+  }
+}
+
+if (existsSync(paths.docsLlmsRoute)) {
+  const docsLlms = readFileSync(paths.docsLlmsRoute, 'utf-8');
+  if (
+    !docsLlms.includes(
+      'https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp',
+    )
+  ) {
+    throw new Error(
+      'docs llms.txt route must document canonical MCP OAuth resource /oauth-protected-resource/mcp',
     );
   }
 }

@@ -4,7 +4,6 @@
     ".": {
       "next": true,
       "entry": [
-        "lib/scripts/generate_sitemap.ts",
         "lib/scripts/update-orama-index.ts"
       ],
       "project": [

@@ -10,6 +10,10 @@ import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
+import {
+  buildDocsAlternates,
+  localizeDocsPath,
+} from '@/lib/utils/docs-routing';
 import type { Language } from '@/lib/i18n/config';
 import { Wrapper } from '@/components/preview/wrapper';
 import { getMDXComponents } from '@/mdx-components';
@@ -60,18 +64,22 @@ const generator = createGenerator();
 
 export const revalidate = false;
 
+function serializeStructuredData(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
 export default async function Page({
   params,
 }: {
   params: Promise<{ slug?: string[] }>;
 }) {
   const resolvedParams = await params;
+  const locale = await getDocsLocale();
   if (!resolvedParams.slug || resolvedParams.slug.length === 0) {
-    redirect(`/${DEFAULT_DOC_SLUG.join('/')}`);
+    redirect(localizeDocsPath(`/${DEFAULT_DOC_SLUG.join('/')}`, locale));
   }
 
   const slug = effectiveSlug(resolvedParams.slug);
-  const locale = await getDocsLocale();
   const { page, resolvedLocale } = resolvePageForLocale(slug, locale);
 
   if (!page) notFound();
@@ -83,78 +91,136 @@ export default async function Page({
   const Mdx = pageData.body;
   const toc = pageData.toc;
   const lastModified = pageData.lastModified;
+  const origin = getDocsSiteOrigin();
+  const pagePath = page.url.startsWith('/') ? page.url : `/${page.url}`;
+  const canonicalUrl = `${origin}${localizeDocsPath(pagePath, locale)}`;
+  const overviewUrl = `${origin}${localizeDocsPath(
+    `/${DEFAULT_DOC_SLUG.join('/')}`,
+    locale,
+  )}`;
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'TechArticle',
+      headline: page.data.title,
+      description: page.data.description,
+      inLanguage: resolvedLocale,
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      publisher: {
+        '@type': 'Organization',
+        name: 'lomi.',
+        url: 'https://lomi.africa',
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'lomi. docs',
+          item: overviewUrl,
+        },
+        ...(canonicalUrl === overviewUrl
+          ? []
+          : [
+              {
+                '@type': 'ListItem',
+                position: 2,
+                name: page.data.title,
+                item: canonicalUrl,
+              },
+            ]),
+      ],
+    },
+  ];
+  const localizedPageUrl = localizeDocsPath(page.url, locale);
 
   return (
-    <DocsPage
-      toc={toc}
-      lastUpdate={lastModified ? new Date(lastModified) : undefined}
-      tableOfContent={{
-        style: 'clerk',
-      }}
-    >
-      <div className="docs-page-header">
-        <div className="docs-page-header-main">
-          <h1 className="docs-page-title font-semibold">{page.data.title}</h1>
-          <p className="docs-page-description">{page.data.description}</p>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeStructuredData(structuredData),
+        }}
+      />
+      <DocsPage
+        toc={toc}
+        lastUpdate={lastModified ? new Date(lastModified) : undefined}
+        tableOfContent={{
+          style: 'clerk',
+        }}
+      >
+        <div className="docs-page-header">
+          <div className="docs-page-header-main">
+            <h1 className="docs-page-title font-semibold">{page.data.title}</h1>
+            <p className="docs-page-description">{page.data.description}</p>
+          </div>
+          <div className="docs-page-actions">
+            <LLMCopyButton markdownUrl={`${localizedPageUrl}.mdx`} />
+            <ViewOptions
+              markdownUrl={`${localizedPageUrl}.mdx`}
+              githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
+            />
+          </div>
         </div>
-        <div className="docs-page-actions">
-          <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-          <ViewOptions
-            markdownUrl={`${page.url}.mdx`}
-            githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
-          />
-        </div>
-      </div>
-      <div className="prose flex-1 text-fd-foreground/80">
-        {preview ? <PreviewRenderer preview={preview} /> : null}
-        <Mdx
-          components={getMDXComponents({
-            ...Twoslash,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            a: ({ href, children, ...props }: any): JSX.Element => {
-              const resolvedHref = typeof href === 'string' ? href : '';
-              const found = source.getPageByHref(resolvedHref, {
-                dir: path.dirname(page.path),
-                language: resolvedLocale,
-              });
+        <div className="prose flex-1 text-fd-foreground/80">
+          {preview ? <PreviewRenderer preview={preview} /> : null}
+          <Mdx
+            components={getMDXComponents({
+              ...Twoslash,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              a: ({ href, children, ...props }: any): JSX.Element => {
+                const resolvedHref = typeof href === 'string' ? href : '';
+                const found = source.getPageByHref(resolvedHref, {
+                  dir: path.dirname(page.path),
+                  language: resolvedLocale,
+                });
 
-              if (!found) {
+                if (!found) {
+                  return (
+                    <Link href={resolvedHref} {...props}>
+                      {children}
+                    </Link>
+                  );
+                }
+
+                const localizedTarget = localizeDocsPath(
+                  found.page.url,
+                  locale,
+                );
+                const targetHref = found.hash
+                  ? `${localizedTarget}#${found.hash}`
+                  : localizedTarget;
                 return (
-                  <Link href={resolvedHref} {...props}>
+                  <Link href={targetHref} {...props}>
                     {children}
                   </Link>
                 );
-              }
-
-              const targetHref = found.hash
-                ? `${found.page.url}#${found.hash}`
-                : found.page.url;
-              return (
-                <Link href={targetHref} {...props}>
-                  {children}
-                </Link>
-              );
-            },
-            Banner,
-            TypeTable,
-            AutoTypeTable: (props) => (
-              <AutoTypeTable generator={generator} {...props} />
-            ),
-            Wrapper,
-            blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            DocsCategory: ({ url }: any): JSX.Element => {
-              return <DocsCategory url={url ?? page.url} locale={locale} />;
-            },
-            Installation,
-            Customisation,
-          })}
-        />
-        {pageData.index ? (
-          <DocsCategory url={page.url} locale={resolvedLocale} />
-        ) : null}
-      </div>
-    </DocsPage>
+              },
+              Banner,
+              TypeTable,
+              AutoTypeTable: (props) => (
+                <AutoTypeTable generator={generator} {...props} />
+              ),
+              Wrapper,
+              blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              DocsCategory: ({ url }: any): JSX.Element => {
+                return <DocsCategory url={url ?? page.url} locale={locale} />;
+              },
+              Installation,
+              Customisation,
+            })}
+          />
+          {pageData.index ? (
+            <DocsCategory url={page.url} locale={resolvedLocale} />
+          ) : null}
+        </div>
+      </DocsPage>
+    </>
   );
 }
 
@@ -168,7 +234,11 @@ function DocsCategory({ url, locale }: { url: string; locale: Language }) {
     <div className="not-prose my-5">
       <Cards className="gap-3">
         {peersArray.map((peer) => (
-          <Card key={peer.url} title={peer.name} href={peer.url}>
+          <Card
+            key={peer.url}
+            title={peer.name}
+            href={localizeDocsPath(peer.url, locale)}
+          >
             {peer.description}
           </Card>
         ))}
@@ -192,7 +262,7 @@ export async function generateMetadata({
     page.data.description ?? 'The library for building documentation sites';
 
   const origin = getDocsSiteOrigin();
-  const ogPath = [...page.slugs, 'image.png'].join('/');
+  const ogPath = [locale, ...page.slugs, 'image.png'].join('/');
   const image = {
     url: `${origin}/og/${ogPath}`,
     width: 1200,
@@ -200,16 +270,17 @@ export async function generateMetadata({
   };
 
   const canonicalPath = page.url.startsWith('/') ? page.url : `/${page.url}`;
-  const canonical = `${origin}${canonicalPath}`;
+  const localizedCanonicalPath = localizeDocsPath(canonicalPath, locale);
 
   return createMetadata({
     title: page.data.title,
     description,
-    alternates: {
-      canonical,
-    },
+    alternates: buildDocsAlternates(canonicalPath, locale),
     openGraph: {
-      url: canonicalPath,
+      url: `${origin}${localizedCanonicalPath}`,
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      alternateLocale: [locale === 'fr' ? 'en_US' : 'fr_FR'],
+      type: 'article',
       images: [image],
     },
     twitter: {
