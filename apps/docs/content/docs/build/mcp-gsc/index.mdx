@@ -1,0 +1,74 @@
+---
+title: Search Console MCP
+description: Connect AI clients to Google Search Console with typed analytics, inspection, and sitemap tools.
+---
+
+# Search Console MCP
+
+`@lomi./gsc-mcp` is a public MCP server for Google Search Console. It is separate from the merchant payment MCP and is designed for SEO operators using Cursor, Claude Desktop, or a self-hosted team deployment.
+
+**Source:** [github.com/lomiafrica/gsc-mcp](https://github.com/lomiafrica/gsc-mcp)
+
+## What you get
+
+- Property discovery and permission details
+- Search Analytics with dimensions, filters, pagination, and freshness controls
+- Performance overview, period comparison, and quick-win analysis
+- URL inspection and indexing issue summaries
+- Sitemap listing and detail views
+- Read-only by default
+
+## Local setup
+
+1. Enable the Google Search Console API in Google Cloud.
+2. Create an OAuth desktop client and download the JSON.
+3. Save it to `~/.config/lomi-gsc-mcp/oauth_credentials.json`.
+4. Run:
+
+```bash
+npx -y @lomi./gsc-mcp auth
+```
+
+5. Add the server to Cursor:
+
+```json
+{
+  "mcpServers": {
+    "google-search-console": {
+      "command": "npx",
+      "args": ["-y", "@lomi./gsc-mcp"]
+    }
+  }
+}
+```
+
+## Recommended workflow
+
+1. Call `gsc_list_properties` and copy the exact property identifier.
+2. Use `gsc_performance_overview` or `gsc_search_analytics`.
+3. Use `gsc_inspect_url` or `gsc_indexing_issues` for crawl/index problems.
+4. Use `gsc_list_sitemaps` after sitemap changes.
+
+## Write tools
+
+Mutation tools are disabled by default. To enable sitemap submit/delete or property add/remove:
+
+- request write scope with `GSC_OAUTH_SCOPE=write`, or use a service account with write access
+- set `GSC_ENABLE_WRITES=true`
+- use `confirm: true` on destructive tools
+
+## Self-hosted HTTP
+
+For team use, run the HTTP entrypoint with a client bearer token and explicit host/origin allowlists:
+
+```bash
+GSC_MCP_TRANSPORT=http \
+GSC_MCP_CLIENT_BEARER_TOKEN=replace-me \
+GSC_MCP_ALLOWED_HOSTS=localhost \
+GSC_MCP_ALLOWED_ORIGINS=http://localhost:3000 \
+npx -y @lomi./gsc-mcp-http
+```
+
+## Important limits
+
+Search Analytics returns top rows sorted by clicks, not guaranteed exhaustive data. URL Inspection returns indexed snapshots only and does not request indexing.

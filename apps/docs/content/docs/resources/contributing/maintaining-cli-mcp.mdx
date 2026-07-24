@@ -25,7 +25,7 @@ Maintainer docs: [`apps/cli/CONTRIBUTING.md`](https://github.com/lomiafrica/lomi
 | --- | --- |
 | Local dev | `cd apps/cli && cargo build && cargo test` |
 | Docs drift | `lomi docs check` or `dt check` (from monorepo root) |
-| Docs scan / graph | `lomi docs scan`, `lomi docs graph` (delegates to `apps/doctool`) |
+| Docs scan / graph | `lomi docs scan`, `lomi docs graph` (delegates to `apps/tools/doctool`) |
 | Docs i18n | `lomi docs sync-i18n`, `lomi docs translate-i18n` |
 | Docs improve / diff | `lomi docs improve`, `lomi docs diff` |
 | Agent rules | `./apps/cli/scripts/generate-rules.sh` |
@@ -33,20 +33,20 @@ Maintainer docs: [`apps/cli/CONTRIBUTING.md`](https://github.com/lomiafrica/lomi
 
 ## doctool (`dt`)
 
-Documentation tooling CLI (CORE-38). **Standalone repo:** [github.com/lomiafrica/doctool](https://github.com/lomiafrica/doctool) (not a git submodule).
+Documentation tooling CLI (CORE-38). **Standalone repo:** [github.com/lomiafrica/doctool](https://github.com/lomiafrica/doctool), checked out as a submodule at `apps/tools/doctool`.
 
-Clone into the monorepo for local dev:
+Initialize for local dev:
 
 ```bash
-git clone git@github.com:lomiafrica/doctool.git apps/doctool
-cd apps/doctool && cargo build
+git submodule update --init apps/tools/doctool
+cd apps/tools/doctool && cargo build
 ```
 
-Maintainer docs: [`apps/doctool/CONTRIBUTING.md`](https://github.com/lomiafrica/doctool/blob/main/CONTRIBUTING.md)
+Maintainer docs: [`apps/tools/doctool/CONTRIBUTING.md`](https://github.com/lomiafrica/doctool/blob/main/CONTRIBUTING.md)
 
 | Task | Command / location |
 | --- | --- |
-| Local dev | `cd apps/doctool && cargo build && cargo test` |
+| Local dev | `cd apps/tools/doctool && cargo build && cargo test` |
 | Index monorepo | `dt scan --root .` → `.doctool/index.json` |
 | Drift report | `dt drift --root .` |
 | Knowledge graph | `dt graph --root .` |
@@ -55,7 +55,7 @@ Maintainer docs: [`apps/doctool/CONTRIBUTING.md`](https://github.com/lomiafrica/
 | i18n translate (LLM) | `dt translate-i18n --dry-run` (set `DOCTOOL_LLM_API_KEY` or `DOCTOOL_LLM_MOCK=1`) |
 | Improve MDX | `dt improve --path build/usage-billing.mdx --stdout` |
 | Diff proposed MDX | `dt diff --path build/usage-billing.mdx --proposed .doctool/out/...` |
-| CI | `.github/workflows/doctool.yml` |
+| CI | `.github/workflows/app-ci-doctool.yml` |
 
 ## MCP (`apps/mcp`)
 

@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           repository: lomiafrica/doctool
-          path: apps/doctool
+          path: apps/tools/doctool
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dtolnay/rust-toolchain@stable
       - uses: pnpm/action-setup@v4
@@ -33,10 +33,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: apps/docs/pnpm-lock.yaml
       - name: Build doctool (dt)
-        working-directory: apps/doctool
+        working-directory: apps/tools/doctool
         run: cargo build --release -p doctool-cli
       - name: Run doctool tests
-        working-directory: apps/doctool
+        working-directory: apps/tools/doctool
         run: cargo test --workspace
       - name: Install docs dependencies
         working-directory: apps/docs
@@ -48,6 +48,6 @@ jobs:
         working-directory: apps/mcp
         run: pnpm test
       - name: dt check
-        run: ./apps/doctool/target/release/dt check --root .
+        run: ./apps/tools/doctool/target/release/dt check --root .
       - name: dt sync-i18n check
-        run: ./apps/doctool/target/release/dt sync-i18n --check --root .
+        run: ./apps/tools/doctool/target/release/dt sync-i18n --check --root .

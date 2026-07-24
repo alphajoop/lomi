@@ -30,8 +30,8 @@
 [submodule "apps/design"]
 	path = apps/design
 	url = https://github.com/lomiafrica/design.git
-[submodule "apps/doctool"]
-	path = apps/doctool
+[submodule "apps/tools/doctool"]
+	path = apps/tools/doctool
 	url = https://github.com/lomiafrica/doctool.git
 	branch = main
 [submodule "apps/sdks/pi-spi-sdk"]
@@ -61,4 +61,8 @@
 [submodule "apps/crm"]
 	path = apps/crm
 	url = https://github.com/lomiafrica/crm.git
+	branch = main
+[submodule "apps/tools/gsc-mcp"]
+	path = apps/tools/gsc-mcp
+	url = https://github.com/lomiafrica/gsc-mcp.git
 	branch = main

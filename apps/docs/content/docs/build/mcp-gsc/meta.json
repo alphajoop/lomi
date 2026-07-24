@@ -1,0 +1,6 @@
+{
+  "title": "Search Console MCP",
+  "description": "Connect Cursor and Claude to Google Search Console with typed analytics and inspection tools.",
+  "icon": "Search",
+  "pages": ["index"]
+}

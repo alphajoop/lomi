@@ -25,7 +25,7 @@ Documentation mainteneur : [`apps/cli/CONTRIBUTING.md`](https://github.com/lomia
 | --- | --- |
 | Dev local | `cd apps/cli && cargo build && cargo test` |
 | Dérive docs | `lomi docs check` ou `dt check` (depuis la racine du monorepo) |
-| Scan / graphe docs | `lomi docs scan`, `lomi docs graph` (délègue à `apps/doctool`) |
+| Scan / graphe docs | `lomi docs scan`, `lomi docs graph` (délègue à `apps/tools/doctool`) |
 | i18n docs | `lomi docs sync-i18n`, `lomi docs translate-i18n` |
 | Amélioration / diff docs | `lomi docs improve`, `lomi docs diff` |
 | Règles agent | `./apps/cli/scripts/generate-rules.sh` |
@@ -33,20 +33,20 @@ Documentation mainteneur : [`apps/cli/CONTRIBUTING.md`](https://github.com/lomia
 
 ## doctool (`dt`)
 
-Outil de documentation CLI (CORE-38). **Dépôt autonome :** [github.com/lomiafrica/doctool](https://github.com/lomiafrica/doctool) (pas un sous-module git).
+Outil de documentation CLI (CORE-38). **Dépôt autonome :** [github.com/lomiafrica/doctool](https://github.com/lomiafrica/doctool), présent en sous-module à `apps/tools/doctool`.
 
-Clone dans le monorepo pour le dev local :
+Initialiser pour le dev local :
 
 ```bash
-git clone git@github.com:lomiafrica/doctool.git apps/doctool
-cd apps/doctool && cargo build
+git submodule update --init apps/tools/doctool
+cd apps/tools/doctool && cargo build
 ```
 
-Documentation mainteneur : [`apps/doctool/CONTRIBUTING.md`](https://github.com/lomiafrica/doctool/blob/main/CONTRIBUTING.md)
+Documentation mainteneur : [`apps/tools/doctool/CONTRIBUTING.md`](https://github.com/lomiafrica/doctool/blob/main/CONTRIBUTING.md)
 
 | Tâche | Commande / emplacement |
 | --- | --- |
-| Dev local | `cd apps/doctool && cargo build && cargo test` |
+| Dev local | `cd apps/tools/doctool && cargo build && cargo test` |
 | Index monorepo | `dt scan --root .` → `.doctool/index.json` |
 | Rapport de dérive | `dt drift --root .` |
 | Graphe de connaissances | `dt graph --root .` |
@@ -55,7 +55,7 @@ Documentation mainteneur : [`apps/doctool/CONTRIBUTING.md`](https://github.com/l
 | Traduction i18n (LLM) | `dt translate-i18n --dry-run` (définir `DOCTOOL_LLM_API_KEY` ou `DOCTOOL_LLM_MOCK=1`) |
 | Améliorer MDX | `dt improve --path build/usage-billing.mdx --stdout` |
 | Diff MDX proposé | `dt diff --path build/usage-billing.mdx --proposed .doctool/out/...` |
-| CI | `.github/workflows/doctool.yml` |
+| CI | `.github/workflows/app-ci-doctool.yml` |
 
 ## MCP (`apps/mcp`)
 

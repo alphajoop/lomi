@@ -116,8 +116,8 @@ pub enum DocsCommands {
 use crate::monorepo::find_monorepo_root;
 
 fn run_dt(root: &Path, args: &[String]) -> Result<()> {
-    let debug_bin = root.join("apps/doctool/target/debug/dt");
-    let release_bin = root.join("apps/doctool/target/release/dt");
+    let debug_bin = root.join("apps/tools/doctool/target/debug/dt");
+    let release_bin = root.join("apps/tools/doctool/target/release/dt");
 
     let mut cmd = if release_bin.is_file() {
         Command::new(release_bin)
@@ -135,7 +135,7 @@ fn run_dt(root: &Path, args: &[String]) -> Result<()> {
             "run",
             "--quiet",
             "--manifest-path",
-            &root.join("apps/doctool/Cargo.toml").to_string_lossy(),
+            &root.join("apps/tools/doctool/Cargo.toml").to_string_lossy(),
             "-p",
             "doctool-cli",
             "--",
@@ -146,7 +146,7 @@ fn run_dt(root: &Path, args: &[String]) -> Result<()> {
     cmd.args(args).current_dir(root);
     let status = cmd
         .status()
-        .context("Failed to run dt — build with: cd apps/doctool && cargo build")?;
+        .context("Failed to run dt — build with: cd apps/tools/doctool && cargo build")?;
 
     if !status.success() {
         anyhow::bail!(
