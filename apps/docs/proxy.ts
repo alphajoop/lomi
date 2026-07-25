@@ -1,58 +1,32 @@
 /* @proprietary license */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { Cookies } from '@/lib/utils/constants';
 import {
-  DOCS_DEFAULT_LOCALE,
-  DOCS_ROUTE_LOCALE_HEADER,
   isDocsMachinePath,
-  localizeDocsPath,
   parseDocsLocalePath,
 } from '@/lib/utils/docs-routing';
 
-function withDocsRouteLocale(
-  request: NextRequest,
-  locale: string,
-  rewritePath?: string,
-): NextResponse {
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set(DOCS_ROUTE_LOCALE_HEADER, locale);
+/**
+ * Docs locale (EN/FR) is resolved in server components via `getDocsLocale()` from the
+ * `lomi.language` cookie — not via Fumadocs `createI18nMiddleware`, so public URLs stay
+ * unchanged (no `/{lang}/...` segment).
+ *
+ * Old `/en/...` and `/fr/...` links 301 to the unprefixed path.
+ *
+ * Do not call Supabase auth.getSession() here: docs has no /auth or /workspace routes,
+ * and reading shared *.lomi.africa cookies can trigger refresh_token rate limits.
+ */
+function maybeRedirectLocalePrefix(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  const { locale, pathname: strippedPath } = parseDocsLocalePath(pathname);
 
-  if (rewritePath !== undefined) {
-    const url = request.nextUrl.clone();
-    url.pathname = rewritePath;
-    return NextResponse.rewrite(url, {
-      request: { headers: requestHeaders },
-    });
-  }
-
-  return NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-}
-
-function maybeRedirectToPreferredEnglish(
-  request: NextRequest,
-  pathname: string,
-): NextResponse | null {
-  const cookieLocale = request.cookies.get(Cookies.Language)?.value;
-  if (cookieLocale !== 'en') {
-    return null;
-  }
-
-  const userAgent = request.headers.get('user-agent') ?? '';
-  if (/bot|crawl|spider|slurp|googlebot|bingbot/i.test(userAgent)) {
-    return null;
-  }
-
-  const localized = localizeDocsPath(pathname, 'en');
-  if (localized === pathname) {
+  if (!locale) {
     return null;
   }
 
   const url = request.nextUrl.clone();
-  url.pathname = localized;
-  return NextResponse.redirect(url);
+  url.pathname = strippedPath;
+  return NextResponse.redirect(url, 301);
 }
 
 export default function proxy(request: NextRequest) {
@@ -62,18 +36,12 @@ export default function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { locale, pathname: strippedPath } = parseDocsLocalePath(pathname);
-
-  if (locale === 'en') {
-    return withDocsRouteLocale(request, 'en', strippedPath);
+  const localePrefixRedirect = maybeRedirectLocalePrefix(request);
+  if (localePrefixRedirect) {
+    return localePrefixRedirect;
   }
 
-  const preferredRedirect = maybeRedirectToPreferredEnglish(request, pathname);
-  if (preferredRedirect) {
-    return preferredRedirect;
-  }
-
-  return withDocsRouteLocale(request, DOCS_DEFAULT_LOCALE);
+  return NextResponse.next();
 }
 
 export const config = {

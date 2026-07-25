@@ -1,26 +1,20 @@
 /* @proprietary license */
 
-import { cache } from 'react';
-import { headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import type { Language } from '@/lib/i18n/config';
-import {
-  DOCS_DEFAULT_LOCALE,
-  DOCS_ROUTE_LOCALE_HEADER,
-} from '@/lib/utils/docs-routing';
+import { Cookies } from '@/lib/utils/constants';
+
+const VALID_LOCALES = new Set<Language>(['en', 'fr']);
 
 /**
- * Locale from `/en/...` aliases set by `proxy.ts`. Unprefixed routes resolve to French.
+ * Resolves the active docs content locale from the same cookie as `TranslationProvider`
+ * (`lomi.language`). No URL segment is used.
  */
-export const detectDocsRouteLocale = cache(async (): Promise<Language> => {
-  const headerList = await headers();
-  const fromRoute = headerList.get(DOCS_ROUTE_LOCALE_HEADER);
-  if (fromRoute === 'en') {
-    return 'en';
-  }
-  return DOCS_DEFAULT_LOCALE;
-});
-
-/** Resolves docs content solely from the crawlable URL locale. */
 export async function getDocsLocale(): Promise<Language> {
-  return detectDocsRouteLocale();
+  const store = await cookies();
+  const raw = store.get(Cookies.Language)?.value;
+  if (raw && VALID_LOCALES.has(raw as Language)) {
+    return raw as Language;
+  }
+  return 'fr';
 }

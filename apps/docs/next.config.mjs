@@ -22,18 +22,8 @@ const config = {
         permanent: true,
       },
       {
-        source: '/en/core/introduction/what-is-lomi',
-        destination: '/en/start/overview',
-        permanent: true,
-      },
-      {
         source: '/build/lomi-ui/quick-start',
         destination: '/build/lomi-ui',
-        permanent: true,
-      },
-      {
-        source: '/en/build/lomi-ui/quick-start',
-        destination: '/en/build/lomi-ui',
         permanent: true,
       },
       {
@@ -42,18 +32,8 @@ const config = {
         permanent: true,
       },
       {
-        source: '/en/build/guides/payment-methods',
-        destination: '/en/build/payment-channels',
-        permanent: true,
-      },
-      {
         source: '/build/cards',
         destination: '/build/payment-methods/cards',
-        permanent: true,
-      },
-      {
-        source: '/en/build/cards',
-        destination: '/en/build/payment-methods/cards',
         permanent: true,
       },
     ];

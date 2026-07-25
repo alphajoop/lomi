@@ -3,16 +3,13 @@
 import type { MetadataRoute } from 'next';
 import { source } from '@/lib/utils/source';
 import { getDocsSiteOrigin } from '@/lib/utils/metadata';
-import {
-  buildDocsAlternates,
-  localizeDocsPath,
-} from '@/lib/utils/docs-routing';
+import { buildDocsAlternates } from '@/lib/utils/docs-routing';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const origin = getDocsSiteOrigin();
   const pages = source.getPages('en');
 
-  return pages.flatMap((page) => {
+  return pages.map((page) => {
     const path = page.url.startsWith('/') ? page.url : `/${page.url}`;
     const alternates = buildDocsAlternates(path);
     const languages = (alternates?.languages ?? {}) as Record<string, string>;
@@ -20,11 +17,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const priority =
       path === '/start/overview' ? 1 : path.startsWith('/start/') ? 0.9 : 0.7;
 
-    return [path, localizeDocsPath(path, 'en')].map((localizedPath) => ({
-      url: `${origin}${localizedPath}`,
+    return {
+      url: `${origin}${path}`,
       changeFrequency,
       priority,
       alternates: { languages },
-    }));
+    };
   });
 }

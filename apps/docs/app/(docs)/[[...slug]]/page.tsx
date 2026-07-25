@@ -10,10 +10,7 @@ import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
-import {
-  buildDocsAlternates,
-  localizeDocsPath,
-} from '@/lib/utils/docs-routing';
+import { buildDocsAlternates } from '@/lib/utils/docs-routing';
 import type { Language } from '@/lib/i18n/config';
 import { Wrapper } from '@/components/preview/wrapper';
 import { getMDXComponents } from '@/mdx-components';
@@ -74,12 +71,12 @@ export default async function Page({
   params: Promise<{ slug?: string[] }>;
 }) {
   const resolvedParams = await params;
-  const locale = await getDocsLocale();
   if (!resolvedParams.slug || resolvedParams.slug.length === 0) {
-    redirect(localizeDocsPath(`/${DEFAULT_DOC_SLUG.join('/')}`, locale));
+    redirect(`/${DEFAULT_DOC_SLUG.join('/')}`);
   }
 
   const slug = effectiveSlug(resolvedParams.slug);
+  const locale = await getDocsLocale();
   const { page, resolvedLocale } = resolvePageForLocale(slug, locale);
 
   if (!page) notFound();
@@ -93,11 +90,8 @@ export default async function Page({
   const lastModified = pageData.lastModified;
   const origin = getDocsSiteOrigin();
   const pagePath = page.url.startsWith('/') ? page.url : `/${page.url}`;
-  const canonicalUrl = `${origin}${localizeDocsPath(pagePath, locale)}`;
-  const overviewUrl = `${origin}${localizeDocsPath(
-    `/${DEFAULT_DOC_SLUG.join('/')}`,
-    locale,
-  )}`;
+  const canonicalUrl = `${origin}${pagePath}`;
+  const overviewUrl = `${origin}/${DEFAULT_DOC_SLUG.join('/')}`;
   const structuredData = [
     {
       '@context': 'https://schema.org',
@@ -136,8 +130,6 @@ export default async function Page({
       ],
     },
   ];
-  const localizedPageUrl = localizeDocsPath(page.url, locale);
-
   return (
     <>
       <script
@@ -159,9 +151,9 @@ export default async function Page({
             <p className="docs-page-description">{page.data.description}</p>
           </div>
           <div className="docs-page-actions">
-            <LLMCopyButton markdownUrl={`${localizedPageUrl}.mdx`} />
+            <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
             <ViewOptions
-              markdownUrl={`${localizedPageUrl}.mdx`}
+              markdownUrl={`${page.url}.mdx`}
               githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
             />
           </div>
@@ -187,13 +179,9 @@ export default async function Page({
                   );
                 }
 
-                const localizedTarget = localizeDocsPath(
-                  found.page.url,
-                  locale,
-                );
                 const targetHref = found.hash
-                  ? `${localizedTarget}#${found.hash}`
-                  : localizedTarget;
+                  ? `${found.page.url}#${found.hash}`
+                  : found.page.url;
                 return (
                   <Link href={targetHref} {...props}>
                     {children}
@@ -234,11 +222,7 @@ function DocsCategory({ url, locale }: { url: string; locale: Language }) {
     <div className="not-prose my-5">
       <Cards className="gap-3">
         {peersArray.map((peer) => (
-          <Card
-            key={peer.url}
-            title={peer.name}
-            href={localizeDocsPath(peer.url, locale)}
-          >
+          <Card key={peer.url} title={peer.name} href={peer.url}>
             {peer.description}
           </Card>
         ))}
@@ -270,14 +254,13 @@ export async function generateMetadata({
   };
 
   const canonicalPath = page.url.startsWith('/') ? page.url : `/${page.url}`;
-  const localizedCanonicalPath = localizeDocsPath(canonicalPath, locale);
 
   return createMetadata({
     title: page.data.title,
     description,
-    alternates: buildDocsAlternates(canonicalPath, locale),
+    alternates: buildDocsAlternates(canonicalPath),
     openGraph: {
-      url: `${origin}${localizedCanonicalPath}`,
+      url: `${origin}${canonicalPath}`,
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       alternateLocale: [locale === 'fr' ? 'en_US' : 'fr_FR'],
       type: 'article',

@@ -2,15 +2,11 @@
 
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ChevronDown, Languages } from 'lucide-react';
 import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
 import { languages, type Language } from '@/lib/i18n/config';
 import { useTranslation } from '@/lib/utils/translation-context';
-import {
-  localizeDocsPath,
-  parseDocsLocalePath,
-} from '@/lib/utils/docs-routing';
 import { cn } from '@/lib/utils/cn';
 
 /** Consistent with sidebar control radius in this app */
@@ -28,9 +24,7 @@ export function DocsSidebarLocaleAndTheme({
   className?: string;
 }) {
   const router = useRouter();
-  const pathname = usePathname() ?? '/';
   const { currentLanguage, setLanguage } = useTranslation();
-  const strippedPath = parseDocsLocalePath(pathname).pathname;
 
   return (
     <div
@@ -63,7 +57,7 @@ export function DocsSidebarLocaleAndTheme({
             onChange={(e) => {
               const lang = e.target.value as Language;
               setLanguage(lang);
-              router.push(localizeDocsPath(strippedPath, lang));
+              router.refresh();
             }}
           >
             {languages.map((l) => (

@@ -4,7 +4,6 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions, linkItems, logo } from '@/lib/utils/layout.shared';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
-import { localizeDocsPath } from '@/lib/utils/docs-routing';
 // import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import type { CSSProperties, ReactNode } from 'react';
 import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
@@ -87,20 +86,7 @@ function localizeNode(node: Node, locale: Language): Node {
     return {
       ...node,
       name: localizeTreeLabel(node.name, locale),
-      index: node.index
-        ? {
-            ...node.index,
-            url: localizeDocsPath(node.index.url, locale),
-          }
-        : undefined,
       children: node.children.map((child) => localizeNode(child, locale)),
-    };
-  }
-
-  if (node.type === 'page') {
-    return {
-      ...node,
-      url: localizeDocsPath(node.url, locale),
     };
   }
 
@@ -128,7 +114,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   const fallbackLocale: Language = locale === 'fr' ? 'en' : 'fr';
   const treeLocale =
     requestedTree.children.length > 0 ? locale : fallbackLocale;
-  const pageTree = localizeTree(source.getPageTree(treeLocale), locale);
+  const pageTree = localizeTree(source.getPageTree(treeLocale), treeLocale);
   const base = baseOptions();
   const tabs: LayoutTab[] = pageTree.children.flatMap((node) => {
     if (node.type !== 'folder') return [];
