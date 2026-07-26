@@ -23,5 +23,9 @@
   "license": "MIT",
   "devDependencies": {
     "openapi-typescript": "^7.8.0"
+  },
+  "dependencies": {
+    "brace-expansion": "^2.1.2",
+    "js-yaml": "^4.3.0"
   }
 }
