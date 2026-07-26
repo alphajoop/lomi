@@ -1,7 +1,6 @@
 /* @proprietary license */
 
 import type { Metadata } from 'next';
-import type { Language } from '@/lib/i18n/config';
 import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 
 /** Legacy locale prefixes redirected away by `proxy.ts`. */
@@ -62,10 +61,7 @@ export function parseDocsLocalePath(pathname: string): {
 }
 
 /** Paths are never locale-prefixed; language is cookie-only. */
-export function localizeDocsPath(
-  path: string,
-  _locale?: Language,
-): string {
+export function localizeDocsPath(path: string): string {
   return normalizeDocsPath(path);
 }
 
