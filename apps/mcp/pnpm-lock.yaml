@@ -9,7 +9,7 @@ overrides:
   hono: ^4.12.25
   vite: 7.3.5
   fast-uri: ^3.1.4
-  '@hono/node-server': ^1.19.15
+  '@hono/node-server': ^2.0.12
   brace-expansion@^5: ^5.0.8
   '@isaacs/brace-expansion': ^5.0.8
   tar: ^7.5.21
@@ -260,9 +260,9 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@hono/node-server@1.19.15':
-    resolution: {integrity: sha512-Za2ai6TLdKjUvnur+eenO6nuYYipVAEhyCAdaV8IRvmU9kK8crOZUSYvIXn72E4f8fJqyAbpcJuTsYYmZp9Deg==}
-    engines: {node: '>=18.14.1'}
+  '@hono/node-server@2.0.12':
+    resolution: {integrity: sha512-eWpQYr67tqJLeaSUl0Q+TquuYfUdTibpOJlUMV2FfUP7+KqCC5TufnwnlXL6mobZBJbGAYRd7ZvEBDCbLInjhg==}
+    engines: {node: '>=20'}
     peerDependencies:
       hono: ^4.12.25
 
@@ -1551,7 +1551,7 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hono/node-server@1.19.15(hono@4.12.30)':
+  '@hono/node-server@2.0.12(hono@4.12.30)':
     dependencies:
       hono: 4.12.30
 
@@ -1575,7 +1575,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 1.19.15(hono@4.12.30)
+      '@hono/node-server': 2.0.12(hono@4.12.30)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
