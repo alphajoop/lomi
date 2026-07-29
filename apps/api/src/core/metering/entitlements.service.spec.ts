@@ -45,10 +45,11 @@ describe('EntitlementsService', () => {
   it('calls check_entitlement for a customer and feature', async () => {
     mock.rpc.mockResolvedValue({ data: { allowed: true }, error: null });
 
-    const result = await service.check('cust-1', 'api_access');
+    const result = await service.check(user, 'cust-1', 'api_access');
 
     expect(result).toEqual({ allowed: true });
     expect(mock.rpc).toHaveBeenCalledWith('check_entitlement', {
+      p_organization_id: user.organizationId,
       p_customer_id: 'cust-1',
       p_feature_key: 'api_access',
     });
@@ -60,7 +61,7 @@ describe('EntitlementsService', () => {
       error: { message: 'check failed' },
     });
 
-    await expect(service.check('cust-1', 'api_access')).rejects.toThrow(
+    await expect(service.check(user, 'cust-1', 'api_access')).rejects.toThrow(
       'check failed',
     );
   });

@@ -24,10 +24,11 @@ export class EntitlementsService {
     return { entitlement_id: data };
   }
 
-  async check(customerId: string, featureKey: string) {
+  async check(user: AuthContext, customerId: string, featureKey: string) {
     const { data, error } = await this.supabase.getClient().rpc(
       'check_entitlement' as never,
       {
+        p_organization_id: user.organizationId,
         p_customer_id: customerId,
         p_feature_key: featureKey,
       } as never,

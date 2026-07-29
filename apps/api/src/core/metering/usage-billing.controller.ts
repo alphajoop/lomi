@@ -99,9 +99,10 @@ export class UsageBillingController {
   @Get('entitlements/check')
   @ApiOperation({ summary: 'Check if a customer has an active entitlement' })
   checkEntitlement(
+    @CurrentUser() user: AuthContext,
     @Query('customer_id') customerId: string,
     @Query('feature_key') featureKey: string,
   ) {
-    return this.entitlementsService.check(customerId, featureKey);
+    return this.entitlementsService.check(user, customerId, featureKey);
   }
 }

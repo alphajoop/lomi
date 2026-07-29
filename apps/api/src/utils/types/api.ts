@@ -5440,7 +5440,11 @@ export type Database = {
         Returns: string;
       };
       check_entitlement: {
-        Args: { p_customer_id: string; p_feature_key: string };
+        Args: {
+          p_customer_id: string;
+          p_feature_key: string;
+          p_organization_id: string;
+        };
         Returns: Json;
       };
       create_entitlement: {
