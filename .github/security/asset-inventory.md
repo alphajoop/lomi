@@ -30,7 +30,6 @@ Canonical inventory for penetration testing and PCI scoping. Production URLs are
 | --- | --- | --- |
 | Website | `lomi.africa` | Sanity CMS; agent discovery (`openapi.json`, `.well-known`) |
 | Docs | `docs.lomi.africa` | `/api/proxy` → sandbox API only |
-| CRM (Twenty fork) | `api.crm.lomi.africa` | Manual deploy; low priority |
 
 ## Infrastructure dependencies
 

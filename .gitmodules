@@ -58,10 +58,6 @@
 	path = apps/plugins/bubble
 	url = https://github.com/lomiafrica/bubble.git
 	branch = main
-[submodule "apps/crm"]
-	path = apps/crm
-	url = https://github.com/lomiafrica/crm.git
-	branch = main
 [submodule "apps/tools/gsc-mcp"]
 	path = apps/tools/gsc-mcp
 	url = https://github.com/lomiafrica/gsc-mcp.git
