@@ -3,9 +3,7 @@
   "workspaces": {
     ".": {
       "next": true,
-      "entry": [
-        "lib/scripts/update-orama-index.ts"
-      ],
+      "entry": ["lib/scripts/update-orama-index.ts"],
       "project": [
         "proxy.ts",
         "app/**/*.{ts,tsx,js,jsx}",

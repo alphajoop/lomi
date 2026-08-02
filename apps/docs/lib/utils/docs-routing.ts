@@ -65,9 +65,7 @@ export function localizeDocsPath(path: string): string {
   return normalizeDocsPath(path);
 }
 
-export function buildDocsAlternates(
-  basePath: string,
-): Metadata['alternates'] {
+export function buildDocsAlternates(basePath: string): Metadata['alternates'] {
   const origin = getDocsSiteOrigin();
   const normalized = normalizeDocsPath(basePath);
   const url = `${origin}${normalized}`;

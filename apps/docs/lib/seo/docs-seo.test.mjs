@@ -16,10 +16,7 @@ function read(relativePath) {
 test('docs pages use unprefixed self-canonical URLs for all languages', () => {
   const alternates = buildDocsAlternates('/start/overview');
 
-  assert.equal(
-    alternates.canonical,
-    'https://docs.lomi.africa/start/overview',
-  );
+  assert.equal(alternates.canonical, 'https://docs.lomi.africa/start/overview');
   assert.deepEqual(alternates.languages, {
     'x-default': 'https://docs.lomi.africa/start/overview',
     fr: 'https://docs.lomi.africa/start/overview',

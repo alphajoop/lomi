@@ -194,7 +194,9 @@ export default async function Page({
                 <AutoTypeTable generator={generator} {...props} />
               ),
               Wrapper,
-              blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
+              blockquote: Callout as unknown as FC<
+                ComponentProps<'blockquote'>
+              >,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               DocsCategory: ({ url }: any): JSX.Element => {
                 return <DocsCategory url={url ?? page.url} locale={locale} />;

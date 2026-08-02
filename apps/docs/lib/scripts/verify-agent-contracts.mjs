@@ -77,7 +77,9 @@ if (existsSync(paths.agentCard)) {
     );
   }
   if (
-    !agentCard.endpoints.llms_full_txt?.includes('docs.lomi.africa/llms-full.txt')
+    !agentCard.endpoints.llms_full_txt?.includes(
+      'docs.lomi.africa/llms-full.txt',
+    )
   ) {
     throw new Error(
       'agent.json: endpoints.llms_full_txt must point to docs.lomi.africa/llms-full.txt',
@@ -210,10 +212,7 @@ if (agentCard) {
   }
 }
 
-if (
-  existsSync(paths.websiteOpenApi) &&
-  existsSync(paths.merchantOpenApi)
-) {
+if (existsSync(paths.websiteOpenApi) && existsSync(paths.merchantOpenApi)) {
   assertByteIdentical(
     paths.merchantOpenApi,
     paths.websiteOpenApi,
@@ -221,10 +220,7 @@ if (
   );
 }
 
-if (
-  existsSync(paths.websiteAgentOpenApi) &&
-  existsSync(paths.agentOpenApi)
-) {
+if (existsSync(paths.websiteAgentOpenApi) && existsSync(paths.agentOpenApi)) {
   assertByteIdentical(
     paths.agentOpenApi,
     paths.websiteAgentOpenApi,
