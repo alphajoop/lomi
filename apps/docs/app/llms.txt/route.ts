@@ -51,7 +51,7 @@ export async function GET() {
   lines.push('# lomi.');
   lines.push('');
   lines.push(
-    "> Francophone West Africa's payment platform: Mobile Money (Wave, MTN, SPI), cards (Visa, Mastercard, Apple Pay, Google Pay), bank transfers across eight UEMOA markets. Use this file as a **map**: then read the linked pages for schemas and examples.",
+    "> Payment infrastructure for francophone West Africa: hosted checkout, Mobile Money, cards, payouts, subscriptions, and developer APIs across UEMOA. Use this file as a **map**: then read the linked pages for schemas and examples.",
   );
   lines.push('');
 
