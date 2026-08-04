@@ -8,12 +8,15 @@ import type { ReactNode } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { getDocsSiteOrigin } from '@/lib/utils/metadata';
+import { SiteJsonLd } from '@/components/seo/site-json-ld';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 
 const docsOrigin = getDocsSiteOrigin();
 
 const title = 'lomi.';
 const description =
+  'Payment infrastructure for francophone West Africa: hosted checkout, Mobile Money, cards, payouts, subscriptions, and developer APIs across UEMOA.';
+const descriptionFr =
   "Suite d'API pour le traitement des paiements en ligne et le commerce en Afrique de l'Ouest francophone. Encaissez, versez et automatisez vos flux financiers.";
 
 export const metadata: Metadata = {
@@ -150,6 +153,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <Body>
+        <SiteJsonLd />
         <Provider initialLanguage={initialLanguage}>{children}</Provider>
         <Analytics />
         <SpeedInsights />

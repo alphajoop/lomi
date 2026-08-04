@@ -24,6 +24,8 @@ import * as path from 'node:path';
 import { Banner } from 'fumadocs-ui/components/banner';
 import { Installation } from '@/components/preview/installation';
 import { Customisation } from '@/components/preview/customisation';
+import { FaqPageJsonLd } from '@/components/seo/faq-page-json-ld';
+import { BRAND_FAQ } from '@/lib/seo/brand-facts';
 import { DocsPage } from 'fumadocs-ui/page';
 
 const DEFAULT_DOC_SLUG = ['start', 'overview'] as const;
@@ -130,8 +132,11 @@ export default async function Page({
       ],
     },
   ];
+  const isOverview =
+    slug.length === 2 && slug[0] === 'start' && slug[1] === 'overview';
   return (
     <>
+      {isOverview ? <FaqPageJsonLd items={BRAND_FAQ} /> : null}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

@@ -16,6 +16,7 @@ const MACHINE_EXACT_PATHS = new Set([
   '/robots.txt',
   '/openapi.json',
   '/agent-openapi.json',
+  '/agents',
 ]);
 
 const MACHINE_PATH_PREFIXES = [
@@ -24,6 +25,7 @@ const MACHINE_PATH_PREFIXES = [
   '/og/',
   '/llms.mdx/',
   '/static.json',
+  '/agents/',
 ] as const;
 
 export function normalizeDocsPath(path: string): string {

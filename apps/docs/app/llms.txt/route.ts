@@ -1,6 +1,8 @@
 /* @proprietary license */
 
+import { buildLlmsGeoSections } from '@/lib/docs/agent-corpus/build';
 import { REST_API_SECTION_ORDER } from '@/lib/scripts/manual-api/constants';
+import { BRAND_DEFINITION } from '@/lib/seo/brand-facts';
 import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 
@@ -51,9 +53,10 @@ export async function GET() {
   lines.push('# lomi.');
   lines.push('');
   lines.push(
-    "> Payment infrastructure for francophone West Africa: hosted checkout, Mobile Money, cards, payouts, subscriptions, and developer APIs across UEMOA. Use this file as a **map**: then read the linked pages for schemas and examples.",
+    `> ${BRAND_DEFINITION} Use this file as a **map**: then read the linked pages for schemas and examples.`,
   );
   lines.push('');
+  lines.push(buildLlmsGeoSections(docsOrigin));
 
   lines.push('## How to use this briefing');
   lines.push('');

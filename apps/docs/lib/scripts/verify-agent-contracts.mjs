@@ -246,6 +246,25 @@ if (existsSync(paths.websiteLlmsMarketing)) {
 
 if (existsSync(paths.docsLlmsRoute)) {
   const docsLlms = readFileSync(paths.docsLlmsRoute, 'utf-8');
+  const brandFactsPath = join(docsRoot, 'lib/seo/brand-facts.ts');
+  if (existsSync(brandFactsPath)) {
+    const brandFacts = readFileSync(brandFactsPath, 'utf-8');
+    const defMatch = brandFacts.match(
+      /export const BRAND_DEFINITION =\s*\n?\s*'([^']+)'/,
+    );
+    if (defMatch) {
+      if (!docsLlms.includes('BRAND_DEFINITION')) {
+        throw new Error(
+          'docs llms.txt route must import and use BRAND_DEFINITION from lib/seo/brand-facts.ts',
+        );
+      }
+      if (!docsLlms.includes('buildLlmsGeoSections')) {
+        throw new Error(
+          'docs llms.txt route must use buildLlmsGeoSections from agent-corpus builder',
+        );
+      }
+    }
+  }
   if (
     !docsLlms.includes(
       'https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp',
