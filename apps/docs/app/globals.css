@@ -220,6 +220,18 @@
     outline: none !important;
     box-shadow: none !important;
   }
+
+  /* Tailwind v4 dropped button cursor:pointer from preflight. */
+  :where(button, [role='button'], summary):not(
+      :disabled,
+      [aria-disabled='true']
+    ) {
+    cursor: pointer;
+  }
+
+  :where(button, [role='button']):is(:disabled, [aria-disabled='true']) {
+    cursor: not-allowed;
+  }
 }
 
 /* Remove focus outline globally - A11Y WARNING: Not recommended */
