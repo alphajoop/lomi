@@ -191,7 +191,7 @@ export async function GET() {
   );
   if (cardCharge) {
     lines.push(
-      `- **Embedded card charge (Elements-style)** → [${cardCharge.data.title ?? 'Card charge'}](${docsOrigin}${cardCharge.url}).`,
+      `- **Embedded card charge (Elements-style)** → [${cardCharge.data.title ?? 'Card charge'}](${docsOrigin}${cardCharge.url}) (**not available yet**: \`POST /charge/card\` returns \`503 service_unavailable\`; use [hosted checkout](/build/checkout) for cards).`,
     );
   }
   const pr = pages.find(

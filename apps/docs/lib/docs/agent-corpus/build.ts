@@ -172,7 +172,9 @@ export function buildAgentCorpusPage(slug: AgentCorpusSlug): string {
   }
 }
 
-export function buildAgentCorpusForSlug(slug: string | undefined): string | null {
+export function buildAgentCorpusForSlug(
+  slug: string | undefined,
+): string | null {
   if (!slug) return buildAgentCorpusIndex();
   if (!isAgentCorpusSlug(slug)) return null;
   return buildAgentCorpusPage(slug);
@@ -202,7 +204,10 @@ export function buildLlmsGeoSections(docsOrigin: string): string {
   lines.push(
     'Machine-readable pages for crawlers and agents (not linked from the docs navigation):',
   );
-  for (const path of [`${docsOrigin}/agents`, ...AGENT_CORPUS_SLUGS.map((s) => `${docsOrigin}/agents/${s}`)]) {
+  for (const path of [
+    `${docsOrigin}/agents`,
+    ...AGENT_CORPUS_SLUGS.map((s) => `${docsOrigin}/agents/${s}`),
+  ]) {
     lines.push(`- ${path}`);
   }
   lines.push('');

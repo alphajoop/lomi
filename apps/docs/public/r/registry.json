@@ -15,20 +15,14 @@
       "type": "registry:block",
       "title": "Customer information section",
       "description": "Hosted checkout personal information form from customer-information-section.tsx.",
-      "dependencies": [
-        "lucide-react",
-        "react-phone-number-input"
-      ]
+      "dependencies": ["lucide-react", "react-phone-number-input"]
     },
     {
       "name": "mobile-money-checkout-card",
       "type": "registry:block",
       "title": "Mobile money checkout card",
       "description": "Provider selection, customer form, and pay button aligned with hosted checkout.",
-      "dependencies": [
-        "lucide-react",
-        "react-phone-number-input"
-      ]
+      "dependencies": ["lucide-react", "react-phone-number-input"]
     },
     {
       "name": "checkout-summary-card",

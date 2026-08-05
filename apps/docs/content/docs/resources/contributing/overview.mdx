@@ -263,6 +263,18 @@ Your PR will be reviewed by maintainers.
 - **Clean Up:** You can safely delete your feature branch from your fork.
 - **Stay involved:** Keep an eye on related issues or follow up if needed. Monitor the deployment if applicable.
 
+## Product surface parity (API, docs, website)
+
+When you change the public merchant API or add a marketing product page, keep these surfaces aligned:
+
+1. **Export OpenAPI** from `apps/api`: `pnpm openapi:export:all` (commits `apps/docs/openapi.json` and `agent-openapi.json`).
+2. **Docs drift**: `cd apps/docs && pnpm docs:drift`.
+3. **Parity worker** (full gate): `cd apps/docs && pnpm parity` (allowlist, build sidebar, website mirrors, product surface, MCP manifest).
+4. **Website mirrors**: `cd apps/website && node src/lib/scripts/sync-openapi.mjs`, then commit `public/openapi.json` and `public/agent-openapi.json` in the `lomiafrica/website` repo and bump the monorepo submodule pointer.
+5. **MCP tools** (if allowlist changed): `cd apps/mcp && pnpm generate`.
+
+CI runs `.github/workflows/app-parity.yml` on API/docs/website changes; a weekly cron posts failures to `#devops` when `SLACK_WEBHOOK_URL` is set.
+
 ## Next steps
 
 - Familiarize yourself with our [Code of conduct](/resources/contributing/code-of-conduct).

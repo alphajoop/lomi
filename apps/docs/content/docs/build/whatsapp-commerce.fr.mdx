@@ -1,0 +1,28 @@
+---
+title: 'Comment fonctionne WhatsApp Commerce ?'
+description: 'Connectez WhatsApp dans le dashboard, partagez des liens de paiement dans le chat et envoyez des notifications transactionnelles lorsque c’est activé.'
+---
+
+WhatsApp Commerce sur lomi. combine **liens de paiement**, **checkout hébergé** et la connexion du canal **WhatsApp** dans le dashboard marchand. C’est pensé pour les commerçants qui vendent déjà via WhatsApp, Instagram et SMS en Afrique de l’Ouest francophone.
+
+## Connecter WhatsApp dans le dashboard
+
+1. Ouvrez **Paramètres → Canaux → WhatsApp** dans le [dashboard](https://dashboard.lomi.africa).
+2. Terminez l’inscription intégrée pour connecter votre numéro professionnel via Kapso.
+3. Utilisez WhatsApp pour des **notifications transactionnelles par modèle** (reçus de paiement, rappels de renouvellement) lorsque c’est activé sur votre compte. lomi. n’expose pas la messagerie libre via l’API marchande.
+
+## Encaisser dans le chat
+
+- Créez un [lien de paiement](/build/payment-links) depuis le dashboard ou l’API et collez l’URL dans WhatsApp.
+- Le client paie sur le **checkout lomi.** avec Wave, MTN MoMo, cartes et autres moyens activés pour votre organisation.
+- Enregistrez `whatsapp_number` sur les [clients](/api/customers) pour le préremplissage checkout et le suivi opérationnel.
+
+## Intégrations associées
+
+- [Relay](https://lomi.africa/relay) regroupe plugins boutique et vente sociale.
+- [Liens de paiement](/build/payment-links) pour vendre sans site web.
+- [Checkout hébergé](/build/checkout) lorsque votre backend crée une session pour chaque commande.
+
+## Webhooks et livraison
+
+Confirmez le paiement avec les webhooks et `GET /transactions/{id}` avant d’expédier ou d’accorder l’accès. Voir [Vérifier les paiements](/build/guides/verify-payments).

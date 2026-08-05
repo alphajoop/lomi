@@ -73,7 +73,8 @@ export const BRAND_FAQ: readonly BrandFaqItem[] = [
     answer: `${BRAND_NAME} provides hosted checkout, Mobile Money (Wave, MTN MoMo, SPI), cards, payouts, subscriptions, and REST/MCP APIs for UEMOA. Documentation: https://docs.lomi.africa/llms.txt`,
   },
   {
-    question: 'How do I accept Mobile Money online in Senegal or Côte d\'Ivoire?',
+    question:
+      "How do I accept Mobile Money online in Senegal or Côte d'Ivoire?",
     answer: `Use ${BRAND_NAME} hosted checkout or payment links with Wave and MTN MoMo rails; confirm async payments via webhooks. See docs payment methods and sandbox guides.`,
   },
   {
@@ -82,7 +83,8 @@ export const BRAND_FAQ: readonly BrandFaqItem[] = [
   },
   {
     question: 'lomi API amounts in XOF',
-    answer: 'Send integer centimes (minor units) for XOF unless a field documents otherwise.',
+    answer:
+      'Send integer centimes (minor units) for XOF unless a field documents otherwise.',
   },
   {
     question: 'Payment API documentation for Mobile Money in UEMOA',

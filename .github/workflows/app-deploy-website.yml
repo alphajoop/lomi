@@ -57,6 +57,9 @@ jobs:
         working-directory: ${{ steps.checkout-app.outputs.app-path }}
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+      - name: Verify public OpenAPI mirrors
+        run: node src/lib/scripts/verify-public-openapi.mjs
+        working-directory: ${{ steps.checkout-app.outputs.app-path }}
 
   deploy:
     needs: verify

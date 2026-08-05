@@ -30,12 +30,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  const agentEntries: MetadataRoute.Sitemap = AGENT_CORPUS_ROUTES.map((path) => ({
-    url: `${origin}${path}`,
-    changeFrequency: 'monthly' as const,
-    priority: path === '/agents' ? 0.75 : 0.7,
-    lastModified,
-  }));
+  const agentEntries: MetadataRoute.Sitemap = AGENT_CORPUS_ROUTES.map(
+    (path) => ({
+      url: `${origin}${path}`,
+      changeFrequency: 'monthly' as const,
+      priority: path === '/agents' ? 0.75 : 0.7,
+      lastModified,
+    }),
+  );
 
   return [...agentEntries, ...docEntries];
 }

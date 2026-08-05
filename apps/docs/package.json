@@ -28,6 +28,7 @@
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev --turbo",
     "lint": "fumadocs-mdx && pnpm exec tsx ./lib/scripts/lint.ts && pnpm exec tsx ./lib/scripts/check-mdx-sdk-snippets.ts && pnpm exec tsx lib/scripts/manual-api/verify-en-operation-overrides.ts && eslint .",
     "docs:drift": "pnpm exec tsx lib/scripts/docs-drift.ts",
+    "parity": "pnpm exec tsx lib/scripts/parity-worker.ts",
     "docs:export-fr-book": "pnpm exec tsx lib/scripts/export-french-regulatory-book.ts",
     "docs:export-fr-book:api": "pnpm exec tsx lib/scripts/export-french-regulatory-book.ts -- --book api",
     "docs:export-fr-book:services": "pnpm exec tsx lib/scripts/export-french-regulatory-book.ts -- --book services",

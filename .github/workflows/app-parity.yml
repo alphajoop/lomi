@@ -1,0 +1,92 @@
+name: lomi · parity · product surface
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/api/**'
+      - 'apps/docs/**'
+      - 'apps/website/**'
+      - 'apps/mcp/**'
+      - '.github/workflows/app-parity.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'apps/docs/**'
+      - 'apps/website/**'
+      - 'apps/mcp/**'
+      - '.github/workflows/app-parity.yml'
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: |
+            apps/api/pnpm-lock.yaml
+            apps/docs/pnpm-lock.yaml
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: pnpm install --frozen-lockfile
+
+      - name: Export OpenAPI and verify committed specs
+        working-directory: apps/api
+        run: |
+          pnpm run openapi:export
+          git diff --exit-code ../docs/openapi.json
+          pnpm run openapi:export:agent
+          git diff --exit-code ../docs/agent-openapi.json
+
+      - name: Sync website OpenAPI mirrors
+        working-directory: apps/website
+        run: node src/lib/scripts/sync-openapi.mjs
+
+      - name: Assert website OpenAPI mirrors match docs
+        run: |
+          git diff --exit-code apps/website/public/openapi.json apps/website/public/agent-openapi.json || (
+            echo "Website public OpenAPI is out of sync with apps/docs. Run sync-openapi and commit apps/website/public/*.json"
+            exit 1
+          )
+
+      - name: Install docs dependencies
+        working-directory: apps/docs
+        run: pnpm install --frozen-lockfile
+
+      - name: Run parity worker
+        working-directory: apps/docs
+        env:
+          PARITY_LIVE_PROBE: ${{ github.event_name == 'schedule' && '1' || '0' }}
+        run: pnpm parity
+
+      - name: Notify Slack on failure (scheduled)
+        if: failure() && github.event_name == 'schedule'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "SLACK_WEBHOOK_URL not set; skipping notification"
+            exit 0
+          fi
+          curl -sS -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-type: application/json' \
+            --data "{\"text\":\"Product surface parity worker failed (scheduled). See ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\"}"
