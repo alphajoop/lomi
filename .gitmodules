@@ -74,7 +74,3 @@
 	path = apps/tools/wallet
 	url = https://github.com/lomiafrica/wallet.git
 	branch = main
-[submodule "apps/tools/passage"]
-	path = apps/tools/passage
-	url = https://github.com/lomiafrica/passage.git
-	branch = main
