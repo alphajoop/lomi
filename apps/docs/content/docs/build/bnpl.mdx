@@ -8,16 +8,16 @@ description: SPI deferred debit for XOF checkout — merchant upfront payout and
 lomi. BNPL uses **SPI débit différé** on **XOF** only. When a customer chooses BNPL at checkout:
 
 1. An installment plan is created with deferred SPI payment requests.
-2. You receive the **net product amount** immediately (minus BNPL processing fees).
-3. The customer repays principal plus interest on each due date via SPI.
+2. You receive the **net product amount** immediately (minus BNPL processing fees from your fee schedule).
+3. The customer repays each installment on the due date via SPI (bank deferred debit).
 
-BNPL is exposed at checkout as provider **JUMBO** / method **BNPL**. This is separate from the **Jumbo** mobile POS app.
+Enable BNPL from **Payment Channels** by connecting **Jumbo**. There is no separate BNPL settings card.
+
+**v1 scope:** one-time products with standard fixed prices only. Not subscriptions, usage billing, PWYW, or multi-item carts. Customer pays the listed price in installments; merchant processing uses your **JUMBO/BNPL** fee line from the org fee schedule.
 
 ## Merchant API
 
 - `GET /bnpl/config` — configuration summary
-- `PATCH /bnpl/settings` — enable or disable BNPL
-- `PATCH /bnpl/interest-rate` — customer interest rate (0.5–10%)
 - `GET /bnpl/plans` — list installment plans
 
 ## Hosted checkout

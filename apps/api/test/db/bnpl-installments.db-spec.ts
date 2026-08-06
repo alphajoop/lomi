@@ -15,6 +15,17 @@ import {
   ensureReferenceData,
 } from './support/seed';
 
+async function connectJumbo(client: Db, organizationId: string): Promise<void> {
+  await client.query(
+    `INSERT INTO public.organization_providers_settings (
+       organization_id, provider_code, is_connected
+     ) VALUES ($1, 'JUMBO', true)
+     ON CONFLICT (organization_id, provider_code)
+     DO UPDATE SET is_connected = true, updated_at = NOW()`,
+    [organizationId],
+  );
+}
+
 async function ensureBnplConfiguration(
   client: Db,
   organizationId: string,
@@ -61,6 +72,7 @@ async function seedBnplCtx(client: Db) {
     environment: 'live',
   });
   await connectSpi(client, organizationId);
+  await connectJumbo(client, organizationId);
   await ensureBnplConfiguration(client, organizationId);
   const spiAccountNumber = await ensureSpiBnplAccount(client, organizationId);
   return {
@@ -84,8 +96,12 @@ dbDescribe('BNPL installments :: calculate_bnpl_breakdown', () => {
       });
       const row = res.rows[0] as Record<string, unknown>;
       expect(Number(row.customer_principal)).toBe(12000);
-      expect(Number(row.customer_total)).toBeGreaterThan(12000);
-      expect(Number(row.merchant_receives_immediately)).toBeLessThan(12000);
+      expect(Number(row.customer_total)).toBe(12000);
+      expect(Number(row.customer_interest_total)).toBe(0);
+      const processingFee = Number(row.merchant_processing_fee);
+      expect(Number(row.merchant_receives_immediately)).toBe(
+        12000 - processingFee,
+      );
     });
   });
 });

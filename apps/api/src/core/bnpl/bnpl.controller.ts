@@ -1,9 +1,6 @@
 import {
-  Body,
   Controller,
   Get,
-  Patch,
-  Post,
   Query,
   UseGuards,
   DefaultValuePipe,
@@ -14,7 +11,6 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
 import { BnplService } from './bnpl.service';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ApiLomiAccountHeader } from '../common/decorators/api-lomi-account-header.decorator';
@@ -22,14 +18,6 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
-import {
-  WRITE_THROTTLE_LIMIT,
-  WRITE_THROTTLE_TTL_MS,
-} from '../../config/http.constants';
-import {
-  UpdateBnplInterestRateDto,
-  UpdateBnplSettingsDto,
-} from './dto/update-bnpl-settings.dto';
 
 @ApiTags('BNPL')
 @ApiSecurity('api-key')
@@ -54,31 +42,5 @@ export class BnplController {
   @ApiOperation({ summary: 'Get BNPL configuration summary' })
   getConfig(@CurrentUser() user: AuthContext) {
     return this.bnplService.getConfigSummary(user);
-  }
-
-  @Patch('settings')
-  @ApiLomiAccountHeader()
-  @Throttle({
-    default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS },
-  })
-  @ApiOperation({ summary: 'Enable or disable BNPL for the organization' })
-  updateSettings(
-    @CurrentUser() user: AuthContext,
-    @Body() body: UpdateBnplSettingsDto,
-  ) {
-    return this.bnplService.toggleBnpl(user, body.enabled);
-  }
-
-  @Patch('interest-rate')
-  @ApiLomiAccountHeader()
-  @Throttle({
-    default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS },
-  })
-  @ApiOperation({ summary: 'Update customer BNPL interest rate (XOF)' })
-  updateInterestRate(
-    @CurrentUser() user: AuthContext,
-    @Body() body: UpdateBnplInterestRateDto,
-  ) {
-    return this.bnplService.updateInterestRate(user, body.interestRate);
   }
 }

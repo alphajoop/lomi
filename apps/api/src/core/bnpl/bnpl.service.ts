@@ -176,44 +176,6 @@ export class BnplService {
     return data ?? [];
   }
 
-  async toggleBnpl(user: AuthContext, enable: boolean) {
-    await this.supabase.rpc('ensure_bnpl_configuration' as never, {
-      p_organization_id: user.organizationId,
-    } as never);
-
-    const { data, error } = await this.supabase.rpc(
-      'toggle_bnpl_for_organization' as never,
-      {
-        p_organization_id: user.organizationId,
-        p_currency_code: 'XOF',
-        p_enable: enable,
-      } as never,
-    );
-
-    if (error) {
-      throwMappedSupabaseRpcError(error.message);
-    }
-
-    return { enabled: Boolean(data) };
-  }
-
-  async updateInterestRate(user: AuthContext, rate: number) {
-    const { data, error } = await this.supabase.rpc(
-      'update_bnpl_interest_rate' as never,
-      {
-        p_organization_id: user.organizationId,
-        p_currency_code: 'XOF',
-        p_interest_rate: rate,
-      } as never,
-    );
-
-    if (error) {
-      throwMappedSupabaseRpcError(error.message);
-    }
-
-    return data;
-  }
-
   async getConfigSummary(user: AuthContext) {
     const { data, error } = await this.supabase.rpc(
       'get_bnpl_config_summary' as never,

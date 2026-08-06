@@ -61,8 +61,6 @@
   "GET /webhook-delivery-logs/{id}",
   "GET /webhooks",
   "GET /webhooks/{id}",
-  "PATCH /bnpl/interest-rate",
-  "PATCH /bnpl/settings",
   "PATCH /customers/{id}",
   "PATCH /meters/{id}",
   "PATCH /organization/radar-settings",

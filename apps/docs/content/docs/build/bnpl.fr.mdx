@@ -8,16 +8,16 @@ description: Débit différé SPI en XOF — paiement marchand immédiat et mens
 Le BNPL lomi. repose sur le **débit différé SPI** en **XOF** uniquement. Quand un client choisit le BNPL au checkout :
 
 1. Un plan de mensualités est créé avec des demandes de paiement SPI différées.
-2. Vous recevez le **montant net** tout de suite (moins les frais BNPL).
-3. Le client rembourse capital et intérêts à chaque échéance via SPI.
+2. Vous recevez le **montant net** tout de suite (moins les frais BNPL de votre grille).
+3. Le client rembourse chaque échéance à la date prévue via SPI (débit différé bancaire).
 
-Au checkout, le BNPL apparaît comme fournisseur **JUMBO** / méthode **BNPL**. Ce n'est pas l'application mobile POS **Jumbo**.
+Activez le BNPL depuis **Canaux de paiement** en connectant **Jumbo**. Pas de carte de réglages BNPL séparée.
+
+**Périmètre v1 :** produits ponctuels à prix fixe standard uniquement. Pas d'abonnements, facturation à l'usage, montant libre ou paniers multi-articles. Le client paie le prix affiché en mensualités ; les frais marchands passent par la ligne **JUMBO/BNPL** de votre grille de frais.
 
 ## API marchand
 
 - `GET /bnpl/config` — résumé de configuration
-- `PATCH /bnpl/settings` — activer ou désactiver le BNPL
-- `PATCH /bnpl/interest-rate` — taux d'intérêt client (0,5–10 %)
 - `GET /bnpl/plans` — liste des plans
 
 ## Checkout hébergé
