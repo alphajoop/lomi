@@ -74,3 +74,11 @@
 	path = apps/tools/wallet
 	url = https://github.com/lomiafrica/wallet.git
 	branch = main
+[submodule "apps/tools/geolook"]
+	path = apps/tools/geolook
+	url = https://github.com/lomiafrica/geolook.git
+	branch = main
+[submodule "apps/tools/payterm"]
+	path = apps/tools/payterm
+	url = https://github.com/lomiafrica/payterm.git
+	branch = main
