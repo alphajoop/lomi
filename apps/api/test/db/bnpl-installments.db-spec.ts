@@ -123,9 +123,16 @@ dbDescribe('BNPL installments :: create_bnpl_plan_with_spi', () => {
         [row.initial_transaction_id],
       );
       expect(initialTxn.rows[0]?.is_bnpl).toBe(true);
-      expect(initialTxn.rows[0]?.provider_code).toBe('SPI');
-      expect(initialTxn.rows[0]?.payment_method_code).toBe('BANK_TRANSFER');
+      expect(initialTxn.rows[0]?.provider_code).toBe('JUMBO');
+      expect(initialTxn.rows[0]?.payment_method_code).toBe('BNPL');
       expect(initialTxn.rows[0]?.status).toBe('completed');
+
+      const balance = await client.query(
+        `SELECT balance FROM public.accounts
+          WHERE organization_id = $1 AND currency_code = 'XOF'`,
+        [ctx.organizationId],
+      );
+      expect(Number(balance.rows[0]?.balance)).toBeGreaterThan(0);
     });
   });
 });

@@ -1,0 +1,32 @@
+---
+title: Buy Now Pay Later (BNPL)
+description: SPI deferred debit for XOF checkout — merchant upfront payout and customer installments.
+---
+
+# Buy Now Pay Later (BNPL)
+
+lomi. BNPL uses **SPI débit différé** on **XOF** only. When a customer chooses BNPL at checkout:
+
+1. An installment plan is created with deferred SPI payment requests.
+2. You receive the **net product amount** immediately (minus BNPL processing fees).
+3. The customer repays principal plus interest on each due date via SPI.
+
+BNPL is exposed at checkout as provider **JUMBO** / method **BNPL**. This is separate from the **Jumbo** mobile POS app.
+
+## Merchant API
+
+- `GET /bnpl/config` — configuration summary
+- `PATCH /bnpl/settings` — enable or disable BNPL
+- `PATCH /bnpl/interest-rate` — customer interest rate (0.5–10%)
+- `GET /bnpl/plans` — list installment plans
+
+## Hosted checkout
+
+Public endpoints (no API key; session is the capability):
+
+- `GET /checkout/v1/bnpl/display` — installment breakdown
+- `POST /checkout/v1/bnpl/create` — create plan and register SPI installments
+
+## Operations
+
+See [BNPL gates](/resources/contributing/bnpl-gates) for capital, SPI authorization, and naming decisions before enabling live traffic.

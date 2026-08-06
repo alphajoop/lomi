@@ -24,6 +24,7 @@ import { ProductsModule } from './core/products/products.module';
 import { SubscriptionsOpenApiModule } from './core/subscriptions/subscriptions-open-api.module';
 import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.module';
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
+import { BnplModule } from './core/bnpl/bnpl.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
 import { DisputesModule } from './core/disputes/disputes.module';
@@ -63,6 +64,7 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
     SubscriptionsOpenApiModule,
     DiscountCouponsModule,
     CheckoutSessionsModule,
+    BnplModule,
     PaymentLinksModule,
     PayoutsModule,
     DisputesModule,

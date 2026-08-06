@@ -1,0 +1,16 @@
+---
+title: Garde-fous BNPL
+description: Capital, autorisation SPI et naming pour le BNPL (débit différé).
+---
+
+# Garde-fous BNPL
+
+Checklist avant d'activer le BNPL pour les marchands :
+
+1. **Trésorerie** — Le marchand est crédité à la création du plan ; la plateforme porte le risque jusqu'aux règlements SPI.
+2. **SPI** — Le payeur doit être autorisé au débit différé (codes AG03 / AM14).
+3. **Réglementaire** — Alignement BCEAO / MoR avant communication marchande.
+
+**Naming :** libellé checkout **JUMBO** + méthode **BNPL** ; même paire en ledger. Ce n'est pas l'app MPOS Jumbo (`apps/jumbo`).
+
+Référence technique : `apps/api/docs/bnpl-gates.md` dans le monorepo.

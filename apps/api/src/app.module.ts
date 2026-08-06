@@ -22,6 +22,7 @@ import { ProductsModule } from './core/products/products.module';
 import { SubscriptionsModule } from './core/subscriptions/subscriptions.module';
 import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.module';
 import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
+import { BnplModule } from './core/bnpl/bnpl.module';
 import { PaymentLinksModule } from './core/payment-links/payment-links.module';
 import { PayoutsModule } from './core/payouts/payouts.module';
 import { DisputesModule } from './core/disputes/disputes.module';
@@ -144,6 +145,7 @@ const logger = new Logger('RedisConfig');
     SubscriptionsModule,
     DiscountCouponsModule,
     CheckoutSessionsModule,
+    BnplModule,
     PaymentLinksModule,
     PayoutsModule,
     DisputesModule,

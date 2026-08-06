@@ -51,7 +51,6 @@ We are progressively open-sourcing the monorepo toward **eventual self-hosting**
   - API service: **[apps/api](./apps/api)**
   - SDKs: **[apps/sdks](./apps/sdks)**
   - E-commerce plugins: **[apps/plugins](./apps/plugins)**
-  - MCP server: **[apps/mcp](./apps/mcp)**
   - Events boilerplate (separate repo): **[lomiafrica/events](https://github.com/lomiafrica/events/)**
 
 - **Opening soon**:
@@ -60,6 +59,7 @@ We are progressively open-sourcing the monorepo toward **eventual self-hosting**
 
 - **Proprietary**:
   - Admin dashboard: **[apps/admin](./apps/admin)**
+  - Merchant MCP server: **[apps/mcp](./apps/mcp)** (`lomiafrica/mcp`)
 
 All open-source repositories will be merged into the monorepo in the coming months.
 

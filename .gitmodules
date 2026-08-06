@@ -62,3 +62,7 @@
 	path = apps/tools/gsc-mcp
 	url = https://github.com/lomiafrica/gsc-mcp.git
 	branch = main
+[submodule "apps/mcp"]
+	path = apps/mcp
+	url = https://github.com/lomiafrica/mcp.git
+	branch = main

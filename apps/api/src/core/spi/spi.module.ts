@@ -7,6 +7,7 @@ import { SpiPosService } from './spi-pos.service';
 import { SpiTokenService } from './spi-token.service';
 import { SpiBalanceSyncService } from './spi-balance-sync.service';
 import { SpiPayoutExecutionService } from './spi-payout-execution.service';
+import { SpiBnplService } from './spi-bnpl.service';
 
 @Module({
   imports: [SupabaseModule],
@@ -18,6 +19,7 @@ import { SpiPayoutExecutionService } from './spi-payout-execution.service';
     SpiInvoicingService,
     SpiBalanceSyncService,
     SpiPayoutExecutionService,
+    SpiBnplService,
   ],
   exports: [
     SpiTokenService,
@@ -27,6 +29,7 @@ import { SpiPayoutExecutionService } from './spi-payout-execution.service';
     SpiInvoicingService,
     SpiBalanceSyncService,
     SpiPayoutExecutionService,
+    SpiBnplService,
   ],
 })
 export class SpiModule {}
