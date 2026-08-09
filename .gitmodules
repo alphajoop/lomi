@@ -70,10 +70,6 @@
 	path = apps/stellar
 	url = https://github.com/lomiafrica/stellar.git
 	branch = main
-[submodule "apps/tools/wallet"]
-	path = apps/tools/wallet
-	url = https://github.com/lomiafrica/wallet.git
-	branch = main
 [submodule "apps/tools/geolook"]
 	path = apps/tools/geolook
 	url = https://github.com/lomiafrica/geolook.git
