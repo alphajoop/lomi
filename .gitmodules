@@ -66,8 +66,8 @@
 	path = apps/mcp
 	url = https://github.com/lomiafrica/mcp.git
 	branch = main
-[submodule "apps/stellar"]
-	path = apps/stellar
+[submodule "apps/tools/stellar"]
+	path = apps/tools/stellar
 	url = https://github.com/lomiafrica/stellar.git
 	branch = main
 [submodule "apps/tools/geolook"]
