@@ -203,6 +203,25 @@ describe('createHttpApplication', () => {
 
   it('GET /mcp with lomi_oat_* bearer passes transport gate when gated', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    process.env.INTERNAL_API_KEY = 'test-internal-key';
+    const realFetch = globalThis.fetch.bind(globalThis);
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(
+      async (input, init) => {
+        const url = String(input);
+        if (url.includes('/oauth/introspect/mcp')) {
+          return new Response(
+            JSON.stringify({
+              active: true,
+              grant_type: 'merchant',
+              connection_key: 'lomi_sk_test_oauth_connection_key',
+              access_level: 'read',
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        }
+        return realFetch(input, init);
+      },
+    );
     const manifest = parseManifest(manifestJson);
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
@@ -210,15 +229,32 @@ describe('createHttpApplication', () => {
     const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
       headers: { Authorization: 'Bearer lomi_oat_synth_test_token' },
     });
+    fetchMock.mockRestore();
     expect(res.status).not.toBe(401);
     expect(res.status).toBe(400);
+  });
+
+  it('GET /mcp with unintrospectable lomi_oat_* is rejected when gated', async () => {
+    process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    delete process.env.INTERNAL_API_KEY;
+    delete process.env.CRON_SECRET;
+    const manifest = parseManifest(manifestJson);
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    // Distinct token so a prior introspect cache entry cannot satisfy the gate.
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      headers: { Authorization: 'Bearer lomi_oat_unconfigured_introspect_token' },
+    });
+    expect(res.status).toBe(401);
   });
 
   it('POST /mcp initialize with introspected lomi_oat_* opens a session', async () => {
     process.env.INTERNAL_API_KEY = 'test-internal-key';
     process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const realFetch = globalThis.fetch.bind(globalThis);
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(
-      async (input) => {
+      async (input, init) => {
         const url = String(input);
         if (url.includes('/oauth/introspect/mcp')) {
           return new Response(
@@ -232,7 +268,7 @@ describe('createHttpApplication', () => {
             { status: 200, headers: { 'Content-Type': 'application/json' } },
           );
         }
-        return new Response('not found', { status: 404 });
+        return realFetch(input, init);
       },
     );
 

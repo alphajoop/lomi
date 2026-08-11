@@ -33,6 +33,8 @@ describe('looksLikeLomiApiCredential', () => {
   it('rejects short or unrelated tokens', () => {
     expect(looksLikeLomiApiCredential('lomi_')).toBe(false);
     expect(looksLikeLomiApiCredential('secret')).toBe(false);
+    expect(looksLikeLomiApiCredential('lomi_oat_' + 'x'.repeat(20))).toBe(false);
+    expect(looksLikeLomiApiCredential('lomi_prov_' + 'y'.repeat(20))).toBe(false);
   });
 });
 
@@ -45,11 +47,21 @@ describe('extractSessionMerchantApiKey', () => {
     expect(
       extractSessionMerchantApiKey(
         req({
-          'x-lomi-api-key': 'lomi_mcp_one',
-          authorization: 'Bearer lomi_mcp_two',
+          'x-lomi-api-key': 'lomi_mcp_one_abcdefghij',
+          authorization: 'Bearer lomi_mcp_two_abcdefghij',
         }),
       ),
-    ).toBe('lomi_mcp_one');
+    ).toBe('lomi_mcp_one_abcdefghij');
+  });
+
+  it('rejects header values that do not look like lomi credentials', () => {
+    expect(
+      extractSessionMerchantApiKey(
+        req({
+          'x-lomi-api-key': 'not-a-lomi-key',
+        }),
+      ),
+    ).toBe(null);
   });
 
   it('reads x-api-key', () => {

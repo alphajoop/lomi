@@ -181,24 +181,30 @@ function ensureProductionBearer(): void {
 }
 
 /**
- * True when the request carries any lomi. credential we can act on: a merchant
- * API key (`x-lomi-api-key` / `x-api-key` or a `lomi_*` bearer), a provisioning
- * key, or an OAuth access token. These credentials gate the transport on their
- * own, so merchants only need their API key — no shared transport secret.
+ * Resolves whether the request carries a transport-acceptable lomi. credential.
+ * Merchant / provisioning keys must match known prefixes; OAuth access tokens
+ * must pass server-side introspection before they unlock the gate.
  */
-function requestPresentsLomiCredential(req: Request): boolean {
+async function resolveTransportCredential(req: Request): Promise<boolean> {
+  if (extractSessionMerchantApiKey(req) || extractSessionProvisioningKey(req)) {
+    return true;
+  }
+
+  const oauthToken = extractOAuthAccessToken(req);
+  if (!oauthToken) return false;
+
+  const introspected = await introspectOAuthAccessToken(oauthToken);
   return Boolean(
-    extractSessionMerchantApiKey(req) ||
-      extractSessionProvisioningKey(req) ||
-      extractOAuthAccessToken(req),
+    introspected.active &&
+      (introspected.connection_key || introspected.provisioning_key),
   );
 }
 
-function bearerAuthMiddleware(
+async function bearerAuthMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
-): void {
+): Promise<void> {
   const tokens = getMcpHttpBearerTokens();
   const auth = req.headers.authorization;
   const presented =
@@ -207,14 +213,14 @@ function bearerAuthMiddleware(
       : null;
 
   // Legacy path: a shared transport secret still unlocks the endpoint.
+  // Compared against server-configured secrets (not user-controlled allow).
   if (presented && tokens.length > 0 && bearerTokenMatches(presented, tokens)) {
     next();
     return;
   }
 
-  // Primary path: a valid lomi. credential (merchant key, provisioning key, or
-  // OAuth token) is sufficient. This is what merchants use — API key only.
-  if (requestPresentsLomiCredential(req)) {
+  // Primary path: shaped merchant/provisioning key, or introspected OAuth token.
+  if (await resolveTransportCredential(req)) {
     next();
     return;
   }
@@ -255,21 +261,14 @@ function resolveProvisioningKey(
   return initialKey ?? getOptionalProvisioningKey();
 }
 
-function hasSessionCredential(
-  registry: McpSessionRegistry,
-  sessionId: string | undefined,
-  headerMerchantKey: string | null,
-  headerProvisioningKey: string | null,
+/** Credentials already resolved for this request (headers / OAuth / env). */
+function hasResolvedSessionCredential(
+  merchantKey: string | null,
+  provisioningKey: string | null,
   oauthMerchantGrant: boolean,
 ): boolean {
-  const merchant =
-    headerMerchantKey ??
-    (sessionId ? registry.getMerchantApiKey(sessionId) : null) ??
-    getOptionalMerchantApiKey();
-  const provisioning =
-    headerProvisioningKey ??
-    (sessionId ? registry.getProvisioningApiKey(sessionId) : null) ??
-    getOptionalProvisioningKey();
+  const merchant = merchantKey ?? getOptionalMerchantApiKey();
+  const provisioning = provisioningKey ?? getOptionalProvisioningKey();
   return Boolean(merchant || provisioning || oauthMerchantGrant);
 }
 
@@ -396,35 +395,14 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
         let transport: TransportEntry | undefined;
 
         if (sessionId && registry.has(sessionId)) {
+          // Existing session: id must match a server-issued registry entry.
           transport = registry.get(sessionId)!.transport;
           registry.touch(sessionId);
           store.sessionId = sessionId;
-        } else if (!sessionId && isInitializeRequest(req.body)) {
-          if (!registry.canAcceptNewSession()) {
-            mcpLog(
-              'mcp_session_rejected',
-              {
-                reason: 'max_sessions',
-                activeSessions: registry.size,
-                maxSessions: mcpMaxSessions(),
-              },
-              'warn',
-            );
-            res.status(503).json({
-              jsonrpc: '2.0',
-              error: {
-                code: -32000,
-                message: `MCP server at session capacity (${mcpMaxSessions()}). Try again later.`,
-              },
-              id: null,
-            });
-            return;
-          }
-
+        } else if (!sessionId) {
+          // New session: require credentials first, then an MCP initialize body.
           if (
-            !hasSessionCredential(
-              registry,
-              undefined,
+            !hasResolvedSessionCredential(
               resolvedMerchantKey,
               resolvedProvisioningKey,
               Boolean(merchantGrant?.connectionKey),
@@ -447,6 +425,38 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
             return;
           }
 
+          if (!isInitializeRequest(req.body)) {
+            res.status(400).json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32000,
+                message: 'Bad Request: No valid MCP session ID provided',
+              },
+              id: null,
+            });
+            return;
+          }
+
+          if (!registry.canAcceptNewSession()) {
+            mcpLog(
+              'mcp_session_rejected',
+              {
+                reason: 'max_sessions',
+                activeSessions: registry.size,
+                maxSessions: mcpMaxSessions(),
+              },
+              'warn',
+            );
+            res.status(503).json({
+              jsonrpc: '2.0',
+              error: {
+                code: -32000,
+                message: `MCP server at session capacity (${mcpMaxSessions()}). Try again later.`,
+              },
+              id: null,
+            });
+            return;
+          }
           const sessionState = {
             sessionId: null as string | null,
             merchantApiKey: resolvedMerchantKey,

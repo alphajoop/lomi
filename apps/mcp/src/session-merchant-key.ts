@@ -13,6 +13,8 @@ export function firstHeaderValue(
 /** True for keys issued by our flows (REST secret keys, CLI/MCP connect tokens). */
 export function looksLikeLomiApiCredential(token: string): boolean {
   const t = token.trim();
+  // OAuth access tokens and provisioning keys have their own extractors.
+  if (t.startsWith('lomi_oat_') || t.startsWith('lomi_prov_')) return false;
   return t.startsWith('lomi_') && t.length >= 16;
 }
 
@@ -22,7 +24,7 @@ export function looksLikeProvisioningCredential(token: string): boolean {
 
 export function extractSessionProvisioningKey(req: Request): string | null {
   const headerKey = firstHeaderValue(req.headers['x-lomi-provisioning-key']);
-  if (headerKey && headerKey.length > 0) {
+  if (headerKey && looksLikeProvisioningCredential(headerKey)) {
     return headerKey;
   }
 
@@ -60,7 +62,8 @@ export function extractSessionMerchantApiKey(req: Request): string | null {
   const headerKey =
     firstHeaderValue(req.headers['x-lomi-api-key']) ??
     firstHeaderValue(req.headers['x-api-key']);
-  if (headerKey && headerKey.length > 0) return headerKey;
+  // Reject arbitrary header strings — only accept shaped lomi. credentials.
+  if (headerKey && looksLikeLomiApiCredential(headerKey)) return headerKey;
 
   const auth = firstHeaderValue(req.headers.authorization);
   if (!auth?.startsWith('Bearer ')) return null;
