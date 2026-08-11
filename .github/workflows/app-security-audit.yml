@@ -6,14 +6,14 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - "apps/api/pnpm-lock.yaml"
+      - "apps/api"
       - "apps/dashboard/pnpm-lock.yaml"
       - "apps/checkout/pnpm-lock.yaml"
       - ".github/workflows/app-security-audit.yml"
   pull_request:
     branches: [main]
     paths:
-      - "apps/api/pnpm-lock.yaml"
+      - "apps/api"
       - "apps/dashboard/pnpm-lock.yaml"
       - "apps/checkout/pnpm-lock.yaml"
       - ".github/workflows/app-security-audit.yml"
@@ -32,6 +32,13 @@ jobs:
         working-directory: apps/api
     steps:
       - uses: actions/checkout@v5
+      - name: Checkout API submodule
+        uses: actions/checkout@v5
+        with:
+          repository: lomiafrica/api-cloud
+          ref: main
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          path: apps/api
       - uses: pnpm/action-setup@v4
         with:
           version: 9

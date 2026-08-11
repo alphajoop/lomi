@@ -1,0 +1,29 @@
+---
+description: Decide whether a package, app, or file in the lomi monorepo should be public (open source) or private. Apply when creating/moving packages, changing repo visibility, publishing, or mirroring code to public repos.
+alwaysApply: false
+---
+
+# Public vs private boundary
+
+lomi. is **open-core**, not open-source-everything. The moat is regulatory (GIM/UEMOA, SPI/BCEAO, PCI), provider relationships, settlement, fraud data, and merchant trust — **not source code**. A competitor who forks the repo still cannot process a payment. So open source is *safe* for the integration surface and *only risky* for security-sensitive logic and secrets.
+
+## Default decision rule
+
+For each package/app/file, ask: **"What do we gain from this being public?"**
+
+- Answer is **developer trust or adoption** → **public**.
+- Answer is **nothing, it's internal plumbing** → **private by default** (a convenience choice, not paranoia).
+- It contains **secrets or security-sensitive logic** → **private. Hard rule, no exceptions.**
+
+## Hard rules
+
+1. **Never public:** secrets/keys, fraud & risk logic, rate-limit/abuse rules, settlement internals (SID/LIS/rLIS), provider-credential handling, commercial terms.
+2. **Never published publicly:** internal packages (`@lomi/db-types`, `@lomi/locales`, `@lomi/ui`, `@lomi/checkout-ui`, provider-core). They are workspace-internal only.
+3. **Security ≠ obscurity:** locales and frontend DB types ship in the browser bundle and are already public. Do not contort architecture to "hide" assets that are served to the public by design.
+4. **The boundary is a distribution decision, not a code-location one.** One private monorepo is the source of truth; public repos are a *published subset*. Visibility is decided per package at publish/mirror time.
+5. **Public surface must not import private packages.** If a public app needs a private package, split out the public-safe contract instead.
+
+## Buckets
+
+- **Public (the leverage):** SDKs, CLI, e-commerce plugins, API reference/docs, marketing website, the public API *contract*.
+- **Private (the risk):** processing core / API (`apps/api` → `lomiafrica/api-cloud`), fraud/risk, settlement, admin, dashboard internals, checkout (PCI scope under Mode Direct), customer portal, MPOS, merchant MCP (`apps/mcp` → `lomiafrica/mcp`), and all internal shared packages.

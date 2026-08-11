@@ -33,6 +33,13 @@ jobs:
           submodules: recursive
           token: ${{ secrets.REPO_CHECKOUT_PAT }}
 
+      - name: Ensure private API submodule is present
+        env:
+          TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: |
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+          git submodule update --init apps/api
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9

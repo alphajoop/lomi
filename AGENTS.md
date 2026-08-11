@@ -4,7 +4,7 @@
 
 You are AGI-pilled.
 
-This repo is the **lomi.** payment-platform monorepo. There is **no root `package.json`/Makefile**; each app under `apps/` is installed and run independently. Only the open-source apps are checked out here (`apps/api`, `apps/cli`, `apps/docs`, `apps/sdks`, `apps/plugins`). The other `apps/*` entries in `.gitmodules` (e.g. `dashboard`, `checkout`, `storefront`, `admin`, `mcp`) are **private submodules that are not initialized** in this environment.
+This repo is the **lomi.** payment-platform monorepo. There is **no root `package.json`/Makefile**; each app under `apps/` is installed and run independently. Only the open-source apps are checked out here (`apps/cli`, `apps/docs`, `apps/sdks`, `apps/plugins`). Private submodules (`apps/api` → `lomiafrica/api-cloud`, plus `dashboard`, `checkout`, `storefront`, `admin`, `mcp`, etc.) are **not initialized** in this environment without `REPO_CHECKOUT_PAT`.
 
 Standard per-app commands live in each app's `package.json`/`README.md` and in `.github/workflows/`; the notes below only cover non-obvious setup/run caveats.
 
@@ -14,11 +14,13 @@ Standard per-app commands live in each app's `package.json`/`README.md` and in `
 - **Rust ≥ 1.85 is required** (the CLI uses edition 2024). The VM's default base image ships Rust 1.83, which fails to compile `apps/cli`. The snapshot has been updated to the latest stable via `rustup update stable`; if a future VM reverts to 1.83, run `rustup update stable` before building the CLI.
 - **Redis** is installed for the API's BullMQ queues. It is **not auto-started** — run `redis-server --daemonize yes --save "" --appendonly no` once per boot before starting the API (otherwise `/ready` reports `redis_ping: false` and the log spams `ioredis ECONNREFUSED`; the API still serves core routes via a synchronous fallback).
 
-### apps/api (NestJS REST API — the core product)
+### apps/api (NestJS REST API — private submodule)
 
+- Private repo: [`lomiafrica/api-cloud`](https://github.com/lomiafrica/api-cloud). Init with `git submodule update --init apps/api` (needs org access / `REPO_CHECKOUT_PAT`).
 - Needs `apps/api/.env.local`. `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are required for boot but **placeholder values are enough to start the server** and serve `/health`, `/ready`, Swagger at `/api`, and the request/auth pipeline (unauthenticated → `401`). Real Supabase credentials are only needed for DB-backed RPC calls (actual payment/checkout creation). For local Redis add `REDIS_HOST=localhost` / `REDIS_PORT=6379`.
 - Run: `pnpm run start:dev` (watch) or `pnpm run build && pnpm run start:prod`. Listens on `http://localhost:3000`.
 - **Gotcha (incremental build):** `nest build` / `nest start --watch` use `deleteOutDir: true` plus TypeScript incremental caching. A stale `apps/api/tsconfig.build.tsbuildinfo` can make tsc skip emit after `dist` was deleted, so the app crashes with `Cannot find module dist/main`. Fix: `rm -f apps/api/tsconfig.build.tsbuildinfo` and rebuild.
+- **Deploys:** Railway production (`api.lomi.africa`) from `lomiafrica/api-cloud` root `/`. Vercel sandbox (`sandbox.api.lomi.africa`) via `deploy-vercel-sandbox.yml` (Hobby cannot Git-connect private org repos).
 - **Tests (`pnpm test`):** most pass, but two suites fail in this environment by design: `src/core/__tests__/network-rpc.contract.spec.ts` reads SQL from the **private `apps/dashboard` submodule** (CI initializes it via a PAT — not available here), and `src/app.controller.spec.ts` has a DI gap (`ApiKeyGuard` now needs `RedisService` that the spec doesn't provide). These are unrelated to environment setup.
 
 ### apps/cli (Rust CLI)

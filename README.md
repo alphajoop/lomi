@@ -48,7 +48,6 @@ We are progressively open-sourcing the monorepo toward **eventual self-hosting**
 - **Currently open-source**:
   - Documentation website: **[apps/docs](./apps/docs)**
   - CLI: **[apps/cli](./apps/cli)**
-  - API service: **[apps/api](./apps/api)**
   - SDKs: **[apps/sdks](./apps/sdks)**
   - E-commerce plugins: **[apps/plugins](./apps/plugins)**
   - Events boilerplate (separate repo): **[lomiafrica/events](https://github.com/lomiafrica/events/)**
@@ -58,6 +57,7 @@ We are progressively open-sourcing the monorepo toward **eventual self-hosting**
   - Shopify extension: **[apps/plugins/shopify](./apps/plugins/shopify)**
 
 - **Proprietary**:
+  - API service: **[apps/api](./apps/api)** (`lomiafrica/api-cloud`)
   - Admin dashboard: **[apps/admin](./apps/admin)**
   - Merchant MCP server: **[apps/mcp](./apps/mcp)** (`lomiafrica/mcp`)
 

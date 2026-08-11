@@ -78,3 +78,7 @@
 	path = apps/tools/payterm
 	url = https://github.com/lomiafrica/payterm.git
 	branch = main
+[submodule "apps/api"]
+	path = apps/api
+	url = https://github.com/lomiafrica/api-cloud.git
+	branch = main
