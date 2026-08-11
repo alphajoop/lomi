@@ -57,7 +57,7 @@ We are progressively open-sourcing the monorepo toward **eventual self-hosting**
   - Shopify extension: **[apps/plugins/shopify](./apps/plugins/shopify)**
 
 - **Proprietary**:
-  - API service: **[apps/api](./apps/api)** (`lomiafrica/api-cloud`)
+  - API service: **[apps/api](./apps/api)** (`lomiafrica/api`)
   - Admin dashboard: **[apps/admin](./apps/admin)**
   - Merchant MCP server: **[apps/mcp](./apps/mcp)** (`lomiafrica/mcp`)
 

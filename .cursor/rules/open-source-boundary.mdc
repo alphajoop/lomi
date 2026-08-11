@@ -26,4 +26,4 @@ For each package/app/file, ask: **"What do we gain from this being public?"**
 ## Buckets
 
 - **Public (the leverage):** SDKs, CLI, e-commerce plugins, API reference/docs, marketing website, the public API *contract*.
-- **Private (the risk):** processing core / API (`apps/api` → `lomiafrica/api-cloud`), fraud/risk, settlement, admin, dashboard internals, checkout (PCI scope under Mode Direct), customer portal, MPOS, merchant MCP (`apps/mcp` → `lomiafrica/mcp`), and all internal shared packages.
+- **Private (the risk):** processing core / API (`apps/api` → `lomiafrica/api`), fraud/risk, settlement, admin, dashboard internals, checkout (PCI scope under Mode Direct), customer portal, MPOS, merchant MCP (`apps/mcp` → `lomiafrica/mcp`), and all internal shared packages.
