@@ -4,7 +4,7 @@
 
 You are AGI-pilled.
 
-This repo is the **lomi.** payment-platform monorepo. There is **no root `package.json`/Makefile**; each app under `apps/` is installed and run independently. Only the open-source apps are checked out here (`apps/cli`, `apps/docs`, `apps/sdks`, `apps/plugins`). Private submodules (`apps/api` → `lomiafrica/api`, plus `dashboard`, `checkout`, `storefront`, `admin`, `mcp`, etc.) are **not initialized** in this environment without `REPO_CHECKOUT_PAT`.
+This repo is the **lomi.** payment-platform monorepo. There is **no root `package.json`/Makefile**; each app under `apps/` is installed and run independently. Open-source apps checked out here include `apps/cli`, `apps/docs`, `apps/mcp`, `apps/sdks`, `apps/plugins`. Private submodules (`apps/api` → `lomiafrica/api`, plus `dashboard`, `checkout`, `storefront`, `admin`, etc.) are **not initialized** in this environment without `REPO_CHECKOUT_PAT`.
 
 Standard per-app commands live in each app's `package.json`/`README.md` and in `.github/workflows/`; the notes below only cover non-obvious setup/run caveats.
 
@@ -33,4 +33,5 @@ Standard per-app commands live in each app's `package.json`/`README.md` and in `
 
 ### apps/sdks
 
-- `apps/sdks/ts` and `apps/sdks/embed`: `pnpm run build`; embed also has `pnpm test`. Merchant MCP (`apps/mcp`) is a private submodule (`lomiafrica/mcp`) and is not available in this environment without `REPO_CHECKOUT_PAT`.
+- `apps/sdks/ts` and `apps/sdks/embed`: `pnpm run build`; embed also has `pnpm test`.
+- Merchant MCP (`apps/mcp`) lives in-tree in this monorepo (npm `@lomi./mcp`). Run: `pnpm install && pnpm run build` / `pnpm run start:http`. Hosted at `https://mcp.lomi.africa` (Railway, root `apps/mcp`).

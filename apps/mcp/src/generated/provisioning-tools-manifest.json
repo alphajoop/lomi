@@ -1,0 +1,307 @@
+{
+  "manifestVersion": 1,
+  "apiVersion": "1.1.0",
+  "apiTitle": "lomi. Provisioning API",
+  "toolCount": 8,
+  "tools": [
+    {
+      "name": "lomi_post_provisioning_v1_accounts",
+      "operationKey": "POST /provisioning/v1/accounts",
+      "method": "POST",
+      "pathTemplate": "/provisioning/v1/accounts",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Create a merchant account for agent-driven onboarding",
+      "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_createAccount",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": true,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_post_provisioning_v1_merchants_merchantId_onboarding_documents",
+      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/onboarding/documents",
+      "method": "POST",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/documents",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Upload a KYC document",
+      "description": "Upload a KYC/identity document (ID, business registration, proof of address) for a merchant's onboarding. Pass the merchantId and the document; submit required documents before calling onboarding/complete.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_uploadDocument",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_post_provisioning_v1_merchants_merchantId_onboarding_extract",
+      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/onboarding/extract",
+      "method": "POST",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/extract",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Extract onboarding data",
+      "description": "Auto-extract onboarding details from the merchant's website or uploaded documents to pre-fill their profile. Pass the merchantId; review the extracted fields before completing onboarding.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_extractOnboarding",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_post_provisioning_v1_merchants_merchantId_onboarding_complete",
+      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/onboarding/complete",
+      "method": "POST",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/complete",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Complete merchant onboarding and submit KYC",
+      "description": "Atomically creates the organization, provisions test API keys, and queues KYC review.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_completeOnboarding",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_get_provisioning_v1_merchants_merchantId_onboarding_status",
+      "operationKey": "GET /provisioning/v1/merchants/{merchantId}/onboarding/status",
+      "method": "GET",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/status",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Get onboarding status",
+      "description": "Return the merchant's onboarding progress plus KYC and verification state. Poll this to see what remains before calling onboarding/complete.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_getOnboardingStatus",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_get_provisioning_v1_merchants_merchantId_api_keys",
+      "operationKey": "GET /provisioning/v1/merchants/{merchantId}/api-keys",
+      "method": "GET",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/api-keys",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Retrieve provisioned test API keys for the merchant",
+      "description": "Returns test secret keys and publishable keys after onboarding completes.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_getApiKeys",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_post_provisioning_v1_merchants_merchantId_live_activation_request",
+      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/live-activation/request",
+      "method": "POST",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/live-activation/request",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Request live mode activation (requires merchant approval)",
+      "description": "Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_requestLiveActivation",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": false,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    },
+    {
+      "name": "lomi_get_provisioning_v1_merchants_merchantId_live_activation_status",
+      "operationKey": "GET /provisioning/v1/merchants/{merchantId}/live-activation/status",
+      "method": "GET",
+      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/live-activation/status",
+      "pathParamNames": [
+        "merchantId"
+      ],
+      "queryParamNames": [],
+      "title": "Get live activation request status",
+      "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard; not via this API.",
+      "tags": [
+        "Provisioning"
+      ],
+      "operationId": "ProvisioningController_getLiveActivationStatus",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
+          }
+        },
+        "required": [
+          "merchantId"
+        ]
+      },
+      "readOnly": true,
+      "destructive": false,
+      "alwaysLoad": false,
+      "searchHint": "provisioning onboarding merchant account",
+      "authMode": "provisioning"
+    }
+  ]
+}

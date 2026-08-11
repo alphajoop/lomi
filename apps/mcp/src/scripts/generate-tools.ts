@@ -1,0 +1,199 @@
+/**
+ * Generates src/generated/tools-manifest.json from apps/docs/openapi.json
+ * and the public merchant operation allowlist (same contract as SDKs).
+ */
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  type OpenAPISpec,
+  buildInputJsonSchema,
+  toolNameFromOperation,
+} from '../generator/openapi-helpers.js';
+import {
+  type EnglishCopyOverride,
+  resolveEnglishCopy,
+} from '../generator/mcp-english-copy.js';
+import {
+  loadAlwaysLoadKeys,
+  loadExcludedOperationKeys,
+  loadToolNameOverrides,
+  resolveToolPolicy,
+} from '../tool-policy.js';
+import { validateManifestToolEntry } from './validate-manifest-entry.js';
+import {
+  readSpecAndAllowlist,
+  getNormalizedOperations,
+  HTTP_WITH_BODY,
+  METHOD_NAME_BY_OP,
+} from '../../../sdks/scripts/public-sdk-operations.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const mcpRoot = join(__dirname, '../..');
+const openapiPath = join(mcpRoot, '../docs/openapi.json');
+const allowlistPath = join(
+  mcpRoot,
+  '../docs/lib/scripts/manual-api/_expected-public-operations.json',
+);
+const policyPath = join(__dirname, 'mcp-tool-policy.json');
+const copyOverridesPath = join(__dirname, 'mcp-tool-copy.en.json');
+const outDir = join(mcpRoot, 'src/generated');
+const outFile = join(outDir, 'tools-manifest.json');
+
+const WRITE_METHODS = new Set(['post', 'patch', 'put', 'delete']);
+
+function assertUniqueToolNames(names: string[]): void {
+  const seen = new Set<string>();
+  for (const n of names) {
+    if (seen.has(n)) throw new Error(`Duplicate MCP tool name: ${n}`);
+    seen.add(n);
+  }
+}
+
+function loadCopyOverrides(): Record<string, EnglishCopyOverride> {
+  const raw = readFileSync(copyOverridesPath, 'utf-8');
+  return JSON.parse(raw) as Record<string, EnglishCopyOverride>;
+}
+
+function main(): void {
+  const { spec, allowed } = readSpecAndAllowlist(openapiPath, allowlistPath);
+  const apiSpec = spec as OpenAPISpec;
+  const { operations } = getNormalizedOperations(spec, allowed);
+  const policyJson = JSON.parse(readFileSync(policyPath, 'utf-8')) as {
+    alwaysLoadOperationKeys?: string[];
+    mcpExcludedOperationKeys?: string[];
+    toolNameOverrides?: Record<string, string>;
+  };
+  const alwaysLoadKeys = loadAlwaysLoadKeys(policyJson);
+  const excludedKeys = loadExcludedOperationKeys(policyJson);
+  const nameOverrides = loadToolNameOverrides(policyJson);
+  const copyOverrides = loadCopyOverrides();
+
+  // MCP-only exclusions must reference operations that are still in the shared
+  // SDK allowlist, otherwise the exclusion is stale and silently does nothing.
+  const allowedKeys = new Set(operations.map((op) => op.operationKey));
+  for (const key of excludedKeys) {
+    if (!allowedKeys.has(key)) {
+      throw new Error(
+        `mcpExcludedOperationKeys references "${key}" which is not in the allowlist. Remove the stale exclusion from mcp-tool-policy.json.`,
+      );
+    }
+  }
+
+  const includedOperations = operations.filter(
+    (op) => !excludedKeys.has(op.operationKey),
+  );
+
+  // Copy overrides must target a tool that is actually generated, otherwise the
+  // curated title/description silently does nothing (typo or removed operation).
+  const includedKeys = new Set(includedOperations.map((op) => op.operationKey));
+  for (const key of Object.keys(copyOverrides)) {
+    if (!includedKeys.has(key)) {
+      throw new Error(
+        `mcp-tool-copy.en.json has copy for "${key}" which is not a generated MCP tool (excluded or unknown). Fix the key or remove the entry.`,
+      );
+    }
+  }
+
+  // Name overrides must target a generated tool and use the lomi_ namespace so
+  // the surface stays consistent. Uniqueness is enforced later across all names.
+  const nameOverridePattern = /^lomi_[a-z0-9]+(?:_[a-z0-9]+)*$/;
+  for (const [key, override] of nameOverrides) {
+    if (!includedKeys.has(key)) {
+      throw new Error(
+        `mcp-tool-policy.json toolNameOverrides has "${key}" which is not a generated MCP tool (excluded or unknown). Fix the key or remove the entry.`,
+      );
+    }
+    if (!nameOverridePattern.test(override)) {
+      throw new Error(
+        `mcp-tool-policy.json toolNameOverrides value "${override}" for "${key}" must match ${nameOverridePattern}.`,
+      );
+    }
+  }
+
+  const tools = includedOperations.map((op) => {
+    const name =
+      nameOverrides.get(op.operationKey) ??
+      toolNameFromOperation(op.httpMethodLower, op.pathTemplate);
+    const tags = op.openApiOp.tags ?? [];
+
+    const write = WRITE_METHODS.has(op.httpMethodLower);
+    const wantsBody =
+      HTTP_WITH_BODY.has(op.httpMethodLower) &&
+      Boolean(op.openApiOp.requestBody);
+
+    const inputSchema = buildInputJsonSchema({
+      spec: apiSpec,
+      operation: op.openApiOp,
+      pathItem: op.pathItem,
+      pathTemplate: op.pathTemplate,
+      httpMethodLower: op.httpMethodLower,
+      includeIdempotencyKey: write,
+    });
+
+    const { title, description } = resolveEnglishCopy({
+      operationKey: op.operationKey,
+      httpMethodLower: op.httpMethodLower,
+      tags,
+      methodNameByOp: METHOD_NAME_BY_OP,
+      override: copyOverrides[op.operationKey],
+      openApiSummary: op.summary,
+      openApiDescription:
+        typeof op.openApiOp.description === 'string'
+          ? op.openApiOp.description
+          : undefined,
+    });
+
+    const policy = resolveToolPolicy(
+      {
+        name,
+        method: op.httpMethodLower,
+        operationKey: op.operationKey,
+        pathTemplate: op.pathTemplate,
+        tags,
+      },
+      alwaysLoadKeys,
+    );
+
+    return {
+      name,
+      operationKey: op.operationKey,
+      method: op.httpMethodLower,
+      pathTemplate: op.pathTemplate,
+      pathParamNames: op.pathParamNames,
+      queryParamNames: op.queryParams.map((q) => q.name),
+      title,
+      description,
+      tags,
+      operationId: op.operationId,
+      write,
+      wantsBody,
+      inputSchema,
+      readOnly: policy.readOnly,
+      destructive: policy.destructive,
+      alwaysLoad: policy.alwaysLoad,
+      searchHint: policy.searchHint,
+    };
+  });
+
+  for (const t of tools) {
+    validateManifestToolEntry(t);
+  }
+
+  tools.sort((a, b) => a.name.localeCompare(b.name));
+  assertUniqueToolNames(tools.map((t) => t.name));
+
+  const manifest = {
+    manifestVersion: 1 as const,
+    apiVersion: apiSpec.info?.version ?? 'unknown',
+    apiTitle: apiSpec.info?.title ?? 'lomi. API',
+    toolCount: tools.length,
+    tools,
+  };
+
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(outFile, `${JSON.stringify(manifest, null, 2)}\n`, 'utf-8');
+  console.log(`Wrote ${outFile} (${tools.length} tools)`);
+}
+
+main();

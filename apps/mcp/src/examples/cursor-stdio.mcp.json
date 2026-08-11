@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "lomi": {
+      "command": "npx",
+      "args": ["-y", "@lomi./mcp"],
+      "env": {
+        "LOMI_SECRET_KEY": "YOUR_LOMI_SECRET_KEY",
+        "LOMI_API_URL": "https://api.lomi.africa"
+      }
+    }
+  }
+}

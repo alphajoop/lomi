@@ -1,0 +1,8 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "deploy": {
+    "startCommand": "pnpm run start:http",
+    "healthcheckPath": "/ready",
+    "healthcheckTimeout": 120
+  }
+}
