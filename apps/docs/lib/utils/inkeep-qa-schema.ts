@@ -47,6 +47,6 @@ const AIAnnotationsToolSchema = z.looseObject({
   answerConfidence: AnswerConfidence,
 });
 
-const ProvideAIAnnotationsToolSchema = z.object({
+export const ProvideAIAnnotationsToolSchema = z.object({
   aiAnnotations: AIAnnotationsToolSchema,
 });

@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Initialize WooCommerce plugin submodule
-        run: git submodule update --init apps/plugins/woo
+        run: bash .github/scripts/init-submodules.sh apps/plugins/woo
 
       - uses: pnpm/action-setup@v4
         with:

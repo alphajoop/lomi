@@ -25,6 +25,6 @@ export const ImageZoom = dynamic(() =>
   import('fumadocs-ui/components/image-zoom').then((res) => res.ImageZoom),
 );
 
-const GraphView = dynamic(() =>
+export const GraphView = dynamic(() =>
   import('@/components/preview/graph-view').then((res) => res.GraphView),
 );

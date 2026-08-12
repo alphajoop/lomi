@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Initialize PrestaShop plugin submodule
-        run: git submodule update --init apps/plugins/prestashop
+        run: bash .github/scripts/init-submodules.sh apps/plugins/prestashop
 
       - name: Run plugin parity checks
         run: apps/plugins/scripts/verify-lomi-plugins.sh

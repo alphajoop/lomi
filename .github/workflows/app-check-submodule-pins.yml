@@ -1,0 +1,22 @@
+name: lomi · check · submodule pins
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify every gitlink SHA exists on its origin
+        env:
+          REPO_CHECKOUT_PAT: ${{ secrets.REPO_CHECKOUT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/verify-submodule-pins.sh

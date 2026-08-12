@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/index.ts",
+    "src/http-entry.ts",
+    "src/scripts/**/*.ts",
+    "test/**/*.ts",
+    "eslint.config.mjs"
+  ],
+  "project": ["src/**/*.ts", "test/**/*.ts", "eslint.config.mjs"],
+  "ignore": ["src/generated/**"],
+  "ignoreDependencies": ["@eslint/js"],
+  "ignoreBinaries": ["lomi-mcp", "lomi-mcp-http"],
+  "ignoreExportsUsedInFile": true
+}

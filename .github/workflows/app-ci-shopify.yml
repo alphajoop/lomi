@@ -28,9 +28,11 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ci-test-service-role-key
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Initialize Shopify plugin submodule
-        run: git submodule update --init apps/plugins/shopify
+        run: bash .github/scripts/init-submodules.sh apps/plugins/shopify
 
       - uses: pnpm/action-setup@v4
         with:

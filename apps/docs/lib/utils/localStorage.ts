@@ -23,7 +23,7 @@ export const setLocalStorageItem = (key: string, value: string): void => {
   }
 };
 
-const removeLocalStorageItem = (key: string): void => {
+export const removeLocalStorageItem = (key: string): void => {
   if (typeof window === 'undefined') {
     return;
   }

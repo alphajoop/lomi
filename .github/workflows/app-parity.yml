@@ -36,9 +36,7 @@ jobs:
       - name: Ensure private API submodule is present
         env:
           TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
-        run: |
-          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
-          git submodule update --init apps/api
+        run: bash .github/scripts/init-submodules.sh apps/api
 
       - uses: pnpm/action-setup@v4
         with:
@@ -56,13 +54,16 @@ jobs:
         working-directory: apps/api
         run: pnpm install --frozen-lockfile
 
-      - name: Export OpenAPI and verify committed specs
+      - name: Export OpenAPI
         working-directory: apps/api
         run: |
           pnpm run openapi:export
-          git diff --exit-code ../docs/openapi.json
           pnpm run openapi:export:agent
-          git diff --exit-code ../docs/agent-openapi.json
+
+      - name: Verify committed OpenAPI specs
+        run: |
+          git diff --exit-code -- apps/docs/openapi.json
+          git diff --exit-code -- apps/docs/agent-openapi.json
 
       - name: Sync website OpenAPI mirrors
         working-directory: apps/website
@@ -70,7 +71,7 @@ jobs:
 
       - name: Assert website OpenAPI mirrors match docs
         run: |
-          git diff --exit-code apps/website/public/openapi.json apps/website/public/agent-openapi.json || (
+          git -C apps/website diff --exit-code -- public/openapi.json public/agent-openapi.json || (
             echo "Website public OpenAPI is out of sync with apps/docs. Run sync-openapi and commit apps/website/public/*.json"
             exit 1
           )

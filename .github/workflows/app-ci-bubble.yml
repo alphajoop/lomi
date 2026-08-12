@@ -28,10 +28,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
         run: |
-          if [ -n "$TOKEN" ]; then
-            git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
-          fi
-          if ! git submodule update --init apps/plugins/bubble; then
+          if ! bash .github/scripts/init-submodules.sh apps/plugins/bubble; then
             echo "::warning::Bubble submodule not available — private repo needs REPO_CHECKOUT_PAT or org access"
             exit 0
           fi

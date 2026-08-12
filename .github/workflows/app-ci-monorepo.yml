@@ -44,9 +44,7 @@ jobs:
         working-directory: .
         env:
           TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
-        run: |
-          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
-          git submodule update --init apps/api apps/dashboard
+        run: bash .github/scripts/init-submodules.sh apps/api apps/dashboard
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -58,13 +56,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
       - run: pnpm test
-      - name: Export OpenAPI and verify committed specs
+      - name: Export OpenAPI
         run: |
           pnpm run openapi:export
-          git diff --exit-code ../docs/openapi.json
           pnpm run openapi:export:agent
-          git diff --exit-code ../docs/agent-openapi.json
-          node ../docs/lib/scripts/verify-agent-contracts.mjs
+      - name: Verify committed OpenAPI specs
+        working-directory: .
+        run: |
+          git diff --exit-code -- apps/docs/openapi.json
+          git diff --exit-code -- apps/docs/agent-openapi.json
+          node apps/docs/lib/scripts/verify-agent-contracts.mjs
 
   build-docs:
     needs: detect-changes
