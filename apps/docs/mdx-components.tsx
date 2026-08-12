@@ -12,6 +12,10 @@ import { CustomerInformationSection } from '@/components/lomi-ui/customer-inform
 import { CheckoutSummaryCard } from '@/components/lomi-ui/checkout-summary-card';
 import { MobileMoneyCheckoutCard } from '@/components/lomi-ui/mobile-money-checkout-card';
 import { PaymentProviderSelector } from '@/components/lomi-ui/payment-provider-selector';
+import {
+  MobileMoneyCheckoutCardDemo,
+  PaymentProviderSelectorDemo,
+} from '@/components/lomi-ui/demo';
 import { PriceSelector } from '@/components/lomi-ui/price-selector';
 import { UsageMeter } from '@/components/lomi-ui/usage-meter';
 import { DocsScreenshot } from '@/components/docs/docs-screenshot';
@@ -36,7 +40,9 @@ export function getMDXComponents(components?: MDXComponents) {
     CustomerInformationSection,
     CheckoutSummaryCard,
     MobileMoneyCheckoutCard,
+    MobileMoneyCheckoutCardDemo,
     PaymentProviderSelector,
+    PaymentProviderSelectorDemo,
     PriceSelector,
     UsageMeter,
     DocsScreenshot,
