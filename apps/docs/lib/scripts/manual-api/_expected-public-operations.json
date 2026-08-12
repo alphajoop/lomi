@@ -4,8 +4,6 @@
   "GET /accounts/balance",
   "GET /accounts/balance/breakdown",
   "GET /accounts/balance/check/{currency}",
-  "GET /bnpl/config",
-  "GET /bnpl/plans",
   "GET /charge/card/{id}",
   "GET /checkout-sessions",
   "GET /checkout-sessions/{id}",

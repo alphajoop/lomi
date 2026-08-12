@@ -14,6 +14,7 @@
     "payment-methods",
     "---Accept payments---",
     "checkout",
+    "bnpl",
     "embed-widget",
     "payment-links",
     "payment-requests",
