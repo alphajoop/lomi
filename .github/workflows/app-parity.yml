@@ -69,7 +69,9 @@ jobs:
 
       - name: Assert website OpenAPI mirrors match docs
         run: |
-          git -C apps/website diff --exit-code -- public/openapi.json public/agent-openapi.json || (
+          node .github/scripts/assert-json-equivalent.mjs --same \
+            apps/docs/openapi.json apps/website/public/openapi.json \
+            apps/docs/agent-openapi.json apps/website/public/agent-openapi.json || (
             echo "Website public OpenAPI is out of sync with apps/docs. Run sync-openapi and commit apps/website/public/*.json"
             exit 1
           )

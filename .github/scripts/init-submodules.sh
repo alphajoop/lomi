@@ -12,10 +12,18 @@ fi
 root="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}"
 cd "$root"
 
-if [[ -n "${REPO_CHECKOUT_PAT:-${TOKEN:-}}" ]]; then
-  token="${REPO_CHECKOUT_PAT:-$TOKEN}"
-  git config url."https://x-access-token:${token}@github.com/".insteadOf "https://github.com/"
+token="${REPO_CHECKOUT_PAT:-${TOKEN:-}}"
+if [[ -n "$token" ]]; then
+  git config --global url."https://x-access-token:${token}@github.com/".insteadOf "https://github.com/"
 fi
+
+auth_url() {
+  local url="$1"
+  if [[ -n "$token" ]]; then
+    url="${url/https:\/\/github.com\//https://x-access-token:${token}@github.com/}"
+  fi
+  printf '%s\n' "$url"
+}
 
 url_for_path() {
   local path="$1" key value name
@@ -47,7 +55,7 @@ for path in "$@"; do
   fi
   if [[ ! -e "${path}/.git" ]]; then
     mkdir -p "$(dirname "$path")"
-    git clone --no-checkout "$url" "$path"
+    git clone --no-checkout "$(auth_url "$url")" "$path"
   fi
   git -C "$path" -c protocol.version=1 fetch --force origin "$sha"
   git -C "$path" checkout --force "$sha"
