@@ -22,5 +22,13 @@
     "tailwindcss",
     "tailwindcss-animate"
   ],
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "enumMembers": "off",
+    "classMembers": "off"
+  }
 }

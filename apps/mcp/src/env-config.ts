@@ -251,12 +251,6 @@ export function isMcpTransportBearerToken(candidate: string): boolean {
   return getMcpHttpBearerTokens().includes(candidate);
 }
 
-/** First transport token, if any (backward compatibility). */
-export function getMcpHttpBearerToken(): string | null {
-  const tokens = getMcpHttpBearerTokens();
-  return tokens.length > 0 ? tokens[0]! : null;
-}
-
 export type ReadinessCheck = {
   name: string;
   ok: boolean;
