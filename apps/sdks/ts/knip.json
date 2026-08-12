@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["src/index.ts"],
+  "project": ["src/**/*.ts"],
+  "ignore": ["src/generated/**"],
+  "ignoreDependencies": [
+    "form-data",
+    "openapi-typescript",
+    "openapi-typescript-codegen"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "enumMembers": "off",
+    "duplicates": "off"
+  }
+}

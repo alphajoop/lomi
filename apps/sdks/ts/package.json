@@ -21,7 +21,8 @@
     "dev": "tsc --watch",
     "generate": "node ../scripts/typescript-generate.js",
     "prepublishOnly": "npm run generate && npm run build",
-    "publish:npm": "npm publish --access public"
+    "publish:npm": "npm publish --access public",
+    "knip": "knip --no-config-hints"
   },
   "keywords": [
     "lomi.",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.25",
+    "knip": "5.63.0",
     "openapi-typescript": "^7.8.0",
     "openapi-typescript-codegen": "^0.29.0",
     "typescript": "^5.9.3"

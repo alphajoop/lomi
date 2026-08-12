@@ -20,9 +20,11 @@
     "build": "tsc && vite build",
     "build:iife": "vite build",
     "prepublishOnly": "pnpm run build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "knip": "knip --no-config-hints"
   },
   "devDependencies": {
+    "knip": "5.63.0",
     "typescript": "^5.0.0",
     "vite": "^6.0.0",
     "vitest": "^4.1.0"
