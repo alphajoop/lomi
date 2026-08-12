@@ -1,49 +1,26 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "workspaces": {
-    ".": {
-      "next": true,
-      "entry": ["lib/scripts/update-orama-index.ts"],
-      "project": [
-        "proxy.ts",
-        "app/**/*.{ts,tsx,js,jsx}",
-        "components/**/*.{ts,tsx,js,jsx}",
-        "lib/**/*.{ts,tsx,js,jsx}"
-      ],
-      "paths": {
-        "@/*": ["./*"]
-      },
-      "ignore": [
-        "**/*.d.ts",
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/build/**",
-        "**/.next/**",
-        "**/.nuxt/**",
-        "**/.vuepress/**",
-        "**/.cache/**",
-        "**/.temp/**",
-        "**/.tmp/**",
-        "**/coverage/**",
-        "**/*.test.{ts,tsx,js,jsx}",
-        "**/*.spec.{ts,tsx,js,jsx}",
-        "**/*.stories.{ts,tsx,js,jsx}",
-        "**/stories/**",
-        "**/__tests__/**",
-        "**/__mocks__/**"
-      ],
-      "ignoreExportsUsedInFile": true,
-      "treatRulesAsErrors": false
-    }
+  "next": true,
+  "entry": [
+    "app/**/*.{ts,tsx}",
+    "source.config.ts",
+    "proxy.ts",
+    "lib/scripts/**/*.{ts,js,mjs}",
+    "content/**/*.mdx"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx,js,jsx}",
+    "components/**/*.{ts,tsx,js,jsx}",
+    "lib/**/*.{ts,tsx,js,jsx}",
+    "content/**/*.mdx"
+  ],
+  "paths": {
+    "@/*": ["./*"]
   },
-  "rules": {
-    "files": "error",
-    "exports": "warn",
-    "types": "warn",
-    "nsExports": "warn",
-    "nsTypes": "warn",
-    "enumMembers": "warn",
-    "classMembers": "warn",
-    "duplicates": "error"
-  }
+  "ignoreDependencies": [
+    "@tailwindcss/container-queries",
+    "tailwindcss",
+    "tailwindcss-animate"
+  ],
+  "ignoreExportsUsedInFile": true
 }

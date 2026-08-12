@@ -40,4 +40,4 @@ export function Logo({
 }
 
 // Legacy export for backward compatibility
-export const logo = <Logo />;
+const logo = <Logo />;

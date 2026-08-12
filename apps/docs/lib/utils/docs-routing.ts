@@ -63,7 +63,7 @@ export function parseDocsLocalePath(pathname: string): {
 }
 
 /** Paths are never locale-prefixed; language is cookie-only. */
-export function localizeDocsPath(path: string): string {
+function localizeDocsPath(path: string): string {
   return normalizeDocsPath(path);
 }
 

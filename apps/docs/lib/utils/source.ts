@@ -24,4 +24,4 @@ export const source = loader({
 });
 
 export type Page = InferPageType<typeof source>;
-export type Meta = InferMetaType<typeof source>;
+type Meta = InferMetaType<typeof source>;

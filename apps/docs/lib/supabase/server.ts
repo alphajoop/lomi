@@ -52,7 +52,7 @@ export async function createClient() {
 }
 
 // Simple anonymous client for public data access
-export function createAnonymousClient() {
+function createAnonymousClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 
