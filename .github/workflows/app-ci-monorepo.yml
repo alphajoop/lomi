@@ -63,8 +63,7 @@ jobs:
       - name: Verify committed OpenAPI specs
         working-directory: .
         run: |
-          git diff --exit-code -- apps/docs/openapi.json
-          git diff --exit-code -- apps/docs/agent-openapi.json
+          node .github/scripts/assert-json-equivalent.mjs apps/docs/openapi.json apps/docs/agent-openapi.json
           node apps/docs/lib/scripts/verify-agent-contracts.mjs
 
   build-docs:

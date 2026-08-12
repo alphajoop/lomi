@@ -32,6 +32,9 @@ jobs:
           fetch-depth: 0
 
       - name: Initialize Shopify plugin submodule
+        working-directory: ${{ github.workspace }}
+        env:
+          TOKEN: ${{ secrets.REPO_CHECKOUT_PAT }}
         run: bash .github/scripts/init-submodules.sh apps/plugins/shopify
 
       - uses: pnpm/action-setup@v4

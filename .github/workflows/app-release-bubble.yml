@@ -21,6 +21,15 @@ jobs:
       - name: Run plugin parity checks
         run: apps/plugins/scripts/verify-lomi-plugins.sh
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/sdks/embed/pnpm-lock.yaml
+
       - name: Validate Bubble plugin JSON
         run: |
           find apps/plugins/bubble -name '*.json' -print0 | xargs -0 -I{} node -e "JSON.parse(require('fs').readFileSync('{}','utf8'))"
@@ -28,8 +37,8 @@ jobs:
       - name: Build embed asset
         run: |
           cd apps/sdks/embed
-          npm ci
-          npm run build:iife
+          pnpm install --frozen-lockfile
+          pnpm run build:iife
           node ../../plugins/bubble/scripts/build-assets.mjs
 
       - name: API smoke test

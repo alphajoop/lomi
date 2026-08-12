@@ -9,7 +9,7 @@ if [[ $# -lt 1 ]]; then
   exit 2
 fi
 
-root="$(git rev-parse --show-toplevel)"
+root="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}"
 cd "$root"
 
 if [[ -n "${REPO_CHECKOUT_PAT:-${TOKEN:-}}" ]]; then

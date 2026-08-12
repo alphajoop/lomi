@@ -61,9 +61,7 @@ jobs:
           pnpm run openapi:export:agent
 
       - name: Verify committed OpenAPI specs
-        run: |
-          git diff --exit-code -- apps/docs/openapi.json
-          git diff --exit-code -- apps/docs/agent-openapi.json
+        run: node .github/scripts/assert-json-equivalent.mjs apps/docs/openapi.json apps/docs/agent-openapi.json
 
       - name: Sync website OpenAPI mirrors
         working-directory: apps/website

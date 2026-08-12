@@ -53,6 +53,15 @@ jobs:
           fi
           node apps/plugins/scripts/test_bubble_json.mjs
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: apps/sdks/embed/pnpm-lock.yaml
+
       - name: Build embed asset
         run: |
           if [ ! -f apps/plugins/bubble/scripts/build-assets.mjs ]; then
@@ -60,8 +69,8 @@ jobs:
             exit 0
           fi
           cd apps/sdks/embed
-          npm ci
-          npm run build:iife
+          pnpm install --frozen-lockfile
+          pnpm run build:iife
           node ../../plugins/bubble/scripts/build-assets.mjs
 
       - name: API smoke test
