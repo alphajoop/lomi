@@ -1337,6 +1337,10 @@ body {
   background-color: var(--color-fd-background);
 }
 
+html {
+  overscroll-behavior: none;
+}
+
 .dark {
   --headless-color: hsl(250 100% 80%);
   --ui-color: hsl(217 92% 76%);

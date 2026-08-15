@@ -158,7 +158,7 @@ export function PaymentProviderSelector({
   return (
     <div className={cn('lomi-checkout-ui space-y-0', className)}>
       <div className="relative w-full">
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pb-2 px-1">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory pb-2 px-1 touch-pan-x">
           {availableProviders.map((provider) => {
             const isSelected = selectedProvider === provider;
             const isSpiDisabled = provider === 'spi' && !spiOperational;

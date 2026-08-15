@@ -136,6 +136,7 @@ const font = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
