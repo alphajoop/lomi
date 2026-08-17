@@ -2,13 +2,12 @@
 
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
-import { userCanUseTestKeyForOrg } from '@/lib/tryit/verify-org-access';
 import { tryitPreferenceCookieOptions } from '@/lib/tryit/cookie-options';
 import {
   COOKIE_TRYIT_ORG,
   COOKIE_TRYIT_USE_TEST_KEY,
 } from '@/lib/tryit/constants';
+import { docsApiGet, getDocsSessionToken } from '@/lib/docs-session';
 
 const bodySchema = z.object({
   useTestKey: z.boolean(),
@@ -31,18 +30,17 @@ export async function POST(request: Request) {
   const { useTestKey, organizationId: rawOrg } = parsed.data;
   const organizationId = rawOrg ?? null;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const token = await getDocsSessionToken();
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   if (organizationId) {
-    const ok = await userCanUseTestKeyForOrg(supabase, user.id, organizationId);
-    if (!ok) {
+    const access = await docsApiGet<{ allowed?: boolean }>(
+      `/auth/docs-session/org-access?organizationId=${encodeURIComponent(organizationId)}`,
+      token,
+    );
+    if (!access?.allowed) {
       return NextResponse.json(
         { error: 'Organization not allowed or no test secret key' },
         { status: 403 },

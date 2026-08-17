@@ -42,7 +42,7 @@ jobs:
       - name: Generate rules (OpenAPI + llms.txt)
         working-directory: ${{ env.REPO_DIR }}/apps/cli
         shell: bash
-        run: ./src/utils/scripts/generate-rules.sh
+        run: ./scripts/generate/generate-rules.sh
 
       - name: Build
         working-directory: ${{ env.REPO_DIR }}/apps/cli

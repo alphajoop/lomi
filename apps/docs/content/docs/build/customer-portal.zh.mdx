@@ -8,5 +8,5 @@ description: 托管客户门户：启动会话、OTP 验证与客户范围访问
 要点：
 
 - 默认入口：`https://customers.lomi.africa/o/{组织 slug}`
-- 预认证启动：`POST /customers/{id}/portal-launch-session` 返回 `launch_url`（含 `customer_id` 时跳过二次 OTP）
+- 预认证启动：`POST /customers/{id}/portal` 返回 `launch_url`（含 `customer_id` 时跳过二次 OTP）
 - 交易收据邮件包含组织门户链接

@@ -44,7 +44,7 @@ When drafting or reviewing, compare against:
 
 - `apps/docs/content/docs/start/sandbox-payments.mdx`
 - `apps/docs/content/docs/build/usage-billing.mdx`
-- `apps/docs/content/docs/api/organization/RadarController_updateSettings.mdx`
+- `apps/docs/content/docs/api/organizations/OrganizationsController_updateRadarSettings.mdx`
 
 ## CI and tooling
 

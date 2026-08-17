@@ -3,7 +3,7 @@ title: "List webhook delivery logs"
 description: "List webhook delivery logs"
 full: true
 method: get
-path: /webhook-delivery-logs
+path: /webhooks/deliveries
 operationId: WebhookDeliveryLogsController_findAll
 ---
 
@@ -29,7 +29,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`GET /webhook-delivery-logs`
+`GET /webhooks/deliveries`
 
 Base URLs:
 
@@ -69,13 +69,13 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/webhook-delivery-logs?offset=1&limit=1" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/webhooks/deliveries?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ## OpenAPI
 
 - **operationId**: `WebhookDeliveryLogsController_findAll`
-- **Operation**: `GET /webhook-delivery-logs`
+- **Operation**: `GET /webhooks/deliveries`
 
 Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

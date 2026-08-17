@@ -1,0 +1,72 @@
+---
+title: "Lister les coupons"
+description: "Lister les coupons"
+full: true
+method: get
+path: /coupons
+operationId: DiscountCouponsController_findAll
+---
+
+## Aperçu
+
+Lister les coupons
+
+Renvoie tous les coupons de réduction de l'organisation du marchand authentifié.
+
+
+### Quand l’utiliser
+
+Utilisez cet endpoint quand vous devez exécuter `GET /coupons` (Lister les coupons).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /coupons`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+_Pas d’autre paramètre dans l’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Liste des coupons |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/coupons" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `DiscountCouponsController_findAll`
+- **Operation**: `GET /coupons`
+
+Schémas complets et **Try it** : [référence API](/api).

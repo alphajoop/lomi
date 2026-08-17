@@ -25,6 +25,8 @@ const __dirname = path.dirname(__filename);
 
 const SPEC_PATH = path.join(__dirname, '../spec.yaml');
 const OUTPUT_PATH = path.join(__dirname, '../postman-collection.json');
+const isObjectRecord = (value) =>
+    value !== null && Object(value) === value && !Array.isArray(value);
 
 console.log('📋 Generating Postman Collection from OpenAPI spec...\n');
 
@@ -67,7 +69,7 @@ const folders = {};
 
 for (const [path, methods] of Object.entries(spec.paths)) {
     for (const [method, operation] of Object.entries(methods)) {
-        if (typeof operation !== 'object') continue;
+        if (!isObjectRecord(operation)) continue;
 
         const tag = operation.tags?.[0] || 'Other';
 

@@ -25,10 +25,10 @@ pub struct RadarAssessmentsListArgs {
     pub decision: Option<String>,
     #[arg(long)]
     pub rail: Option<String>,
-    #[arg(long, default_value_t = 1)]
-    pub page: u32,
-    #[arg(long, default_value_t = 50)]
-    pub page_size: u32,
+    #[arg(long)]
+    pub cursor: Option<String>,
+    #[arg(long, default_value_t = 20)]
+    pub limit: u32,
 }
 
 pub async fn run(common: &CommonOptions, args: RadarArgs) -> Result<()> {
@@ -43,10 +43,10 @@ async fn list_assessments(common: &CommonOptions, args: RadarAssessmentsListArgs
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let mut path = format!(
-        "/risk-assessments?page={}&pageSize={}",
-        args.page, args.page_size
-    );
+    let mut path = format!("/risk-assessments?limit={}", args.limit);
+    if let Some(cursor) = &args.cursor {
+        path.push_str(&format!("&cursor={cursor}"));
+    }
     if let Some(decision) = &args.decision {
         path.push_str(&format!("&decision={decision}"));
     }
@@ -70,7 +70,7 @@ async fn get_settings(common: &CommonOptions) -> Result<()> {
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let rows: serde_json::Value = client.get("/organization/radar-settings").await?;
+    let rows: serde_json::Value = client.get("/organizations/radar-settings").await?;
     if json {
         return cli::output::print_json(&rows);
     }

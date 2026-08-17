@@ -9,7 +9,7 @@ Base URLs:
 - `GET /accounts`: Lister les comptes
 - `GET /accounts/balance`: Solde du compte
 - `GET /accounts/balance/breakdown`: Détail du solde
-- `GET /accounts/balance/check/{currency}`: Vérifier le solde disponible
+- `GET /accounts/balance/{currency}`: Vérifier le solde disponible
 - `GET /accounts/{id}`: Obtenir un compte par ID
 - `GET /agent/capabilities`: Négociation des capacités de l'agent (surface de découverte non authentifiée)
 - `GET /agent/events`: Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)
@@ -35,18 +35,19 @@ Base URLs:
 - `GET /customers/{id}`: Obtenir un client par ID
 - `PATCH /customers/{id}`: Mettre à jour un client
 - `GET /customers/{id}/portal-audit`: Hosted customer portal audit
-- `POST /customers/{id}/portal-launch-session`: Créer une session de lancement du portail client
+- `POST /customers/{id}/portal`: Créer une session de lancement du portail client
 - `GET /customers/{id}/transactions`: Transactions du client
-- `GET /discount-coupons`: Lister les coupons
-- `POST /discount-coupons`: Créer un coupon
-- `GET /discount-coupons/{id}`: Obtenir un coupon par ID
-- `GET /discount-coupons/{id}/performance`: Indicateurs de performance du coupon
+- `GET /coupons`: Lister les coupons
+- `POST /coupons`: Créer un coupon
+- `GET /coupons/{id}`: Obtenir un coupon par ID
+- `GET /coupons/{id}/performance`: Indicateurs de performance du coupon
 - `GET /merchants/{id}`: Get merchant details
 - `GET /merchants/{id}/arr`: Get merchant ARR
 - `GET /merchants/{id}/balance`: Get merchant account balance for a currency
 - `GET /merchants/{id}/mrr`: Get merchant MRR
 - `GET /organizations`: Détails de l'organisation
 - `GET /organizations/metrics`: Indicateurs de l'organisation
+- `GET /organizations/radar-settings`: Paramètres Radar
 - `GET /organizations/{id}`: Organisation par ID
 - `POST /charge/card`: Encaissement carte embarqué (client_secret)
 - `GET /charge/card/{id}`: Récupérer un encaissement carte
@@ -63,27 +64,29 @@ Base URLs:
 - `POST /products`: Créer un produit
 - `GET /products/{id}`: Obtenir un produit par ID
 - `POST /products/{id}/prices`: Ajouter un prix à un produit
-- `POST /products/{id}/prices/{priceId}/set-default`: Définir le prix par défaut
+- `POST /products/{id}/prices/{priceId}/default`: Définir le prix par défaut
 - `GET /providers`: List payment providers
 - `POST /refunds`: Créer un remboursement
 - `GET /refunds`: Lister les remboursements
 - `GET /refunds/{id}`: Obtenir un remboursement
 - `GET /subscriptions`: Lister les abonnements
-- `GET /subscriptions/customer/{customerId}`: Abonnements d’un client
+- `GET /customers/{id}/subscriptions`: Abonnements d’un client
 - `GET /subscriptions/{id}`: Obtenir un abonnement par ID
 - `PATCH /subscriptions/{id}`: Mettre à jour un abonnement
 - `POST /subscriptions/{id}/cancel`: Résilier un abonnement
+- `POST /subscriptions/{id}/resume`: Annuler une résiliation planifiée
+- `GET /subscriptions/{id}/usage`: Usage d’un abonnement
 - `GET /transactions`: Lister les transactions
 - `GET /transactions/{id}`: Obtenir une transaction par ID
-- `GET /webhook-delivery-logs`: Lister les journaux de livraison
-- `GET /webhook-delivery-logs/{id}`: Obtenir un journal de livraison par ID
+- `GET /webhooks/deliveries`: Lister les journaux de livraison
+- `GET /webhooks/deliveries/{id}`: Obtenir un journal de livraison par ID
 - `GET /webhooks`: Lister les webhooks
 - `POST /webhooks`: Créer un webhook
 - `DELETE /webhooks/{id}`: Supprimer un webhook
 - `GET /webhooks/{id}`: Obtenir un webhook par ID
 - `PATCH /webhooks/{id}`: Mettre à jour un webhook
 - `POST /webhooks/{id}/test`: Envoyer un événement test au webhook
-- `POST /webhooks/{webhookId}/logs/{logId}/retry`: Relancer une livraison webhook
+- `POST /webhooks/{id}/deliveries/{deliveryId}/retry`: Relancer une livraison webhook
 
 Full docs: https://docs.lomi.africa/api
 

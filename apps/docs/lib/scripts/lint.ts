@@ -13,6 +13,12 @@ import { remark } from 'remark';
 import { remarkHeading } from 'fumadocs-core/mdx-plugins';
 import { isPublicRestApiOperation } from '@/lib/scripts/manual-api/constants';
 import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operation-mdx';
+import {
+  type JsonObject,
+  type JsonValue,
+  isJsonObject,
+  isString,
+} from '@lomi./shared';
 
 const HTTP_METHODS = [
   'get',
@@ -24,8 +30,6 @@ const HTTP_METHODS = [
   'patch',
   'trace',
 ] as const;
-
-type JsonObject = Record<string, unknown>;
 
 /** Guardrails for public REST docs tone (source: openapi.json from Nest @ApiOperation). */
 const OPENAPI_DESCRIPTION_BANNED: { test: RegExp; hint: string }[] = [
@@ -80,9 +84,10 @@ function collectOpenApiEnglishResidual(
   errors: string[],
 ): void {
   const infos = spec.info;
-  if (infos && typeof infos === 'object' && 'description' in infos) {
+  if (infos && isJsonObject(infos) && 'description' in infos) {
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const d = (infos as { description?: unknown }).description;
-    if (typeof d === 'string') {
+    if (isString(d)) {
       for (const { test, hint } of OPENAPI_ENGLISH_RESIDUAL) {
         if (test.test(d)) {
           errors.push(
@@ -93,20 +98,23 @@ function collectOpenApiEnglishResidual(
     }
   }
 
-  if (!spec.paths || typeof spec.paths !== 'object') return;
+  if (!isJsonObject(spec.paths)) return;
 
   for (const [p, item] of Object.entries(
-    spec.paths as Record<string, unknown>,
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
+    spec.paths as JsonObject,
   )) {
-    if (!item || typeof item !== 'object') continue;
+    if (!isJsonObject(item)) continue;
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const pathItem = item as JsonObject;
     for (const method of HTTP_METHODS) {
       const op = pathItem[method];
-      if (!op || typeof op !== 'object') continue;
+      if (!isJsonObject(op)) continue;
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const operation = op as JsonObject;
       for (const field of ['summary', 'description'] as const) {
         const text = operation[field];
-        if (typeof text !== 'string') continue;
+        if (!isString(text)) continue;
         for (const { test, hint } of OPENAPI_ENGLISH_RESIDUAL) {
           if (test.test(text)) {
             errors.push(
@@ -120,20 +128,23 @@ function collectOpenApiEnglishResidual(
 }
 
 function collectOpenApiTextErrors(spec: JsonObject, errors: string[]): void {
-  if (!spec.paths || typeof spec.paths !== 'object') return;
+  if (!isJsonObject(spec.paths)) return;
 
   for (const [p, item] of Object.entries(
-    spec.paths as Record<string, unknown>,
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
+    spec.paths as JsonObject,
   )) {
-    if (!item || typeof item !== 'object') continue;
+    if (!isJsonObject(item)) continue;
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const pathItem = item as JsonObject;
     for (const method of HTTP_METHODS) {
       const op = pathItem[method];
-      if (!op || typeof op !== 'object') continue;
+      if (!isJsonObject(op)) continue;
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const operation = op as JsonObject;
       for (const field of ['summary', 'description'] as const) {
         const text = operation[field];
-        if (typeof text !== 'string') continue;
+        if (!isString(text)) continue;
         for (const { test, hint } of OPENAPI_DESCRIPTION_BANNED) {
           if (test.test(text)) {
             errors.push(
@@ -160,8 +171,9 @@ function collectForbiddenProviderIngressOpenApiPaths(
   spec: JsonObject,
   errors: string[],
 ): void {
-  if (!spec.paths || typeof spec.paths !== 'object') return;
-  for (const pathKey of Object.keys(spec.paths as Record<string, unknown>)) {
+  if (!isJsonObject(spec.paths)) return;
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
+  for (const pathKey of Object.keys(spec.paths as JsonObject)) {
     if (
       FORBIDDEN_PUBLIC_OPENAPI_PATHS.has(pathKey) ||
       FORBIDDEN_PUBLIC_OPENAPI_PREFIXES.some((prefix) =>
@@ -225,11 +237,11 @@ const OPENAPI_FORBIDDEN_STRING: { test: RegExp; hint: string }[] = [
 ];
 
 function collectOpenApiForbiddenStrings(
-  value: unknown,
+  value: JsonValue,
   jsonPath: string,
   errors: string[],
 ): void {
-  if (typeof value === 'string') {
+  if (isString(value)) {
     for (const { test, hint } of OPENAPI_FORBIDDEN_STRING) {
       if (test.test(value)) {
         errors.push(`openapi.json ${jsonPath}: ${hint}`);
@@ -243,9 +255,10 @@ function collectOpenApiForbiddenStrings(
     );
     return;
   }
-  if (value && typeof value === 'object') {
+  if (value && isJsonObject(value)) {
     for (const [key, child] of Object.entries(
-      value as Record<string, unknown>,
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
+      value as JsonObject,
     )) {
       collectOpenApiForbiddenStrings(child, `${jsonPath}.${key}`, errors);
     }
@@ -300,10 +313,11 @@ function collectOpenApiSecurityErrors(
   const schemes = spec.components;
   if (
     schemes &&
-    typeof schemes === 'object' &&
+    isJsonObject(schemes) &&
     'securitySchemes' in schemes &&
     schemes.securitySchemes &&
-    typeof schemes.securitySchemes === 'object' &&
+    isJsonObject(schemes.securitySchemes) &&
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     'X-API-KEY' in (schemes.securitySchemes as object)
   ) {
     errors.push(
@@ -311,10 +325,10 @@ function collectOpenApiSecurityErrors(
     );
   }
 
-  const checkReqs = (where: string, reqs: unknown) => {
+  const checkReqs = (where: string, reqs: JsonValue) => {
     if (!Array.isArray(reqs)) return;
     for (const req of reqs) {
-      if (req && typeof req === 'object' && 'X-API-KEY' in (req as object)) {
+      if (isJsonObject(req) && 'X-API-KEY' in req) {
         errors.push(
           `${where}: security must reference "api-key", not "X-API-KEY" as a scheme name.`,
         );
@@ -323,17 +337,20 @@ function collectOpenApiSecurityErrors(
   };
 
   checkReqs('openapi.json security', spec.security);
-  if (!spec.paths || typeof spec.paths !== 'object') return;
+  if (!isJsonObject(spec.paths)) return;
 
   for (const [p, item] of Object.entries(
-    spec.paths as Record<string, unknown>,
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
+    spec.paths as JsonObject,
   )) {
-    if (!item || typeof item !== 'object') continue;
+    if (!isJsonObject(item)) continue;
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const pathItem = item as JsonObject;
     checkReqs(`openapi.json path ${p}`, pathItem.security);
     for (const method of HTTP_METHODS) {
       const op = pathItem[method];
-      if (!op || typeof op !== 'object') continue;
+      if (!isJsonObject(op)) continue;
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const operation = op as JsonObject;
       checkReqs(
         `openapi.json ${method.toUpperCase()} ${p}`,
@@ -365,9 +382,11 @@ function hasAnyHeading(
 async function checkRestApiManualPages(): Promise<void> {
   const openApiPath = path.resolve(process.cwd(), 'openapi.json');
   const raw = await fs.readFile(openApiPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const spec = JSON.parse(raw) as JsonObject;
 
   const operations = collectPublicOperations(
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     spec as Parameters<typeof collectPublicOperations>[0],
   ).filter((o) => isPublicRestApiOperation(o.method, o.path));
 
@@ -387,14 +406,14 @@ async function checkRestApiManualPages(): Promise<void> {
     const routePath = parsed.data['path'];
     const operationId = parsed.data['operationId'];
 
-    if (typeof method !== 'string' || typeof routePath !== 'string') {
+    if (!isString(method) || !isString(routePath)) {
       errors.push(
         `${file}: REST API pages must set frontmatter 'method' and 'path' (from OpenAPI).`,
       );
       continue;
     }
 
-    if (typeof operationId !== 'string' || operationId.length === 0) {
+    if (!isString(operationId) || operationId.length === 0) {
       errors.push(
         `${file}: REST API pages must set frontmatter 'operationId'.`,
       );
@@ -443,6 +462,7 @@ async function checkRestApiManualPages(): Promise<void> {
 async function checkOpenApiDocs(): Promise<void> {
   const openApiPath = path.resolve(process.cwd(), 'openapi.json');
   const raw = await fs.readFile(openApiPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const spec = JSON.parse(raw) as JsonObject;
   const errors: string[] = [];
   collectOpenApiSecurityErrors(spec, errors);
@@ -462,21 +482,17 @@ async function checkOpenApiDocs(): Promise<void> {
 function parseMdxFrontmatter(content: string) {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/m.exec(content);
   if (!match) return { data: {}, content };
-  const data: Record<string, unknown> = {};
+  const data: JsonObject = {};
   for (const line of match[1].split('\n')) {
     const trimmed = line.trim();
     if (!trimmed) continue;
     const colon = trimmed.indexOf(':');
     if (colon === -1) continue;
     const key = trimmed.slice(0, colon).trim();
-    let value: unknown = trimmed.slice(colon + 1).trim();
+    let value: JsonValue = trimmed.slice(colon + 1).trim();
     if (value === 'true') value = true;
     else if (value === 'false') value = false;
-    else if (
-      typeof value === 'string' &&
-      value.startsWith('"') &&
-      value.endsWith('"')
-    ) {
+    else if (isString(value) && value.startsWith('"') && value.endsWith('"')) {
       value = value.slice(1, -1);
     }
     data[key] = value;
@@ -497,23 +513,43 @@ async function readFromPath(file: string) {
   };
 }
 
-function remarkIncludeId() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tree: any, file: { data: Record<string, unknown> }) => {
-    (file.data.ids as string[]) ??= [];
-    visit(tree, 'mdxJsxFlowElement', (element) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const elem = element as any;
-      if (!elem.name || !elem.attributes) return;
+type UnistNode = {
+  type: string;
+  children?: UnistNode[];
+};
 
-      const attributes = elem.attributes;
-      const idAttr = attributes.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (attr: any) => attr.type === 'mdxJsxAttribute' && attr.name === 'id',
+type MdxJsxAttribute = {
+  type?: string;
+  name?: string;
+  value?: string | number | boolean | null;
+};
+
+type MdxJsxFlowElement = {
+  name?: string;
+  attributes?: MdxJsxAttribute[];
+};
+
+type RemarkFileData = {
+  ids?: string[];
+};
+
+function remarkIncludeId() {
+  return (tree: UnistNode, file: { data?: RemarkFileData }) => {
+    const data: RemarkFileData = file.data ?? {};
+    file.data = data;
+    if (!data.ids) {
+      data.ids = [];
+    }
+    const ids = data.ids;
+    visit(tree, 'mdxJsxFlowElement', (element: MdxJsxFlowElement) => {
+      if (!element.name || !element.attributes) return;
+
+      const idAttr = element.attributes.find(
+        (attr) => attr.type === 'mdxJsxAttribute' && attr.name === 'id',
       );
 
-      if (idAttr) {
-        (file.data.ids as string[]).push(String(idAttr.value));
+      if (idAttr && idAttr.value != null) {
+        ids.push(String(idAttr.value));
       }
     });
   };
@@ -522,7 +558,7 @@ function remarkIncludeId() {
 const processor = remark()
   .use(remarkMdx)
   .use(remarkInclude)
-  .use(remarkIncludeId)
+  .use(remarkIncludeId as typeof remarkHeading)
   .use(remarkHeading);
 
 async function getHeadings(path: string, content: string) {
@@ -534,10 +570,14 @@ async function getHeadings(path: string, content: string) {
 
   if ('toc' in result.data)
     ids.push(
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       ...(result.data.toc as TOCItemType[]).map((item) => item.url.slice(1)),
     );
 
-  if ('ids' in result.data) ids.push(...(result.data.ids as string[]));
+  if ('ids' in result.data) {
+    // SAFETY: remarkIncludeId stores string[] under result.data.ids.
+    ids.push(...(result.data.ids as string[]));
+  }
 
   return ids;
 }

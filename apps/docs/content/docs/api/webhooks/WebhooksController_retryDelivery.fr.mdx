@@ -3,7 +3,7 @@ title: "Relancer une livraison webhook"
 description: "Relancer une livraison webhook"
 full: true
 method: post
-path: /webhooks/{webhookId}/logs/{logId}/retry
+path: /webhooks/{id}/deliveries/{deliveryId}/retry
 operationId: WebhooksController_retryDelivery
 ---
 
@@ -13,7 +13,7 @@ Relancer une livraison webhook
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `POST /webhooks/&#123;webhookId&#125;/logs/&#123;logId&#125;/retry` (Relancer une livraison webhook).
+Utilisez cet endpoint quand vous devez exécuter `POST /webhooks/&#123;id&#125;/deliveries/&#123;deliveryId&#125;/retry` (Relancer une livraison webhook).
 
 
 ## Authentification
@@ -22,7 +22,7 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 ## Endpoint
 
-`POST /webhooks/{webhookId}/logs/{logId}/retry`
+`POST /webhooks/{id}/deliveries/{deliveryId}/retry`
 
 URLs de base :
 
@@ -35,8 +35,8 @@ URLs de base :
 
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
-| `logId` | Oui | - | Delivery log UUID |
-| `webhookId` | Oui | - | Webhook UUID |
+| `deliveryId` | Oui | - | Delivery log UUID |
+| `id` | Oui | - | Webhook UUID |
 
 ### Paramètres de requête
 
@@ -61,7 +61,7 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 ## Exemple
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/logs/value/retry" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/deliveries/value/retry" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
@@ -70,6 +70,6 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/logs/value/retr
 ## OpenAPI
 
 - **operationId**: `WebhooksController_retryDelivery`
-- **Operation**: `POST /webhooks/{webhookId}/logs/{logId}/retry`
+- **Operation**: `POST /webhooks/{id}/deliveries/{deliveryId}/retry`
 
 Schémas complets et **Try it** : [référence API](/api).

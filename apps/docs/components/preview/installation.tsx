@@ -13,7 +13,7 @@ import {
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 const codeThemes = {
   light: 'github-light',
@@ -77,14 +77,14 @@ export function Installation({ name }: { name: string }) {
     { name: 'pnpm', value: 'pnpm' },
     { name: 'yarn', value: 'yarn' },
     { name: 'bun', value: 'bun' },
-  ];
+  ] as const;
 
-  const commands: Record<string, string> = {
+  const commands = {
     npx: `npx shadcn@latest add ${registryUrl}`,
     pnpm: `pnpm dlx shadcn@latest add ${registryUrl}`,
     yarn: `yarn dlx shadcn@latest add ${registryUrl}`,
     bun: `bunx shadcn@latest add ${registryUrl}`,
-  };
+  } as const;
 
   return (
     <Tabs
@@ -115,7 +115,9 @@ export function Installation({ name }: { name: string }) {
           value={tab.value}
           className="mt-0 border-t border-fd-border p-0 data-[state=inactive]:hidden"
         >
-          <InstallCommand code={commands[tab.value] ?? commands.npx} />
+          <InstallCommand
+            code={commands[tab.value]}
+          />
         </TabsContent>
       ))}
     </Tabs>

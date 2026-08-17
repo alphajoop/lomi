@@ -48,12 +48,11 @@ export function validateEmbedOptions(options: LomiEmbedOptions): void {
 }
 
 export const withEmbeddedParam = (url: string, embedOrigin?: string): string => {
+  const defaultOrigin = globalThis.window?.location.origin;
   try {
     const parsed = new URL(url);
     parsed.searchParams.set("embedded", "true");
-    const origin =
-      embedOrigin ??
-      (typeof window !== "undefined" ? window.location.origin : undefined);
+    const origin = embedOrigin ?? defaultOrigin;
     if (origin) {
       parsed.searchParams.set("embed_origin", origin);
     }
@@ -61,9 +60,7 @@ export const withEmbeddedParam = (url: string, embedOrigin?: string): string => 
   } catch {
     const joiner = url.includes("?") ? "&" : "?";
     let result = `${url}${joiner}embedded=true`;
-    const origin =
-      embedOrigin ??
-      (typeof window !== "undefined" ? window.location.origin : undefined);
+    const origin = embedOrigin ?? defaultOrigin;
     if (origin) {
       result += `&embed_origin=${encodeURIComponent(origin)}`;
     }

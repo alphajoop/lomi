@@ -14,6 +14,7 @@ import { Toaster } from 'sonner';
 import type { Language } from '@/lib/i18n/config';
 import { languages } from '@/lib/i18n/config';
 import { t as translate } from '@/lib/i18n/translations';
+import { isString } from '@lomi./shared';
 
 const SearchDialog = dynamic(() => import('@/components/ui/search'), {
   ssr: false,
@@ -30,7 +31,7 @@ export function Provider({
     const urlParams = new URLSearchParams(window.location.search);
     const uwuParam = urlParams.get('uwu');
 
-    if (typeof uwuParam === 'string') {
+    if (isString(uwuParam)) {
       localStorage.setItem('uwu', uwuParam);
     }
 

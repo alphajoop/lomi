@@ -11,6 +11,10 @@ overrides:
 importers:
 
   .:
+    dependencies:
+      '@lomi./shared':
+        specifier: file:../../../packages/shared
+        version: file:../../../packages/shared
     devDependencies:
       knip:
         specifier: 5.63.0
@@ -194,6 +198,9 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
+  '@lomi./shared@file:../../../packages/shared':
+    resolution: {directory: ../../../packages/shared, type: directory}
 
   '@napi-rs/wasm-runtime@1.2.3':
     resolution: {integrity: sha512-UMduMbqO5s5zF2NkNacMT/yK5Y5QiKvWr2+50bzIIxFDwVJ2h49b+oyjaCGPhJxd2/gC2x39EHv/gHVuu36x2Q==}
@@ -579,6 +586,9 @@ packages:
       '@types/node': '>=18'
       typescript: '>=5.0.4'
 
+  libphonenumber-js@1.13.11:
+    resolution: {integrity: sha512-ETER2kMaIFTI/Nh1a8Gk03dUF/SL0VZqtI+CcVHZxp5WIHYwNS7S+uiYZDYCvLy3lOR4/DAD5jf0h5WkePPpqg==}
+
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -885,6 +895,10 @@ snapshots:
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
+
+  '@lomi./shared@file:../../../packages/shared':
+    dependencies:
+      libphonenumber-js: 1.13.11
 
   '@napi-rs/wasm-runtime@1.2.3(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
     dependencies:
@@ -1217,6 +1231,8 @@ snapshots:
       typescript: 5.9.3
       zod: 3.25.76
       zod-validation-error: 3.5.4(zod@3.25.76)
+
+  libphonenumber-js@1.13.11: {}
 
   magic-string@0.30.21:
     dependencies:

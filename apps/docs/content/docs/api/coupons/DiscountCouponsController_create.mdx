@@ -1,0 +1,82 @@
+---
+title: "Create discount coupon"
+description: "Create discount coupon"
+full: true
+method: post
+path: /coupons
+operationId: DiscountCouponsController_create
+---
+
+## Overview
+
+Create discount coupon
+
+Creates a coupon with scope and redemption rules for use at checkout or payment links.
+
+
+### When to use this
+
+Use when launching promotions or segment-specific discounts.
+
+### See also
+
+[List coupons](/api/coupons/DiscountCouponsController_findAll) · [Checkout session](/api/checkout-sessions/CheckoutSessionsController_create)
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`POST /coupons`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+_No query parameters._
+
+
+### Request body
+
+_No application/json body for this operation._
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `201` | Created successfully |
+| `400` | Bad request, invalid or missing parameters |
+| `401` | Invalid or missing API key |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/coupons" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+## OpenAPI
+
+- **operationId**: `DiscountCouponsController_create`
+- **Operation**: `POST /coupons`
+
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

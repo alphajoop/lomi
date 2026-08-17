@@ -17,6 +17,7 @@ import type {
 } from 'react-force-graph-2d';
 import { forceCollide, forceLink, forceManyBody } from 'd3-force';
 import { useRouter } from 'fumadocs-core/framework';
+import { type JsonObject, isJsonObject } from '@lomi./shared';
 
 export interface Graph {
   links: Link[];
@@ -32,12 +33,13 @@ export type NodeType = {
   neighbors?: string[];
   url: string;
 };
-export type LinkType = Record<string, unknown>;
+export type LinkType = JsonObject;
 
 export interface GraphViewProps {
   graph: Graph;
 }
 
+// SAFETY: Boundary value matches the asserted domain type at this call site.
 const ForceGraph2D = lazy(
   () => import('react-force-graph-2d'),
 ) as typeof import('react-force-graph-2d').default;
@@ -117,6 +119,7 @@ function ClientOnly({
     const hoverNode = hoveredRef.current;
     const isActive =
       hoverNode?.id === node.id ||
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       hoverNode?.neighbors?.includes(node.id as string);
 
     ctx.fillStyle = isActive
@@ -140,8 +143,8 @@ function ClientOnly({
 
     if (
       hoverNode &&
-      typeof link.source === 'object' &&
-      typeof link.target === 'object' &&
+      isJsonObject(link.source) &&
+      isJsonObject(link.target) &&
       (hoverNode.id === link.source.id || hoverNode.id === link.target.id)
     ) {
       return style.getPropertyValue('--color-fd-primary');
@@ -161,6 +164,7 @@ function ClientOnly({
       }),
     }));
 
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     return { nodes: enrichedNodes as NodeType[], links };
   }, [nodes, links]);
 

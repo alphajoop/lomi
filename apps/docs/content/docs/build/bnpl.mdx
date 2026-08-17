@@ -13,14 +13,14 @@ lomi. BNPL uses **SPI débit différé** on **XOF** only. When a customer choose
 
 Enable BNPL from **Payment Channels** by connecting **Jumbo**. There is no separate BNPL settings card.
 
-**v1 scope:** one-time products with standard fixed prices only. Not subscriptions, usage billing, PWYW, or multi-item carts. Customer pays the listed price in installments; merchant processing uses your **JUMBO/BNPL** fee line from the org fee schedule.
+**Initial scope:** one-time products with standard fixed prices only. Not subscriptions, usage billing, PWYW, or multi-item carts. Customer pays the listed price in installments; merchant processing uses your **JUMBO/BNPL** fee line from the org fee schedule.
 
 ## Hosted checkout
 
 Public endpoints (no API key; session is the capability):
 
-- `GET /checkout/v1/bnpl/display` — installment breakdown
-- `POST /checkout/v1/bnpl/create` — create plan and register SPI installments
+- `GET /checkout/bnpl/display` — installment breakdown
+- `POST /checkout/bnpl/create` — create plan and register SPI installments
 
 ## Operations
 

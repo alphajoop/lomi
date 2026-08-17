@@ -23,10 +23,10 @@ pub enum DisputesCommand {
 pub struct DisputesListArgs {
     #[arg(long)]
     pub status: Option<String>,
-    #[arg(long, default_value_t = 1)]
-    pub page: u32,
-    #[arg(long, default_value_t = 50)]
-    pub page_size: u32,
+    #[arg(long)]
+    pub cursor: Option<String>,
+    #[arg(long, default_value_t = 20)]
+    pub limit: u32,
 }
 
 pub async fn run(common: &CommonOptions, args: DisputesArgs) -> Result<()> {
@@ -41,7 +41,10 @@ async fn list_disputes(common: &CommonOptions, args: DisputesListArgs) -> Result
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let mut path = format!("/disputes?page={}&pageSize={}", args.page, args.page_size);
+    let mut path = format!("/disputes?limit={}", args.limit);
+    if let Some(cursor) = &args.cursor {
+        path.push_str(&format!("&cursor={cursor}"));
+    }
     if let Some(status) = &args.status {
         path.push_str(&format!("&status={status}"));
     }

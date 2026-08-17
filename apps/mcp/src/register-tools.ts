@@ -1,13 +1,18 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { fromJSONSchema } from 'zod';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { fromJSONSchema } from "zod";
 
-import { toolNameFromOperation } from './generator/openapi-helpers.js';
-import type { ManifestTool, ToolsManifest } from './manifest.js';
-import { callLomiRest, formatHttpResult } from './lomi-http.js';
-import { getLomiApiBaseUrl, getOptionalMerchantApiKey } from './env-config.js';
-import { mcpLog } from './mcp-request-context.js';
-import { truncateToolResultText } from './truncate-result.js';
-import { registerSearchToolsMetaTool } from './register-search-tools.js';
+import type { ManifestTool, ToolsManifest } from "./manifest.js";
+import { callLomiRest, formatHttpResult } from "./lomi-http.js";
+import { getLomiApiBaseUrl, getOptionalMerchantApiKey } from "./env-config.js";
+import { mcpLog } from "./mcp-request-context.js";
+import { truncateToolResultText } from "./truncate-result.js";
+import { registerSearchToolsMetaTool } from "./register-search-tools.js";
+import { resolveManifestAction, restCallSpecFor } from "./resolve-action.js";
+import {
+  isJsonObject,
+  validateJsonValue,
+  type JsonObject,
+} from "@lomi./shared";
 
 export type ToolRegistrationContext = {
   baseUrl: string;
@@ -15,20 +20,13 @@ export type ToolRegistrationContext = {
   readOnlyOnly?: boolean;
 };
 
-/** Pre-override mechanical name (lomi_{method}_{path}) kept for MCP client caches. */
-export function legacyToolName(tool: ManifestTool): string | null {
-  if (!tool.pathTemplate) return null;
-  const legacy = toolNameFromOperation(tool.method, tool.pathTemplate);
-  return legacy === tool.name ? null : legacy;
-}
-
 function registerOneTool(
   server: McpServer,
   tool: ManifestTool,
   ctx: ToolRegistrationContext,
 ): void {
   const inputSchema = fromJSONSchema(tool.inputSchema, {
-    defaultTarget: 'openapi-3.0',
+    defaultTarget: "openapi-3.0",
   });
 
   server.registerTool(
@@ -42,64 +40,78 @@ function registerOneTool(
         destructiveHint: tool.destructive,
       },
       _meta: {
-        'anthropic/searchHint': tool.searchHint,
-        'anthropic/alwaysLoad': tool.alwaysLoad,
+        "anthropic/searchHint": tool.searchHint,
+        "anthropic/alwaysLoad": tool.alwaysLoad,
       },
     },
-    async (args: unknown) => {
+    async (args) => {
       const parsed = inputSchema.safeParse(args);
       if (!parsed.success) {
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: `Invalid tool arguments: ${parsed.error.message}`,
             },
           ],
           isError: true,
         };
       }
-      const input = parsed.data as Record<string, unknown>;
+      const validated = validateJsonValue(parsed.data);
+      if (!isJsonObject(validated)) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: "Invalid tool arguments: expected a JSON object",
+            },
+          ],
+          isError: true,
+        };
+      }
+      const input: JsonObject = validated;
       const apiKey = ctx.getApiKey();
       if (!apiKey) {
         return {
           content: [
             {
-              type: 'text',
-              text:
-                'Missing merchant API key: provide x-lomi-api-key (or x-api-key) when creating MCP session, or set server-side LOMI_SECRET_KEY fallback. See https://docs.lomi.africa/build/mcp',
+              type: "text",
+              text: "Missing merchant API key: provide x-lomi-api-key (or x-api-key) when creating MCP session, or set server-side LOMI_SECRET_KEY fallback. See https://docs.lomi.africa/build/mcp",
             },
           ],
           isError: true,
         };
       }
       try {
+        const action = resolveManifestAction(tool, input);
         const t0 = Date.now();
-        const result = await callLomiRest(tool, input, {
+        const result = await callLomiRest(restCallSpecFor(tool, action), input, {
           baseUrl: ctx.baseUrl,
           apiKey,
         });
         const latencyMs = Date.now() - t0;
         mcpLog(
-          'tool_upstream_complete',
+          "tool_upstream_complete",
           {
             tool: tool.name,
-            method: tool.method,
+            action: input["action"],
+            method: action.method,
             upstreamStatus: result.status,
             latencyMs,
           },
-          result.status >= 400 ? 'warn' : 'info',
+          result.status >= 400 ? "warn" : "info",
         );
         const text = truncateToolResultText(formatHttpResult(result));
         const ok = result.status >= 200 && result.status < 300;
-        return {
-          content: [{ type: 'text', text }],
-          ...(ok ? {} : { isError: true }),
-        };
+        const response = {
+          content: [{ type: "text", text }],
+        } satisfies { content: Array<{ type: "text"; text: string }> };
+        if (!ok) return { ...response, isError: true };
+        return response;
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         return {
-          content: [{ type: 'text', text: message }],
+          content: [{ type: "text", text: message }],
           isError: true,
         };
       }
@@ -122,9 +134,5 @@ export function registerMerchantTools(
   for (const tool of manifest.tools) {
     if (readOnlyOnly && !tool.readOnly) continue;
     registerOneTool(server, tool, fullCtx);
-    const legacyName = legacyToolName(tool);
-    if (legacyName) {
-      registerOneTool(server, { ...tool, name: legacyName }, fullCtx);
-    }
   }
 }

@@ -73,7 +73,7 @@ flowchart LR
 | Path | Card data in logs? |
 | --- | --- |
 | Merchant API `api_interactions` | Redacted on sensitive paths (`api-log-payload.ts`) |
-| `POST /checkout/v1/gim/pay` | Unauthenticated — not written to `api_interactions`; infra logs TBD |
+| `POST /checkout/gim/pay` | Unauthenticated — not written to `api_interactions`; infra logs TBD |
 | GIM error logs | `sanitizeGimLogPayload` + `gim-pci-redaction.spec.ts` |
 | Merchant webhooks | Stripe internals stripped (`sanitize-merchant-webhook-transaction-payload.ts`) |
 

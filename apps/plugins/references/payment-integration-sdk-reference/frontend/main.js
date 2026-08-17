@@ -5,6 +5,16 @@ const eventsOutput = document.getElementById("events-output");
 const checkoutEmbed = document.getElementById("checkout-embed");
 const publicKeyInput = document.getElementById("public-key");
 
+function isPlainObject(value) {
+  return value !== null && !Array.isArray(value) && Object(value) === value;
+}
+function isTranslationLeaf(value) {
+  return value === null || value === undefined || Object(value) !== value;
+}
+function isStringValue(value) {
+  return Object.prototype.toString.call(value) === '[object String]';
+}
+
 let lastCheckoutUrl = null;
 let lastEmbeddedCheckoutUrl = null;
 let lastCheckoutSessionId = null;
@@ -15,7 +25,7 @@ function printJson(element, value) {
 }
 
 function withEmbeddedParam(url) {
-  if (!url || typeof url !== "string") return null;
+  if (!url || !isStringValue(url)) return null;
   try {
     const parsed = new URL(url);
     parsed.searchParams.set("embedded", "true");
@@ -27,7 +37,7 @@ function withEmbeddedParam(url) {
 }
 
 function checkoutUrlFromSession(payload) {
-  if (!payload || typeof payload !== "object") return null;
+  if (!payload || isTranslationLeaf(payload)) return null;
   if (payload.checkout_url) return payload.checkout_url;
   const id = payload.checkout_session?.checkout_session_id;
   return id ? `https://checkout.lomi.africa/checkout/${id}` : null;

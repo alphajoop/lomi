@@ -2,6 +2,7 @@
 
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { JsonValue } from '@lomi./shared';
 
 export interface RegistryFile {
   type: string;
@@ -26,7 +27,7 @@ export interface Registry {
         type: string;
         path: string;
       };
-  onResolve(ref: unknown): unknown;
+  onResolve(ref: JsonValue): JsonValue;
   components: RegistryComponent[];
   dependencies: Record<string, string | null>;
 }

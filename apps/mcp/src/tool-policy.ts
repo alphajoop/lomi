@@ -50,7 +50,7 @@ export function buildSearchHint(input: ToolPolicyInput): string {
       if (word.length > 1) tokens.add(word.toLowerCase());
     }
   }
-  const nameTail = input.name.replace(/^lomi_[a-z]+_/, '');
+  const nameTail = input.name.replace(/^lomi_/, '');
   for (const word of nameTail.split('_')) {
     if (word.length > 1) tokens.add(word);
   }
@@ -86,16 +86,4 @@ export function loadExcludedOperationKeys(
   policyJson: { mcpExcludedOperationKeys?: string[] },
 ): Set<string> {
   return new Set(policyJson.mcpExcludedOperationKeys ?? []);
-}
-
-/**
- * Curated `operationKey -> tool name` overrides. Lets us expose short,
- * task-oriented names (e.g. `lomi_create_customer`) instead of the mechanical
- * `lomi_{method}_{path}` fallback. Keys must reference an included operation
- * (validated in the generator); missing entries fall back to the derived name.
- */
-export function loadToolNameOverrides(
-  policyJson: { toolNameOverrides?: Record<string, string> },
-): Map<string, string> {
-  return new Map(Object.entries(policyJson.toolNameOverrides ?? {}));
 }

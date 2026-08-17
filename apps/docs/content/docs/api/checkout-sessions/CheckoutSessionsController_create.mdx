@@ -20,7 +20,7 @@ Use for e-commerce, invoices, or any flow where you want lomi. to host payment c
 
 ### Good to know
 
-Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods. For pay_what_you_want products, amount must fall within the linked price minimum_amount and maximum_amount bounds (unit × quantity). `currency_code` is optional and falls back to your organization default configured under **Settings → Checkout → Payments**.
+Prefer checkout sessions over ad-hoc charges when you need a consistent buyer experience across payment methods. For pay_what_you_want products, amount must fall within the linked price minimum_amount and maximum_amount bounds (unit × quantity).
 
 ### See also
 
@@ -66,8 +66,8 @@ Schema: `object`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `amount` | No | `number` | - |
-| `currency_code` | No | `enum ("XOF", "USD", "EUR")` | Optional. When omitted, uses the organization `default_currency` from **Settings → Checkout → Payments**. Must be in the organization's `allowed_currencies` list. |
+| `amount` | Yes | `number` | - |
+| `currency_code` | No | `enum ("XOF", "USD", "EUR")` | Optional. Falls back to organization default_currency when omitted. |
 | `title` | No | `string` | - |
 | `description` | No | `string` | - |
 | `customer_id` | No | `string` | - |
@@ -86,11 +86,11 @@ Schema: `object`
 | `success_url` | No | `string` | - |
 | `cancel_url` | No | `string` | - |
 | `allow_coupon_code` | No | `boolean` | - |
-| `require_billing_address` | No | `boolean` | When `true`, show and require billing address fields. Default when unset follows org checkout settings, then `false`. See [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields). |
-| `require_name` | No | `boolean` | When `true`, show and require customer name. When `false`, hide the name field (display name falls back to email or phone). Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_name). |
-| `require_email` | No | `boolean` | When `true`, show and require email. When `false`, hide email. Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_email). |
-| `require_phone` | No | `boolean` | When `true`, show and require phone. When `false`, phone is optional if email is visible, or hidden if email is hidden. Default when unset: `false`. See [Checkout form fields](/build/payments/checkout-behavior#require_phone). |
-| `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides `require_*` booleans. |
+| `require_billing_address` | No | `boolean` | When true, show and require billing address on checkout. Default false when unset. |
+| `require_email` | No | `boolean` | When true, show and require customer email. Default true when unset. |
+| `require_phone` | No | `boolean` | When true, show and require customer phone. Default true when unset. |
+| `require_name` | No | `boolean` | When true, show and require customer name. Default true when unset. |
+| `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides require_* booleans. |
 | `payment_link_id` | No | `string` | - |
 | `metadata` | No | `object` | - |
 | `line_items` | No | `array<object>` | - |
@@ -99,7 +99,7 @@ Example body:
 
 ```json
 {
-  "currency_code": "XOF"
+  "amount": 10000
 }
 ```
 
@@ -118,32 +118,12 @@ Errors follow the standard JSON error format (status code and machine-readable m
 
 ## Example
 
-Minimal session:
-
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"currency_code":"XOF"}'
+  -d '{"amount":10000}'
 ```
-
-Phone-only checkout (name, email, and billing address hidden):
-
-```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
-  -H "X-API-KEY: $LOMI_SECRET_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "amount": 1000,
-    "currency_code": "XOF",
-    "require_name": false,
-    "require_email": false,
-    "require_phone": true,
-    "require_billing_address": false
-  }'
-```
-
-See [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields) for all flag combinations.
 
 ## OpenAPI
 

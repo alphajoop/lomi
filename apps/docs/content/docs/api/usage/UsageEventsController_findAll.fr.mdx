@@ -1,0 +1,73 @@
+---
+title: "List usage events"
+description: "List usage events"
+full: true
+method: get
+path: /usage/events
+operationId: UsageEventsController_findAll
+---
+
+## Aperçu
+
+List usage events
+
+### Quand l’utiliser
+
+Utilisez cet endpoint quand vous devez exécuter `GET /usage/events` (List usage events).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /usage/events`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+_Pas d’autre paramètre dans l’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `status` | query | Non | - |  |
+| `code` | query | Non | - |  |
+| `customer_id` | query | Non | - |  |
+| `page_size` | query | Non | - |  |
+| `page` | query | Non | - |  |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | - |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/usage/events?status=pending&code=value" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `UsageEventsController_findAll`
+- **Operation**: `GET /usage/events`
+
+Schémas complets et **Try it** : [référence API](/api).

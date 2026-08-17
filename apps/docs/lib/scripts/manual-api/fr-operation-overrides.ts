@@ -10,7 +10,7 @@ export type FrOperationGuidance = {
   related?: string;
 };
 
-export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
+export const FR_OPERATION_COPY = {
   AccountsController_checkAvailableBalance: {
     whenToUse:
       'Appelez avant un retrait, un paiement bénéficiaire ou tout flux nécessitant un solde disponible garanti.',
@@ -101,13 +101,13 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     whenToUse:
       'Utilisez pour lancer des promotions ou des remises ciblées par segment.',
     related:
-      '[Récupérer un coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
+      '[Récupérer un coupon](/api/coupons/DiscountCouponsController_findOne)',
   },
   DiscountCouponsController_getPerformance: {
     whenToUse:
       'Utilisez dans les tableaux de bord marketing pour mesurer l’efficacité d’une campagne.',
     related:
-      '[Récupérer un coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
+      '[Récupérer un coupon](/api/coupons/DiscountCouponsController_findOne)',
   },
   PaymentLinksController_create: {
     whenToUse:
@@ -179,7 +179,7 @@ export const FR_OPERATION_COPY: Partial<Record<string, FrOperationGuidance>> = {
     related:
       '[Récupérer un abonnement](/api/subscriptions/SubscriptionsController_findOne) · [Abonnements](/build/subscriptions)',
   },
-  SubscriptionsController_findByCustomer: {
+  CustomersController_getSubscriptions: {
     whenToUse:
       'Utilisez pour afficher les abonnements actifs d’un client dans le support ou le portail.',
     related:

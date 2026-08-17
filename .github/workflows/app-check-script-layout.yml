@@ -1,0 +1,29 @@
+name: lomi · check · script layout
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "tooling/**"
+      - ".github/workflows/app-check-script-layout.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "tooling/**"
+      - ".github/workflows/app-check-script-layout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  script-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check script layout
+        run: node tooling/scripts/check-script-layout.mjs

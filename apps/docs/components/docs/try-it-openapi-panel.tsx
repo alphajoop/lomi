@@ -4,9 +4,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils/cn';
+import { Checkbox } from '@lomi./ui/checkbox';
+import { Label } from '@lomi./ui/label';
+import { cn } from '@lomi./ui/cn';
 
 type TryItContext = {
   signedIn: boolean;
@@ -49,7 +49,24 @@ export function TryItOpenApiPanel() {
   }
 
   if (!ctx.signedIn) {
-    return null;
+    const dashboard =
+      process.env.NEXT_PUBLIC_DASHBOARD_URL ?? 'https://dashboard.lomi.africa';
+    const next = pathname || '/docs/api';
+    return (
+      <div
+        className={cn(
+          'mb-4 rounded-md border border-fd-border bg-fd-card px-3 py-2 text-sm text-fd-muted-foreground',
+        )}
+      >
+        <a
+          className="underline underline-offset-2"
+          href={`${dashboard.replace(/\/$/, '')}/docs-handoff?next=${encodeURIComponent(next)}`}
+        >
+          Connect from the dashboard
+        </a>{' '}
+        to try the API with a least-privilege docs session.
+      </div>
+    );
   }
 
   const hasTestKeys = ctx.organizations.length > 0;

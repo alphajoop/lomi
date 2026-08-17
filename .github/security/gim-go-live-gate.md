@@ -6,7 +6,7 @@ GIM is **code-complete** but **not production-enabled** (no acquirer keys; UAT e
 
 | # | Gate | Evidence |
 | --- | --- | --- |
-| G1 | **Logging redaction** for `/checkout/v1/gim` and `/charge/switch` in `api-log-payload.ts` | Unit tests green |
+| G1 | **Logging redaction** for `/checkout/gim` and `/charge/switch` in `api-log-payload.ts` | Unit tests green |
 | G2 | **Sandbox pentest** of GIM reject and happy paths | [sandbox-pentest-runbook.md](./sandbox-pentest-runbook.md) signed; no open Critical/High |
 | G3 | **Provider AOC** from GIM/PaySky for production endpoint | File in compliance vault |
 | G4 | **CDE boundary** documented and QSA-reviewed | [cde-data-flows.md](./cde-data-flows.md) + QSA sign-off |

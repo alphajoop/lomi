@@ -104,7 +104,7 @@ export class ProductsService {
     public async setDefaultPrice(id: string, priceId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['ProductResponseDto']> {
         return requestWithClient<components['schemas']['ProductResponseDto']>(this.client, {
             method: 'POST',
-            url: '/products/{id}/prices/{priceId}/set-default',
+            url: '/products/{id}/prices/{priceId}/default',
             path: { id: id, priceId: priceId },
             ...options,
         });

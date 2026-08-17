@@ -1,0 +1,35 @@
+name: lomi · check · duplication
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "tooling/**"
+      - ".github/scripts/check-source-duplication.mjs"
+      - ".github/duplication-policy.json"
+      - ".github/workflows/app-check-duplication.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "tooling/**"
+      - ".github/scripts/check-source-duplication.mjs"
+      - ".github/duplication-policy.json"
+      - ".github/workflows/app-check-duplication.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  duplication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Self-test sentinels
+        run: node .github/scripts/check-source-duplication.mjs --self-test
+      - name: Check source duplication
+        run: node .github/scripts/check-source-duplication.mjs

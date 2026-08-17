@@ -18,7 +18,7 @@
     "customers",
     "products",
     "subscriptions",
-    "discount-coupons",
+    "coupons",
     "---Mouvements d’argent---",
     "balances",
     "transactions",

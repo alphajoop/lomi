@@ -1,9 +1,0 @@
-{
-  "title": "Usage Events",
-  "pages": [
-    "UsageEventsController_createUsageSubscription",
-    "UsageEventsController_findAll",
-    "UsageEventsController_findOne",
-    "UsageEventsController_ingest"
-  ]
-}

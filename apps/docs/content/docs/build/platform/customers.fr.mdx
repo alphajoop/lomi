@@ -288,7 +288,7 @@ curl -X GET "https://api.lomi.africa/customers/cus_abc123.../transactions" \
 
 ## Créer une session de lancement portail client
 
-**Référence API :** [Session de lancement portail](/api/customers/CustomersController_createPortalLaunchSession)
+**Référence API :** [Session de lancement portail](/api/customers/CustomersController_createPortalSession)
 
 Génère une URL portail hébergée à usage unique depuis votre backend. Retourne `launch_url` pour la redirection. Voir [Portail client](/build/customer-portal) pour les flux, la sécurité et la checklist production.
 
@@ -299,7 +299,7 @@ Génère une URL portail hébergée à usage unique depuis votre backend. Retour
 import axios from 'axios';
 
 const { data: launch } = await axios.post(
-  'https://api.lomi.africa/customers/cus_abc123.../portal-launch-session',
+  'https://api.lomi.africa/customers/cus_abc123.../portal',
   {
     return_url: 'https://merchant.example.com/account',
     flow_type: 'subscription_cancel',
@@ -321,7 +321,7 @@ window.location.href = launch.launch_url;
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-session" \
+curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -345,5 +345,5 @@ curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-sess
 - [Mettre à jour un client](/api/customers/CustomersController_update)
 - [Supprimer un client](/api/customers/CustomersController_remove)
 - [Transactions client](/api/customers/CustomersController_getTransactions)
-- [Session de lancement portail](/api/customers/CustomersController_createPortalLaunchSession)
+- [Session de lancement portail](/api/customers/CustomersController_createPortalSession)
 - [Guide portail client](/build/customer-portal)

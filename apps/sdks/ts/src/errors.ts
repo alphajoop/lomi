@@ -1,3 +1,5 @@
+import type { JsonValue } from "@lomi./shared";
+
 /**
  * Custom error classes for lomi. SDK
  */
@@ -6,7 +8,7 @@ export type LomiApiErrorBody = {
   error?: {
     code?: string;
     message?: string;
-    details?: unknown;
+    details?: JsonValue;
   };
   request_id?: string;
   message?: string | string[];
@@ -20,7 +22,7 @@ export class LomiError extends Error {
     message: string,
     public statusCode?: number,
     public code?: string,
-    public details?: unknown,
+    public details?: JsonValue,
     public requestId?: string,
     public body?: LomiApiErrorBody,
   ) {
@@ -34,7 +36,7 @@ export class LomiError extends Error {
 export class LomiValidationError extends LomiError {
   constructor(
     message: string,
-    public errors?: unknown,
+    public errors?: JsonValue,
     requestId?: string,
     body?: LomiApiErrorBody,
   ) {

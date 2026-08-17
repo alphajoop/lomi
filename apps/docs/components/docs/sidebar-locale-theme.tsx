@@ -7,7 +7,7 @@ import { ChevronDown, Languages } from 'lucide-react';
 import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
 import { languages, type Language } from '@/lib/i18n/config';
 import { useTranslation } from '@/lib/utils/translation-context';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 /** Consistent with sidebar control radius in this app */
 const r = 'rounded-[0.3rem]';
@@ -55,6 +55,7 @@ export function DocsSidebarLocaleAndTheme({
             )}
             value={currentLanguage}
             onChange={(e) => {
+              // SAFETY: Boundary value matches the asserted domain type at this call site.
               const lang = e.target.value as Language;
               setLanguage(lang);
               router.refresh();

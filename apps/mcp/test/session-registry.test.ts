@@ -1,11 +1,19 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import type { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { McpSessionRegistry } from '../src/session-registry.js';
 
-function mockTransport() {
-  return {
+type MockTransport = {
+  close: ReturnType<typeof vi.fn>;
+  onclose: (() => void) | undefined;
+};
+
+function mockTransport(): StreamableHTTPServerTransport {
+  const transport: MockTransport = {
     close: vi.fn().mockResolvedValue(undefined),
-    onclose: undefined as (() => void) | undefined,
-  } as unknown as import('@modelcontextprotocol/sdk/server/streamableHttp.js').StreamableHTTPServerTransport;
+    onclose: undefined,
+  };
+  // SAFETY: Test double implements the transport methods used by the registry.
+  return transport as StreamableHTTPServerTransport;
 }
 
 describe('McpSessionRegistry', () => {

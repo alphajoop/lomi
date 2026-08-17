@@ -3,7 +3,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { Check, ChevronDown, Copy, ExternalLinkIcon } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
 import {
@@ -88,7 +88,7 @@ export function ViewOptions({
 }) {
   const items = useMemo(() => {
     const fullMarkdownUrl =
-      typeof window !== 'undefined'
+      'window' in globalThis && globalThis.window !== undefined
         ? new URL(markdownUrl, window.location.origin)
         : 'loading';
     const q = `Read ${fullMarkdownUrl}, I want to ask questions about it.`;

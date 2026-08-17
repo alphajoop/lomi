@@ -11,7 +11,7 @@
     "customers",
     "products",
     "subscriptions",
-    "discount-coupons",
+    "coupons",
     "balances",
     "organizations",
     "merchants",
@@ -25,7 +25,6 @@
     "webhooks",
     "logs",
     "meters",
-    "usage-events",
-    "usage-billing"
+    "usage"
   ]
 }

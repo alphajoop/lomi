@@ -51,6 +51,8 @@ Use `https://sandbox.api.lomi.africa` for sandbox.
 
 Clients that support deferred loading can call **`lomi_search_tools`** with a keyword query.
 
+Merchant tools are **resource tools** named `lomi_<resource>` with a required `action` (for example `lomi_customers` with `action=list`). There are no mechanical `lomi_post_*` / `lomi_get_*` aliases.
+
 MCP **resources** (`lomi://docs/getting-started`, `lomi://docs/authentication`, `lomi://docs/idempotency`, `lomi://docs/pagination`, `lomi://docs/webhooks`, `lomi://docs/money`, `lomi://docs/recipes`, `lomi://docs/errors`, `lomi://tools/index`) and **prompts** (`onboard_merchant`, `debug_failed_payment`, `setup_webhook`) ship with the server.
 
 ## Get a secret key

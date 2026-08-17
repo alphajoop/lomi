@@ -3,23 +3,17 @@ name: lomi · ci · assistant
 on:
   pull_request:
     paths:
-      - "apps/dashboard/supabase/functions/_shared/agent/**"
-      - "apps/dashboard/supabase/functions/assistant/**"
-      - "apps/dashboard/supabase/functions/assistant-resume/**"
-      - "apps/dashboard/supabase/functions/assistant-cancel/**"
+      - "apps/api/src/merchant-assistant/**"
       - "apps/dashboard/src/lib/assistant/**"
-      - "apps/dashboard/src/lib/scripts/generate-assistant-tool-manifest.mjs"
+      - "apps/dashboard/scripts/build/generate-assistant-tool-manifest.mjs"
       - ".github/workflows/app-ci-assistant.yml"
   push:
     branches:
       - main
     paths:
-      - "apps/dashboard/supabase/functions/_shared/agent/**"
-      - "apps/dashboard/supabase/functions/assistant/**"
-      - "apps/dashboard/supabase/functions/assistant-resume/**"
-      - "apps/dashboard/supabase/functions/assistant-cancel/**"
+      - "apps/api/src/merchant-assistant/**"
       - "apps/dashboard/src/lib/assistant/**"
-      - "apps/dashboard/src/lib/scripts/generate-assistant-tool-manifest.mjs"
+      - "apps/dashboard/scripts/build/generate-assistant-tool-manifest.mjs"
       - ".github/workflows/app-ci-assistant.yml"
 
 jobs:
@@ -28,19 +22,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: denoland/setup-deno@v2
+      - name: Init private submodules
+        env:
+          REPO_CHECKOUT_PAT: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: bash .github/scripts/init-submodules.sh apps/api apps/dashboard
+
+      - uses: actions/setup-node@v4
         with:
-          deno-version: v2.x
+          node-version: "22"
 
       - name: Generate tool manifest
         working-directory: apps/dashboard
-        run: node src/lib/scripts/generate-assistant-tool-manifest.mjs
+        run: node scripts/build/generate-assistant-tool-manifest.mjs
 
       - name: Check manifest drift
         working-directory: apps/dashboard
         run: |
           git diff --exit-code src/lib/assistant/tool-manifest.generated.json src/lib/assistant/ui-tool-ids.generated.ts
-
-      - name: Run assistant eval tests
-        working-directory: apps/dashboard/supabase/functions/_shared/agent
-        run: deno test __tests__/assistant.eval.test.ts --allow-read --no-check

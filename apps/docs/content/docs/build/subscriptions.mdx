@@ -120,7 +120,7 @@ curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
 
 ## Get subscriptions for a customer
 
-**API reference:** [Subscriptions by customer](/api/subscriptions/SubscriptionsController_findByCustomer)
+**API reference:** [Subscriptions by customer](/api/subscriptions/CustomersController_getSubscriptions)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -274,10 +274,10 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 
 ## Uncancel a scheduled cancellation
 
-**API reference:** [Uncancel subscription](/api/subscriptions/SubscriptionsController_uncancel)
+**API reference:** [Uncancel subscription](/api/subscriptions/SubscriptionsController_resume)
 
 ```bash
-curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../resume" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
@@ -319,9 +319,9 @@ lomi. does not emit a webhook for trial card setup (`setup_intent.succeeded`). L
 
 - [List subscriptions](/api/subscriptions/SubscriptionsController_findAll)
 - [Get subscription](/api/subscriptions/SubscriptionsController_findOne)
-- [Subscriptions by customer](/api/subscriptions/SubscriptionsController_findByCustomer)
+- [Subscriptions by customer](/api/subscriptions/CustomersController_getSubscriptions)
 - [Cancel subscription](/api/subscriptions/SubscriptionsController_cancel)
-- [Uncancel subscription](/api/subscriptions/SubscriptionsController_uncancel)
+- [Uncancel subscription](/api/subscriptions/SubscriptionsController_resume)
 - [Change plan](/api/subscriptions/SubscriptionsController_changePlan)
 - [Update subscription](/api/subscriptions/SubscriptionsController_update)
 - [Checkout behavior: subscriptions](/build/payments/checkout-behavior#subscription-checkout)

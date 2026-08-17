@@ -33,7 +33,7 @@ Envoyez la clé secrète dans l’en-tête `X-API-Key` depuis votre serveur.
 | Clients et sessions de portail client | [Customers](/api/customers) |
 | Produits, prix et catalogues | [Products](/api/products) |
 | Facturation récurrente et abonnements clients | [Subscriptions](/api/subscriptions) |
-| Codes promo et performance des coupons | [Discount coupons](/api/discount-coupons) |
+| Codes promo et performance des coupons | [Coupons](/api/coupons) |
 
 ## Déplacer et réconcilier l’argent
 
@@ -56,4 +56,13 @@ Envoyez la clé secrète dans l’en-tête `X-API-Key` depuis votre serveur.
 - Les pages API décrivent les opérations HTTP exactes.
 - Les encaissements directs sont avancés ; le checkout hébergé reste la recommandation par défaut.
 - Utilisez la sandbox pour développer et le live seulement après la [checklist de production](/start/go-live).
+
+## Règles de contrat
+
+- **Montants :** les champs `amount` publics sont des entiers en unités mineures. `10000` vaut 10 000 XOF, ou 100,00 USD/EUR. Envoyez toujours `currency_code`.
+- **Idempotence :** `Idempotency-Key` est obligatoire sur `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts` et `POST /charge/*`. Voir [Clés d’idempotence](/build/advanced-guides/idempotency-keys).
+- **Listes :** interrogez avec `cursor` et `limit` (défaut 20, max 100). Réponse `{ object: "list", data, has_more, next_cursor, limit }`.
+- **Erreurs :** `{ error: { code, message, details }, request_id }`. Voir [Gestion des erreurs](/api/errors).
+- **Limites :** les réponses réussies incluent `X-RateLimit-Remaining`. Un `429` inclut `Retry-After`.
+- Les routes restent sans version. La `info.version` OpenAPI est la version du schéma.
 

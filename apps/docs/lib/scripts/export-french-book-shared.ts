@@ -15,10 +15,12 @@ export type BookSection = {
   inlinePages?: Array<{ title: string; body: string }>;
 };
 
-export function stripFrontmatter(source: string): {
+export type StrippedFrontmatter = {
   title?: string;
   body: string;
-} {
+};
+
+export function stripFrontmatter(source: string): StrippedFrontmatter {
   if (!source.startsWith('---')) {
     return { body: source.trim() };
   }

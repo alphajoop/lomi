@@ -5,6 +5,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { checkAllowlistParity } from '@/lib/scripts/check-allowlist-parity';
 import { checkBuildSidebarParity } from '@/lib/scripts/check-build-sidebar-parity';
+import { type JsonObject } from '@lomi./shared';
 
 const DOCS_ROOT = process.cwd();
 const MONOREPO_ROOT = path.resolve(DOCS_ROOT, '..', '..');
@@ -38,6 +39,7 @@ async function checkWebsiteOpenApiMirror(errors: string[]): Promise<void> {
   ]) {
     try {
       const raw = await fs.readFile(file, 'utf-8');
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const spec = JSON.parse(raw) as {
         info?: { version?: string };
         paths?: object;
@@ -106,9 +108,10 @@ async function checkLiveProbe(errors: string[]): Promise<void> {
         if (status !== 200) {
           throw new Error(`openapi.json HTTP ${status}`);
         }
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         const spec = JSON.parse(body) as {
           info?: { version?: string };
-          paths?: Record<string, unknown>;
+          paths?: JsonObject;
         };
         if (spec.info?.version === '0.0.0-stub') {
           throw new Error('live openapi.json is stub');

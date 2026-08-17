@@ -1,6 +1,5 @@
 import { InlineCommand } from '@/components/docs/inline-command';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
-import type { Language } from '@/lib/i18n/config';
 
 type DocsAgentIndexProps = {
   /** Override the docs site origin (defaults to production). */
@@ -9,16 +8,7 @@ type DocsAgentIndexProps = {
 
 const DEFAULT_ORIGIN = 'https://docs.lomi.africa';
 
-const COPY: Record<
-  Language,
-  {
-    title: string;
-    beforeUrl: string;
-    between: string;
-    after: string;
-    command: string;
-  }
-> = {
+const COPY = {
   en: {
     title: 'Documentation index',
     beforeUrl: 'Fetch the complete map at',

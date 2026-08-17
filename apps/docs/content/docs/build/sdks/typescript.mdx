@@ -408,14 +408,13 @@ const elements = await loadLomi('lomi_pk_test_…');
 | `accounts` | `getBalance`, `getBalanceBreakdown`, `checkBalance` |
 | `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `createSwitchCharge`, `getCardCharge`, `cancelCardCharge` |
 | `checkoutSessions` | `list`, `listAll`, `get`, `create` |
-| `customers` | `list`, `listAll`, `get`, `create`, `update`, `delete`, `getTransactions`, `createPortalLaunchSession`, `getPortalAudit` |
-| `discountCoupons` | `list`, `listAll`, `get`, `create`, `getPerformance` |
+| `customers` | `list`, `listAll`, `get`, `create`, `update`, `delete`, `getTransactions`, `getSubscriptions`, `createPortalSession`, `getPortalAudit` |
+| `coupons` | `list`, `listAll`, `get`, `create`, `getPerformance` |
 | `disputes` | `list`, `listAll`, `get` |
 | `logs` | `list`, `listAll`, `get` |
 | `merchants` | `get`, `getArr`, `getBalance`, `getMrr` |
 | `meters` | `list`, `listAll`, `get`, `create`, `update`, `getCustomerBalance` |
-| `organization` | `get` |
-| `organizations` | `list`, `listAll`, `get`, `getMetrics` |
+| `organizations` | `list`, `listAll`, `get`, `getMetrics`, `getRadarSettings`, `updateRadarSettings` |
 | `paymentLinks` | `list`, `listAll`, `get`, `create` |
 | `paymentRequests` | `list`, `listAll`, `get`, `create` |
 | `payouts` | `create`, `list`, `listAll`, `get` |
@@ -424,13 +423,10 @@ const elements = await loadLomi('lomi_pk_test_…');
 | `refunds` | `create`, `list`, `listAll`, `get` |
 | `riskAssessments` | `list`, `listAll`, `get` |
 | `settlements` | `findAll`, `findAllAll`, `findTransactions` |
-| `subscriptions` | `list`, `listAll`, `get`, `findByCustomer`, `cancel`, `uncancel`, `changePlan`, `update` |
+| `subscriptions` | `list`, `listAll`, `get`, `getUsage`, `cancel`, `resume`, `changePlan`, `update` |
 | `transactions` | `list`, `listAll`, `get` |
-| `usageBilling` | `checkEntitlement`, `listPeriods`, `getRevenue`, `getSubscriptionUsage`, `grantCredits`, `createEntitlement` |
-| `usageEvents` | `list`, `listAll`, `get`, `create` |
-| `usageSubscriptions` | `create` |
-| `webhookDeliveryLogs` | `list`, `listAll`, `get` |
-| `webhooks` | `list`, `listAll`, `get`, `create`, `update`, `delete`, `test`, `retryDelivery`, `verifySignature` |
+| `usage` | `list`, `listAll`, `get`, `create`, `createSubscription`, `listPeriods`, `getRevenue`, `grantCredits`, `createEntitlement`, `checkEntitlement` |
+| `webhooks` | `list`, `listAll`, `get`, `create`, `update`, `delete`, `test`, `retryDelivery`, `listDeliveries`, `getDelivery`, `verifySignature` |
 
 ---
 

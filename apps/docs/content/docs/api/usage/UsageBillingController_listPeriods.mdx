@@ -1,0 +1,78 @@
+---
+title: "List usage billing periods"
+description: "List usage billing periods"
+full: true
+method: get
+path: /usage/periods
+operationId: UsageBillingController_listPeriods
+---
+
+## Overview
+
+List usage billing periods
+
+Returns billing periods for usage subscriptions, optionally filtered by subscription ID.
+
+
+### When to use this
+
+Use for invoicing windows, period-close reconciliation, or support lookups.
+
+### See also
+
+[Get subscription usage](/api/subscriptions/SubscriptionsController_getUsage) · [Usage billing guide](/build/usage-billing)
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /usage/periods`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `page_size` | query | No | - |  |
+| `page` | query | No | - |  |
+| `subscription_id` | query | No | - |  |
+
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `200` | Success |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/usage/periods?page_size=1&page=1" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `UsageBillingController_listPeriods`
+- **Operation**: `GET /usage/periods`
+
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

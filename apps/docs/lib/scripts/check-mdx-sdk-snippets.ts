@@ -8,6 +8,7 @@
 import { glob } from 'tinyglobby';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { isJsonObject } from '@lomi./shared';
 
 type Manifest = {
   generatedAt?: string;
@@ -39,9 +40,10 @@ async function main(): Promise<void> {
       `Missing ${manifestPath}. Run \`node scripts/typescript-generate.js\` from apps/sdks first.`,
     );
   });
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const manifest = JSON.parse(raw) as Manifest;
   const sdk = manifest.sdk;
-  if (!sdk || typeof sdk !== 'object') {
+  if (!isJsonObject(sdk)) {
     throw new Error('sdk-public-methods.json: missing "sdk" object');
   }
 

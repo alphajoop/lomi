@@ -2,6 +2,7 @@
 
 import { source } from '@/lib/utils/source';
 import { getBreadcrumbItems } from 'fumadocs-core/breadcrumb';
+import { isString, isJsonObject } from '@lomi./shared';
 
 export const revalidate = false;
 
@@ -21,12 +22,26 @@ interface OramaCloudDocument {
   breadcrumbs: string[];
 }
 
-interface StructuredHeading {
-  id?: string;
+function toHeadingStrings(headings: unknown): string[] {
+  if (!Array.isArray(headings)) return [];
+  return headings
+    .map((h) => (isJsonObject(h) && h.id ? String(h.id) : String(h)))
+    .filter((h) => h.length > 0);
 }
 
-interface StructuredContent {
-  content?: string;
+function toContentStrings(contents: unknown): string[] {
+  if (!Array.isArray(contents)) return [];
+  return contents
+    .map((c) => {
+      if (isJsonObject(c)) {
+        const content = c.content;
+        return isString(content)
+          ? content.trim()
+          : String(content ?? '').trim();
+      }
+      return String(c).trim();
+    })
+    .filter((c) => c.length > 0);
 }
 
 export async function GET(): Promise<Response> {
@@ -40,35 +55,14 @@ export async function GET(): Promise<Response> {
       includeRoot: true,
     });
 
-    const pageData = page.data as unknown as {
-      structuredData: {
-        headings: string[];
-        contents: string[];
-      };
-    };
-    const structuredData = pageData.structuredData;
+    const structuredData =
+      'structuredData' in page.data && isJsonObject(page.data.structuredData)
+        ? page.data.structuredData
+        : undefined;
     const structured = structuredData
       ? {
-          // Extract heading IDs (or content) as flat string array
-          // Ensure headings is an array and map to strings
-          headings: Array.isArray(structuredData.headings)
-            ? structuredData.headings
-                .map((h: StructuredHeading | string) =>
-                  typeof h === 'object' && h?.id ? h.id : String(h),
-                )
-                .filter((h: string) => h.length > 0)
-            : [],
-          // Extract content strings as flat array, filtering empty
-          // Ensure contents is an array and map to strings
-          contents: Array.isArray(structuredData.contents)
-            ? structuredData.contents
-                .map((c: StructuredContent | string) =>
-                  typeof c === 'object' && c?.content
-                    ? c.content.trim()
-                    : String(c).trim(),
-                )
-                .filter((c: string) => c.length > 0)
-            : [],
+          headings: toHeadingStrings(structuredData.headings),
+          contents: toContentStrings(structuredData.contents),
         }
       : { headings: [], contents: [] };
 
@@ -81,7 +75,7 @@ export async function GET(): Promise<Response> {
       tag: page.slugs[0],
       structured,
       breadcrumbs: items.flatMap<string>((item, i) =>
-        i > 0 && typeof item.name === 'string' ? item.name : [],
+        i > 0 && isString(item.name) ? item.name : [],
       ),
     });
   }

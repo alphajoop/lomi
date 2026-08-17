@@ -1,6 +1,18 @@
-# Root
+# Editor
 .cursor/
 .vscode/
-package.json
-.vercel
+
+# Environment
 .env*
+.vercel
+
+# Dependencies
+node_modules/
+/pnpm-lock.yaml
+
+# Build
+*.tsbuildinfo
+
+# Local
+package.json
+/oxlint.config.ts

@@ -65,11 +65,11 @@ Schema: `object`
 | `price_id` | No | `string` | - |
 | `allow_coupon_code` | No | `boolean` | - |
 | `allow_quantity` | No | `boolean` | - |
-| `require_billing_address` | No | `boolean` | When `true`, show and require billing address on checkout. Default when unset follows org settings, then `false`. See [Checkout form fields](/build/payments/checkout-behavior#checkout-form-fields). |
-| `require_name` | No | `boolean` | When `true`, show and require customer name. When `false`, hide the name field (display name falls back to email or phone). Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_name). |
-| `require_email` | No | `boolean` | When `true`, show and require email. When `false`, hide email. Default when unset: `true`. See [Checkout form fields](/build/payments/checkout-behavior#require_email). |
-| `require_phone` | No | `boolean` | When `true`, show and require phone. When `false`, phone is optional if email is visible, or hidden if email is hidden. Default when unset: `false`. See [Checkout form fields](/build/payments/checkout-behavior#require_phone). |
-| `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides `require_*` booleans. |
+| `require_billing_address` | No | `boolean` | When true, show and require billing address on checkout. Default false when unset. |
+| `require_email` | No | `boolean` | When true, show and require customer email. Default true when unset. |
+| `require_phone` | No | `boolean` | When true, show and require customer phone. Default true when unset. |
+| `require_name` | No | `boolean` | When true, show and require customer name. Default true when unset. |
+| `fields` | No | `array<object>` | Optional ordered checkout field schema. When provided, overrides require_* booleans. |
 | `expires_at` | No | `string` | - |
 | `success_url` | No | `string` | - |
 | `cancel_url` | No | `string` | - |

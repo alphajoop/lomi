@@ -24,13 +24,13 @@ export class CustomersService {
     }
 
     /**
-     * Create customer portal session
-     * @see OpenAPI `CustomersController_createPortalLaunchSession`
+     * Créer une session de lancement du portail client
+     * @see OpenAPI `CustomersController_createPortalSession`
      */
-    public async createPortalLaunchSession(id: string, body: NonNullable<paths['/customers/{id}/portal-launch-session']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['PortalLaunchSessionResponseDto']> {
+    public async createPortalSession(id: string, body: NonNullable<paths['/customers/{id}/portal']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['PortalLaunchSessionResponseDto']> {
         return requestWithClient<components['schemas']['PortalLaunchSessionResponseDto']>(this.client, {
             method: 'POST',
-            url: '/customers/{id}/portal-launch-session',
+            url: '/customers/{id}/portal',
             path: { id: id },
             body,
             ...options,
@@ -73,6 +73,19 @@ export class CustomersService {
             url: '/customers/{id}/portal-audit',
             path: { id: id },
             query: params,
+            ...options,
+        });
+    }
+
+    /**
+     * Abonnements d’un client
+     * @see OpenAPI `CustomersController_getSubscriptions`
+     */
+    public async getSubscriptions(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/customers/{id}/subscriptions']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/customers/{id}/subscriptions']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
+            method: 'GET',
+            url: '/customers/{id}/subscriptions',
+            path: { id: id },
             ...options,
         });
     }

@@ -54,7 +54,7 @@ export function CheckoutWhatsAppNumberInput({
   return (
     <div className="whatsapp-input-container">
       <div className="relative shadow-sm shadow-black/[.04]">
-        <div className="checkout-phone-shell flex w-full rounded-none bg-transparent">
+        <div className="checkout-phone-shell flex h-10 w-full overflow-hidden rounded-[9px] border border-stone-200 bg-white shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06)] dark:border-white/[0.16] dark:bg-[#252522] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]">
           <RPNInput.default
             className="flex w-full"
             international
@@ -79,7 +79,7 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ ...props }, ref) => (
     <CheckoutInput
-      className="rounded-none border-0 bg-transparent focus-visible:ring-0"
+      className="rounded-l-none rounded-r-[9px] border-0 bg-transparent shadow-none focus:border-transparent focus-visible:shadow-none"
       ref={ref}
       {...props}
       autoComplete="tel"

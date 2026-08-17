@@ -12,12 +12,9 @@ use crate::config::GlobalConfig;
 pub const PRODUCTION_API_URL: &str = "https://api.lomi.africa";
 pub const SANDBOX_API_URL: &str = "https://sandbox.api.lomi.africa";
 pub const LOCAL_API_URL: &str = "http://localhost:4242";
-pub const SUPABASE_URL: &str = "https://mdswvokxrnfggrujsfjd.supabase.co";
-pub fn cli_auth_base() -> String {
-    format!("{SUPABASE_URL}/functions/v1/cli-auth")
+pub fn cli_auth_base(api_url: &str) -> String {
+    format!("{}/cli-auth", api_url.trim_end_matches('/'))
 }
-/// Public Supabase anon key (same as dashboard client). Override via LOMI_SUPABASE_ANON_KEY.
-pub const SUPABASE_ANON_KEY: &str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kc3d2b2t4cm5mZ2dydWpzZmpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MTA0NTIsImV4cCI6MjA4NTg3MDQ1Mn0.vWQoCk2mBTUPWVpzcu3WmKv9xwXoj0bv8SCRrEdJxpM";
 pub const DOCS_URL: &str = "https://docs.lomi.africa";
 pub const LOMI_UI_REGISTRY_URL: &str = "https://docs.lomi.africa/r/registry.json";
 pub const LOMI_UI_INDEX_URL: &str = "https://docs.lomi.africa/r/index.json";

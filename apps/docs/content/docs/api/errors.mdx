@@ -29,7 +29,7 @@ All error responses follow a consistent JSON format:
 | Property          | Type                             | Description                                                                                                                     |
 | ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `` `error` ``     | `` `object` ``                   | Container for the error information.                                                                                          |
-| `` `error.code` ``| `` `string` ``                   | Machine-readable code (e.g. `unauthorized`, `rate_limit_exceeded`, `not_found`).                                              |
+| `` `error.code` ``| `` `string` ``                   | Machine-readable code (e.g. `unauthorized`, `idempotency_key_required`, `validation_failed`).                                              |
 | `` `message` ``   | `` `string` ``                   | A brief, human-readable summary of the error.                                                                                    |
 | `` `details` ``   | `` `string` `` or `` `object` `` | Optional. Provides more specific context or structured data about the error (e.g., validation failures, conflicting resources). |
 | `` `request_id` ``| `` `string` `` (UUID)            | Correlates the response with server logs; also sent as the `` `X-Request-Id` `` response header.                                |
@@ -75,11 +75,14 @@ While the specific `` `message` `` and `` `details` `` will vary, here are examp
 
 **`` `409` `` Conflict:**
 
-- `"message": "Conflict"`, `"details": "A webhook with this URL already exists for your organization."`
+- `"code": "idempotency_key_reused"`, `"message": "Idempotency-Key was reused with a different request payload"`
+- `"code": "idempotency_in_progress"`, `"message": "A request with this Idempotency-Key is already in progress"`
 
 **`` `429` `` Too Many Requests:**
 
-- `"message": "Rate limit exceeded"`
+- `"code": "rate_limit_exceeded"`. Response includes `Retry-After`.
+
+Stable codes also include `validation_failed` (field-level `details`), `amount_invalid`, `invalid_cursor`, and `api_access_suspended`.
 
 **`` `500` `` Internal Server Error:**
 

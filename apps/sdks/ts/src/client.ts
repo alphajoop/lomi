@@ -4,7 +4,11 @@
 
 import type { LomiConfig } from './config.js';
 import { DEFAULT_CONFIG } from './config.js';
-import type { LomiClientRequestOptions } from './request-options.js';
+import type {
+  LomiClientRequestOptions,
+  LomiHeaders,
+  LomiPathParameters,
+} from './request-options.js';
 
 export class LomiClient {
   public readonly baseUrl: string;
@@ -12,7 +16,7 @@ export class LomiClient {
   public readonly retries: number;
   private apiKey: string;
   private defaultAccount?: string;
-  private defaultHeaders: Record<string, string>;
+  private defaultHeaders: LomiHeaders;
 
   constructor(config: LomiConfig) {
     this.baseUrl =
@@ -35,7 +39,7 @@ export class LomiClient {
     return this.apiKey;
   }
 
-  buildUrl(pathTemplate: string, path?: Record<string, string | number>): string {
+  buildUrl(pathTemplate: string, path?: LomiPathParameters): string {
     let url = `${this.baseUrl}${pathTemplate}`;
     if (path) {
       for (const [key, value] of Object.entries(path)) {
@@ -45,8 +49,8 @@ export class LomiClient {
     return url;
   }
 
-  buildHeaders(options?: LomiClientRequestOptions): Record<string, string> {
-    const headers: Record<string, string> = {
+  buildHeaders(options?: LomiClientRequestOptions): LomiHeaders {
+    const headers: LomiHeaders = {
       'Content-Type': 'application/json',
       'X-API-KEY': this.apiKey,
       ...this.defaultHeaders,

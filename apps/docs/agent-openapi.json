@@ -242,7 +242,7 @@
         "tags": ["Agent"]
       }
     },
-    "/provisioning/v1/accounts": {
+    "/provisioning/accounts": {
       "post": {
         "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
         "operationId": "ProvisioningController_createAccount",
@@ -261,7 +261,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/onboarding/documents": {
+    "/provisioning/merchants/{merchantId}/onboarding/documents": {
       "post": {
         "operationId": "ProvisioningController_uploadDocument",
         "parameters": [
@@ -289,7 +289,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/onboarding/extract": {
+    "/provisioning/merchants/{merchantId}/onboarding/extract": {
       "post": {
         "operationId": "ProvisioningController_extractOnboarding",
         "parameters": [
@@ -317,7 +317,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/onboarding/complete": {
+    "/provisioning/merchants/{merchantId}/onboarding/complete": {
       "post": {
         "description": "Atomically creates the organization, provisions test API keys, and queues KYC review.",
         "operationId": "ProvisioningController_completeOnboarding",
@@ -346,7 +346,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/onboarding/status": {
+    "/provisioning/merchants/{merchantId}/onboarding/status": {
       "get": {
         "operationId": "ProvisioningController_getOnboardingStatus",
         "parameters": [
@@ -374,7 +374,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/api-keys": {
+    "/provisioning/merchants/{merchantId}/api-keys": {
       "get": {
         "description": "Returns test secret keys and publishable keys after onboarding completes.",
         "operationId": "ProvisioningController_getApiKeys",
@@ -403,7 +403,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/live-activation/request": {
+    "/provisioning/merchants/{merchantId}/live-activation/request": {
       "post": {
         "description": "Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.",
         "operationId": "ProvisioningController_requestLiveActivation",
@@ -432,7 +432,7 @@
         "tags": ["Provisioning"]
       }
     },
-    "/provisioning/v1/merchants/{merchantId}/live-activation/status": {
+    "/provisioning/merchants/{merchantId}/live-activation/status": {
       "get": {
         "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard; not via this API.",
         "operationId": "ProvisioningController_getLiveActivationStatus",
@@ -461,9 +461,9 @@
         "tags": ["Provisioning"]
       }
     },
-    "/partners/v1/provisioning-keys": {
+    "/partners/provisioning-keys": {
       "post": {
-        "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning/v1 for agent onboarding.",
+        "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning for agent onboarding.",
         "operationId": "PartnersController_mintProvisioningKey",
         "parameters": [],
         "responses": {
@@ -496,7 +496,7 @@
         "tags": ["Partners"]
       }
     },
-    "/partners/v1/provisioning-keys/{provisioningKeyId}": {
+    "/partners/provisioning-keys/{provisioningKeyId}": {
       "delete": {
         "operationId": "PartnersController_revokeProvisioningKey",
         "parameters": [
@@ -524,7 +524,7 @@
         "tags": ["Partners"]
       }
     },
-    "/partners/v1/usage": {
+    "/partners/usage": {
       "get": {
         "operationId": "PartnersController_getUsage",
         "parameters": [],

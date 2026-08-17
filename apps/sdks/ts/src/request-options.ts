@@ -2,6 +2,14 @@
  * Per-request options (idempotency, connected account, abort).
  */
 
+import type { JsonPrimitive } from "@lomi./shared";
+
+export type LomiHeaders = { [key: string]: string };
+export type LomiPathParameters = { [key: string]: string | number };
+export interface LomiQueryParameters {}
+export interface LomiRequestBody {}
+export type LomiRequestPayload = JsonPrimitive | LomiRequestBody;
+
 export type LomiRequestOptions = {
   /** Idempotency key for safe retries on create-style calls (`Idempotency-Key` header). */
   idempotencyKey?: string;
@@ -10,7 +18,7 @@ export type LomiRequestOptions = {
   /** AbortSignal for cancellation. */
   signal?: AbortSignal;
   /** Extra headers for this request only. */
-  headers?: Record<string, string>;
+  headers?: LomiHeaders;
 };
 
 export type LomiHttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -18,7 +26,7 @@ export type LomiHttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type LomiClientRequestOptions = LomiRequestOptions & {
   method: LomiHttpMethod;
   url: string;
-  path?: Record<string, string | number>;
-  query?: Record<string, unknown>;
-  body?: unknown;
+  path?: LomiPathParameters;
+  query?: LomiQueryParameters;
+  body?: LomiRequestPayload;
 };

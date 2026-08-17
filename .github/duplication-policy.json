@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "allowances": [
+    {
+      "id": "hosted-commerce-injection-adapters",
+      "owner": "hosted-checkout",
+      "reason": "Checkout and storefront bind shared @lomi./pay helpers to local Supabase clients, env, and Next admin factories.",
+      "paths": [
+        "apps/checkout/src/lib/providers-api.ts",
+        "apps/storefront/src/lib/providers-api.ts",
+        "apps/checkout/src/lib/utils/image-helpers.ts",
+        "apps/storefront/src/lib/utils/image-helpers.ts",
+        "apps/checkout/src/lib/hooks/checkout/use-checkout-colors.ts",
+        "apps/storefront/src/lib/hooks/checkout/use-checkout-colors.ts",
+        "apps/checkout/src/lib/digital-download/handler.ts",
+        "apps/storefront/src/lib/digital-download/handler.ts"
+      ],
+      "permanent": true,
+      "boundary": "runtime-injection"
+    },
+    {
+      "id": "vite-browser-session-adapters",
+      "owner": "dashboard-admin",
+      "reason": "Admin and dashboard inject audience, Vite env, and the local Supabase browser client into createBrowserSession.",
+      "paths": [
+        "apps/dashboard/src/lib/auth/browser-session.ts",
+        "apps/admin/src/lib/auth/browser-session.ts"
+      ],
+      "permanent": true,
+      "boundary": "security-session"
+    },
+    {
+      "id": "themed-lottie-adapters",
+      "owner": "dashboard-admin",
+      "reason": "Theme hook and Spinner stay app-local; core lives in @lomi./ui/lottie-icon.",
+      "paths": [
+        "apps/dashboard/src/components/ui/lottie-icon.tsx",
+        "apps/admin/src/components/ui/lottie-icon.tsx"
+      ],
+      "permanent": true,
+      "boundary": "runtime-ui"
+    },
+    {
+      "id": "translation-sync-wrappers",
+      "owner": "i18n",
+      "reason": "Thin spawn wrappers keep per-app locales directories while implementations live in tooling/scripts/i18n.",
+      "paths": [
+        "apps/dashboard/scripts/i18n/sync-missing-translations.js",
+        "apps/checkout/scripts/i18n/sync-missing-translations.js",
+        "apps/storefront/scripts/i18n/sync-missing-translations.js",
+        "apps/customers/scripts/i18n/sync-missing-translations.js",
+        "apps/jumbo/scripts/i18n/sync-missing-translations.js",
+        "apps/website/scripts/i18n/sync-missing-translations.js",
+        "apps/dashboard/scripts/i18n/analyze-i18n.js",
+        "apps/storefront/scripts/i18n/analyze-i18n.js",
+        "apps/website/scripts/i18n/analyze-i18n.mjs"
+      ],
+      "permanent": true,
+      "boundary": "automation"
+    },
+    {
+      "id": "hosted-next-route-adapters",
+      "owner": "hosted-checkout",
+      "reason": "Thin Next route adapters stay in each app; handlers live in @lomi./pay or shared geo logic.",
+      "paths": [
+        "apps/checkout/src/app/api/digital-download/route.ts",
+        "apps/storefront/src/app/[slug]/api/digital-download/route.ts",
+        "apps/checkout/src/app/api/geo/route.ts",
+        "apps/storefront/src/app/api/geo/route.ts",
+        "apps/checkout/src/lib/supabase/auth-recovery.ts",
+        "apps/storefront/src/lib/supabase/auth-recovery.ts",
+        "apps/checkout/src/lib/utils/validate-checkout-customer.ts",
+        "apps/storefront/src/lib/utils/validate-checkout-customer.ts"
+      ],
+      "permanent": true,
+      "boundary": "runtime-injection"
+    },
+    {
+      "id": "vite-theme-hook",
+      "owner": "dashboard-admin",
+      "reason": "Theme context is bound to each Vite app ThemeProvider; keep the hook next to that provider.",
+      "paths": [
+        "apps/admin/src/lib/hooks/use-theme.ts",
+        "apps/dashboard/src/lib/hooks/use-theme.ts"
+      ],
+      "permanent": true,
+      "boundary": "runtime-ui"
+    },
+    {
+      "id": "react-query-provider",
+      "owner": "next-apps",
+      "reason": "Identical React Query defaults for standalone Next apps that cannot share a React 19 package with dashboard.",
+      "paths": [
+        "apps/customers/src/lib/providers/query-provider.tsx",
+        "apps/storefront/src/lib/providers/query-provider.tsx"
+      ],
+      "permanent": true,
+      "boundary": "runtime-ui"
+    }
+  ]
+}

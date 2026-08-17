@@ -1,10 +1,10 @@
 import http from 'node:http';
-import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it, beforeEach, vi } from 'vitest';
 
 import manifestJson from '../src/generated/tools-manifest.json' with { type: 'json' };
 import { createHttpApplication } from '../src/http.js';
 import { parseManifest } from '../src/manifest-parse.js';
+import { isString, validateJsonValue, type JsonObject } from "@lomi./shared";
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -14,7 +14,11 @@ function listen(
   return new Promise((resolve, reject) => {
     const server = http.createServer(app);
     server.listen(0, '127.0.0.1', () => {
-      const addr = server.address() as AddressInfo;
+      const addr = server.address();
+      if (!addr || isString(addr)) {
+        reject(new Error('expected TCP AddressInfo'));
+        return;
+      }
       resolve({ server, port: addr.port });
     });
     server.on('error', reject);
@@ -41,7 +45,7 @@ describe('createHttpApplication', () => {
   });
 
   it('GET /health returns 200 JSON', async () => {
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -53,7 +57,7 @@ describe('createHttpApplication', () => {
   });
 
   it('GET /ready returns 200 when env is valid', async () => {
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -65,7 +69,7 @@ describe('createHttpApplication', () => {
 
   it('GET /mcp without any credential returns 401 missing_credentials when gated', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -80,7 +84,7 @@ describe('createHttpApplication', () => {
 
   it('GET /mcp with a non-credential bearer returns invalid_credentials', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -94,7 +98,7 @@ describe('createHttpApplication', () => {
 
   it('GET /mcp with only x-lomi-api-key passes the transport gate when gated', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -108,7 +112,7 @@ describe('createHttpApplication', () => {
 
   it('GET /mcp with a lomi_ bearer passes the transport gate when gated', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -120,7 +124,7 @@ describe('createHttpApplication', () => {
   });
 
   it('DELETE /mcp without session returns 400', async () => {
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -133,7 +137,7 @@ describe('createHttpApplication', () => {
   it('GET /ready returns 503 in production without transport bearer', async () => {
     process.env.NODE_ENV = 'production';
     delete process.env.LOMI_MCP_BEARER_TOKEN;
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -144,7 +148,7 @@ describe('createHttpApplication', () => {
   });
 
   it('GET /.well-known/oauth-protected-resource returns metadata', async () => {
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -152,13 +156,15 @@ describe('createHttpApplication', () => {
       `http://127.0.0.1:${ctx.port}/.well-known/oauth-protected-resource`,
     );
     expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
+    // SAFETY: OAuth metadata response is a JSON object for assertion fields.
+
+    const body = (await res.json()) as JsonObject;
     expect(body.resource).toBeTruthy();
   });
 
   it('GET path-scoped /.well-known/oauth-protected-resource/mcp returns metadata', async () => {
     process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -166,7 +172,9 @@ describe('createHttpApplication', () => {
       `http://127.0.0.1:${ctx.port}/.well-known/oauth-protected-resource/mcp`,
     );
     expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
+    // SAFETY: OAuth metadata response is a JSON object for assertion fields.
+
+    const body = (await res.json()) as JsonObject;
     expect(body.resource).toBe('https://mcp.lomi.africa/mcp');
   });
 
@@ -176,7 +184,7 @@ describe('createHttpApplication', () => {
     delete process.env.LOMI_SECRET_KEY;
     delete process.env.X_API_KEY;
     process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -222,7 +230,7 @@ describe('createHttpApplication', () => {
         return realFetch(input, init);
       },
     );
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -238,7 +246,7 @@ describe('createHttpApplication', () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
     delete process.env.INTERNAL_API_KEY;
     delete process.env.CRON_SECRET;
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -272,7 +280,7 @@ describe('createHttpApplication', () => {
       },
     );
 
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;
@@ -300,7 +308,7 @@ describe('createHttpApplication', () => {
 
   it('rate limits MCP routes when LOMI_MCP_RATE_LIMIT_RPM is low', async () => {
     process.env.LOMI_MCP_RATE_LIMIT_RPM = '2';
-    const manifest = parseManifest(manifestJson);
+    const manifest = parseManifest(validateJsonValue(manifestJson));
     const app = createHttpApplication(manifest);
     const ctx = await listen(app);
     server = ctx.server;

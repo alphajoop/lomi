@@ -13,7 +13,9 @@ When you make a potentially mutating API request (like `POST`, `PATCH`, `DELETE`
 3.  **First Request:** lomi. processes the request normally and stores the result associated with your key.
 4.  **Subsequent Requests (Same Key):** If lomi. receives another request with the **same key** within 24 hours, it will not re-process the operation. Instead, it will return the **same response** (success or error) that it sent for the original request.
 
-When the response is served from the idempotency cache, the API adds **`Idempotency-Cache-Hit: true`**. Supported today on **`POST /checkout-sessions`** and **`POST /payment-requests`**.
+`Idempotency-Key` is **required** on money-moving writes: `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts`, and `POST /charge/*`. Missing keys return `400` `idempotency_key_required`.
+
+When the response is served from the idempotency cache, the API adds `Idempotency-Cache-Hit: true`. Same key with a different body returns `409` `idempotency_key_reused`. An in-flight duplicate returns `409` `idempotency_in_progress` (retry with the same key).
 
 ## Using idempotency keys
 
@@ -126,7 +128,9 @@ If the original request failed (e.g., HTTP `400 Bad Request`), retrying with the
 
 Specific idempotency-related errors (though less common if using UUIDs correctly):
 
-- **`409 Conflict` (or similar):** Might occur if you attempt to reuse a key with different request parameters than the original request within the 24-hour window.
+- **`409` `idempotency_key_reused`:** the key was reused with a different request body within 24 hours.
+- **`409` `idempotency_in_progress`:** a request with this key is still running. Retry with the same key.
+- **`400` `idempotency_key_required`:** a money-moving write omitted the header.
 
 ## Best practices
 

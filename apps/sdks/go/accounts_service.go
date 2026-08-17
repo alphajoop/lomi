@@ -11,7 +11,7 @@ type AccountsService struct {
 }
 
 func (s *AccountsService) CheckBalance(currency string) (interface{}, error) {
-		path := "/accounts/balance/check/{currency}"
+		path := "/accounts/balance/{currency}"
 		path = strings.ReplaceAll(path, "{currency}", currency)
 		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
 		if err != nil {

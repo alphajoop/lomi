@@ -36,6 +36,18 @@ export class OrganizationsService {
     }
 
     /**
+     * Get Radar settings for the organization
+     * @see OpenAPI `OrganizationsController_getRadarSettings`
+     */
+    public async getRadarSettings(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
+            method: 'GET',
+            url: '/organizations/radar-settings',
+            ...options,
+        });
+    }
+
+    /**
      * List organizations
      * @see OpenAPI `OrganizationsController_findAll`
      */
@@ -82,5 +94,18 @@ export class OrganizationsService {
 
             page += 1;
         }
+    }
+
+    /**
+     * Update Radar settings
+     * @see OpenAPI `OrganizationsController_updateRadarSettings`
+     */
+    public async updateRadarSettings(body: components['schemas']['UpdateRadarSettingsDto'], options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
+            method: 'PATCH',
+            url: '/organizations/radar-settings',
+            body,
+            ...options,
+        });
     }
 }

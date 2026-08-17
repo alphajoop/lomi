@@ -81,7 +81,7 @@ func (s *ProductsService) List(params map[string]string) (interface{}, error) {
 
 
 func (s *ProductsService) SetDefaultPrice(id string, priceId string) (interface{}, error) {
-		path := "/products/{id}/prices/{priceId}/set-default"
+		path := "/products/{id}/prices/{priceId}/default"
 		path = strings.ReplaceAll(path, "{id}", id)
 		path = strings.ReplaceAll(path, "{priceId}", priceId)
 		bodyResp, err := s.client.doRequest("POST", path, nil, nil)

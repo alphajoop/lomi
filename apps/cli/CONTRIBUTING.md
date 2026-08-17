@@ -35,14 +35,14 @@ Runs `pnpm lint` and `pnpm docs:drift` in `apps/docs`. See [Writing for lomi. do
 ## Publishing a release
 
 1. Bump version in `apps/cli/Cargo.toml` and `apps/cli/npm/package.json`
-2. Run `./src/utils/scripts/generate-rules.sh` to refresh `src/utils/rules/llms.txt` and API reference
+2. Run `./scripts/generate/generate-rules.sh` to refresh `src/utils/rules/llms.txt` and API reference
 3. Update SHA256 checksums in `apps/cli/homebrew/lomi.rb`
 4. Tag and push: `git tag cli-v3.0.0 && git push origin cli-v3.0.0`
 5. GitHub Actions builds binaries, creates a release, and publishes `lomi.cli` to npm (requires `NPM_TOKEN` secret)
 
 ## Auth backend
 
-Login uses the Supabase `cli-auth` edge function ([`apps/dashboard/supabase/functions/cli-auth`](../dashboard/supabase/functions/cli-auth/index.ts)) and DB schema ([`20250226000075_cli_tool.sql`](../dashboard/supabase/migrations/20250226000075_cli_tool.sql)):
+Login uses Nest `POST /cli-auth/*` on the API (`apps/api/src/device-auth/`) and DB schema ([`20250226000075_cli_tool.sql`](../dashboard/supabase/migrations/20250226000075_cli_tool.sql)):
 
 1. `POST /cli-auth/device-auth` → user code + verification URI
 2. Browser authorization in dashboard

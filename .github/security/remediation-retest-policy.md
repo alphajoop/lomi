@@ -23,7 +23,7 @@ PCI DSS Req **11.4.4** requires correcting exploitable vulnerabilities found dur
 Re-run **focused** pentest or automated security suite when any of the following ship to production:
 
 - New or materially changed **card data path** (GIM enablement, direct charges unmuted)
-- New **public unauthenticated** API or edge function
+- New **public unauthenticated** API route
 - **Auth model** change (OAuth, API key format, RLS overhaul)
 - **Admin / provisioning / partner** surface expansion
 - **Third-party webhook** integration added

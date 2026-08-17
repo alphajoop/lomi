@@ -39,19 +39,6 @@ export class SubscriptionsService {
     }
 
     /**
-     * List subscriptions for customer
-     * @see OpenAPI `SubscriptionsController_findByCustomer`
-     */
-    public async findByCustomer(customerId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/subscriptions/customer/{customerId}']['get']['responses'][200]>['content']>['application/json'])> {
-        return requestWithClient<(NonNullable<NonNullable<paths['/subscriptions/customer/{customerId}']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
-            method: 'GET',
-            url: '/subscriptions/customer/{customerId}',
-            path: { customerId: customerId },
-            ...options,
-        });
-    }
-
-    /**
      * Retrieve subscription
      * @see OpenAPI `SubscriptionsController_findOne`
      */
@@ -59,6 +46,19 @@ export class SubscriptionsService {
         return requestWithClient<components['schemas']['SubscriptionResponseDto']>(this.client, {
             method: 'GET',
             url: '/subscriptions/{id}',
+            path: { id: id },
+            ...options,
+        });
+    }
+
+    /**
+     * Get meter usage for a subscription
+     * @see OpenAPI `SubscriptionsController_getUsage`
+     */
+    public async getUsage(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
+            method: 'GET',
+            url: '/subscriptions/{id}/usage',
             path: { id: id },
             ...options,
         });
@@ -114,13 +114,13 @@ export class SubscriptionsService {
     }
 
     /**
-     * Uncancel subscription
-     * @see OpenAPI `SubscriptionsController_uncancel`
+     * Annuler une résiliation planifiée
+     * @see OpenAPI `SubscriptionsController_resume`
      */
-    public async uncancel(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['SubscriptionResponseDto']> {
+    public async resume(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['SubscriptionResponseDto']> {
         return requestWithClient<components['schemas']['SubscriptionResponseDto']>(this.client, {
             method: 'POST',
-            url: '/subscriptions/{id}/uncancel',
+            url: '/subscriptions/{id}/resume',
             path: { id: id },
             ...options,
         });

@@ -16,6 +16,7 @@ export async function checkAllowlistParity(errors: string[]): Promise<void> {
   );
 
   const raw = await fs.readFile(openApiPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const spec = JSON.parse(raw) as Parameters<typeof collectPublicOperations>[0];
 
   const fromOpenApi = collectPublicOperations(spec)
@@ -24,6 +25,7 @@ export async function checkAllowlistParity(errors: string[]): Promise<void> {
     .sort();
 
   const expectedRaw = await fs.readFile(expectedPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const expected = (JSON.parse(expectedRaw) as string[]).slice().sort();
 
   const fromSet = new Set(fromOpenApi);

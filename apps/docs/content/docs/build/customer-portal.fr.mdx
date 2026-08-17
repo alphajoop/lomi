@@ -34,14 +34,14 @@ Ce guide décrit l'intégration recommandée en production.
 
 ## Créer une session de lancement
 
-Utilisez `POST /customers/{id}/portal-launch-session` :
+Utilisez `POST /customers/{id}/portal` :
 
 - `return_url` (optionnel)
 - `flow_type` (optionnel) : `portal_home`, `subscription_cancel`, `subscription_manage`
 - `flow_subscription_id` (optionnel, obligatoire pour `subscription_cancel`)
 - `flow_after_completion_url` (optionnel)
 
-Les détails de l’URL et des exemples de corps figurent dans [Clients](/api/customers/CustomersController_createPortalLaunchSession).
+Les détails de l’URL et des exemples de corps figurent dans [Clients](/api/customers/CustomersController_createPortalSession).
 
 ## Modèle d'éligibilité
 
@@ -63,7 +63,7 @@ const apiKey = process.env.LOMI_SECRET_KEY!;
 const customerId = "2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265";
 
 const { data } = await axios.post(
-  `https://api.lomi.africa/customers/${customerId}/portal-launch-session`,
+  `https://api.lomi.africa/customers/${customerId}/portal`,
   {
     return_url: "https://merchant.example.com/account",
     flow_type: "subscription_cancel",
@@ -85,7 +85,7 @@ return data.launch_url;
 </Tab>
 <Tab value="cURL">
 ```bash
-curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265/portal-launch-session" \
+curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265/portal" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{

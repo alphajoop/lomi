@@ -50,6 +50,19 @@ export class WebhooksService {
     }
 
     /**
+     * Retrieve webhook delivery log
+     * @see OpenAPI `WebhookDeliveryLogsController_findOne`
+     */
+    public async getDelivery(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['WebhookDeliveryLogResponseDto']> {
+        return requestWithClient<components['schemas']['WebhookDeliveryLogResponseDto']>(this.client, {
+            method: 'GET',
+            url: '/webhooks/deliveries/{id}',
+            path: { id: id },
+            ...options,
+        });
+    }
+
+    /**
      * List webhooks
      * @see OpenAPI `WebhooksController_findAll`
      */
@@ -99,14 +112,27 @@ export class WebhooksService {
     }
 
     /**
+     * List webhook delivery logs
+     * @see OpenAPI `WebhookDeliveryLogsController_findAll`
+     */
+    public async listDeliveries(params?: paths['/webhooks/deliveries']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/webhooks/deliveries']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/webhooks/deliveries']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
+            method: 'GET',
+            url: '/webhooks/deliveries',
+            query: params,
+            ...options,
+        });
+    }
+
+    /**
      * Retry webhook delivery
      * @see OpenAPI `WebhooksController_retryDelivery`
      */
-    public async retryDelivery(webhookId: string, logId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+    public async retryDelivery(id: string, deliveryId: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
         return requestWithClient<unknown>(this.client, {
             method: 'POST',
-            url: '/webhooks/{webhookId}/logs/{logId}/retry',
-            path: { webhookId: webhookId, logId: logId },
+            url: '/webhooks/{id}/deliveries/{deliveryId}/retry',
+            path: { id: id, deliveryId: deliveryId },
             ...options,
         });
     }

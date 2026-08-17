@@ -9,7 +9,7 @@ const publicProjectId = process.env.NEXT_PUBLIC_ORAMA_PROJECT_ID;
 const isSearchConfigured = !!(publicApiKey && publicProjectId);
 
 if (!isSearchConfigured) {
-  if (typeof window === 'undefined') {
+  if (!('window' in globalThis) || globalThis.window === undefined) {
     console.error(
       'Orama search env vars are not set: NEXT_PUBLIC_ORAMA_PROJECT_ID and NEXT_PUBLIC_ORAMA_API_KEY.',
     );

@@ -23,7 +23,7 @@ export interface PriceSelectorProps {
   className?: string;
 }
 
-const INTERVAL_LABELS: Record<string, string> = {
+const INTERVAL_LABELS = {
   day: 'day',
   week: 'week',
   'bi-weekly': 'bi-weekly',
@@ -36,7 +36,13 @@ const INTERVAL_LABELS: Record<string, string> = {
   yearly: 'year',
   lifetime: 'lifetime',
   unit: 'unit',
-};
+} as const;
+
+function isIntervalLabelKey(
+  interval: string,
+): interval is keyof typeof INTERVAL_LABELS {
+  return Object.hasOwn(INTERVAL_LABELS, interval);
+}
 
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
@@ -54,7 +60,7 @@ function formatCurrency(amount: number, currency: string) {
 
 function formatBillingIntervalLabel(interval: string | null | undefined) {
   if (!interval) return 'month';
-  return INTERVAL_LABELS[interval] ?? interval;
+  return isIntervalLabelKey(interval) ? INTERVAL_LABELS[interval] : interval;
 }
 
 export function PriceSelector({

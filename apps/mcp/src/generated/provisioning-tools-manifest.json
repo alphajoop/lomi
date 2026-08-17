@@ -2,306 +2,323 @@
   "manifestVersion": 1,
   "apiVersion": "1.1.0",
   "apiTitle": "lomi. Provisioning API",
-  "toolCount": 8,
+  "toolCount": 2,
   "tools": [
     {
-      "name": "lomi_post_provisioning_v1_accounts",
-      "operationKey": "POST /provisioning/v1/accounts",
-      "method": "POST",
-      "pathTemplate": "/provisioning/v1/accounts",
-      "pathParamNames": [],
-      "queryParamNames": [],
-      "title": "Create a merchant account for agent-driven onboarding",
-      "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
+      "name": "lomi_provision",
+      "title": "Merchant provisioning",
+      "description": "Merchant provisioning. Pass required `action` to choose the REST call.\n\nActions:\n- `create_account` — Create a merchant account for agent-driven onboarding (POST /provisioning/accounts). No extra required fields.\n- `upload_document` — Upload a KYC document (POST /provisioning/merchants/{merchantId}/onboarding/documents). Required: merchantId.\n- `extract` — Extract onboarding data (POST /provisioning/merchants/{merchantId}/onboarding/extract). Required: merchantId.\n- `complete` — Complete merchant onboarding and submit KYC (POST /provisioning/merchants/{merchantId}/onboarding/complete). Required: merchantId.\n- `status` — Get onboarding status (GET /provisioning/merchants/{merchantId}/onboarding/status). Required: merchantId.\n- `api_keys` — Retrieve provisioned test API keys for the merchant (GET /provisioning/merchants/{merchantId}/api-keys). Required: merchantId.\n- `request_live` — Request live mode activation (requires merchant approval) (POST /provisioning/merchants/{merchantId}/live-activation/request). Required: merchantId.\n- `live_status` — Get live activation request status (GET /provisioning/merchants/{merchantId}/live-activation/status). Required: merchantId.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Provisioning"
       ],
-      "operationId": "ProvisioningController_createAccount",
       "write": true,
-      "wantsBody": false,
       "inputSchema": {
         "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "action"
+        ],
         "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "create_account",
+              "upload_document",
+              "extract",
+              "complete",
+              "status",
+              "api_keys",
+              "request_live",
+              "live_status"
+            ],
+            "description": "Which REST operation to run. One of: create_account, upload_document, extract, complete, status, api_keys, request_live, live_status."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "merchantId": {
+            "format": "uuid",
+            "type": "string",
+            "description": "MerchantId"
           }
-        },
-        "required": []
+        }
       },
       "readOnly": false,
       "destructive": false,
       "alwaysLoad": true,
-      "searchHint": "provisioning onboarding merchant account",
+      "searchHint": "account accounts activation api api_keys complete create_account documents extract get keys live live_status merchant merchants onboarding post provision provisioning request request_live status upload_document",
+      "actions": {
+        "create_account": {
+          "operationKey": "POST /provisioning/accounts",
+          "method": "POST",
+          "pathTemplate": "/provisioning/accounts",
+          "pathParamNames": [],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_createAccount",
+          "write": true,
+          "wantsBody": false,
+          "title": "Create a merchant account for agent-driven onboarding",
+          "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": []
+        },
+        "upload_document": {
+          "operationKey": "POST /provisioning/merchants/{merchantId}/onboarding/documents",
+          "method": "POST",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/onboarding/documents",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_uploadDocument",
+          "write": true,
+          "wantsBody": false,
+          "title": "Upload a KYC document",
+          "description": "Upload a KYC/identity document (ID, business registration, proof of address) for a merchant's onboarding. Pass the merchantId and the document; submit required documents before calling onboarding/complete.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        },
+        "extract": {
+          "operationKey": "POST /provisioning/merchants/{merchantId}/onboarding/extract",
+          "method": "POST",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/onboarding/extract",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_extractOnboarding",
+          "write": true,
+          "wantsBody": false,
+          "title": "Extract onboarding data",
+          "description": "Auto-extract onboarding details from the merchant's website or uploaded documents to pre-fill their profile. Pass the merchantId; review the extracted fields before completing onboarding.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        },
+        "complete": {
+          "operationKey": "POST /provisioning/merchants/{merchantId}/onboarding/complete",
+          "method": "POST",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/onboarding/complete",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_completeOnboarding",
+          "write": true,
+          "wantsBody": false,
+          "title": "Complete merchant onboarding and submit KYC",
+          "description": "Atomically creates the organization, provisions test API keys, and queues KYC review.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        },
+        "status": {
+          "operationKey": "GET /provisioning/merchants/{merchantId}/onboarding/status",
+          "method": "GET",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/onboarding/status",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_getOnboardingStatus",
+          "write": false,
+          "wantsBody": false,
+          "title": "Get onboarding status",
+          "description": "Return the merchant's onboarding progress plus KYC and verification state. Poll this to see what remains before calling onboarding/complete.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        },
+        "api_keys": {
+          "operationKey": "GET /provisioning/merchants/{merchantId}/api-keys",
+          "method": "GET",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/api-keys",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_getApiKeys",
+          "write": false,
+          "wantsBody": false,
+          "title": "Retrieve provisioned test API keys for the merchant",
+          "description": "Returns test secret keys and publishable keys after onboarding completes.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        },
+        "request_live": {
+          "operationKey": "POST /provisioning/merchants/{merchantId}/live-activation/request",
+          "method": "POST",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/live-activation/request",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_requestLiveActivation",
+          "write": true,
+          "wantsBody": false,
+          "title": "Request live mode activation (requires merchant approval)",
+          "description": "Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        },
+        "live_status": {
+          "operationKey": "GET /provisioning/merchants/{merchantId}/live-activation/status",
+          "method": "GET",
+          "pathTemplate": "/provisioning/merchants/{merchantId}/live-activation/status",
+          "pathParamNames": [
+            "merchantId"
+          ],
+          "queryParamNames": [],
+          "operationId": "ProvisioningController_getLiveActivationStatus",
+          "write": false,
+          "wantsBody": false,
+          "title": "Get live activation request status",
+          "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard; not via this API.",
+          "tags": [
+            "Provisioning"
+          ],
+          "requiredInput": [
+            "merchantId"
+          ]
+        }
+      },
       "authMode": "provisioning"
     },
     {
-      "name": "lomi_post_provisioning_v1_merchants_merchantId_onboarding_documents",
-      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/onboarding/documents",
-      "method": "POST",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/documents",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Upload a KYC document",
-      "description": "Upload a KYC/identity document (ID, business registration, proof of address) for a merchant's onboarding. Pass the merchantId and the document; submit required documents before calling onboarding/complete.",
+      "name": "lomi_partners",
+      "title": "Partner provisioning keys",
+      "description": "Partner provisioning keys. Pass required `action` to choose the REST call.\n\nActions:\n- `mint_key` — Mint a per-user provisioning key (POST /partners/provisioning-keys). No extra required fields.\n- `list_keys` — List provisioning keys minted by this partner (GET /partners/provisioning-keys). No extra required fields.\n- `revoke_key` — Revoke a provisioning key (DELETE /partners/provisioning-keys/{provisioningKeyId}). Required: provisioningKeyId.\n- `usage` — Partner provisioning usage summary (GET /partners/usage). No extra required fields.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
-        "Provisioning"
+        "Partners"
       ],
-      "operationId": "ProvisioningController_uploadDocument",
       "write": true,
-      "wantsBody": false,
       "inputSchema": {
         "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "action"
+        ],
         "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "mint_key",
+              "list_keys",
+              "revoke_key",
+              "usage"
+            ],
+            "description": "Which REST operation to run. One of: mint_key, list_keys, revoke_key, usage."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
-          "merchantId": {
+          "provisioningKeyId": {
             "format": "uuid",
             "type": "string",
-            "description": "MerchantId"
+            "description": "ProvisioningKeyId"
           }
-        },
-        "required": [
-          "merchantId"
-        ]
+        }
       },
       "readOnly": false,
-      "destructive": false,
+      "destructive": true,
       "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
-    },
-    {
-      "name": "lomi_post_provisioning_v1_merchants_merchantId_onboarding_extract",
-      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/onboarding/extract",
-      "method": "POST",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/extract",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Extract onboarding data",
-      "description": "Auto-extract onboarding details from the merchant's website or uploaded documents to pre-fill their profile. Pass the merchantId; review the extracted fields before completing onboarding.",
-      "tags": [
-        "Provisioning"
-      ],
-      "operationId": "ProvisioningController_extractOnboarding",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "merchantId": {
-            "format": "uuid",
-            "type": "string",
-            "description": "MerchantId"
-          }
+      "searchHint": "account delete get keys list_keys merchant mint_key onboarding partner partners post provisioning revoke_key usage",
+      "actions": {
+        "mint_key": {
+          "operationKey": "POST /partners/provisioning-keys",
+          "method": "POST",
+          "pathTemplate": "/partners/provisioning-keys",
+          "pathParamNames": [],
+          "queryParamNames": [],
+          "operationId": "PartnersController_mintProvisioningKey",
+          "write": true,
+          "wantsBody": false,
+          "title": "Mint a per-user provisioning key",
+          "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning for agent onboarding.",
+          "tags": [
+            "Partners"
+          ],
+          "requiredInput": []
         },
-        "required": [
-          "merchantId"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
-    },
-    {
-      "name": "lomi_post_provisioning_v1_merchants_merchantId_onboarding_complete",
-      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/onboarding/complete",
-      "method": "POST",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/complete",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Complete merchant onboarding and submit KYC",
-      "description": "Atomically creates the organization, provisions test API keys, and queues KYC review.",
-      "tags": [
-        "Provisioning"
-      ],
-      "operationId": "ProvisioningController_completeOnboarding",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "merchantId": {
-            "format": "uuid",
-            "type": "string",
-            "description": "MerchantId"
-          }
+        "list_keys": {
+          "operationKey": "GET /partners/provisioning-keys",
+          "method": "GET",
+          "pathTemplate": "/partners/provisioning-keys",
+          "pathParamNames": [],
+          "queryParamNames": [],
+          "operationId": "PartnersController_listProvisioningKeys",
+          "write": false,
+          "wantsBody": false,
+          "title": "List provisioning keys minted by this partner",
+          "description": "List provisioning keys minted by this partner",
+          "tags": [
+            "Partners"
+          ],
+          "requiredInput": []
         },
-        "required": [
-          "merchantId"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
-    },
-    {
-      "name": "lomi_get_provisioning_v1_merchants_merchantId_onboarding_status",
-      "operationKey": "GET /provisioning/v1/merchants/{merchantId}/onboarding/status",
-      "method": "GET",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/onboarding/status",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Get onboarding status",
-      "description": "Return the merchant's onboarding progress plus KYC and verification state. Poll this to see what remains before calling onboarding/complete.",
-      "tags": [
-        "Provisioning"
-      ],
-      "operationId": "ProvisioningController_getOnboardingStatus",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "merchantId": {
-            "format": "uuid",
-            "type": "string",
-            "description": "MerchantId"
-          }
+        "revoke_key": {
+          "operationKey": "DELETE /partners/provisioning-keys/{provisioningKeyId}",
+          "method": "DELETE",
+          "pathTemplate": "/partners/provisioning-keys/{provisioningKeyId}",
+          "pathParamNames": [
+            "provisioningKeyId"
+          ],
+          "queryParamNames": [],
+          "operationId": "PartnersController_revokeProvisioningKey",
+          "write": true,
+          "wantsBody": false,
+          "title": "Revoke a provisioning key",
+          "description": "Revoke a provisioning key",
+          "tags": [
+            "Partners"
+          ],
+          "requiredInput": [
+            "provisioningKeyId"
+          ]
         },
-        "required": [
-          "merchantId"
-        ]
+        "usage": {
+          "operationKey": "GET /partners/usage",
+          "method": "GET",
+          "pathTemplate": "/partners/usage",
+          "pathParamNames": [],
+          "queryParamNames": [],
+          "operationId": "PartnersController_getUsage",
+          "write": false,
+          "wantsBody": false,
+          "title": "Partner provisioning usage summary",
+          "description": "Partner provisioning usage summary",
+          "tags": [
+            "Partners"
+          ],
+          "requiredInput": []
+        }
       },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
-    },
-    {
-      "name": "lomi_get_provisioning_v1_merchants_merchantId_api_keys",
-      "operationKey": "GET /provisioning/v1/merchants/{merchantId}/api-keys",
-      "method": "GET",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/api-keys",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Retrieve provisioned test API keys for the merchant",
-      "description": "Returns test secret keys and publishable keys after onboarding completes.",
-      "tags": [
-        "Provisioning"
-      ],
-      "operationId": "ProvisioningController_getApiKeys",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "merchantId": {
-            "format": "uuid",
-            "type": "string",
-            "description": "MerchantId"
-          }
-        },
-        "required": [
-          "merchantId"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
-    },
-    {
-      "name": "lomi_post_provisioning_v1_merchants_merchantId_live_activation_request",
-      "operationKey": "POST /provisioning/v1/merchants/{merchantId}/live-activation/request",
-      "method": "POST",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/live-activation/request",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Request live mode activation (requires merchant approval)",
-      "description": "Creates a live activation request. The merchant must approve on the dashboard before platform review. Live secret keys are never returned via provisioning.",
-      "tags": [
-        "Provisioning"
-      ],
-      "operationId": "ProvisioningController_requestLiveActivation",
-      "write": true,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "idempotency_key": {
-            "type": "string",
-            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
-          },
-          "merchantId": {
-            "format": "uuid",
-            "type": "string",
-            "description": "MerchantId"
-          }
-        },
-        "required": [
-          "merchantId"
-        ]
-      },
-      "readOnly": false,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
-    },
-    {
-      "name": "lomi_get_provisioning_v1_merchants_merchantId_live_activation_status",
-      "operationKey": "GET /provisioning/v1/merchants/{merchantId}/live-activation/status",
-      "method": "GET",
-      "pathTemplate": "/provisioning/v1/merchants/{merchantId}/live-activation/status",
-      "pathParamNames": [
-        "merchantId"
-      ],
-      "queryParamNames": [],
-      "title": "Get live activation request status",
-      "description": "Poll until approved. When live_keys_available is true, the merchant must retrieve the live secret key from the dashboard; not via this API.",
-      "tags": [
-        "Provisioning"
-      ],
-      "operationId": "ProvisioningController_getLiveActivationStatus",
-      "write": false,
-      "wantsBody": false,
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "merchantId": {
-            "format": "uuid",
-            "type": "string",
-            "description": "MerchantId"
-          }
-        },
-        "required": [
-          "merchantId"
-        ]
-      },
-      "readOnly": true,
-      "destructive": false,
-      "alwaysLoad": false,
-      "searchHint": "provisioning onboarding merchant account",
-      "authMode": "provisioning"
+      "authMode": "partner"
     }
   ]
 }

@@ -8,7 +8,7 @@ import { Callout } from '@/components/docs/docs-callout';
 Usage billing lets you charge customers based on **metered consumption** (API calls, seats, credits, etc.) on top of `usage_based` products. The flow is contract-first: every step below maps to a public REST endpoint in [openapi.json](https://github.com/lomiafrica/lomi./blob/main/apps/docs/openapi.json).
 
 <Callout type="info">
-  For product setup (`product_type: usage_based`, prices, aggregation), see **[Products](/build/products)**. Usage subscriptions are separate from recurring checkout subscriptions, use **`POST /usage-subscriptions`** to enroll customers on usage-based plans.
+  For product setup (`product_type: usage_based`, prices, aggregation), see **[Products](/build/products)**. Usage subscriptions are separate from recurring checkout subscriptions, use **`POST /usage/subscriptions`** to enroll customers on usage-based plans.
 </Callout>
 
 ## Golden path
@@ -40,7 +40,7 @@ curl -X POST "https://sandbox.api.lomi.africa/meters" \
 Before ingesting usage for a customer, enroll them on the usage-based product.
 
 ```bash
-curl -X POST "https://sandbox.api.lomi.africa/usage-subscriptions" \
+curl -X POST "https://sandbox.api.lomi.africa/usage/subscriptions" \
   -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -49,14 +49,14 @@ curl -X POST "https://sandbox.api.lomi.africa/usage-subscriptions" \
   }'
 ```
 
-→ [Create usage subscription](/api/usage-events/UsageEventsController_createUsageSubscription)
+→ [Create usage subscription](/api/usage/events/UsageEventsController_createUsageSubscription)
 
 ### 4. Record usage events
 
 Send usage as it happens. Use a stable `transaction_id` per logical event for idempotency.
 
 ```bash
-curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
+curl -X POST "https://sandbox.api.lomi.africa/usage/events" \
   -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -70,33 +70,33 @@ curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
 
 Returns **202 Accepted**; processing is asynchronous.
 
-→ [Record usage event](/api/usage-events/UsageEventsController_ingest)
+→ [Record usage event](/api/usage/events/UsageEventsController_ingest)
 
 ### 5. Read balances and billing periods
 
 | Goal | Endpoint |
 |------|----------|
 | Customer meter wallet | [Get meter balance](/api/meters/MetersController_getBalance) |
-| Usage in current period | [Get subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage) |
-| Historical periods | [List billing periods](/api/usage-billing/UsageBillingController_listPeriods) |
-| Prepaid credits | [Credit wallet](/api/usage-billing/UsageBillingController_creditWallet) |
-| Feature gating | [Check entitlement](/api/usage-billing/UsageBillingController_checkEntitlement) |
+| Usage in current period | [Get subscription usage](/api/subscriptions/SubscriptionsController_getUsage) |
+| Historical periods | [List billing periods](/api/usage/UsageBillingController_listPeriods) |
+| Prepaid credits | [Credit wallet](/api/usage/UsageBillingController_creditWallet) |
+| Feature gating | [Check entitlement](/api/usage/UsageBillingController_checkEntitlement) |
 
 ## Reconciliation
 
-- **List or get usage events** when webhooks are delayed: [List usage events](/api/usage-events/UsageEventsController_findAll), [Get usage event](/api/usage-events/UsageEventsController_findOne).
-- **Revenue reporting** across MRR + usage + one-time: [Combined revenue metrics](/api/usage-billing/UsageBillingController_getRevenue).
+- **List or get usage events** when webhooks are delayed: [List usage events](/api/usage/events/UsageEventsController_findAll), [Get usage event](/api/usage/events/UsageEventsController_findOne).
+- **Revenue reporting** across MRR + usage + one-time: [Combined revenue metrics](/api/usage/UsageBillingController_getRevenue).
 
 ## Reference: lomi. Radar metering
 
 [lomi. Radar](/build/radar) bills per screened charge when enabled on your organization. Each evaluation calls `enqueue_usage_event` with meter code **`radar_screen`** (aggregation: `count`).
 
-1. Enable Radar via [PATCH /organization/radar-settings](/api/organization/RadarController_updateSettings) (`enabled: true`). A `radar_screen` meter is created automatically when a matching usage-based product exists.
+1. Enable Radar via [PATCH /organizations/radar-settings](/api/organizations/OrganizationsController_updateRadarSettings) (`enabled: true`). A `radar_screen` meter is created automatically when a matching usage-based product exists.
 2. Every screened charge (card, MTN, Wave) records one usage unit while Radar is on.
-3. Read balances and periods with the same endpoints as other usage meters ([Get meter balance](/api/meters/MetersController_getBalance), [List billing periods](/api/usage-billing/UsageBillingController_listPeriods)).
+3. Read balances and periods with the same endpoints as other usage meters ([Get meter balance](/api/meters/MetersController_getBalance), [List billing periods](/api/usage/UsageBillingController_listPeriods)).
 
 ```bash
-curl -X POST "https://sandbox.api.lomi.africa/usage-events" \
+curl -X POST "https://sandbox.api.lomi.africa/usage/events" \
   -H "Authorization: Bearer $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{

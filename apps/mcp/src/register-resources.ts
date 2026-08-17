@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import type { ToolsManifest } from './manifest.js';
+import { toolRefForOperation } from './manifest-lookup.js';
 import { buildServerInstructions } from './server-instructions.js';
 
 const GETTING_STARTED = buildServerInstructions('http');
@@ -33,6 +34,8 @@ When \`ok\` is false, an \`error\` object is included:
 }
 \`\`\`
 
+When \`ok\` is false, read \`error.body.error.code\` for stable API codes such as \`idempotency_key_required\`, \`idempotency_key_reused\`, \`validation_failed\`, \`amount_invalid\`, \`invalid_cursor\`, \`rate_limit_exceeded\`, and \`api_access_suspended\`.
+
 Use list endpoints with query filters before calling destructive tools.
 `;
 
@@ -44,7 +47,8 @@ Every merchant tool call is scoped to the organization behind the key you presen
 - **Browser OAuth (hosted, recommended):** add the hosted MCP URL (\`https://mcp.lomi.africa/mcp\`) with no headers. OAuth-capable clients open a Connect-with-lomi. consent flow and send \`Authorization: Bearer lomi_oat_*\` afterwards.
 - **Merchant secret key (HTTP):** send \`x-lomi-api-key: <key>\` (or \`x-api-key: <key>\`) on MCP session initialize.
 - **Merchant secret key (stdio):** set \`LOMI_SECRET_KEY\` (or \`X_API_KEY\`) in the server environment.
-- **Provisioning key:** the \`*_provisioning_*\` tools require \`x-lomi-provisioning-key\` (HTTP) or \`LOMI_PROVISIONING_KEY\` (env). These onboard a brand-new merchant and are separate from merchant keys.
+- **Provisioning key:** \`lomi_provision\` requires \`x-lomi-provisioning-key\` (HTTP) or \`LOMI_PROVISIONING_KEY\` (env). These onboard a brand-new merchant and are separate from merchant keys.
+- **Partner key:** \`lomi_partners\` requires \`x-lomi-partner-key\` (HTTP) or \`LOMI_PARTNER_KEY\` (env) (\`lomi_partner_*\`).
 
 ## Test vs live
 - Test keys look like \`lomi_sk_test_*\`; live keys like \`lomi_sk_*\`.
@@ -66,26 +70,25 @@ If you retry with the same key but different arguments, the API rejects the mism
 
 const PAGINATION_DOC = `# Listing, filtering, and pagination
 
-- \`list_*\` tools accept query-parameter filters. Inspect a tool's \`inputSchema\` to see exactly which filters it supports (commonly status, customer, currency, date range, and a limit/cursor).
-- Prefer narrowing with a \`list_*\` tool (e.g. by status or customer) before fetching a single record with a \`get_*\` tool or calling a destructive tool.
+- List tools use \`cursor\` (opaque) and \`limit\` (default 20, max 100). Do not send \`page\`, \`pageSize\`, or \`offset\`.
+- The API returns \`{ object: "list", data, has_more, next_cursor, limit }\`. Pass \`next_cursor\` back as \`cursor\` to fetch the next page.
+- Resource tools take a required \`action\` (for example \`lomi_customers\` with \`action=list\`). Inspect a tool's \`inputSchema\` to see which filters each list action supports (commonly status, customer, currency, date range, and a limit/cursor).
+- Prefer narrowing with a list action (e.g. by status or customer) before fetching a single record with a get action or calling a destructive action.
 - Use \`lomi_search_tools\` with a keyword when the tool you need is not already loaded.
 - Read the \`lomi://tools/index\` resource for the full catalog grouped by area.
 `;
 
-/** Resolve a tool name by its stable OpenAPI operation key (rename-proof). */
+/** Resolve a grouped MCP call by its stable OpenAPI operation key (rename-proof). */
 function nameFor(manifest: ToolsManifest, operationKey: string): string {
-  return (
-    manifest.tools.find((t) => t.operationKey === operationKey)?.name ??
-    operationKey
-  );
+  return toolRefForOperation(manifest, operationKey);
 }
 
 function buildWebhooksDoc(manifest: ToolsManifest): string {
   const create = nameFor(manifest, 'POST /webhooks');
   const test = nameFor(manifest, 'POST /webhooks/{id}/test');
-  const listDeliveries = nameFor(manifest, 'GET /webhook-delivery-logs');
-  const getDelivery = nameFor(manifest, 'GET /webhook-delivery-logs/{id}');
-  const retry = nameFor(manifest, 'POST /webhooks/{webhookId}/logs/{logId}/retry');
+  const listDeliveries = nameFor(manifest, 'GET /webhooks/deliveries');
+  const getDelivery = nameFor(manifest, 'GET /webhooks/deliveries/{id}');
+  const retry = nameFor(manifest, 'POST /webhooks/{id}/deliveries/{deliveryId}/retry');
   const update = nameFor(manifest, 'PATCH /webhooks/{id}');
   const remove = nameFor(manifest, 'DELETE /webhooks/{id}');
   return `# Webhooks
@@ -103,7 +106,7 @@ Always verify the signature and treat delivery as at-least-once (handle duplicat
 
 function buildMoneyDoc(manifest: ToolsManifest): string {
   const balance = nameFor(manifest, 'GET /accounts/balance');
-  const checkBalance = nameFor(manifest, 'GET /accounts/balance/check/{currency}');
+  const checkBalance = nameFor(manifest, 'GET /accounts/balance/{currency}');
   const payout = nameFor(manifest, 'POST /payouts');
   const settlements = nameFor(manifest, 'GET /settlements');
   const settlementTx = nameFor(manifest, 'GET /settlements/{id}/transactions');
@@ -111,7 +114,7 @@ function buildMoneyDoc(manifest: ToolsManifest): string {
   const link = nameFor(manifest, 'POST /payment-links');
   return `# Money, currency, and reconciliation
 
-- **Currencies** are ISO 4217 codes (e.g. \`XOF\`). Follow each tool's \`inputSchema\` for the amount field and its unit — do not assume a fixed convention across currencies.
+- **Amounts** are integers in minor units of \`currency_code\`. \`10000\` is 10,000 XOF (exponent 0) or 100.00 USD/EUR (exponent 2). Reject fractions.
 - **Before paying out:** check funds with \`${balance}\` (all currencies) or \`${checkBalance}\` (one currency), then call \`${payout}\`.
 - **Reconciliation:** \`${settlements}\` lists settlement periods; each \`settlement_id\` is \`{currency}:{YYYY-MM-DD}\` (UTC). \`${settlementTx}\` lists the transactions inside one period so you can tie a payout to underlying payments.
 - **Collecting money as an agent:** use \`${checkout}\` (hosted checkout) or \`${link}\` (shareable link) and hand the returned URL to the customer. Direct charge endpoints are intentionally **not** exposed here because they require client-side card collection or an interactive end-user prompt.
@@ -136,19 +139,19 @@ Task-oriented sequences. Pass \`idempotency_key\` on every write. Use \`lomi_sea
 ## Start a subscription
 1. \`${n('GET /products')}\` (or \`${n('POST /products')}\` first) to pick a plan.
 2. \`${n('POST /checkout-sessions')}\` referencing the product to collect the first payment and enroll.
-3. Manage later with \`${n('GET /subscriptions/customer/{customerId}')}\`, \`${n('POST /subscriptions/{id}/change-plan')}\`, \`${n('POST /subscriptions/{id}/cancel')}\`, \`${n('POST /subscriptions/{id}/uncancel')}\`.
+3. Manage later with \`${n('GET /customers/{id}/subscriptions')}\`, \`${n('POST /subscriptions/{id}/change-plan')}\`, \`${n('POST /subscriptions/{id}/cancel')}\`, \`${n('POST /subscriptions/{id}/resume')}\`.
 
 ## Issue a refund
 1. \`${n('GET /transactions')}\` to find the payment.
 2. \`${n('POST /refunds')}\` with the transaction id and an optional partial amount.
 
 ## Pay out funds
-1. \`${n('GET /accounts/balance')}\` / \`${n('GET /accounts/balance/check/{currency}')}\` to confirm available funds.
+1. \`${n('GET /accounts/balance')}\` / \`${n('GET /accounts/balance/{currency}')}\` to confirm available funds.
 2. \`${n('POST /payouts')}\` for the amount and currency.
 
 ## Set up webhooks
 1. \`${n('POST /webhooks')}\` with URL + events (store the signing secret).
-2. \`${n('POST /webhooks/{id}/test')}\`, then verify with \`${n('GET /webhook-delivery-logs')}\`.
+2. \`${n('POST /webhooks/{id}/test')}\`, then verify with \`${n('GET /webhooks/deliveries')}\`.
 
 ## Investigate a failed payment
 1. \`${n('GET /transactions')}\` (filter by status/customer/date).

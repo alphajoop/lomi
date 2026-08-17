@@ -1,24 +1,27 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { fromJSONSchema } from 'zod';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { fromJSONSchema } from "zod";
 
-import type { ManifestTool } from './manifest.js';
-import { callLomiRest, formatHttpResult } from './lomi-http.js';
-import { getLomiApiBaseUrl } from './env-config.js';
-import { mcpLog } from './mcp-request-context.js';
-import { truncateToolResultText } from './truncate-result.js';
-import { extractMerchantSecretKey } from './extract-secret-key.js';
+import type { ManifestTool, ToolsManifest } from "./manifest.js";
+import { callLomiRest, formatHttpResult } from "./lomi-http.js";
+import { getLomiApiBaseUrl, getOptionalPartnerKey, getOptionalProvisioningKey } from "./env-config.js";
+import { mcpLog } from "./mcp-request-context.js";
+import { truncateToolResultText } from "./truncate-result.js";
+import { extractMerchantSecretKey } from "./extract-secret-key.js";
+import { resolveManifestAction, restCallSpecFor } from "./resolve-action.js";
+import {
+  isJsonObject,
+  validateJsonValue,
+  type JsonObject,
+} from "@lomi./shared";
 
-export type ProvisioningToolsManifest = {
-  manifestVersion: 1;
-  apiVersion: string;
-  apiTitle: string;
-  toolCount: number;
-  tools: Array<ManifestTool & { authMode?: 'provisioning' }>;
-};
+export type ProvisioningToolsManifest = ToolsManifest;
+
+export type ProvisioningAuthMode = "provisioning" | "partner";
 
 export type ProvisioningToolRegistrationContext = {
   baseUrl: string;
   getProvisioningKey: () => string | null;
+  getPartnerKey: () => string | null;
   /**
    * Called when a provisioning response yields a usable merchant secret key,
    * so the session can adopt it and unlock the full merchant REST surface.
@@ -26,14 +29,19 @@ export type ProvisioningToolRegistrationContext = {
   onMerchantKeyDiscovered?: (secretKey: string) => void;
 };
 
+function authModeFor(tool: ManifestTool): ProvisioningAuthMode {
+  return tool.authMode === "partner" ? "partner" : "provisioning";
+}
+
 function registerOneProvisioningTool(
   server: McpServer,
   tool: ManifestTool,
   ctx: ProvisioningToolRegistrationContext,
 ): void {
   const inputSchema = fromJSONSchema(tool.inputSchema, {
-    defaultTarget: 'openapi-3.0',
+    defaultTarget: "openapi-3.0",
   });
+  const authMode = authModeFor(tool);
 
   server.registerTool(
     tool.name,
@@ -46,18 +54,18 @@ function registerOneProvisioningTool(
         destructiveHint: tool.destructive,
       },
       _meta: {
-        'anthropic/searchHint': tool.searchHint,
-        'anthropic/alwaysLoad': tool.alwaysLoad,
-        'lomi/authMode': 'provisioning',
+        "anthropic/searchHint": tool.searchHint,
+        "anthropic/alwaysLoad": tool.alwaysLoad,
+        "lomi/authMode": authMode,
       },
     },
-    async (args: unknown) => {
+    async (args) => {
       const parsed = inputSchema.safeParse(args);
       if (!parsed.success) {
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: `Invalid tool arguments: ${parsed.error.message}`,
             },
           ],
@@ -65,59 +73,78 @@ function registerOneProvisioningTool(
         };
       }
 
-      const provisioningKey = ctx.getProvisioningKey();
-      if (!provisioningKey) {
+      const credential =
+        authMode === "partner" ? ctx.getPartnerKey() : ctx.getProvisioningKey();
+      if (!credential) {
+        const message =
+          authMode === "partner"
+            ? "Missing partner key: set LOMI_PARTNER_KEY or send x-lomi-partner-key when creating the MCP session. See https://docs.lomi.africa/build/mcp"
+            : "Missing provisioning key: set LOMI_PROVISIONING_KEY or send x-lomi-provisioning-key when creating the MCP session. See https://docs.lomi.africa/build/mcp";
         return {
-          content: [
-            {
-              type: 'text',
-              text:
-                'Missing provisioning key: set LOMI_PROVISIONING_KEY or send x-lomi-provisioning-key when creating the MCP session. See https://docs.lomi.africa/build/mcp',
-            },
-          ],
+          content: [{ type: "text", text: message }],
           isError: true,
         };
       }
 
       try {
+        const validated = validateJsonValue(parsed.data);
+        if (!isJsonObject(validated)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: "Invalid tool arguments: expected a JSON object",
+              },
+            ],
+            isError: true,
+          };
+        }
+        const input: JsonObject = validated;
+        const action = resolveManifestAction(tool, input);
         const t0 = Date.now();
-        const result = await callLomiRest(tool, parsed.data as Record<string, unknown>, {
+        const result = await callLomiRest(restCallSpecFor(tool, action), input, {
           baseUrl: ctx.baseUrl,
-          apiKey: provisioningKey,
-          authHeaderName: 'X-Lomi-Provisioning-Key',
+          apiKey: credential,
+          authHeaderName:
+            authMode === "partner"
+              ? "X-Lomi-Partner-Key"
+              : "X-Lomi-Provisioning-Key",
         });
         const latencyMs = Date.now() - t0;
         mcpLog(
-          'provisioning_tool_upstream_complete',
+          "provisioning_tool_upstream_complete",
           {
             tool: tool.name,
-            method: tool.method,
+            action: input["action"],
+            method: action.method,
+            authMode,
             upstreamStatus: result.status,
             latencyMs,
           },
-          result.status >= 400 ? 'warn' : 'info',
+          result.status >= 400 ? "warn" : "info",
         );
         const ok = result.status >= 200 && result.status < 300;
-        if (ok && ctx.onMerchantKeyDiscovered) {
+        if (ok && authMode === "provisioning" && ctx.onMerchantKeyDiscovered) {
           const secretKey = extractMerchantSecretKey(result.bodyText);
           if (secretKey) {
             ctx.onMerchantKeyDiscovered(secretKey);
             mcpLog(
-              'provisioning_merchant_key_promoted',
+              "provisioning_merchant_key_promoted",
               { tool: tool.name },
-              'info',
+              "info",
             );
           }
         }
         const text = truncateToolResultText(formatHttpResult(result));
-        return {
-          content: [{ type: 'text', text }],
-          ...(ok ? {} : { isError: true }),
-        };
+        const response = {
+          content: [{ type: "text", text }],
+        } satisfies { content: Array<{ type: "text"; text: string }> };
+        if (!ok) return { ...response, isError: true };
+        return response;
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         return {
-          content: [{ type: 'text', text: message }],
+          content: [{ type: "text", text: message }],
           isError: true,
         };
       }
@@ -132,10 +159,12 @@ export function registerProvisioningTools(
 ): void {
   const baseUrl = ctx?.baseUrl ?? getLomiApiBaseUrl();
   const getProvisioningKey =
-    ctx?.getProvisioningKey ?? (() => process.env.LOMI_PROVISIONING_KEY?.trim() ?? null);
+    ctx?.getProvisioningKey ?? getOptionalProvisioningKey;
+  const getPartnerKey = ctx?.getPartnerKey ?? getOptionalPartnerKey;
   const fullCtx: ProvisioningToolRegistrationContext = {
     baseUrl,
     getProvisioningKey,
+    getPartnerKey,
     onMerchantKeyDiscovered: ctx?.onMerchantKeyDiscovered,
   };
 

@@ -39,6 +39,7 @@ export function DocsCallout({
 
   return (
     <DocsAside
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       variant={type as DocsAsideVariant}
       icon={asideIcon}
       title={title}

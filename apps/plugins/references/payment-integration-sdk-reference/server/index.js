@@ -25,6 +25,16 @@ const eventStore = [];
 const MAX_EVENTS = 50;
 
 const sdk = lomiApiKey
+
+function isPlainObject(value) {
+  return value !== null && !Array.isArray(value) && Object(value) === value;
+}
+function isTranslationLeaf(value) {
+  return value === null || value === undefined || Object(value) !== value;
+}
+function isStringValue(value) {
+  return Object.prototype.toString.call(value) === '[object String]';
+}
   ? new LomiSDK({
       apiKey: lomiApiKey,
       baseUrl: lomiBaseUrl,
@@ -65,7 +75,7 @@ function toNumber(value) {
 }
 
 function withEmbeddedParam(url) {
-  if (!url || typeof url !== "string") return null;
+  if (!url || !isStringValue(url)) return null;
   try {
     const parsed = new URL(url);
     parsed.searchParams.set("embedded", "true");
@@ -77,7 +87,7 @@ function withEmbeddedParam(url) {
 }
 
 function normalizeCheckoutUrl(data) {
-  if (!data || typeof data !== "object") return null;
+  if (!data || isTranslationLeaf(data)) return null;
   const direct =
     data.url || data.checkout_url || data.checkout_page_url || data.redirect_url || null;
   if (direct) return direct;

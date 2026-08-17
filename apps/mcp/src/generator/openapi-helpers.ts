@@ -1,300 +1,291 @@
 /**
- * Shared helpers for OpenAPI → MCP manifest generation (used by scripts/generate-tools.ts).
+ * Shared helpers for OpenAPI → MCP manifest generation.
  */
-import type { ParameterObject } from './openapi-types.js';
-import { resolveEnglishSchemaDescription } from './mcp-english-copy.js';
+import {
+  isJsonObject,
+  isString,
+  readObject,
+  readString,
+  type JsonObject,
+  type JsonValue,
+} from "@lomi./shared";
+import type { ParameterObject } from "./openapi-types.js";
+import { resolveEnglishSchemaDescription } from "./mcp-english-copy.js";
 
-export type OpenAPISpec = {
+export interface OpenAPISpec {
   openapi?: string;
   info?: { title?: string; version?: string };
-  paths?: Record<string, unknown>;
-  components?: { schemas?: Record<string, unknown> };
-};
+  paths?: JsonObject;
+  components?: { schemas?: JsonObject };
+}
 
-export type ResolvedJsonSchema = Record<string, unknown>;
+export type ResolvedJsonSchema = JsonObject;
 
-/** `{id}` segments in an OpenAPI path template (order preserved). */
 export function pathTemplateParamNames(template: string): string[] {
   const names: string[] = [];
   const re = /\{([^}]+)\}/g;
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(template)) !== null) {
-    const n = m[1]?.trim();
-    if (n) names.push(n);
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(template)) !== null) {
+    const name = match[1]?.trim();
+    if (name) names.push(name);
   }
   return names;
 }
 
-function sortKeysStable<T extends Record<string, unknown>>(obj: T): T {
-  const sorted = {} as Record<string, unknown>;
-  for (const k of Object.keys(obj).sort()) {
-    sorted[k] = obj[k];
-  }
-  return sorted as T;
+function sortKeysStable(object: JsonObject): JsonObject {
+  const sorted: JsonObject = {};
+  for (const key of Object.keys(object).sort()) sorted[key] = object[key] ?? null;
+  return sorted;
 }
 
-/**
- * Deterministic JSON Schema for MCP: sorted `required`, sorted `properties` keys,
- * shallow recurse into `properties` values if they are objects with `properties`.
- */
-export function canonicalizeInputSchema(schema: ResolvedJsonSchema): ResolvedJsonSchema {
-  const out = { ...schema } as ResolvedJsonSchema;
-  if (Array.isArray(out.required)) {
-    out.required = [...(out.required as string[])].sort();
+function stringArray(value: JsonValue | undefined): string[] {
+  return Array.isArray(value) ? value.filter(isString) : [];
+}
+
+export function canonicalizeInputSchema(
+  schema: ResolvedJsonSchema,
+): ResolvedJsonSchema {
+  const out: JsonObject = { ...schema };
+  if (Array.isArray(out["required"])) {
+    out["required"] = stringArray(out["required"]).sort();
   }
-  if (
-    out.properties &&
-    typeof out.properties === 'object' &&
-    !Array.isArray(out.properties)
-  ) {
-    const props = out.properties as Record<string, unknown>;
-    const nextProps: Record<string, unknown> = {};
-    for (const key of Object.keys(props).sort()) {
-      const v = props[key];
-      if (v && typeof v === 'object' && !Array.isArray(v)) {
-        const child = v as ResolvedJsonSchema;
-        if (child.properties && typeof child.properties === 'object') {
-          nextProps[key] = canonicalizeInputSchema(child as ResolvedJsonSchema);
-          continue;
-        }
-      }
-      nextProps[key] = v as unknown;
+  const properties = readObject(out, "properties");
+  if (properties) {
+    const next: JsonObject = {};
+    for (const key of Object.keys(properties).sort()) {
+      const value = properties[key];
+      next[key] =
+        value !== undefined &&
+        isJsonObject(value) &&
+        readObject(value, "properties")
+          ? canonicalizeInputSchema(value)
+          : (value ?? null);
     }
-    out.properties = sortKeysStable(nextProps as Record<string, unknown>);
+    out["properties"] = sortKeysStable(next);
   }
   return out;
 }
 
-/** Ensure every `{pathParam}` appears in schema.properties and required[]. */
 export function ensurePathParamsInInputSchema(
   schema: ResolvedJsonSchema,
   pathTemplate: string,
 ): ResolvedJsonSchema {
-  const pathNames = pathTemplateParamNames(pathTemplate);
-  if (pathNames.length === 0) return canonicalizeInputSchema(schema);
+  const names = pathTemplateParamNames(pathTemplate);
+  if (names.length === 0) return canonicalizeInputSchema(schema);
 
-  const props =
-    typeof schema.properties === 'object' &&
-    schema.properties !== null &&
-    !Array.isArray(schema.properties)
-      ? ({
-          ...(schema.properties as Record<string, ResolvedJsonSchema>),
-        } as Record<string, ResolvedJsonSchema>)
-      : ({} as Record<string, ResolvedJsonSchema>);
-
-  const req = new Set<string>(
-    Array.isArray(schema.required) ? (schema.required as string[]) : [],
-  );
-
-  for (const name of pathNames) {
-    if (!props[name]) {
-      props[name] = {
-        type: 'string',
+  const properties = { ...(readObject(schema, "properties") ?? {}) };
+  const required = new Set(stringArray(schema["required"]));
+  for (const name of names) {
+    if (!properties[name]) {
+      properties[name] = {
+        type: "string",
         description: `Path parameter "${name}" for \`${pathTemplate}\`.`,
       };
     }
-    req.add(name);
+    required.add(name);
   }
-
-  const merged: ResolvedJsonSchema = {
+  return canonicalizeInputSchema({
     ...schema,
-    type: 'object',
-    properties: props as ResolvedJsonSchema['properties'],
-    required: [...req].sort(),
-  };
-
-  return canonicalizeInputSchema(merged);
+    type: "object",
+    properties,
+    required: [...required].sort(),
+  });
 }
 
-export function toolNameFromOperation(
-  methodLower: string,
-  pathTemplate: string,
-): string {
-  const slug = pathTemplate
-    .replace(/^\//, '')
-    .replace(/\//g, '_')
-    .replace(/{([^}]+)}/g, '$1')
-    .replace(/-/g, '_');
-  return `lomi_${methodLower}_${slug}`;
+function specRoot(spec: OpenAPISpec): JsonObject {
+  const root: JsonObject = {};
+  if (spec.openapi) root["openapi"] = spec.openapi;
+  if (spec.info) {
+    const info: JsonObject = {};
+    if (spec.info.title) info["title"] = spec.info.title;
+    if (spec.info.version) info["version"] = spec.info.version;
+    root["info"] = info;
+  }
+  if (spec.paths) root["paths"] = spec.paths;
+  if (spec.components?.schemas) {
+    root["components"] = { schemas: spec.components.schemas };
+  }
+  return root;
 }
 
 export function resolveRef(
   ref: string | undefined,
   spec: OpenAPISpec,
 ): ResolvedJsonSchema | null {
-  if (!ref || typeof ref !== 'string' || !ref.startsWith('#/')) return null;
-  let cur: unknown = spec;
-  for (const segment of ref.replace(/^#\//, '').split('/')) {
-    if (cur === null || typeof cur !== 'object') return null;
-    cur = (cur as Record<string, unknown>)[segment];
+  if (!ref?.startsWith("#/")) return null;
+  let current: JsonValue = specRoot(spec);
+  for (const segment of ref.replace(/^#\//, "").split("/")) {
+    if (!isJsonObject(current)) return null;
+    const next: JsonValue | undefined = current[segment];
+    if (next === undefined) return null;
+    current = next;
   }
-  return cur !== null && typeof cur === 'object'
-    ? (cur as ResolvedJsonSchema)
-    : null;
+  return isJsonObject(current) ? current : null;
+}
+
+function parameterFromObject(object: JsonObject): ParameterObject | null {
+  const name = readString(object, "name");
+  const location = readString(object, "in");
+  if (
+    !name ||
+    (location !== "query" &&
+      location !== "path" &&
+      location !== "header" &&
+      location !== "cookie")
+  ) {
+    return null;
+  }
+  return {
+    name,
+    in: location,
+    required: object["required"] === true,
+    description: readString(object, "description"),
+    schema: readObject(object, "schema"),
+  };
 }
 
 function normalizeParam(
-  p: ParameterObject | { $ref?: string } | undefined,
-  resolve: (ref: string) => ResolvedJsonSchema | null,
+  value: JsonValue,
+  spec: OpenAPISpec,
 ): ParameterObject | null {
-  if (!p || typeof p !== 'object') return null;
-  if ('$ref' in p && typeof p.$ref === 'string') {
-    const r = resolve(p.$ref);
-    return r as ParameterObject | null;
-  }
-  return p as ParameterObject;
+  if (!isJsonObject(value)) return null;
+  const ref = readString(value, "$ref");
+  const object = ref ? resolveRef(ref, spec) : value;
+  return object ? parameterFromObject(object) : null;
 }
 
 export function flattenOperationParameters(
   spec: OpenAPISpec,
-  pathItem: Record<string, unknown>,
-  operation: Record<string, unknown>,
+  pathItem: JsonObject,
+  operation: JsonObject,
 ): ParameterObject[] {
-  const resolve = (ref: string) => resolveRef(ref, spec);
+  const pathParameters = pathItem["parameters"];
+  const operationParameters = operation["parameters"];
   const merged = [
-    ...(Array.isArray(pathItem.parameters) ? pathItem.parameters : []),
-    ...(Array.isArray(operation.parameters) ? operation.parameters : []),
+    ...(Array.isArray(pathParameters) ? pathParameters : []),
+    ...(Array.isArray(operationParameters) ? operationParameters : []),
   ];
-  const out: ParameterObject[] = [];
+  const output: ParameterObject[] = [];
   const seen = new Set<string>();
   for (const raw of merged) {
-    const n = normalizeParam(raw as ParameterObject, resolve);
+    const parameter = normalizeParam(raw, spec);
     if (
-      n &&
-      n.in &&
-      n.name &&
-      (n.in === 'query' || n.in === 'path' || n.in === 'header')
+      !parameter ||
+      (parameter.in !== "query" &&
+        parameter.in !== "path" &&
+        parameter.in !== "header")
     ) {
-      const k = `${n.in}:${n.name}`;
-      if (seen.has(k)) continue;
-      seen.add(k);
-      out.push(n);
+      continue;
+    }
+    const key = `${parameter.in}:${parameter.name}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      output.push(parameter);
     }
   }
-  return out;
+  return output;
 }
 
-function cloneSchema(node: unknown): unknown {
-  return node === undefined ? undefined : JSON.parse(JSON.stringify(node));
+function cloneSchema(value: JsonValue | undefined): JsonValue | undefined {
+  return value === undefined
+    ? undefined
+    : JSON.parse(JSON.stringify(value));
 }
 
-/** Inline $ref for JSON Schema objects (shallow recursion with cycle guard). */
 export function inlineRefs(
-  node: unknown,
+  node: JsonValue,
   spec: OpenAPISpec,
   seenRefs = new Set<string>(),
   depth = 0,
-): unknown {
-  if (depth > 24) return node;
-  if (node === null || typeof node !== 'object') return node;
-
-  if (Array.isArray(node)) {
-    return node.map((x) => inlineRefs(x, spec, seenRefs, depth + 1));
+): JsonValue {
+  if (depth > 24 || node === null || !isJsonObject(node)) {
+    return Array.isArray(node)
+      ? node.map((item) => inlineRefs(item, spec, seenRefs, depth + 1))
+      : node;
   }
 
-  const obj = node as Record<string, unknown>;
-  if (typeof obj.$ref === 'string') {
-    const ref = obj.$ref;
-    if (seenRefs.has(ref)) return { type: 'object', additionalProperties: true };
+  const ref = readString(node, "$ref");
+  if (ref) {
+    if (seenRefs.has(ref)) return { type: "object", additionalProperties: true };
     seenRefs.add(ref);
     const resolved = resolveRef(ref, spec);
-    if (!resolved) return { type: 'object', additionalProperties: true };
-    return inlineRefs(cloneSchema(resolved), spec, seenRefs, depth + 1);
+    if (!resolved) return { type: "object", additionalProperties: true };
+    return inlineRefs(cloneSchema(resolved) ?? resolved, spec, seenRefs, depth + 1);
   }
 
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(obj)) {
-    out[k] = inlineRefs(v, spec, seenRefs, depth + 1);
+  const output: JsonObject = {};
+  for (const [key, value] of Object.entries(node)) {
+    output[key] = inlineRefs(value, spec, seenRefs, depth + 1);
   }
-  return out;
+  return output;
 }
 
 function jsonSchemaFromParameter(
-  param: ParameterObject,
+  parameter: ParameterObject,
   fieldName?: string,
 ): ResolvedJsonSchema {
-  const schema =
-    param.schema && typeof param.schema === 'object'
-      ? (param.schema as ResolvedJsonSchema)
-      : { type: 'string' };
-  const base: ResolvedJsonSchema = {
-    ...cloneSchema(schema) as ResolvedJsonSchema,
-  };
-  const name =
-    fieldName ??
-    (typeof param.name === 'string' ? param.name : 'parameter');
-  base.description = resolveEnglishSchemaDescription(
+  const schema = parameter.schema ?? { type: "string" };
+  const cloned = cloneSchema(schema);
+  const base = cloned !== undefined && isJsonObject(cloned) ? cloned : {};
+  const name = fieldName ?? parameter.name;
+  base["description"] = resolveEnglishSchemaDescription(
     name,
-    typeof param.description === 'string' ? param.description : undefined,
+    parameter.description,
   );
-  if (param.required === true && base.default === undefined) {
-    // OpenAPI required flag on parameter
-    return base;
-  }
   return base;
 }
 
 function mergeBodySchema(
-  bodySchema: unknown | undefined,
+  bodySchema: JsonValue | undefined,
 ): ResolvedJsonSchema | undefined {
-  if (!bodySchema || typeof bodySchema !== 'object') return undefined;
-  const s = bodySchema as ResolvedJsonSchema;
-  const out: ResolvedJsonSchema = {
-    type: 'object',
+  if (bodySchema === undefined || !isJsonObject(bodySchema)) return undefined;
+  const bodyField: JsonObject = { ...bodySchema };
+  bodyField["description"] =
+    readString(bodySchema, "description") ??
+    "JSON request body for this operation.";
+  return {
+    type: "object",
     properties: {
-      body: {
-        ...s,
-        description:
-          typeof s.description === 'string'
-            ? s.description
-            : 'JSON request body for this operation.',
-      },
+      body: bodyField,
     },
-    required: ['body'],
+    required: ["body"],
   };
-  return out;
 }
 
 function mergeSchemas(
-  a: ResolvedJsonSchema | undefined,
-  b: ResolvedJsonSchema | undefined,
+  first: ResolvedJsonSchema | undefined,
+  second: ResolvedJsonSchema | undefined,
 ): ResolvedJsonSchema {
-  const A = a ?? { type: 'object', properties: {} };
-  const B = b ?? { type: 'object', properties: {} };
-  const props = {
-    ...(typeof A.properties === 'object' && A.properties !== null
-      ? (A.properties as Record<string, unknown>)
-      : {}),
-    ...(typeof B.properties === 'object' && B.properties !== null
-      ? (B.properties as Record<string, unknown>)
-      : {}),
+  const a = first ?? {};
+  const b = second ?? {};
+  const properties = {
+    ...(readObject(a, "properties") ?? {}),
+    ...(readObject(b, "properties") ?? {}),
   };
-  const req = new Set<string>([
-    ...(Array.isArray(A.required) ? (A.required as string[]) : []),
-    ...(Array.isArray(B.required) ? (B.required as string[]) : []),
+  const required = new Set([
+    ...stringArray(a["required"]),
+    ...stringArray(b["required"]),
   ]);
-  const schema: ResolvedJsonSchema = {
-    type: 'object',
-    properties: props as ResolvedJsonSchema['properties'],
-  };
-  if (req.size > 0) schema.required = [...req].sort();
-  if (
-    A.additionalProperties === true ||
-    B.additionalProperties === true
-  ) {
-    schema.additionalProperties = true;
+  const schema: JsonObject = { type: "object", properties };
+  if (required.size > 0) schema["required"] = [...required].sort();
+  if (a["additionalProperties"] === true || b["additionalProperties"] === true) {
+    schema["additionalProperties"] = true;
   }
   return schema;
 }
 
-export function buildInputJsonSchema(args: {
+export interface BuildInputJsonSchemaArgs {
   spec: OpenAPISpec;
-  operation: Record<string, unknown>;
-  pathItem: Record<string, unknown>;
+  operation: JsonObject;
+  pathItem: JsonObject;
   pathTemplate: string;
   httpMethodLower: string;
   includeIdempotencyKey: boolean;
-}): ResolvedJsonSchema {
+}
+
+export function buildInputJsonSchema(
+  args: BuildInputJsonSchemaArgs,
+): ResolvedJsonSchema {
   const {
     spec,
     operation,
@@ -303,71 +294,42 @@ export function buildInputJsonSchema(args: {
     httpMethodLower,
     includeIdempotencyKey,
   } = args;
-
-  const params = flattenOperationParameters(spec, pathItem, operation);
-  const propBag: Record<string, ResolvedJsonSchema> = {};
+  const properties: JsonObject = {};
   const required = new Set<string>();
-
-  for (const p of params) {
-    const loc = p.in;
+  for (const parameter of flattenOperationParameters(spec, pathItem, operation)) {
     const key =
-      loc === 'header'
-        ? `header_${p.name}`
-        : loc === 'query'
-          ? p.name
-          : p.name;
-
-    propBag[key] = jsonSchemaFromParameter(p, key);
-    if (p.required === true) required.add(key);
+      parameter.in === "header" ? `header_${parameter.name}` : parameter.name;
+    properties[key] = jsonSchemaFromParameter(parameter, key);
+    if (parameter.required) required.add(key);
   }
 
-  let merged: ResolvedJsonSchema = mergeSchemas(
-    { type: 'object', properties: propBag },
-    { type: 'object', required: [...required].sort() },
+  let merged = mergeSchemas(
+    { type: "object", properties },
+    { type: "object", required: [...required].sort() },
   );
-
-  const wantsBody =
-    ['post', 'patch', 'put'].includes(httpMethodLower) &&
-    operation.requestBody &&
-    typeof operation.requestBody === 'object';
-
-  if (wantsBody) {
-    const rb = operation.requestBody as Record<string, unknown>;
-    const content = rb.content as Record<string, Record<string, unknown>>;
-    const json = content?.['application/json'];
-    const rawSchema = json?.schema;
-    if (rawSchema && typeof rawSchema === 'object') {
-      const inlined = inlineRefs(
-        cloneSchema(rawSchema),
-        spec,
-      ) as ResolvedJsonSchema;
-      const bodyWrapper = mergeBodySchema(inlined);
-      if (bodyWrapper) merged = mergeSchemas(merged, bodyWrapper);
+  const requestBody = readObject(operation, "requestBody");
+  if (
+    ["post", "patch", "put"].includes(httpMethodLower) &&
+    requestBody
+  ) {
+    const content = readObject(requestBody, "content");
+    const json = content ? readObject(content, "application/json") : undefined;
+    const rawSchema = json?.["schema"];
+    if (rawSchema !== undefined && isJsonObject(rawSchema)) {
+      const body = mergeBodySchema(inlineRefs(rawSchema, spec));
+      if (body) merged = mergeSchemas(merged, body);
     }
   }
 
   if (includeIdempotencyKey) {
-    const props =
-      typeof merged.properties === 'object' && merged.properties !== null
-        ? ({ ...(merged.properties as Record<string, unknown>) } as Record<
-            string,
-            ResolvedJsonSchema
-          >)
-        : {};
-    props.idempotency_key = {
-      type: 'string',
+    const nextProperties = { ...(readObject(merged, "properties") ?? {}) };
+    nextProperties["idempotency_key"] = {
+      type: "string",
       description:
-        'Optional Idempotency-Key header (recommended on writes for safe retries).',
+        "Optional Idempotency-Key header (recommended on writes for safe retries).",
     };
-    merged = {
-      ...merged,
-      type: 'object',
-      properties: props,
-    };
-    const reqArr = Array.isArray(merged.required)
-      ? [...(merged.required as string[])]
-      : [];
-    merged.required = reqArr.sort();
+    merged = { ...merged, type: "object", properties: nextProperties };
+    merged["required"] = stringArray(merged["required"]).sort();
   }
 
   return ensurePathParamsInInputSchema(merged, pathTemplate);

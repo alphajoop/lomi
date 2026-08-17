@@ -78,9 +78,29 @@ impl GlobalConfig {
         }
         let contents = fs::read_to_string(&path)
             .with_context(|| format!("Failed to read config at {}", path.display()))?;
-        let config: GlobalConfig = serde_json::from_str(&contents)
+        let mut config: GlobalConfig = serde_json::from_str(&contents)
             .with_context(|| format!("Failed to parse config at {}", path.display()))?;
+        config.migrate_plaintext_tokens()?;
         Ok(config)
+    }
+
+    fn migrate_plaintext_tokens(&mut self) -> Result<()> {
+        let names: Vec<String> = self.profiles.keys().cloned().collect();
+        let mut changed = false;
+        for name in names {
+            let Some(token) = self.profiles.get(&name).and_then(|p| p.cli_token.clone()) else {
+                continue;
+            };
+            crate::config::secrets::store_cli_token(&name, &token)?;
+            if let Some(settings) = self.profiles.get_mut(&name) {
+                settings.cli_token = None;
+            }
+            changed = true;
+        }
+        if changed {
+            self.save()?;
+        }
+        Ok(())
     }
 
     pub fn save(&self) -> Result<()> {
@@ -111,13 +131,25 @@ impl GlobalConfig {
     }
 
     pub fn set_token(&mut self, profile: &str, token: String, api_url: String) -> Result<()> {
+        crate::config::secrets::store_cli_token(profile, &token)?;
         let settings = self.profile_mut(profile);
-        settings.cli_token = Some(token.clone());
+        settings.cli_token = None;
         settings.api_url = Some(api_url);
         settings.created_at = Some(Utc::now());
         settings.token_suffix = Some(Self::token_suffix(&token));
         self.current_profile = profile.to_string();
         self.save()
+    }
+
+    pub fn cli_token(&self, profile: &str) -> Result<Option<String>> {
+        if let Some(stored) = crate::config::secrets::read_cli_token(profile)? {
+            return Ok(Some(stored));
+        }
+        let Some(legacy) = self.profile(profile).and_then(|p| p.cli_token.clone()) else {
+            return Ok(None);
+        };
+        crate::config::secrets::store_cli_token(profile, &legacy)?;
+        Ok(Some(legacy))
     }
 
     pub fn update_profile_metadata(
@@ -136,6 +168,7 @@ impl GlobalConfig {
     }
 
     pub fn clear_token(&mut self, profile: &str) -> Result<()> {
+        crate::config::secrets::delete_cli_token(profile)?;
         if let Some(settings) = self.profiles.get_mut(profile) {
             settings.cli_token = None;
             settings.expires_at = None;
@@ -148,6 +181,7 @@ impl GlobalConfig {
     }
 
     pub fn clear_profile(&mut self, profile: &str) -> Result<()> {
+        crate::config::secrets::delete_cli_token(profile)?;
         self.profiles.remove(profile);
         if self.current_profile == profile {
             self.current_profile = DEFAULT_PROFILE.to_string();
@@ -213,12 +247,11 @@ mod tests {
         )?;
 
         let loaded = GlobalConfig::load()?;
-        assert_eq!(
-            loaded
-                .profile("sandbox")
-                .and_then(|p| p.cli_token.as_deref()),
-            Some("test_token")
-        );
+        assert_eq!(loaded.cli_token("sandbox")?.as_deref(), Some("test_token"));
+        assert!(loaded
+            .profile("sandbox")
+            .and_then(|p| p.cli_token.as_deref())
+            .is_none());
         assert_eq!(
             loaded
                 .profile("sandbox")

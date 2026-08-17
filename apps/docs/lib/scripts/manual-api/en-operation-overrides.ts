@@ -22,7 +22,7 @@ export type EnOperationOverride = {
 };
 
 /** Full coverage for all public merchant operations in `openapi.json` (enforced by verify script). */
-export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
+export const EN_OPERATION_COPY = {
   AccountsController_checkAvailableBalance: {
     summary: 'Check available balance',
     body: 'Checks whether sufficient funds exist in the requested currency before you move money out or reserve balance.',
@@ -135,7 +135,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when buyers edit their profile or when syncing CRM changes into lomi.',
   },
-  CustomersController_createPortalLaunchSession: {
+  CustomersController_createPortalSession: {
     summary: 'Create customer portal session',
     body: 'Returns a short-lived URL so the customer can manage subscriptions and payment methods in the hosted portal.',
     whenToUse:
@@ -149,14 +149,14 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when investigating billing disputes or verifying what the customer changed in the portal.',
     related:
-      '[Create portal session](/api/customers/CustomersController_createPortalLaunchSession)',
+      '[Create portal session](/api/customers/CustomersController_createPortalSession)',
   },
   DiscountCouponsController_create: {
     summary: 'Create discount coupon',
     body: 'Creates a coupon with scope and redemption rules for use at checkout or payment links.',
     whenToUse: 'Use when launching promotions or segment-specific discounts.',
     related:
-      '[List coupons](/api/discount-coupons/DiscountCouponsController_findAll) · [Checkout session](/api/checkout-sessions/CheckoutSessionsController_create)',
+      '[List coupons](/api/coupons/DiscountCouponsController_findAll) · [Checkout session](/api/checkout-sessions/CheckoutSessionsController_create)',
   },
   DiscountCouponsController_findAll: {
     summary: 'List discount coupons',
@@ -174,7 +174,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns usage and performance metrics for a coupon (redemptions, revenue impact) for reporting.',
     whenToUse: 'Use in marketing dashboards to measure campaign effectiveness.',
     related:
-      '[Retrieve coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
+      '[Retrieve coupon](/api/coupons/DiscountCouponsController_findOne)',
   },
   DisputesController_findAll: {
     summary: 'List disputes',
@@ -341,15 +341,15 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
       'Use after create or from webhook-driven flows to confirm refund details.',
     related: '[Create refund](/api/refunds/RefundsController_create)',
   },
-  RadarController_getSettings: {
+  OrganizationsController_getRadarSettings: {
     summary: 'Get Radar settings',
     body: 'Returns whether lomi. Radar screening is enabled for the organization, the monitor/block mode, and card-network passthrough preferences.',
     whenToUse:
       'Use before toggling Radar in your own settings UI or to confirm org configuration in support tools.',
     related:
-      '[Update Radar settings](/api/organization/RadarController_updateSettings) · [lomi. Radar guide](/build/radar)',
+      '[Update Radar settings](/api/organizations/OrganizationsController_updateRadarSettings) · [lomi. Radar guide](/build/radar)',
   },
-  RadarController_updateSettings: {
+  OrganizationsController_updateRadarSettings: {
     summary: 'Update Radar settings',
     body: 'Enables or disables Radar screening and updates monitor/block mode or card-network passthrough for the organization.',
     whenToUse:
@@ -357,7 +357,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     caveats:
       'Radar is opt-in. When `mode` is `block`, charges that hit block rules are rejected before completion.',
     related:
-      '[Get Radar settings](/api/organization/RadarController_getSettings) · [List risk assessments](/api/risk-assessments/RadarController_listAssessments)',
+      '[Get Radar settings](/api/organizations/OrganizationsController_getRadarSettings) · [List risk assessments](/api/risk-assessments/RadarController_listAssessments)',
   },
   RadarController_listAssessments: {
     summary: 'List risk assessments',
@@ -399,8 +399,8 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     related:
       '[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne)',
   },
-  SubscriptionsController_uncancel: {
-    summary: 'Uncancel subscription',
+  SubscriptionsController_resume: {
+    summary: 'Resume subscription',
     body: 'Removes a scheduled end-of-period cancellation so the subscription keeps renewing.',
     whenToUse:
       'Use when a customer reverses a pending cancel-at-period-end before the billing period ends.',
@@ -421,7 +421,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for billing ops, dunning dashboards, and revenue reporting.',
   },
-  SubscriptionsController_findByCustomer: {
+  CustomersController_getSubscriptions: {
     summary: 'List subscriptions for customer',
     body: 'Returns subscriptions tied to one customer ID. Responds with **404** when the customer is unknown.',
     whenToUse: 'Use on customer portals showing active plans.',
@@ -464,7 +464,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   },
   LogsController_findOne: {
     summary: 'Retrieve log entry',
-    body: 'Returns a single log entry by type and ID. Responds with **404** when the entry does not exist or is outside the API key organization scope.',
+    body: 'Returns a single log entry by ID. Pass `type` to select the log stream. Responds with **404** when the entry does not exist or is outside the API key organization scope.',
     whenToUse:
       'Use when drilling into one failed request, webhook delivery, or activity event from a list view.',
     related: '[List logs](/api/logs/LogsController_findAll)',
@@ -595,7 +595,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'First step in usage billing: create a meter before ingesting usage events or enrolling customers on usage-based products.',
     related:
-      '[Usage billing guide](/build/usage-billing) · [Record usage event](/api/usage-events/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)',
+      '[Usage billing guide](/build/usage-billing) · [Record usage event](/api/usage/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)',
   },
   MetersController_findAll: {
     summary: 'List meters',
@@ -626,7 +626,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for prepaid wallets, usage dashboards, or entitlement checks before granting access.',
     related:
-      '[Credit wallet](/api/usage-billing/UsageBillingController_creditWallet) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+      '[Credit wallet](/api/usage/UsageBillingController_creditWallet) · [Record usage event](/api/usage/UsageEventsController_ingest)',
   },
   UsageEventsController_findAll: {
     summary: 'List usage events',
@@ -634,7 +634,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for support, reconciliation, or debugging failed usage ingest.',
     related:
-      '[Record usage event](/api/usage-events/UsageEventsController_ingest) · [Get usage event](/api/usage-events/UsageEventsController_findOne)',
+      '[Record usage event](/api/usage/UsageEventsController_ingest) · [Get usage event](/api/usage/UsageEventsController_findOne)',
   },
   UsageEventsController_findOne: {
     summary: 'Get a usage event',
@@ -642,7 +642,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use after ingest to confirm processing or investigate a specific event.',
     related:
-      '[List usage events](/api/usage-events/UsageEventsController_findAll) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+      '[List usage events](/api/usage/UsageEventsController_findAll) · [Record usage event](/api/usage/UsageEventsController_ingest)',
   },
   UsageEventsController_ingest: {
     summary: 'Record a usage event',
@@ -650,9 +650,9 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Call from your app whenever billable usage occurs; use a stable `transaction_id` per logical event.',
     caveats:
-      'Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage-events/{id}`.',
+      'Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage/events/{id}`.',
     related:
-      '[Usage billing guide](/build/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage-events/UsageEventsController_createUsageSubscription)',
+      '[Usage billing guide](/build/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage/UsageEventsController_createUsageSubscription)',
   },
   UsageEventsController_createUsageSubscription: {
     summary: 'Create a usage subscription',
@@ -660,7 +660,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'After creating a usage-based product and meter; enroll each customer before sending usage events tied to a subscription.',
     related:
-      '[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage)',
+      '[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/subscriptions/SubscriptionsController_getUsage)',
   },
   UsageBillingController_listPeriods: {
     summary: 'List usage billing periods',
@@ -668,15 +668,15 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for invoicing windows, period-close reconciliation, or support lookups.',
     related:
-      '[Get subscription usage](/api/usage-billing/UsageBillingController_getSubscriptionUsage) · [Usage billing guide](/build/usage-billing)',
+      '[Get subscription usage](/api/subscriptions/SubscriptionsController_getUsage) · [Usage billing guide](/build/usage-billing)',
   },
-  UsageBillingController_getSubscriptionUsage: {
+  SubscriptionsController_getUsage: {
     summary: 'Get meter usage for a subscription',
     body: 'Returns aggregated meter usage for a usage subscription across its billing period.',
     whenToUse:
       'Use on invoices, customer usage dashboards, or before closing a billing period.',
     related:
-      '[List billing periods](/api/usage-billing/UsageBillingController_listPeriods) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+      '[List billing periods](/api/usage/UsageBillingController_listPeriods) · [Record usage event](/api/usage/UsageEventsController_ingest)',
   },
   UsageBillingController_getRevenue: {
     summary: 'Combined revenue metrics',
@@ -693,7 +693,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use for prepaid packs, promotions, or manual adjustments before usage draws down balance.',
     related:
-      '[Get meter balance](/api/meters/MetersController_getBalance) · [Record usage event](/api/usage-events/UsageEventsController_ingest)',
+      '[Get meter balance](/api/meters/MetersController_getBalance) · [Record usage event](/api/usage/UsageEventsController_ingest)',
   },
   UsageBillingController_createEntitlement: {
     summary: 'Create or update an entitlement',
@@ -701,7 +701,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use when feature access is tied to plan entitlements rather than raw meter balance alone.',
     related:
-      '[Check entitlement](/api/usage-billing/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/usage-billing)',
+      '[Check entitlement](/api/usage/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/usage-billing)',
   },
   UsageBillingController_checkEntitlement: {
     summary: 'Check customer entitlement',
@@ -709,7 +709,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     whenToUse:
       'Use at request time to gate features without loading full subscription objects.',
     related:
-      '[Create entitlement](/api/usage-billing/UsageBillingController_createEntitlement)',
+      '[Create entitlement](/api/usage/UsageBillingController_createEntitlement)',
   },
   ProvidersController_findAll: {
     summary: 'List payment providers',

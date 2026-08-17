@@ -3,7 +3,7 @@ title: "Définir le prix par défaut"
 description: "Définir le prix par défaut"
 full: true
 method: post
-path: /products/{id}/prices/{priceId}/set-default
+path: /products/{id}/prices/{priceId}/default
 operationId: ProductsController_setDefaultPrice
 ---
 
@@ -29,7 +29,7 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 ## Endpoint
 
-`POST /products/{id}/prices/{priceId}/set-default`
+`POST /products/{id}/prices/{priceId}/default`
 
 URLs de base :
 
@@ -70,7 +70,7 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 ## Exemple
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/products/value/prices/value/set-default" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/products/value/prices/value/default" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
@@ -79,6 +79,6 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/products/value/prices/value/se
 ## OpenAPI
 
 - **operationId**: `ProductsController_setDefaultPrice`
-- **Operation**: `POST /products/{id}/prices/{priceId}/set-default`
+- **Operation**: `POST /products/{id}/prices/{priceId}/default`
 
 Schémas complets et **Try it** : [référence API](/api).

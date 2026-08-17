@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Sun, Moon } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 export interface ComponentPreviewProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;

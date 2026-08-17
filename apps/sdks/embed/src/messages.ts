@@ -1,5 +1,21 @@
 import type { LomiCheckoutCompletePayload } from "./utils";
 import { LOMI_CHECKOUT_MESSAGE_TYPE } from "./types";
+import {
+  isBoolean,
+  isJsonObject,
+  isNumber,
+  readString,
+  type JsonObject,
+  type JsonValue,
+} from "@lomi./shared";
+
+export interface ParsedCheckoutMessage {
+  event: string;
+  payload?: LomiCheckoutCompletePayload;
+  height?: number;
+  code?: string;
+  message?: string;
+}
 
 export function getCheckoutOrigin(checkoutUrl: string): string | null {
   try {
@@ -21,49 +37,65 @@ export function isAllowedCheckoutOrigin(
 }
 
 export function legacyCompleteToPayload(
-  data: Record<string, unknown>,
+  data: JsonObject,
 ): LomiCheckoutCompletePayload {
+  const sessionId = data["sessionId"];
   return {
     type: "LOMI_CHECKOUT_COMPLETE",
-    sessionId: (data.sessionId as string | null | undefined) ?? null,
-    transactionId: data.transactionId as string | undefined,
-    amount: data.amount as number | undefined,
-    currency: data.currency as string | undefined,
-    hasDigitalDeliverables: data.hasDigitalDeliverables as boolean | undefined,
+    sessionId:
+      sessionId === null ? null : readString(data, "sessionId") ?? null,
+    transactionId: readString(data, "transactionId"),
+    amount: isNumber(data["amount"]) ? data["amount"] : undefined,
+    currency: readString(data, "currency"),
+    hasDigitalDeliverables: isBoolean(data["hasDigitalDeliverables"])
+      ? data["hasDigitalDeliverables"]
+      : undefined,
   };
 }
 
 export function parseCheckoutMessage(
-  data: unknown,
-): { event: string; payload?: LomiCheckoutCompletePayload } | null {
-  if (typeof data !== "object" || data === null) {
+  data: JsonValue,
+): ParsedCheckoutMessage | null {
+  if (!isJsonObject(data)) {
     return null;
   }
 
-  const record = data as Record<string, unknown>;
-
-  if (record.type === LOMI_CHECKOUT_MESSAGE_TYPE && typeof record.event === "string") {
-    if (record.event === "success") {
+  const event = readString(data, "event");
+  if (data["type"] === LOMI_CHECKOUT_MESSAGE_TYPE && event) {
+    if (event === "success") {
       return {
         event: "success",
-        payload: legacyCompleteToPayload(record),
+        payload: legacyCompleteToPayload(data),
       };
     }
-    if (record.event === "resize") {
-      return { event: "resize" };
+    if (event === "resize") {
+      return {
+        event: "resize",
+        height: isNumber(data["height"]) ? data["height"] : undefined,
+      };
     }
-    return { event: record.event };
+    if (event === "error") {
+      return {
+        event,
+        code: readString(data, "code"),
+        message: readString(data, "message"),
+      };
+    }
+    return { event };
   }
 
-  if (record.type === "LOMI_CHECKOUT_COMPLETE") {
+  if (data["type"] === "LOMI_CHECKOUT_COMPLETE") {
     return {
       event: "success",
-      payload: legacyCompleteToPayload(record),
+      payload: legacyCompleteToPayload(data),
     };
   }
 
-  if (record.type === "LOMI_RESIZE") {
-    return { event: "resize" };
+  if (data["type"] === "LOMI_RESIZE") {
+    return {
+      event: "resize",
+      height: isNumber(data["height"]) ? data["height"] : undefined,
+    };
   }
 
   return null;

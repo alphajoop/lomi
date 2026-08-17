@@ -4,9 +4,9 @@
     "SubscriptionsController_cancel",
     "SubscriptionsController_changePlan",
     "SubscriptionsController_findAll",
-    "SubscriptionsController_findByCustomer",
     "SubscriptionsController_findOne",
-    "SubscriptionsController_uncancel",
+    "SubscriptionsController_getUsage",
+    "SubscriptionsController_resume",
     "SubscriptionsController_update"
   ]
 }

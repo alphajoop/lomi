@@ -36,22 +36,13 @@ export const createMessageHandler = (
       return;
     }
 
-    if (event.data?.type === "LOMI_RESIZE" && event.data?.height) {
-      const height = Number(event.data.height);
-      options.onResize?.(height);
-      if (options.mode === "inline") {
-        iframe.style.height = `${Math.max(240, height)}px`;
-      }
-      return;
-    }
-
     const parsed = parseCheckoutMessage(event.data);
     if (!parsed) {
       return;
     }
 
     if (parsed.event === "resize") {
-      const height = Number((event.data as { height?: number })?.height ?? 0);
+      const height = parsed.height ?? 0;
       if (!height) {
         return;
       }
@@ -82,8 +73,8 @@ export const createMessageHandler = (
 
     if (parsed.event === "error") {
       options.onError?.({
-        code: String(event.data?.code ?? "embed_error"),
-        message: event.data?.message as string | undefined,
+        code: parsed.code ?? "embed_error",
+        message: parsed.message,
       });
     }
   };

@@ -38,7 +38,7 @@ declare global {
   }
 }
 
-if (typeof window !== "undefined") {
+if (globalThis.window) {
   window.Lomi = {
     loadLomiCheckout,
     mountInlineProductEmbeds,

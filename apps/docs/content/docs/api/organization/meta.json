@@ -1,7 +1,0 @@
-{
-  "title": "Organization",
-  "pages": [
-    "RadarController_getSettings",
-    "RadarController_updateSettings"
-  ]
-}

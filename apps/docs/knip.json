@@ -20,7 +20,9 @@
   "ignoreDependencies": [
     "@tailwindcss/container-queries",
     "tailwindcss",
-    "tailwindcss-animate"
+    "tailwindcss-animate",
+    "clsx",
+    "tailwind-merge"
   ],
   "ignoreExportsUsedInFile": true,
   "rules": {

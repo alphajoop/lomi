@@ -20,7 +20,7 @@ Utilisez pour l’e-commerce, les factures ou tout flux où lomi. héberge l’e
 
 ### À savoir
 
-Préférez les sessions checkout aux encaissements ad hoc pour une expérience acheteur cohérente. Pour les produits pay_what_you_want, le montant doit respecter minimum_amount et maximum_amount du prix lié (unité × quantité). `currency_code` est optionnel et reprend la devise par défaut de l’organisation (**Paramètres → Checkout → Paiements**).
+Préférez les sessions checkout aux encaissements ad hoc pour une expérience acheteur cohérente. Pour les produits pay_what_you_want, le montant doit respecter minimum_amount et maximum_amount du prix lié (unité × quantité).
 
 ### Voir aussi
 
@@ -66,8 +66,8 @@ Schéma: `object`
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
-| `amount` | Non | `number` | - |
-| `currency_code` | Non | `enum ("XOF", "USD", "EUR")` | Optionnel. S’il est omis, utilise la `default_currency` de l’organisation (**Paramètres → Checkout → Paiements**). Doit figurer dans `allowed_currencies`. |
+| `amount` | Oui | `number` | - |
+| `currency_code` | Non | `enum ("XOF", "USD", "EUR")` | Optional. Falls back to organization default_currency when omitted. |
 | `title` | Non | `string` | - |
 | `description` | Non | `string` | - |
 | `customer_id` | Non | `string` | - |
@@ -86,11 +86,11 @@ Schéma: `object`
 | `success_url` | Non | `string` | - |
 | `cancel_url` | Non | `string` | - |
 | `allow_coupon_code` | Non | `boolean` | - |
-| `require_billing_address` | Non | `boolean` | Si `true`, affiche et exige l’adresse de facturation. Si omis, suit les paramètres checkout de l’organisation, puis `false`. Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#checkout-form-fields). |
-| `require_name` | Non | `boolean` | Si `true`, affiche et exige le nom du client. Si `false`, masque le champ nom (le nom d’affichage repose sur l’e-mail ou le téléphone). Défaut si omis : `true`. Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#require_name). |
-| `require_email` | Non | `boolean` | Si `true`, affiche et exige l’e-mail. Si `false`, masque l’e-mail. Défaut si omis : `true`. Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#require_email). |
-| `require_phone` | Non | `boolean` | Si `true`, affiche et exige le téléphone. Si `false`, téléphone optionnel si l’e-mail est visible, ou masqué si l’e-mail est masqué. Défaut si omis : `false`. Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#require_phone). |
-| `fields` | Non | `array<object>` | Schéma ordonné optionnel des champs checkout. S’il est fourni, remplace les booléens `require_*`. |
+| `require_billing_address` | Non | `boolean` | When true, show and require billing address on checkout. Default false when unset. |
+| `require_email` | Non | `boolean` | When true, show and require customer email. Default true when unset. |
+| `require_phone` | Non | `boolean` | When true, show and require customer phone. Default true when unset. |
+| `require_name` | Non | `boolean` | When true, show and require customer name. Default true when unset. |
+| `fields` | Non | `array<object>` | Optional ordered checkout field schema. When provided, overrides require_* booleans. |
 | `payment_link_id` | Non | `string` | - |
 | `metadata` | Non | `object` | - |
 | `line_items` | Non | `array<object>` | - |
@@ -99,7 +99,7 @@ Exemple de corps :
 
 ```json
 {
-  "currency_code": "XOF"
+  "amount": 10000
 }
 ```
 
@@ -118,32 +118,12 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 
 ## Exemple
 
-Session minimale :
-
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"currency_code":"XOF"}'
+  -d '{"amount":10000}'
 ```
-
-Checkout téléphone seul (nom, e-mail et adresse masqués) :
-
-```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
-  -H "X-API-KEY: $LOMI_SECRET_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "amount": 1000,
-    "currency_code": "XOF",
-    "require_name": false,
-    "require_email": false,
-    "require_phone": true,
-    "require_billing_address": false
-  }'
-```
-
-Voir [Champs du formulaire checkout](/build/payments/checkout-behavior#checkout-form-fields) pour toutes les combinaisons.
 
 ## OpenAPI
 

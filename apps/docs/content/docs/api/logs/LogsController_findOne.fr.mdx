@@ -3,7 +3,7 @@ title: "Get a log entry"
 description: "Get a log entry"
 full: true
 method: get
-path: /logs/{type}/{id}
+path: /logs/{id}
 operationId: LogsController_findOne
 ---
 
@@ -11,12 +11,12 @@ operationId: LogsController_findOne
 
 Get a log entry
 
-Returns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.
+Returns a single log entry by ID. Pass `type` to select the log stream. Responds with 404 when the entry does not exist or is outside the API key organization scope.
 
 
 ### Quand l’utiliser
 
-Utilisez cet endpoint quand vous devez exécuter `GET /logs/&#123;type&#125;/&#123;id&#125;` (Get a log entry).
+Utilisez cet endpoint quand vous devez exécuter `GET /logs/&#123;id&#125;` (Get a log entry).
 
 
 ## Authentification
@@ -25,7 +25,7 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 ## Endpoint
 
-`GET /logs/{type}/{id}`
+`GET /logs/{id}`
 
 URLs de base :
 
@@ -39,12 +39,12 @@ URLs de base :
 | Nom | Obligatoire | Schéma | Description |
 | --- | --- | --- | --- |
 | `id` | Oui | - | Log entry UUID |
-| `type` | Oui | - |  |
 
 ### Paramètres de requête
 
-_Aucun paramètre de requête._
-
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `type` | query | Oui | - | Log stream to query |
 
 
 
@@ -63,13 +63,13 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 ## Exemple
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/logs/api_request/value" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/logs/value?type=api_request" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ## OpenAPI
 
 - **operationId**: `LogsController_findOne`
-- **Operation**: `GET /logs/{type}/{id}`
+- **Operation**: `GET /logs/{id}`
 
 Schémas complets et **Try it** : [référence API](/api).

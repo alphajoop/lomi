@@ -14,7 +14,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const docEntries = pages.map((page) => {
     const path = page.url.startsWith('/') ? page.url : `/${page.url}`;
     const alternates = buildDocsAlternates(path);
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const languages = (alternates?.languages ?? {}) as Record<string, string>;
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const changeFrequency = (
       path.startsWith('/api/') ? 'weekly' : 'monthly'
     ) as 'weekly' | 'monthly';

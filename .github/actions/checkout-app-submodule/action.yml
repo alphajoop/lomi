@@ -1,5 +1,5 @@
 name: Checkout app submodule
-description: Verify PAT access and checkout a lomi app repository at the submodule ref resolved from the monorepo or dispatch payload.
+description: Verify PAT access and checkout a lomi app repository at the submodule ref resolved from the monorepo or dispatch payload. Optionally keep the public umbrella (packages/) on disk for workspace builds.
 
 outputs:
   app-path:
@@ -27,6 +27,10 @@ inputs:
     description: Commit SHA from repository_dispatch client_payload
     required: false
     default: ""
+  with-umbrella:
+    description: When true, check out the public monorepo (packages/, pnpm-workspace.yaml) before the app
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -55,8 +59,9 @@ runs:
           exit 1
         fi
 
-    - name: Checkout monorepo pointer
-      if: inputs.event-name == 'push'
+    # Full umbrella when workspace packages are needed, or a pointer checkout on push to resolve the gitlink SHA.
+    - name: Checkout monorepo
+      if: inputs.with-umbrella == 'true' || inputs.event-name == 'push'
       uses: actions/checkout@v5
 
     - name: Resolve app ref

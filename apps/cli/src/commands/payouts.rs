@@ -26,10 +26,10 @@ pub enum PayoutsCommand {
 pub struct PayoutsListArgs {
     #[arg(long)]
     pub status: Option<String>,
-    #[arg(long, default_value_t = 1)]
-    pub page: u32,
-    #[arg(long, default_value_t = 50)]
-    pub page_size: u32,
+    #[arg(long)]
+    pub cursor: Option<String>,
+    #[arg(long, default_value_t = 20)]
+    pub limit: u32,
 }
 
 #[derive(Args, Debug)]
@@ -39,7 +39,7 @@ pub struct PayoutsCreateArgs {
     #[arg(long, value_parser = ["wave", "mtn", "spi", "bank"])]
     pub rail: Option<String>,
     #[arg(long)]
-    pub amount: Option<f64>,
+    pub amount: Option<i64>,
     #[arg(long, default_value = "XOF")]
     pub currency: String,
     #[arg(long)]
@@ -56,7 +56,7 @@ pub struct PayoutsCreateArgs {
 struct CreatePayoutRequest {
     destination: String,
     rail: String,
-    amount: f64,
+    amount: i64,
     currency_code: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     payout_method_id: Option<String>,
@@ -85,7 +85,10 @@ async fn list_payouts(common: &CommonOptions, args: PayoutsListArgs) -> Result<(
     let auth = ensure_authenticated(common, true, false, false).await?;
     let client = ApiClient::new(&auth)?;
 
-    let mut path = format!("/payouts?page={}&pageSize={}", args.page, args.page_size);
+    let mut path = format!("/payouts?limit={}", args.limit);
+    if let Some(cursor) = &args.cursor {
+        path.push_str(&format!("&cursor={cursor}"));
+    }
     if let Some(status) = &args.status {
         path.push_str(&format!("&status={status}"));
     }

@@ -3,7 +3,7 @@
   "entry": [
     "src/index.ts",
     "src/http-entry.ts",
-    "src/scripts/**/*.ts",
+    "scripts/**/*.ts",
     "test/**/*.ts",
     "eslint.config.mjs"
   ],

@@ -3,7 +3,7 @@ title: "Retry webhook delivery"
 description: "Retry webhook delivery"
 full: true
 method: post
-path: /webhooks/{webhookId}/logs/{logId}/retry
+path: /webhooks/{id}/deliveries/{deliveryId}/retry
 operationId: WebhooksController_retryDelivery
 ---
 
@@ -29,7 +29,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`POST /webhooks/{webhookId}/logs/{logId}/retry`
+`POST /webhooks/{id}/deliveries/{deliveryId}/retry`
 
 Base URLs:
 
@@ -42,8 +42,8 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `logId` | Yes | - | Delivery log UUID |
-| `webhookId` | Yes | - | Webhook UUID |
+| `deliveryId` | Yes | - | Delivery log UUID |
+| `id` | Yes | - | Webhook UUID |
 
 ### Query parameters
 
@@ -68,7 +68,7 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/logs/value/retry" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/deliveries/value/retry" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
@@ -77,6 +77,6 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/value/logs/value/retr
 ## OpenAPI
 
 - **operationId**: `WebhooksController_retryDelivery`
-- **Operation**: `POST /webhooks/{webhookId}/logs/{logId}/retry`
+- **Operation**: `POST /webhooks/{id}/deliveries/{deliveryId}/retry`
 
 Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

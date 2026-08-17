@@ -1,5 +1,7 @@
 import type { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 
+import { isFunction } from "@lomi./shared";
+
 export type MerchantAccessLevel = 'read' | 'write' | 'full';
 
 export type SessionRegistryEntry = {
@@ -7,6 +9,7 @@ export type SessionRegistryEntry = {
   lastActivity: number;
   merchantApiKey: string | null;
   provisioningApiKey: string | null;
+  partnerApiKey: string | null;
   merchantAccessLevel: MerchantAccessLevel;
 };
 
@@ -32,7 +35,7 @@ export class McpSessionRegistry {
     this.pruneTimer = setInterval(() => {
       this.prune();
     }, intervalMs);
-    if (typeof this.pruneTimer.unref === 'function') {
+    if (isFunction(this.pruneTimer.unref)) {
       this.pruneTimer.unref();
     }
   }
@@ -88,6 +91,16 @@ export class McpSessionRegistry {
     return this.sessions.get(sessionId)?.provisioningApiKey ?? null;
   }
 
+  updatePartnerApiKey(sessionId: string, apiKey: string | null): void {
+    const e = this.sessions.get(sessionId);
+    if (!e || !apiKey) return;
+    e.partnerApiKey = apiKey;
+  }
+
+  getPartnerApiKey(sessionId: string): string | null {
+    return this.sessions.get(sessionId)?.partnerApiKey ?? null;
+  }
+
   getMerchantApiKey(sessionId: string): string | null {
     return this.sessions.get(sessionId)?.merchantApiKey ?? null;
   }
@@ -117,12 +130,14 @@ export class McpSessionRegistry {
     merchantApiKey: string | null,
     provisioningApiKey: string | null = null,
     merchantAccessLevel: MerchantAccessLevel = 'full',
+    partnerApiKey: string | null = null,
   ): void {
     this.sessions.set(sessionId, {
       transport,
       lastActivity: Date.now(),
       merchantApiKey,
       provisioningApiKey,
+      partnerApiKey,
       merchantAccessLevel,
     });
     transport.onclose = () => {

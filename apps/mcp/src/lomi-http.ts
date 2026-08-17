@@ -1,4 +1,11 @@
-import type { ManifestTool } from './manifest.js';
+import type { RestCallSpec } from './manifest.js';
+import {
+  isJsonObject,
+  isString,
+  readObject,
+  type JsonObject,
+  type JsonValue,
+} from "@lomi./shared";
 
 export type LomiHttpResult = {
   status: number;
@@ -7,19 +14,17 @@ export type LomiHttpResult = {
   contentType: string | null;
 };
 
-function serializeQueryValue(value: unknown): string | undefined {
+function serializeQueryValue(value: JsonValue | undefined): string | undefined {
   if (value === undefined || value === null) return undefined;
-  if (typeof value === 'object') return JSON.stringify(value);
+  if (isJsonObject(value) || Array.isArray(value)) return JSON.stringify(value);
   return String(value);
 }
 
-function declaredHeaderInputKeys(inputSchema: Record<string, unknown>): Set<string> {
-  const props = inputSchema.properties;
-  if (!props || typeof props !== 'object' || Array.isArray(props)) {
-    return new Set();
-  }
+function declaredHeaderInputKeys(inputSchema: JsonObject): Set<string> {
+  const props = readObject(inputSchema, 'properties');
+  if (!props) return new Set();
   return new Set(
-    Object.keys(props as Record<string, unknown>).filter((k) =>
+    Object.keys(props).filter((k) =>
       k.startsWith('header_'),
     ),
   );
@@ -40,8 +45,8 @@ function fetchMaxRetries(): number {
 }
 
 export async function callLomiRest(
-  tool: ManifestTool,
-  args: Record<string, unknown>,
+  spec: RestCallSpec,
+  args: JsonObject,
   options: {
     baseUrl: string;
     apiKey: string;
@@ -49,13 +54,14 @@ export async function callLomiRest(
   },
 ): Promise<LomiHttpResult> {
   const { baseUrl, apiKey, authHeaderName = 'X-API-KEY' } = options;
-  const headers: Record<string, string> = {
+  type LomiRequestHeaders = { [header: string]: string };
+  const headers: LomiRequestHeaders = {
     [authHeaderName]: apiKey,
     Accept: 'application/json',
   };
 
-  let path = tool.pathTemplate;
-  for (const name of tool.pathParamNames) {
+  let path = spec.pathTemplate;
+  for (const name of spec.pathParamNames) {
     const v = args[name];
     if (v === undefined || v === null) {
       throw new Error(`Missing required path parameter "${name}"`);
@@ -64,14 +70,13 @@ export async function callLomiRest(
   }
 
   const qp = new URLSearchParams();
-  for (const name of tool.queryParamNames) {
+  for (const name of spec.queryParamNames) {
     const v = args[name];
     const s = serializeQueryValue(v);
     if (s !== undefined) qp.append(name, s);
   }
 
-  const schema = tool.inputSchema as Record<string, unknown>;
-  for (const key of declaredHeaderInputKeys(schema)) {
+  for (const key of declaredHeaderInputKeys(spec.inputSchema)) {
     const v = args[key];
     if (v === undefined || v === null) continue;
     const headerName = key.slice('header_'.length);
@@ -79,12 +84,12 @@ export async function callLomiRest(
   }
 
   const idem = args.idempotency_key;
-  if (typeof idem === 'string' && idem.length > 0) {
+  if (isString(idem) && idem.length > 0) {
     headers['Idempotency-Key'] = idem;
   }
 
   let body: string | undefined;
-  if (tool.wantsBody) {
+  if (spec.wantsBody) {
     const b = args.body;
     if (b === undefined || b === null) {
       throw new Error('Missing required "body" object for this operation.');
@@ -97,20 +102,20 @@ export async function callLomiRest(
   const query = qp.toString();
   const url = `${root}${path}${query ? `?${query}` : ''}`;
 
-  const methodLower = tool.method.toLowerCase();
+  const methodLower = spec.method.toLowerCase();
   const allowRetry =
     methodLower === 'get' || methodLower === 'head';
   const maxRetries = fetchMaxRetries();
   const maxAttempts = allowRetry ? maxRetries + 1 : 1;
   const timeoutMs = fetchTimeoutMs();
 
-  let lastError: unknown;
+  let lastError = new Error('lomi. API request failed');
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const res = await fetch(url, {
-        method: tool.method.toUpperCase(),
+        method: spec.method.toUpperCase(),
         headers,
         body,
         signal: controller.signal,
@@ -138,7 +143,8 @@ export async function callLomiRest(
       };
     } catch (err) {
       clearTimeout(timer);
-      lastError = err;
+      lastError =
+        err instanceof Error ? err : new Error('Unexpected lomi. API failure');
       if (!allowRetry || attempt >= maxAttempts - 1) {
         throw err instanceof Error ? err : new Error(String(err));
       }
@@ -146,22 +152,20 @@ export async function callLomiRest(
     }
   }
 
-  throw lastError instanceof Error
-    ? lastError
-    : new Error(String(lastError));
+  throw lastError;
 }
 
 export function formatHttpResult(result: LomiHttpResult): string {
-  let parsed: unknown;
+  let parsed: JsonValue;
   try {
-    parsed = JSON.parse(result.bodyText) as unknown;
+    parsed = JSON.parse(result.bodyText);
   } catch {
     parsed = result.bodyText;
   }
 
   const ok = result.status >= 200 && result.status < 300;
 
-  const envelope: Record<string, unknown> = {
+  const envelope: JsonObject = {
     ok,
     status: result.status,
     statusText: result.statusText,

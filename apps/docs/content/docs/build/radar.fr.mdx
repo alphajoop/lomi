@@ -8,13 +8,13 @@ import { Callout } from '@/components/docs/docs-callout';
 **lomi. Radar** évalue les **encaissements entrants** (carte, MTN, Wave) avant leur finalisation. C'est distinct des [Litiges](/build/disputes) (chargebacks carte a posteriori) et des contrôles de retrait plateforme décrits dans [Payouts](/build/payouts).
 
 <Callout type="info">
-  Radar est **opt-in** par organisation. Activez-le via `PATCH /organization/radar-settings` (`enabled: true`). Désactivé par défaut.
+  Radar est **opt-in** par organisation. Activez-le via `PATCH /organizations/radar-settings` (`enabled: true`). Désactivé par défaut.
 </Callout>
 
 ## Activer Radar
 
 ```bash
-curl -X PATCH "https://api.lomi.africa/organization/radar-settings" \
+curl -X PATCH "https://api.lomi.africa/organizations/radar-settings" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "enabled": true, "mode": "block" }'

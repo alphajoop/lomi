@@ -2,7 +2,10 @@
 
 import type { Language } from './config';
 
-const STRINGS: Record<Language, Record<string, string>> = {
+type LocaleStringTable = { [key: string]: string };
+type TranslationsByLanguage = { [L in Language]: LocaleStringTable };
+
+const STRINGS: TranslationsByLanguage = {
   en: {
     'search.all': 'All',
     'search.core': 'Core',

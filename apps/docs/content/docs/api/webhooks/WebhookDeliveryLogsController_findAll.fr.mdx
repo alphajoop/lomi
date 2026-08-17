@@ -3,7 +3,7 @@ title: "Lister les journaux de livraison"
 description: "Lister les journaux de livraison"
 full: true
 method: get
-path: /webhook-delivery-logs
+path: /webhooks/deliveries
 operationId: WebhookDeliveryLogsController_findAll
 ---
 
@@ -29,7 +29,7 @@ Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (v
 
 ## Endpoint
 
-`GET /webhook-delivery-logs`
+`GET /webhooks/deliveries`
 
 URLs de base :
 
@@ -69,13 +69,13 @@ Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalid
 ## Exemple
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/webhook-delivery-logs?offset=1&limit=1" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/webhooks/deliveries?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ## OpenAPI
 
 - **operationId**: `WebhookDeliveryLogsController_findAll`
-- **Operation**: `GET /webhook-delivery-logs`
+- **Operation**: `GET /webhooks/deliveries`
 
 Schémas complets et **Try it** : [référence API](/api).

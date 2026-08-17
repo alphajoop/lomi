@@ -38,6 +38,7 @@ export function CheckoutCountrySelect({
       <select
         disabled={disabled}
         value={value || ''}
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         onChange={(event) => onChange(event.target.value as RPNInput.Country)}
         className="absolute inset-0 text-sm opacity-0"
         aria-label="Select country"

@@ -6,6 +6,7 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
   devIndicators: false,
+  transpilePackages: ['@lomi./ui', '@lomi./shared'],
   serverExternalPackages: ['prettier'],
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

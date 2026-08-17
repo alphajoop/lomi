@@ -24,9 +24,19 @@ import { InlineCommand } from '@/components/docs/inline-command';
 import { Callout } from '@/components/docs/docs-callout';
 import { DocsDownloadButton } from '@/components/docs/docs-download-button';
 
+function lucideIconsAsMdx(): MDXComponents {
+  const components: MDXComponents = {};
+  for (const [name, icon] of Object.entries(icons)) {
+    if (typeof icon === 'function' && icon.length <= 1) {
+      components[name] = icon as MDXComponents[string];
+    }
+  }
+  return components;
+}
+
 export function getMDXComponents(components?: MDXComponents) {
   return {
-    ...(icons as unknown as MDXComponents),
+    ...lucideIconsAsMdx(),
     ...defaultMdxComponents,
     Callout,
     DocsDownloadButton,

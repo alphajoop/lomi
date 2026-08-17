@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import type { ToolsManifest } from './manifest.js';
+import { parseManifest } from './manifest-parse.js';
 import { registerLomiPrompts } from './register-prompts.js';
 import { registerLomiResources } from './register-resources.js';
 import { registerMerchantTools } from './register-tools.js';
@@ -10,7 +11,11 @@ import {
   type ProvisioningToolsManifest,
 } from './register-provisioning-tools.js';
 import { buildServerInstructions, type InstructionMode } from './server-instructions.js';
-import { getOptionalProvisioningKey } from './env-config.js';
+import {
+  getOptionalPartnerKey,
+  getOptionalProvisioningKey,
+} from './env-config.js';
+import { validateJsonValue } from "@lomi./shared";
 
 export type WireMcpServerOptions = {
   manifest: ToolsManifest;
@@ -18,6 +23,7 @@ export type WireMcpServerOptions = {
   mode: InstructionMode;
   getApiKey: () => string | null;
   getProvisioningKey?: () => string | null;
+  getPartnerKey?: () => string | null;
   /** When read, only register merchant tools marked readOnly. */
   merchantAccessLevel?: 'read' | 'write' | 'full';
   /**
@@ -32,10 +38,11 @@ export type WireMcpServerOptions = {
 export function wireMcpServer(options: WireMcpServerOptions): McpServer {
   const {
     manifest,
-    provisioningManifest = provisioningManifestJson as ProvisioningToolsManifest,
+    provisioningManifest = parseManifest(validateJsonValue(provisioningManifestJson)),
     mode,
     getApiKey,
     getProvisioningKey = getOptionalProvisioningKey,
+    getPartnerKey = getOptionalPartnerKey,
     merchantAccessLevel = 'full',
     onMerchantKeyDiscovered,
   } = options;
@@ -47,6 +54,7 @@ export function wireMcpServer(options: WireMcpServerOptions): McpServer {
   );
   registerProvisioningTools(server, provisioningManifest, {
     getProvisioningKey,
+    getPartnerKey,
     onMerchantKeyDiscovered,
   });
   registerMerchantTools(server, manifest, {

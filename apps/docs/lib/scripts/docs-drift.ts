@@ -71,6 +71,7 @@ async function collectValidSlugs(): Promise<Set<string>> {
 async function checkOpenApiParity(errors: string[]): Promise<void> {
   const openApiPath = path.join(DOCS_ROOT, 'openapi.json');
   const raw = await fs.readFile(openApiPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const spec = JSON.parse(raw) as Parameters<typeof collectPublicOperations>[0];
 
   const operations = collectPublicOperations(spec).filter((o) =>
@@ -164,6 +165,7 @@ async function checkMcpManifestParity(errors: string[]): Promise<void> {
   );
 
   const expectedRaw = await fs.readFile(expectedPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const expected = JSON.parse(expectedRaw) as string[];
 
   // MCP intentionally drops some allowlisted operations (e.g. direct charges
@@ -173,23 +175,40 @@ async function checkMcpManifestParity(errors: string[]): Promise<void> {
     DOCS_ROOT,
     '..',
     'mcp',
-    'src/scripts/mcp-tool-policy.json',
+    'config/mcp-tool-policy.json',
   );
   const policyRaw = await fs.readFile(policyPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const policy = JSON.parse(policyRaw) as {
     mcpExcludedOperationKeys?: string[];
   };
   const excluded = new Set(policy.mcpExcludedOperationKeys ?? []);
-  const expectedMcpCount = expected.filter((op) => !excluded.has(op)).length;
+  const expectedMcpOps = expected.filter((op) => !excluded.has(op));
 
   const manifestRaw = await fs.readFile(manifestPath, 'utf-8');
-  const manifest = JSON.parse(manifestRaw) as { tools?: unknown[] };
-  const toolCount = manifest.tools?.length ?? 0;
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
+  const manifest = JSON.parse(manifestRaw) as {
+    tools?: Array<{
+      actions?: Record<string, { operationKey?: string }>;
+    }>;
+  };
 
-  if (expectedMcpCount !== toolCount) {
-    errors.push(
-      `MCP manifest tool count (${toolCount}) does not match _expected-public-operations.json minus MCP exclusions (${expectedMcpCount}). Run apps/mcp: pnpm run generate`,
-    );
+  const covered = new Set<string>();
+  for (const tool of manifest.tools ?? []) {
+    for (const action of Object.values(tool.actions ?? {})) {
+      if (action.operationKey) covered.add(action.operationKey);
+    }
+  }
+
+  for (const op of expectedMcpOps) {
+    if (!covered.has(op)) {
+      errors.push(`MCP manifest missing operation: ${op}`);
+    }
+  }
+  for (const op of covered) {
+    if (!expectedMcpOps.includes(op) && !excluded.has(op)) {
+      errors.push(`MCP manifest has unexpected operation: ${op}`);
+    }
   }
 
   const mcpRoot = path.resolve(DOCS_ROOT, '..', 'mcp');

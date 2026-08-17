@@ -6,6 +6,12 @@ import axios, { type AxiosRequestConfig } from 'axios';
 import type { LomiClient } from './client.js';
 import type { LomiClientRequestOptions } from './request-options.js';
 import {
+  isJsonObject,
+  isString,
+  readString,
+  type JsonValue,
+} from "@lomi./shared";
+import {
   ApiError,
   LomiAuthError,
   LomiError,
@@ -21,16 +27,32 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function parseApiBody(data: unknown): LomiApiErrorBody {
-  if (data && typeof data === 'object') {
-    return data as LomiApiErrorBody;
-  }
-  return {};
+export function parseApiBody(data: JsonValue): LomiApiErrorBody {
+  if (!isJsonObject(data)) return {};
+  const errorValue = data['error'];
+  const error = errorValue !== undefined && isJsonObject(errorValue)
+    ? {
+        code: readString(errorValue, 'code'),
+        message: readString(errorValue, 'message'),
+        details: errorValue['details'],
+      }
+    : undefined;
+  const messageValue = data['message'];
+  const message = isString(messageValue)
+    ? messageValue
+    : Array.isArray(messageValue)
+      ? messageValue.filter(isString)
+      : undefined;
+  return {
+    error,
+    request_id: readString(data, 'request_id'),
+    message,
+  };
 }
 
 function messageFromBody(body: LomiApiErrorBody, fallback: string): string {
   if (body.error?.message) return body.error.message;
-  if (typeof body.message === 'string') return body.message;
+  if (isString(body.message)) return body.message;
   if (Array.isArray(body.message)) return body.message.join(', ');
   return fallback;
 }
@@ -69,7 +91,7 @@ export async function requestWithClient<T>(
   const headers = client.buildHeaders(options);
   const maxAttempts = 1 + (options.method === 'GET' ? client.retries : 0);
 
-  let lastError: unknown;
+  let lastError = new LomiError('Request failed');
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const config: AxiosRequestConfig = {
@@ -86,6 +108,7 @@ export async function requestWithClient<T>(
     try {
       const response = await axios(config);
       if (response.status >= 200 && response.status < 300) {
+        // SAFETY: Generated service methods bind T to the endpoint response schema.
         return response.data as T;
       }
 

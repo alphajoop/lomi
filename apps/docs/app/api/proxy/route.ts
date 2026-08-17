@@ -3,7 +3,6 @@
 import { cookies } from 'next/headers';
 import { createSecureOpenApiProxyHandlers } from '@/lib/openapi-secure-proxy';
 import { resolveTestSecretApiKey } from '@/lib/resolve-test-api-key';
-import { createClient } from '@/lib/supabase/server';
 import {
   COOKIE_TRYIT_ORG,
   COOKIE_TRYIT_USE_TEST_KEY,
@@ -26,8 +25,7 @@ const handlers = createSecureOpenApiProxyHandlers({
     return { shouldInjectTestKey, activeOrganizationId };
   },
   async resolveTestKey({ activeOrganizationId }) {
-    const supabase = await createClient();
-    return resolveTestSecretApiKey(supabase, {
+    return resolveTestSecretApiKey({
       activeOrganizationId,
     });
   },

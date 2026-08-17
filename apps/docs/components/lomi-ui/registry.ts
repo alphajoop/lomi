@@ -44,13 +44,15 @@ const placeholderAssets: LomiUiRegistryAsset[] = ['card.webp'].map((file) => ({
   type: 'registry:file' as const,
 }));
 
-export const lomiUiRegistry: {
+type LomiUiRegistry = {
   dir: string;
   name: string;
   version: string;
   homepage: string;
   items: LomiUiRegistryItem[];
-} = {
+};
+
+export const lomiUiRegistry: LomiUiRegistry = {
   dir: docsDir,
   name: 'lomi-ui',
   version: '1.0.0',

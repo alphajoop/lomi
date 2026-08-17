@@ -1,0 +1,64 @@
+name: lomi · release · plugin
+
+on:
+  workflow_call:
+    inputs:
+      plugin:
+        required: true
+        type: string
+      submodule-path:
+        required: true
+        type: string
+      zip-source:
+        required: true
+        type: string
+      artifact:
+        required: true
+        type: string
+      tag-prefix:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Initialize plugin submodule
+        run: bash .github/scripts/init-submodules.sh ${{ inputs.submodule-path }}
+
+      - name: Run plugin parity checks
+        run: apps/plugins/scripts/verify-lomi-plugins.sh
+
+      - name: Package plugin zip
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/dist"
+          cd "${{ inputs.submodule-path }}"
+          zip -r "${GITHUB_WORKSPACE}/dist/${{ inputs.artifact }}" ${{ inputs.zip-source }} \
+            -x "*.git*" -x "dev/*" -x ".DS_Store"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.plugin }}-lomi
+          path: dist/${{ inputs.artifact }}
+
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    if: always() && !cancelled() && (startsWith(github.ref, format('refs/tags/{0}', inputs.tag-prefix)) || github.event_name == 'workflow_dispatch')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.plugin }}-lomi
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ inputs.artifact }}
+          generate_release_notes: true

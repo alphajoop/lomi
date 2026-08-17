@@ -20,13 +20,30 @@ export function resourceLabelFromPath(pathTemplate: string): string {
   return 'Resource';
 }
 
-const METHOD_VERB: Record<string, string> = {
+interface MethodVerbMap {
+  [method: string]: string;
+}
+
+const METHOD_VERB = {
   get: 'Get',
   post: 'Create',
   patch: 'Update',
   put: 'Update',
   delete: 'Delete',
-};
+} as const satisfies MethodVerbMap;
+
+function isMethodVerb(method: string): method is keyof typeof METHOD_VERB {
+  return Object.hasOwn(METHOD_VERB, method);
+}
+
+export interface MethodNameByOperation {
+  [operationKey: string]: string;
+}
+
+export interface EnglishCopy {
+  title: string;
+  description: string;
+}
 
 /**
  * Build English title from operationKey + SDK method name + tags.
@@ -34,7 +51,7 @@ const METHOD_VERB: Record<string, string> = {
 export function buildEnglishTitle(
   operationKey: string,
   httpMethodLower: string,
-  methodNameByOp: Record<string, string>,
+  methodNameByOp: MethodNameByOperation,
   tags: string[],
 ): string {
   const sdkMethod = methodNameByOp[operationKey];
@@ -53,7 +70,9 @@ export function buildEnglishTitle(
   if (sdkMethod?.includes('cancel')) return `Cancel ${resource}`;
   if (sdkMethod?.includes('test')) return `Test ${resource}`;
 
-  const verb = METHOD_VERB[httpMethodLower] ?? httpMethodLower.toUpperCase();
+  const verb = isMethodVerb(httpMethodLower)
+    ? METHOD_VERB[httpMethodLower]
+    : httpMethodLower.toUpperCase();
   return `${verb} ${resource}`;
 }
 
@@ -86,11 +105,11 @@ export function resolveEnglishCopy(args: {
   operationKey: string;
   httpMethodLower: string;
   tags: string[];
-  methodNameByOp: Record<string, string>;
+  methodNameByOp: MethodNameByOperation;
   override?: EnglishCopyOverride;
   openApiSummary?: string;
   openApiDescription?: string;
-}): { title: string; description: string } {
+}): EnglishCopy {
   const {
     operationKey,
     httpMethodLower,

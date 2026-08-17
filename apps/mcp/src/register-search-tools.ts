@@ -1,7 +1,7 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { z } from 'zod';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 
-import type { ManifestTool, ToolsManifest } from './manifest.js';
+import type { ManifestTool, ToolsManifest } from "./manifest.js";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 25;
@@ -14,6 +14,12 @@ export function scoreManifestTool(tool: ManifestTool, query: string): number {
   const nameLower = tool.name.toLowerCase();
   if (nameLower === q) score += 10;
   else if (nameLower.includes(q)) score += 5;
+
+  for (const action of Object.keys(tool.actions)) {
+    const actionLower = action.toLowerCase();
+    if (actionLower === q) score += 6;
+    else if (actionLower.includes(q) || q.includes(actionLower)) score += 3;
+  }
 
   const hint = tool.searchHint.toLowerCase();
   if (hint) {
@@ -61,21 +67,24 @@ export function searchManifestTools(
     name: tool.name,
     title: tool.title,
     write: tool.write,
-    description: tool.description.split('\n\n')[0] ?? tool.description,
+    description: tool.description.split("\n\n")[0] ?? tool.description,
     destructive: tool.destructive,
     readOnly: tool.readOnly,
   }));
 }
 
 const searchInputSchema = {
-  query: z.string().min(1).describe('Keywords describing the capability you need'),
+  query: z
+    .string()
+    .min(1)
+    .describe("Keywords describing the capability you need"),
   limit: z
     .number()
     .int()
     .min(1)
     .max(MAX_LIMIT)
     .optional()
-    .describe('Max results (default 10)'),
+    .describe("Max results (default 10)"),
 };
 
 export function registerSearchToolsMetaTool(
@@ -83,28 +92,38 @@ export function registerSearchToolsMetaTool(
   manifest: ToolsManifest,
 ): void {
   server.registerTool(
-    'lomi_search_tools',
+    "lomi_search_tools",
     {
-      title: 'Search lomi. MCP tools',
+      title: "Search lomi. MCP tools",
       description:
-        'Search available lomi. merchant API tools by keyword when the full catalog is not loaded. Returns compact matches (name, title, write flag).',
+        "Search available lomi. merchant API tools by keyword when the full catalog is not loaded. Returns compact matches (name, title, write flag). Resource tools take a required `action` parameter.",
       inputSchema: searchInputSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
       },
       _meta: {
-        'anthropic/alwaysLoad': true,
+        "anthropic/alwaysLoad": true,
       },
     },
     async (args) => {
+      // SAFETY: searchInputSchema constrains args to query + optional limit.
       const { query, limit } = args as { query: string; limit?: number };
-      const matches = searchManifestTools(manifest, query, limit ?? DEFAULT_LIMIT);
-      const text = JSON.stringify({ query, count: matches.length, tools: matches }, null, 2);
-      return {
-        content: [{ type: 'text', text }],
-        ...(matches.length > 0 ? {} : { isError: true }),
-      };
+      const matches = searchManifestTools(
+        manifest,
+        query,
+        limit ?? DEFAULT_LIMIT,
+      );
+      const text = JSON.stringify(
+        { query, count: matches.length, tools: matches },
+        null,
+        2,
+      );
+      const response = {
+        content: [{ type: "text", text }],
+      } satisfies { content: Array<{ type: "text"; text: string }> };
+      if (matches.length === 0) return { ...response, isError: true };
+      return response;
     },
   );
 }

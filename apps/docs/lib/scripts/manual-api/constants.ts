@@ -12,7 +12,7 @@ export const REST_API_SECTION_ORDER = [
   'customers',
   'products',
   'subscriptions',
-  'discount-coupons',
+  'coupons',
   'balances',
   'organizations',
   'merchants',
@@ -26,14 +26,13 @@ export const REST_API_SECTION_ORDER = [
   'webhooks',
   'logs',
   'meters',
-  'usage-events',
-  'usage-billing',
+  'usage',
 ] as const;
 
 const PUBLIC_REST_API_OPERATIONS = [
   'GET /accounts/balance',
   'GET /accounts/balance/breakdown',
-  'GET /accounts/balance/check/{currency}',
+  'GET /accounts/balance/{currency}',
   'POST /charge/card',
   'GET /charge/card/{id}',
   'POST /charge/card/{id}/cancel',
@@ -42,7 +41,7 @@ const PUBLIC_REST_API_OPERATIONS = [
   'POST /charge/wave',
   'checkout-sessions',
   'customers',
-  'discount-coupons',
+  'coupons',
   'payment-links',
   'payment-requests',
   'payouts',
@@ -51,19 +50,15 @@ const PUBLIC_REST_API_OPERATIONS = [
   'refunds',
   'disputes',
   'risk-assessments',
-  'organization/radar-settings',
   'subscriptions',
   'transactions',
-  'webhook-delivery-logs',
   'webhooks',
   'logs',
   'organizations',
   'merchants',
   'providers',
   'meters',
-  'usage-events',
-  'usage-subscriptions',
-  'usage-billing',
+  'usage',
 ] as const;
 
 export type RestApiFolder = (typeof REST_API_SECTION_ORDER)[number];
@@ -84,9 +79,7 @@ export function pathToFolder(route: string): string {
   const first = parts[0];
   if (!first) return 'general';
   if (first === 'accounts') return 'balances';
-  if (first === 'webhook-delivery-logs') return 'webhooks';
   if (first === 'logs') return 'logs';
-  if (first === 'usage-subscriptions') return 'usage-events';
   return first;
 }
 

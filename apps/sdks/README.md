@@ -114,14 +114,14 @@ All SDKs provide access to these services:
 - `refunds` - Refund processing
 - `products` - Product catalog
 - `subscriptions` - Subscription billing
-- `discountCoupons` - Coupon management
+- `coupons` - Coupon management
 - `checkoutSessions` - Checkout creation
 - `paymentLinks` - Payment links
 - `payouts` - Payouts (self withdrawals and beneficiary payouts via `destination`)
 - `merchants` - Partner/sub-merchant metrics
 - `providers` - Enabled payment providers
-- `webhooks` - Webhook configuration
-- `webhookDeliveryLogs` - Webhook logs
+- `usage` - Usage events, entitlements, and metered billing
+- `webhooks` - Webhook configuration and delivery logs
 
 ## Documentation
 

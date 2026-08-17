@@ -9,8 +9,8 @@ Canonical inventory for penetration testing and PCI scoping. Production URLs are
 | Merchant API | `api.lomi.africa`, `sandbox.api.lomi.africa` | NestJS on Railway | Webhooks, checkout, provisioning, partners, OAuth |
 | Hosted checkout | `checkout.lomi.africa` (+ merchant CNAMEs) | Next.js on Vercel | Stripe Elements + GIM plain fields (pre-live) |
 | Storefront | `store.lomi.africa` | Next.js on Vercel | Same payment stack as checkout |
-| Supabase | `mdswvokxrnfggrujsfjd.supabase.co` | Postgres, Auth, PostgREST, Storage, Edge Functions | 56 edge functions; many `verify_jwt = false` |
-| MCP server | `mcp.lomi.africa` | Node on Railway | ~85 merchant tools; OAuth resource server |
+| Supabase | `mdswvokxrnfggrujsfjd.supabase.co` | Postgres, Auth, PostgREST, Storage | No product Edge Functions; HTTP is Nest |
+| MCP server | `mcp.lomi.africa` | Node on Railway | ~22 merchant resource tools + search; OAuth resource server |
 | Admin | `admin.lomi.africa` | Vite SPA on Vercel | Platform admin; `@lomi.africa` gate |
 | Dashboard | `dashboard.lomi.africa` | Vite SPA on Vercel | Merchant auth + PostgREST RPCs |
 
@@ -19,7 +19,7 @@ Canonical inventory for penetration testing and PCI scoping. Production URLs are
 | Asset | Host / URL | Notes |
 | --- | --- | --- |
 | Customer portal | `customers.lomi.africa` | Portal session tokens |
-| CLI | `lomi` binary | Device flow via `cli-auth` edge function |
+| CLI | `lomi` binary | Device flow via Nest `/cli-auth` |
 | SDKs / embed | npm `@lomi./sdk`, embed widget | Merchant sites |
 | MPOS (jumbo) | iOS/Android | Stripe Terminal + API |
 | E-commerce plugins | Woo, Shopify (`connect.lomi.africa`), etc. | Separate deploy repos |
@@ -37,7 +37,7 @@ Canonical inventory for penetration testing and PCI scoping. Production URLs are
 | --- | --- |
 | Railway | API, MCP |
 | Vercel | Web apps |
-| Supabase | Database, auth, edge functions |
+| Supabase | Database, auth, storage |
 | Upstash Redis | BullMQ (webhooks, metering) |
 | Stripe | Card tokenization (live rail) |
 | GIM / PaySky | Card acquiring (pre-live; UAT URL in code) |

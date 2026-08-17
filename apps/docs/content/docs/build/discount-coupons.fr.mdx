@@ -20,7 +20,7 @@ Cette page décrit les règles de validation et d’application des coupons util
 
 En résumé :
 
-1. Création via **`POST /discount-coupons`** avec vos contraintes.
+1. Création via **`POST /coupons`** avec vos contraintes.
 2. Validation au tunnel (règles serveur : client, périmètre, quantité, fréquence).
 3. Calcul et application de la remise sur la session checkout, y compris cumul lorsque autorisé.
 4. Réservation d’usage liée à la session jusqu’au paiement.
@@ -120,7 +120,7 @@ print(f"Coupon created: {coupon['code']}")
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/discount-coupons" \
+curl -X POST "https://api.lomi.africa/coupons" \
   -H "X-API-KEY: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -212,7 +212,7 @@ coupons = client.discount_coupons.list()
 
 <Tab value="cURL">
 ```bash
-curl -X GET "https://api.lomi.africa/discount-coupons" \
+curl -X GET "https://api.lomi.africa/coupons" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
@@ -241,7 +241,7 @@ coupon = client.discount_coupons.get('dc_abc123...')
 
 <Tab value="cURL">
 ```bash
-curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123..." \
+curl -X GET "https://api.lomi.africa/coupons/dc_abc123..." \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>
@@ -276,7 +276,7 @@ print(f"Total uses: {performance['total_uses']}")
 
 <Tab value="cURL">
 ```bash
-curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123.../performance" \
+curl -X GET "https://api.lomi.africa/coupons/dc_abc123.../performance" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 </Tab>

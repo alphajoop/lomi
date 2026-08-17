@@ -28,25 +28,8 @@ jobs:
 
       # GitHub runners are IPv4-only; Supabase pooler is flaky (EAUTHQUERY).
       # Direct db.<ref>.supabase.co is IPv6-only — WARP provides IPv6 egress.
-      - name: Set up IPv6 egress (Cloudflare WARP)
-        uses: fscarmen/warp-on-actions@v1.4
-        with:
-          stack: ipv6
-          mode: wireguard
-
-      - name: Verify IPv6 connectivity
-        run: |
-          set -euo pipefail
-          for attempt in 1 2 3 4 5 6; do
-            if curl -6 -fsS -m 10 https://api64.ipify.org >/dev/null 2>&1; then
-              echo "IPv6 egress is up."
-              exit 0
-            fi
-            echo "IPv6 not ready yet (attempt ${attempt}); waiting..."
-            sleep 5
-          done
-          echo "::error::IPv6 egress is not available after WARP setup."
-          exit 2
+      - name: Set up IPv6 egress
+        uses: ./.github/actions/setup-ipv6-warp
 
       - name: Install PostgreSQL client
         run: |

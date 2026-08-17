@@ -32,7 +32,8 @@ impl ApiClient {
     }
 
     pub async fn get<T: DeserializeOwned>(&self, path: &str) -> Result<T> {
-        self.request(reqwest::Method::GET, path, None::<&()>).await
+        self.request(reqwest::Method::GET, path, None::<&()>, false)
+            .await
     }
 
     pub async fn get_text(&self, path: &str) -> Result<String> {
@@ -58,7 +59,8 @@ impl ApiClient {
         path: &str,
         body: &B,
     ) -> Result<T> {
-        self.request(reqwest::Method::POST, path, Some(body)).await
+        self.request(reqwest::Method::POST, path, Some(body), true)
+            .await
     }
 
     async fn request<T: DeserializeOwned, B: serde::Serialize>(
@@ -66,12 +68,21 @@ impl ApiClient {
         method: reqwest::Method,
         path: &str,
         body: Option<&B>,
+        send_idempotency_key: bool,
     ) -> Result<T> {
         let url = format!("{}{}", self.base_url, path);
         let mut request = self.client.request(method, &url);
 
         if let Some(body) = body {
             request = request.json(body);
+        }
+        if send_idempotency_key {
+            let key = format!(
+                "cli-{}-{}",
+                chrono::Utc::now().timestamp_millis(),
+                std::process::id()
+            );
+            request = request.header("Idempotency-Key", key);
         }
 
         let response = request

@@ -7,7 +7,11 @@ on:
     branches: [main]
     paths:
       - "apps/website/**"
+      - "packages/**"
+      - "pnpm-workspace.yaml"
+      - "package.json"
       - ".github/workflows/app-deploy-website.yml"
+      - ".github/workflows/app-deploy-vercel.yml"
       - ".github/actions/checkout-app-submodule/**"
   workflow_dispatch:
     inputs:
@@ -32,7 +36,7 @@ jobs:
         with:
           sparse-checkout: .github/actions/checkout-app-submodule
 
-      - name: Checkout app source
+      - name: Checkout umbrella + app source
         id: checkout-app
         uses: ./.github/actions/checkout-app-submodule
         with:
@@ -42,6 +46,7 @@ jobs:
           event-name: ${{ github.event_name }}
           workflow-ref: ${{ inputs.ref }}
           dispatch-sha: ${{ github.event.client_payload.sha }}
+          with-umbrella: "true"
 
       - uses: pnpm/action-setup@v4
         with:
@@ -58,7 +63,7 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: "1"
       - name: Verify public OpenAPI mirrors
-        run: node src/lib/scripts/verify-public-openapi.mjs
+        run: node scripts/check/verify-public-openapi.mjs
         working-directory: ${{ steps.checkout-app.outputs.app-path }}
 
   deploy:
@@ -67,29 +72,16 @@ jobs:
       github.event.client_payload.target == 'production' ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Load local actions
-        uses: actions/checkout@v5
-        with:
-          sparse-checkout: .github/actions/checkout-app-submodule
-
-      - name: Checkout app source
-        id: checkout-app
-        uses: ./.github/actions/checkout-app-submodule
-        with:
-          repository: lomiafrica/website
-          submodule-path: apps/website
-          token: ${{ secrets.REPO_CHECKOUT_PAT }}
-          event-name: ${{ github.event_name }}
-          workflow-ref: ${{ inputs.ref }}
-          dispatch-sha: ${{ github.event.client_payload.sha }}
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v42.2.0
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
-          working-directory: ${{ github.workspace }}/${{ steps.checkout-app.outputs.app-path }}
-          target: production
+    uses: ./.github/workflows/app-deploy-vercel.yml
+    with:
+      app: website
+      repository: lomiafrica/website
+      submodule-path: apps/website
+      working-directory-mode: app
+      workflow-ref: ${{ inputs.ref }}
+      vercel-target: production
+    secrets:
+      REPO_CHECKOUT_PAT: ${{ secrets.REPO_CHECKOUT_PAT }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}

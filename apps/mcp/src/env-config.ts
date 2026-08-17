@@ -99,20 +99,37 @@ export function getOptionalProvisioningKey(): string | null {
   return cachedPositiveProvisioningKey;
 }
 
+let cachedPositivePartnerKey: string | undefined;
+
+/** Reads partner management key from env (empty/absent returns null). */
+export function getOptionalPartnerKey(): string | null {
+  if (cachedPositivePartnerKey !== undefined) {
+    return cachedPositivePartnerKey;
+  }
+  const key = process.env.LOMI_PARTNER_KEY?.trim() ?? null;
+  if (!key) {
+    return null;
+  }
+  cachedPositivePartnerKey = key;
+  return cachedPositivePartnerKey;
+}
+
 export type McpTransportMode = 'stdio' | 'http';
 
 export function getTransportMode(): McpTransportMode {
   const t = (process.env.LOMI_MCP_TRANSPORT ?? 'stdio').toLowerCase();
-  if (t === 'http' || t === 'stdio') return t as McpTransportMode;
+  if (t === 'http' || t === 'stdio') return t;
   throw new Error(
     `[env] Invalid LOMI_MCP_TRANSPORT=${quoted(process.env.LOMI_MCP_TRANSPORT)}. Use "stdio" or "http".`,
   );
 }
 
-export function listenHostOptions(): {
+export interface ListenHostOptions {
   host: string;
   allowedHosts?: string[];
-} {
+}
+
+export function listenHostOptions(): ListenHostOptions {
   // HTTP entrypoint should be reachable by platform health checks even when
   // LOMI_MCP_TRANSPORT is unset (e.g. start:http deployments on Railway).
   const host = process.env.LOMI_MCP_HTTP_HOST?.trim() || '0.0.0.0';
@@ -260,10 +277,12 @@ export type ReadinessCheck = {
 /**
  * Validates env and outbound config for /ready (does not require manifest).
  */
-export function getMcpReadinessChecks(): {
+export interface McpReadinessResult {
   ok: boolean;
   checks: ReadinessCheck[];
-} {
+}
+
+export function getMcpReadinessChecks(): McpReadinessResult {
   const checks: ReadinessCheck[] = [];
 
   const run = (name: string, fn: () => void): void => {

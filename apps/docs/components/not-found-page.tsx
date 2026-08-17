@@ -2,7 +2,7 @@
 
 'use client';
 
-import { FuzzyText } from '@/components/preview/fuzzy-text';
+import { FuzzyText } from '@lomi./ui/fuzzy-text';
 
 type NotFoundPageProps = {
   label: string;

@@ -10,11 +10,10 @@ import {
   LomiNotFoundError,
   LomiRateLimitError,
   ApiError,
-  type LomiApiErrorBody,
 } from './errors.js';
-import { mapResponseToLomiError } from './http.js';
+import { mapResponseToLomiError, parseApiBody } from './http.js';
 
-export function handleApiError(error: unknown): never {
+export function handleApiError(error: Error | string): never {
   if (error instanceof LomiError) {
     throw error;
   }
@@ -25,7 +24,7 @@ export function handleApiError(error: unknown): never {
 
   if (axios.isAxiosError(error) && error.response) {
     const { status, data, statusText } = error.response;
-    const body = (data ?? {}) as LomiApiErrorBody;
+    const body = parseApiBody(data ?? null);
     throw mapResponseToLomiError(
       status,
       body,

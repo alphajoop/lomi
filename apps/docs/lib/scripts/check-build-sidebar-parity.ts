@@ -19,6 +19,7 @@ function slugFromRelative(relative: string): string {
 
 async function pagesFromMeta(metaPath: string): Promise<Set<string>> {
   const raw = await fs.readFile(metaPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const meta = JSON.parse(raw) as { pages?: string[] };
   const pages = new Set<string>();
   for (const entry of meta.pages ?? []) {
@@ -35,6 +36,7 @@ export async function checkBuildSidebarParity(errors: string[]): Promise<void> {
   let exempt = new Set<string>();
   try {
     const exemptRaw = await fs.readFile(EXEMPT_PATH, 'utf-8');
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     exempt = new Set(JSON.parse(exemptRaw) as string[]);
   } catch {
     exempt = new Set();

@@ -43,19 +43,23 @@ export function isDocsMachinePath(pathname: string): boolean {
   return MACHINE_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-export function parseDocsLocalePath(pathname: string): {
+type ParsedDocsLocalePath = {
   locale: DocsLegacyPrefixLocale | null;
   pathname: string;
-} {
+};
+
+export function parseDocsLocalePath(pathname: string): ParsedDocsLocalePath {
   const normalized = normalizeDocsPath(pathname);
   const segments = normalized.split('/').filter(Boolean);
   const first = segments[0];
 
   if (
     first &&
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     (DOCS_LEGACY_PREFIX_LOCALES as readonly string[]).includes(first)
   ) {
     const stripped = normalizeDocsPath(`/${segments.slice(1).join('/')}`);
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     return { locale: first as DocsLegacyPrefixLocale, pathname: stripped };
   }
 

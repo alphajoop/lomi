@@ -250,7 +250,7 @@ export async function GET() {
   lines.push('## Agent onboarding & MCP OAuth');
   lines.push('');
   lines.push(
-    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/v1/*\` REST API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes).`,
+    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/*\` REST API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes).`,
   );
   lines.push('');
   lines.push('**Credential types:**');
@@ -259,7 +259,7 @@ export async function GET() {
     '- **`lomi_partner_*`**, platform management key (issued by lomi admin). Mint per-user `lomi_prov_*` via Partner API.',
   );
   lines.push(
-    '- **`lomi_prov_*`**, provisioning key for `/provisioning/v1/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).',
+    '- **`lomi_prov_*`**, provisioning key for `/provisioning/*` and MCP 0→1 tools (`x-lomi-provisioning-key`).',
   );
   lines.push(
     '- **`lomi_oat_*`**, OAuth access token from MCP authorization; MCP introspects it to a scoped `lomi_prov_*` session.',
@@ -270,11 +270,11 @@ export async function GET() {
   );
   lines.push('');
   lines.push(
-    '- `POST /partners/v1/provisioning-keys`, mint scoped `lomi_prov_*` for `external_user_ref`',
+    '- `POST /partners/provisioning-keys`, mint scoped `lomi_prov_*` for `external_user_ref`',
   );
-  lines.push('- `GET /partners/v1/provisioning-keys`, list keys');
-  lines.push('- `DELETE /partners/v1/provisioning-keys/{id}`, revoke');
-  lines.push('- `GET /partners/v1/usage`, usage summary');
+  lines.push('- `GET /partners/provisioning-keys`, list keys');
+  lines.push('- `DELETE /partners/provisioning-keys/{id}`, revoke');
+  lines.push('- `GET /partners/usage`, usage summary');
   lines.push('');
   lines.push(
     '**OAuth self-service** (MCP clients with authorization support):',
@@ -295,10 +295,10 @@ export async function GET() {
   lines.push('**Test → live (human-gated):**');
   lines.push('');
   lines.push(
-    '- `POST /provisioning/v1/merchants/{id}/live-activation/request`, agent requests go-live; share `merchant_approval_path` with the human merchant.',
+    '- `POST /provisioning/merchants/{id}/live-activation/request`, agent requests go-live; share `merchant_approval_path` with the human merchant.',
   );
   lines.push(
-    '- `GET /provisioning/v1/merchants/{id}/live-activation/status`, poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).',
+    '- `GET /provisioning/merchants/{id}/live-activation/status`, poll until approved (`live_keys_available` means merchant can retrieve live key on dashboard).',
   );
   lines.push(
     '- Merchant approves at `https://dashboard.lomi.africa/connect/go-live` and retrieves `lomi_sk_*` live secret (never via provisioning API). Starter: AI KYC review; registered: admin approval.',

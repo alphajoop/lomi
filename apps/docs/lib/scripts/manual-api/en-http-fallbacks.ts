@@ -11,7 +11,7 @@ export function isLikelyFrench(text: string): boolean {
   return FRENCH_MARKERS.test(trimmed);
 }
 
-const EN_STANDARD_HTTP_RESPONSES: Record<string, string> = {
+const EN_STANDARD_HTTP_RESPONSES = {
   '200': 'Success',
   '201': 'Created successfully',
   '202': 'Accepted',
@@ -26,7 +26,13 @@ const EN_STANDARD_HTTP_RESPONSES: Record<string, string> = {
   '500': 'Internal server error',
   '502': 'Bad gateway',
   '503': 'Service unavailable',
-};
+} as const;
+
+function isStandardHttpStatus(
+  statusCode: string,
+): statusCode is keyof typeof EN_STANDARD_HTTP_RESPONSES {
+  return Object.hasOwn(EN_STANDARD_HTTP_RESPONSES, statusCode);
+}
 
 export function englishResponseDescription(
   statusCode: string,
@@ -34,7 +40,12 @@ export function englishResponseDescription(
 ): string {
   const desc = openApiDescription?.trim() ?? '';
   if (!desc || isLikelyFrench(desc)) {
-    return EN_STANDARD_HTTP_RESPONSES[statusCode] ?? (desc || ', ');
+    return (
+      (isStandardHttpStatus(statusCode)
+        ? EN_STANDARD_HTTP_RESPONSES[statusCode]
+        : undefined) ??
+      (desc || ', ')
+    );
   }
   return desc;
 }

@@ -18,11 +18,11 @@ describe('openapi-helpers', () => {
     const base = {
       type: 'object',
       properties: {},
-      required: [] as string[],
+      required: new Array<string>(),
     };
     const fixed = ensurePathParamsInInputSchema(
       base,
-      '/accounts/balance/check/{currency}',
+      '/accounts/balance/{currency}',
     );
     expect(fixed.properties).toMatchObject({
       currency: expect.objectContaining({ type: 'string' }),
@@ -41,6 +41,6 @@ describe('openapi-helpers', () => {
     };
     const c = canonicalizeInputSchema(schema);
     expect(c.required).toEqual(['a', 'z']);
-    expect(Object.keys(c.properties as object)).toEqual(['a', 'z']);
+    expect(Object.keys(c.properties ?? {})).toEqual(['a', 'z']);
   });
 });

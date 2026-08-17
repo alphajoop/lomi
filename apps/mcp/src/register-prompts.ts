@@ -1,18 +1,16 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import type { ToolsManifest } from './manifest.js';
+import { toolRefForOperation } from './manifest-lookup.js';
 import type { ProvisioningToolsManifest } from './register-provisioning-tools.js';
 
-/**
- * Resolve a tool name by its stable OpenAPI operation key (e.g. "POST /products"),
- * so prompts keep working regardless of how the tool is named in the manifest.
- * Falls back to the passed key if the operation is not exposed.
- */
-function toolNameByOperation(manifest: ToolsManifest, operationKey: string): string {
-  return (
-    manifest.tools.find((t) => t.operationKey === operationKey)?.name ??
-    operationKey
-  );
+function provisionRef(
+  manifest: ProvisioningToolsManifest | undefined,
+  toolName: string,
+  action: string,
+): string {
+  const tool = manifest?.tools.find((t) => t.name === toolName);
+  return `${tool?.name ?? toolName} action=${action}`;
 }
 
 export function registerLomiPrompts(
@@ -20,51 +18,58 @@ export function registerLomiPrompts(
   manifest: ToolsManifest,
   provisioningManifest?: ProvisioningToolsManifest,
 ): void {
-  const createProduct = toolNameByOperation(manifest, 'POST /products');
-  const createCheckout = toolNameByOperation(manifest, 'POST /checkout-sessions');
-  const createPaymentLink = toolNameByOperation(manifest, 'POST /payment-links');
-  const createWebhook = toolNameByOperation(manifest, 'POST /webhooks');
-  const listTransactions = toolNameByOperation(manifest, 'GET /transactions');
-  const getTransaction = toolNameByOperation(manifest, 'GET /transactions/{id}');
-  const testWebhook = toolNameByOperation(manifest, 'POST /webhooks/{id}/test');
-  const listWebhookLogs = toolNameByOperation(
+  const createProduct = toolRefForOperation(manifest, 'POST /products');
+  const createCheckout = toolRefForOperation(manifest, 'POST /checkout-sessions');
+  const createPaymentLink = toolRefForOperation(manifest, 'POST /payment-links');
+  const createWebhook = toolRefForOperation(manifest, 'POST /webhooks');
+  const listTransactions = toolRefForOperation(manifest, 'GET /transactions');
+  const getTransaction = toolRefForOperation(manifest, 'GET /transactions/{id}');
+  const testWebhook = toolRefForOperation(manifest, 'POST /webhooks/{id}/test');
+  const listWebhookLogs = toolRefForOperation(
     manifest,
-    'GET /webhook-delivery-logs',
+    'GET /webhooks/deliveries',
   );
 
-  const createAccount =
-    provisioningManifest?.tools.find((t) => t.name.includes('post_provisioning_v1_accounts'))
-      ?.name ?? 'lomi_post_provisioning_v1_accounts';
-  const uploadDocument =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('onboarding_documents'),
-    )?.name ?? 'lomi_post_provisioning_v1_merchants_merchantId_onboarding_documents';
-  const extractOnboarding =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('onboarding_extract'),
-    )?.name ?? 'lomi_post_provisioning_v1_merchants_merchantId_onboarding_extract';
-  const completeOnboarding =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('onboarding_complete'),
-    )?.name ?? 'lomi_post_provisioning_v1_merchants_merchantId_onboarding_complete';
-  const getProvisioningStatus =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('onboarding_status'),
-    )?.name ?? 'lomi_get_provisioning_v1_merchants_merchantId_onboarding_status';
-  const getProvisioningApiKeys =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('merchants_merchantId_api_keys'),
-    )?.name ?? 'lomi_get_provisioning_v1_merchants_merchantId_api_keys';
-  const requestLiveActivation =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('live_activation_request'),
-    )?.name ??
-    'lomi_post_provisioning_v1_merchants_merchantId_live_activation_request';
-  const getLiveActivationStatus =
-    provisioningManifest?.tools.find((t) =>
-      t.name.includes('live_activation_status'),
-    )?.name ??
-    'lomi_get_provisioning_v1_merchants_merchantId_live_activation_status';
+  const createAccount = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'create_account',
+  );
+  const uploadDocument = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'upload_document',
+  );
+  const extractOnboarding = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'extract',
+  );
+  const completeOnboarding = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'complete',
+  );
+  const getProvisioningStatus = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'status',
+  );
+  const getProvisioningApiKeys = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'api_keys',
+  );
+  const requestLiveActivation = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'request_live',
+  );
+  const getLiveActivationStatus = provisionRef(
+    provisioningManifest,
+    'lomi_provision',
+    'live_status',
+  );
 
   server.registerPrompt(
     'provision_merchant_from_zero',

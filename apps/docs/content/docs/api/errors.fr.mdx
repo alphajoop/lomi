@@ -73,11 +73,14 @@ Les champs `` `message` `` et `` `details` `` varient ; exemples selon les statu
 
 **`` `409` `` Conflict:**
 
-- `"message": "Conflict"`, `"details": "A webhook with this URL already exists for your organization."`
+- `"code": "idempotency_key_reused"` : la clé a été réutilisée avec un autre corps.
+- `"code": "idempotency_in_progress"` : une requête avec cette clé est encore en cours.
 
 **`` `429` `` Too Many Requests:**
 
-- `"message": "Rate limit exceeded"`
+- `"code": "rate_limit_exceeded"`. La réponse inclut `Retry-After`.
+
+Autres codes stables : `validation_failed` (détails par champ), `amount_invalid`, `invalid_cursor`, `api_access_suspended`.
 
 **`` `500` `` Internal Server Error:**
 

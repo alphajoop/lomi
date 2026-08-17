@@ -4,6 +4,7 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions, linkItems, logo } from '@/lib/utils/layout.shared';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
+import { isString } from '@lomi./shared';
 // import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import type { CSSProperties, ReactNode } from 'react';
 import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
@@ -13,7 +14,7 @@ import type { Language } from '@/lib/i18n/config';
 // import { Sparkles } from 'lucide-react';
 // import { AISearchTrigger } from '@/components/ai';
 // import { cn } from '@/lib/cn';
-// import { buttonVariants } from '@/components/ui/button';
+// import { buttonVariants } from '@lomi./ui/button';
 import 'katex/dist/katex.min.css';
 import { TryItOpenApiPanel } from '@/components/docs/try-it-openapi-panel';
 
@@ -31,7 +32,7 @@ function getFirstPageUrl(node: Folder): string | undefined {
   return undefined;
 }
 
-const SECTION_LABEL_KEYS: Record<string, string> = {
+const SECTION_LABEL_KEYS = {
   Start: 'section.start',
   Build: 'section.build',
   Resources: 'section.resources',
@@ -42,9 +43,9 @@ const SECTION_LABEL_KEYS: Record<string, string> = {
   Implementation: 'section.implementation',
   Community: 'section.community',
   Management: 'section.management',
-};
+} as const;
 
-const SECTION_DESCRIPTION_KEYS: Record<string, string> = {
+const SECTION_DESCRIPTION_KEYS = {
   'Understand lomi., create your account, get API keys, make a test payment, and go live.':
     'sectionDescription.start',
   'Choose an integration path and build checkout, payment links, subscriptions, webhooks, and tools.':
@@ -58,12 +59,24 @@ const SECTION_DESCRIPTION_KEYS: Record<string, string> = {
   'Complete reference to building with lomi. API.':
     'sectionDescription.apiReference',
   'Payment and commerce endpoints.': 'sectionDescription.restApi',
-};
+} as const;
+
+function isSectionLabelKey(
+  value: string,
+): value is keyof typeof SECTION_LABEL_KEYS {
+  return Object.hasOwn(SECTION_LABEL_KEYS, value);
+}
+
+function isSectionDescriptionKey(
+  value: string,
+): value is keyof typeof SECTION_DESCRIPTION_KEYS {
+  return Object.hasOwn(SECTION_DESCRIPTION_KEYS, value);
+}
 
 function localizeTreeLabel(value: ReactNode, locale: Language): ReactNode {
-  if (typeof value !== 'string') return value;
+  if (!isString(value)) return value;
 
-  const key = SECTION_LABEL_KEYS[value];
+  const key = isSectionLabelKey(value) ? SECTION_LABEL_KEYS[value] : undefined;
   if (!key) return value;
 
   return translate(key, locale);
@@ -73,9 +86,11 @@ function localizeTreeDescription(
   value: ReactNode,
   locale: Language,
 ): ReactNode {
-  if (typeof value !== 'string') return value;
+  if (!isString(value)) return value;
 
-  const key = SECTION_DESCRIPTION_KEYS[value];
+  const key = isSectionDescriptionKey(value)
+    ? SECTION_DESCRIPTION_KEYS[value]
+    : undefined;
   if (!key) return value;
 
   return translate(key, locale);
@@ -137,6 +152,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
           <div
             className="[&_svg]:size-full rounded-sm size-full text-(--tab-color) max-md:bg-(--tab-color)/10 max-md:border max-md:p-1.5"
             style={
+              // SAFETY: Boundary value matches the asserted domain type at this call site.
               {
                 '--tab-color': color,
               } as CSSProperties

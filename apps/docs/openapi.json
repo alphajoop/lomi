@@ -93,7 +93,7 @@
         ]
       }
     },
-    "/accounts/balance/check/{currency}": {
+    "/accounts/balance/{currency}": {
       "get": {
         "description": "Vérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée",
         "operationId": "AccountsController_checkAvailableBalance",
@@ -190,6 +190,76 @@
         ]
       }
     },
+    "/organizations/radar-settings": {
+      "get": {
+        "operationId": "OrganizationsController_getRadarSettings",
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get Radar settings for the organization",
+        "tags": [
+          "Organisations"
+        ]
+      },
+      "patch": {
+        "operationId": "OrganizationsController_updateRadarSettings",
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRadarSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Update Radar settings",
+        "tags": [
+          "Organisations"
+        ]
+      }
+    },
     "/organizations/{id}": {
       "get": {
         "description": "Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)",
@@ -218,6 +288,133 @@
         "summary": "Organisation par ID",
         "tags": [
           "Organisations"
+        ]
+      }
+    },
+    "/risk-assessments": {
+      "get": {
+        "operationId": "RadarController_listAssessments",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "rail",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "card",
+                "mtn",
+                "wave"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "decision",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "allow",
+                "flag",
+                "block"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Risk assessments"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List payment risk assessments",
+        "tags": [
+          "Radar"
+        ]
+      }
+    },
+    "/risk-assessments/{id}": {
+      "get": {
+        "operationId": "RadarController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Risk assessment ID",
+            "schema": {}
+          },
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a risk assessment",
+        "tags": [
+          "Radar"
         ]
       }
     },
@@ -1164,10 +1361,57 @@
         ]
       }
     },
-    "/customers/{id}/portal-launch-session": {
+    "/customers/{id}/subscriptions": {
+      "get": {
+        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
+        "operationId": "CustomersController_getSubscriptions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "UUID du client",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des abonnements du client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "404": {
+            "description": "Client introuvable ou accès refusé"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Abonnements d’un client",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/customers/{id}/portal": {
       "post": {
         "description": "Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.",
-        "operationId": "CustomersController_createPortalLaunchSession",
+        "operationId": "CustomersController_createPortalSession",
         "parameters": [
           {
             "name": "id",
@@ -1820,7 +2064,7 @@
         ]
       }
     },
-    "/products/{id}/prices/{priceId}/set-default": {
+    "/products/{id}/prices/{priceId}/default": {
       "post": {
         "description": "Indique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.",
         "operationId": "ProductsController_setDefaultPrice",
@@ -1946,16 +2190,15 @@
         ]
       }
     },
-    "/subscriptions/customer/{customerId}": {
+    "/subscriptions/{id}/usage": {
       "get": {
-        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
-        "operationId": "SubscriptionsController_findByCustomer",
+        "operationId": "SubscriptionsController_getUsage",
         "parameters": [
           {
-            "name": "customerId",
+            "name": "id",
             "required": true,
             "in": "path",
-            "description": "UUID du client",
+            "description": "UUID de l’abonnement",
             "schema": {
               "type": "string"
             }
@@ -1963,23 +2206,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Liste des abonnements du client",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SubscriptionResponseDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Clé API invalide ou manquante"
-          },
-          "404": {
-            "description": "Client introuvable ou accès refusé"
+            "description": ""
           }
         },
         "security": [
@@ -1987,7 +2214,7 @@
             "api-key": []
           }
         ],
-        "summary": "Abonnements d’un client",
+        "summary": "Get meter usage for a subscription",
         "tags": [
           "Subscriptions"
         ]
@@ -2071,10 +2298,10 @@
         ]
       }
     },
-    "/subscriptions/{id}/uncancel": {
+    "/subscriptions/{id}/resume": {
       "post": {
         "description": "Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).",
-        "operationId": "SubscriptionsController_uncancel",
+        "operationId": "SubscriptionsController_resume",
         "parameters": [
           {
             "name": "id",
@@ -2251,7 +2478,7 @@
         ]
       }
     },
-    "/discount-coupons": {
+    "/coupons": {
       "get": {
         "description": "Renvoie tous les coupons de réduction de l'organisation du marchand authentifié.",
         "operationId": "DiscountCouponsController_findAll",
@@ -2281,7 +2508,7 @@
         ],
         "summary": "Lister les coupons",
         "tags": [
-          "Discount Coupons"
+          "Coupons"
         ]
       },
       "post": {
@@ -2313,11 +2540,11 @@
         ],
         "summary": "Créer un coupon",
         "tags": [
-          "Discount Coupons"
+          "Coupons"
         ]
       }
     },
-    "/discount-coupons/{id}/performance": {
+    "/coupons/{id}/performance": {
       "get": {
         "description": "Renvoie les statistiques d'utilisation et l'impact sur le chiffre d'affaires pour un coupon donné.",
         "operationId": "DiscountCouponsController_getPerformance",
@@ -2374,11 +2601,11 @@
         ],
         "summary": "Indicateurs de performance du coupon",
         "tags": [
-          "Discount Coupons"
+          "Coupons"
         ]
       }
     },
-    "/discount-coupons/{id}": {
+    "/coupons/{id}": {
       "get": {
         "description": "Renvoie un coupon. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "DiscountCouponsController_findOne",
@@ -2418,7 +2645,7 @@
         ],
         "summary": "Obtenir un coupon par ID",
         "tags": [
-          "Discount Coupons"
+          "Coupons"
         ]
       }
     },
@@ -3264,203 +3491,6 @@
         ]
       }
     },
-    "/risk-assessments": {
-      "get": {
-        "operationId": "RadarController_listAssessments",
-        "parameters": [
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "endDate",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "startDate",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "rail",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "card",
-                "mtn",
-                "wave"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "decision",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "enum": [
-                "allow",
-                "flag",
-                "block"
-              ],
-              "type": "string"
-            }
-          },
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Risk assessments"
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "List payment risk assessments",
-        "tags": [
-          "Radar"
-        ]
-      }
-    },
-    "/risk-assessments/{id}": {
-      "get": {
-        "operationId": "RadarController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Risk assessment ID",
-            "schema": {}
-          },
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Get a risk assessment",
-        "tags": [
-          "Radar"
-        ]
-      }
-    },
-    "/organization/radar-settings": {
-      "get": {
-        "operationId": "RadarController_getSettings",
-        "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Get Radar settings for the organization",
-        "tags": [
-          "Radar"
-        ]
-      },
-      "patch": {
-        "operationId": "RadarController_updateSettings",
-        "parameters": [
-          {
-            "name": "Lomi-Account",
-            "in": "header",
-            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "acct_1234567890"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateRadarSettingsDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Update Radar settings",
-        "tags": [
-          "Radar"
-        ]
-      }
-    },
     "/settlements": {
       "get": {
         "description": "Returns completed payment totals grouped by availability date and currency. Each settlement_id is {currency}:{YYYY-MM-DD} (UTC date of available_at).",
@@ -3570,7 +3600,7 @@
         ]
       }
     },
-    "/webhook-delivery-logs": {
+    "/webhooks/deliveries": {
       "get": {
         "description": "Renvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.",
         "operationId": "WebhookDeliveryLogsController_findAll",
@@ -3654,7 +3684,7 @@
         ]
       }
     },
-    "/webhook-delivery-logs/{id}": {
+    "/webhooks/deliveries/{id}": {
       "get": {
         "description": "Renvoie un journal. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "WebhookDeliveryLogsController_findOne",
@@ -3843,9 +3873,9 @@
         ]
       }
     },
-    "/logs/{type}/{id}": {
+    "/logs/{id}": {
       "get": {
-        "description": "Returns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.",
+        "description": "Returns a single log entry by ID. Pass `type` to select the log stream. Responds with 404 when the entry does not exist or is outside the API key organization scope.",
         "operationId": "LogsController_findOne",
         "parameters": [
           {
@@ -3860,7 +3890,8 @@
           {
             "name": "type",
             "required": true,
-            "in": "path",
+            "in": "query",
+            "description": "Log stream to query",
             "schema": {
               "enum": [
                 "api_request",
@@ -3977,19 +4008,19 @@
         ]
       }
     },
-    "/webhooks/{webhookId}/logs/{logId}/retry": {
+    "/webhooks/{id}/deliveries/{deliveryId}/retry": {
       "post": {
         "operationId": "WebhooksController_retryDelivery",
         "parameters": [
           {
-            "name": "logId",
+            "name": "deliveryId",
             "required": true,
             "in": "path",
             "description": "Delivery log UUID",
             "schema": {}
           },
           {
-            "name": "webhookId",
+            "name": "id",
             "required": true,
             "in": "path",
             "description": "Webhook UUID",
@@ -4568,7 +4599,7 @@
         ]
       }
     },
-    "/usage-events": {
+    "/usage/events": {
       "get": {
         "operationId": "UsageEventsController_findAll",
         "parameters": [
@@ -4636,7 +4667,7 @@
         ],
         "summary": "List usage events",
         "tags": [
-          "Usage events"
+          "Usage"
         ]
       },
       "post": {
@@ -4662,11 +4693,11 @@
         ],
         "summary": "Record a usage event",
         "tags": [
-          "Usage events"
+          "Usage"
         ]
       }
     },
-    "/usage-events/{id}": {
+    "/usage/events/{id}": {
       "get": {
         "operationId": "UsageEventsController_findOne",
         "parameters": [
@@ -4697,11 +4728,11 @@
         ],
         "summary": "Get a usage event",
         "tags": [
-          "Usage events"
+          "Usage"
         ]
       }
     },
-    "/usage-subscriptions": {
+    "/usage/subscriptions": {
       "post": {
         "description": "Enrolls a customer on a usage_based product without an upfront charge. Required before billing metered usage.",
         "operationId": "UsageEventsController_createUsageSubscription",
@@ -4725,11 +4756,11 @@
         ],
         "summary": "Create a usage subscription",
         "tags": [
-          "Usage events"
+          "Usage"
         ]
       }
     },
-    "/usage-billing/periods": {
+    "/usage/periods": {
       "get": {
         "operationId": "UsageBillingController_listPeriods",
         "parameters": [
@@ -4768,31 +4799,11 @@
         ],
         "summary": "List usage billing periods",
         "tags": [
-          "Usage billing"
+          "Usage"
         ]
       }
     },
-    "/usage-billing/subscriptions/{subscriptionId}/usage": {
-      "get": {
-        "operationId": "UsageBillingController_getSubscriptionUsage",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "api-key": []
-          }
-        ],
-        "summary": "Get meter usage for a subscription",
-        "tags": [
-          "Usage billing"
-        ]
-      }
-    },
-    "/usage-billing/revenue": {
+    "/usage/revenue": {
       "get": {
         "operationId": "UsageBillingController_getRevenue",
         "parameters": [
@@ -4821,11 +4832,11 @@
         ],
         "summary": "Combined MRR + usage + one-time revenue metrics",
         "tags": [
-          "Usage billing"
+          "Usage"
         ]
       }
     },
-    "/usage-billing/credits": {
+    "/usage/credits": {
       "post": {
         "operationId": "UsageBillingController_creditWallet",
         "parameters": [],
@@ -4841,11 +4852,11 @@
         ],
         "summary": "Credit prepaid usage units to a customer meter wallet",
         "tags": [
-          "Usage billing"
+          "Usage"
         ]
       }
     },
-    "/usage-billing/entitlements": {
+    "/usage/entitlements": {
       "post": {
         "operationId": "UsageBillingController_createEntitlement",
         "parameters": [],
@@ -4861,14 +4872,25 @@
         ],
         "summary": "Create or update a plan entitlement feature",
         "tags": [
-          "Usage billing"
+          "Usage"
         ]
-      }
-    },
-    "/usage-billing/entitlements/check": {
+      },
       "get": {
         "operationId": "UsageBillingController_checkEntitlement",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "feature_key",
+            "required": true,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "customer_id",
+            "required": true,
+            "in": "query",
+            "schema": {}
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -4881,7 +4903,7 @@
         ],
         "summary": "Check if a customer has an active entitlement",
         "tags": [
-          "Usage billing"
+          "Usage"
         ]
       }
     }
@@ -4903,10 +4925,10 @@
       "name": "Checkout Sessions"
     },
     {
-      "name": "Customers"
+      "name": "Coupons"
     },
     {
-      "name": "Discount Coupons"
+      "name": "Customers"
     },
     {
       "name": "Logs"
@@ -4936,10 +4958,7 @@
       "name": "Transactions"
     },
     {
-      "name": "Usage billing"
-    },
-    {
-      "name": "Usage events"
+      "name": "Usage"
     },
     {
       "name": "Webhooks"
@@ -5277,6 +5296,24 @@
           "currency_code",
           "calculated_at"
         ]
+      },
+      "UpdateRadarSettingsDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "monitor",
+              "block"
+            ]
+          },
+          "stripe_radar_passthrough": {
+            "type": "boolean"
+          }
+        }
       },
       "MerchantResponseDto": {
         "type": "object",
@@ -5816,6 +5853,110 @@
           "flow_subscription_id",
           "return_url",
           "flow_after_completion_url"
+        ]
+      },
+      "SubscriptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique subscription identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "456e7890-e89b-12d3-a456-426614174000",
+            "description": "Product ID (recurring product)"
+          },
+          "price_id": {
+            "type": "string",
+            "example": "321e4567-e89b-12d3-a456-426614174000",
+            "description": "Price ID used for this subscription",
+            "nullable": true
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "654e7890-e89b-12d3-a456-426614174000",
+            "description": "Customer ID"
+          },
+          "status": {
+            "type": "string",
+            "example": "active",
+            "description": "Subscription status",
+            "enum": [
+              "pending",
+              "active",
+              "past_due",
+              "cancelled",
+              "trial",
+              "paused",
+              "expired"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "example": "2024-01-15",
+            "description": "Subscription start date"
+          },
+          "end_date": {
+            "type": "string",
+            "example": "2024-12-31",
+            "description": "Subscription end date (set when cancelled)",
+            "nullable": true
+          },
+          "next_billing_date": {
+            "type": "string",
+            "example": "2024-02-15",
+            "description": "Next billing date (system-managed)",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "notes": "Premium plan"
+            },
+            "description": "Additional metadata as JSON",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was last updated"
+          }
+        },
+        "required": [
+          "subscription_id",
+          "organization_id",
+          "product_id",
+          "price_id",
+          "customer_id",
+          "status",
+          "start_date",
+          "end_date",
+          "next_billing_date",
+          "metadata",
+          "environment",
+          "created_at",
+          "updated_at"
         ]
       },
       "PaymentRequestResponseDto": {
@@ -6420,110 +6561,6 @@
           "updated_at"
         ]
       },
-      "SubscriptionResponseDto": {
-        "type": "object",
-        "properties": {
-          "subscription_id": {
-            "type": "string",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
-            "description": "Unique subscription identifier"
-          },
-          "organization_id": {
-            "type": "string",
-            "example": "789e0123-e89b-12d3-a456-426614174000",
-            "description": "Organization ID"
-          },
-          "product_id": {
-            "type": "string",
-            "example": "456e7890-e89b-12d3-a456-426614174000",
-            "description": "Product ID (recurring product)"
-          },
-          "price_id": {
-            "type": "string",
-            "example": "321e4567-e89b-12d3-a456-426614174000",
-            "description": "Price ID used for this subscription",
-            "nullable": true
-          },
-          "customer_id": {
-            "type": "string",
-            "example": "654e7890-e89b-12d3-a456-426614174000",
-            "description": "Customer ID"
-          },
-          "status": {
-            "type": "string",
-            "example": "active",
-            "description": "Subscription status",
-            "enum": [
-              "pending",
-              "active",
-              "past_due",
-              "cancelled",
-              "trial",
-              "paused",
-              "expired"
-            ]
-          },
-          "start_date": {
-            "type": "string",
-            "example": "2024-01-15",
-            "description": "Subscription start date"
-          },
-          "end_date": {
-            "type": "string",
-            "example": "2024-12-31",
-            "description": "Subscription end date (set when cancelled)",
-            "nullable": true
-          },
-          "next_billing_date": {
-            "type": "string",
-            "example": "2024-02-15",
-            "description": "Next billing date (system-managed)",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "example": {
-              "notes": "Premium plan"
-            },
-            "description": "Additional metadata as JSON",
-            "nullable": true
-          },
-          "environment": {
-            "type": "string",
-            "example": "live",
-            "description": "Environment (test or live)",
-            "enum": [
-              "test",
-              "live"
-            ]
-          },
-          "created_at": {
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z",
-            "description": "When the subscription was created"
-          },
-          "updated_at": {
-            "type": "string",
-            "example": "2024-01-15T10:30:00Z",
-            "description": "When the subscription was last updated"
-          }
-        },
-        "required": [
-          "subscription_id",
-          "organization_id",
-          "product_id",
-          "price_id",
-          "customer_id",
-          "status",
-          "start_date",
-          "end_date",
-          "next_billing_date",
-          "metadata",
-          "environment",
-          "created_at",
-          "updated_at"
-        ]
-      },
       "DiscountCouponResponseDto": {
         "type": "object",
         "properties": {
@@ -7064,24 +7101,6 @@
         "required": [
           "success"
         ]
-      },
-      "UpdateRadarSettingsDto": {
-        "type": "object",
-        "properties": {
-          "enabled": {
-            "type": "boolean"
-          },
-          "mode": {
-            "type": "string",
-            "enum": [
-              "monitor",
-              "block"
-            ]
-          },
-          "stripe_radar_passthrough": {
-            "type": "boolean"
-          }
-        }
       },
       "WebhookDeliveryLogResponseDto": {
         "type": "object",

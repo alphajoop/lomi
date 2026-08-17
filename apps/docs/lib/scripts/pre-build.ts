@@ -56,6 +56,7 @@ async function normalizeOpenApiSecurityFile(): Promise<void> {
   if (!existsSync(openApiPath)) return;
 
   const raw = await readFile(openApiPath, 'utf-8');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const spec = JSON.parse(raw) as Document;
   const normalized = normalizeOpenApiSecurity(spec);
   await writeFile(

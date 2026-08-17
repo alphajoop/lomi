@@ -4,7 +4,7 @@
 
 import { useParams } from 'next/navigation';
 import { type ReactNode, useId, type SVGProps, type JSX } from 'react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 export function Body({ children }: { children: ReactNode }): JSX.Element {
   const mode = useMode();

@@ -6,13 +6,12 @@
   "private": true,
   "scripts": {
     "generate:all": "node scripts/generate-all-sdks.js",
-    "generate:ts": "cd typescript && npm install && npm run generate && npm run build",
-    "generate:js": "cd javascript && npm install && npm run generate && npm run build",
+    "generate:ts": "pnpm --dir ts install && pnpm --dir ts generate && pnpm --dir ts build",
     "generate:python": "node scripts/python-generate.js",
     "generate:go": "node scripts/go-generate.js",
     "generate:php": "node scripts/php-generate.js",
     "verify:sdk-parity": "node scripts/verify-sdk-surface-parity.js",
-    "build:embed": "cd embed && npm install && npm run build"
+    "build:embed": "pnpm --dir embed install && pnpm --dir embed build"
   },
   "keywords": [
     "lomi",

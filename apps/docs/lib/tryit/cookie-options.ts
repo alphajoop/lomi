@@ -12,6 +12,5 @@ export function tryitPreferenceCookieOptions() {
     sameSite: 'lax' as const,
     secure: isProduction,
     maxAge: 60 * 60 * 24 * 365,
-    ...(isProduction ? { domain: '.lomi.africa' as const } : {}),
   };
 }

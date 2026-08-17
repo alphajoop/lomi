@@ -45,7 +45,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/accounts/balance/check/{currency}": {
+    "/accounts/balance/{currency}": {
         parameters: {
             query?: never;
             header?: never;
@@ -105,6 +105,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/organizations/radar-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Radar settings for the organization */
+        get: operations["OrganizationsController_getRadarSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Radar settings */
+        patch: operations["OrganizationsController_updateRadarSettings"];
+        trace?: never;
+    };
     "/organizations/{id}": {
         parameters: {
             query?: never;
@@ -125,6 +143,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/risk-assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List payment risk assessments */
+        get: operations["RadarController_listAssessments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risk-assessments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a risk assessment */
+        get: operations["RadarController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/merchants/{id}": {
         parameters: {
             query?: never;
@@ -134,7 +186,7 @@ export interface paths {
         };
         /**
          * Get merchant details
-         * @description Returns merchant profile and organization metrics (MRR, ARR, LTV). Metrics are refreshed daily and on subscription changes.
+         * @description Returns merchant profile and metrics (MRR, ARR, predicted per-customer LTV) for the organization linked to the API key. Metrics are refreshed daily and on subscription changes.
          */
         get: operations["MerchantsController_getDetails"];
         put?: never;
@@ -152,7 +204,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get merchant MRR */
+        /**
+         * Get merchant MRR
+         * @description Monthly Recurring Revenue for the organization linked to the API key (org default currency). Scoped to that org even if the merchant belongs to multiple organizations.
+         */
         get: operations["MerchantsController_getMrr"];
         put?: never;
         post?: never;
@@ -169,7 +224,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get merchant ARR */
+        /**
+         * Get merchant ARR
+         * @description Annual Recurring Revenue (MRR × 12) for the organization linked to the API key (org default currency). Scoped to that org even if the merchant belongs to multiple organizations.
+         */
         get: operations["MerchantsController_getArr"];
         put?: never;
         post?: never;
@@ -348,7 +406,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/customers/{id}/portal-launch-session": {
+    "/customers/{id}/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Abonnements d’un client
+         * @description Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+         */
+        get: operations["CustomersController_getSubscriptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers/{id}/portal": {
         parameters: {
             query?: never;
             header?: never;
@@ -361,7 +439,7 @@ export interface paths {
          * Créer une session de lancement du portail client
          * @description Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.
          */
-        post: operations["CustomersController_createPortalLaunchSession"];
+        post: operations["CustomersController_createPortalSession"];
         delete?: never;
         options?: never;
         head?: never;
@@ -514,7 +592,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/products/{id}/prices/{priceId}/set-default": {
+    "/products/{id}/prices/{priceId}/default": {
         parameters: {
             query?: never;
             header?: never;
@@ -554,18 +632,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/subscriptions/customer/{customerId}": {
+    "/subscriptions/{id}/usage": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Abonnements d’un client
-         * @description Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
-         */
-        get: operations["SubscriptionsController_findByCustomer"];
+        /** Get meter usage for a subscription */
+        get: operations["SubscriptionsController_getUsage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -598,7 +673,7 @@ export interface paths {
         patch: operations["SubscriptionsController_update"];
         trace?: never;
     };
-    "/subscriptions/{id}/uncancel": {
+    "/subscriptions/{id}/resume": {
         parameters: {
             query?: never;
             header?: never;
@@ -611,7 +686,7 @@ export interface paths {
          * Annuler une résiliation planifiée
          * @description Retire une résiliation planifiée en fin de période (`cancel_at_period_end`).
          */
-        post: operations["SubscriptionsController_uncancel"];
+        post: operations["SubscriptionsController_resume"];
         delete?: never;
         options?: never;
         head?: never;
@@ -658,7 +733,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/discount-coupons": {
+    "/coupons": {
         parameters: {
             query?: never;
             header?: never;
@@ -682,7 +757,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/discount-coupons/{id}/performance": {
+    "/coupons/{id}/performance": {
         parameters: {
             query?: never;
             header?: never;
@@ -702,7 +777,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/discount-coupons/{id}": {
+    "/coupons/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -882,58 +957,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/risk-assessments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List payment risk assessments */
-        get: operations["RadarController_listAssessments"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/risk-assessments/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a risk assessment */
-        get: operations["RadarController_findOne"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organization/radar-settings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Radar settings for the organization */
-        get: operations["RadarController_getSettings"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update Radar settings */
-        patch: operations["RadarController_updateSettings"];
-        trace?: never;
-    };
     "/settlements": {
         parameters: {
             query?: never;
@@ -974,7 +997,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhook-delivery-logs": {
+    "/webhooks/deliveries": {
         parameters: {
             query?: never;
             header?: never;
@@ -994,7 +1017,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhook-delivery-logs/{id}": {
+    "/webhooks/deliveries/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1039,7 +1062,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/logs/{type}/{id}": {
+    "/logs/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1048,7 +1071,7 @@ export interface paths {
         };
         /**
          * Get a log entry
-         * @description Returns a single log entry by type and ID. Responds with 404 when the entry does not exist or is outside the API key organization scope.
+         * @description Returns a single log entry by ID. Pass `type` to select the log stream. Responds with 404 when the entry does not exist or is outside the API key organization scope.
          */
         get: operations["LogsController_findOne"];
         put?: never;
@@ -1094,7 +1117,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhooks/{webhookId}/logs/{logId}/retry": {
+    "/webhooks/{id}/deliveries/{deliveryId}/retry": {
         parameters: {
             query?: never;
             header?: never;
@@ -1303,7 +1326,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-events": {
+    "/usage/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -1324,7 +1347,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-events/{id}": {
+    "/usage/events/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -1341,7 +1364,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-subscriptions": {
+    "/usage/subscriptions": {
         parameters: {
             query?: never;
             header?: never;
@@ -1361,7 +1384,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-billing/periods": {
+    "/usage/periods": {
         parameters: {
             query?: never;
             header?: never;
@@ -1378,24 +1401,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-billing/subscriptions/{subscriptionId}/usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get meter usage for a subscription */
-        get: operations["UsageBillingController_getSubscriptionUsage"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/usage-billing/revenue": {
+    "/usage/revenue": {
         parameters: {
             query?: never;
             header?: never;
@@ -1412,7 +1418,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-billing/credits": {
+    "/usage/credits": {
         parameters: {
             query?: never;
             header?: never;
@@ -1429,24 +1435,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/usage-billing/entitlements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create or update a plan entitlement feature */
-        post: operations["UsageBillingController_createEntitlement"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/usage-billing/entitlements/check": {
+    "/usage/entitlements": {
         parameters: {
             query?: never;
             header?: never;
@@ -1456,7 +1445,8 @@ export interface paths {
         /** Check if a customer has an active entitlement */
         get: operations["UsageBillingController_checkEntitlement"];
         put?: never;
-        post?: never;
+        /** Create or update a plan entitlement feature */
+        post: operations["UsageBillingController_createEntitlement"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1616,8 +1606,8 @@ export interface components {
              */
             arr: number;
             /**
-             * @description Average Customer Lifetime Value
-             * @example 150000
+             * @description Predicted per-customer lifetime value (Customer Value x Avg Lifespan), org default currency
+             * @example 14250
              */
             merchant_lifetime_value: number;
             /**
@@ -1705,6 +1695,12 @@ export interface components {
              */
             calculated_at: string;
         };
+        UpdateRadarSettingsDto: {
+            enabled?: boolean;
+            /** @enum {string} */
+            mode?: "monitor" | "block";
+            stripe_radar_passthrough?: boolean;
+        };
         MerchantResponseDto: {
             /** @example 904d003c-3736-41d4-90a5-9de74d404fd7 */
             merchant_id: string;
@@ -1716,11 +1712,20 @@ export interface components {
             phone_number?: string;
             /** @example SN */
             country?: string;
-            /** @example 50000 */
+            /**
+             * @description Monthly Recurring Revenue for the organization linked to the API key, in org default currency
+             * @example 50000
+             */
             mrr: number;
-            /** @example 600000 */
+            /**
+             * @description Annual Recurring Revenue (MRR × 12) for the organization linked to the API key, in org default currency
+             * @example 600000
+             */
             arr: number;
-            /** @example 1200000 */
+            /**
+             * @description Predicted per-customer lifetime value (Customer Value x Avg Lifespan) for the linked organization, in org default currency
+             * @example 14250
+             */
             merchant_lifetime_value: number;
             /** @example 3 */
             retry_payment_every?: number;
@@ -1732,6 +1737,10 @@ export interface components {
         };
         MerchantMrrResponseDto: {
             merchant_id: string;
+            /**
+             * @description Monthly Recurring Revenue for the organization linked to the API key, in org default currency
+             * @example 50000
+             */
             mrr: number;
             /** @example XOF */
             currency_code: string;
@@ -1739,6 +1748,10 @@ export interface components {
         };
         MerchantArrResponseDto: {
             merchant_id: string;
+            /**
+             * @description Annual Recurring Revenue (MRR × 12) for the organization linked to the API key, in org default currency
+             * @example 600000
+             */
             arr: number;
             /** @example XOF */
             currency_code: string;
@@ -2035,6 +2048,77 @@ export interface components {
              * @example https://merchant.example.com/account/subscription-cancelled
              */
             flow_after_completion_url: string | null;
+        };
+        SubscriptionResponseDto: {
+            /**
+             * @description Unique subscription identifier
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            subscription_id: string;
+            /**
+             * @description Organization ID
+             * @example 789e0123-e89b-12d3-a456-426614174000
+             */
+            organization_id: string;
+            /**
+             * @description Product ID (recurring product)
+             * @example 456e7890-e89b-12d3-a456-426614174000
+             */
+            product_id: string;
+            /**
+             * @description Price ID used for this subscription
+             * @example 321e4567-e89b-12d3-a456-426614174000
+             */
+            price_id: string | null;
+            /**
+             * @description Customer ID
+             * @example 654e7890-e89b-12d3-a456-426614174000
+             */
+            customer_id: string;
+            /**
+             * @description Subscription status
+             * @example active
+             * @enum {string}
+             */
+            status: "pending" | "active" | "past_due" | "cancelled" | "trial" | "paused" | "expired";
+            /**
+             * @description Subscription start date
+             * @example 2024-01-15
+             */
+            start_date: string;
+            /**
+             * @description Subscription end date (set when cancelled)
+             * @example 2024-12-31
+             */
+            end_date: string | null;
+            /**
+             * @description Next billing date (system-managed)
+             * @example 2024-02-15
+             */
+            next_billing_date: string | null;
+            /**
+             * @description Additional metadata as JSON
+             * @example {
+             *       "notes": "Premium plan"
+             *     }
+             */
+            metadata: Record<string, never> | null;
+            /**
+             * @description Environment (test or live)
+             * @example live
+             * @enum {string}
+             */
+            environment: "test" | "live";
+            /**
+             * @description When the subscription was created
+             * @example 2024-01-15T10:30:00Z
+             */
+            created_at: string;
+            /**
+             * @description When the subscription was last updated
+             * @example 2024-01-15T10:30:00Z
+             */
+            updated_at: string;
         };
         PaymentRequestResponseDto: {
             /** @example 123 */
@@ -2350,77 +2434,6 @@ export interface components {
              */
             updated_at: string;
         };
-        SubscriptionResponseDto: {
-            /**
-             * @description Unique subscription identifier
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            subscription_id: string;
-            /**
-             * @description Organization ID
-             * @example 789e0123-e89b-12d3-a456-426614174000
-             */
-            organization_id: string;
-            /**
-             * @description Product ID (recurring product)
-             * @example 456e7890-e89b-12d3-a456-426614174000
-             */
-            product_id: string;
-            /**
-             * @description Price ID used for this subscription
-             * @example 321e4567-e89b-12d3-a456-426614174000
-             */
-            price_id: string | null;
-            /**
-             * @description Customer ID
-             * @example 654e7890-e89b-12d3-a456-426614174000
-             */
-            customer_id: string;
-            /**
-             * @description Subscription status
-             * @example active
-             * @enum {string}
-             */
-            status: "pending" | "active" | "past_due" | "cancelled" | "trial" | "paused" | "expired";
-            /**
-             * @description Subscription start date
-             * @example 2024-01-15
-             */
-            start_date: string;
-            /**
-             * @description Subscription end date (set when cancelled)
-             * @example 2024-12-31
-             */
-            end_date: string | null;
-            /**
-             * @description Next billing date (system-managed)
-             * @example 2024-02-15
-             */
-            next_billing_date: string | null;
-            /**
-             * @description Additional metadata as JSON
-             * @example {
-             *       "notes": "Premium plan"
-             *     }
-             */
-            metadata: Record<string, never> | null;
-            /**
-             * @description Environment (test or live)
-             * @example live
-             * @enum {string}
-             */
-            environment: "test" | "live";
-            /**
-             * @description When the subscription was created
-             * @example 2024-01-15T10:30:00Z
-             */
-            created_at: string;
-            /**
-             * @description When the subscription was last updated
-             * @example 2024-01-15T10:30:00Z
-             */
-            updated_at: string;
-        };
         DiscountCouponResponseDto: {
             /**
              * @description Unique coupon identifier
@@ -2683,12 +2696,6 @@ export interface components {
             /** @example processing */
             status?: string;
             message?: string;
-        };
-        UpdateRadarSettingsDto: {
-            enabled?: boolean;
-            /** @enum {string} */
-            mode?: "monitor" | "block";
-            stripe_radar_passthrough?: boolean;
         };
         WebhookDeliveryLogResponseDto: {
             /**
@@ -3338,6 +3345,50 @@ export interface operations {
             };
         };
     };
+    OrganizationsController_getRadarSettings: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
+                "Lomi-Account"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrganizationsController_updateRadarSettings: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
+                "Lomi-Account"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRadarSettingsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     OrganizationsController_findOne: {
         parameters: {
             query?: never;
@@ -3358,6 +3409,57 @@ export interface operations {
             };
             /** @description Organisation introuvable ou accès refusé */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RadarController_listAssessments: {
+        parameters: {
+            query?: {
+                pageSize?: number;
+                page?: number;
+                endDate?: string;
+                startDate?: string;
+                rail?: "card" | "mtn" | "wave";
+                decision?: "allow" | "flag" | "block";
+            };
+            header?: {
+                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
+                "Lomi-Account"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Risk assessments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RadarController_findOne: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
+                "Lomi-Account"?: string;
+            };
+            path: {
+                /** @description Risk assessment ID */
+                id: unknown;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3908,7 +4010,44 @@ export interface operations {
             };
         };
     };
-    CustomersController_createPortalLaunchSession: {
+    CustomersController_getSubscriptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description UUID du client */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Liste des abonnements du client */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionResponseDto"][];
+                };
+            };
+            /** @description Clé API invalide ou manquante */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Client introuvable ou accès refusé */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CustomersController_createPortalSession: {
         parameters: {
             query?: never;
             header?: never;
@@ -4398,36 +4537,19 @@ export interface operations {
             };
         };
     };
-    SubscriptionsController_findByCustomer: {
+    SubscriptionsController_getUsage: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                /** @description UUID du client */
-                customerId: string;
+                /** @description UUID de l’abonnement */
+                id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Liste des abonnements du client */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResponseDto"][];
-                };
-            };
-            /** @description Clé API invalide ou manquante */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Client introuvable ou accès refusé */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4495,7 +4617,7 @@ export interface operations {
             };
         };
     };
-    SubscriptionsController_uncancel: {
+    SubscriptionsController_resume: {
         parameters: {
             query?: never;
             header?: never;
@@ -4783,12 +4905,13 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @example 10000 */
-                    amount?: number;
+                    amount: number;
                     /**
+                     * @description Optional. Falls back to organization default_currency when omitted.
                      * @example XOF
                      * @enum {string}
                      */
-                    currency_code: "XOF" | "USD" | "EUR";
+                    currency_code?: "XOF" | "USD" | "EUR";
                     title?: string;
                     description?: string;
                     /** Format: uuid */
@@ -4814,7 +4937,10 @@ export interface operations {
                     /** Format: uri */
                     cancel_url?: string;
                     allow_coupon_code?: boolean;
-                    /** @description When true, show and require billing address on checkout. */
+                    /**
+                     * @description When true, show and require billing address on checkout. Default false when unset.
+                     * @default false
+                     */
                     require_billing_address?: boolean;
                     /**
                      * @description When true, show and require customer email. Default true when unset.
@@ -4822,8 +4948,8 @@ export interface operations {
                      */
                     require_email?: boolean;
                     /**
-                     * @description When true, show and require customer phone. Default false when unset.
-                     * @default false
+                     * @description When true, show and require customer phone. Default true when unset.
+                     * @default true
                      */
                     require_phone?: boolean;
                     /**
@@ -4978,7 +5104,10 @@ export interface operations {
                     price_id?: string;
                     allow_coupon_code?: boolean;
                     allow_quantity?: boolean;
-                    /** @description When true, show and require billing address on checkout. */
+                    /**
+                     * @description When true, show and require billing address on checkout. Default false when unset.
+                     * @default false
+                     */
                     require_billing_address?: boolean;
                     /**
                      * @description When true, show and require customer email. Default true when unset.
@@ -4986,8 +5115,8 @@ export interface operations {
                      */
                     require_email?: boolean;
                     /**
-                     * @description When true, show and require customer phone. Default false when unset.
-                     * @default false
+                     * @description When true, show and require customer phone. Default true when unset.
+                     * @default true
                      */
                     require_phone?: boolean;
                     /**
@@ -5197,101 +5326,6 @@ export interface operations {
             };
         };
     };
-    RadarController_listAssessments: {
-        parameters: {
-            query?: {
-                pageSize?: number;
-                page?: number;
-                endDate?: string;
-                startDate?: string;
-                rail?: "card" | "mtn" | "wave";
-                decision?: "allow" | "flag" | "block";
-            };
-            header?: {
-                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
-                "Lomi-Account"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Risk assessments */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    RadarController_findOne: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
-                "Lomi-Account"?: string;
-            };
-            path: {
-                /** @description Risk assessment ID */
-                id: unknown;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    RadarController_getSettings: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
-                "Lomi-Account"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    RadarController_updateSettings: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
-                "Lomi-Account"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateRadarSettingsDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     SettlementsController_findAll: {
         parameters: {
             query?: {
@@ -5471,12 +5505,14 @@ export interface operations {
     };
     LogsController_findOne: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Log stream to query */
+                type: "api_request" | "api_error" | "webhook_delivery" | "activity";
+            };
             header?: never;
             path: {
                 /** @description Log entry UUID */
                 id: string;
-                type: "api_request" | "api_error" | "webhook_delivery" | "activity";
             };
             cookie?: never;
         };
@@ -5571,9 +5607,9 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Delivery log UUID */
-                logId: unknown;
+                deliveryId: unknown;
                 /** @description Webhook UUID */
-                webhookId: unknown;
+                id: unknown;
             };
             cookie?: never;
         };
@@ -6034,23 +6070,6 @@ export interface operations {
             };
         };
     };
-    UsageBillingController_getSubscriptionUsage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     UsageBillingController_getRevenue: {
         parameters: {
             query: {
@@ -6088,6 +6107,26 @@ export interface operations {
             };
         };
     };
+    UsageBillingController_checkEntitlement: {
+        parameters: {
+            query: {
+                feature_key: unknown;
+                customer_id: unknown;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     UsageBillingController_createEntitlement: {
         parameters: {
             query?: never;
@@ -6098,23 +6137,6 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    UsageBillingController_checkEntitlement: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -52,13 +52,23 @@ function mustParseJson(label, filePath) {
   return JSON.parse(raw);
 }
 
+function isStringValue(value) {
+  return Object.prototype.toString.call(value) === '[object String]';
+}
+
+function isObjectValue(value) {
+  return (
+    value !== null && Object.prototype.toString.call(value) === '[object Object]'
+  );
+}
+
 // The agent card lives in the private `apps/website` submodule, which is not
 // available on fork PRs (no PAT to clone a private repo). Validate it when the
 // submodule is checked out; skip gracefully otherwise so docs CI still runs.
 let agentCard = null;
 if (existsSync(paths.agentCard)) {
   agentCard = mustParseJson('agent card', paths.agentCard);
-  if (typeof agentCard.name !== 'string' || !agentCard.endpoints?.openapi) {
+  if (!isStringValue(agentCard.name) || !agentCard.endpoints?.openapi) {
     throw new Error('agent.json: expected name and endpoints.openapi');
   }
   if (!agentCard.endpoints.agent_openapi) {
@@ -105,7 +115,7 @@ const merchantSpec = mustParseJson('merchant OpenAPI', paths.merchantOpenApi);
 if (
   !merchantSpec.openapi ||
   !merchantSpec.paths ||
-  typeof merchantSpec.paths !== 'object'
+  !isObjectValue(merchantSpec.paths)
 ) {
   throw new Error('openapi.json: invalid OpenAPI document');
 }
@@ -114,7 +124,7 @@ const agentSpec = mustParseJson('agent OpenAPI', paths.agentOpenApi);
 if (
   !agentSpec.openapi ||
   !agentSpec.paths ||
-  typeof agentSpec.paths !== 'object'
+  !isObjectValue(agentSpec.paths)
 ) {
   throw new Error(
     'agent-openapi.json: invalid OpenAPI document (run apps/api: pnpm run openapi:export:agent)',
@@ -129,10 +139,7 @@ const requiredPaths = [
   '/agent/handoff',
 ];
 
-const requiredPartnerPaths = [
-  '/partners/v1/provisioning-keys',
-  '/partners/v1/usage',
-];
+const requiredPartnerPaths = ['/partners/provisioning-keys', '/partners/usage'];
 
 for (const p of requiredPaths) {
   if (!agentSpec.paths[p]) {
@@ -202,7 +209,7 @@ for (const entry of expectedProvisioningOps) {
 
 if (agentCard) {
   for (const [key, url] of Object.entries(agentCard.agent ?? {})) {
-    if (key === 'card_version' || typeof url !== 'string') continue;
+    if (key === 'card_version' || !isStringValue(url)) continue;
     const pathKey = new URL(url).pathname;
     if (!agentSpec.paths[pathKey]) {
       throw new Error(

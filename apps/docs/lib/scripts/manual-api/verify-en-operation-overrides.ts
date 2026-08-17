@@ -9,19 +9,20 @@ import { fileURLToPath } from 'node:url';
 
 import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
 import { isPublicRestApiOperation } from '@/lib/scripts/manual-api/constants';
-import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operation-mdx';
+import { collectPublicOperations, isEnOperationId } from '@/lib/scripts/manual-api/render-operation-mdx';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const openApiPath = join(__dirname, '..', '..', '..', 'openapi.json');
 
 const raw = readFileSync(openApiPath, 'utf-8');
+// SAFETY: Boundary value matches the asserted domain type at this call site.
 const spec = JSON.parse(raw) as Parameters<typeof collectPublicOperations>[0];
 
 const merchant = collectPublicOperations(spec).filter((o) =>
   isPublicRestApiOperation(o.method, o.path),
 );
 
-const missing = merchant.filter((o) => !EN_OPERATION_COPY[o.operationId]);
+const missing = merchant.filter((o) => !isEnOperationId(o.operationId));
 
 if (missing.length > 0) {
   console.error(

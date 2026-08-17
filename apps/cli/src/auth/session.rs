@@ -38,12 +38,11 @@ pub fn resolve_auth(common: &CommonOptions) -> Result<Option<AuthContext>> {
     }
 
     let config = GlobalConfig::load()?;
-    if let Some(profile_settings) = config.profile(&profile) {
-        if let Some(token) = profile_settings.cli_token.clone() {
+    if let Some(token) = config.cli_token(&profile)? {
+        if let Some(profile_settings) = config.profile(&profile) {
             if GlobalConfig::is_token_expired(profile_settings) {
                 return Ok(None);
             }
-
             let api_url = profile_settings
                 .api_url
                 .clone()
@@ -54,6 +53,11 @@ pub fn resolve_auth(common: &CommonOptions) -> Result<Option<AuthContext>> {
                 api_url,
             }));
         }
+        return Ok(Some(AuthContext {
+            profile: profile.clone(),
+            cli_token: token,
+            api_url: api_url_for_profile(&profile, common.api_url.as_deref()),
+        }));
     }
 
     Ok(None)
@@ -90,7 +94,7 @@ pub async fn ensure_authenticated(
     let profile = common.effective_profile()?;
     let config = GlobalConfig::load()?;
     if let Some(settings) = config.profile(&profile) {
-        if settings.cli_token.is_some() && GlobalConfig::is_token_expired(settings) {
+        if config.cli_token(&profile)?.is_some() && GlobalConfig::is_token_expired(settings) {
             if !embedded && !silent && !common.use_json() {
                 crate::cli::output::print_auth_expired(&profile);
             }
@@ -131,11 +135,11 @@ pub fn try_authenticated(common: &CommonOptions) -> AuthResult {
         Ok(None) => {
             let profile = common.effective_profile().unwrap_or_default();
             let config = GlobalConfig::load().ok();
-            if config
-                .as_ref()
-                .and_then(|c| c.profile(&profile))
-                .is_some_and(|p| p.cli_token.is_some() && GlobalConfig::is_token_expired(p))
-            {
+            if config.as_ref().is_some_and(|c| {
+                c.profile(&profile)
+                    .is_some_and(|p| GlobalConfig::is_token_expired(p))
+                    && c.cli_token(&profile).ok().flatten().is_some()
+            }) {
                 AuthResult::Expired(format!(
                     "CLI token expired for profile `{profile}`. Run `lomi login`."
                 ))

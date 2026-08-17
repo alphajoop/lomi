@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 import type { HTMLAttributes } from 'react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 export function Wrapper(props: HTMLAttributes<HTMLDivElement>) {
   return (

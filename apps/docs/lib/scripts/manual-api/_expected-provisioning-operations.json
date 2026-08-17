@@ -1,10 +1,10 @@
 [
-  "POST /provisioning/v1/accounts",
-  "POST /provisioning/v1/merchants/{merchantId}/onboarding/documents",
-  "POST /provisioning/v1/merchants/{merchantId}/onboarding/extract",
-  "POST /provisioning/v1/merchants/{merchantId}/onboarding/complete",
-  "GET /provisioning/v1/merchants/{merchantId}/onboarding/status",
-  "GET /provisioning/v1/merchants/{merchantId}/api-keys",
-  "POST /provisioning/v1/merchants/{merchantId}/live-activation/request",
-  "GET /provisioning/v1/merchants/{merchantId}/live-activation/status"
+  "POST /provisioning/accounts",
+  "POST /provisioning/merchants/{merchantId}/onboarding/documents",
+  "POST /provisioning/merchants/{merchantId}/onboarding/extract",
+  "POST /provisioning/merchants/{merchantId}/onboarding/complete",
+  "GET /provisioning/merchants/{merchantId}/onboarding/status",
+  "GET /provisioning/merchants/{merchantId}/api-keys",
+  "POST /provisioning/merchants/{merchantId}/live-activation/request",
+  "GET /provisioning/merchants/{merchantId}/live-activation/status"
 ]

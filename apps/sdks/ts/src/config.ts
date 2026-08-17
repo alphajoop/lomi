@@ -1,3 +1,5 @@
+import type { LomiHeaders } from './request-options.js';
+
 /**
  * SDK Configuration
  */
@@ -27,7 +29,7 @@ export interface LomiConfig {
   /**
    * Extra headers merged into every request.
    */
-  headers?: Record<string, string>;
+  headers?: LomiHeaders;
 
   /**
    * Request timeout in milliseconds.

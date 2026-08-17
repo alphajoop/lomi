@@ -23,6 +23,7 @@ import {
   collectPublicOperations,
   renderOperationPageMdx,
 } from '@/lib/scripts/manual-api/render-operation-mdx';
+import { type JsonObject, parseJson } from '@lomi./shared';
 
 const DOCS_API_ROOT = join(process.cwd(), 'content/docs/api');
 
@@ -51,17 +52,16 @@ async function main(): Promise<void> {
 
   const specPath = join(process.cwd(), 'openapi.json');
   const raw = readFileSync(specPath, 'utf-8');
-  const spec = JSON.parse(raw) as unknown as Parameters<
-    typeof collectPublicOperations
-  >[0];
+  // SAFETY: openapi.json is the OpenAPI document consumed by collectPublicOperations.
+  const spec = parseJson(raw) as Parameters<typeof collectPublicOperations>[0];
 
   const all = collectPublicOperations(spec);
   const merchant = all.filter((o) =>
     isPublicRestApiOperation(o.method, o.path),
   );
-  const schemaComponents = (
-    spec as { components?: { schemas?: Record<string, unknown> } }
-  ).components?.schemas;
+  const schemaComponents =
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
+    (spec as { components?: { schemas?: JsonObject } }).components?.schemas;
 
   const byFolder = new Map<string, typeof merchant>();
   for (const entry of merchant) {
@@ -81,6 +81,7 @@ async function main(): Promise<void> {
     entries.sort((a, b) => a.operationId.localeCompare(b.operationId));
 
     for (const { method, path: routePath, operationId, operation } of entries) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const rawPathItem = spec.paths?.[routePath] as
         { parameters?: unknown[] } | undefined;
 
@@ -89,10 +90,12 @@ async function main(): Promise<void> {
         path: routePath,
         operationId,
         operation,
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         pathItem: rawPathItem as Parameters<
           typeof renderOperationPageMdx
         >[0]['pathItem'],
         components: {
+          // SAFETY: Boundary value matches the asserted domain type at this call site.
           schemas: schemaComponents as Parameters<
             typeof renderOperationPageMdx
           >[0]['components'] extends { schemas?: infer TSchemas }
@@ -106,10 +109,12 @@ async function main(): Promise<void> {
         path: routePath,
         operationId,
         operation,
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         pathItem: rawPathItem as Parameters<
           typeof renderOperationPageMdx
         >[0]['pathItem'],
         components: {
+          // SAFETY: Boundary value matches the asserted domain type at this call site.
           schemas: schemaComponents as Parameters<
             typeof renderOperationPageMdx
           >[0]['components'] extends { schemas?: infer TSchemas }

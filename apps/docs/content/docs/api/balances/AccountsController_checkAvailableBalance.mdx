@@ -3,7 +3,7 @@ title: "Check available balance"
 description: "Check available balance"
 full: true
 method: get
-path: /accounts/balance/check/{currency}
+path: /accounts/balance/{currency}
 operationId: AccountsController_checkAvailableBalance
 ---
 
@@ -29,7 +29,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`GET /accounts/balance/check/{currency}`
+`GET /accounts/balance/{currency}`
 
 Base URLs:
 
@@ -63,13 +63,13 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/check/currency_value" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/currency_value" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ## OpenAPI
 
 - **operationId**: `AccountsController_checkAvailableBalance`
-- **Operation**: `GET /accounts/balance/check/{currency}`
+- **Operation**: `GET /accounts/balance/{currency}`
 
 Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

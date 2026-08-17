@@ -17,11 +17,13 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import manifestJson from './generated/tools-manifest.json' with { type: 'json' };
 import type { ToolsManifest } from './manifest.js';
 import { parseManifest } from './manifest-parse.js';
+import { validateJsonValue } from "@lomi./shared";
 import {
   getLomiApiBaseUrl,
   getMcpHttpBearerTokens,
   getMcpReadinessChecks,
   getOptionalMerchantApiKey,
+  getOptionalPartnerKey,
   getOptionalProvisioningKey,
   httpListenPort,
   listenHostOptions,
@@ -32,7 +34,7 @@ import {
   mcpSessionTtlMs,
   mcpTrustProxy,
 } from './env-config.js';
-import { extractSessionMerchantApiKey, extractSessionProvisioningKey, extractOAuthAccessToken } from './session-merchant-key.js';
+import { extractSessionMerchantApiKey, extractSessionPartnerKey, extractSessionProvisioningKey, extractOAuthAccessToken } from './session-merchant-key.js';
 import { McpSessionRegistry, type MerchantAccessLevel } from './session-registry.js';
 import { mcpLog, mcpRequestAls } from './mcp-request-context.js';
 import { wireMcpServer } from './wire-mcp-server.js';
@@ -41,11 +43,40 @@ import {
   getProtectedResourceMetadataUrl,
   introspectOAuthAccessToken,
 } from './oauth-introspection.js';
+import { isJsonObject, isString, type JsonValue } from "@lomi./shared";
+import type { McpRequestStore } from './mcp-request-context.js';
 
 type TransportEntry = StreamableHTTPServerTransport;
 
+type JsonRpcId = JsonValue;
+
+/** Express error middleware payload at the framework boundary. */
+type ExpressError = Error | JsonValue;
+
+/** Express JSON body at the HTTP boundary. */
+type RequestBody = JsonValue | undefined | null;
+
+function jsonRpcIdFromBody(body: RequestBody): JsonRpcId {
+  if (!isJsonObject(body) || !('id' in body)) return null;
+  const id = body.id;
+  if (id === undefined) return null;
+  return id;
+}
+
+function isPayloadTooLargeError(err: ExpressError): boolean {
+  return isJsonObject(err) && err.type === 'entity.too.large';
+}
+
+type SessionBootstrapState = {
+  sessionId: string | null;
+  merchantApiKey: string | null;
+  provisioningApiKey: string | null;
+  partnerApiKey: string | null;
+  merchantAccessLevel: MerchantAccessLevel;
+};
+
 const MISSING_SESSION_CREDENTIAL_MESSAGE =
-  'Missing credentials: complete OAuth at the authorization server, send x-lomi-provisioning-key for 0-to-1 onboarding, or x-lomi-api-key / x-api-key for merchant API tools. See https://docs.lomi.africa/build/mcp';
+  'Missing credentials: complete OAuth at the authorization server, send x-lomi-provisioning-key for 0-to-1 onboarding, x-lomi-partner-key for partner tools, or x-lomi-api-key / x-api-key for merchant API tools. See https://docs.lomi.africa/build/mcp';
 
 async function resolveProvisioningKeyFromRequest(
   req: Request,
@@ -99,7 +130,7 @@ type RateBucket = { count: number; windowStart: number };
 function clientIp(req: Request): string {
   if (mcpTrustProxy()) {
     const xf = req.headers['x-forwarded-for'];
-    if (typeof xf === 'string') {
+    if (isString(xf)) {
       const first = xf.split(',')[0]?.trim();
       if (first) return first;
     }
@@ -186,7 +217,7 @@ function ensureProductionBearer(): void {
  * must pass server-side introspection before they unlock the gate.
  */
 async function resolveTransportCredential(req: Request): Promise<boolean> {
-  if (extractSessionMerchantApiKey(req) || extractSessionProvisioningKey(req)) {
+  if (extractSessionMerchantApiKey(req) || extractSessionProvisioningKey(req) || extractSessionPartnerKey(req)) {
     return true;
   }
 
@@ -261,15 +292,28 @@ function resolveProvisioningKey(
   return initialKey ?? getOptionalProvisioningKey();
 }
 
+function resolvePartnerKey(
+  registry: McpSessionRegistry,
+  sessionId: string | undefined,
+  initialKey: string | null,
+): string | null {
+  if (sessionId) {
+    return registry.getPartnerApiKey(sessionId) ?? getOptionalPartnerKey();
+  }
+  return initialKey ?? getOptionalPartnerKey();
+}
+
 /** Credentials already resolved for this request (headers / OAuth / env). */
 function hasResolvedSessionCredential(
   merchantKey: string | null,
   provisioningKey: string | null,
   oauthMerchantGrant: boolean,
+  partnerKey: string | null,
 ): boolean {
   const merchant = merchantKey ?? getOptionalMerchantApiKey();
   const provisioning = provisioningKey ?? getOptionalProvisioningKey();
-  return Boolean(merchant || provisioning || oauthMerchantGrant);
+  const partner = partnerKey ?? getOptionalPartnerKey();
+  return Boolean(merchant || provisioning || partner || oauthMerchantGrant);
 }
 
 export function createHttpApplication(manifest: ToolsManifest): Express {
@@ -355,10 +399,10 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   const mcpPostHandler = async (req: Request, res: Response): Promise<void> => {
     const headerRequestId = req.headers['x-request-id'];
     const requestId =
-      (typeof headerRequestId === 'string' && headerRequestId.trim()) ||
+      (isString(headerRequestId) && headerRequestId.trim()) ||
       randomUUID();
 
-    const store: { requestId: string; sessionId?: string } = { requestId };
+    const store: McpRequestStore = { requestId };
 
     await mcpRequestAls.run(store, async () => {
       try {
@@ -369,12 +413,14 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
         const headerMerchantKey = extractSessionMerchantApiKey(req);
         const headerProvisioningKey = extractSessionProvisioningKey(req);
+        const headerPartnerKey = extractSessionPartnerKey(req);
         const merchantGrant = await resolveMerchantGrantFromRequest(req);
         const resolvedMerchantKey =
           merchantGrant?.connectionKey ?? headerMerchantKey;
         const resolvedProvisioningKey =
           (await resolveProvisioningKeyFromRequest(req, headerProvisioningKey)) ??
           headerProvisioningKey;
+        const resolvedPartnerKey = headerPartnerKey;
         if (sessionId && registry.has(sessionId) && resolvedMerchantKey) {
           registry.updateMerchantApiKey(sessionId, resolvedMerchantKey);
         }
@@ -391,6 +437,9 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
         if (sessionId && registry.has(sessionId) && resolvedProvisioningKey) {
           registry.updateProvisioningApiKey(sessionId, resolvedProvisioningKey);
         }
+        if (sessionId && registry.has(sessionId) && resolvedPartnerKey) {
+          registry.updatePartnerApiKey(sessionId, resolvedPartnerKey);
+        }
 
         let transport: TransportEntry | undefined;
 
@@ -406,6 +455,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
               resolvedMerchantKey,
               resolvedProvisioningKey,
               Boolean(merchantGrant?.connectionKey),
+              resolvedPartnerKey,
             )
           ) {
             res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge());
@@ -415,12 +465,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
                 code: -32002,
                 message: MISSING_SESSION_CREDENTIAL_MESSAGE,
               },
-              id:
-                req.body &&
-                typeof req.body === 'object' &&
-                'id' in req.body
-                  ? (req.body as { id: unknown }).id
-                  : null,
+              id: jsonRpcIdFromBody(req.body),
             });
             return;
           }
@@ -457,12 +502,13 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
             });
             return;
           }
-          const sessionState = {
-            sessionId: null as string | null,
+
+          const sessionState: SessionBootstrapState = {
+            sessionId: null,
             merchantApiKey: resolvedMerchantKey,
             provisioningApiKey: resolvedProvisioningKey,
-            merchantAccessLevel:
-              merchantGrant?.accessLevel ?? ('full' as MerchantAccessLevel),
+            partnerApiKey: resolvedPartnerKey,
+            merchantAccessLevel: merchantGrant?.accessLevel ?? 'full',
           };
 
           transport = new StreamableHTTPServerTransport({
@@ -475,6 +521,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
                 sessionState.merchantApiKey,
                 sessionState.provisioningApiKey,
                 sessionState.merchantAccessLevel,
+                sessionState.partnerApiKey,
               );
               store.sessionId = sid;
             },
@@ -496,6 +543,12 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
                 sessionState.sessionId ?? undefined,
                 sessionState.provisioningApiKey,
               ),
+            getPartnerKey: () =>
+              resolvePartnerKey(
+                registry,
+                sessionState.sessionId ?? undefined,
+                sessionState.partnerApiKey,
+              ),
             onMerchantKeyDiscovered: (secretKey) => {
               sessionState.merchantApiKey = secretKey;
               if (sessionState.sessionId) {
@@ -504,6 +557,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
             },
           });
           await server.connect(transport);
+          // SAFETY: Express Request/Response implement Node IncomingMessage/ServerResponse for the MCP transport.
           await transport.handleRequest(
             req as IncomingMessage,
             res as ServerResponse,
@@ -522,6 +576,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           return;
         }
 
+        // SAFETY: Express Request/Response implement Node IncomingMessage/ServerResponse for the MCP transport.
         await transport!.handleRequest(
           req as IncomingMessage,
           res as ServerResponse,
@@ -552,9 +607,9 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   const mcpGetHandler = async (req: Request, res: Response): Promise<void> => {
     const headerRequestIdGet = req.headers['x-request-id'];
     const requestId =
-      (typeof headerRequestIdGet === 'string' && headerRequestIdGet.trim()) ||
+      (isString(headerRequestIdGet) && headerRequestIdGet.trim()) ||
       randomUUID();
-    const store: { requestId: string; sessionId?: string } = { requestId };
+    const store: McpRequestStore = { requestId };
 
     await mcpRequestAls.run(store, async () => {
       try {
@@ -569,6 +624,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
         store.sessionId = sessionId;
         registry.touch(sessionId);
         const transport = registry.get(sessionId)!.transport;
+        // SAFETY: Express Request/Response implement Node IncomingMessage/ServerResponse for the MCP transport.
         await transport.handleRequest(
           req as IncomingMessage,
           res as ServerResponse,
@@ -591,9 +647,9 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   const mcpDeleteHandler = async (req: Request, res: Response): Promise<void> => {
     const headerRequestIdDel = req.headers['x-request-id'];
     const requestId =
-      (typeof headerRequestIdDel === 'string' && headerRequestIdDel.trim()) ||
+      (isString(headerRequestIdDel) && headerRequestIdDel.trim()) ||
       randomUUID();
-    const store: { requestId: string; sessionId?: string } = { requestId };
+    const store: McpRequestStore = { requestId };
 
     await mcpRequestAls.run(store, async () => {
       try {
@@ -607,6 +663,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
         }
         store.sessionId = sessionId;
         const transport = registry.get(sessionId)!.transport;
+        // SAFETY: Express Request/Response implement Node IncomingMessage/ServerResponse for the MCP transport.
         await transport.handleRequest(
           req as IncomingMessage,
           res as ServerResponse,
@@ -631,13 +688,8 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   app.delete(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpDeleteHandler);
 
   app.use(
-    (err: unknown, _req: Request, res: Response, next: NextFunction) => {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'type' in err &&
-        (err as { type: string }).type === 'entity.too.large'
-      ) {
+    (err: ExpressError, _req: Request, res: Response, next: NextFunction) => {
+      if (isPayloadTooLargeError(err)) {
         res.status(413).json({
           error: 'Payload Too Large',
           error_code: 'payload_too_large',
@@ -654,7 +706,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
 export async function startHttpServer(): Promise<void> {
   ensureProductionBearer();
-  const manifest = parseManifest(manifestJson);
+  const manifest = parseManifest(validateJsonValue(manifestJson));
   const app = createHttpApplication(manifest);
   const port = httpListenPort();
   const hostOpts = listenHostOptions();

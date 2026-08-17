@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - typescript
-          - javascript
           - python
           - embed
           - mcp
@@ -56,11 +55,10 @@ jobs:
         run: npm version ${{ inputs.version_bump }} --no-git-tag-version
 
       - name: Install dependencies and build
+        working-directory: apps/sdks
         run: |
-          cd apps/sdks && npm install
-          cd ts && pnpm install --frozen-lockfile
-          pnpm run generate
-          pnpm run build
+          pnpm install --frozen-lockfile
+          pnpm run generate:ts
 
       - name: Publish to npm
         working-directory: apps/sdks/ts
@@ -76,39 +74,6 @@ jobs:
           git add apps/sdks/ts/package.json
           git diff --staged --quiet || git commit -m "chore(sdks): release @lomi./sdk $(node -p "require('./apps/sdks/ts/package.json').version")"
           git push
-
-  publish-javascript:
-    name: Publish JavaScript SDK
-    runs-on: ubuntu-latest
-    if: inputs.sdk == 'javascript' || inputs.sdk == 'all'
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Bump version
-        if: inputs.version_bump != 'skip'
-        working-directory: apps/sdks/js
-        run: npm version ${{ inputs.version_bump }} --no-git-tag-version
-
-      - name: Install dependencies and build
-        working-directory: apps/sdks/js
-        run: |
-          npm install
-          npm run generate
-          npm run build
-
-      - name: Publish to npm
-        working-directory: apps/sdks/js
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-python:
     name: Publish Python SDK
@@ -260,8 +225,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - uses: pnpm/action-setup@v4
         with:
@@ -273,21 +236,21 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
-          cache-dependency-path: apps/design/shared/receipt-pdf/pnpm-lock.yaml
+          cache-dependency-path: packages/receipt-pdf/pnpm-lock.yaml
 
       - name: Bump version
         if: inputs.version_bump != 'skip'
-        working-directory: apps/design/shared/receipt-pdf
+        working-directory: packages/receipt-pdf
         run: npm version ${{ inputs.version_bump }} --no-git-tag-version
 
       - name: Install dependencies and build
-        working-directory: apps/design/shared/receipt-pdf
+        working-directory: packages/receipt-pdf
         run: |
           pnpm install --frozen-lockfile
           pnpm run build
 
       - name: Publish to npm
-        working-directory: apps/design/shared/receipt-pdf
+        working-directory: packages/receipt-pdf
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

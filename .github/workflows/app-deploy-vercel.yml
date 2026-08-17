@@ -1,0 +1,86 @@
+name: lomi · deploy · vercel
+
+on:
+  workflow_call:
+    inputs:
+      app:
+        required: true
+        type: string
+      repository:
+        required: true
+        type: string
+      submodule-path:
+        required: true
+        type: string
+      working-directory-mode:
+        required: true
+        type: string
+      extra-submodules:
+        required: false
+        type: string
+        default: ""
+      workflow-ref:
+        required: false
+        type: string
+        default: ""
+      vercel-target:
+        required: false
+        type: string
+        default: ""
+    secrets:
+      REPO_CHECKOUT_PAT:
+        required: true
+      VERCEL_TOKEN:
+        required: true
+      VERCEL_ORG_ID:
+        required: true
+      VERCEL_PROJECT_ID:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load local actions
+        uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/actions/checkout-app-submodule
+
+      - name: Checkout umbrella + app source
+        id: checkout-app
+        uses: ./.github/actions/checkout-app-submodule
+        with:
+          repository: ${{ inputs.repository }}
+          submodule-path: ${{ inputs.submodule-path }}
+          token: ${{ secrets.REPO_CHECKOUT_PAT }}
+          event-name: ${{ github.event_name }}
+          workflow-ref: ${{ inputs.workflow-ref }}
+          dispatch-sha: ${{ github.event.client_payload.sha }}
+          with-umbrella: "true"
+
+      - name: Checkout extra submodules
+        if: inputs.extra-submodules != ''
+        env:
+          REPO_CHECKOUT_PAT: ${{ secrets.REPO_CHECKOUT_PAT }}
+        run: bash .github/scripts/init-submodules.sh ${{ inputs.extra-submodules }}
+
+      - name: Resolve working directory
+        id: wd
+        run: |
+          if [ "${{ inputs.working-directory-mode }}" = "umbrella" ]; then
+            echo "dir=${GITHUB_WORKSPACE}" >> "$GITHUB_OUTPUT"
+          else
+            echo "dir=${GITHUB_WORKSPACE}/${{ steps.checkout-app.outputs.app-path }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v42.2.0
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ${{ steps.wd.outputs.dir }}
+          target: ${{ inputs.vercel-target || github.event.client_payload.target || 'production' }}

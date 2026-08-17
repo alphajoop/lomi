@@ -1,3 +1,4 @@
+import { type JsonObject } from '@lomi./shared';
 /* @proprietary license */
 
 /** OpenAPI 3 types for docs preprocessing (no longer exported by fumadocs-openapi v10+). */
@@ -10,7 +11,7 @@ export type ParameterObject = {
   in: string;
   name: string;
   required?: boolean;
-  schema?: { type?: string; [key: string]: unknown };
+  schema?: { type?: string } & JsonObject;
   description?: string;
 };
 
@@ -34,7 +35,7 @@ export type PathItemObject = {
 export type Document = {
   paths?: Record<string, PathItemObject | undefined>;
   components?: {
-    securitySchemes?: Record<string, unknown>;
+    securitySchemes?: JsonObject;
   };
   security?: Array<Record<string, string[]>>;
 };

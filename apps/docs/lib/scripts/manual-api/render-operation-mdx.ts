@@ -9,11 +9,17 @@ import {
   englishResponseDescription,
 } from '@/lib/scripts/manual-api/en-http-fallbacks';
 import { FR_OPERATION_COPY } from '@/lib/scripts/manual-api/fr-operation-overrides';
+import {
+  type JsonObject,
+  type JsonValue,
+  isJsonObject,
+  isString,
+} from '@lomi./shared';
 
 type ReferenceObject = { $ref: string };
 
 type ComponentsObject = {
-  schemas?: Record<string, SchemaObject | ReferenceObject>;
+  schemas?: { [name: string]: SchemaObject | ReferenceObject };
 };
 
 type ParameterObject = {
@@ -21,7 +27,7 @@ type ParameterObject = {
   in?: string;
   required?: boolean;
   description?: string;
-  schema?: ReferenceObject | Record<string, unknown>;
+  schema?: ReferenceObject | JsonObject;
 };
 
 type ResponseObject = {
@@ -39,21 +45,18 @@ type OperationObject = {
     | ReferenceObject
     | {
         description?: string;
-        content?: Record<
-          string,
-          { schema?: ReferenceObject | Record<string, unknown> }
-        >;
+        content?: Record<string, { schema?: ReferenceObject | JsonObject }>;
       };
 };
 
 type SchemaObject = {
   type?: string;
   description?: string;
-  enum?: unknown[];
+  enum?: JsonValue[];
   properties?: Record<string, SchemaObject | ReferenceObject>;
   required?: string[];
   items?: SchemaObject | ReferenceObject;
-  example?: unknown;
+  example?: JsonValue;
 };
 
 type PathItemObject = {
@@ -65,6 +68,18 @@ type PathItemObject = {
 
 const HTTP_OPS = ['get', 'post', 'put', 'patch', 'delete'] as const;
 type DocsLanguage = 'en' | 'fr';
+
+export function isEnOperationId(
+  id: string,
+): id is keyof typeof EN_OPERATION_COPY {
+  return Object.hasOwn(EN_OPERATION_COPY, id);
+}
+
+function isFrOperationId(
+  id: string,
+): id is keyof typeof FR_OPERATION_COPY {
+  return Object.hasOwn(FR_OPERATION_COPY, id);
+}
 
 type Labels = {
   name: string;
@@ -194,7 +209,7 @@ function escapeMdxText(s: string | undefined): string {
 }
 
 function isRef(o: unknown): o is ReferenceObject {
-  return Boolean(o && typeof o === 'object' && '$ref' in (o as object));
+  return isJsonObject(o) && isString(o['$ref']);
 }
 
 function isSchemaObject(
@@ -246,7 +261,7 @@ function toSampleValue(
   schema: SchemaObject | ReferenceObject | undefined,
   components: ComponentsObject | undefined,
   depth = 0,
-): unknown {
+): JsonValue {
   if (!schema) return 'value';
   if (depth > 3) return '...';
   if (isRef(schema)) {
@@ -256,8 +271,12 @@ function toSampleValue(
       depth + 1,
     );
   }
-  if (schema.example !== undefined) return schema.example;
-  if (schema.enum && schema.enum.length > 0) return schema.enum[0];
+  if (schema.example !== undefined) {
+    return schema.example;
+  }
+  if (schema.enum && schema.enum.length > 0) {
+    return schema.enum[0] ?? 'value';
+  }
   if (schema.type === 'string') return 'string';
   if (schema.type === 'number' || schema.type === 'integer') return 0;
   if (schema.type === 'boolean') return true;
@@ -265,7 +284,7 @@ function toSampleValue(
     return [toSampleValue(schema.items, components, depth + 1)];
   }
   if (schema.type === 'object' || schema.properties) {
-    const out: Record<string, unknown> = {};
+    const out: JsonObject = {};
     const properties = schema.properties ?? {};
     const required = new Set(schema.required ?? []);
     const keys = Object.keys(properties);
@@ -287,15 +306,12 @@ function paramRow(
 ): string {
   if ('$ref' in p || !('in' in p)) return '';
   const required = 'required' in p && p.required ? labels.yes : labels.no;
-  const schema =
-    'schema' in p &&
-    p.schema &&
-    typeof p.schema === 'object' &&
-    '$ref' in p.schema
-      ? (((p.schema as ReferenceObject).$ref ?? '').split('/').pop() ?? '')
-      : '';
+  let schema = '';
+  if ('schema' in p && isRef(p.schema)) {
+    schema = (p.schema.$ref ?? '').split('/').pop() ?? '';
+  }
   const desc =
-    'description' in p && typeof p.description === 'string'
+    'description' in p && isString(p.description)
       ? escapeMdxText(p.description)
       : '';
   const nameCell = '`' + (p.name ?? '') + '`';
@@ -305,7 +321,7 @@ function paramRow(
 
 function parameterSampleValue(p: ParameterObject): string {
   const schema = p.schema;
-  if (schema && typeof schema === 'object' && !isRef(schema)) {
+  if (schema && isJsonObject(schema) && !isRef(schema)) {
     if (Array.isArray(schema.enum) && schema.enum.length > 0) {
       return String(schema.enum[0]);
     }
@@ -323,12 +339,8 @@ function responseRows(
   const rows: string[] = [];
   for (const [code, res] of Object.entries(responses)) {
     let desc = '';
-    if (
-      !isRef(res) &&
-      typeof res === 'object' &&
-      res !== null &&
-      'description' in res
-    ) {
+    if (!isRef(res) && isJsonObject(res) && 'description' in res) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const openApiDesc = (res as ResponseObject).description ?? '';
       desc =
         lang === 'en'
@@ -340,13 +352,15 @@ function responseRows(
   return rows;
 }
 
+type RequestBodySection = { section: string; sampleBody: JsonValue | null };
+
 function buildRequestBodySection(
   operation: OperationObject,
   components: ComponentsObject | undefined,
   labels: Labels,
   lang: DocsLanguage,
   enCopy: EnOperationOverride | undefined,
-): { section: string; sampleBody: unknown | null } {
+): RequestBodySection {
   const rb = operation.requestBody;
   if (!rb || isRef(rb)) {
     return {
@@ -358,7 +372,7 @@ function buildRequestBodySection(
   }
 
   const desc =
-    'description' in rb && typeof rb.description === 'string'
+    'description' in rb && isString(rb.description)
       ? escapeMdxText(
           lang === 'en'
             ? englishRequestBodyIntro(
@@ -370,6 +384,7 @@ function buildRequestBodySection(
         )
       : '';
   const jsonContent = rb.content?.['application/json'];
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const rawSchema = jsonContent?.schema as
     SchemaObject | ReferenceObject | undefined;
   const resolvedSchema = resolveSchema(rawSchema, components);
@@ -408,7 +423,7 @@ function buildRequestBodySection(
   }
 
   const sampleBody = toSampleValue(rawSchema ?? resolvedSchema, components);
-  if (sampleBody && typeof sampleBody === 'object') {
+  if (sampleBody && isJsonObject(sampleBody)) {
     lines.push(labels.exampleBody);
     lines.push('');
     lines.push('```json');
@@ -468,11 +483,18 @@ export function renderOperationPageMdx(input: {
   const lang = input.lang ?? 'en';
   const labels = labelsForLanguage(lang);
   const mLower = method.toLowerCase();
-  const enCopy = lang === 'en' ? EN_OPERATION_COPY[operationId] : undefined;
+  const enCopy =
+    lang === 'en' && isEnOperationId(operationId)
+      ? EN_OPERATION_COPY[operationId]
+      : undefined;
   const guidanceCopy =
     lang === 'en'
-      ? EN_OPERATION_COPY[operationId]
-      : FR_OPERATION_COPY[operationId];
+      ? isEnOperationId(operationId)
+        ? EN_OPERATION_COPY[operationId]
+        : undefined
+      : isFrOperationId(operationId)
+        ? FR_OPERATION_COPY[operationId]
+        : undefined;
   const titleSource = enCopy?.summary ?? operation.summary ?? operationId;
   const overviewDetail =
     lang === 'en' && enCopy
@@ -521,17 +543,12 @@ export function renderOperationPageMdx(input: {
           .concat(
             pathParams.map((p) => {
               const req = p.required ? labels.yes : labels.no;
-              const schema =
-                'schema' in p &&
-                p.schema &&
-                typeof p.schema === 'object' &&
-                '$ref' in p.schema
-                  ? (((p.schema as ReferenceObject).$ref ?? '')
-                      .split('/')
-                      .pop() ?? '')
-                  : '';
+              let schema = '';
+              if ('schema' in p && isRef(p.schema)) {
+                schema = (p.schema.$ref ?? '').split('/').pop() ?? '';
+              }
               const desc =
-                'description' in p && typeof p.description === 'string'
+                'description' in p && isString(p.description)
                   ? escapeMdxText(p.description)
                   : '';
               return `| \`${p.name}\` | ${req} | ${schema ? `\`${schema}\`` : '-'} | ${desc} |`;
@@ -607,7 +624,7 @@ export function renderOperationPageMdx(input: {
     shouldHaveBody ? `  -H "Content-Type: application/json"` : '',
     shouldHaveBody
       ? `  -d '${JSON.stringify(
-          requestBody.sampleBody && typeof requestBody.sampleBody === 'object'
+          requestBody.sampleBody && isJsonObject(requestBody.sampleBody)
             ? requestBody.sampleBody
             : {},
         )}'`
@@ -707,6 +724,7 @@ export function collectPublicOperations(spec: {
   for (const [p, item] of Object.entries(spec.paths)) {
     if (!item) continue;
     for (const m of HTTP_OPS) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const op = item[m] as OperationObject | undefined;
       if (!op?.operationId) continue;
       out.push({

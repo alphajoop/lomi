@@ -306,18 +306,18 @@ interface LomiConfig {
 | `accounts` | `list`, `get`, `getBalance`, `getBalanceBreakdown`, `checkBalance` |
 | `charges` | `createWaveCharge`, `createMtnCharge`, `createCardCharge`, `getCardCharge`, `cancelCardCharge` |
 | `checkoutSessions` | `list`, `get`, `create` |
-| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions` |
-| `discountCoupons` | `list`, `get`, `create`, `getPerformance` |
-| `organizations` | `list`, `get`, `getMetrics` |
+| `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions`, `getSubscriptions`, `createPortalSession` |
+| `coupons` | `list`, `get`, `create`, `getPerformance` |
+| `organizations` | `list`, `get`, `getMetrics`, `getRadarSettings`, `updateRadarSettings` |
 | `paymentLinks` | `list`, `get`, `create` |
 | `paymentRequests` | `list`, `get`, `create` |
 | `payouts` | `create`, `list`, `get` |
 | `products` | `list`, `get`, `create`, `addPrice`, `setDefaultPrice` |
 | `refunds` | `create`, `list`, `get` |
-| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel` |
+| `subscriptions` | `list`, `get`, `getUsage`, `cancel`, `resume` |
 | `transactions` | `list`, `get` |
-| `webhookDeliveryLogs` | `list`, `get` |
-| `webhooks` | `list`, `get`, `update` |
+| `usage` | `list`, `get`, `create`, `createSubscription`, `listPeriods`, `getRevenue`, `grantCredits`, `createEntitlement`, `checkEntitlement` |
+| `webhooks` | `list`, `get`, `update`, `listDeliveries`, `getDelivery` |
 
 ---
 

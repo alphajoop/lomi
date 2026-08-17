@@ -18,7 +18,9 @@ export function verifyWebhookSignature(
 ): boolean {
   if (!signature || !secret) return false;
 
-  const payload = typeof rawBody === 'string' ? rawBody : rawBody.toString('utf8');
+  const payload = Buffer.isBuffer(rawBody)
+    ? rawBody.toString('utf8')
+    : rawBody;
   const expected = createHmac('sha256', secret).update(payload).digest('hex');
 
   const sigBuffer = Buffer.from(signature, 'utf8');

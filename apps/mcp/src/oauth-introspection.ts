@@ -71,6 +71,7 @@ export async function introspectOAuthAccessToken(
     return { active: false };
   }
 
+  // SAFETY: OAuth introspect endpoint returns OAuthIntrospectionResult JSON.
   const result = (await response.json()) as OAuthIntrospectionResult;
   const ttlMs = result.exp
     ? Math.max(0, result.exp * 1000 - Date.now())

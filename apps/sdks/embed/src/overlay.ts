@@ -6,6 +6,11 @@ import {
   type LomiEmbedOptions,
 } from "./utils";
 
+export interface OverlayShell {
+  overlay: HTMLDivElement;
+  container: HTMLDivElement;
+}
+
 export const getModalStyles = (options: LomiEmbedOptions) => ({
   overlay: `
     position: fixed;
@@ -39,7 +44,7 @@ export const getModalStyles = (options: LomiEmbedOptions) => ({
 
 export const createOverlayShell = (
   options: LomiEmbedOptions,
-): { overlay: HTMLDivElement; container: HTMLDivElement } => {
+): OverlayShell => {
   const existing = document.getElementById(OVERLAY_ID);
   existing?.remove();
 

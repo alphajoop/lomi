@@ -10,11 +10,10 @@ type LogsService struct {
 	client *Client
 }
 
-func (s *LogsService) Get(typeParam string, id string) (interface{}, error) {
-		path := "/logs/{type}/{id}"
-		path = strings.ReplaceAll(path, "{type}", typeParam)
+func (s *LogsService) Get(id string, params map[string]string) (interface{}, error) {
+		path := "/logs/{id}"
 		path = strings.ReplaceAll(path, "{id}", id)
-		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
 		if err != nil {
 			return nil, err
 		}

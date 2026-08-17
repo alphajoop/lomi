@@ -1,3 +1,5 @@
-# Generated files
+# Dependencies
 node_modules/
+
+# Build
 dist/

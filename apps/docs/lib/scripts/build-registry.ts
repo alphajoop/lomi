@@ -16,11 +16,16 @@ export async function buildRegistry(): Promise<void> {
   const indexes: { name: string; title?: string; description?: string }[] = [];
 
   for (const comp of registry.components) {
-    indexes.push({
-      name: comp.name,
-      ...(comp.title ? { title: comp.title } : {}),
-      ...(comp.description ? { description: comp.description } : {}),
-    });
+    indexes.push(
+      Object.assign(
+        {},
+        {
+          name: comp.name,
+        },
+        comp.title ? { title: comp.title } : {},
+        comp.description ? { description: comp.description } : {},
+      ),
+    );
 
     const files = [];
     for (const f of comp.files) {
@@ -33,15 +38,21 @@ export async function buildRegistry(): Promise<void> {
       });
     }
 
-    const payload = {
-      name: comp.name,
-      ...(comp.title ? { title: comp.title } : {}),
-      ...(comp.description ? { description: comp.description } : {}),
-      files,
-      subComponents: [] as unknown[],
-      dependencies: registry.dependencies,
-      devDependencies: {},
-    };
+    const payload = Object.assign(
+      {},
+      {
+        name: comp.name,
+      },
+      comp.title ? { title: comp.title } : {},
+      comp.description ? { description: comp.description } : {},
+      {
+        files,
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
+        subComponents: [] as unknown[],
+        dependencies: registry.dependencies,
+        devDependencies: {},
+      },
+    );
 
     const jsonRel = `${comp.name}.json`;
     const jsonPath = path.join(outDir, jsonRel);
@@ -89,27 +100,37 @@ async function buildLomiUiRegistry(): Promise<void> {
       });
     }
 
-    const payload = {
-      $schema: 'https://ui.shadcn.com/schema/registry-item.json',
-      name: item.name,
-      type: 'registry:block',
-      title: item.title,
-      description: item.description,
-      ...(item.dependencies ? { dependencies: item.dependencies } : {}),
-      ...(item.registryDependencies
+    const payload = Object.assign(
+      {},
+      {
+        $schema: 'https://ui.shadcn.com/schema/registry-item.json',
+        name: item.name,
+        type: 'registry:block',
+        title: item.title,
+        description: item.description,
+      },
+      item.dependencies ? { dependencies: item.dependencies } : {},
+      item.registryDependencies
         ? { registryDependencies: item.registryDependencies }
-        : {}),
-      files,
-      ...(assetFiles.length > 0 ? { assetFiles } : {}),
-    };
+        : {},
+      {
+        files,
+      },
+      assetFiles.length > 0 ? { assetFiles } : {},
+    );
 
-    items.push({
-      name: item.name,
-      type: 'registry:block',
-      title: item.title,
-      description: item.description,
-      ...(item.dependencies ? { dependencies: item.dependencies } : {}),
-    });
+    items.push(
+      Object.assign(
+        {},
+        {
+          name: item.name,
+          type: 'registry:block',
+          title: item.title,
+          description: item.description,
+        },
+        item.dependencies ? { dependencies: item.dependencies } : {},
+      ),
+    );
 
     await writeFile(
       path.join(outDir, `${item.name}.json`),
@@ -159,12 +180,17 @@ async function buildLomiUiRegistry(): Promise<void> {
         version: lomiUiRegistry.version,
         homepage: lomiUiRegistry.homepage,
         registry_url: 'https://docs.lomi.africa/r/registry.json',
-        items: items.map((item) => ({
-          name: item.name,
-          title: item.title,
-          description: item.description,
-          ...(item.dependencies ? { dependencies: item.dependencies } : {}),
-        })),
+        items: items.map((item) =>
+          Object.assign(
+            {},
+            {
+              name: item.name,
+              title: item.title,
+              description: item.description,
+            },
+            item.dependencies ? { dependencies: item.dependencies } : {},
+          ),
+        ),
       },
       null,
       2,

@@ -17,7 +17,7 @@ We aim to acknowledge reports within **3 business days** and provide a remediati
 
 ## Scope
 
-In scope: lomi.-operated services (API, checkout, dashboard, admin, MCP, Supabase edge functions, customer portal, docs, website).
+In scope: lomi.-operated services (API, checkout, dashboard, admin, MCP, Supabase Postgres/Auth/Storage, customer portal, docs, website).
 
 Out of scope unless explicitly agreed:
 

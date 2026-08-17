@@ -3,7 +3,7 @@ title: "Retrieve log entry"
 description: "Retrieve log entry"
 full: true
 method: get
-path: /logs/{type}/{id}
+path: /logs/{id}
 operationId: LogsController_findOne
 ---
 
@@ -11,7 +11,7 @@ operationId: LogsController_findOne
 
 Retrieve log entry
 
-Returns a single log entry by type and ID. Responds with **404** when the entry does not exist or is outside the API key organization scope.
+Returns a single log entry by ID. Pass `type` to select the log stream. Responds with **404** when the entry does not exist or is outside the API key organization scope.
 
 
 ### When to use this
@@ -29,7 +29,7 @@ Merchant routes require an API key in the `X-API-KEY` header (see [Integration o
 
 ## Endpoint
 
-`GET /logs/{type}/{id}`
+`GET /logs/{id}`
 
 Base URLs:
 
@@ -43,12 +43,12 @@ Base URLs:
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
 | `id` | Yes | - | Log entry UUID |
-| `type` | Yes | - |  |
 
 ### Query parameters
 
-_No query parameters._
-
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `type` | query | Yes | - | Log stream to query |
 
 
 
@@ -67,13 +67,13 @@ Errors follow the standard JSON error format (status code and machine-readable m
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/logs/api_request/value" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/logs/value?type=api_request" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
 ## OpenAPI
 
 - **operationId**: `LogsController_findOne`
-- **Operation**: `GET /logs/{type}/{id}`
+- **Operation**: `GET /logs/{id}`
 
 Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

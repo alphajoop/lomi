@@ -14,10 +14,10 @@ export class AccountsService {
      * Check available balance
      * @see OpenAPI `AccountsController_checkAvailableBalance`
      */
-    public async checkBalance(currency: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/accounts/balance/check/{currency}']['get']['responses'][200]>['content']>['application/json'])> {
-        return requestWithClient<(NonNullable<NonNullable<paths['/accounts/balance/check/{currency}']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
+    public async checkBalance(currency: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/accounts/balance/{currency}']['get']['responses'][200]>['content']>['application/json'])> {
+        return requestWithClient<(NonNullable<NonNullable<paths['/accounts/balance/{currency}']['get']['responses'][200]>['content']>['application/json'])>(this.client, {
             method: 'GET',
-            url: '/accounts/balance/check/{currency}',
+            url: '/accounts/balance/{currency}',
             path: { currency: currency },
             ...options,
         });

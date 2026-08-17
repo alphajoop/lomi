@@ -126,9 +126,8 @@ twine upload dist/*
 
 ```bash
 cd apps/sdks
-npm run generate:ts
-npm run generate:js
-npm run generate:python
+pnpm run generate:ts
+pnpm run generate:python
 # or all at once
-npm run generate:all
+pnpm run generate:all
 ```

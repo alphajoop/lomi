@@ -14,14 +14,15 @@ export async function createClient() {
   }
 
   const isProduction = process.env.NODE_ENV === 'production';
-  // Read the same session namespace as apps/dashboard for API Try It SSO.
-  const dashboardAuthStorageKey = `sb-${new URL(supabaseUrl).hostname.split('.')[0]}-dashboard-auth`;
+  const docsAuthStorageKey = `sb-${new URL(supabaseUrl).hostname.split('.')[0]}-docs-auth`;
 
   const client = createServerClient(supabaseUrl, supabaseAnonKey, {
     auth: {
-      storageKey: dashboardAuthStorageKey,
-      autoRefreshToken: true,
-      persistSession: true,
+      storageKey: docsAuthStorageKey,
+      autoRefreshToken: false,
+      persistSession: false,
+      flowType: 'pkce',
+      detectSessionInUrl: false,
     },
     cookies: {
       getAll() {
@@ -30,14 +31,12 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            const cookieOptions = {
+            cookieStore.set(name, value, {
               ...options,
-              domain: isProduction ? '.lomi.africa' : options.domain,
               path: options.path || '/',
               sameSite: options.sameSite || ('lax' as const),
               secure: isProduction ? true : options.secure,
-            };
-            cookieStore.set(name, value, cookieOptions);
+            });
           });
         } catch {
           // The `setAll` method was called from a Server Component.

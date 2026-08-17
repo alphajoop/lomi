@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "generate": "tsx src/scripts/generate-tools.ts && tsx src/scripts/generate-provisioning-tools.ts",
+    "generate": "tsx scripts/build/generate-tools.ts && tsx scripts/build/generate-provisioning-tools.ts",
     "generate:check": "pnpm run generate && git diff --exit-code src/generated/",
     "prebuild": "pnpm run generate",
     "prepublishOnly": "pnpm run build",
@@ -25,9 +25,10 @@
     "dev": "tsx src/index.ts",
     "dev:http": "LOMI_MCP_TRANSPORT=http tsx src/http-entry.ts",
     "test": "vitest run",
-    "lint": "eslint \"src/**/*.ts\" --fix",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "knip": "knip --no-config-hints",
-    "smoke:http": "tsx src/scripts/smoke-http.ts"
+    "smoke:http": "tsx scripts/smoke/smoke-http.ts"
   },
   "engines": {
     "node": ">=18"
@@ -52,7 +53,9 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "express": "^5.2.1",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "@lomi./shared": "file:../../packages/shared",
+    "@lomi./sdk-scripts": "file:../sdks/scripts"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

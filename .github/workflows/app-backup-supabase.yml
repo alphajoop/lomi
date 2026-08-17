@@ -90,30 +90,9 @@ jobs:
               ;;
           esac
 
-      # GitHub-hosted runners are IPv4-only, and Supabase's shared pooler (the only
-      # free IPv4 path) has been unreliable (EAUTHQUERY/ECIRCUITBREAKER). The direct
-      # database host (db.<ref>.supabase.co) is reachable and stable, but IPv6-only.
-      # Cloudflare WARP gives the runner IPv6 egress so we can use the direct host.
-      - name: Set up IPv6 egress (Cloudflare WARP)
-        uses: fscarmen/warp-on-actions@v1.4
-        with:
-          stack: ipv6
-          mode: wireguard
-
-      - name: Verify IPv6 connectivity
-        run: |
-          set -euo pipefail
-          echo "Verifying IPv6 egress via WARP..."
-          for attempt in 1 2 3 4 5 6; do
-            if curl -6 -fsS -m 10 https://api64.ipify.org >/dev/null 2>&1; then
-              echo "IPv6 egress is up."
-              exit 0
-            fi
-            echo "IPv6 not ready yet (attempt ${attempt}); waiting..."
-            sleep 5
-          done
-          echo "::error::IPv6 egress is not available after WARP setup. The direct Supabase host (db.<ref>.supabase.co) is IPv6-only and cannot be reached without it."
-          exit 1
+      # GitHub-hosted runners are IPv4-only; the direct Supabase host is IPv6-only.
+      - name: Set up IPv6 egress
+        uses: ./.github/actions/setup-ipv6-warp
 
       - name: Install backup tools
         run: |

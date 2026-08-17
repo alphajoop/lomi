@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 import { callLomiRest } from '../src/lomi-http.ts';
-import type { ManifestTool } from '../src/manifest.ts';
+import type { RestCallSpec } from '../src/manifest.ts';
 
 describe('callLomiRest', () => {
   beforeEach(() => {
@@ -16,18 +16,11 @@ describe('callLomiRest', () => {
   });
 
   it('substitutes path params and sets API key', async () => {
-    const tool: ManifestTool = {
-      name: 't',
-      operationKey: 'GET /customers/{id}',
+    const spec: RestCallSpec = {
       method: 'get',
       pathTemplate: '/customers/{id}',
       pathParamNames: ['id'],
       queryParamNames: [],
-      title: '',
-      description: '',
-      tags: [],
-      operationId: '',
-      write: false,
       wantsBody: false,
       inputSchema: {
         type: 'object',
@@ -38,7 +31,7 @@ describe('callLomiRest', () => {
       },
     };
 
-    await callLomiRest(tool, { id: 'abc-123' }, {
+    await callLomiRest(spec, { id: 'abc-123' }, {
       baseUrl: 'https://api.example.test',
       apiKey: 'secret',
     });
@@ -46,25 +39,20 @@ describe('callLomiRest', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     const call = vi.mocked(fetch).mock.calls[0]!;
     expect(call[0]).toBe('https://api.example.test/customers/abc-123');
+    // SAFETY: fetch mock records RequestInit as the second call argument.
     const init = call[1] as RequestInit;
     expect(init.method).toBe('GET');
-    const headers = init.headers as Record<string, string>;
+    // SAFETY: callLomiRest sets plain string header maps on RequestInit.
+    const headers = init.headers as { [name: string]: string };
     expect(headers['X-API-KEY']).toBe('secret');
   });
 
   it('only forwards header_* keys declared on inputSchema', async () => {
-    const tool: ManifestTool = {
-      name: 't',
-      operationKey: 'GET /x',
+    const spec: RestCallSpec = {
       method: 'get',
       pathTemplate: '/x',
       pathParamNames: [],
       queryParamNames: [],
-      title: '',
-      description: '',
-      tags: [],
-      operationId: '',
-      write: false,
       wantsBody: false,
       inputSchema: {
         type: 'object',
@@ -75,7 +63,7 @@ describe('callLomiRest', () => {
     };
 
     await callLomiRest(
-      tool,
+      spec,
       {
         'header_X-Request-Id': 'rid',
         header_Evil: 'no',
@@ -83,8 +71,10 @@ describe('callLomiRest', () => {
       { baseUrl: 'https://api.example.test', apiKey: 'k' },
     );
 
+    // SAFETY: fetch mock records RequestInit as the second call argument.
     const init = vi.mocked(fetch).mock.calls[0]![1] as RequestInit;
-    const headers = init.headers as Record<string, string>;
+    // SAFETY: callLomiRest sets plain string header maps on RequestInit.
+    const headers = init.headers as { [name: string]: string };
     expect(headers['X-Request-Id']).toBe('rid');
     expect(headers.Evil).toBeUndefined();
   });

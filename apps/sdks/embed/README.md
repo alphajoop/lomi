@@ -13,7 +13,7 @@ npm install @lomi./embed
 Create a checkout session on your server (or use a payment link URL), then pass the returned `checkout_url` to the embed SDK:
 
 ```bash
-curl -X POST https://api.lomi.africa/v1/checkout-sessions \
+curl -X POST https://api.lomi.africa/checkout-sessions \
   -H "Authorization: Bearer sk_live_..." \
   -H "Content-Type: application/json" \
   -d '{"amount": 5000, "currency": "XOF", "success_url": "https://yoursite.com/success"}'

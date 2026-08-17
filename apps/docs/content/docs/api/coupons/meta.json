@@ -1,0 +1,9 @@
+{
+  "title": "Coupons",
+  "pages": [
+    "DiscountCouponsController_create",
+    "DiscountCouponsController_findAll",
+    "DiscountCouponsController_findOne",
+    "DiscountCouponsController_getPerformance"
+  ]
+}

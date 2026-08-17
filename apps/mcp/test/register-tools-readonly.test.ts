@@ -1,49 +1,67 @@
 import { describe, expect, it } from 'vitest';
 import type { ToolsManifest } from '../src/manifest.js';
 
+function groupedTool(
+  name: string,
+  readOnly: boolean,
+): ToolsManifest['tools'][number] {
+  return {
+    name,
+    title: name,
+    description: name,
+    tags: [],
+    write: !readOnly,
+    readOnly,
+    destructive: false,
+    searchHint: name,
+    alwaysLoad: false,
+    inputSchema: {
+      type: 'object',
+      required: ['action'],
+      properties: { action: { type: 'string', enum: ['list'] } },
+    },
+    actions: {
+      list: {
+        operationKey: readOnly ? 'GET /items' : 'POST /items',
+        method: readOnly ? 'get' : 'post',
+        pathTemplate: '/items',
+        pathParamNames: [],
+        queryParamNames: [],
+        operationId: name,
+        write: !readOnly,
+        wantsBody: !readOnly,
+        title: name,
+        description: name,
+        tags: [],
+        requiredInput: readOnly ? [] : ['body'],
+      },
+    },
+  };
+}
+
 describe('registerMerchantTools read-only filter', () => {
   it('skips write tools when readOnlyOnly is true', async () => {
     const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js');
     const { registerMerchantTools } = await import('../src/register-tools.js');
 
     const manifest: ToolsManifest = {
-      manifestVersion: 'test',
+      manifestVersion: 1,
       apiVersion: 'test',
+      apiTitle: 'test',
       toolCount: 2,
-      tools: [
-        {
-          name: 'read_tool',
-          title: 'Read',
-          description: 'read',
-          method: 'GET',
-          path: '/items',
-          readOnly: true,
-          destructive: false,
-          searchHint: false,
-          alwaysLoad: false,
-          inputSchema: { type: 'object', properties: {} },
-        },
-        {
-          name: 'write_tool',
-          title: 'Write',
-          description: 'write',
-          method: 'POST',
-          path: '/items',
-          readOnly: false,
-          destructive: false,
-          searchHint: false,
-          alwaysLoad: false,
-          inputSchema: { type: 'object', properties: {} },
-        },
-      ],
+      tools: [groupedTool('read_tool', true), groupedTool('write_tool', false)],
     };
 
     const server = new McpServer({ name: 'test', version: '0' });
     const registered: string[] = [];
     const original = server.registerTool.bind(server);
-    server.registerTool = ((name: string, ...rest: unknown[]) => {
+    // SAFETY: Test wrapper preserves registerTool's production signature while recording names.
+    server.registerTool = ((
+      name: string,
+      ...rest: Parameters<typeof original> extends [string, ...infer R] ? R : never
+    ) => {
       registered.push(name);
-      return original(name, ...(rest as Parameters<typeof original> extends [string, ...infer R] ? R : never));
+      return original(name, ...rest);
     }) as typeof server.registerTool;
 
     registerMerchantTools(server, manifest, {

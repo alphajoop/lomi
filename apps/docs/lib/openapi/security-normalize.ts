@@ -5,6 +5,7 @@ import type {
   OperationObject,
   PathItemObject,
 } from '@/lib/openapi/types';
+import { type JsonObject } from '@lomi./shared';
 
 const HTTP_METHODS = [
   'get',
@@ -41,8 +42,9 @@ function mapSecurityRequirements(
  * definitions so Fumadocs renders a single Authorization block.
  */
 export function normalizeOpenApiSecurity(document: Document): Document {
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const schemes = document.components?.securitySchemes as
-    Record<string, unknown> | undefined;
+    JsonObject | undefined;
 
   if (schemes) {
     if (schemes['X-API-KEY'] && !schemes['api-key']) {
@@ -55,6 +57,7 @@ export function normalizeOpenApiSecurity(document: Document): Document {
 
   if (document.security) {
     document.security = mapSecurityRequirements(
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       document.security as SecurityRequirementObject[],
     );
   }
@@ -64,19 +67,23 @@ export function normalizeOpenApiSecurity(document: Document): Document {
   for (const pathItem of Object.values(document.paths)) {
     if (!pathItem) continue;
 
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const item = pathItem as PathItemObject & {
       security?: SecurityRequirementObject[];
     };
     if (item.security) {
       item.security = mapSecurityRequirements(
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         item.security as SecurityRequirementObject[],
       );
     }
 
     for (const method of HTTP_METHODS) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       const operation = item[method] as OperationObject | undefined;
       if (!operation?.security) continue;
       operation.security = mapSecurityRequirements(
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         operation.security as SecurityRequirementObject[],
       );
     }

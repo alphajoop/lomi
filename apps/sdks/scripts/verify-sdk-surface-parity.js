@@ -9,6 +9,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sdksRoot = join(__dirname, '..');
+const isObjectRecord = (value) =>
+  value !== null && Object(value) === value && !Array.isArray(value);
 
 const canonicalPath = join(
   sdksRoot,
@@ -17,7 +19,7 @@ const canonicalPath = join(
 
 function loadSdk(path) {
   const j = JSON.parse(readFileSync(path, 'utf-8'));
-  if (!j.sdk || typeof j.sdk !== 'object') {
+  if (!isObjectRecord(j.sdk)) {
     throw new Error(`${path}: missing sdk object`);
   }
   return j.sdk;

@@ -38,6 +38,8 @@ const apiTypesPath = join(__dirname, '../api-types.ts');
 const openapiPath = DEFAULT_OPENAPI_PATH;
 const allowlistPath = DEFAULT_ALLOWLIST_PATH;
 const outputDir = join(__dirname, '../ts/src/generated');
+const isObjectRecord = (value) =>
+  value !== null && Object(value) === value && !Array.isArray(value);
 const enOverridesPath = join(
   __dirname,
   '../../docs/lib/scripts/manual-api/en-operation-overrides.ts',
@@ -128,7 +130,7 @@ function buildMethodSource(
   spec,
 ) {
   const pathItem = spec.paths[pathTpl];
-  if (!pathItem || typeof pathItem !== 'object') {
+  if (!isObjectRecord(pathItem)) {
     throw new Error(`OpenAPI paths missing "${pathTpl}"`);
   }
 
@@ -358,7 +360,7 @@ function generateSchemaTypeAliases(spec, flatOps) {
     const code = first2xxResponseCode(op);
 
     const collectRef = (ref) => {
-      if (!ref || typeof ref !== 'string') return;
+      if (!ref || ref.constructor !== String) return;
       const resolved = resolveRef(ref, spec);
       if (ref.includes('/components/schemas/')) {
         const name = ref.split('/').pop();

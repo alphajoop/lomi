@@ -1,4 +1,5 @@
 pub mod global;
+pub mod secrets;
 
 pub use global::{GlobalConfig, ProfileMetadata};
 

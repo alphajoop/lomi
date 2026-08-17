@@ -1,0 +1,269 @@
+{
+  "alwaysLoadOperationKeys": [
+    "GET /accounts/balance",
+    "GET /customers",
+    "GET /products",
+    "GET /checkout-sessions",
+    "POST /checkout-sessions",
+    "POST /payment-links",
+    "GET /transactions",
+    "GET /webhooks",
+    "POST /customers"
+  ],
+  "mcpExcludedOperationKeys": [
+    "POST /charge/card",
+    "POST /charge/card/{id}/cancel",
+    "GET /charge/card/{id}",
+    "POST /charge/wave",
+    "POST /charge/mtn",
+    "POST /charge/switch",
+    "POST /usage/events"
+  ],
+  "groups": [
+    {
+      "name": "lomi_customers",
+      "title": "Customers",
+      "actions": {
+        "list": "GET /customers",
+        "get": "GET /customers/{id}",
+        "create": "POST /customers",
+        "update": "PATCH /customers/{id}",
+        "delete": "DELETE /customers/{id}",
+        "transactions": "GET /customers/{id}/transactions",
+        "portal": "POST /customers/{id}/portal",
+        "portal_audit": "GET /customers/{id}/portal-audit",
+        "subscriptions": "GET /customers/{id}/subscriptions"
+      }
+    },
+    {
+      "name": "lomi_products",
+      "title": "Products",
+      "actions": {
+        "list": "GET /products",
+        "get": "GET /products/{id}",
+        "create": "POST /products",
+        "add_price": "POST /products/{id}/prices",
+        "set_default_price": "POST /products/{id}/prices/{priceId}/default"
+      }
+    },
+    {
+      "name": "lomi_checkout",
+      "title": "Checkout sessions",
+      "actions": {
+        "list": "GET /checkout-sessions",
+        "get": "GET /checkout-sessions/{id}",
+        "create": "POST /checkout-sessions"
+      }
+    },
+    {
+      "name": "lomi_payment_links",
+      "title": "Payment links",
+      "actions": {
+        "list": "GET /payment-links",
+        "get": "GET /payment-links/{id}",
+        "create": "POST /payment-links"
+      }
+    },
+    {
+      "name": "lomi_payment_requests",
+      "title": "Payment requests",
+      "actions": {
+        "list": "GET /payment-requests",
+        "get": "GET /payment-requests/{id}",
+        "create": "POST /payment-requests"
+      }
+    },
+    {
+      "name": "lomi_transactions",
+      "title": "Transactions",
+      "actions": {
+        "list": "GET /transactions",
+        "get": "GET /transactions/{id}"
+      }
+    },
+    {
+      "name": "lomi_refunds",
+      "title": "Refunds",
+      "actions": {
+        "list": "GET /refunds",
+        "get": "GET /refunds/{id}",
+        "create": "POST /refunds"
+      }
+    },
+    {
+      "name": "lomi_payouts",
+      "title": "Payouts",
+      "actions": {
+        "list": "GET /payouts",
+        "get": "GET /payouts/{id}",
+        "create": "POST /payouts"
+      }
+    },
+    {
+      "name": "lomi_subscriptions",
+      "title": "Subscriptions",
+      "actions": {
+        "list": "GET /subscriptions",
+        "get": "GET /subscriptions/{id}",
+        "update": "PATCH /subscriptions/{id}",
+        "cancel": "POST /subscriptions/{id}/cancel",
+        "resume": "POST /subscriptions/{id}/resume",
+        "change_plan": "POST /subscriptions/{id}/change-plan",
+        "usage": "GET /subscriptions/{id}/usage"
+      }
+    },
+    {
+      "name": "lomi_webhooks",
+      "title": "Webhooks",
+      "actions": {
+        "list": "GET /webhooks",
+        "get": "GET /webhooks/{id}",
+        "create": "POST /webhooks",
+        "update": "PATCH /webhooks/{id}",
+        "delete": "DELETE /webhooks/{id}",
+        "test": "POST /webhooks/{id}/test",
+        "deliveries": "GET /webhooks/deliveries",
+        "delivery": "GET /webhooks/deliveries/{id}",
+        "retry": "POST /webhooks/{id}/deliveries/{deliveryId}/retry"
+      }
+    },
+    {
+      "name": "lomi_balance",
+      "title": "Account balance",
+      "actions": {
+        "get": "GET /accounts/balance",
+        "breakdown": "GET /accounts/balance/breakdown",
+        "check": "GET /accounts/balance/{currency}"
+      }
+    },
+    {
+      "name": "lomi_coupons",
+      "title": "Coupons",
+      "actions": {
+        "list": "GET /coupons",
+        "get": "GET /coupons/{id}",
+        "create": "POST /coupons",
+        "performance": "GET /coupons/{id}/performance"
+      }
+    },
+    {
+      "name": "lomi_disputes",
+      "title": "Disputes",
+      "actions": {
+        "list": "GET /disputes",
+        "get": "GET /disputes/{id}"
+      }
+    },
+    {
+      "name": "lomi_logs",
+      "title": "API logs",
+      "actions": {
+        "list": "GET /logs",
+        "get": "GET /logs/{id}"
+      }
+    },
+    {
+      "name": "lomi_merchant",
+      "title": "Merchant",
+      "actions": {
+        "get": "GET /merchants/{id}",
+        "arr": "GET /merchants/{id}/arr",
+        "mrr": "GET /merchants/{id}/mrr",
+        "balance": "GET /merchants/{id}/balance"
+      }
+    },
+    {
+      "name": "lomi_organization",
+      "title": "Organization",
+      "actions": {
+        "list": "GET /organizations",
+        "get": "GET /organizations/{id}",
+        "metrics": "GET /organizations/metrics"
+      }
+    },
+    {
+      "name": "lomi_meters",
+      "title": "Meters",
+      "actions": {
+        "list": "GET /meters",
+        "get": "GET /meters/{id}",
+        "create": "POST /meters",
+        "update": "PATCH /meters/{id}",
+        "balance": "GET /meters/{id}/balances/{customerId}"
+      }
+    },
+    {
+      "name": "lomi_usage",
+      "title": "Usage billing",
+      "actions": {
+        "check_entitlement": "GET /usage/entitlements",
+        "set_entitlement": "POST /usage/entitlements",
+        "periods": "GET /usage/periods",
+        "revenue": "GET /usage/revenue",
+        "credits": "POST /usage/credits",
+        "events": "GET /usage/events",
+        "get_event": "GET /usage/events/{id}",
+        "create_subscription": "POST /usage/subscriptions"
+      }
+    },
+    {
+      "name": "lomi_radar",
+      "title": "Radar settings",
+      "actions": {
+        "get": "GET /organizations/radar-settings",
+        "update": "PATCH /organizations/radar-settings"
+      }
+    },
+    {
+      "name": "lomi_providers",
+      "title": "Payment providers",
+      "actions": {
+        "list": "GET /providers"
+      }
+    },
+    {
+      "name": "lomi_settlements",
+      "title": "Settlements",
+      "actions": {
+        "list": "GET /settlements",
+        "transactions": "GET /settlements/{id}/transactions"
+      }
+    },
+    {
+      "name": "lomi_risk",
+      "title": "Risk assessments",
+      "actions": {
+        "list": "GET /risk-assessments",
+        "get": "GET /risk-assessments/{id}"
+      }
+    }
+  ],
+  "provisioningGroups": [
+    {
+      "name": "lomi_provision",
+      "title": "Merchant provisioning",
+      "authMode": "provisioning",
+      "actions": {
+        "create_account": "POST /provisioning/accounts",
+        "upload_document": "POST /provisioning/merchants/{merchantId}/onboarding/documents",
+        "extract": "POST /provisioning/merchants/{merchantId}/onboarding/extract",
+        "complete": "POST /provisioning/merchants/{merchantId}/onboarding/complete",
+        "status": "GET /provisioning/merchants/{merchantId}/onboarding/status",
+        "api_keys": "GET /provisioning/merchants/{merchantId}/api-keys",
+        "request_live": "POST /provisioning/merchants/{merchantId}/live-activation/request",
+        "live_status": "GET /provisioning/merchants/{merchantId}/live-activation/status"
+      }
+    },
+    {
+      "name": "lomi_partners",
+      "title": "Partner provisioning keys",
+      "authMode": "partner",
+      "actions": {
+        "mint_key": "POST /partners/provisioning-keys",
+        "list_keys": "GET /partners/provisioning-keys",
+        "revoke_key": "DELETE /partners/provisioning-keys/{provisioningKeyId}",
+        "usage": "GET /partners/usage"
+      }
+    }
+  ]
+}

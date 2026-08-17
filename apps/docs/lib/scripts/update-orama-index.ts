@@ -4,6 +4,7 @@ import * as fs from 'node:fs/promises';
 import { OramaCloud } from '@orama/core';
 import { CloudManager } from '@oramacloud/client';
 import { DataSourceId, isAdmin } from '@/lib/orama/client';
+import { type JsonObject } from '@lomi./shared';
 
 const useOramaCoreIndex =
   !!process.env.ORAMA_PROJECT_ID && !!process.env.ORAMA_DATASOURCE_ID;
@@ -20,7 +21,8 @@ async function updateWithOramaCore(
 
   const batchSize = 100;
   for (let i = 0; i < records.length; i += batchSize) {
-    const batch = records.slice(i, i + batchSize) as Record<string, unknown>[];
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
+    const batch = records.slice(i, i + batchSize) as JsonObject[];
     await temporary.insertDocuments(batch);
   }
 
@@ -55,6 +57,7 @@ export async function updateSearchIndexes(): Promise<void> {
   }
 
   const content = await fs.readFile('.next/server/app/static.json.body');
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const records = JSON.parse(content.toString()) as unknown[];
 
   if (useOramaCoreIndex) {

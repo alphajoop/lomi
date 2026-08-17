@@ -2,21 +2,29 @@
 
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import { type ComponentProps, type FC, type ReactNode, type JSX } from 'react';
+import {
+  type ComponentProps,
+  type ComponentType,
+  type FC,
+  type ReactNode,
+  type JSX,
+} from 'react';
 import * as Twoslash from 'fumadocs-twoslash/ui';
 import { Callout } from '@/components/docs/docs-callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
-import { source } from '@/lib/utils/source';
+import { source, type Page } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 import { buildDocsAlternates } from '@/lib/utils/docs-routing';
 import type { Language } from '@/lib/i18n/config';
 import { Wrapper } from '@/components/preview/wrapper';
+import type { MDXComponents } from 'mdx/types';
 import { getMDXComponents } from '@/mdx-components';
 import Link from 'fumadocs-core/link';
 import { AutoTypeTable } from 'fumadocs-typescript/ui';
 import { createGenerator } from 'fumadocs-typescript';
+import { TOCItemType } from 'fumadocs-core/toc';
 import { getPageTreePeers } from 'fumadocs-core/page-tree';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { LLMCopyButton, ViewOptions } from '@/components/preview/page-actions';
@@ -27,6 +35,18 @@ import { Customisation } from '@/components/preview/customisation';
 import { FaqPageJsonLd } from '@/components/seo/faq-page-json-ld';
 import { BRAND_FAQ } from '@/lib/seo/brand-facts';
 import { DocsPage } from 'fumadocs-ui/page';
+import { asJsonValue, isString, type JsonValue } from '@lomi./shared';
+
+type CompiledDocsPageData = {
+  body: ComponentType<{ components?: MDXComponents }>;
+  toc: TOCItemType[];
+  lastModified?: Date | string | number;
+  index?: boolean;
+};
+
+function compiledDocsPageData(data: Page['data']): CompiledDocsPageData {
+  return data as Page['data'] & CompiledDocsPageData;
+}
 
 const DEFAULT_DOC_SLUG = ['start', 'overview'] as const;
 
@@ -52,6 +72,7 @@ function resolvePageForLocale(slug: string[], locale: Language) {
 
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
+    // SAFETY: Boundary value matches the asserted domain type at this call site.
     const Comp = Preview[preview as keyof typeof Preview];
     return <Comp />;
   }
@@ -63,7 +84,7 @@ const generator = createGenerator();
 
 export const revalidate = false;
 
-function serializeStructuredData(value: unknown): string {
+function serializeStructuredData(value: JsonValue): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
 }
 
@@ -83,10 +104,11 @@ export default async function Page({
 
   if (!page) notFound();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pageData = page.data as any;
-
-  const preview = pageData.preview as string | undefined;
+  const pageData = compiledDocsPageData(page.data);
+  const preview =
+    'preview' in page.data && isString(page.data.preview)
+      ? page.data.preview
+      : undefined;
   const Mdx = pageData.body;
   const toc = pageData.toc;
   const lastModified = pageData.lastModified;
@@ -98,8 +120,8 @@ export default async function Page({
     {
       '@context': 'https://schema.org',
       '@type': 'TechArticle',
-      headline: page.data.title,
-      description: page.data.description,
+      headline: page.data.title ?? '',
+      description: page.data.description ?? '',
       inLanguage: resolvedLocale,
       url: canonicalUrl,
       mainEntityOfPage: canonicalUrl,
@@ -140,7 +162,7 @@ export default async function Page({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: serializeStructuredData(structuredData),
+          __html: serializeStructuredData(asJsonValue(structuredData)),
         }}
       />
       <DocsPage
@@ -170,7 +192,7 @@ export default async function Page({
               ...Twoslash,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               a: ({ href, children, ...props }: any): JSX.Element => {
-                const resolvedHref = typeof href === 'string' ? href : '';
+                const resolvedHref = isString(href) ? href : '';
                 const found = source.getPageByHref(resolvedHref, {
                   dir: path.dirname(page.path),
                   language: resolvedLocale,
@@ -199,9 +221,8 @@ export default async function Page({
                 <AutoTypeTable generator={generator} {...props} />
               ),
               Wrapper,
-              blockquote: Callout as unknown as FC<
-                ComponentProps<'blockquote'>
-              >,
+              // SAFETY: Callout accepts blockquote props used by MDX blockquotes.
+              blockquote: Callout as FC<ComponentProps<'blockquote'>>,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               DocsCategory: ({ url }: any): JSX.Element => {
                 return <DocsCategory url={url ?? page.url} locale={locale} />;
@@ -280,9 +301,7 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  const list = source
-    .getPages('en')
-    .map((p) => ({ slug: p.slugs }) as { slug: string[] });
+  const list = source.getPages('en').map((p) => ({ slug: p.slugs }));
   const withoutEmpty = list.filter((p) => (p.slug?.length ?? 0) > 0);
   return [{ slug: [] }, ...withoutEmpty];
 }

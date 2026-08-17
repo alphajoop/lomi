@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lomi.africa/schemas/tasks.json",
+  "title": "lomi. task registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "projects"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+    "projects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/project" }
+    }
+  },
+  "$defs": {
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "kind",
+        "manager",
+        "workspace",
+        "submodule",
+        "required",
+        "capabilities",
+        "owner",
+        "risk"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": ["app", "package", "sdk", "plugin", "tool", "cli"]
+        },
+        "manager": {
+          "type": "string",
+          "enum": ["pnpm", "cargo", "python", "go", "php", "none"]
+        },
+        "workspace": { "type": "boolean" },
+        "submodule": { "type": "boolean" },
+        "required": { "type": "boolean" },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "install",
+              "dev",
+              "build",
+              "start",
+              "lint",
+              "format",
+              "typecheck",
+              "knip",
+              "test",
+              "types:generate"
+            ]
+          }
+        },
+        "owner": { "type": "string", "minLength": 1 },
+        "risk": { "type": "string", "enum": ["low", "medium", "high", "ops"] },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

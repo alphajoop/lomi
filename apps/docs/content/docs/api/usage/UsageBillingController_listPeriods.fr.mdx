@@ -1,0 +1,71 @@
+---
+title: "List usage billing periods"
+description: "List usage billing periods"
+full: true
+method: get
+path: /usage/periods
+operationId: UsageBillingController_listPeriods
+---
+
+## Aperçu
+
+List usage billing periods
+
+### Quand l’utiliser
+
+Utilisez cet endpoint quand vous devez exécuter `GET /usage/periods` (List usage billing periods).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /usage/periods`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+_Pas d’autre paramètre dans l’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `page_size` | query | Non | - |  |
+| `page` | query | Non | - |  |
+| `subscription_id` | query | Non | - |  |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | - |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/usage/periods?page_size=1&page=1" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `UsageBillingController_listPeriods`
+- **Operation**: `GET /usage/periods`
+
+Schémas complets et **Try it** : [référence API](/api).

@@ -120,7 +120,7 @@ curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
 
 ## Abonnements d’un client
 
-**Référence API :** [Abonnements par client](/api/subscriptions/SubscriptionsController_findByCustomer)
+**Référence API :** [Abonnements par client](/api/subscriptions/CustomersController_getSubscriptions)
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -271,10 +271,10 @@ curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
 
 ## Annuler une résiliation planifiée
 
-**Référence API :** [Annuler la résiliation](/api/subscriptions/SubscriptionsController_uncancel)
+**Référence API :** [Annuler la résiliation](/api/subscriptions/SubscriptionsController_resume)
 
 ```bash
-curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../uncancel" \
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../resume" \
   -H "X-API-KEY: $LOMI_SECRET_KEY"
 ```
 
@@ -316,9 +316,9 @@ lomi. n’émet pas de webhook pour l’enregistrement de carte en essai (`setup
 
 - [Lister les abonnements](/api/subscriptions/SubscriptionsController_findAll)
 - [Obtenir un abonnement](/api/subscriptions/SubscriptionsController_findOne)
-- [Abonnements par client](/api/subscriptions/SubscriptionsController_findByCustomer)
+- [Abonnements par client](/api/subscriptions/CustomersController_getSubscriptions)
 - [Annuler un abonnement](/api/subscriptions/SubscriptionsController_cancel)
-- [Annuler la résiliation](/api/subscriptions/SubscriptionsController_uncancel)
+- [Annuler la résiliation](/api/subscriptions/SubscriptionsController_resume)
 - [Changer de plan](/api/subscriptions/SubscriptionsController_changePlan)
 - [Mettre à jour un abonnement](/api/subscriptions/SubscriptionsController_update)
 - [Comportement du tunnel : abonnements](/build/payments/checkout-behavior#subscription-checkout)

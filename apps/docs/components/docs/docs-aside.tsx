@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 export type DocsAsideVariant =
   'info' | 'warning' | 'error' | 'success' | 'idea';

@@ -65,7 +65,7 @@ jobs:
 
       - name: Sync website OpenAPI mirrors
         working-directory: apps/website
-        run: node src/lib/scripts/sync-openapi.mjs
+        run: node scripts/build/sync-openapi.mjs
 
       - name: Assert website OpenAPI mirrors match docs
         run: |

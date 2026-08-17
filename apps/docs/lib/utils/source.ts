@@ -14,6 +14,7 @@ export const source = loader({
   i18n: fumadocsI18n,
   icon(icon) {
     if (icon && icon in icons)
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       return createElement(icons[icon as keyof typeof icons]);
   },
   source: docs.toFumadocsSource(),

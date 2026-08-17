@@ -5,32 +5,11 @@ use serde::Deserialize;
 use std::time::{Duration, Instant};
 
 use crate::api::{ApiClient, MeResponse};
-use crate::cli::{cli_auth_base, PRODUCTION_API_URL, SUPABASE_ANON_KEY};
+use crate::cli::{cli_auth_base, PRODUCTION_API_URL};
 use crate::config::{GlobalConfig, ProfileMetadata};
 
 fn auth_client() -> Result<reqwest::Client> {
-    let mut headers = reqwest::header::HeaderMap::new();
-    if let Some(anon_key) = std::env::var("LOMI_SUPABASE_ANON_KEY")
-        .ok()
-        .filter(|v| !v.is_empty())
-        .or_else(|| {
-            if SUPABASE_ANON_KEY.is_empty() {
-                None
-            } else {
-                Some(SUPABASE_ANON_KEY.to_string())
-            }
-        })
-    {
-        let apikey = reqwest::header::HeaderValue::from_str(&anon_key)
-            .context("Invalid LOMI_SUPABASE_ANON_KEY")?;
-        let bearer = reqwest::header::HeaderValue::from_str(&format!("Bearer {anon_key}"))
-            .context("Invalid LOMI_SUPABASE_ANON_KEY for Authorization")?;
-        headers.insert("apikey", apikey);
-        headers.insert(reqwest::header::AUTHORIZATION, bearer);
-    }
-    Ok(reqwest::Client::builder()
-        .default_headers(headers)
-        .build()?)
+    Ok(reqwest::Client::builder().build()?)
 }
 
 #[derive(Debug, Deserialize)]
@@ -65,7 +44,7 @@ pub struct LoginOptions {
 pub async fn login(options: LoginOptions) -> Result<String> {
     let client = auth_client()?;
 
-    let auth_base = cli_auth_base();
+    let auth_base = cli_auth_base(&options.api_url);
     let device_auth = client
         .post(format!("{auth_base}/device-auth"))
         .send()

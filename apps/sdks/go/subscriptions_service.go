@@ -46,9 +46,9 @@ func (s *SubscriptionsService) ChangePlan(id string, body interface{}) (interfac
 	}
 
 
-func (s *SubscriptionsService) FindByCustomer(customerId string) (interface{}, error) {
-		path := "/subscriptions/customer/{customerId}"
-		path = strings.ReplaceAll(path, "{customerId}", customerId)
+func (s *SubscriptionsService) Get(id string) (interface{}, error) {
+		path := "/subscriptions/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
 		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
 		if err != nil {
 			return nil, err
@@ -64,8 +64,8 @@ func (s *SubscriptionsService) FindByCustomer(customerId string) (interface{}, e
 	}
 
 
-func (s *SubscriptionsService) Get(id string) (interface{}, error) {
-		path := "/subscriptions/{id}"
+func (s *SubscriptionsService) GetUsage(id string) (interface{}, error) {
+		path := "/subscriptions/{id}/usage"
 		path = strings.ReplaceAll(path, "{id}", id)
 		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
 		if err != nil {
@@ -99,8 +99,8 @@ func (s *SubscriptionsService) List(params map[string]string) (interface{}, erro
 	}
 
 
-func (s *SubscriptionsService) Uncancel(id string) (interface{}, error) {
-		path := "/subscriptions/{id}/uncancel"
+func (s *SubscriptionsService) Resume(id string) (interface{}, error) {
+		path := "/subscriptions/{id}/resume"
 		path = strings.ReplaceAll(path, "{id}", id)
 		bodyResp, err := s.client.doRequest("POST", path, nil, nil)
 		if err != nil {

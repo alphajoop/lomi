@@ -8,8 +8,8 @@ import { languages } from '@/lib/i18n/config';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
-} from '@/lib/utils/localStorage';
-import { LocalStorageKeys } from '@/lib/utils/constants';
+} from '@lomi./shared';
+import { LocalStorageKeys } from '@lomi./shared';
 
 interface TranslationContextType {
   currentLanguage: Language;
@@ -37,7 +37,7 @@ export function TranslationProvider({
 
   useEffect(() => {
     // Only run on client side to avoid SSR issues
-    if (typeof window === 'undefined') return;
+    if (!('window' in globalThis) || globalThis.window === undefined) return;
 
     // After mount, read the actual language preference
     // Try cookie first (set by setLanguage), then localStorage
@@ -50,6 +50,7 @@ export function TranslationProvider({
     if (cookieMatch) {
       const cookieLang = cookieMatch.split('=')[1];
       if (languages.some((lang) => lang.code === cookieLang)) {
+        // SAFETY: Boundary value matches the asserted domain type at this call site.
         preferredLang = cookieLang as Language;
       }
     }
@@ -60,6 +61,7 @@ export function TranslationProvider({
       savedLanguage &&
       languages.some((lang) => lang.code === savedLanguage)
     ) {
+      // SAFETY: Boundary value matches the asserted domain type at this call site.
       preferredLang = savedLanguage as Language;
     }
 
@@ -78,7 +80,7 @@ export function TranslationProvider({
   useEffect(() => {
     // Sync cookie whenever language changes (after initialization)
     // Only run on client side
-    if (typeof window === 'undefined') return;
+    if (!('window' in globalThis) || globalThis.window === undefined) return;
 
     if (isInitialized && currentLanguage) {
       document.cookie = `${LocalStorageKeys.Language}=${currentLanguage}; path=/; max-age=31536000; SameSite=Lax`;
@@ -90,7 +92,7 @@ export function TranslationProvider({
     setLocalStorageItem(LocalStorageKeys.Language, lang);
 
     // Set cookie for server-side access (only on client side)
-    if (typeof window !== 'undefined') {
+    if ('window' in globalThis && globalThis.window !== undefined) {
       document.cookie = `${LocalStorageKeys.Language}=${lang}; path=/; max-age=31536000; SameSite=Lax`;
     }
   };

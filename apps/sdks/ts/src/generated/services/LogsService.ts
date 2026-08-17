@@ -14,11 +14,12 @@ export class LogsService {
      * Retrieve log entry
      * @see OpenAPI `LogsController_findOne`
      */
-    public async get(type: string, id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['LogEntryResponseDto']> {
+    public async get(id: string, params?: paths['/logs/{id}']['get']['parameters'] extends { query: infer Q } ? Q : Record<string, unknown>, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['LogEntryResponseDto']> {
         return requestWithClient<components['schemas']['LogEntryResponseDto']>(this.client, {
             method: 'GET',
-            url: '/logs/{type}/{id}',
-            path: { type: type, id: id },
+            url: '/logs/{id}',
+            path: { id: id },
+            query: params,
             ...options,
         });
     }

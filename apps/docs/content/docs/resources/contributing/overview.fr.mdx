@@ -253,7 +253,7 @@ Lorsque vous modifiez l’API marchande publique ou une page produit sur lomi.af
 1. **Exporter OpenAPI** depuis `apps/api` : `pnpm openapi:export:all`.
 2. **Docs drift** : `cd apps/docs && pnpm docs:drift`.
 3. **Parity worker** : `cd apps/docs && pnpm parity`.
-4. **Miroirs site** : `cd apps/website && node src/lib/scripts/sync-openapi.mjs`, puis committer `public/openapi.json` et `public/agent-openapi.json` dans le dépôt `lomiafrica/website` et mettre à jour le sous-module.
+4. **Miroirs site** : `cd apps/website && node scripts/build/sync-openapi.mjs`, puis committer `public/openapi.json` et `public/agent-openapi.json` dans le dépôt `lomiafrica/website` et mettre à jour le sous-module.
 5. **Outils MCP** (si la allowlist change) : `cd apps/mcp && pnpm generate`.
 
 Le workflow `.github/workflows/app-parity.yml` tourne sur les changements API/docs/website ; un cron hebdomadaire alerte `#devops` si `SLACK_WEBHOOK_URL` est défini.

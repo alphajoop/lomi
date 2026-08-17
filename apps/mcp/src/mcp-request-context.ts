@@ -1,5 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+import type { JsonObject } from "@lomi./shared";
+
 export type McpRequestStore = {
   requestId: string;
   sessionId?: string;
@@ -16,7 +18,7 @@ export type McpLogLevel = 'info' | 'warn' | 'error';
 /** Structured JSON log line (secrets must never be passed in fields). */
 export function mcpLog(
   event: string,
-  fields: Record<string, unknown> = {},
+  fields: JsonObject = {},
   level: McpLogLevel = 'info',
 ): void {
   const store = getMcpRequestStore();

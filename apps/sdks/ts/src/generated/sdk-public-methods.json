@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-08T16:57:23.282Z",
+  "generatedAt": "2026-08-16T20:09:53.172Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -20,23 +20,24 @@
       "list",
       "listAll"
     ],
-    "customers": [
-      "create",
-      "createPortalLaunchSession",
-      "delete",
-      "get",
-      "getPortalAudit",
-      "getTransactions",
-      "list",
-      "listAll",
-      "update"
-    ],
-    "discountCoupons": [
+    "coupons": [
       "create",
       "get",
       "getPerformance",
       "list",
       "listAll"
+    ],
+    "customers": [
+      "create",
+      "createPortalSession",
+      "delete",
+      "get",
+      "getPortalAudit",
+      "getSubscriptions",
+      "getTransactions",
+      "list",
+      "listAll",
+      "update"
     ],
     "disputes": [
       "get",
@@ -62,15 +63,13 @@
       "listAll",
       "update"
     ],
-    "organization": [
-      "getSettings",
-      "updateSettings"
-    ],
     "organizations": [
       "get",
       "getMetrics",
+      "getRadarSettings",
       "list",
-      "listAll"
+      "listAll",
+      "updateRadarSettings"
     ],
     "paymentLinks": [
       "create",
@@ -120,11 +119,11 @@
     "subscriptions": [
       "cancel",
       "changePlan",
-      "findByCustomer",
       "get",
+      "getUsage",
       "list",
       "listAll",
-      "uncancel",
+      "resume",
       "update"
     ],
     "transactions": [
@@ -132,34 +131,26 @@
       "list",
       "listAll"
     ],
-    "usageBilling": [
+    "usage": [
       "checkEntitlement",
-      "createEntitlement",
-      "getRevenue",
-      "getSubscriptionUsage",
-      "grantCredits",
-      "listPeriods"
-    ],
-    "usageEvents": [
       "create",
+      "createEntitlement",
+      "createSubscription",
       "get",
+      "getRevenue",
+      "grantCredits",
       "list",
-      "listAll"
-    ],
-    "usageSubscriptions": [
-      "create"
-    ],
-    "webhookDeliveryLogs": [
-      "get",
-      "list",
-      "listAll"
+      "listAll",
+      "listPeriods"
     ],
     "webhooks": [
       "create",
       "delete",
       "get",
+      "getDelivery",
       "list",
       "listAll",
+      "listDeliveries",
       "retryDelivery",
       "test",
       "update",

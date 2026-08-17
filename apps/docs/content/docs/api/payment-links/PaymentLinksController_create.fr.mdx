@@ -65,9 +65,9 @@ Schéma: `object`
 | `price_id` | Non | `string` | - |
 | `allow_coupon_code` | Non | `boolean` | - |
 | `allow_quantity` | Non | `boolean` | - |
-| `require_billing_address` | Non | `boolean` | When true, show and require billing address on checkout. |
+| `require_billing_address` | Non | `boolean` | When true, show and require billing address on checkout. Default false when unset. |
 | `require_email` | Non | `boolean` | When true, show and require customer email. Default true when unset. |
-| `require_phone` | Non | `boolean` | When true, show and require customer phone. Default false when unset. |
+| `require_phone` | Non | `boolean` | When true, show and require customer phone. Default true when unset. |
 | `require_name` | Non | `boolean` | When true, show and require customer name. Default true when unset. |
 | `fields` | Non | `array<object>` | Optional ordered checkout field schema. When provided, overrides require_* booleans. |
 | `expires_at` | Non | `string` | - |

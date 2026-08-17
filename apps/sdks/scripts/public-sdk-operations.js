@@ -10,6 +10,8 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const isObjectRecord = (value) =>
+  value !== null && Object(value) === value && !Array.isArray(value);
 
 export const SCRIPTS_DIR = __dirname;
 
@@ -27,19 +29,22 @@ export const METHOD_NAME_BY_OP = {
   'DELETE /customers/{id}': 'delete',
   'GET /accounts/balance': 'getBalance',
   'GET /accounts/balance/breakdown': 'getBalanceBreakdown',
-  'GET /accounts/balance/check/{currency}': 'checkBalance',
+  'GET /accounts/balance/{currency}': 'checkBalance',
   'GET /checkout-sessions': 'list',
   'GET /checkout-sessions/{id}': 'get',
   'GET /customers': 'list',
   'GET /customers/{id}': 'get',
   'GET /customers/{id}/transactions': 'getTransactions',
+  'GET /customers/{id}/subscriptions': 'getSubscriptions',
   'GET /customers/{id}/portal-audit': 'getPortalAudit',
-  'POST /customers/{id}/portal-launch-session': 'createPortalLaunchSession',
-  'GET /discount-coupons': 'list',
-  'GET /discount-coupons/{id}': 'get',
-  'GET /discount-coupons/{id}/performance': 'getPerformance',
+  'POST /customers/{id}/portal': 'createPortalSession',
+  'GET /coupons': 'list',
+  'GET /coupons/{id}': 'get',
+  'GET /coupons/{id}/performance': 'getPerformance',
   'GET /organizations': 'list',
   'GET /organizations/metrics': 'getMetrics',
+  'GET /organizations/radar-settings': 'getRadarSettings',
+  'PATCH /organizations/radar-settings': 'updateRadarSettings',
   'GET /organizations/{id}': 'get',
   'GET /merchants/{id}': 'get',
   'GET /merchants/{id}/mrr': 'getMrr',
@@ -52,16 +57,14 @@ export const METHOD_NAME_BY_OP = {
   'GET /products': 'list',
   'GET /products/{id}': 'get',
   'GET /subscriptions': 'list',
-  'GET /subscriptions/customer/{customerId}': 'findByCustomer',
   'GET /risk-assessments': 'listAssessments',
   'GET /risk-assessments/{id}': 'findOne',
-  'GET /organization/radar-settings': 'getSettings',
-  'PATCH /organization/radar-settings': 'updateSettings',
   'GET /subscriptions/{id}': 'get',
+  'GET /subscriptions/{id}/usage': 'getUsage',
   'GET /transactions': 'list',
   'GET /transactions/{id}': 'get',
-  'GET /webhook-delivery-logs': 'list',
-  'GET /webhook-delivery-logs/{id}': 'get',
+  'GET /webhooks/deliveries': 'listDeliveries',
+  'GET /webhooks/deliveries/{id}': 'getDelivery',
   'GET /webhooks': 'list',
   'GET /webhooks/{id}': 'get',
   'PATCH /customers/{id}': 'update',
@@ -69,7 +72,7 @@ export const METHOD_NAME_BY_OP = {
   'POST /webhooks': 'create',
   'DELETE /webhooks/{id}': 'delete',
   'POST /webhooks/{id}/test': 'test',
-  'POST /webhooks/{webhookId}/logs/{logId}/retry': 'retryDelivery',
+  'POST /webhooks/{id}/deliveries/{deliveryId}/retry': 'retryDelivery',
   'GET /providers': 'list',
   'PATCH /subscriptions/{id}': 'update',
   'POST /charge/wave': 'createWaveCharge',
@@ -83,12 +86,12 @@ export const METHOD_NAME_BY_OP = {
   'GET /payouts/{id}': 'get',
   'POST /checkout-sessions': 'create',
   'POST /customers': 'create',
-  'POST /discount-coupons': 'create',
+  'POST /coupons': 'create',
   'POST /payment-links': 'create',
   'POST /payment-requests': 'create',
   'POST /products': 'create',
   'POST /products/{id}/prices': 'addPrice',
-  'POST /products/{id}/prices/{priceId}/set-default': 'setDefaultPrice',
+  'POST /products/{id}/prices/{priceId}/default': 'setDefaultPrice',
   'POST /refunds': 'create',
   'GET /refunds': 'list',
   'GET /refunds/{id}': 'get',
@@ -97,24 +100,23 @@ export const METHOD_NAME_BY_OP = {
   'GET /disputes': 'list',
   'GET /disputes/{id}': 'get',
   'GET /logs': 'list',
-  'GET /logs/{type}/{id}': 'get',
+  'GET /logs/{id}': 'get',
   'GET /meters': 'list',
   'GET /meters/{id}': 'get',
   'GET /meters/{id}/balances/{customerId}': 'getCustomerBalance',
   'PATCH /meters/{id}': 'update',
   'POST /meters': 'create',
-  'GET /usage-billing/entitlements/check': 'checkEntitlement',
-  'GET /usage-billing/periods': 'listPeriods',
-  'GET /usage-billing/revenue': 'getRevenue',
-  'GET /usage-billing/subscriptions/{subscriptionId}/usage': 'getSubscriptionUsage',
-  'GET /usage-events': 'list',
-  'GET /usage-events/{id}': 'get',
-  'POST /usage-billing/credits': 'grantCredits',
-  'POST /usage-billing/entitlements': 'createEntitlement',
-  'POST /usage-events': 'create',
-  'POST /usage-subscriptions': 'create',
+  'GET /usage/entitlements': 'checkEntitlement',
+  'GET /usage/periods': 'listPeriods',
+  'GET /usage/revenue': 'getRevenue',
+  'GET /usage/events': 'list',
+  'GET /usage/events/{id}': 'get',
+  'POST /usage/credits': 'grantCredits',
+  'POST /usage/entitlements': 'createEntitlement',
+  'POST /usage/events': 'create',
+  'POST /usage/subscriptions': 'createSubscription',
   'POST /subscriptions/{id}/cancel': 'cancel',
-  'POST /subscriptions/{id}/uncancel': 'uncancel',
+  'POST /subscriptions/{id}/resume': 'resume',
   'POST /subscriptions/{id}/change-plan': 'changePlan',
 };
 
@@ -154,7 +156,7 @@ export function pathIds(pathTpl) {
 
 /** @param {string | undefined} ref @param {any} spec */
 export function resolveRef(ref, spec) {
-  if (!ref || typeof ref !== 'string' || !ref.startsWith('#/')) return null;
+  if (!ref || ref.constructor !== String || !ref.startsWith('#/')) return null;
   let cur = spec;
   for (const segment of ref.replace(/^#\//, '').split('/')) {
     cur = cur?.[segment];
@@ -220,12 +222,12 @@ export function getNormalizedOperations(spec, allowed) {
       throw new Error(`METHOD_NAME_BY_OP missing for allowed operation: ${key}`);
     }
     const pathItemRoot = spec.paths?.[template];
-    if (!pathItemRoot || typeof pathItemRoot !== 'object') {
+    if (!isObjectRecord(pathItemRoot)) {
       throw new Error(`OpenAPI paths missing "${template}" (from allowlist)`);
     }
     const lw = method.toLowerCase();
     const op = pathItemRoot[lw];
-    if (!op || typeof op !== 'object') {
+    if (!isObjectRecord(op)) {
       throw new Error(`OpenAPI missing ${lw.toUpperCase()} ${template}`);
     }
     const pathItem = pathItemRoot;

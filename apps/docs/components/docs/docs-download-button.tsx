@@ -1,5 +1,5 @@
 import { Download } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 
 type DocsDownloadButtonProps = {
   /** Path on docs.lomi.africa, e.g. `/downloads/woo-lomi.zip` */

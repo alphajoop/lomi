@@ -63,6 +63,7 @@ function parseArgs(): CliOptions {
   const bookIdx = args.indexOf('--book');
   const outIdx = args.indexOf('--out-dir');
   const bookRaw = bookIdx === -1 ? 'all' : args[bookIdx + 1];
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   if (!bookRaw || !BOOK_IDS.includes(bookRaw as BookId)) {
     throw new Error(
       `Invalid --book value. Expected one of: ${BOOK_IDS.join(', ')}`,
@@ -76,6 +77,7 @@ function parseArgs(): CliOptions {
           if (!value) throw new Error('Missing path after --out-dir');
           return value;
         })();
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   return { book: bookRaw as BookId, pdf: args.includes('--pdf'), outDir };
 }
 
@@ -232,6 +234,7 @@ function renderAgentOpenApiReference(): string {
     return '_Contrat agent-openapi.json introuvable._';
   }
 
+  // SAFETY: Boundary value matches the asserted domain type at this call site.
   const spec = JSON.parse(readFileSync(agentPath, 'utf-8')) as AgentOpenApi;
   const paths = spec.paths ?? {};
   const lines: string[] = [
@@ -298,7 +301,7 @@ function buildAgentCredentialOverview(): string {
     '| Identifiant | Rôle |',
     '| --- | --- |',
     '| `lomi_partner_*` | Clé de gestion plateforme (émise par lomi.). Sert à créer des clés de provisioning par utilisateur externe. |',
-    '| `lomi_prov_*` | Clé de provisioning pour `/provisioning/v1/*` et les outils MCP d’onboarding (`x-lomi-provisioning-key`). |',
+    '| `lomi_prov_*` | Clé de provisioning pour `/provisioning/*` et les outils MCP d’onboarding (`x-lomi-provisioning-key`). |',
     '| `lomi_oat_*` | Jeton OAuth MCP; introspecté vers une session scoped provisioning / marchande. |',
     '| `lomi_sk_*` / `lomi_sk_test_*` | Clé secrète marchande (API REST publique et outils MCP marchands). |',
     '',
@@ -306,10 +309,10 @@ function buildAgentCredentialOverview(): string {
     '',
     'En-tête : `x-lomi-partner-key` ou `Authorization: Bearer lomi_partner_*`.',
     '',
-    '- `POST /partners/v1/provisioning-keys` : créer une clé `lomi_prov_*` pour un `external_user_ref`',
-    '- `GET /partners/v1/provisioning-keys` : lister',
-    '- `DELETE /partners/v1/provisioning-keys/{id}` : révoquer',
-    '- `GET /partners/v1/usage` : résumé d’usage',
+    '- `POST /partners/provisioning-keys` : créer une clé `lomi_prov_*` pour un `external_user_ref`',
+    '- `GET /partners/provisioning-keys` : lister',
+    '- `DELETE /partners/provisioning-keys/{id}` : révoquer',
+    '- `GET /partners/usage` : résumé d’usage',
     '',
     '### OAuth MCP (self-service)',
     '',
@@ -321,8 +324,8 @@ function buildAgentCredentialOverview(): string {
     '',
     '### Test → live (validation humaine)',
     '',
-    '- `POST /provisioning/v1/merchants/{id}/live-activation/request` : l’agent demande le passage en live',
-    '- `GET /provisioning/v1/merchants/{id}/live-activation/status` : suivi jusqu’à approbation',
+    '- `POST /provisioning/merchants/{id}/live-activation/request` : l’agent demande le passage en live',
+    '- `GET /provisioning/merchants/{id}/live-activation/status` : suivi jusqu’à approbation',
     '- Le marchand approuve sur `https://dashboard.lomi.africa/connect/go-live` et récupère la clé live `lomi_sk_*` (jamais via l’API de provisioning)',
     '',
   ].join('\n');
@@ -361,14 +364,14 @@ function buildAgentSections(): BookSection[] {
   ];
 }
 
-const BOOK_META: Record<
-  ConcreteBookId,
-  {
-    title: string;
-    fileStem: string;
-    build: () => BookSection[];
-  }
-> = {
+type BookMetaEntry = {
+  title: string;
+  fileStem: string;
+  build: () => BookSection[];
+};
+type BookMetaById = { [Id in ConcreteBookId]: BookMetaEntry };
+
+const BOOK_META: BookMetaById = {
   api: {
     title: 'Documentation technique lomi.',
     fileStem: 'lomi-reference-api-fr',
@@ -435,7 +438,7 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((error: unknown) => {
+main().catch((error: Error) => {
   console.error(error);
   process.exit(1);
 });

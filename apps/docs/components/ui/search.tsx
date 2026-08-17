@@ -20,7 +20,7 @@ import {
 } from 'fumadocs-ui/components/ui/popover';
 import { ChevronDown } from 'lucide-react';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@lomi./ui/cn';
 import { useTranslation } from '@/lib/utils/translation-context';
 import { t as translate } from '@/lib/i18n/translations';
 import { orama } from '@/lib/orama/client';

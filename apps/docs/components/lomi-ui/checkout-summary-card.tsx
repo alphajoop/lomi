@@ -34,6 +34,10 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
 }
 
+function isNumber(value: number | CheckoutSummaryFee[]): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
 function formatAmount(amount: number) {
   return new Intl.NumberFormat('fr-FR', {
     maximumFractionDigits: 0,
@@ -44,7 +48,7 @@ function normalizeFees(
   fees: number | CheckoutSummaryFee[] | undefined,
 ): CheckoutSummaryFee[] {
   if (!fees) return [];
-  if (typeof fees === 'number') {
+  if (isNumber(fees)) {
     return fees > 0 ? [{ name: 'Fees', amount: fees }] : [];
   }
   return fees.filter((fee) => fee.amount > 0);

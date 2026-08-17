@@ -19,7 +19,7 @@ export function CheckoutPhoneFlag({
 
   return (
     <span
-      className="checkout-phone-flag inline-flex h-5 w-5 shrink-0 overflow-hidden rounded-sm"
+      className="checkout-phone-flag inline-flex h-5 w-5 shrink-0 overflow-hidden rounded-[3px]"
       suppressHydrationWarning
     >
       {mounted && Flag ? (

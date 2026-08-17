@@ -28,7 +28,7 @@ cd apps/mcp
 pnpm run generate
 ```
 
-Commit `src/generated/tools-manifest.json` and any updated copy in `scripts/mcp-tool-copy.en.json`.
+Commit `src/generated/tools-manifest.json`, `src/generated/provisioning-tools-manifest.json`, and any updated groups in `config/mcp-tool-policy.json`.
 
 ## Tests
 

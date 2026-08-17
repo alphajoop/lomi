@@ -29,7 +29,7 @@ const MOBILE_MONEY_IDS = new Set<ProviderId>(['WAVE', 'MTN']);
 
 const DEFAULT_PROVIDERS: ProviderId[] = ['WAVE', 'MTN', 'cards', 'spi'];
 
-const DEFAULT_LABELS: Record<ProviderId, string> = {
+const DEFAULT_LABELS = {
   WAVE: 'Wave',
   MTN: 'MTN',
   cards: 'Card',

@@ -8,7 +8,7 @@
  * ```ts
  * import { loadLomi } from '@lomi./sdk';
  * import type { Lomi, LomiElements } from '@lomi./sdk';
- * 
+ *
  * const lomi: Lomi = await loadLomi('lomi_pk_...');
  * const elements: LomiElements = lomi.elements({ clientSecret });
  * const paymentElement = elements.create('payment');
@@ -16,17 +16,17 @@
  * ```
  */
 
-import { loadStripe } from '@stripe/stripe-js';
-import type { 
-  Stripe, 
-  StripeElements, 
+import { loadStripe } from "@stripe/stripe-js";
+import type {
+  Stripe,
+  StripeElements,
   StripeElementsOptions,
   StripePaymentElement,
   StripePaymentElementOptions,
   PaymentIntentResult,
   SetupIntentResult,
   ConfirmPaymentData,
-} from '@stripe/stripe-js';
+} from "@stripe/stripe-js";
 
 // White-labeled type aliases - developers see "Lomi" not "Stripe"
 /** White-labeled Stripe instance for card / Payment Element flows. */
@@ -39,12 +39,12 @@ export type LomiConfirmPaymentData = ConfirmPaymentData;
 export type LomiPaymentElement = StripePaymentElement;
 export type LomiPaymentElementCreateOptions = StripePaymentElementOptions;
 export type LomiPaymentElementTheme =
-  | 'light'
-  | 'dark'
-  | 'flat'
-  | 'stripe'
-  | 'night';
-export type LomiBillingAddressCollection = 'auto' | 'never';
+  | "light"
+  | "dark"
+  | "flat"
+  | "stripe"
+  | "night";
+export type LomiBillingAddressCollection = "auto" | "never";
 
 export interface CreateLomiElementsOptions {
   clientSecret: string;
@@ -58,19 +58,20 @@ export interface CreateLomiPaymentElementOptions {
 
 function normalizeThemeForStripe(
   theme?: LomiPaymentElementTheme,
-): 'stripe' | 'night' | 'flat' {
-  if (theme === 'dark' || theme === 'night') return 'night';
-  if (theme === 'flat') return 'flat';
-  return 'stripe';
+): "stripe" | "night" | "flat" {
+  if (theme === "dark" || theme === "night") return "night";
+  if (theme === "flat") return "flat";
+  return "stripe";
 }
 
 /**
  * lomi. Platform Key
- * 
+ *
  * Internal platform key used for payment processing infrastructure.
  * This is an immutable value - SDK updates required if changed.
  */
-const LOMI_PLATFORM_KEY = 'pk_live_51Ig94GGwgS0qnVOVpvSCeUiAf5RfjFFcv4alY8MpuB1M3X7gz3gMdcAoUA7OjG6e0Y2MAOtCsaYqkdqHT0zhTcC800gRyH9ssq';
+const LOMI_PLATFORM_KEY =
+  "pk_live_51Ig94GGwgS0qnVOVpvSCeUiAf5RfjFFcv4alY8MpuB1M3X7gz3gMdcAoUA7OjG6e0Y2MAOtCsaYqkdqHT0zhTcC800gRyH9ssq";
 
 // Singleton promise to avoid multiple loads
 let lomiPromise: Promise<Lomi | null> | null = null;
@@ -84,24 +85,24 @@ let lomiPromise: Promise<Lomi | null> | null = null;
  *
  * @param publishableKey - Your lomi. publishable key (`lomi_pk_…`)
  * @returns Promise resolving to a Lomi (Stripe-backed) instance for Elements
- * 
+ *
  * @example
  * ```ts
  * import { loadLomi } from '@lomi./sdk';
  * import type { Lomi, LomiElements } from '@lomi./sdk';
- * 
+ *
  * const lomi: Lomi | null = await loadLomi('lomi_pk_your_key');
- * 
+ *
  * if (lomi) {
  *   // Create elements with client secret from your server
- *   const elements: LomiElements = lomi.elements({ 
- *     clientSecret: 'pi_xxx_secret_xxx' 
+ *   const elements: LomiElements = lomi.elements({
+ *     clientSecret: 'pi_xxx_secret_xxx'
  *   });
- * 
+ *
  *   // Create and mount payment element
  *   const paymentElement = elements.create('payment');
  *   paymentElement.mount('#payment-element');
- * 
+ *
  *   // Handle form submission
  *   const { error } = await lomi.confirmPayment({
  *     elements,
@@ -112,8 +113,10 @@ let lomiPromise: Promise<Lomi | null> | null = null;
  */
 export async function loadLomi(publishableKey: string): Promise<Lomi | null> {
   // Validate lomi. key format
-  if (!publishableKey || !publishableKey.startsWith('lomi_pk_')) {
-    console.warn('[Lomi] Invalid key format. Keys should start with "lomi_pk_"');
+  if (!publishableKey || !publishableKey.startsWith("lomi_pk_")) {
+    console.warn(
+      '[Lomi] Invalid key format. Keys should start with "lomi_pk_"',
+    );
   }
 
   // Initialize only once (singleton pattern)
@@ -133,16 +136,19 @@ export function createLomiElements(
 ): LomiElements {
   const elementsOptions: LomiElementsOptions = {
     clientSecret: options.clientSecret,
-    appearance: {
-      theme: normalizeThemeForStripe(options.theme),
-      ...(options.borderRadiusPx !== undefined
+    appearance: Object.assign(
+      {},
+      {
+        theme: normalizeThemeForStripe(options.theme),
+      },
+      options.borderRadiusPx !== undefined
         ? {
             variables: {
               borderRadius: `${options.borderRadiusPx}px`,
             },
           }
-        : {}),
-    },
+        : {},
+    ),
   };
   return lomi.elements(elementsOptions);
 }
@@ -158,11 +164,11 @@ export function createLomiPaymentElement(
   const paymentOptions: LomiPaymentElementCreateOptions = {
     fields: {
       billingDetails: {
-        address: options?.billingAddress ?? 'auto',
+        address: options?.billingAddress ?? "auto",
       },
     },
   };
-  return elements.create('payment', paymentOptions);
+  return elements.create("payment", paymentOptions);
 }
 
 /**
