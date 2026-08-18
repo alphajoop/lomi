@@ -23,7 +23,7 @@ go get golang.org/x/net/context
 Put the package under your project folder and add the following in import:
 
 ```go
-import lomisdk "github.com/lomiafrica/lomi-go-sdk"
+import lomisdk "github.com/lomiafrica/lomi./apps/sdks/go"
 ```
 
 To use a proxy, set the environment variable `HTTP_PROXY`:

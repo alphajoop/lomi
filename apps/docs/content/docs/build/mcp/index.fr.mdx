@@ -175,6 +175,13 @@ Le serveur MCP introspecte le jeton et attache un `lomi_prov_*` limité à la se
 
 Les plateformes autorisées reçoivent une clé de gestion **`lomi_partner_*`** (admin lomi). Elles émettent des clés **`lomi_prov_*`** par utilisateur via MCP **`lomi_partners`** (`action=mint_key`, `list_keys`, `revoke_key`, `usage`) ou `/partners/provisioning-keys` avec l’en-tête `x-lomi-partner-key`. Suivi dans **admin.lomi.africa → Provisioning**.
 
+## Annuaires et ChatGPT
+
+- MCP hébergé : `https://mcp.lomi.africa/mcp`
+- Carte serveur : `https://mcp.lomi.africa/server-card`
+- La config Smithery est dans le dépôt (`apps/mcp/smithery.yaml`). Recherche : [smithery.ai/search?q=lomi.africa](https://smithery.ai/search?q=lomi.africa)
+- ChatGPT : ajoutez la même URL MCP en mode développeur. Page de l'app : [lomi.africa/chatgpt](https://lomi.africa/chatgpt)
+
 ## Déployer votre propre serveur MCP
 
 La plupart des intégrateurs utilisent `https://mcp.lomi.africa` ou le stdio local. Déployer une instance MCP séparée est réservé à **l’ingénierie et aux opérateurs lomi.** Voir [Maintenir la CLI et le MCP](/resources/contributing/maintaining-cli-mcp).

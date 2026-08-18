@@ -184,6 +184,13 @@ Authorized platforms receive a **`lomi_partner_*`** management key from lomi adm
 
 Send `x-lomi-partner-key: lomi_partner_*` (or `Authorization: Bearer lomi_partner_*`). End users pass the returned `lomi_prov_*` to MCP or `/provisioning/*`. Monitor partners and audit events in **admin.lomi.africa → Provisioning**.
 
+## Registries and ChatGPT
+
+- Hosted MCP: `https://mcp.lomi.africa/mcp`
+- Server card: `https://mcp.lomi.africa/server-card`
+- Smithery listing config lives in the repo (`apps/mcp/smithery.yaml`). Search: [smithery.ai/search?q=lomi.africa](https://smithery.ai/search?q=lomi.africa)
+- ChatGPT: add the same MCP URL in developer mode. First-party app page: [lomi.africa/chatgpt](https://lomi.africa/chatgpt)
+
 ## Deploying your own MCP server
 
 Most integrators use `https://mcp.lomi.africa` or local stdio. Deploying a separate MCP instance is for **lomi. engineering and operators** only. See [Maintaining CLI and MCP](/resources/contributing/maintaining-cli-mcp).

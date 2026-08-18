@@ -9,6 +9,7 @@
     ".env.example"
   ],
   "description": "Model Context Protocol server for the lomi. merchant REST API",
+  "homepage": "https://lomi.africa/developers",
   "type": "module",
   "bin": {
     "lomi-mcp": "./dist/index.js",

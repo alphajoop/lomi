@@ -17,8 +17,9 @@ Official SDKs for lomi.. payments API. Choose the SDK that matches your tech sta
 | **TypeScript** | `@lomi./sdk`      | `npm install @lomi./sdk`                   |
 | **Embed**      | `@lomi./embed`    | `npm install @lomi./embed`                 |
 | **Python**     | `lomi-sdk`        | `pip install lomi-sdk`                     |
-| **Go**         | `lomi-go-sdk`     | `go get github.com/lomiafrica/lomi-go-sdk` |
+| **Go**         | `lomi-go`         | `go get github.com/lomiafrica/lomi./apps/sdks/go` |
 | **PHP**        | `lomi/lomi-sdk`   | Via Composer (see below)                   |
+| **React Native** | `@lomi./react-native` | `npm install @lomi./react-native`      |
 
 <Callout type="info">
   The curated TypeScript client is generated from the **public merchant OpenAPI** contract plus a strict `_expected-public-operations.json` allowlist. Other SDKs mirror the same endpoints but may diverge stylistically, always defer to **`openapi.json`** for truth.
@@ -78,6 +79,11 @@ All SDKs provide access to these API services:
     title="PHP"
     description="For Laravel, Symfony, and WordPress"
     href="/build/sdks/php"
+  />
+  <Card
+    title="React Native"
+    description="Mobile merchant apps"
+    href="/build/sdks/typescript"
   />
 </Cards>
 

@@ -21,6 +21,10 @@ const paths = {
     monorepoRoot,
     'apps/website/src/lib/seo/llms-marketing.ts',
   ),
+  aiCatalog: join(
+    monorepoRoot,
+    'apps/website/public/.well-known/ai-catalog.json',
+  ),
   docsLlmsRoute: join(docsRoot, 'app/llms.txt/route.ts'),
   merchantOpenApi: join(docsRoot, 'openapi.json'),
   agentOpenApi: join(docsRoot, 'agent-openapi.json'),
@@ -111,6 +115,13 @@ if (existsSync(paths.agentCard)) {
   );
 }
 
+if (existsSync(paths.aiCatalog)) {
+  const catalog = mustParseJson('ai-catalog', paths.aiCatalog);
+  if (!catalog.specVersion || !Array.isArray(catalog.entries)) {
+    throw new Error('ai-catalog.json: expected specVersion and entries');
+  }
+}
+
 const merchantSpec = mustParseJson('merchant OpenAPI', paths.merchantOpenApi);
 if (
   !merchantSpec.openapi ||
@@ -118,6 +129,16 @@ if (
   !isObjectValue(merchantSpec.paths)
 ) {
   throw new Error('openapi.json: invalid OpenAPI document');
+}
+if (!merchantSpec.components?.schemas?.ErrorResponse) {
+  throw new Error('openapi.json: missing ErrorResponse schema');
+}
+if (!merchantSpec.components?.parameters?.['Idempotency-Key'] &&
+    !merchantSpec.components?.parameters?.IdempotencyKey) {
+  throw new Error('openapi.json: missing Idempotency-Key parameter');
+}
+if (!merchantSpec.components?.securitySchemes?.oauth2) {
+  throw new Error('openapi.json: missing oauth2 security scheme');
 }
 
 const agentSpec = mustParseJson('agent OpenAPI', paths.agentOpenApi);
@@ -137,6 +158,7 @@ const requiredPaths = [
   '/agent/subscriptions',
   '/agent/workflows',
   '/agent/handoff',
+  '/.well-known/oauth-authorization-server',
 ];
 
 const requiredPartnerPaths = ['/partners/provisioning-keys', '/partners/usage'];

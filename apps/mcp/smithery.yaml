@@ -1,0 +1,31 @@
+# Smithery listing for the lomi. merchant MCP server.
+# Hosted URL: https://mcp.lomi.africa/mcp
+# Registry search: https://smithery.ai/search?q=lomi.africa
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - lomiSecretKey
+    properties:
+      lomiSecretKey:
+        type: string
+        title: LOMI_SECRET_KEY
+        description: Merchant secret API key from dashboard.lomi.africa
+      lomiApiUrl:
+        type: string
+        title: LOMI_API_URL
+        default: https://api.lomi.africa
+        description: Live or sandbox API origin
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', '@lomi./mcp'],
+      env: {
+        LOMI_SECRET_KEY: config.lomiSecretKey,
+        LOMI_API_URL: config.lomiApiUrl || 'https://api.lomi.africa'
+      }
+    })
+  exampleConfig:
+    lomiSecretKey: lomi_sk_test_example
+    lomiApiUrl: https://api.lomi.africa

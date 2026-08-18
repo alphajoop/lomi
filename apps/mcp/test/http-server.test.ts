@@ -320,4 +320,46 @@ describe('createHttpApplication', () => {
     expect(r2.status).not.toBe(429);
     expect(r3.status).toBe(429);
   });
+
+  it('GET /.well-known/mcp returns a public tools preview', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/.well-known/mcp`);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as JsonObject;
+    expect(body.mcp).toBe('https://mcp.lomi.africa/mcp');
+    expect(Array.isArray(body.tools_preview)).toBe(true);
+  });
+
+  it('GET /server-card returns MCP server card metadata', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/server-card`);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as JsonObject;
+    expect(body.name).toBe('io.lomi/mcp');
+  });
+
+  it('GET /.well-known/oauth-authorization-server points at the API issuer', async () => {
+    process.env.LOMI_OAUTH_ISSUER = 'https://api.lomi.africa';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(
+      `http://127.0.0.1:${ctx.port}/.well-known/oauth-authorization-server`,
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as JsonObject;
+    expect(body.issuer).toBe('https://api.lomi.africa');
+    expect(body.authorization_endpoint).toBe(
+      'https://api.lomi.africa/oauth/authorize',
+    );
+  });
 });

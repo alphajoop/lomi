@@ -43,6 +43,12 @@ import {
   getProtectedResourceMetadataUrl,
   introspectOAuthAccessToken,
 } from './oauth-introspection.js';
+import {
+  buildAuthorizationServerPointer,
+  buildMcpCatalog,
+  buildMcpServerCard,
+  buildMcpWellKnown,
+} from './discovery.js';
 import { isJsonObject, isString, type JsonValue } from "@lomi./shared";
 import type { McpRequestStore } from './mcp-request-context.js';
 
@@ -352,6 +358,26 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   }
 
   app.get(protectedResourceMetadataPattern, serveProtectedResourceMetadata);
+
+  app.get('/.well-known/oauth-authorization-server', (_req, res) => {
+    res.status(200).json(buildAuthorizationServerPointer());
+  });
+
+  app.get('/.well-known/mcp', (_req, res) => {
+    res.status(200).json(buildMcpWellKnown(manifest));
+  });
+
+  app.get('/.well-known/mcp.json', (_req, res) => {
+    res.status(200).json(buildMcpWellKnown(manifest));
+  });
+
+  app.get('/.well-known/mcp/catalog.json', (_req, res) => {
+    res.status(200).json(buildMcpCatalog(manifest));
+  });
+
+  app.get('/server-card', (_req, res) => {
+    res.status(200).json(buildMcpServerCard(manifest));
+  });
 
   app.get('/health', (_req, res) => {
     res.status(200).json({

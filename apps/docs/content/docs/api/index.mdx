@@ -63,5 +63,5 @@ Send your secret key in the `X-API-Key` header from your server.
 - **Idempotency:** `Idempotency-Key` is required on `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts`, and `POST /charge/*`. See [Idempotency keys](/build/advanced-guides/idempotency-keys).
 - **Lists:** query with `cursor` and `limit` (default 20, max 100). Responses use `{ object: "list", data, has_more, next_cursor, limit }`.
 - **Errors:** `{ error: { code, message, details }, request_id }`. See [Error handling](/api/errors).
-- **Rate limits:** successful responses include `X-RateLimit-Remaining`. `429` includes `Retry-After`.
-- Routes stay unversioned. The OpenAPI `info.version` is the schema release.
+- **Rate limits:** successful responses include `X-RateLimit-Remaining` and IETF `RateLimit` / `RateLimit-Policy`. `429` includes `Retry-After`.
+- Routes stay unversioned. The OpenAPI `info.version` is the schema release. Send optional `Lomi-Version` to pin a known schema.
