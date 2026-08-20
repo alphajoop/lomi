@@ -6,6 +6,7 @@ interface SpinnerProps {
   style?: React.CSSProperties;
 }
 
+/** Braille page spinner. Async submit controls use `@lomi./ui/interior/loading-button`. */
 function Spinner({ className = "", inline = false, style }: SpinnerProps) {
   const spinnerChars = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
   const [currentChar, setCurrentChar] = React.useState(0);

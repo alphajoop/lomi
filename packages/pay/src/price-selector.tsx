@@ -95,7 +95,7 @@ export function PriceSelector({
               data-selected={isSelected ? "true" : "false"}
               onClick={() => onPriceSelect(price.price_id)}
               className={cn(
-                "price-selector-option w-full flex items-center gap-2.5 px-3 h-10 rounded-sm transition-colors duration-150",
+                "price-selector-option w-full flex items-center gap-2.5 px-3 h-10 rounded-md transition-colors duration-150",
                 "bg-transparent text-left",
                 isSelected && "price-selector-option-selected",
               )}

@@ -134,7 +134,7 @@ export function PriceSelector({
               data-selected={isSelected ? 'true' : 'false'}
               onClick={() => onPriceSelect(price.price_id)}
               className={cn(
-                'price-selector-option flex h-10 w-full items-center gap-2.5 rounded-sm bg-transparent px-3 text-left transition-colors duration-150 outline-none',
+                'price-selector-option flex h-10 w-full items-center gap-2.5 rounded-md bg-transparent px-3 text-left transition-colors duration-150 outline-none',
                 isSelected
                   ? 'price-selector-option-selected border border-[#56A5F9]'
                   : 'border border-transparent',

@@ -44,7 +44,7 @@ export function CustomCheckoutFieldsSection({
 
     let roundingClass = "rounded-none";
     if (isFirst && isLast) {
-      roundingClass = "rounded-sm";
+      roundingClass = "rounded-md";
     } else if (isFirst) {
       roundingClass = "rounded-tl rounded-tr";
     } else if (isLast) {
@@ -105,7 +105,7 @@ export function CustomCheckoutFieldsSection({
       <label className="block text-sm font-normal text-gray-700 select-none">
         {t("checkout.custom_fields.title")}
       </label>
-      <div className="rounded-sm shadow-sm shadow-black/[.04]">
+      <div className="rounded-md shadow-sm shadow-black/[.04]">
         {customFields.map((field, index) => (
           <div key={field.id} className={index > 0 ? "flex -mt-px" : "flex"}>
             <div className="w-full">

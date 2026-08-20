@@ -301,7 +301,7 @@ export function Dropdown({
     <div ref={rootRef} className={`relative inline-block text-left ${className}`}>
       <button
         {...triggerProps}
-        className={`flex h-9 select-none items-center gap-2 whitespace-nowrap rounded-[9px] border border-stone-200 bg-white px-3 text-[13px] font-medium text-stone-700 outline-none transition-[box-shadow,border-color] duration-150 disabled:opacity-50 dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 ${
+        className={`flex h-9 select-none items-center gap-2 whitespace-nowrap rounded-md border border-stone-200 bg-white px-3 text-[13px] font-medium text-stone-700 outline-none transition-[box-shadow,border-color] duration-150 disabled:opacity-50 dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 ${
           open
             ? "shadow-[inset_0_1px_2px_rgba(28,25,23,0.09)] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"
             : "shadow-[0_1px_2px_rgba(28,25,23,0.06),0_4px_10px_-8px_rgba(28,25,23,0.45)] hover:border-stone-300 hover:shadow-[0_1px_2px_rgba(28,25,23,0.06),0_8px_18px_-12px_rgba(28,25,23,0.5)] focus-visible:border-stone-400 focus-visible:shadow-[0_1px_2px_rgba(28,25,23,0.08),0_10px_22px_-12px_rgba(28,25,23,0.55)] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)] dark:hover:border-white/20 dark:hover:shadow-[0_2px_10px_rgba(0,0,0,0.55)] dark:focus-visible:border-white/30 dark:focus-visible:shadow-[0_2px_12px_rgba(0,0,0,0.6)]"

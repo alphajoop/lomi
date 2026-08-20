@@ -1,15 +1,25 @@
+"use client";
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import type { VariantProps } from "class-variance-authority";
+import { motion, useReducedMotion } from "motion/react";
 import Spinner from "./spinner";
 import { cn } from "./cn";
 import { buttonVariants } from "./button-variants";
 
+const CELL = { type: "spring", stiffness: 520, damping: 34, mass: 0.45 } as const;
+
 interface ButtonProps
   extends Omit<
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
-    "Icon" | "iconPlacement"
-  >,
+      React.ButtonHTMLAttributes<HTMLButtonElement>,
+      | "Icon"
+      | "iconPlacement"
+      | "onAnimationStart"
+      | "onDrag"
+      | "onDragStart"
+      | "onDragEnd"
+    >,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
@@ -33,22 +43,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       rightSection,
       Icon,
       iconPlacement = "right",
+      style,
       ...props
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button";
+    const reduced = useReducedMotion();
+    const isDisabled = loading || disabled;
 
     if (asChild) {
       return (
-        <Comp
+        <Slot
           className={cn(buttonVariants({ variant, size, className }))}
-          disabled={loading || disabled}
           ref={ref}
+          style={{ borderRadius: 9, touchAction: "manipulation", ...style }}
+          aria-disabled={isDisabled || undefined}
           {...props}
         >
           {children}
-        </Comp>
+        </Slot>
       );
     }
 
@@ -101,14 +114,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <Comp
+      <motion.button
         className={cn(buttonVariants({ variant, size, className }))}
-        disabled={loading || disabled}
+        disabled={isDisabled}
         ref={ref}
+        whileTap={isDisabled || reduced ? undefined : { y: 1 }}
+        transition={CELL}
+        style={{ borderRadius: 9, touchAction: "manipulation", ...style }}
         {...props}
       >
         {content}
-      </Comp>
+      </motion.button>
     );
   },
 );

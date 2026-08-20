@@ -33,7 +33,7 @@ export function UsageMeter({
   return (
     <section
       className={cn(
-        'w-full max-w-xl rounded-sm border bg-card p-5 text-card-foreground shadow-sm',
+        'w-full max-w-xl rounded-md border bg-card p-5 text-card-foreground shadow-sm',
         className,
       )}
     >

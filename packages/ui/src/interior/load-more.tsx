@@ -308,7 +308,7 @@ export function LoadMore({
           }
           load();
         }}
-        className={`group relative inline-flex h-8 select-none items-center justify-center rounded-[9px] px-3 text-[12.5px] font-medium outline-none transition-[background-color,box-shadow,transform] duration-150 focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.1] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF] ${
+        className={`group relative inline-flex h-8 select-none items-center justify-center rounded-md px-3 text-[12.5px] font-medium outline-none transition-[background-color,box-shadow,transform] duration-150 focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.1] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF] ${
           inert
             ? "cursor-default"
             : "cursor-pointer hover:bg-stone-800/[0.04] active:translate-y-px dark:hover:bg-white/[0.06]"

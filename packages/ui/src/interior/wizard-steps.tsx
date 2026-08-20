@@ -366,7 +366,7 @@ export function WizardSteps({
                 intent.current = "panel";
                 back();
               }}
-              className="h-9 rounded-[9px] border border-stone-200 bg-white px-3 text-[13px] font-medium text-stone-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-stone-300 focus-visible:border-[#4568FF] focus-visible:shadow-[0_1px_2px_rgba(28,25,23,0.08),0_10px_20px_-14px_rgba(69,104,255,0.6)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:hover:border-white/20 dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_10px_20px_-14px_rgba(147,176,255,0.5)]"
+              className="h-9 rounded-md border border-stone-200 bg-white px-3 text-[13px] font-medium text-stone-700 outline-none transition-[border-color,box-shadow] duration-150 hover:border-stone-300 focus-visible:border-[#4568FF] focus-visible:shadow-[0_1px_2px_rgba(28,25,23,0.08),0_10px_20px_-14px_rgba(69,104,255,0.6)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:hover:border-white/20 dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_10px_20px_-14px_rgba(147,176,255,0.5)]"
             >
               {backLabel}
             </motion.button>
@@ -392,7 +392,7 @@ export function WizardSteps({
                   : { duration: 0.14, ease: EXIT_EASE },
               }}
               transition={reduced ? { duration: 0 } : CROSSFADE}
-              className="ml-auto grid h-9 place-items-center rounded-[9px] bg-stone-800 px-3.5 text-[13px] font-medium text-white outline-none focus-visible:shadow-[inset_0_0_0_1.5px_#93B0FF] dark:bg-stone-100 dark:text-stone-900 dark:focus-visible:shadow-[inset_0_0_0_1.5px_#4568FF]"
+              className="ml-auto grid h-9 place-items-center rounded-md bg-stone-800 px-3.5 text-[13px] font-medium text-white outline-none focus-visible:shadow-[inset_0_0_0_1.5px_#93B0FF] dark:bg-stone-100 dark:text-stone-900 dark:focus-visible:shadow-[inset_0_0_0_1.5px_#4568FF]"
             >
               <span aria-hidden className="invisible col-start-1 row-start-1">
                 {finishLabel.length > nextLabel.length ? finishLabel : nextLabel}

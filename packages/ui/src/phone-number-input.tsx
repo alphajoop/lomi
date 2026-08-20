@@ -151,10 +151,10 @@ export function PhoneNumberInput({
             className={cn(
               "flex w-full overflow-hidden bg-transparent transition-colors",
               compact
-                ? "phone-input-compact h-7 rounded-[9px] border border-stone-200 dark:border-white/[0.16]"
+                ? "phone-input-compact h-7 rounded-md border border-stone-200 dark:border-white/[0.16]"
                 : isFirstInStack
                   ? "phone-input-first-in-stack h-10 rounded-t-[9px] rounded-b-none border border-stone-200 dark:border-white/[0.16]"
-                  : "h-10 rounded-[9px] border border-stone-200 shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06)] dark:border-white/[0.16] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]",
+                  : "h-10 rounded-md border border-stone-200 shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06)] dark:border-white/[0.16] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07)]",
               showActionButton && !compact && "pr-9",
               className,
             )}
@@ -372,7 +372,7 @@ export function WhatsAppNumberInput({
       <div className="relative">
         <div
           className={cn(
-            "flex h-10 w-full overflow-hidden rounded-[9px] bg-transparent",
+            "flex h-10 w-full overflow-hidden rounded-md bg-transparent",
             interiorField,
             "px-0",
           )}

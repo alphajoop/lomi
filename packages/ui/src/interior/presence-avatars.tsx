@@ -243,7 +243,7 @@ export function PresenceAvatars({
     transition: reduced ? INSTANT : SLOT,
   };
   const chipClass =
-    "absolute left-0 top-0 grid place-items-center rounded-[9px] border border-stone-200 bg-white font-mono text-[10.5px] leading-none tabular-nums text-stone-500 outline-none ring-2 ring-white dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-400 dark:ring-stone-900";
+    "absolute left-0 top-0 grid place-items-center rounded-md border border-stone-200 bg-white font-mono text-[10.5px] leading-none tabular-nums text-stone-500 outline-none ring-2 ring-white dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-400 dark:ring-stone-900";
 
   return (
     <div role="group" aria-label={label} className={`inline-flex items-center ${className}`}>

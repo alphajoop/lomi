@@ -336,7 +336,7 @@ export function SliderDetents({
       <div
         ref={trackRef}
         {...trackProps}
-        className={`relative h-9 w-full rounded-[9px] outline-none focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.1] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF] ${
+        className={`relative h-9 w-full rounded-md outline-none focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.1] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF] ${
           disabled
             ? "pointer-events-none opacity-50"
             : dragging

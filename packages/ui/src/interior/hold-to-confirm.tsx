@@ -279,7 +279,7 @@ export function HoldToConfirm({
       aria-describedby={hintId}
       {...bind}
       style={{ touchAction: "manipulation", WebkitTouchCallout: "none" }}
-      className={`relative isolate inline-grid h-10 select-none place-items-center overflow-hidden rounded-[9px] border border-stone-200 bg-white px-4 text-[13px] font-medium text-stone-700 outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:focus-visible:ring-stone-500 ${
+      className={`relative isolate inline-grid h-10 select-none place-items-center overflow-hidden rounded-md border border-stone-200 bg-white px-4 text-[13px] font-medium text-stone-700 outline-none focus-visible:ring-2 focus-visible:ring-stone-400 dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:focus-visible:ring-stone-500 ${
         disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
       } ${className}`}
     >

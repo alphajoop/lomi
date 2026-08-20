@@ -11,7 +11,10 @@ export const CheckoutCard = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('border bg-card rounded-sm', className)}
+    className={cn(
+      'rounded-[9px] border border-stone-200 bg-white text-stone-700 shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),0_1px_2px_rgba(28,25,23,0.08)] dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200',
+      className,
+    )}
     {...props}
   />
 ));

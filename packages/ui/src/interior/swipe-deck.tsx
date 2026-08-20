@@ -420,7 +420,7 @@ export function SwipeDeck<T>({
   const current = items[deck.index];
 
   const control =
-    "inline-flex h-8 items-center gap-1.5 rounded-[9px] border border-stone-200 bg-white px-2.5 text-[12px] font-medium text-stone-700 outline-none transition-[background-color,border-color,opacity] duration-150 hover:bg-stone-100 focus-visible:border-[#4568FF] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:hover:bg-white/10 dark:focus-visible:border-[#93B0FF]";
+    "inline-flex h-8 items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 text-[12px] font-medium text-stone-700 outline-none transition-[background-color,border-color,opacity] duration-150 hover:bg-stone-100 focus-visible:border-[#4568FF] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:hover:bg-white/10 dark:focus-visible:border-[#93B0FF]";
 
   return (
     <div className={`w-full ${className}`}>

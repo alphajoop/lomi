@@ -229,7 +229,7 @@ export type LogoMarqueeProps = {
 };
 
 const FACE =
-  "inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-[9px] px-3 text-[13px] font-medium tracking-[-0.01em] text-stone-500 dark:text-stone-400";
+  "inline-flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 text-[13px] font-medium tracking-[-0.01em] text-stone-500 dark:text-stone-400";
 
 const HIT =
   "outline-none transition-colors duration-150 hover:text-stone-700 focus-visible:bg-[#4568FF]/[0.06] focus-visible:text-stone-700 focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:hover:text-stone-200 dark:focus-visible:bg-[#93B0FF]/[0.10] dark:focus-visible:text-stone-200 dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF]";

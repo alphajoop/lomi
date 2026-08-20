@@ -414,7 +414,7 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
             receipt.
           </Text>
           <Text style={{ fontSize: PDF_FONT_SIZE.footer, color: PDF_LABEL_COLOR }}>
-            Powered by lomi. | © {currentYear} lomi. Technology Africa S.A.R.L.
+            Powered by lomi. | © {currentYear} lomi. Technologies Africa S.A
             — All rights reserved
           </Text>
         </View>

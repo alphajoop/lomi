@@ -164,7 +164,7 @@ export function BillingAddressSection({
       <label className="block text-sm font-normal text-gray-700 select-none">
         {t("checkout.billing_address.title")}
       </label>
-      <div className="rounded-sm shadow-sm shadow-black/[.04]">
+      <div className="rounded-md shadow-sm shadow-black/[.04]">
         <div className="relative">
           <select
             name="country"

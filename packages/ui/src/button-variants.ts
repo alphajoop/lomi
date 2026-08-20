@@ -6,13 +6,13 @@ const interiorInset =
 const interiorSurface =
   `border border-stone-200 bg-white text-stone-700 hover:bg-stone-50 ${interiorInset} dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:hover:bg-[#2A2A27]`;
 
-const settingsButtonAction = `relative rounded-[9px] font-medium transition-[border-color,box-shadow,background-color] duration-150 ${interiorSurface}`;
+const settingsButtonAction = `relative rounded-md font-medium transition-[border-color,box-shadow,background-color] duration-150 ${interiorSurface}`;
 
 const liveButton =
   `bg-brand-600 text-white border border-brand-600 hover:brightness-110 focus-visible:brightness-110 ${interiorInset} dark:border-transparent dark:bg-sky-900 dark:text-sky-300 dark:hover:brightness-100 dark:hover:bg-sky-800 dark:hover:text-sky-200`;
 
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[9px] text-[13px] font-medium ring-offset-background transition-[border-color,box-shadow,background-color] duration-150 select-none focus-visible:outline-none focus-visible:border-[#4568FF] focus-visible:shadow-[0_1px_2px_rgba(28,25,23,0.08),0_10px_20px_-14px_rgba(69,104,255,0.6)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_10px_20px_-14px_rgba(147,176,255,0.5)]",
+  "inline-flex cursor-pointer touch-manipulation items-center justify-center gap-2 whitespace-nowrap rounded-md text-[13px] font-medium outline-none ring-offset-background transition-[border-color,box-shadow,background-color] duration-150 select-none focus-visible:outline-none focus-visible:border-[#4568FF] focus-visible:shadow-[0_1px_2px_rgba(28,25,23,0.08),0_10px_20px_-14px_rgba(69,104,255,0.6)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_10px_20px_-14px_rgba(147,176,255,0.5)]",
   {
     variants: {
       variant: {
@@ -42,17 +42,17 @@ export const buttonVariants = cva(
           "bg-sky-100/10 text-sky-600 hover:bg-sky-100/20 hover:text-sky-600 dark:bg-sky-900/30 dark:text-sky-300 dark:hover:bg-sky-900/40 dark:hover:text-sky-300",
       },
       size: {
-        default: "h-9 px-3.5",
+        default: "h-9 px-3",
         xs: "h-7 px-2 text-xs",
         sm: "h-8 px-3",
-        md: "h-9 px-3.5",
+        md: "h-9 px-3",
         lg: "h-11 px-5 text-[15px]",
         icon: "h-8 w-8",
         "icon-xs": "h-7 w-7",
         "icon-sm": "h-8 w-8",
         "icon-md": "h-9 w-9",
-        header: "h-8 px-3.5",
-        sidebarActions: "h-8 px-3.5 justify-start",
+        header: "h-8 px-3",
+        sidebarActions: "h-8 px-3 justify-start",
         small: "h-7 w-7 p-0",
         sidebar: "h-7 py-2 w-56",
       },

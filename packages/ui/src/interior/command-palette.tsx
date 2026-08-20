@@ -300,14 +300,14 @@ export function CommandPalette({
                 transition={spring}
                 onPointerMove={(e) => pointerActivate(item.id, e)}
                 onClick={() => run(item)}
-                className="relative flex h-9 shrink-0 cursor-default items-center rounded-[9px] px-2.5"
+                className="relative flex h-9 shrink-0 cursor-default items-center rounded-md px-2.5"
               >
                 <motion.span
                   aria-hidden
                   initial={false}
                   animate={{ opacity: active ? 1 : 0 }}
                   transition={reduced ? { duration: 0 } : CROSSFADE}
-                  className="absolute inset-0 rounded-[9px] bg-stone-100 dark:bg-white/10"
+                  className="absolute inset-0 rounded-md bg-stone-100 dark:bg-white/10"
                 />
                 <span className="relative flex min-w-0 flex-1 items-center gap-2.5">
                   <span className="truncate text-[13px] font-medium text-stone-700 dark:text-stone-200">

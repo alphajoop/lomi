@@ -64,7 +64,7 @@ export function CheckoutPhoneNumberInput({
   return (
     <div className="space-y-2">
       <div className="relative shadow-sm shadow-black/[.04]">
-        <div className="flex h-10 w-full overflow-hidden rounded-[9px] border border-stone-200 bg-white shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06)] dark:border-white/[0.16] dark:bg-[#252522] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] checkout-phone-shell">
+        <div className="flex h-10 w-full overflow-hidden rounded-md border border-stone-200 bg-white shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06)] dark:border-white/[0.16] dark:bg-[#252522] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] checkout-phone-shell">
           <RPNInput.default
             className="flex w-full"
             international

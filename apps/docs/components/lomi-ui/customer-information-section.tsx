@@ -85,7 +85,7 @@ export function CustomerInformationSection({
       <label className="block select-none text-sm font-normal text-gray-700">
         {title}
       </label>
-      <div className="customer-information-stack rounded-sm shadow-sm shadow-black/4">
+      <div className="customer-information-stack rounded-md shadow-sm shadow-black/4">
         <div className="relative">
           <CheckoutInput
             type="text"
@@ -114,7 +114,7 @@ export function CustomerInformationSection({
                 <Info className="h-3.5 w-3.5 cursor-pointer text-gray-400 transition-colors hover:text-gray-600" />
               </button>
               {showNameTooltip ? (
-                <div className="absolute right-0 top-full z-10 mt-2 max-w-xs rounded-sm border border-gray-200 bg-white p-2 text-xs text-gray-700 shadow-sm">
+                <div className="absolute right-0 top-full z-10 mt-2 max-w-xs rounded-md border border-gray-200 bg-white p-2 text-xs text-gray-700 shadow-sm">
                   {nameTooltip}
                 </div>
               ) : null}

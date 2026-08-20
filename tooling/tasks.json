@@ -88,6 +88,19 @@
       "notes": "React 19 package; excluded from pnpm-workspace.yaml."
     },
     {
+      "id": "portal",
+      "path": "apps/portal",
+      "kind": "app",
+      "manager": "pnpm",
+      "workspace": false,
+      "submodule": false,
+      "required": false,
+      "capabilities": ["install", "dev", "build", "start", "lint", "format", "typecheck", "knip", "test", "types:generate"],
+      "owner": "merchant-dashboard",
+      "risk": "high",
+      "notes": "Local Next.js merchant dashboard rewrite at apps/portal. React 19; file: @lomi./shared, @lomi./queries, and @lomi./ui. Vite dashboard stays production until route parity."
+    },
+    {
       "id": "website",
       "path": "apps/website",
       "kind": "app",

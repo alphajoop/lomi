@@ -240,7 +240,7 @@ export function PaymentProviderSelector({
             placeholder="your-alias@bank"
             className={cn(
               checkoutCustomerFieldClass,
-              'mb-0.5 rounded-sm shadow-none',
+              'mb-0.5 rounded-md shadow-none',
             )}
           />
         </div>

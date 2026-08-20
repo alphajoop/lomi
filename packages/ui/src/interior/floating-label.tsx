@@ -214,7 +214,7 @@ export function FloatingLabelInput({
             fieldProps.onChange(event);
             onChange?.(event.currentTarget.value, event);
           }}
-            className="absolute inset-0 h-full w-full rounded-[9px] bg-transparent px-3 py-0 text-[13px] leading-[20px] text-stone-700 outline-none focus-visible:outline-none disabled:cursor-not-allowed dark:text-stone-200"
+            className="absolute inset-0 h-full w-full rounded-md bg-transparent px-3 py-0 text-[13px] leading-[20px] text-stone-700 outline-none focus-visible:outline-none disabled:cursor-not-allowed dark:text-stone-200"
           />
         </div>
 

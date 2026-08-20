@@ -12,10 +12,10 @@ const calendarSelectedDaySurface = cn(
 );
 
 const calendarRangeStartRounding =
-  "day-range-start [&:not(.day-range-end)]:rounded-tl-sm [&:not(.day-range-end)]:rounded-bl-sm [&:not(.day-range-end)]:rounded-tr-none [&:not(.day-range-end)]:rounded-br-none [&.day-range-end]:rounded-[9px]";
+  "day-range-start [&:not(.day-range-end)]:rounded-tl-sm [&:not(.day-range-end)]:rounded-bl-sm [&:not(.day-range-end)]:rounded-tr-none [&:not(.day-range-end)]:rounded-br-none [&.day-range-end]:rounded-md";
 
 const calendarRangeEndRounding =
-  "day-range-end [&:not(.day-range-start)]:rounded-tr-sm [&:not(.day-range-start)]:rounded-br-sm [&:not(.day-range-start)]:rounded-tl-none [&:not(.day-range-start)]:rounded-bl-none [&.day-range-start]:rounded-[9px]";
+  "day-range-end [&:not(.day-range-start)]:rounded-tr-sm [&:not(.day-range-start)]:rounded-br-sm [&:not(.day-range-start)]:rounded-tl-none [&:not(.day-range-start)]:rounded-bl-none [&.day-range-start]:rounded-md";
 
 const calendarRangeCellRounding =
   "[&:has(>.day-range-start)]:rounded-tl-sm [&:has(>.day-range-start)]:rounded-bl-sm [&:has(>.day-range-start)]:rounded-tr-none [&:has(>.day-range-start)]:rounded-br-none [&:has(>.day-range-end)]:rounded-tr-sm [&:has(>.day-range-end)]:rounded-br-sm [&:has(>.day-range-end)]:rounded-tl-none [&:has(>.day-range-end)]:rounded-bl-none first:[&:has([aria-selected])]:rounded-tl-sm first:[&:has([aria-selected])]:rounded-bl-sm first:[&:has([aria-selected])]:rounded-tr-none first:[&:has([aria-selected])]:rounded-br-none last:[&:has([aria-selected])]:rounded-tr-sm last:[&:has([aria-selected])]:rounded-br-sm last:[&:has([aria-selected])]:rounded-tl-none last:[&:has([aria-selected])]:rounded-bl-none";
@@ -41,7 +41,7 @@ const calendarSizeStyles = {
     caption_label: "text-sm font-normal",
     nav_button: "h-7 w-7",
     head_cell:
-      "text-muted-foreground rounded-[9px] w-9 font-normal text-[0.8rem] text-center",
+      "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
     row: "grid grid-cols-7 w-full mt-2",
     day: "h-8 w-8 text-sm",
   },
@@ -52,7 +52,7 @@ const calendarSizeStyles = {
     caption_label: "text-xs font-medium",
     nav_button: "h-5 w-5",
     head_cell:
-      "text-muted-foreground rounded-[9px] w-7 h-6 font-medium text-[0.65rem] text-center flex items-center justify-center",
+      "text-muted-foreground rounded-md w-7 h-6 font-medium text-[0.65rem] text-center flex items-center justify-center",
     row: "grid grid-cols-7 w-full mt-1 gap-1",
     day: "h-7 w-7 text-xs",
   },
@@ -61,7 +61,7 @@ const calendarSizeStyles = {
     month: "w-full space-y-2",
     caption: "relative mb-2 flex items-center justify-center pt-1",
     caption_label: "text-sm font-medium",
-    nav_button: "h-9 w-9 rounded-[9px]",
+    nav_button: "h-9 w-9 rounded-md",
     head_cell:
       "flex h-8 w-10 items-center justify-center text-center text-xs font-medium text-muted-foreground",
     row: "grid grid-cols-7 w-full mt-1 gap-1",
@@ -96,7 +96,7 @@ function Calendar({
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
           sizeStyle.nav_button,
-          "bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-accent dark:hover:bg-accent rounded-[9px]",
+          "bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-accent dark:hover:bg-accent rounded-md",
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
@@ -108,13 +108,13 @@ function Calendar({
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent/60 dark:[&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/40 dark:[&:has([aria-selected].day-outside)]:bg-accent/60",
           isRangeMode
             ? calendarRangeCellRounding
-            : "[&:has([aria-selected])]:rounded-[9px]",
+            : "[&:has([aria-selected])]:rounded-md",
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
           sizeStyle.day,
           "p-0 font-normal aria-selected:opacity-100 mx-auto hover:bg-accent dark:hover:bg-accent flex items-center justify-center transition-colors duration-150",
-          isRangeMode ? "rounded-none" : "rounded-[9px]",
+          isRangeMode ? "rounded-none" : "rounded-md",
         ),
         day_range_start: cn(
           calendarSelectedDaySurface,
@@ -123,9 +123,9 @@ function Calendar({
         day_range_end: cn(calendarSelectedDaySurface, calendarRangeEndRounding),
         day_selected: cn(
           calendarSelectedDaySurface,
-          isRangeMode ? null : "rounded-[9px]",
+          isRangeMode ? null : "rounded-md",
         ),
-        day_today: "bg-accent text-foreground rounded-[9px] font-medium",
+        day_today: "bg-accent text-foreground rounded-md font-medium",
         day_outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-muted aria-selected:text-foreground/90 dark:aria-selected:text-foreground/95 aria-selected:opacity-100",
         day_disabled: "text-muted-foreground opacity-50",
