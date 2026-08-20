@@ -15,6 +15,16 @@ const config = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
+  turbopack: {},
+  webpack(webpackConfig) {
+    webpackConfig.resolve = webpackConfig.resolve ?? {};
+    webpackConfig.resolve.extensionAlias = {
+      ...webpackConfig.resolve.extensionAlias,
+      '.js': ['.ts', '.tsx', '.js'],
+      '.mjs': ['.mts', '.mjs'],
+    };
+    return webpackConfig;
+  },
   async redirects() {
     return [
       {

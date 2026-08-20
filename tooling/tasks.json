@@ -34,7 +34,7 @@
       "workspace": true,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "typecheck", "types:generate"],
+      "capabilities": ["install", "typecheck", "build", "types:generate"],
       "owner": "shared-packages",
       "risk": "medium"
     },
@@ -58,7 +58,7 @@
       "workspace": true,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "typecheck"],
+      "capabilities": ["install", "typecheck", "build"],
       "owner": "shared-packages",
       "risk": "medium"
     },

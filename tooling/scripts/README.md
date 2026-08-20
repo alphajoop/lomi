@@ -8,10 +8,13 @@ Shared automation lives here. App-specific work stays in `apps/<app>/scripts/` o
 
 ```bash
 pnpm install:apps
+pnpm packages:build
 pnpm check
 pnpm typecheck
 node tooling/scripts/workspace.mjs list
 ```
+
+`pnpm packages:build` (watch: `pnpm packages:watch`) compiles `@lomi./shared` and `@lomi./queries` to `dist/`. Next, Nest, and Metro load that JavaScript. After editing those packages, rebuild once; `file:` consumers hard-link `dist/`, so you do not need to reinstall apps.
 
 ## Command contract
 

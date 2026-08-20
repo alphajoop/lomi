@@ -26,7 +26,7 @@
     "build:pre:sync": "DOCS_SYNC_OPENAPI=1 pnpm exec tsx ./lib/scripts/pre-build.ts",
     "build:post": "pnpm exec tsx ./lib/scripts/post-build.ts",
     "clean": "rimraf .next",
-    "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev --turbo",
+    "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev",
     "lint": "fumadocs-mdx && pnpm exec tsx ./lib/scripts/lint.ts && pnpm exec tsx ./lib/scripts/check-mdx-sdk-snippets.ts && pnpm exec tsx lib/scripts/manual-api/verify-en-operation-overrides.ts && eslint .",
     "docs:drift": "pnpm exec tsx lib/scripts/docs-drift.ts",
     "parity": "pnpm exec tsx lib/scripts/parity-worker.ts",

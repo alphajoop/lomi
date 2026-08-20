@@ -2,15 +2,34 @@ import type { NextConfig } from "next";
 
 const SUPABASE_HOST = "mdswvokxrnfggrujsfjd.supabase.co";
 
+type WebpackResolveConfig = {
+  resolve?: {
+    extensionAlias?: Record<string, string | string[]>;
+  };
+};
+
+/** Webpack fallback: remap TypeScript ESM `.js` specifiers to `.ts`. Turbopack uses compiled `dist/` instead. */
+function applyTypeScriptJsExtensionAlias(webpackConfig: WebpackResolveConfig) {
+  webpackConfig.resolve = webpackConfig.resolve ?? {};
+  webpackConfig.resolve.extensionAlias = {
+    ...webpackConfig.resolve.extensionAlias,
+    ".js": [".ts", ".tsx", ".js"],
+    ".mjs": [".mts", ".mjs"],
+  };
+}
+
 export function createHostedCommerceNextConfig(
   overrides: NextConfig = {},
 ): NextConfig {
+  const previousWebpack = overrides.webpack;
   return {
     reactStrictMode: true,
     devIndicators: false,
+    turbopack: {},
     transpilePackages: [
       "@lomi./ui",
       "@lomi./shared",
+      "@lomi./queries",
       "@lomi./pay",
       "@lomi./receipt-pdf",
     ],
@@ -84,5 +103,11 @@ export function createHostedCommerceNextConfig(
       ];
     },
     ...overrides,
+    webpack: (webpackConfig, options) => {
+      applyTypeScriptJsExtensionAlias(webpackConfig);
+      return previousWebpack
+        ? previousWebpack(webpackConfig, options)
+        : webpackConfig;
+    },
   };
 }
