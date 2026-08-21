@@ -10,7 +10,16 @@
       "workspace": true,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "lint", "format", "typecheck", "knip", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "lint",
+        "format",
+        "typecheck",
+        "knip",
+        "types:generate"
+      ],
       "owner": "merchant-dashboard",
       "risk": "high"
     },
@@ -22,7 +31,16 @@
       "workspace": true,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "lint", "format", "typecheck", "knip", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "lint",
+        "format",
+        "typecheck",
+        "knip",
+        "types:generate"
+      ],
       "owner": "platform-admin",
       "risk": "high"
     },
@@ -34,7 +52,12 @@
       "workspace": true,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "typecheck", "build", "types:generate"],
+      "capabilities": [
+        "install",
+        "typecheck",
+        "build",
+        "types:generate"
+      ],
       "owner": "shared-packages",
       "risk": "medium"
     },
@@ -46,7 +69,10 @@
       "workspace": true,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "typecheck"],
+      "capabilities": [
+        "install",
+        "typecheck"
+      ],
       "owner": "shared-packages",
       "risk": "low"
     },
@@ -58,7 +84,11 @@
       "workspace": true,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "typecheck", "build"],
+      "capabilities": [
+        "install",
+        "typecheck",
+        "build"
+      ],
       "owner": "shared-packages",
       "risk": "medium"
     },
@@ -70,7 +100,11 @@
       "workspace": true,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "build", "typecheck"],
+      "capabilities": [
+        "install",
+        "build",
+        "typecheck"
+      ],
       "owner": "shared-packages",
       "risk": "low"
     },
@@ -82,23 +116,13 @@
       "workspace": false,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "typecheck"],
+      "capabilities": [
+        "install",
+        "typecheck"
+      ],
       "owner": "hosted-checkout",
       "risk": "medium",
       "notes": "React 19 package; excluded from pnpm-workspace.yaml."
-    },
-    {
-      "id": "portal",
-      "path": "apps/portal",
-      "kind": "app",
-      "manager": "pnpm",
-      "workspace": false,
-      "submodule": false,
-      "required": false,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "typecheck", "knip", "test", "types:generate"],
-      "owner": "merchant-dashboard",
-      "risk": "high",
-      "notes": "Local Next.js merchant dashboard rewrite at apps/portal. React 19; file: @lomi./shared, @lomi./queries, and @lomi./ui. Vite dashboard stays production until route parity."
     },
     {
       "id": "website",
@@ -108,7 +132,15 @@
       "workspace": false,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "knip"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "knip"
+      ],
       "owner": "marketing",
       "risk": "medium"
     },
@@ -120,7 +152,16 @@
       "workspace": false,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "knip", "test"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "knip",
+        "test"
+      ],
       "owner": "developer-docs",
       "risk": "medium",
       "notes": "Build/parity scripts stay under lib/scripts."
@@ -133,7 +174,16 @@
       "workspace": false,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "knip", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "knip",
+        "types:generate"
+      ],
       "owner": "hosted-checkout",
       "risk": "high"
     },
@@ -145,7 +195,17 @@
       "workspace": false,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "knip", "test", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "knip",
+        "test",
+        "types:generate"
+      ],
       "owner": "hosted-checkout",
       "risk": "high"
     },
@@ -157,7 +217,17 @@
       "workspace": false,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "knip", "test", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "knip",
+        "test",
+        "types:generate"
+      ],
       "owner": "customer-portal",
       "risk": "medium"
     },
@@ -169,7 +239,18 @@
       "workspace": false,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "typecheck", "knip", "test", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "typecheck",
+        "knip",
+        "test",
+        "types:generate"
+      ],
       "owner": "merchant-api",
       "risk": "ops"
     },
@@ -181,7 +262,15 @@
       "workspace": false,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "dev", "build", "start", "lint", "knip", "test"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "knip",
+        "test"
+      ],
       "owner": "merchant-mcp",
       "risk": "medium"
     },
@@ -193,7 +282,14 @@
       "workspace": false,
       "submodule": true,
       "required": true,
-      "capabilities": ["install", "dev", "lint", "format", "knip", "types:generate"],
+      "capabilities": [
+        "install",
+        "dev",
+        "lint",
+        "format",
+        "knip",
+        "types:generate"
+      ],
       "owner": "mobile",
       "risk": "medium",
       "notes": "dev is the Expo bundler. start remains an Expo-compatible alias."
@@ -206,7 +302,13 @@
       "workspace": false,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "lint", "format", "typecheck", "test"],
+      "capabilities": [
+        "install",
+        "lint",
+        "format",
+        "typecheck",
+        "test"
+      ],
       "owner": "merchant-cli",
       "risk": "medium"
     },
@@ -218,7 +320,11 @@
       "workspace": false,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "build", "knip"],
+      "capabilities": [
+        "install",
+        "build",
+        "knip"
+      ],
       "owner": "sdks",
       "risk": "low"
     },
@@ -230,7 +336,12 @@
       "workspace": false,
       "submodule": false,
       "required": true,
-      "capabilities": ["install", "build", "knip", "test"],
+      "capabilities": [
+        "install",
+        "build",
+        "knip",
+        "test"
+      ],
       "owner": "sdks",
       "risk": "low"
     },
@@ -242,7 +353,11 @@
       "workspace": false,
       "submodule": false,
       "required": false,
-      "capabilities": ["install", "build", "knip"],
+      "capabilities": [
+        "install",
+        "build",
+        "knip"
+      ],
       "owner": "sdks",
       "risk": "low"
     },
@@ -254,7 +369,15 @@
       "workspace": false,
       "submodule": true,
       "required": false,
-      "capabilities": ["install", "dev", "build", "format", "typecheck", "knip", "test"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "format",
+        "typecheck",
+        "knip",
+        "test"
+      ],
       "owner": "sdks",
       "risk": "medium"
     },
@@ -266,7 +389,12 @@
       "workspace": false,
       "submodule": true,
       "required": false,
-      "capabilities": ["install", "dev", "build", "knip"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "knip"
+      ],
       "owner": "plugins",
       "risk": "medium"
     },
@@ -278,7 +406,17 @@
       "workspace": false,
       "submodule": true,
       "required": false,
-      "capabilities": ["install", "dev", "build", "start", "lint", "format", "typecheck", "knip", "test"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "format",
+        "typecheck",
+        "knip",
+        "test"
+      ],
       "owner": "plugins",
       "risk": "medium"
     },
@@ -290,7 +428,16 @@
       "workspace": false,
       "submodule": true,
       "required": false,
-      "capabilities": ["install", "dev", "build", "start", "lint", "typecheck", "knip", "test"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "typecheck",
+        "knip",
+        "test"
+      ],
       "owner": "tools",
       "risk": "low"
     },
@@ -302,7 +449,16 @@
       "workspace": false,
       "submodule": true,
       "required": false,
-      "capabilities": ["install", "dev", "build", "start", "lint", "typecheck", "knip", "test"],
+      "capabilities": [
+        "install",
+        "dev",
+        "build",
+        "start",
+        "lint",
+        "typecheck",
+        "knip",
+        "test"
+      ],
       "owner": "tools",
       "risk": "ops"
     },
@@ -314,7 +470,13 @@
       "workspace": false,
       "submodule": true,
       "required": false,
-      "capabilities": ["install", "lint", "format", "typecheck", "test"],
+      "capabilities": [
+        "install",
+        "lint",
+        "format",
+        "typecheck",
+        "test"
+      ],
       "owner": "tools",
       "risk": "low"
     }

@@ -73,6 +73,14 @@ The response includes a hosted checkout URL. Open it in your browser.
 
 <DocsScreenshot name="start/hosted-checkout" alt="lomi. hosted checkout payment page in sandbox" />
 
+## Option C: SDK
+
+Create the same sandbox checkout from application code with `@lomi./sdk`. The full install, first call, checkout, and webhook-verify steps are in [Get started with the SDK](/start/sdk-quickstart). Other languages: [Python](/build/sdks/python), [Go](/build/sdks/go), [PHP](/build/sdks/php).
+
+## Option D: MCP
+
+Ask Cursor, Claude Desktop, or another MCP client to create a checkout session (`lomi_checkout`, `action=create`). Connect with OAuth or an API key, then follow [MCP for AI clients](/build/mcp). Compare all four surfaces in [How you call lomi.](/start/integration-journey#how-you-call-lomi).
+
 ## 2. Pay with a test method
 
 For a simple successful card payment, use:
@@ -103,6 +111,7 @@ lomi transactions list --json
 ## What should I build next?
 
 - Follow the full path in [Integration journey](/start/integration-journey).
+- Compare REST API, SDK, CLI, and MCP in [How you call lomi.](/start/integration-journey#how-you-call-lomi).
 - Use [hosted checkout](/build/checkout) for app or store checkout, runnable sample: [hosted checkout reference plugin](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/references/payment-integration-sdk-reference).
 - Use [payment links](/build/payment-links) when you want a shareable URL.
 - For server-initiated Wave, MTN, or card flows, see [Direct charges](/build/direct-charges) and the [direct-charge reference plugin](https://github.com/lomiafrica/lomi./tree/main/apps/plugins/references/direct-charge-integration-reference).

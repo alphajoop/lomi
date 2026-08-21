@@ -15,6 +15,119 @@ Follow this guide before you write production code. Each step links to the detai
   New here? Start with [What is lomi.?](/start/overview), then follow this journey step by step.
 </Callout>
 
+Hosted checkout, payment links, subscriptions, and the other products below all go through the same merchant API. The choice of **what to build** is independent of **how you call lomi.**: REST API, SDK, CLI, or MCP.
+
+## How you call lomi.
+
+Pick the surface that matches how you work. Each card is a starting point. The full walkthroughs stay on their own pages: [REST API](/api), [SDK quickstart](/start/sdk-quickstart), [CLI quickstart](/start/cli-quickstart), and [MCP](/build/mcp).
+
+<IntegrationSurfaceGroup id="how-you-call-lomi">
+
+<IntegrationSurface
+  transport="api"
+  title="Call the HTTP contract directly"
+  identifier="POST /checkout-sessions"
+  href="/api"
+  hrefLabel="Open the REST API reference"
+>
+  Use REST when you want the exact request and response, a language without an official SDK, or to compare against OpenAPI. Send your secret key as `X-API-Key` (`LOMI_SECRET_KEY`). `Idempotency-Key` is required on money-moving writes.
+
+  Create a sandbox checkout:
+
+  ```bash
+  curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+    -H "X-API-Key: $LOMI_SECRET_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "amount": 10000,
+      "currency_code": "XOF",
+      "title": "Test order",
+      "success_url": "https://example.com/success",
+      "cancel_url": "https://example.com/cancel"
+    }'
+  ```
+
+  Open `checkout_url` from the response and pay with a [sandbox test method](/start/sandbox-payments). Full first-payment path: [Make a test payment](/start/first-payment). Endpoint details: [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create).
+</IntegrationSurface>
+
+<IntegrationSurface
+  transport="sdk"
+  title="Call lomi. from application code"
+  identifier="@lomi./sdk"
+  href="/start/sdk-quickstart"
+  hrefLabel="Open the SDK quickstart"
+>
+  The **lomi. SDK** is the fastest way to call the lomi. API from your application code, create checkout sessions, manage customers and subscriptions, issue refunds, and verify webhooks, with typed methods and built-in error handling.
+
+  This guide uses the **TypeScript SDK** (`@lomi./sdk`). The same flow applies to [Python](/build/sdks/python), [Go](/build/sdks/go), and [PHP](/build/sdks/php). Install with `npm install @lomi./sdk`, set `LOMI_SECRET_KEY` in `.env`, then:
+
+  ```typescript
+  const session = await lomi.checkoutSessions.create({
+    amount: 10000,
+    currency_code: 'XOF',
+    title: 'Premium subscription',
+    success_url: 'https://example.com/success',
+    cancel_url: 'https://example.com/cancel',
+  });
+
+  console.log('Redirect to:', session.checkout_url);
+  ```
+
+  `lomi init` can write the SDK client, example files, and your `.env` automatically. Full walkthrough: [Get started with the SDK](/start/sdk-quickstart). Language references: [SDKs](/build/sdks).
+</IntegrationSurface>
+
+<IntegrationSurface
+  transport="cli"
+  title="Work from the terminal"
+  identifier="lomi checkout create"
+  href="/start/cli-quickstart"
+  hrefLabel="Open the CLI quickstart"
+>
+  The **lomi. CLI** is the fastest way to authenticate, create test checkouts, listen for webhooks without ngrok, and install AI agent rules, all from your terminal.
+
+  Requires **Node.js 18+** (used only to download the native binary):
+
+  ```bash filename="Terminal"
+  npm install -g lomi.cli
+  lomi login
+  lomi quickstart
+  lomi checkout create \
+    --amount 10000 \
+    --currency XOF \
+    --success-url https://example.com/success \
+    --cancel-url https://example.com/cancel \
+    --json
+  ```
+
+  Open the `checkout_url` from the JSON response. Forward webhooks with `lomi listen http://localhost:3000/webhooks`. **`lomi login`** stores a CLI token. **`lomi init`** writes your secret API key (`LOMI_SECRET_KEY`) for the SDK. These are different credentials. Full walkthrough: [Get started with the CLI](/start/cli-quickstart). Command reference: [CLI](/build/cli).
+</IntegrationSurface>
+
+<IntegrationSurface
+  transport="mcp"
+  title="Let an AI client call the merchant API"
+  identifier="lomi_checkout"
+  href="/build/mcp"
+  hrefLabel="Open the MCP guide"
+>
+  The **Model Context Protocol (MCP)** lets AI assistants (Cursor, Claude Desktop, custom agents) call the **lomi. merchant API** for you: create checkouts, list payments, debug webhooks, without writing every HTTP request by hand.
+
+  Recommended for Cursor / Claude / VS Code: add the hosted MCP URL with **no API key**. OAuth-capable clients open **Connect with lomi.** in the browser:
+
+  ```json
+  {
+    "mcpServers": {
+      "lomi": {
+        "url": "https://mcp.lomi.africa/mcp"
+      }
+    }
+  }
+  ```
+
+  Then ask the client to create a checkout session (`lomi_checkout`, `action=create`). Merchant tools follow `lomi_<resource>` with a required `action`. In the dashboard: **Settings → Integrations → MCP**, then **Developers → API keys → Connect MCP**. Full guide: [MCP for AI clients](/build/mcp).
+</IntegrationSurface>
+
+</IntegrationSurfaceGroup>
+
 ## Step 1: Create a developer account
 
 Sign up for a lomi. account to access the **test environment**, where you can run full payment flows without moving real money.
@@ -45,6 +158,8 @@ Define what you sell in [Products](/build/products) before you create checkout s
 
 Most teams should start with **hosted checkout**. Use [Which payment integration should I choose?](/build/choose-integration) and [Payment channels](/build/payment-channels) to confirm Wave, MTN, and card coverage for your markets.
 
+That product choice is independent of REST API, SDK, CLI, or MCP. See [How you call lomi.](#how-you-call-lomi).
+
 ## Step 3: Test end-to-end
 
 Test your integration thoroughly using sandbox credentials:
@@ -54,6 +169,8 @@ Test your integration thoroughly using sandbox credentials:
 3. Exercise failure paths with [Simulate errors](/build/guides/simulate-errors).
 4. Fix issues using [Error handling](/build/advanced-guides/error-handling) and [Idempotency keys](/build/advanced-guides/idempotency-keys).
 5. For checkout edge cases (subscriptions, trials, pending mobile money), see [Checkout behavior](/build/payments/checkout-behavior) and per-channel guides under [Payment channels](/build/payment-channels#recommended-path-by-channel).
+
+The same first checkout can be created from [REST](#call-api), [SDK](#call-sdk), [CLI](#call-cli), or [MCP](#call-mcp). The CLI and cURL paths are spelled out in [Make a test payment](/start/first-payment). The SDK and MCP paths are in [Get started with the SDK](/start/sdk-quickstart) and [MCP](/build/mcp).
 
 ## Step 4: Configure webhooks
 
@@ -97,4 +214,4 @@ When sandbox flows pass your checklist:
 - [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp) · [lomi. UI](/build/lomi-ui)
 - [E-commerce extensions](/build/ecommerce-extensions) (WooCommerce, Shopify, Magento, PrestaShop)
 - [Advanced guides](/build/advanced-guides) (error handling, testing, CI/CD, webhook reliability)
-- [CLI quickstart](/start/cli-quickstart)
+- [CLI quickstart](/start/cli-quickstart) · [SDK quickstart](/start/sdk-quickstart)

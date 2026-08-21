@@ -22,7 +22,12 @@ import { DocsScreenshot } from '@/components/docs/docs-screenshot';
 import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 import { InlineCommand } from '@/components/docs/inline-command';
 import { Callout } from '@/components/docs/docs-callout';
+import { McpOauthConnect } from '@/components/docs/mcp-oauth-connect';
 import { DocsDownloadButton } from '@/components/docs/docs-download-button';
+import {
+  IntegrationSurface,
+  IntegrationSurfaceGroup,
+} from '@/components/docs/integration-surface-group';
 
 function lucideIconsAsMdx(): MDXComponents {
   const components: MDXComponents = {};
@@ -40,6 +45,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ...defaultMdxComponents,
     Callout,
     DocsDownloadButton,
+    McpOauthConnect,
     ...TabsComponents,
     ...FilesComponents,
     Accordion,
@@ -58,6 +64,8 @@ export function getMDXComponents(components?: MDXComponents) {
     DocsScreenshot,
     DocsAgentIndex,
     InlineCommand,
+    IntegrationSurfaceGroup,
+    IntegrationSurface,
     ...components,
   } satisfies MDXComponents;
 }

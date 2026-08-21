@@ -94,6 +94,24 @@
   --docs-space-heading-top: 1.25rem;
   --docs-space-heading-bottom: 0.375rem;
   --docs-space-section: 1rem;
+  --docs-sidebar-radius: 9px;
+  --docs-sidebar-well: color-mix(
+    in oklab,
+    var(--foreground) 4.5%,
+    var(--sidebar)
+  );
+  --docs-sidebar-hairline: color-mix(
+    in oklab,
+    var(--foreground) 12%,
+    transparent
+  );
+  --docs-sidebar-hairline-soft: color-mix(
+    in oklab,
+    var(--foreground) 6%,
+    transparent
+  );
+  --docs-sidebar-float:
+    0 4px 16px rgba(28, 25, 23, 0.08), 0 0 0 1px var(--docs-sidebar-hairline);
 }
 
 .dark {
@@ -157,6 +175,23 @@
   --shadow-xl:
     0px 2px 0px 0px hsl(0 0% 20% / 0.15), 0px 8px 10px -1px hsl(0 0% 20% / 0.15);
   --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 20% / 0.38);
+  --docs-sidebar-well: color-mix(
+    in oklab,
+    var(--foreground) 8%,
+    var(--sidebar)
+  );
+  --docs-sidebar-hairline: color-mix(
+    in oklab,
+    var(--foreground) 14%,
+    transparent
+  );
+  --docs-sidebar-hairline-soft: color-mix(
+    in oklab,
+    var(--foreground) 10%,
+    transparent
+  );
+  --docs-sidebar-float:
+    0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--docs-sidebar-hairline);
 }
 
 @layer base {
@@ -444,18 +479,170 @@ button:active:focus {
   @apply hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
 }
 
-/* Docs sidebar spacing tweaks:
-   - tighten search <-> section selector gap
-   - tighten selector <-> section content gap */
-#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 {
-  gap: 0.4rem;
-  padding-bottom: 0;
+/* Docs sidebar: floating 9px card, compact well-active items (Beecargo chrome). */
+#nd-sidebar,
+#nd-sidebar-mobile {
+  --radius: var(--docs-sidebar-radius);
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+}
+
+#nd-sidebar:not([data-collapsed='true']) {
+  inset: 0.5rem;
+  width: auto;
+  border-inline-end-width: 0;
+  border-radius: var(--docs-sidebar-radius);
+  box-shadow: var(--docs-sidebar-float);
+}
+
+#nd-sidebar:not([data-collapsed='true']) > * {
+  width: 100% !important;
+}
+
+#nd-sidebar[data-collapsed='true'] {
+  border-radius: var(--docs-sidebar-radius);
+}
+
+#nd-sidebar[data-collapsed='true'][data-hovered='true'] {
+  box-shadow: var(--docs-sidebar-float);
+}
+
+#nd-sidebar-mobile {
+  border-start-start-radius: var(--docs-sidebar-radius);
+  border-end-start-radius: var(--docs-sidebar-radius);
+  box-shadow: var(--docs-sidebar-float);
+}
+
+#nd-sidebar .p-4,
+#nd-sidebar-mobile .p-4 {
+  padding-inline: 0.5rem;
+}
+
+#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2,
+#nd-sidebar-mobile > div.flex.flex-col.gap-3.p-4.pb-2 {
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+#nd-sidebar [data-search-full],
+#nd-sidebar-mobile [data-search-full] {
+  width: 100%;
+  gap: 0.5rem;
+  border-color: transparent;
+  background: var(--docs-sidebar-well);
+  padding: 0.5rem 0.625rem;
+  font-size: 12.5px;
+  box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline-soft);
+}
+
+#nd-sidebar [data-search-full]:hover,
+#nd-sidebar-mobile [data-search-full]:hover {
+  background: var(--docs-sidebar-well);
+  color: var(--foreground);
+}
+
+#nd-sidebar [data-search-full] kbd,
+#nd-sidebar-mobile [data-search-full] kbd {
+  border-color: var(--docs-sidebar-hairline);
+  background: color-mix(in oklab, var(--foreground) 5%, transparent);
+  padding-inline: 0.375rem;
+  padding-block: 0.125rem;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 > button:not([data-search-full]),
+#nd-sidebar-mobile
+  > div.flex.flex-col.gap-3.p-4.pb-2
+  > button:not([data-search-full]) {
+  gap: 0.5rem;
+  border-color: transparent;
+  background: var(--docs-sidebar-well);
+  padding: 0.375rem 0.5rem;
+  box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline-soft);
+}
+
+#nd-sidebar
+  > div.flex.flex-col.gap-3.p-4.pb-2
+  > button:not([data-search-full]):hover,
+#nd-sidebar-mobile
+  > div.flex.flex-col.gap-3.p-4.pb-2
+  > button:not([data-search-full]):hover,
+#nd-sidebar
+  > div.flex.flex-col.gap-3.p-4.pb-2
+  > button:not([data-search-full])[data-state='open'],
+#nd-sidebar-mobile
+  > div.flex.flex-col.gap-3.p-4.pb-2
+  > button:not([data-search-full])[data-state='open'] {
+  background: var(--docs-sidebar-well);
+  color: var(--foreground);
+}
+
+#nd-sidebar a.relative.flex,
+#nd-sidebar button.relative.flex,
+#nd-sidebar-mobile a.relative.flex,
+#nd-sidebar-mobile button.relative.flex {
+  gap: 0.5rem;
+  padding-block: 0.375rem;
+  padding-inline: 0.625rem;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+#nd-sidebar .flex.flex-col.gap-0\.5 a.relative.flex,
+#nd-sidebar-mobile .flex.flex-col.gap-0\.5 a.relative.flex {
+  padding-block: 0.375rem;
+  padding-inline: 0.5rem;
+  font-size: 12.5px;
+}
+
+#nd-sidebar a.relative.flex:hover,
+#nd-sidebar button.relative.flex:hover,
+#nd-sidebar-mobile a.relative.flex:hover,
+#nd-sidebar-mobile button.relative.flex:hover {
+  background: var(--docs-sidebar-well);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline);
+}
+
+#nd-sidebar a[data-active='true'],
+#nd-sidebar-mobile a[data-active='true'] {
+  background: var(--docs-sidebar-well) !important;
+  color: var(--foreground) !important;
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline);
+}
+
+#nd-sidebar a[data-active='true']::before,
+#nd-sidebar-mobile a[data-active='true']::before {
+  display: none;
+}
+
+#nd-sidebar p.inline-flex.items-center,
+#nd-sidebar-mobile p.inline-flex.items-center {
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  padding-inline: 0.625rem;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }
 
 /* Section dropdown: smaller item descriptions (fumadocs default is 0.8125rem) */
 .flex.flex-col.gap-1.fd-scroll-container > a .text-fd-muted-foreground {
   font-size: 0.6875rem;
   line-height: 1.4;
+}
+
+.flex.flex-col.gap-1.fd-scroll-container > a {
+  border-radius: var(--docs-sidebar-radius);
+}
+
+.flex.flex-col.gap-1.fd-scroll-container > a:hover {
+  background: var(--docs-sidebar-well);
 }
 
 /* Sidebar-specific radius overrides (fumadocs uses fixed rounded-* classes) */
@@ -787,6 +974,199 @@ button:active:focus {
 .docs-aside--idea {
   border-left: 2px solid
     color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
+}
+
+/* Task-first REST / SDK / CLI / MCP cards */
+.docs-surface-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: var(--docs-space-block) 0;
+  scroll-margin-top: 5rem;
+}
+
+.prose .docs-surface-group {
+  margin: var(--docs-space-block) 0;
+}
+
+.docs-surface-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in oklch, var(--color-fd-border) 85%, transparent);
+  background: color-mix(in oklch, var(--color-fd-muted) 22%, transparent);
+  scroll-margin-top: 5rem;
+}
+
+.docs-surface-card[open] {
+  background: color-mix(in oklch, var(--color-fd-muted) 36%, transparent);
+}
+
+.docs-surface-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.75rem 1rem;
+}
+
+.docs-surface-summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-surface-summary:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-lg);
+}
+
+.docs-surface-summary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.docs-surface-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  margin-top: 0.125rem;
+  border-radius: 999px;
+  border: 1px solid;
+  padding: 0.125rem 0.5rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.docs-surface-pill--api {
+  color: color-mix(
+    in oklch,
+    var(--color-fd-info) 72%,
+    var(--color-fd-foreground)
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--color-fd-info) 32%,
+    var(--color-fd-border)
+  );
+  background: color-mix(in oklch, var(--color-fd-info) 10%, transparent);
+}
+
+.docs-surface-pill--sdk {
+  color: color-mix(
+    in oklch,
+    var(--color-fd-primary) 55%,
+    var(--color-fd-foreground)
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--color-fd-primary) 28%,
+    var(--color-fd-border)
+  );
+  background: color-mix(in oklch, var(--color-fd-primary) 8%, transparent);
+}
+
+.docs-surface-pill--cli {
+  color: color-mix(
+    in oklch,
+    var(--color-fd-success) 70%,
+    var(--color-fd-foreground)
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--color-fd-success) 32%,
+    var(--color-fd-border)
+  );
+  background: color-mix(in oklch, var(--color-fd-success) 10%, transparent);
+}
+
+.docs-surface-pill--mcp {
+  color: color-mix(
+    in oklch,
+    var(--color-fd-warning) 68%,
+    var(--color-fd-foreground)
+  );
+  border-color: color-mix(
+    in oklch,
+    var(--color-fd-warning) 32%,
+    var(--color-fd-border)
+  );
+  background: color-mix(in oklch, var(--color-fd-warning) 10%, transparent);
+}
+
+.docs-surface-summary-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.docs-surface-title {
+  display: block;
+  font-weight: 600;
+  color: var(--color-fd-foreground);
+  font-size: var(--docs-text-size);
+  line-height: 1.4;
+}
+
+.docs-surface-identifier {
+  display: block;
+  margin-top: 0.125rem;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-surface-toggle {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--color-fd-muted-foreground);
+  transition: transform 0.16s ease;
+}
+
+.docs-surface-card[open] .docs-surface-toggle {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-surface-toggle {
+    transition: none;
+  }
+}
+
+.docs-surface-body {
+  border-top: 1px solid
+    color-mix(in oklch, var(--color-fd-border) 80%, transparent);
+  padding: 0.75rem 1rem 1rem;
+}
+
+.docs-surface-body > :first-child {
+  margin-top: 0;
+}
+
+.docs-surface-body > :last-child {
+  margin-bottom: 0;
+}
+
+.docs-surface-link-wrap {
+  margin: 0.75rem 0 0;
+}
+
+.docs-surface-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-fd-primary);
+  text-decoration: underline;
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--color-fd-primary) 35%,
+    transparent
+  );
+  text-underline-offset: 2px;
+}
+
+.docs-surface-link:hover {
+  text-decoration-color: var(--color-fd-primary);
 }
 
 /* Agent / llms.txt index — discreet meta line, not a card */
@@ -1246,10 +1626,12 @@ article .mt-auto {
 }
 
 /* Docs sidebar: bottom bar (border + theme slot) is only as wide as its contents and stays end-aligned, not full sidebar width. */
-#nd-sidebar div:has(> [data-sidebar-locale-theme]) {
+#nd-sidebar div:has(> [data-sidebar-locale-theme]),
+#nd-sidebar-mobile div:has(> [data-sidebar-locale-theme]) {
   width: fit-content;
   max-width: 100%;
   align-self: flex-start;
+  border-radius: var(--docs-sidebar-radius);
 }
 
 /* Docs: consistent spacing for card grids inside prose */

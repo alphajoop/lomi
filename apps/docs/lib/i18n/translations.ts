@@ -51,6 +51,13 @@ const STRINGS: TranslationsByLanguage = {
       'Building payments for West Africa? Book a short call with the team.',
     'components.business_outreach.reach_out': 'Schedule a call',
     'components.business_outreach.dismiss': 'Dismiss',
+    'mcpConnect.addCursor': 'Add to Cursor',
+    'mcpConnect.addClaude': 'Add to Claude',
+    'mcpConnect.addOpenCode': 'Add to OpenCode',
+    'mcpConnect.addCodex': 'Add to Codex',
+    'mcpConnect.commandCopied': 'Command copied',
+    'mcpConnect.urlCopied': 'MCP URL copied',
+    'mcpConnect.copyFailed': 'Could not copy. Use the CLI commands below.',
   },
   fr: {
     'search.all': 'Tout',
@@ -98,6 +105,14 @@ const STRINGS: TranslationsByLanguage = {
       'Vous construisez des paiements en Afrique de l’Ouest ? Prenez un court rendez-vous avec l’équipe.',
     'components.business_outreach.reach_out': 'Planifier un appel',
     'components.business_outreach.dismiss': 'Fermer',
+    'mcpConnect.addCursor': 'Ajouter à Cursor',
+    'mcpConnect.addClaude': 'Ajouter à Claude',
+    'mcpConnect.addOpenCode': 'Ajouter à OpenCode',
+    'mcpConnect.addCodex': 'Ajouter à Codex',
+    'mcpConnect.commandCopied': 'Commande copiée',
+    'mcpConnect.urlCopied': 'URL MCP copiée',
+    'mcpConnect.copyFailed':
+      'Impossible de copier. Utilisez les commandes CLI ci-dessous.',
   },
 };
 

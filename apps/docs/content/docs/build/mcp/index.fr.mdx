@@ -4,6 +4,7 @@ description: Connectez Cursor, Claude Desktop ou tout client MCP à l’API marc
 ---
 
 import { Callout } from '@/components/docs/docs-callout';
+import { McpOauthConnect } from '@/components/docs/mcp-oauth-connect';
 
 # MCP pour clients IA
 
@@ -15,31 +16,11 @@ Le **Model Context Protocol (MCP)** permet à vos assistants IA (Cursor, Claude 
   Ce n’est **pas** pour les outils admin internes de lomi. ni pour exploiter votre propre stack paiement. La plupart des équipes utilisent le serveur hébergé `https://mcp.lomi.africa` ou le stdio local avec `npx @lomi./mcp`.
 </Callout>
 
-<Callout type="info" title="Le plus rapide">
-  Dans le [tableau de bord](https://dashboard.lomi.africa) : **Paramètres → Intégrations → MCP** pour une introduction rapide, puis **Développeurs → Clés API → Connecter MCP** pour les extraits et la gestion des tokens.
+## Connexion OAuth
 
-  **Recommandé pour Cursor / Claude / VS Code :** ajoutez l’URL MCP hébergée **sans clé API** — les clients compatibles OAuth ouvrent **Connect with lomi.** dans le navigateur automatiquement.
-</Callout>
+Recommandé : ajoutez l’URL MCP hébergée **sans clé API**. Les clients compatibles OAuth ouvrent **Connect with lomi.** dans le navigateur, vous vous connectez au tableau de bord, et le client stocke un jeton limité (`lomi_oat_*`).
 
-## Connexion OAuth (recommandé — sans clé API)
-
-Les clients MCP compatibles OAuth (Cursor, Claude Desktop, VS Code, etc.) peuvent se connecter sans coller de clé secrète. C’est le moyen le plus simple de configurer ou déboguer l’intégration MCP dans votre IDE.
-
-1. Ajoutez le serveur MCP hébergé **sans** en-têtes :
-
-```json
-{
-  "mcpServers": {
-    "lomi": {
-      "url": "https://mcp.lomi.africa/mcp"
-    }
-  }
-}
-```
-
-2. Redémarrez votre client MCP. À la première connexion, il reçoit un `401` avec une invite de découverte OAuth, récupère `https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp`, puis ouvre **Connect with lomi.** dans le navigateur.
-3. Connectez-vous au tableau de bord, choisissez votre organisation et approuvez l’accès (lecture seule par défaut).
-4. Le client reçoit un jeton limité (`lomi_oat_*`) et peut appeler les outils MCP.
+<McpOauthConnect />
 
 Révoquez une application depuis **Développeurs → Clés API → Connecter MCP → Applications connectées**.
 
@@ -47,9 +28,33 @@ Révoquez une application depuis **Développeurs → Clés API → Connecter MCP
   Les connexions OAuth marchandes nécessitent `LOMI_MERCHANT_OAUTH_ENABLED=true` sur l’API et `VITE_LOMI_MERCHANT_OAUTH_ENABLED=true` dans le dashboard.
 </Callout>
 
+## Pour commencer
+
+1. Cliquez sur **Ajouter à Cursor**, **Ajouter à Claude**, **Ajouter à OpenCode** ou **Ajouter à Codex** ci-dessus (ou collez le JSON URL seule ci-dessous).
+2. À la première connexion, le client reçoit un `401`, récupère `https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp`, puis ouvre **Connect with lomi.**
+3. Connectez-vous au tableau de bord, choisissez votre organisation et approuvez l’accès (lecture seule par défaut).
+4. Le client peut appeler les outils MCP tout de suite.
+
 Modèles supplémentaires dans le dépôt : [`apps/mcp/examples/`](https://github.com/lomiafrica/lomi./tree/master/apps/mcp/examples) (`cursor-http-oauth.mcp.json`, `claude-desktop-http-oauth.mcp.json`, plus les variantes avec clé API).
 
-## Connexion avec une clé API (alternative)
+Vous pouvez aussi commencer depuis le [tableau de bord](https://dashboard.lomi.africa) : **Paramètres → Intégrations → MCP**, puis **Développeurs → Clés API → Connecter MCP**.
+
+## Authentification
+
+### OAuth (recommandé)
+
+Les clients MCP compatibles OAuth (Cursor, Claude Desktop, VS Code, OpenCode, Codex, etc.) se connectent sans coller de clé secrète.
+
+1. Découverte : `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp` (également renvoyé dans l’en-tête `WWW-Authenticate` lors d’une connexion sans identifiants).
+2. Enregistrement (DCR optionnel) : `POST https://api.lomi.africa/oauth/register`.
+3. Autorisation : `GET https://api.lomi.africa/oauth/authorize` (PKCE + paramètre `resource`).
+4. Connexion sur `https://dashboard.lomi.africa/connect/agent-connect` et approbation.
+5. Échange : `POST https://api.lomi.africa/oauth/token`.
+6. Connexion MCP avec `Authorization: Bearer <access_token>` (`lomi_oat_*`).
+
+Le serveur MCP introspecte le jeton et limite chaque appel d’outil à votre organisation.
+
+### Clé API (`LOMI_SECRET_KEY`)
 
 | Valeur | En-tête / variable d’env | Où l’obtenir |
 | --- | --- | --- |
@@ -61,9 +66,7 @@ Votre **`LOMI_SECRET_KEY`** ouvre l’accès au point de terminaison MCP héberg
   Un secret de transport partagé (`Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>`) reste accepté pour les anciens déploiements des opérateurs, mais les marchands n’en ont pas besoin. Envoyez votre clé API dans `x-lomi-api-key` et laissez `Authorization` de côté.
 </Callout>
 
-## Connexion HTTP (Cursor, Claude Desktop)
-
-Serveur MCP hébergé par lomi. :
+## MCP hébergé (HTTP)
 
 | | URL |
 | --- | --- |
@@ -71,7 +74,19 @@ Serveur MCP hébergé par lomi. :
 | Santé (optionnel) | `https://mcp.lomi.africa/health` |
 | Prêt (optionnel) | `https://mcp.lomi.africa/ready` |
 
-Exemple de config **Cursor** / **Claude Desktop** :
+Config URL seule (OAuth) :
+
+```json
+{
+  "mcpServers": {
+    "lomi": {
+      "url": "https://mcp.lomi.africa/mcp"
+    }
+  }
+}
+```
+
+Config avec clé API (repli) :
 
 ```json
 {
@@ -87,6 +102,29 @@ Exemple de config **Cursor** / **Claude Desktop** :
 ```
 
 Remplacez `YOUR_LOMI_SECRET_KEY` par votre vraie clé API, puis redémarrez votre client MCP.
+
+## OpenCode
+
+```bash
+opencode mcp add lomi --url https://mcp.lomi.africa/mcp
+opencode mcp auth lomi
+```
+
+## Codex
+
+```bash
+codex mcp add lomi --url https://mcp.lomi.africa/mcp
+codex mcp login lomi
+```
+
+## Découverte
+
+- MCP hébergé : `https://mcp.lomi.africa/mcp`
+- Carte serveur : `https://mcp.lomi.africa/server-card`
+- Page de connexion : [lomi.africa/connect](https://lomi.africa/connect)
+- La config Smithery est dans le dépôt (`apps/mcp/smithery.yaml`). Recherche : [smithery.ai/search?q=lomi.africa](https://smithery.ai/search?q=lomi.africa)
+- ChatGPT : ajoutez la même URL MCP en mode développeur. Page de l'app : [lomi.africa/chatgpt](https://lomi.africa/chatgpt)
+- Briefing agent : [lomi.africa/llms.txt](https://lomi.africa/llms.txt)
 
 ## Connexion stdio (local)
 
@@ -158,29 +196,18 @@ Exemple HTTP pour un nouveau marchand (provisioning seul tant que vous n’avez 
 
 Après l’onboarding, ajoutez `x-lomi-api-key` (ou passez `LOMI_SECRET_KEY` en env) pour les outils paiement et catalogue. Le mode **TEST** est disponible tout de suite ; le **LIVE** exige la validation KYC (IA pour les comptes starter, revue admin pour les entreprises enregistrées).
 
-### Connexion OAuth (self-service)
-
-Les clients MCP compatibles [l’autorisation MCP](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization) peuvent se connecter sans coller de clé de provisioning :
-
-1. Découverte : `GET https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp` (également renvoyé dans l’en-tête `WWW-Authenticate` lors d’une connexion sans identifiants)
-2. Enregistrement (DCR optionnel) : `POST https://api.lomi.africa/oauth/register`
-3. Autorisation : `GET https://api.lomi.africa/oauth/authorize` (PKCE + paramètre `resource`)
-4. Connexion sur `https://dashboard.lomi.africa/connect/agent-connect` et approbation
-5. Échange : `POST https://api.lomi.africa/oauth/token`
-6. Connexion MCP avec `Authorization: Bearer <access_token>` (`lomi_oat_*`)
-
-Le serveur MCP introspecte le jeton et attache un `lomi_prov_*` limité à la session. Comptes self-service plafonnés (e-mail vérifié, test uniquement).
+L’onboarding OAuth self-service utilise le même flux **Connect with lomi.** Le serveur MCP introspecte le jeton et attache un `lomi_prov_*` limité à la session. Comptes self-service plafonnés (e-mail vérifié, test uniquement).
 
 ### API Partenaire (intégrateurs plateforme)
 
 Les plateformes autorisées reçoivent une clé de gestion **`lomi_partner_*`** (admin lomi). Elles émettent des clés **`lomi_prov_*`** par utilisateur via MCP **`lomi_partners`** (`action=mint_key`, `list_keys`, `revoke_key`, `usage`) ou `/partners/provisioning-keys` avec l’en-tête `x-lomi-partner-key`. Suivi dans **admin.lomi.africa → Provisioning**.
 
-## Annuaires et ChatGPT
-
-- MCP hébergé : `https://mcp.lomi.africa/mcp`
-- Carte serveur : `https://mcp.lomi.africa/server-card`
-- La config Smithery est dans le dépôt (`apps/mcp/smithery.yaml`). Recherche : [smithery.ai/search?q=lomi.africa](https://smithery.ai/search?q=lomi.africa)
-- ChatGPT : ajoutez la même URL MCP en mode développeur. Page de l'app : [lomi.africa/chatgpt](https://lomi.africa/chatgpt)
+| Endpoint | Rôle |
+| --- | --- |
+| `POST /partners/provisioning-keys` | Émettre une clé de provisioning pour un `external_user_ref` |
+| `GET /partners/provisioning-keys` | Lister les clés |
+| `DELETE /partners/provisioning-keys/{id}` | Révoquer une clé |
+| `GET /partners/usage` | Résumé d’usage |
 
 ## Déployer votre propre serveur MCP
 
