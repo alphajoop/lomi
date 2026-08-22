@@ -16,7 +16,7 @@ import type { Language } from '@/lib/i18n/config';
 // import { cn } from '@/lib/cn';
 // import { buttonVariants } from '@lomi./ui/button';
 import 'katex/dist/katex.min.css';
-import { TryItOpenApiPanel } from '@/components/docs/try-it-openapi-panel';
+import { DocsOnboardingChecklist } from '@/components/docs/docs-onboarding-checklist';
 
 function getFirstPageUrl(node: Folder): string | undefined {
   if (node.index?.url) return node.index.url;
@@ -205,9 +205,10 @@ export default async function Layout({ children }: { children: ReactNode }) {
         //   </AISearchTrigger>
         // ),
       }}
-      sidebar={{}}
+      sidebar={{
+        banner: <DocsOnboardingChecklist />,
+      }}
     >
-      <TryItOpenApiPanel />
       {children}
     </DocsLayout>
   );

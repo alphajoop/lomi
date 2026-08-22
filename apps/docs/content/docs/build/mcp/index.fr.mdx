@@ -5,6 +5,7 @@ description: Connectez Cursor, Claude Desktop ou tout client MCP à l’API marc
 
 import { Callout } from '@/components/docs/docs-callout';
 import { McpOauthConnect } from '@/components/docs/mcp-oauth-connect';
+import { McpOperationIndex } from '@/components/docs/mcp-operation-index';
 
 # MCP pour clients IA
 
@@ -169,6 +170,12 @@ En HTTP MCP, les appels utilisent l’environnement API associé à votre `LOMI_
 - Provisioning : `lomi_provision` et `lomi_partners` (même schéma `action`).
 - **Ressources**: `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
 - **Prompts**: `provision_merchant_from_zero` (onboarding 0→1), `onboard_merchant` (intégration après inscription), `debug_failed_payment`, `setup_webhook`.
+
+## API REST ↔ MCP
+
+Chaque action MCP ci-dessous correspond à une opération REST. Les charges directes et `POST /usage/events` ne sont pas exposées en MCP.
+
+<McpOperationIndex />
 
 ## Onboarding piloté par agent (0 à 1)
 

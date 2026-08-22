@@ -7,6 +7,9 @@ import { usePathname } from 'next/navigation';
 import { Checkbox } from '@lomi./ui/checkbox';
 import { Label } from '@lomi./ui/label';
 import { cn } from '@lomi./ui/cn';
+import { canAttachTestKey, isDocsApiOperationPath } from '@/lib/tryit/gating';
+import { t as translate } from '@/lib/i18n/translations';
+import { useTranslation } from '@/lib/utils/translation-context';
 
 type TryItContext = {
   signedIn: boolean;
@@ -16,10 +19,17 @@ type TryItContext = {
   needsOrganizationChoice: boolean;
 };
 
-export function TryItOpenApiPanel() {
+type TryItOpenApiPanelProps = {
+  enabled?: boolean;
+};
+
+export function TryItOpenApiPanel({ enabled }: TryItOpenApiPanelProps) {
   const pathname = usePathname();
+  const { currentLanguage } = useTranslation();
+  const t = (key: string) => translate(key, currentLanguage);
   const [ctx, setCtx] = useState<TryItContext | null>(null);
   const [pending, setPending] = useState(false);
+  const visible = enabled ?? isDocsApiOperationPath(pathname ?? '');
 
   const load = useCallback(async () => {
     const r = await fetch('/api/tryit-context', { credentials: 'include' });
@@ -29,10 +39,11 @@ export function TryItOpenApiPanel() {
   }, []);
 
   useEffect(() => {
+    if (!visible) return;
     void load();
-  }, [load]);
+  }, [load, visible]);
 
-  if (!pathname?.includes('/openapi/')) {
+  if (!visible) {
     return null;
   }
 
@@ -43,7 +54,7 @@ export function TryItOpenApiPanel() {
           'mb-4 rounded-md border border-fd-border bg-fd-card px-3 py-2 text-sm text-fd-muted-foreground',
         )}
       >
-        Loading Try-it preferences…
+        {t('tryit.loading')}
       </div>
     );
   }
@@ -51,7 +62,7 @@ export function TryItOpenApiPanel() {
   if (!ctx.signedIn) {
     const dashboard =
       process.env.NEXT_PUBLIC_DASHBOARD_URL ?? 'https://dashboard.lomi.africa';
-    const next = pathname || '/docs/api';
+    const next = pathname || '/api';
     return (
       <div
         className={cn(
@@ -62,9 +73,9 @@ export function TryItOpenApiPanel() {
           className="underline underline-offset-2"
           href={`${dashboard.replace(/\/$/, '')}/docs-handoff?next=${encodeURIComponent(next)}`}
         >
-          Connect from the dashboard
+          {t('tryit.connect')}
         </a>{' '}
-        to try the API with a least-privilege docs session.
+        {t('tryit.connectHint')}
       </div>
     );
   }
@@ -72,8 +83,11 @@ export function TryItOpenApiPanel() {
   const hasTestKeys = ctx.organizations.length > 0;
   const injectSwitchDisabled =
     pending ||
-    !hasTestKeys ||
-    (ctx.organizations.length > 1 && !ctx.selectedOrganizationId);
+    !canAttachTestKey({
+      signedIn: ctx.signedIn,
+      organizations: ctx.organizations,
+      selectedOrganizationId: ctx.selectedOrganizationId,
+    });
 
   const savePrefs = async (
     useTestKey: boolean,
@@ -117,8 +131,7 @@ export function TryItOpenApiPanel() {
     >
       {!hasTestKeys && (
         <p className="mt-2 text-amber-700 dark:text-amber-400">
-          No active test secret key found for your account. Create one in the
-          dashboard Developers section, then refresh this page.
+          {t('tryit.noTestKey')}
         </p>
       )}
 
@@ -126,7 +139,7 @@ export function TryItOpenApiPanel() {
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {ctx.organizations.length > 1 && (
             <div className="flex flex-col gap-1.5 sm:min-w-[220px]">
-              <Label htmlFor="tryit-org">Organization</Label>
+              <Label htmlFor="tryit-org">{t('tryit.organization')}</Label>
               <select
                 id="tryit-org"
                 className={cn(
@@ -138,8 +151,8 @@ export function TryItOpenApiPanel() {
               >
                 <option value="">
                   {ctx.needsOrganizationChoice
-                    ? 'Select organization…'
-                    : 'Choose…'}
+                    ? t('tryit.selectOrganization')
+                    : t('tryit.chooseOrganization')}
                 </option>
                 {ctx.organizations.map((o) => (
                   <option key={o.id} value={o.id}>
@@ -160,7 +173,7 @@ export function TryItOpenApiPanel() {
               disabled={injectSwitchDisabled}
             />
             <Label htmlFor="tryit-inject" className="cursor-pointer">
-              Attach my test secret key automatically
+              {t('tryit.attachKey')}
             </Label>
           </div>
         </div>
@@ -170,10 +183,7 @@ export function TryItOpenApiPanel() {
         !injectSwitchDisabled &&
         ctx.selectedOrganizationId && (
           <p className="mt-2 text-xs text-fd-muted-foreground">
-            When the playground does not send{' '}
-            <code className="rounded bg-fd-muted px-1">X-API-Key</code>, the
-            proxy adds your test secret for this organization. You can still
-            override by entering a key manually.
+            {t('tryit.proxyHint')}
           </p>
         )}
     </div>

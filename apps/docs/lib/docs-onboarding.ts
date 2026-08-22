@@ -79,3 +79,22 @@ export function writeOnboardingProgress(state: DocsOnboardingProgress): void {
     JSON.stringify({ firstPayment: true }),
   );
 }
+
+export function remainingOnboardingSteps(input: {
+  signedIn: boolean;
+  organizationCount: number;
+  firstPayment: boolean;
+}): number {
+  const accountDone = input.signedIn;
+  const keysDone = input.signedIn && input.organizationCount > 0;
+  const paymentDone = input.signedIn && input.firstPayment;
+  return [accountDone, keysDone, paymentDone].filter((done) => !done).length;
+}
+
+export function shouldShowOnboardingChecklist(input: {
+  ready: boolean;
+  dismissed: boolean;
+  remainingSteps: number;
+}): boolean {
+  return input.ready && !input.dismissed && input.remainingSteps > 0;
+}

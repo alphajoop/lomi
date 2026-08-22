@@ -6,6 +6,14 @@ import path from 'node:path';
 import { glob } from 'tinyglobby';
 import { isPublicRestApiOperation } from '@/lib/scripts/manual-api/constants';
 import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operation-mdx';
+import {
+  flattenMcpTwins,
+  loadMcpToolPolicyFile,
+  mcpTwinAnchor,
+  mcpTwinHref,
+  parseMcpToolPolicy,
+  restDocsHrefFromMdxFile,
+} from '@/lib/mcp-twins';
 
 const DOCS_ROOT = process.cwd();
 const CONTENT_ROOT = path.join(DOCS_ROOT, 'content/docs');
@@ -82,20 +90,7 @@ async function checkOpenApiParity(errors: string[]): Promise<void> {
     operations.map((o) => `${o.method.toUpperCase()} ${o.path}`),
   );
 
-  const docFiles = (
-    await glob('content/docs/api/*/*.mdx', { cwd: DOCS_ROOT })
-  ).filter((file) => !/\/index(?:\.fr)?\.mdx$/.test(file));
-
-  const documented = new Set<string>();
-
-  for (const file of docFiles) {
-    const content = await fs.readFile(path.join(DOCS_ROOT, file), 'utf-8');
-    const methodMatch = /^method:\s*(\S+)/m.exec(content);
-    const pathMatch = /^path:\s*(.+)$/m.exec(content);
-    if (!methodMatch || !pathMatch) continue;
-    const routePath = pathMatch[1].trim().replace(/^['"]|['"]$/g, '');
-    documented.add(`${methodMatch[1].toUpperCase()} ${routePath}`);
-  }
+  const documented = await collectDocumentedRestOperations();
 
   for (const op of expected) {
     if (!documented.has(op)) {
@@ -103,7 +98,7 @@ async function checkOpenApiParity(errors: string[]): Promise<void> {
     }
   }
 
-  for (const op of documented) {
+  for (const op of documented.keys()) {
     if (!expected.has(op)) {
       errors.push(
         `MDX documents unknown or non-public OpenAPI operation: ${op}`,
@@ -224,6 +219,88 @@ async function checkMcpManifestParity(errors: string[]): Promise<void> {
   }
 }
 
+async function collectDocumentedRestOperations(): Promise<Map<string, string>> {
+  const docFiles = (
+    await glob('content/docs/api/*/*.mdx', { cwd: DOCS_ROOT })
+  ).filter((file) => !file.endsWith('.fr.mdx') && !/\/index\.mdx$/.test(file));
+
+  const documented = new Map<string, string>();
+
+  for (const file of docFiles) {
+    const content = await fs.readFile(path.join(DOCS_ROOT, file), 'utf-8');
+    const methodMatch = /^method:\s*(\S+)/m.exec(content);
+    const pathMatch = /^path:\s*(.+)$/m.exec(content);
+    if (!methodMatch || !pathMatch) continue;
+    const routePath = pathMatch[1].trim().replace(/^['"]|['"]$/g, '');
+    const key = `${methodMatch[1].toUpperCase()} ${routePath}`;
+    const href = restDocsHrefFromMdxFile(file);
+    if (href && !documented.has(key)) {
+      documented.set(key, href);
+    }
+  }
+
+  return documented;
+}
+
+async function checkMcpTwinDrift(errors: string[]): Promise<void> {
+  const policy = parseMcpToolPolicy(
+    loadMcpToolPolicyFile(
+      path.resolve(DOCS_ROOT, '..', 'mcp', 'config/mcp-tool-policy.json'),
+    ),
+  );
+  const documented = await collectDocumentedRestOperations();
+  const excluded = new Set(policy.excludedOperationKeys);
+  const twins = flattenMcpTwins(policy.groups);
+
+  for (const [operationKey, twin] of twins) {
+    const expectedAnchor = mcpTwinAnchor(twin.tool, twin.action);
+    const expectedHref = mcpTwinHref(twin.tool, twin.action);
+    if (expectedAnchor !== `${twin.tool}-${twin.action}`) {
+      errors.push(`Unstable MCP twin anchor for ${operationKey}`);
+    }
+    if (expectedHref !== `/build/mcp#${expectedAnchor}`) {
+      errors.push(
+        `Unstable MCP twin href for ${operationKey}: ${expectedHref}`,
+      );
+    }
+
+    if (twin.authMode !== 'merchant') continue;
+    if (excluded.has(operationKey)) {
+      errors.push(
+        `MCP policy maps excluded operation ${operationKey} on ${twin.tool}.${twin.action}`,
+      );
+      continue;
+    }
+    const restHref = documented.get(operationKey);
+    if (!restHref) {
+      errors.push(
+        `MCP twin missing REST MDX: ${twin.tool} action=${twin.action} -> ${operationKey}`,
+      );
+    }
+  }
+
+  for (const operationKey of excluded) {
+    if (twins.has(operationKey)) {
+      errors.push(`MCP excluded operation still has a twin: ${operationKey}`);
+    }
+  }
+
+  const mcpIndexEn = await fs.readFile(
+    path.join(CONTENT_ROOT, 'build/mcp/index.mdx'),
+    'utf-8',
+  );
+  const mcpIndexFr = await fs.readFile(
+    path.join(CONTENT_ROOT, 'build/mcp/index.fr.mdx'),
+    'utf-8',
+  );
+  if (!mcpIndexEn.includes('<McpOperationIndex')) {
+    errors.push('English MCP guide is missing <McpOperationIndex />');
+  }
+  if (!mcpIndexFr.includes('<McpOperationIndex')) {
+    errors.push('French MCP guide is missing <McpOperationIndex />');
+  }
+}
+
 async function checkLlmsTxtRoute(errors: string[]): Promise<void> {
   const routePath = path.join(DOCS_ROOT, 'app/llms.txt/route.ts');
   const source = await fs.readFile(routePath, 'utf-8');
@@ -242,6 +319,7 @@ async function main(): Promise<void> {
   await checkOpenApiParity(errors);
   await checkAgentContracts(errors);
   await checkMcpManifestParity(errors);
+  await checkMcpTwinDrift(errors);
   await checkAllFrenchSiblings(errors);
   await checkInternalLinks(errors, validSlugs);
   await checkLlmsTxtRoute(errors);

@@ -18,6 +18,8 @@ import {
   isTestPaymentPath,
   readOnboardingDismissed,
   readOnboardingProgress,
+  remainingOnboardingSteps,
+  shouldShowOnboardingChecklist,
   writeOnboardingDismissed,
   writeOnboardingProgress,
 } from '@/lib/docs-onboarding';
@@ -137,11 +139,23 @@ export function DocsOnboardingChecklist() {
     },
   ];
 
-  const remaining = steps.filter((step) => !step.done).length;
-  if (remaining === 0) return null;
+  const remaining = remainingOnboardingSteps({
+    signedIn,
+    organizationCount: ctx?.organizations.length ?? 0,
+    firstPayment,
+  });
+  if (
+    !shouldShowOnboardingChecklist({
+      ready,
+      dismissed,
+      remainingSteps: remaining,
+    })
+  ) {
+    return null;
+  }
 
   return (
-    <div className="rounded-[14px] border border-fd-border bg-fd-card/60 p-3 text-[12px]">
+    <div className="docs-onboarding-checklist rounded-[14px] border border-fd-border bg-fd-card/60 p-3 text-[12px]">
       <div className="flex items-center justify-between gap-2">
         <p className="min-w-0 font-medium text-fd-foreground">
           {t('onboarding.title')}

@@ -1,0 +1,64 @@
+/* @proprietary license */
+
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { canAttachTestKey, isDocsApiOperationPath } from './gating';
+
+test('gates Try-it to hand-authored API operation pages', () => {
+  assert.equal(
+    isDocsApiOperationPath(
+      '/api/checkout-sessions/CheckoutSessionsController_create',
+    ),
+    true,
+  );
+  assert.equal(isDocsApiOperationPath('/api/checkout-sessions'), false);
+  assert.equal(isDocsApiOperationPath('/api'), false);
+  assert.equal(isDocsApiOperationPath('/openapi/checkout-sessions'), false);
+  assert.equal(isDocsApiOperationPath('/build/mcp'), false);
+});
+
+test('requires an explicit organization when more than one is available', () => {
+  assert.equal(
+    canAttachTestKey({
+      signedIn: true,
+      organizations: [{ id: 'org_a' }, { id: 'org_b' }],
+      selectedOrganizationId: null,
+    }),
+    false,
+  );
+  assert.equal(
+    canAttachTestKey({
+      signedIn: true,
+      organizations: [{ id: 'org_a' }, { id: 'org_b' }],
+      selectedOrganizationId: 'org_b',
+    }),
+    true,
+  );
+  assert.equal(
+    canAttachTestKey({
+      signedIn: true,
+      organizations: [{ id: 'org_a' }],
+      selectedOrganizationId: null,
+    }),
+    true,
+  );
+});
+
+test('rejects unsigned sessions and accounts without test keys', () => {
+  assert.equal(
+    canAttachTestKey({
+      signedIn: false,
+      organizations: [{ id: 'org_a' }],
+      selectedOrganizationId: 'org_a',
+    }),
+    false,
+  );
+  assert.equal(
+    canAttachTestKey({
+      signedIn: true,
+      organizations: [],
+      selectedOrganizationId: null,
+    }),
+    false,
+  );
+});

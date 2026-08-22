@@ -5,6 +5,7 @@ description: Connect Cursor, Claude Desktop, or other MCP clients to the lomi. m
 
 import { Callout } from '@/components/docs/docs-callout';
 import { McpOauthConnect } from '@/components/docs/mcp-oauth-connect';
+import { McpOperationIndex } from '@/components/docs/mcp-operation-index';
 
 # MCP for AI clients
 
@@ -169,6 +170,12 @@ For HTTP MCP, tool calls use whichever API environment your `LOMI_SECRET_KEY` be
 - Provisioning: `lomi_provision` and `lomi_partners` (same `action` pattern).
 - **Resources**: `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
 - **Prompts**: `provision_merchant_from_zero` (0-to-1 onboarding), `onboard_merchant` (post-signup integration), `debug_failed_payment`, `setup_webhook`.
+
+## REST API ↔ MCP
+
+Each MCP action below is the twin of one REST operation. Direct charges and `POST /usage/events` are not exposed over MCP.
+
+<McpOperationIndex />
 
 ## Agent-driven onboarding (0 to 1)
 

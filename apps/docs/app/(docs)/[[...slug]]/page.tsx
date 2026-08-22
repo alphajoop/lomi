@@ -14,7 +14,7 @@ import { Callout } from '@/components/docs/docs-callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
-import { source, type Page } from '@/lib/utils/source';
+import { source, type Page as DocsPageModel } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 import { buildDocsAlternates } from '@/lib/utils/docs-routing';
 import type { Language } from '@/lib/i18n/config';
@@ -36,6 +36,9 @@ import { FaqPageJsonLd } from '@/components/seo/faq-page-json-ld';
 import { BRAND_FAQ } from '@/lib/seo/brand-facts';
 import { DocsPage } from 'fumadocs-ui/page';
 import { asJsonValue, isString, type JsonValue } from '@lomi./shared';
+import { DocsTwinLink } from '@/components/docs/docs-twin-link';
+import { DocsApiTryIt } from '@/components/docs/docs-api-tryit';
+import { findMcpTwin } from '@/lib/mcp-twins';
 
 type CompiledDocsPageData = {
   body: ComponentType<{ components?: MDXComponents }>;
@@ -44,8 +47,10 @@ type CompiledDocsPageData = {
   index?: boolean;
 };
 
-function compiledDocsPageData(data: Page['data']): CompiledDocsPageData {
-  return data as Page['data'] & CompiledDocsPageData;
+function compiledDocsPageData(
+  data: DocsPageModel['data'],
+): CompiledDocsPageData {
+  return data as DocsPageModel['data'] & CompiledDocsPageData;
 }
 
 const DEFAULT_DOC_SLUG = ['start', 'overview'] as const;
@@ -156,6 +161,16 @@ export default async function Page({
   ];
   const isOverview =
     slug.length === 2 && slug[0] === 'start' && slug[1] === 'overview';
+  const method =
+    'method' in page.data && isString(page.data.method)
+      ? page.data.method
+      : undefined;
+  const operationPath =
+    'path' in page.data && isString(page.data.path)
+      ? page.data.path
+      : undefined;
+  const mcpTwin =
+    method && operationPath ? findMcpTwin(method, operationPath) : undefined;
   return (
     <>
       {isOverview ? <FaqPageJsonLd items={BRAND_FAQ} /> : null}
@@ -176,6 +191,7 @@ export default async function Page({
           <div className="docs-page-header-main">
             <h1 className="docs-page-title font-semibold">{page.data.title}</h1>
             <p className="docs-page-description">{page.data.description}</p>
+            {mcpTwin ? <DocsTwinLink twin={mcpTwin} locale={locale} /> : null}
           </div>
           <div className="docs-page-actions">
             <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
@@ -186,6 +202,13 @@ export default async function Page({
           </div>
         </div>
         <div className="prose flex-1 text-fd-foreground/80">
+          {method && operationPath ? (
+            <DocsApiTryIt
+              method={method}
+              path={operationPath}
+              locale={locale}
+            />
+          ) : null}
           {preview ? <PreviewRenderer preview={preview} /> : null}
           <Mdx
             components={getMDXComponents({

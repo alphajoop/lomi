@@ -28,6 +28,7 @@ import {
   IntegrationSurface,
   IntegrationSurfaceGroup,
 } from '@/components/docs/integration-surface-group';
+import { McpOperationIndex } from '@/components/docs/mcp-operation-index';
 
 function lucideIconsAsMdx(): MDXComponents {
   const components: MDXComponents = {};
@@ -66,6 +67,7 @@ export function getMDXComponents(components?: MDXComponents) {
     InlineCommand,
     IntegrationSurfaceGroup,
     IntegrationSurface,
+    McpOperationIndex,
     ...components,
   } satisfies MDXComponents;
 }

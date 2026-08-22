@@ -1226,6 +1226,190 @@ button:active:focus {
   padding: 0.0625rem 0.375rem;
 }
 
+.docs-onboarding-checklist {
+  margin-top: 0.25rem;
+}
+
+#nd-sidebar[data-collapsed='true'] .docs-onboarding-checklist {
+  display: none;
+}
+
+.docs-twin-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-twin-link-label {
+  font-weight: 500;
+  color: var(--color-fd-foreground);
+}
+
+.docs-twin-link-target {
+  text-decoration: none;
+}
+
+.docs-twin-link-target:hover code {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docs-mcp-index {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.docs-mcp-index-tool {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.docs-mcp-index-tool-title {
+  font-weight: 400;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-mcp-index-table-wrap {
+  overflow-x: auto;
+}
+
+.docs-mcp-index table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.docs-mcp-index th,
+.docs-mcp-index td {
+  border-bottom: 1px solid var(--color-fd-border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.docs-mcp-index-missing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  color: var(--color-fd-muted-foreground);
+}
+
+.docs-api-tryit {
+  margin: 0 0 1.25rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background: color-mix(in oklch, var(--color-fd-card) 70%, transparent);
+}
+
+.docs-api-tryit-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.docs-api-tryit-summary::-webkit-details-marker {
+  display: none;
+}
+
+.docs-api-tryit-summary:focus-visible {
+  outline: 2px solid var(--color-fd-primary);
+  outline-offset: 2px;
+}
+
+.docs-api-tryit-body {
+  padding: 0 1rem 1rem;
+}
+
+.docs-api-playground {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.docs-api-playground-endpoint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.docs-api-playground-method {
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.docs-api-playground-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.docs-api-playground-param,
+.docs-api-playground-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+}
+
+.docs-api-playground-param input,
+.docs-api-playground-body textarea {
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+}
+
+.docs-api-playground-body textarea {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  min-height: 10rem;
+}
+
+.docs-api-playground-send {
+  align-self: flex-start;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+  background: var(--color-fd-primary);
+  color: var(--color-fd-primary-foreground);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.docs-api-playground-send:disabled {
+  opacity: 0.6;
+}
+
+.docs-api-playground-result {
+  margin: 0;
+  max-height: 18rem;
+  overflow: auto;
+  border-radius: 0.5rem;
+  background: var(--color-fd-muted);
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+}
+
 /* Custom Image Layouts */
 .image-grid {
   display: grid;
