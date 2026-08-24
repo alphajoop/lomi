@@ -6,6 +6,7 @@ import {
   type AgentCorpusSlug,
   isAgentCorpusSlug,
 } from '@/lib/docs/agent-corpus/slugs';
+import { PUBLISHED_FEE_FACTS } from '@/lib/docs/pricing-facts';
 import {
   BRAND_CATEGORY,
   BRAND_COMPARISONS,
@@ -78,6 +79,7 @@ export function buildAgentCorpusPage(slug: AgentCorpusSlug): string {
           '## Numeric facts',
           '',
           ...BRAND_NUMERIC_FACTS.map((line) => `- ${line}`),
+          ...PUBLISHED_FEE_FACTS.map((line) => `- ${line}`),
         ].join('\n'),
       );
     case 'uemoa-mobile-money':

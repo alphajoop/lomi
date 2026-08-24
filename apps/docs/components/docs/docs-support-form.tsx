@@ -3,9 +3,7 @@
 import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@lomi./ui/button';
-import { Input } from '@lomi./ui/input';
 import { cn } from '@lomi./ui/cn';
-import { interiorField } from '@lomi./ui/tokens';
 import { useTranslation } from '@/lib/utils/translation-context';
 import { t as translate } from '@/lib/i18n/translations';
 import { useDocsTurnstile } from '@/components/docs/use-docs-turnstile';
@@ -26,7 +24,10 @@ const CONTACT_TOPICS = [
 type ContactTopic = (typeof CONTACT_TOPICS)[number];
 
 const CARD_CLASS =
-  'not-prose my-6 w-full rounded-[11px] border border-[color:var(--docs-hairline)] bg-[var(--docs-well)] p-6 shadow-[var(--docs-shadow-button)] sm:p-8';
+  'docs-support-form not-prose my-6 w-full rounded-[11px] border border-[color:var(--docs-hairline)] bg-[var(--docs-well)] p-6 shadow-none sm:p-8';
+
+const FIELD_CLASS =
+  'h-10 w-full rounded-[9px] px-3 text-[13px] outline-none disabled:cursor-not-allowed disabled:opacity-50';
 
 export function DocsContactForm() {
   return <DocsSupportForm kind="contact" />;
@@ -188,7 +189,8 @@ function DocsSupportForm({ kind }: { kind: DocsSupportFormKind }) {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Field label={t('support.name')}>
-          <Input
+          <input
+            className={FIELD_CLASS}
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoComplete="name"
@@ -197,8 +199,9 @@ function DocsSupportForm({ kind }: { kind: DocsSupportFormKind }) {
           />
         </Field>
         <Field label={t('support.email')}>
-          <Input
+          <input
             type="email"
+            className={FIELD_CLASS}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
@@ -208,12 +211,9 @@ function DocsSupportForm({ kind }: { kind: DocsSupportFormKind }) {
         </Field>
         {kind === 'contact' ? (
           <Field label={t('support.topic')} className="sm:col-span-2">
-            <span className="relative block">
+            <span className="docs-support-select relative block overflow-hidden">
               <select
-                className={cn(
-                  interiorField,
-                  'cursor-pointer appearance-none pe-12',
-                )}
+                className={`${FIELD_CLASS} cursor-pointer appearance-none bg-transparent pe-12`}
                 value={topic}
                 disabled={pending}
                 onChange={(event) =>
@@ -234,8 +234,9 @@ function DocsSupportForm({ kind }: { kind: DocsSupportFormKind }) {
           </Field>
         ) : (
           <Field label={t('support.affectedUrl')} className="sm:col-span-2">
-            <Input
+            <input
               type="url"
+              className={FIELD_CLASS}
               value={affectedUrl}
               onChange={(event) => setAffectedUrl(event.target.value)}
               autoComplete="url"
@@ -252,7 +253,7 @@ function DocsSupportForm({ kind }: { kind: DocsSupportFormKind }) {
             value={message}
             disabled={pending}
             onChange={(event) => setMessage(event.target.value)}
-            className={cn(interiorField, 'h-auto min-h-[9rem] py-2.5')}
+            className={`${FIELD_CLASS} h-auto min-h-[9rem] resize-y py-2.5`}
           />
         </Field>
       </div>

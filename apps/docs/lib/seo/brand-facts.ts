@@ -1,11 +1,10 @@
 /* @proprietary license */
 
-import {
-  ADD_ON_SUBSCRIPTION_PERCENT,
-  FIXED_FEES_CARD_INTL,
-  FIXED_FEES_XOF,
-  formatFee,
-} from '@lomi./shared';
+/**
+ * Brand copy imported by docs middleware (`proxy.ts` → `agent-discovery`).
+ * Do not import `@lomi./shared` here: the package barrel pulls siblings
+ * (including agent-register-pow) that Next.js middleware cannot resolve.
+ */
 
 /** English canonical brand copy (llms.txt, agent corpus, JSON-LD). */
 export const BRAND_NAME = 'lomi.';
@@ -61,13 +60,6 @@ export const BRAND_INTEGRATION_STEPS: readonly string[] = [
   'OpenAPI: apps/docs/openapi.json (merchant API); agent-openapi.json for provisioning/MCP partner routes.',
 ];
 
-export const BRAND_FEE_FACTS: readonly string[] = [
-  `Fixed Mobile Money: ${formatFee(FIXED_FEES_XOF.mobileMoney)}`,
-  `Fixed cards (XOF): ${formatFee(FIXED_FEES_XOF.cards)}`,
-  `Fixed cards (USD/EUR): ${formatFee(FIXED_FEES_CARD_INTL)}`,
-  `Subscription add-on: +${ADD_ON_SUBSCRIPTION_PERCENT}%`,
-];
-
 export const BRAND_NUMERIC_FACTS: readonly string[] = [
   `Sandbox API: ${API_SANDBOX_ORIGIN}`,
   `Live API: ${API_LIVE_ORIGIN}`,
@@ -75,7 +67,6 @@ export const BRAND_NUMERIC_FACTS: readonly string[] = [
   'Auth header: X-API-KEY with lomi_sk_test_* or lomi_sk_live_*',
   'XOF amounts: integer centimes (minor units)',
   'Marketing site: https://lomi.africa',
-  ...BRAND_FEE_FACTS,
 ];
 
 export const BRAND_FAQ: readonly BrandFaqItem[] = [

@@ -339,6 +339,65 @@ button:active:focus {
   border-color: transparent !important;
 }
 
+/* Docs contact form: one hairline, no interior inset (that reads as a double
+   border in dark mode). Also beat the global focus border:transparent rule. */
+.docs-support-form input:not([tabindex='-1']),
+.docs-support-form textarea {
+  border: 1px solid var(--docs-hairline) !important;
+  border-radius: var(--docs-code-radius);
+  background-color: var(--docs-sub) !important;
+  background-image: none;
+  box-shadow: none !important;
+  outline: none !important;
+  color: var(--color-fd-foreground);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.docs-support-form .docs-support-select {
+  border: 1px solid var(--docs-hairline) !important;
+  border-radius: var(--docs-code-radius);
+  background-color: var(--docs-sub);
+  box-shadow: none !important;
+}
+
+.docs-support-form .docs-support-select select {
+  border: 0 !important;
+  border-radius: inherit;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--color-fd-foreground);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.docs-support-form .docs-support-select select::-ms-expand {
+  display: none;
+}
+
+.docs-support-form input:not([tabindex='-1']):hover,
+.docs-support-form textarea:hover,
+.docs-support-form .docs-support-select:hover {
+  border-color: color-mix(in oklab, var(--foreground) 24%, transparent) !important;
+}
+
+.docs-support-form input:not([tabindex='-1']):is(:focus, :focus-visible, :hover:focus, :active:focus),
+.docs-support-form textarea:is(:focus, :focus-visible, :hover:focus, :active:focus),
+.docs-support-form .docs-support-select:focus-within {
+  border: 1px solid color-mix(in oklab, var(--foreground) 36%, transparent) !important;
+  box-shadow: none !important;
+}
+
+.docs-support-form select option {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.dark .docs-support-form {
+  color-scheme: dark;
+}
+
 @layer utilities {
   /* Style @mentions in textarea inputs */
   .mention-input {
