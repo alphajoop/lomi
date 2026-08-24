@@ -15,11 +15,23 @@ Suivez ce guide avant d’écrire du code de production. Chaque étape renvoie v
   Nouveau ? Lisez [Qu’est-ce que lomi. ?](/start/overview), puis suivez ce parcours étape par étape.
 </Callout>
 
-Le checkout hébergé, les liens de paiement, les abonnements et les autres produits ci-dessous passent tous par la même API marchande. Le choix de **ce que vous construisez** est indépendant de **comment vous appelez lomi.** : API REST, SDK, CLI ou MCP.
+Le checkout hébergé, les liens de paiement, les abonnements et les autres produits ci-dessous passent tous par la même API marchande. Le choix de **ce que vous construisez** est indépendant de **comment vous utilisez lomi.** : API, SDK, CLI ou MCP.
 
-## Comment appeler lomi.
+## Dans la sandbox
 
-Choisissez la surface qui correspond à votre façon de travailler. Chaque carte est un point de départ. Les guides complets restent sur leurs pages : [API REST](/api), [Démarrer avec le SDK](/start/sdk-quickstart), [Démarrer avec le CLI](/start/cli-quickstart) et [MCP](/build/mcp).
+- Payer avec des [cartes de test](/start/sandbox-payments)
+- Laisser Wave et MTN se compléter automatiquement avec une clé test
+- Envoyer `X-Scenario-Key: pending` ou `failed` sur les charges Wave/MTN directes
+- Transférer les webhooks avec `lomi listen`
+
+## En live, vous ne pouvez pas
+
+- Auto-compléter le Mobile Money (le client doit approuver sur l’appareil)
+- Utiliser les PAN de test (ils ne fonctionnent qu’avec une clé test)
+
+## Comment utiliser lomi.
+
+Choisissez la surface qui correspond à votre façon de travailler. Chaque onglet est un point de départ. Les guides complets restent sur leurs pages : [API](/api), [Démarrer avec le SDK](/start/sdk-quickstart), [Démarrer avec le CLI](/start/cli-quickstart) et [MCP](/build/mcp).
 
 <IntegrationSurfaceGroup id="how-you-call-lomi">
 
@@ -28,9 +40,9 @@ Choisissez la surface qui correspond à votre façon de travailler. Chaque carte
   title="Appeler le contrat HTTP directement"
   identifier="POST /checkout-sessions"
   href="/api"
-  hrefLabel="Ouvrir la référence API REST"
+  hrefLabel="Ouvrir la référence API"
 >
-  Utilisez REST quand vous voulez la requête et la réponse exactes, un langage sans SDK officiel, ou comparer avec l’OpenAPI. Envoyez votre clé secrète en `X-API-Key` (`LOMI_SECRET_KEY`). `Idempotency-Key` est obligatoire sur les écritures qui déplacent de l’argent.
+  Utilisez l’API quand vous voulez la requête et la réponse exactes, un langage sans SDK officiel, ou comparer avec l’OpenAPI. Envoyez votre clé secrète en `X-API-Key` (`LOMI_SECRET_KEY`). `Idempotency-Key` est obligatoire sur les écritures qui déplacent de l’argent.
 
   Créer un checkout sandbox :
 
@@ -47,7 +59,7 @@ Choisissez la surface qui correspond à votre façon de travailler. Chaque carte
     }'
   ```
 
-  Ouvrez `checkout_url` dans la réponse et payez avec un [moyen de test sandbox](/start/sandbox-payments). Parcours complet : [Faire un paiement de test](/start/first-payment). Détail de l’endpoint : [Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create).
+  Ouvrez `checkout_url` dans la réponse et payez avec un [moyen de test sandbox](/start/sandbox-payments). Parcours complet : [Comment tester un paiement ?](/start/first-payment). Détail de l’endpoint : [Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create).
 </IntegrationSurface>
 
 <IntegrationSurface
@@ -146,70 +158,70 @@ lomi. propose plusieurs options d’intégration selon votre stack :
 
 | Besoin | Commencez par |
 | --- | --- |
-| Page checkout complète | [Checkout hébergé](/build/checkout) |
-| Checkout intégré sur votre site | [Widget checkout](/build/embed-widget) |
-| URL partageable | [Liens de paiement](/build/payment-links) |
-| Demande de paiement créée côté backend | [Demandes de paiement](/build/payment-requests) |
-| Mobile money ou cartes côté serveur | [Charges directes](/build/direct-charges) |
-| Facturation récurrente | [Abonnements](/build/subscriptions) |
+| Page checkout complète | [Checkout hébergé](/build/accept/checkout) |
+| Checkout intégré sur votre site | [Widget checkout](/build/accept/embed-widget) |
+| URL partageable | [Liens de paiement](/build/accept/payment-links) |
+| Demande de paiement créée côté backend | [Demandes de paiement](/build/accept/payment-requests) |
+| Mobile money ou cartes côté serveur | [Charges directes](/build/accept/direct-charges) |
+| Facturation récurrente | [Abonnements](/build/billing/subscriptions) |
 | Plugin boutique (WooCommerce, Shopify, etc.) | [Extensions e‑commerce](/build/ecommerce-extensions) |
 
-Définissez ce que vous vendez dans [Produits](/build/products) avant de créer des sessions checkout ou des plans d’abonnement.
+Définissez ce que vous vendez dans [Produits](/build/billing/products) avant de créer des sessions checkout ou des plans d’abonnement.
 
 La plupart des équipes commencent par le **checkout hébergé**. Consultez [Quelle intégration choisir ?](/build/choose-integration) et [Canaux de paiement](/build/payment-channels) pour confirmer la couverture Wave, MTN et cartes sur vos marchés.
 
-Ce choix de produit est indépendant de l’API REST, du SDK, du CLI ou du MCP. Voir [Comment appeler lomi.](#how-you-call-lomi).
+Ce choix de produit est indépendant de l’API, du SDK, du CLI ou du MCP. Voir [Comment utiliser lomi.](#how-you-call-lomi).
 
 ## Étape 3: Tester de bout en bout
 
 Testez votre intégration à fond avec les identifiants sandbox :
 
-1. [Faire un paiement de test](/start/first-payment) : checkout CLI ou API.
+1. [Comment tester un paiement ?](/start/first-payment) : checkout CLI ou API.
 2. [Paiements sandbox](/start/sandbox-payments): cartes, Wave, MTN
-3. Tester les échecs avec [Simuler des erreurs](/build/guides/simulate-errors)
-4. [Gestion des erreurs](/build/advanced-guides/error-handling) et [idempotence](/build/advanced-guides/idempotency-keys)
-5. Cas limites checkout (abonnements, essais, mobile money en attente) : [Comportement checkout](/build/payments/checkout-behavior) et guides par canal sous [Canaux de paiement](/build/payment-channels#recommended-path-by-channel).
+3. Tester les échecs avec [Simuler des erreurs](/build/reliability/simulate-errors)
+4. [Gestion des erreurs](/build/reliability/error-handling) et [idempotence](/build/reliability/idempotency-keys)
+5. Cas limites checkout (abonnements, essais, mobile money en attente) : [Comportement checkout](/build/accept/checkout-behavior) et guides par canal sous [Canaux de paiement](/build/payment-channels#channel-capabilities).
 
-Le même premier checkout peut être créé depuis [REST](#call-api), le [SDK](#call-sdk), le [CLI](#call-cli) ou [MCP](#call-mcp). Les parcours CLI et cURL sont détaillés dans [Faire un paiement de test](/start/first-payment). SDK et MCP : [Démarrer avec le SDK](/start/sdk-quickstart) et [MCP](/build/mcp).
+Le même premier checkout peut être créé depuis [REST](#call-api), le [SDK](#call-sdk), le [CLI](#call-cli) ou [MCP](#call-mcp). Les parcours CLI et cURL sont détaillés dans [Comment tester un paiement ?](/start/first-payment). SDK et MCP : [Démarrer avec le SDK](/start/sdk-quickstart) et [MCP](/build/mcp).
 
 ## Étape 4: Configurer les webhooks
 
 Les webhooks sont essentiels pour les moyens de paiement et les événements hors de votre application, comme l’approbation mobile money et les renouvellements d’abonnement.
 
 1. Enregistrez une URL HTTPS dans le [portail](https://lomi.africa/portal).
-2. Suivez [Configurer les webhooks](/build/webhooks) et [Traiter les webhooks](/build/advanced-guides/handling-webhooks).
+2. Suivez [Configurer les webhooks](/build/reliability) et [Traiter les webhooks](/build/reliability/handling-webhooks).
 3. Vérifiez la signature sur le corps brut avant de parser le JSON.
 
-**Renouvellements d’abonnement :** les abonnements carte se renouvellent hors session ; écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` de renouvellement. **Wave et MTN** utilisent un **lien checkout de renouvellement manuel** envoyé avant chaque échéance, le client doit payer ce lien ; pas de débit wallet silencieux. Voir [Abonnements : renouvellements](/build/subscriptions#renewals-and-failed-payments).
+**Renouvellements d’abonnement :** les abonnements carte se renouvellent hors session ; écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` de renouvellement. **Wave et MTN** utilisent un **lien checkout de renouvellement manuel** envoyé avant chaque échéance, le client doit payer ce lien ; pas de débit wallet silencieux. Voir [Abonnements : renouvellements](/build/billing/subscriptions#renewals-and-failed-payments).
 
 ## Étape 5: Passer en live
 
 1. Vérification du compte et configuration des reversements.
 2. Passez à `lomi_sk_live_...` et `https://api.lomi.africa`.
-3. Suivez la [checklist go-live](/start/go-live) et traitez un petit paiement live avec webhook.
+3. Suivez [Que vérifier avant le live ?](/start/go-live) et traitez un petit paiement live avec webhook.
 
 ## Étapes suivantes
 
 ### Confirmer les paiements en production
 
-- [Vérifier les paiements](/build/guides/verify-payments)
-- [Cycle de vie des paiements](/build/guides/payment-lifecycle)
+- [Vérifier les paiements](/build/reliability/verify-payments)
+- [Cycle de vie des paiements](/build/reliability/payment-lifecycle)
 - [Machine à états des paiements](/api/payment-state-machine)
 
 ### Exploiter après le go-live
 
-- [Transactions](/build/transactions) · [Remboursements](/build/refunds) · [Reversements](/build/payouts) · [Litiges](/build/disputes)
-- [Solde et règlement](/build/balance-and-settlement) · [Radar (fraude)](/build/radar)
+- [Transactions](/build/money/transactions) · [Remboursements](/build/money/refunds) · [Reversements](/build/money/payouts) · [Litiges](/build/money/disputes)
+- [Solde et règlement](/build/money/balance-and-settlement) · [Radar (fraude)](/build/money/radar)
 
 ### Catalogue, facturation et clients
 
-- [Produits](/build/products) · [Facturation à l’usage](/build/usage-billing) · [Coupons](/build/discount-coupons)
-- [Portail client](/build/customer-portal) · [Clients](/build/platform/customers)
+- [Produits](/build/billing/products) · [Facturation à l’usage](/build/billing/usage-billing) · [Coupons](/build/billing/discount-coupons)
+- [Portail client](/build/billing/customer-portal) · [Clients](/build/platform/customers)
 - [Marchands](/build/platform/merchants) · [Organisations](/build/platform/organizations)
 
 ### Outils et durcissement
 
 - [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp) · [lomi. UI](/build/lomi-ui)
 - [Extensions e‑commerce](/build/ecommerce-extensions) (WooCommerce, Shopify, Magento, PrestaShop)
-- [Guides avancés](/build/advanced-guides) (erreurs, tests, CI/CD, fiabilité webhooks)
+- [Guides avancés](/build/reliability) (erreurs, tests, CI/CD, fiabilité webhooks)
 - [Démarrer avec le CLI](/start/cli-quickstart) · [Démarrer avec le SDK](/start/sdk-quickstart)

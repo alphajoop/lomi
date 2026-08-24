@@ -47,7 +47,7 @@ Chaque statut transaction a un équivalent côté prestataire :
 | `expired` | `expired` |
 | `refunded` | `refunded` |
 
-Voir [Transactions](/build/transactions) pour les champs dans les réponses API.
+Voir [Transactions](/build/money/transactions) pour les champs dans les réponses API.
 
 ## Quand le statut passe à `completed`
 
@@ -69,14 +69,14 @@ L'info d'expiration est stockée dans `expiration_info` sur la transaction.
 2. Le **solde** est mis à jour (`metadata.balance_updated` évite un double crédit).
 3. Un **abonnement** lié peut passer de `pending` à `active`.
 
-Pour le délai de disponibilité des fonds, voir [Solde et règlement](/build/balance-and-settlement).
+Pour le délai de disponibilité des fonds, voir [Solde et règlement](/build/money/balance-and-settlement).
 
 ## Voir aussi
 
-- [Cycle de vie des paiements](/build/guides/payment-lifecycle)
-- [Vérifier les paiements](/build/guides/verify-payments)
-- [Comportement du checkout](/build/payments/checkout-behavior)
-- [Recevoir les webhooks](/build/advanced-guides/handling-webhooks)
+- [Cycle de vie des paiements](/build/reliability/payment-lifecycle)
+- [Vérifier les paiements](/build/reliability/verify-payments)
+- [Comportement du checkout](/build/accept/checkout-behavior)
+- [Recevoir les webhooks](/build/reliability/handling-webhooks)
 
 <Accordions type="single">
   <Accordion title="Pour les contributeurs" id="pour-les-contributeurs">

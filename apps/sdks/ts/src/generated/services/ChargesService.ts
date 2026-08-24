@@ -37,7 +37,7 @@ export class ChargesService {
     }
 
     /**
-     * Create MTN MoMo charge
+     * Create MTN charge
      * @see OpenAPI `ChargesController_createMtnCharge`
      */
     public async createMtnCharge(body: components['schemas']['CreateMtnChargeDto'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['MtnChargeResponseDto']> {

@@ -1,13 +1,7 @@
 {
   "title": "Ressources",
-  "description": "Support, changelog, règles marchandes, open source et documentation contributeur.",
-  "root": true,
-  "icon": "Library",
+  "description": "Open source, communauté, manifeste et documentation contributeur.",
   "pages": [
-    "support",
-    "changelog",
-    "merchant-of-record",
-    "network",
     "open-source",
     "community",
     "manifesto",

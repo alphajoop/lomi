@@ -45,7 +45,7 @@ export async function McpOperationIndex() {
       {groups.map((group) => (
         <section
           key={group.tool}
-          className="docs-mcp-index-group"
+          className="docs-mcp-index-group mb-5 border-b border-[color:var(--docs-hairline)] pb-5 last:mb-0 last:border-b-0 last:pb-0"
           aria-labelledby={group.tool}
         >
           <h3 id={group.tool} className="docs-mcp-index-tool">

@@ -7,11 +7,16 @@
     "overview",
     "integration-journey",
     "create-account",
+    "---Clés et surfaces---",
     "api-keys",
     "cli-quickstart",
     "sdk-quickstart",
+    "---Premiers paiements---",
     "first-payment",
     "sandbox-payments",
-    "go-live"
+    "go-live",
+    "---Politiques et support---",
+    "support",
+    "merchant-of-record"
   ]
 }

@@ -1,5 +1,5 @@
 ---
-title: E‑commerce
+title: Overview
 description:
   Official and maintained plugins for hosted checkout with lomi.. WooCommerce,
   Magento 2, PrestaShop, and Shopify use the same public API contract for
@@ -9,13 +9,11 @@ description:
 import { Cards, Card } from 'fumadocs-ui/components/card';
 import { Callout } from '@/components/docs/docs-callout';
 
-# E‑commerce
-
 Install lomi. on your store without writing checkout plumbing yourself. These modules create **hosted checkout sessions**, redirect shoppers to lomi. Checkout, then confirm payment via **return URLs** and **merchant webhooks**.
 
 ## Shared technical contract
 
-WooCommerce, Magento 2, and PrestaShop talk only to lomi.’s **public REST API** (`/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
+WooCommerce, Magento 2, and PrestaShop talk only to lomi.’s **public API** (`/checkout-sessions`). They do **not** call Supabase RPC or internal-only Nest endpoints.
 
 | Concern | Contract |
 | --- | --- |
@@ -29,9 +27,9 @@ WooCommerce, Magento 2, and PrestaShop talk only to lomi.’s **public REST API*
 For the canonical wording maintained next to source code, see:
 
 - [Shared technical contract](#shared-technical-contract) (this page)
-- [Verify payments](/build/guides/verify-payments) and [Handling webhooks](/build/advanced-guides/handling-webhooks)
+- [Verify payments](/build/reliability/verify-payments) and [Handling webhooks](/build/reliability/handling-webhooks)
 
-Before going live, also read [API integration](/start/first-payment), [Authentication](/api/authentication), and [Webhooks](/build/webhooks) for outbound subscription management.
+Before going live, also read [API integration](/start/first-payment), [Authentication](/api/authentication), and [Webhooks](/build/reliability) for outbound subscription management.
 
 ## Where to get each plugin
 
@@ -81,8 +79,8 @@ Before going live, also read [API integration](/start/first-payment), [Authentic
 
 Not on a supported platform, or building a custom flow? These give you the same hosted checkout without a store plugin:
 
-- **[Embed widget](/build/embed-widget)**, a drop-in checkout button and modal for any site (including Bubble and custom HTML).
-- **[Hosted checkout](/build/checkout)**, the lomi. page your plugins redirect shoppers to.
+- **[Embed widget](/build/accept/embed-widget)**, a drop-in checkout button and modal for any site (including Bubble and custom HTML).
+- **[Hosted checkout](/build/accept/checkout)**, the lomi. page your plugins redirect shoppers to.
 - **[Storefront](https://store.lomi.africa)**, merchant product pages and subscribe flows (`display_on_storefront` on catalog products).
 - **[lomi-ui](/build/lomi-ui)**, copy-paste checkout components when you want your own UI.
 - **[CLI](/build/cli)**, create and test checkout sessions from your terminal.
@@ -93,8 +91,8 @@ Not on a supported platform, or building a custom flow? These give you the same 
 | You want to… | Use |
 | --- | --- |
 | Add payments to a supported store (Woo, Magento, PrestaShop, Shopify, Bubble) | The **plugin** for that platform |
-| Add a checkout button to a custom site or no-code page | **[Embed widget](/build/embed-widget)** |
+| Add a checkout button to a custom site or no-code page | **[Embed widget](/build/accept/embed-widget)** |
 | Keep your own checkout UI but skip the payment plumbing | **[lomi-ui](/build/lomi-ui)** components |
 | Full control from your own backend | The **[public API](/start/first-payment)** (`POST /checkout-sessions`) |
-| Sell from a hosted product catalog (no store plugin) | **[Storefront](https://store.lomi.africa)** with [Products](/build/products) (`display_on_storefront`) |
+| Sell from a hosted product catalog (no store plugin) | **[Storefront](https://store.lomi.africa)** with [Products](/build/billing/products) (`display_on_storefront`) |
 | Automate or test from a terminal or AI agents | **[CLI](/build/cli)** or **[MCP](/build/mcp)** |

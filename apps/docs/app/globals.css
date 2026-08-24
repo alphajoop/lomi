@@ -12,7 +12,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-main);
-  --font-mono: var(--font-main);
+  --font-mono: var(--docs-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -88,6 +88,19 @@
   --font-main:
     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
+  --docs-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  --docs-well: color-mix(in oklab, var(--foreground) 4.5%, var(--background));
+  --docs-sub: color-mix(in oklab, var(--foreground) 2.5%, var(--background));
+  --docs-hairline: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --docs-shadow-well:
+    inset 0 1px 2px rgba(28, 25, 23, 0.05),
+    inset 0 0 0 1px rgba(28, 25, 23, 0.1);
+  --docs-shadow-button:
+    inset 0 0 0 1px rgba(28, 25, 23, 0.05), 0 1px 2px rgba(28, 25, 23, 0.03);
+  --docs-code-radius: 9px;
+  --docs-callout-radius: 11px;
   --docs-text-size: 0.9375rem;
   --docs-text-line-height: 1.7;
   --docs-space-block: 0.75rem;
@@ -95,6 +108,7 @@
   --docs-space-heading-bottom: 0.375rem;
   --docs-space-section: 1rem;
   --docs-sidebar-radius: 9px;
+  --docs-sidebar-inset: 0.5rem;
   --docs-sidebar-well: color-mix(
     in oklab,
     var(--foreground) 4.5%,
@@ -112,6 +126,10 @@
   );
   --docs-sidebar-float:
     0 4px 16px rgba(28, 25, 23, 0.08), 0 0 0 1px var(--docs-sidebar-hairline);
+  --docs-panel-radius: 20px;
+  --docs-overlay: color-mix(in oklab, var(--foreground) 40%, transparent);
+  --docs-shadow-lift:
+    0 1px 2px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.11);
 }
 
 .dark {
@@ -192,6 +210,17 @@
   );
   --docs-sidebar-float:
     0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px var(--docs-sidebar-hairline);
+  --docs-overlay: color-mix(in oklab, #000 65%, transparent);
+  --docs-shadow-lift:
+    0 1px 2px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --docs-well: color-mix(in oklab, var(--foreground) 8%, var(--background));
+  --docs-sub: color-mix(in oklab, var(--foreground) 4%, var(--background));
+  --docs-hairline: color-mix(in oklab, var(--foreground) 14%, transparent);
+  --docs-shadow-well:
+    inset 0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --docs-shadow-button:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.055), 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 @layer base {
@@ -488,11 +517,32 @@ button:active:focus {
 }
 
 #nd-sidebar:not([data-collapsed='true']) {
-  inset: 0.5rem;
+  inset: var(--docs-sidebar-inset);
   width: auto;
   border-inline-end-width: 0;
   border-radius: var(--docs-sidebar-radius);
   box-shadow: var(--docs-sidebar-float);
+}
+
+/* Compact page TOC (below xl): same inset and 9px radius as the floating sidebar,
+   so the bar does not meet the rounded sidebar with a square edge. */
+@media (min-width: 768px) and (width < 80rem) {
+  #nd-docs-layout:has([data-toc-popover]) {
+    --fd-toc-popover-height: calc(var(--docs-sidebar-inset) + 2.5rem);
+  }
+
+  #nd-docs-layout [data-toc-popover] {
+    top: var(--docs-sidebar-inset);
+    margin-inline-end: var(--docs-sidebar-inset);
+  }
+
+  #nd-docs-layout [data-toc-popover] > header {
+    overflow: hidden;
+    border-bottom-width: 0;
+    border-radius: var(--docs-sidebar-radius);
+    background: var(--background);
+    box-shadow: var(--docs-sidebar-float);
+  }
 }
 
 #nd-sidebar:not([data-collapsed='true']) > * {
@@ -507,10 +557,9 @@ button:active:focus {
   box-shadow: var(--docs-sidebar-float);
 }
 
-#nd-sidebar-mobile {
-  border-start-start-radius: var(--docs-sidebar-radius);
-  border-end-start-radius: var(--docs-sidebar-radius);
-  box-shadow: var(--docs-sidebar-float);
+#nd-sidebar .docs-mobile-search-banner,
+#nd-sidebar .docs-mobile-section-switch {
+  display: none;
 }
 
 #nd-sidebar .p-4,
@@ -525,6 +574,24 @@ button:active:focus {
   padding-bottom: 0.25rem;
 }
 
+/* Pull the first nav item up toward the section switcher (search + tab). */
+#nd-sidebar > :nth-child(2) > div,
+#nd-sidebar-mobile > :nth-child(2) > div {
+  padding-top: 0.25rem;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - 12px),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - 12px),
+    transparent
+  );
+}
+
 #nd-sidebar [data-search-full],
 #nd-sidebar-mobile [data-search-full] {
   width: 100%;
@@ -536,20 +603,42 @@ button:active:focus {
   box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline-soft);
 }
 
+/* Desktop: search and section switcher share one control height. */
+#nd-sidebar [data-search-full],
+#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 > button:not([data-search-full]) {
+  height: 2rem;
+  min-height: 2rem;
+  padding-block: 0;
+}
+
 #nd-sidebar [data-search-full]:hover,
 #nd-sidebar-mobile [data-search-full]:hover {
   background: var(--docs-sidebar-well);
   color: var(--foreground);
 }
 
-#nd-sidebar [data-search-full] kbd,
-#nd-sidebar-mobile [data-search-full] kbd {
-  border-color: var(--docs-sidebar-hairline);
+/* One shortcut chip (⌘K), same 6px radius as Copy / Open. Inner kbd
+   chrome is stripped so fumadocs' two <kbd>s read as a single control. */
+#nd-sidebar [data-search-full] .ms-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.05em;
+  border: 1px solid var(--docs-sidebar-hairline);
+  border-radius: var(--radius-md);
   background: color-mix(in oklab, var(--foreground) 5%, transparent);
   padding-inline: 0.375rem;
   padding-block: 0.125rem;
+}
+
+#nd-sidebar [data-search-full] kbd,
+#nd-sidebar-mobile [data-search-full] kbd {
+  border: 0;
+  background: transparent;
+  padding: 0;
   font-size: 10px;
   font-weight: 500;
+  border-radius: 0 !important;
+  box-shadow: none;
 }
 
 #nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 > button:not([data-search-full]),
@@ -561,6 +650,18 @@ button:active:focus {
   background: var(--docs-sidebar-well);
   padding: 0.375rem 0.5rem;
   box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline-soft);
+}
+
+#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 > button:not([data-search-full]) {
+  padding-block: 0;
+}
+
+#nd-sidebar
+  > div.flex.flex-col.gap-3.p-4.pb-2
+  > button:not([data-search-full])
+  > div:first-child {
+  width: 1rem;
+  height: 1rem;
 }
 
 #nd-sidebar
@@ -619,8 +720,7 @@ button:active:focus {
   display: none;
 }
 
-#nd-sidebar p.inline-flex.items-center,
-#nd-sidebar-mobile p.inline-flex.items-center {
+#nd-sidebar p.inline-flex.items-center {
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
   padding-inline: 0.625rem;
@@ -629,6 +729,258 @@ button:active:focus {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted-foreground);
+}
+
+/* Beecargo docs mobile nav: bottom sheet, handle, overlay, larger tap targets. */
+@keyframes docs-mobile-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes docs-mobile-sheet-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes docs-mobile-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes docs-mobile-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  #nd-docs-layout {
+    --fd-header-height: 4rem;
+  }
+
+  [data-sidebar-panel] {
+    display: none !important;
+  }
+
+  /* Tailwind's backdrop-blur-xs wins unless we zero its --tw-backdrop-blur
+     token. Lightning CSS also drops `backdrop-filter: none`. */
+  #nd-docs-layout > .fixed.inset-0.z-40[data-state],
+  #nd-docs-layout .fixed.inset-0.z-40.backdrop-blur-xs {
+    background: var(--docs-overlay) !important;
+    --tw-backdrop-blur: blur(0px);
+    --tw-backdrop-brightness: ;
+    --tw-backdrop-contrast: ;
+    --tw-backdrop-grayscale: ;
+    --tw-backdrop-hue-rotate: ;
+    --tw-backdrop-invert: ;
+    --tw-backdrop-opacity: ;
+    --tw-backdrop-saturate: ;
+    --tw-backdrop-sepia: ;
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+
+  #nd-docs-layout .fixed.inset-0.z-40[data-state='open'] {
+    animation: docs-mobile-backdrop-in 0.2s ease-out;
+  }
+
+  #nd-docs-layout .fixed.inset-0.z-40[data-state='closed'] {
+    animation: docs-mobile-backdrop-out 0.15s ease-in forwards;
+  }
+
+  #nd-sidebar-mobile {
+    display: flex !important;
+    flex-direction: column !important;
+    inset: auto 0.375rem 0.5rem !important;
+    top: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    /* Hug content until the cap. The nav row uses flex-shrink so it can
+       scroll instead of clipping when the list is longer than the sheet. */
+    height: auto !important;
+    max-height: min(82dvh, 680px) !important;
+    overflow: hidden;
+    border: 1px solid var(--docs-hairline) !important;
+    border-radius: var(--docs-panel-radius) !important;
+    background: var(--sidebar) !important;
+    box-shadow: var(--docs-shadow-lift) !important;
+    padding-top: 0.5rem;
+  }
+
+  #nd-sidebar-mobile[data-state='open'] {
+    animation: docs-mobile-sheet-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) !important;
+  }
+
+  #nd-sidebar-mobile[data-state='closed'] {
+    animation: docs-mobile-sheet-out 0.32s cubic-bezier(0.32, 0.72, 0, 1)
+      forwards !important;
+  }
+
+  #nd-sidebar-mobile::before {
+    content: '';
+    display: block;
+    width: 2.5rem;
+    height: 0.25rem;
+    margin: 0 auto;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--foreground) 12%, transparent);
+  }
+
+  #nd-sidebar-mobile .docs-mobile-search-banner {
+    order: -1;
+  }
+
+  /* Compact desktop chip lives in the drawer chrome; language + theme move
+     to the full-width footer below the nav. */
+  #nd-sidebar-mobile > div.flex.flex-col.gap-3.p-4.pb-2 > div.flex.items-center {
+    display: none;
+  }
+
+  /* Desktop section tabs navigate. On mobile, a local switcher swaps the list
+     without leaving the current page. */
+  #nd-sidebar-mobile
+    > div.flex.flex-col.gap-3.p-4.pb-2
+    > button:not([data-search-full]):not(.docs-mobile-section-switch) {
+    display: none;
+  }
+
+  #nd-sidebar-mobile .docs-mobile-section-switch {
+    display: flex;
+    min-height: 2.75rem;
+    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+    border-color: transparent;
+    background: var(--docs-sidebar-well);
+    padding: 0.375rem 0.5rem;
+    font-size: 14px;
+    box-shadow: inset 0 0 0 1px var(--docs-sidebar-hairline-soft);
+  }
+
+  #nd-sidebar-mobile > div.flex.flex-col.border-t {
+    flex-shrink: 0;
+    padding: 0.5rem 0.75rem 0.75rem;
+    border-color: var(--docs-hairline);
+  }
+
+  #nd-sidebar-mobile .docs-mobile-locale-theme-footer,
+  #nd-sidebar-mobile [data-sidebar-locale-theme],
+  #nd-sidebar-mobile [data-sidebar-locale-theme] > div {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  #nd-sidebar-mobile [data-sidebar-locale-theme] > div {
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  #nd-sidebar-mobile [data-sidebar-locale-theme] label {
+    height: 2.75rem;
+    max-width: none;
+    flex: 1 1 auto;
+    padding-inline: 0.75rem;
+  }
+
+  #nd-sidebar-mobile [data-sidebar-locale-theme] select {
+    max-width: none;
+    flex: 1 1 auto;
+    font-size: 15px;
+  }
+
+  #nd-sidebar-mobile [data-sidebar-locale-theme] [role='separator'] {
+    height: 1.25rem;
+  }
+
+  #nd-sidebar-mobile [data-sidebar-locale-theme] button {
+    min-height: 2.75rem;
+  }
+
+  #nd-sidebar-mobile [data-search-full] {
+    min-height: 2.75rem;
+    width: 100%;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 14px;
+  }
+
+  #nd-sidebar-mobile [data-search-full] .ms-auto,
+  #nd-sidebar-mobile [data-search-full] kbd {
+    display: none !important;
+  }
+
+  /* Native overflow on the ScrollArea root. Grow with content (`flex-grow: 0`)
+     so short lists do not leave a cavern; shrink when the sheet hits max-height. */
+  #nd-sidebar-mobile > .overflow-hidden.min-h-0.flex-1 {
+    flex: 0 1 auto !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  #nd-sidebar-mobile [data-radix-scroll-area-viewport] {
+    height: auto !important;
+    min-height: 100%;
+    overflow: visible !important;
+  }
+
+  #nd-sidebar-mobile a.relative.flex,
+  #nd-sidebar-mobile button.relative.flex {
+    min-height: 2.5rem;
+    gap: 0.5rem;
+    padding-block: 0.5rem;
+    padding-inline: 1rem 0.375rem;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  #nd-sidebar-mobile .flex.flex-col.gap-0\.5 a.relative.flex {
+    min-height: 2.5rem;
+    padding-block: 0.5rem;
+    padding-inline: 0.75rem 0.375rem;
+    font-size: 14px;
+  }
+
+  #nd-sidebar-mobile p.inline-flex.items-center {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-inline: 0.75rem 0.5rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nd-sidebar-mobile[data-state='open'],
+  #nd-sidebar-mobile[data-state='closed'],
+  #nd-docs-layout .fixed.inset-0.z-40[data-state] {
+    animation-duration: 0.01ms !important;
+  }
 }
 
 /* Section dropdown: smaller item descriptions (fumadocs default is 0.8125rem) */
@@ -757,6 +1109,26 @@ button:active:focus {
   padding-top: 0.125rem;
 }
 
+@media (max-width: 767.98px) {
+  .docs-page-header .docs-page-actions {
+    display: none;
+  }
+
+  #nd-subnav {
+    background: var(--background);
+  }
+
+  /* Keep the compact TOC glued under the header. Sticky at 4.5rem left an
+     8px gap against the 64px header, so the bar drifted on its own. */
+  #nd-docs-layout [data-toc-popover] {
+    top: var(--fd-header-height);
+  }
+
+  #nd-docs-layout [data-toc-popover] > header {
+    background: var(--background);
+  }
+}
+
 .prose {
   font-family: var(--font-main);
   font-size: var(--docs-text-size);
@@ -817,28 +1189,106 @@ button:active:focus {
   margin: var(--docs-space-block) 0;
 }
 
+/* Recessed well — code surfaces and info boxes */
+.docs-well {
+  background: var(--docs-well);
+  box-shadow: var(--docs-shadow-well);
+  border: none;
+  border-radius: var(--docs-callout-radius);
+}
+
+.docs-inline-code,
+.docs-inline-command,
+.docs-aside-body code:not(.docs-inline-command),
+.prose
+  :where(:not(pre) > code):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  ) {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 999px;
+  border: 1px solid var(--docs-hairline);
+  background: var(--docs-sub);
+  padding: 0.125rem 0.5rem;
+  font-family: var(--docs-mono);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-fd-foreground);
+}
+
+.prose
+  :where(:not(pre) > code):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  )::before,
+.prose
+  :where(:not(pre) > code):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  )::after {
+  content: none;
+}
+
 /* Docs aside cards — callouts */
 .docs-aside {
   margin: var(--docs-space-block) 0;
   display: flex;
   gap: 0.75rem;
-  padding: 0.625rem 0.875rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-fd-border);
+  padding: 0.75rem 1rem;
+  border-radius: var(--docs-callout-radius);
+  background: var(--docs-well);
+  box-shadow: var(--docs-shadow-well);
+  border: none;
   font-family: var(--font-main);
-  font-size: var(--docs-text-size);
-  line-height: var(--docs-text-line-height);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .docs-aside--info,
-.docs-aside--warning,
-.docs-aside--error,
-.docs-aside--success,
 .docs-aside--idea {
-  gap: 0;
-  padding: 0.5rem 0.75rem;
-  border-color: color-mix(in oklch, var(--color-fd-border) 85%, transparent);
-  background: color-mix(in oklch, var(--color-fd-muted) 28%, transparent);
+  color: color-mix(
+    in oklch,
+    var(--color-fd-muted-foreground) 88%,
+    var(--color-fd-foreground)
+  );
+}
+
+.docs-aside--warning {
+  background: color-mix(
+    in oklab,
+    var(--color-fd-warning) 10%,
+    var(--docs-well)
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklab, var(--color-fd-warning) 28%, transparent);
+}
+
+.docs-aside--error {
+  background: color-mix(
+    in oklab,
+    var(--color-fd-error, var(--color-fd-destructive)) 10%,
+    var(--docs-well)
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(
+      in oklab,
+      var(--color-fd-error, var(--color-fd-destructive)) 28%,
+      transparent
+    );
+}
+
+.docs-aside--success {
+  background: color-mix(
+    in oklab,
+    var(--color-fd-success) 10%,
+    var(--docs-well)
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklab, var(--color-fd-success) 28%, transparent);
 }
 
 .docs-aside--info .docs-aside-title,
@@ -855,34 +1305,29 @@ button:active:focus {
 .docs-aside--error .docs-aside-body,
 .docs-aside--success .docs-aside-body,
 .docs-aside--idea .docs-aside-body {
-  color: color-mix(
-    in oklch,
-    var(--color-fd-muted-foreground) 92%,
-    var(--color-fd-foreground)
-  );
+  color: inherit;
 }
 
 .docs-aside-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.25rem;
+  height: 1.25rem;
   flex-shrink: 0;
-  border-radius: calc(var(--radius) + 2px);
-  margin-top: 0.0625rem;
+  margin-top: 0.125rem;
 }
 
 .docs-aside-title {
   margin: 0;
-  font-weight: 600;
+  font-weight: 500;
   font-size: inherit;
   line-height: inherit;
   color: var(--color-fd-foreground);
 }
 
 .docs-aside-body {
-  color: var(--color-fd-muted-foreground);
+  color: inherit;
 }
 
 .docs-aside-body--titled {
@@ -919,74 +1364,43 @@ button:active:focus {
   text-decoration-color: var(--color-fd-primary);
 }
 
-.docs-aside-body code:not(.docs-inline-command) {
-  border-radius: calc(var(--radius) - 2px);
-  border: 1px solid color-mix(in oklch, var(--color-fd-border) 80%, transparent);
-  background: color-mix(in oklch, var(--color-fd-background) 90%, transparent);
-  padding: 0.0625rem 0.375rem;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: inherit;
-  font-weight: 500;
-  color: var(--color-fd-foreground);
-}
-
-.docs-inline-command {
-  display: inline-block;
-  border-radius: calc(var(--radius) - 2px);
-  border: 1px solid color-mix(in oklch, var(--color-fd-border) 90%, transparent);
-  background: color-mix(
-    in oklch,
-    var(--color-fd-background) 88%,
-    var(--color-fd-muted)
-  );
-  padding: 0.125rem 0.4375rem;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: inherit;
-  font-weight: 500;
-  color: var(--color-fd-foreground);
-  vertical-align: baseline;
-}
-
-.docs-aside--info {
-  border-left: 2px solid
-    color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
-}
-
-.docs-aside--warning {
-  border-left: 2px solid
-    color-mix(in oklch, var(--color-fd-warning) 40%, var(--color-fd-border));
-}
-
-.docs-aside--error {
-  border-left: 2px solid
-    color-mix(
-      in oklch,
-      var(--color-fd-error, var(--color-fd-destructive)) 38%,
-      var(--color-fd-border)
-    );
-}
-
-.docs-aside--success {
-  border-left: 2px solid
-    color-mix(in oklch, var(--color-fd-success) 38%, var(--color-fd-border));
-}
-
-.docs-aside--idea {
-  border-left: 2px solid
-    color-mix(in oklch, var(--color-fd-info) 35%, var(--color-fd-border));
-}
-
-/* Task-first REST / SDK / CLI / MCP cards */
+/* Task-first REST / SDK / CLI / MCP tabs */
 .docs-surface-group {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
   margin: var(--docs-space-block) 0;
   scroll-margin-top: 5rem;
 }
 
 .prose .docs-surface-group {
   margin: var(--docs-space-block) 0;
+}
+
+.docs-surface-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0 0 0.5rem;
+}
+
+.docs-surface-tab {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.125rem;
+}
+
+.docs-surface-tab:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+}
+
+.docs-surface-tab--active {
+  background: color-mix(in oklch, var(--color-fd-muted) 55%, transparent);
 }
 
 .docs-surface-card {
@@ -996,40 +1410,21 @@ button:active:focus {
   scroll-margin-top: 5rem;
 }
 
-.docs-surface-card[open] {
+.docs-surface-card--active {
   background: color-mix(in oklch, var(--color-fd-muted) 36%, transparent);
 }
 
-.docs-surface-summary {
-  cursor: pointer;
-  list-style: none;
-  padding: 0.75rem 1rem;
-}
-
-.docs-surface-summary::-webkit-details-marker {
+.docs-surface-card[hidden] {
   display: none;
-}
-
-.docs-surface-summary:focus-visible {
-  outline: 2px solid var(--color-fd-ring);
-  outline-offset: 2px;
-  border-radius: var(--radius-lg);
-}
-
-.docs-surface-summary-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
 }
 
 .docs-surface-pill {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  margin-top: 0.125rem;
   border-radius: 999px;
   border: 1px solid;
-  padding: 0.125rem 0.5rem;
+  padding: 0.25rem 0.7rem;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.625rem;
   font-weight: 600;
@@ -1094,11 +1489,6 @@ button:active:focus {
   background: color-mix(in oklch, var(--color-fd-warning) 10%, transparent);
 }
 
-.docs-surface-summary-copy {
-  min-width: 0;
-  flex: 1;
-}
-
 .docs-surface-title {
   display: block;
   font-weight: 600;
@@ -1117,26 +1507,7 @@ button:active:focus {
   color: var(--color-fd-muted-foreground);
 }
 
-.docs-surface-toggle {
-  flex-shrink: 0;
-  margin-top: 0.125rem;
-  color: var(--color-fd-muted-foreground);
-  transition: transform 0.16s ease;
-}
-
-.docs-surface-card[open] .docs-surface-toggle {
-  transform: rotate(45deg);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .docs-surface-toggle {
-    transition: none;
-  }
-}
-
 .docs-surface-body {
-  border-top: 1px solid
-    color-mix(in oklch, var(--color-fd-border) 80%, transparent);
   padding: 0.75rem 1rem 1rem;
 }
 
@@ -1226,14 +1597,6 @@ button:active:focus {
   padding: 0.0625rem 0.375rem;
 }
 
-.docs-onboarding-checklist {
-  margin-top: 0.25rem;
-}
-
-#nd-sidebar[data-collapsed='true'] .docs-onboarding-checklist {
-  display: none;
-}
-
 .docs-twin-link {
   display: flex;
   flex-wrap: wrap;
@@ -1261,8 +1624,14 @@ button:active:focus {
 .docs-mcp-index {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0;
   margin: 1rem 0 1.5rem;
+}
+
+.docs-mcp-index-group:not(:last-child) {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--docs-hairline);
 }
 
 .docs-mcp-index-tool {
@@ -1403,10 +1772,7 @@ button:active:focus {
   margin: 0;
   max-height: 18rem;
   overflow: auto;
-  border-radius: 0.5rem;
-  background: var(--color-fd-muted);
-  padding: 0.75rem;
-  font-size: 0.75rem;
+  padding: 0.75rem 1rem;
   white-space: pre-wrap;
 }
 
@@ -1642,33 +2008,148 @@ button:active:focus {
   margin: var(--docs-space-block) 0;
 }
 
-/* Code blocks in prose */
+/* Code surfaces — recessed well, real mono, wrap like Beecargo docs */
+.docs-code-surface,
+figure.shiki,
+.docs-surface-body pre,
+.docs-api-playground-result {
+  background: var(--docs-well) !important;
+  box-shadow: var(--docs-shadow-well) !important;
+  border: none !important;
+  border-radius: var(--docs-code-radius) !important;
+  font-family: var(--docs-mono);
+  font-size: 13px;
+  line-height: 1.625;
+  color: var(--color-fd-foreground);
+}
+
+.docs-installation-code {
+  font-family: var(--docs-mono);
+  font-size: 13px;
+  line-height: 1.625;
+  color: var(--color-fd-foreground);
+}
+
 .prose pre {
-  background-color: rgb(244, 244, 245);
+  background: var(--docs-well);
   padding: 0;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-radius: 0.375rem;
+  border-radius: var(--docs-code-radius);
   overflow-x: auto;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.dark .prose pre {
-  background-color: rgb(39, 39, 42);
+figure.shiki {
+  overflow: hidden;
+  background: var(--docs-well) !important;
 }
 
-/* Shiki code blocks: vertical padding on `pre` so highlight bg is continuous */
+figure.shiki pre,
+figure.shiki code,
+figure.shiki .shiki,
+figure.shiki .shiki span {
+  background-color: transparent !important;
+}
+
+figure.shiki .shiki {
+  color: var(--shiki-light);
+}
+
+.dark figure.shiki .shiki,
+.dark figure.shiki .shiki span {
+  color: var(--shiki-dark);
+}
+
 figure.shiki > div[role='region'] {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 1rem 2.75rem 1rem 0 !important;
+  overflow-x: auto;
 }
 
-figure.shiki pre {
-  padding-block: 0.875rem;
+figure.shiki pre,
+.docs-code-surface,
+.docs-surface-body pre,
+.docs-installation-code {
   margin: 0;
   width: 100%;
   box-sizing: border-box;
+  overflow-x: auto;
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.docs-code-surface,
+.docs-surface-body pre {
+  padding: 1rem;
+}
+
+/* Task surface samples are a raw <pre><code>, not figure.shiki. Fumadocs
+   styles `code` as an inline chip; inline backgrounds paint per line box,
+   which looks like highlighted rows on JSON. */
+.docs-code-surface code,
+.docs-surface-body pre code {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent !important;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.docs-installation-code {
+  padding: 0.625rem 2.75rem 0.625rem 1rem;
+}
+
+figure.shiki .line {
+  display: inline-block;
+  width: 100%;
+  padding-inline: 16px;
+}
+
+figure.shiki > .border-b {
+  border-color: var(--docs-hairline);
+  background: transparent;
+}
+
+figure.shiki > .absolute {
+  top: 0.5rem !important;
+  right: 0.375rem !important;
+  z-index: 10;
+  backdrop-filter: none;
+  background: transparent;
+  border-radius: 0;
+}
+
+figure.shiki button[aria-label='Copy Text'],
+figure.shiki button[aria-label='Copied Text'],
+.docs-installation-code button[aria-label='Copy command'],
+.docs-installation-code button[aria-label='Copied command'] {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  padding: 0 !important;
+  border: none;
+  border-radius: var(--docs-code-radius) !important;
+  background: var(--background);
+  color: color-mix(in oklab, var(--foreground) 42%, transparent);
+  box-shadow: var(--docs-shadow-button);
+}
+
+figure.shiki button[aria-label='Copy Text']:hover,
+figure.shiki button[aria-label='Copied Text']:hover,
+.docs-installation-code button[aria-label='Copy command']:hover,
+.docs-installation-code button[aria-label='Copied command']:hover {
+  color: var(--color-fd-foreground);
+}
+
+figure.shiki button[aria-label='Copy Text'] svg,
+figure.shiki button[aria-label='Copied Text'] svg,
+.docs-installation-code button svg {
+  width: 13px;
+  height: 13px;
 }
 
 /* Bash/shell: Shiki italicizes the command name (first token) only */
@@ -1679,27 +2160,37 @@ figure.shiki code.language-shell span[style*='font-style:italic'],
 }
 
 /*
- * Language tabs (TypeScript / Python / cURL): full-bleed code.
- * Fumadocs TabsContent uses p-4 and [&>figure:only-child]:-m-4, but MDX
- * whitespace nodes break :only-child so the code block never expands.
+ * Language tabs (TypeScript / Python / cURL): the tab frame is the well.
+ * Inner code figure stays flush so we do not stack two wells.
  */
-.prose .bg-fd-secondary.my-4 [role='tabpanel']:has(figure.shiki) {
+.prose .bg-fd-secondary.my-4:has(figure.shiki),
+.prose .bg-fd-card.rounded-xl.border:has(figure.shiki) {
+  background: var(--docs-well) !important;
+  box-shadow: var(--docs-shadow-well) !important;
+  border: none !important;
+  border-radius: var(--docs-code-radius) !important;
+}
+
+.prose .bg-fd-secondary.my-4 [role='tabpanel']:has(figure.shiki),
+.prose .bg-fd-card.rounded-xl.border [role='tabpanel']:has(figure.shiki) {
   padding: 0;
   background: transparent;
   border-radius: 0;
 }
 
-.prose .bg-fd-secondary.my-4 [role='tabpanel']:has(figure.shiki) figure.shiki {
+.prose .bg-fd-secondary.my-4 [role='tabpanel']:has(figure.shiki) figure.shiki,
+.prose
+  .bg-fd-card.rounded-xl.border
+  [role='tabpanel']:has(figure.shiki)
+  figure.shiki {
   margin: 0;
-  border-radius: 0;
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 0;
-  box-shadow: none;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 /* Let fumadocs/shiki code blocks inside not-prose keep their own theme */
-.prose :where(.not-prose) pre {
+.prose :where(.not-prose):not(figure.shiki, .docs-code-surface) pre {
   background-color: unset;
   margin-top: 0;
   margin-bottom: 0;
@@ -1717,6 +2208,16 @@ figure.shiki code.language-shell span[style*='font-style:italic'],
   margin: var(--docs-space-section) auto;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+}
+
+/* `.prose img` is a descendant selector, so it still hits images inside
+   `.not-prose` (DocsScreenshot). Reset them so the 16:9 frame fills edge to edge. */
+.prose .not-prose img {
+  margin: 0;
+  max-width: none;
+  aspect-ratio: auto;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 /* Blog post image captions */
@@ -1809,13 +2310,17 @@ article .mt-auto {
   margin-top: 0.5rem;
 }
 
-/* Docs sidebar: bottom bar (border + theme slot) is only as wide as its contents and stays end-aligned, not full sidebar width. */
-#nd-sidebar div:has(> [data-sidebar-locale-theme]),
-#nd-sidebar-mobile div:has(> [data-sidebar-locale-theme]) {
+/* Docs sidebar: desktop bottom bar is only as wide as its contents. Mobile
+   uses a full-width footer in the sheet instead. */
+#nd-sidebar div:has(> [data-sidebar-locale-theme]) {
   width: fit-content;
   max-width: 100%;
   align-self: flex-start;
   border-radius: var(--docs-sidebar-radius);
+}
+
+#nd-sidebar .docs-mobile-locale-theme-footer {
+  display: none;
 }
 
 /* Docs: consistent spacing for card grids inside prose */
@@ -1938,3 +2443,16 @@ html {
     transform: translateX(212px);
   }
 } */
+
+/* After Tailwind utilities so overlay blur actually clears (Lightning CSS
+   drops `backdrop-filter: none` from unlayered rules). */
+@layer utilities {
+  @media (max-width: 767.98px) {
+    #nd-docs-layout > .fixed.z-40.inset-0 {
+      --tw-backdrop-blur: blur(0px);
+      background-color: var(--docs-overlay);
+      -webkit-backdrop-filter: blur(0px);
+      backdrop-filter: blur(0px);
+    }
+  }
+}

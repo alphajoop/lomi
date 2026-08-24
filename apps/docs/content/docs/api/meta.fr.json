@@ -1,5 +1,5 @@
 {
-  "title": "Référence API",
+  "title": "API",
   "description": "Authentification, erreurs, modèles de données et endpoints de l’API lomi.",
   "root": true,
   "icon": "BookOpen",
@@ -14,7 +14,7 @@
     "payment-links",
     "payment-requests",
     "charge",
-    "---Gérer le commerce---",
+    "---Gérer votre commerce---",
     "customers",
     "products",
     "subscriptions",
@@ -24,7 +24,17 @@
     "transactions",
     "refunds",
     "payouts",
+    "settlements",
+    "---Plateforme---",
+    "organizations",
+    "merchants",
+    "providers",
     "---Opérations---",
-    "webhooks"
+    "disputes",
+    "risk-assessments",
+    "webhooks",
+    "logs",
+    "meters",
+    "usage"
   ]
 }

@@ -1,0 +1,179 @@
+---
+title: Widget de paiement intégré
+description: Intégrez le checkout hébergé lomi. sur votre site avec @lomi./embed, fenêtre modale ou iframe inline.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+# Widget de paiement intégré
+
+Gardez vos clients sur votre site pendant qu'ils paient sur la page checkout hébergée lomi. dans une iframe. Utilisez le **mode modal** pour un fenêtre au clic, ou **inline** pour intégrer le checkout dans une page produit.
+
+<Callout type="info">
+  L'intégration convient quand vous voulez l'UI checkout complète lomi. (Wave, MTN, cartes, coupons) sans redirection. Pour des champs carte dans votre propre formulaire, voir [lomi. Payment Elements](/build/accept/payment-elements).
+</Callout>
+
+## Intégrer, rediriger ou vs Payment Elements
+
+| Approche | Idéal pour |
+| --- | --- |
+| **Redirection** ([checkout hébergé](/build/accept/checkout)) | Intégration la plus simple ; le client quitte brièvement votre site |
+| **Intégration** (ce guide) | Même UI checkout, reste sur votre page |
+| **Payment Elements** | Vous maîtrisez l'UI ; cartes ou mobile money dans votre mise en page |
+
+## Étape 1: Créer une session checkout
+
+Votre serveur crée la session et renvoie `checkout_url` au navigateur.
+
+**curl**
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 10000,
+    "currency_code": "XOF",
+    "success_url": "https://example.com/success",
+    "cancel_url": "https://example.com/cancel"
+  }'
+```
+
+**SDK TypeScript**
+
+```typescript
+import { lomiApi } from './lib/lomi/client';
+
+const session = await lomiApi.createCheckoutSession({
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel',
+  amount: 10000,
+  currency_code: 'XOF',
+});
+
+// Passez session.checkout_url au SDK embed
+```
+
+**CLI**
+
+```bash
+lomi checkout create
+```
+
+Le CLI affiche l'URL de redirection et un extrait embed prêt à coller.
+
+## Étape 2: Installer @lomi./embed
+
+```bash
+npm install @lomi./embed
+```
+
+## Exemple modal (bundler)
+
+```html
+<button id="pay">Payer</button>
+<script type="module">
+  import { loadLomiCheckout } from '@lomi./embed';
+
+  document.getElementById('pay').addEventListener('click', () => {
+    loadLomiCheckout({
+      checkoutUrl: 'CHECKOUT_URL_FROM_YOUR_SERVER',
+      mode: 'modal',
+      onComplete: (payload) => {
+        console.log('Paid:', payload.transactionId);
+      },
+    });
+  });
+</script>
+```
+
+Le SDK ajoute `embedded=true` et `embed_origin` automatiquement, ne les ajoutez pas à `checkoutUrl`.
+
+## Exemple inline
+
+```html
+<div
+  id="lomi-checkout"
+  data-lomi-checkout-url="CHECKOUT_URL_FROM_YOUR_SERVER"
+></div>
+<script type="module">
+  import '@lomi./embed';
+</script>
+```
+
+Attributs déclaratifs :
+
+| Attribut | Description |
+| --- | --- |
+| `data-lomi-checkout-url` | Recommandé, URL complète depuis l'API ou un lien de paiement |
+| `data-lomi-session-id` | Alternative avec `data-lomi-checkout-base-url` |
+| `data-lomi-public-key` | Optionnel avec `checkoutUrl` |
+| `id` | Id du conteneur requis (ex. `lomi-checkout`) |
+
+## Script auto-hébergé (sans CDN)
+
+Il n'y a **pas** de CDN hébergé. Copiez le bundle IIFE depuis le paquet :
+
+```bash
+cp node_modules/@lomi./embed/dist/lomi.js public/assets/lomi.js
+```
+
+```html
+<script src="/assets/lomi.js"></script>
+<script>
+  window.Lomi.loadLomiCheckout({
+    checkoutUrl: 'CHECKOUT_URL_FROM_YOUR_SERVER',
+    mode: 'modal',
+    onComplete: (p) => console.log(p),
+  });
+</script>
+```
+
+Les liens de paiement sur `checkout.lomi.africa` fonctionnent de la même façon, passez l'URL du lien comme `checkoutUrl`.
+
+## Callbacks et événements
+
+| Callback | Quand |
+| --- | --- |
+| `onComplete` | Paiement réussi (après livraison si applicable) |
+| `onResize` | Hauteur iframe modifiée (mode inline) |
+| `onError` | Erreur signalée par le checkout |
+
+L'iframe envoie des messages `LOMI_CHECKOUT` ; les types legacy `LOMI_CHECKOUT_COMPLETE` et `LOMI_RESIZE` sont supportés. Les messages d'origines autres que l'hôte checkout sont ignorés.
+
+Charge utile `onComplete` :
+
+```typescript
+{
+  type: 'LOMI_CHECKOUT_COMPLETE';
+  sessionId?: string;
+  transactionId?: string;
+  amount?: number;
+  currency?: string;
+  hasDigitalDeliverables?: boolean;
+}
+```
+
+## Webhooks
+
+Les callbacks embed améliorent seulement l'UX. Vérifiez toujours les commandes avec les [webhooks](/build/reliability) ou une lecture API côté serveur avant livraison.
+
+## Tests sandbox
+
+Utilisez des clés API sandbox et une `checkout_url` sandbox. En local, pointez vers votre app checkout :
+
+```javascript
+loadLomiCheckout({
+  checkoutUrl: 'http://localhost:3000/checkout/cs_test_...',
+  mode: 'modal',
+});
+```
+
+Voir [Paiements sandbox](/start/sandbox-payments) pour les moyens de test.
+
+## Voir aussi
+
+- [Checkout hébergé](/build/accept/checkout): flux par redirection
+- [Liens de paiement](/build/accept/payment-links): URLs partageables (aussi utilisables comme `checkoutUrl`)
+- [Vue d'ensemble SDK](/build/sdks): `@lomi./sdk` et `@lomi./embed`
+- README du paquet, `node_modules/@lomi./embed/README.md`

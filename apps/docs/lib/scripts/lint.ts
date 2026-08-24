@@ -617,7 +617,8 @@ async function checkLinks() {
         const relativePath = path.relative('content/docs', value);
         return getUrl(getSlugs(relativePath));
       },
-      whitelist: (url) => url.startsWith('/api'),
+      whitelist: (url) =>
+        url.startsWith('/api') || url.startsWith('/.well-known'),
     }),
     true,
   );

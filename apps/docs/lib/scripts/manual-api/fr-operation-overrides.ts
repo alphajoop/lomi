@@ -36,7 +36,7 @@ export const FR_OPERATION_COPY = {
     caveats:
       'La soumission des informations de carte brutes nécessite une intégration conforme PCI-DSS. Suivez `next_action` pour la 3DS et `retry_other_rail` en cas de refus du rail principal.',
     related:
-      '[Créer un encaissement carte](/api/charge/ChargesController_createCardCharge) · [Encaissements directs](/build/direct-charges)',
+      '[Créer un encaissement carte](/api/charge/ChargesController_createCardCharge) · [Encaissements directs](/build/accept/direct-charges)',
   },
   ChargesController_createWaveCharge: {
     whenToUse:
@@ -44,7 +44,7 @@ export const FR_OPERATION_COPY = {
     caveats:
       'Suivez les instructions du fournisseur dans la réponse ; l’UX dépend du rail (USSD, redirection app, etc.).',
     related:
-      '[Mobile money](/build/mobile-money) · [Encaissements directs](/build/direct-charges) · [Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Encaissements directs](/build/accept/direct-charges) · [Créer une session checkout](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   ChargesController_getCardCharge: {
     whenToUse: 'Utilisez après confirmation client pour interroger le statut.',
@@ -159,9 +159,9 @@ export const FR_OPERATION_COPY = {
     whenToUse:
       'Pour annuler tout ou partie d’un paiement éligible déjà terminé (remboursement total ou partiel).',
     caveats:
-      '**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable; pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.',
+      '**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN (test) :** uniquement comptable; pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.',
     related:
-      '[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Remboursements](/build/refunds)',
+      '[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Remboursements](/build/money/refunds)',
   },
   RefundsController_findAll: {
     whenToUse: 'Utilisez pour réconciliation, support et tableaux de bord.',
@@ -177,25 +177,25 @@ export const FR_OPERATION_COPY = {
     whenToUse:
       'Utilisez pour arrêter la facturation récurrente à la fin de période ou immédiatement selon votre flux.',
     related:
-      '[Récupérer un abonnement](/api/subscriptions/SubscriptionsController_findOne) · [Abonnements](/build/subscriptions)',
+      '[Récupérer un abonnement](/api/subscriptions/SubscriptionsController_findOne) · [Abonnements](/build/billing/subscriptions)',
   },
   CustomersController_getSubscriptions: {
     whenToUse:
       'Utilisez pour afficher les abonnements actifs d’un client dans le support ou le portail.',
     related:
-      '[Récupérer un client](/api/customers/CustomersController_findOne) · [Abonnements](/build/subscriptions)',
+      '[Récupérer un client](/api/customers/CustomersController_findOne) · [Abonnements](/build/billing/subscriptions)',
   },
   TransactionsController_findAll: {
     whenToUse:
       'Utilisez pour réconciliation, exports et corrélation avec les webhooks de paiement.',
     related:
-      '[Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Transactions](/build/transactions)',
+      '[Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Transactions](/build/money/transactions)',
   },
   WebhookDeliveryLogsController_findAll: {
     whenToUse:
       'Utilisez pour diagnostiquer les échecs de livraison webhook et les retries.',
     related:
-      '[Lister les webhooks](/api/webhooks/WebhooksController_findAll) · [Webhooks](/build/webhooks)',
+      '[Lister les webhooks](/api/webhooks/WebhooksController_findAll) · [Webhooks](/build/reliability)',
   },
   WebhooksController_update: {
     whenToUse:
@@ -203,6 +203,6 @@ export const FR_OPERATION_COPY = {
     caveats:
       'Après rotation du secret, mettez à jour la vérification de signature côté serveur avant de désactiver l’ancien secret.',
     related:
-      '[Créer un webhook](/api/webhooks/WebhooksController_create) · [Webhooks](/build/webhooks)',
+      '[Créer un webhook](/api/webhooks/WebhooksController_create) · [Webhooks](/build/reliability)',
   },
 };

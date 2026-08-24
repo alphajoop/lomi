@@ -11,7 +11,7 @@ import { Logo } from './logo';
  * Home Layout: app/(home)/layout.tsx
  * Docs Layout: app/(docs)/layout.tsx
  */
-export const logo = <Logo />;
+export const logo = <Logo priority />;
 
 export const linkItems: BaseLayoutProps['links'] = [];
 

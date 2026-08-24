@@ -24,7 +24,7 @@ Base URLs:
 - `POST /payouts`: Créer un virement (self ou beneficiary)
 - `GET /payouts`: Lister les virements
 - `GET /payouts/{id}`: Obtenir un virement
-- `POST /charge/mtn`: Lancer un encaissement direct MTN MoMo
+- `POST /charge/mtn`: Lancer un encaissement direct MTN
 - `POST /charge/wave`: Lancer un encaissement direct Wave
 - `GET /checkout-sessions`: Lister les sessions de paiement
 - `POST /checkout-sessions`: Créer une session de paiement

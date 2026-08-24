@@ -11,9 +11,9 @@ interface LogoProps {
 
 export function Logo({
   width = 60,
-  height = 18,
+  height = 30,
   className = '',
-  priority = false,
+  priority = true,
 }: LogoProps) {
   return (
     <>
@@ -24,7 +24,8 @@ export function Logo({
         height={height}
         className={`block dark:hidden ${className}`.trim()}
         priority={priority}
-        style={{ height: 'auto' }}
+        loading={priority ? 'eager' : 'lazy'}
+        style={{ width, height: 'auto' }}
       />
       <Image
         src="/company/lomi_l.webp"
@@ -33,7 +34,8 @@ export function Logo({
         height={height}
         className={`hidden dark:block ${className}`.trim()}
         priority={priority}
-        style={{ height: 'auto' }}
+        loading={priority ? 'eager' : 'lazy'}
+        style={{ width, height: 'auto' }}
       />
     </>
   );

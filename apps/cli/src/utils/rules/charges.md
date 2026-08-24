@@ -1,6 +1,6 @@
 # lomi. Charges
 
-Charges represent a single payment collection attempt (Wave, MTN MoMo, or embedded card).
+Charges represent a single payment collection attempt (Wave, MTN, or embedded card).
 
 ## Embedded card charge
 

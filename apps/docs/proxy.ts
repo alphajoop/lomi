@@ -1,6 +1,7 @@
 /* @proprietary license */
 
 import { type NextRequest, NextResponse } from 'next/server';
+import { discoveryLinkHeaderValue } from '@/lib/seo/agent-discovery';
 import {
   isDocsMachinePath,
   parseDocsLocalePath,
@@ -29,19 +30,27 @@ function maybeRedirectLocalePrefix(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(url, 301);
 }
 
+function withDiscoveryLink(request: NextRequest, response: NextResponse) {
+  response.headers.set(
+    'Link',
+    discoveryLinkHeaderValue(request.nextUrl.origin),
+  );
+  return response;
+}
+
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (isDocsMachinePath(pathname)) {
-    return NextResponse.next();
+    return withDiscoveryLink(request, NextResponse.next());
   }
 
   const localePrefixRedirect = maybeRedirectLocalePrefix(request);
   if (localePrefixRedirect) {
-    return localePrefixRedirect;
+    return withDiscoveryLink(request, localePrefixRedirect);
   }
 
-  return NextResponse.next();
+  return withDiscoveryLink(request, NextResponse.next());
 }
 
 export const config = {

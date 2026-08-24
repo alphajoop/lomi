@@ -8,7 +8,7 @@ Le **SDK lomi.** est le moyen le plus rapide d'appeler l'API lomi. depuis le cod
 Ce guide utilise le **SDK TypeScript** (`@lomi./sdk`). Le même parcours s'applique à [Python](/build/sdks/python), [Go](/build/sdks/go) et [PHP](/build/sdks/php).
 
 <Callout type="info">
-  Vous comparez API REST, SDK, CLI et MCP ? Commencez par [Comment appeler lomi.](/start/integration-journey#how-you-call-lomi), puis suivez cette page pour le parcours SDK complet.
+  Vous comparez API, SDK, CLI et MCP ? Commencez par [Comment utiliser lomi.](/start/integration-journey#how-you-call-lomi), puis suivez cette page pour le parcours SDK complet.
 </Callout>
 
 <Steps>
@@ -105,7 +105,7 @@ Transférez les événements vers votre serveur local avec le CLI, sans ngrok :
 lomi listen http://localhost:3000/webhooks
 ```
 
-Voir [Écouter les webhooks](/build/cli/listen) et [Webhooks](/build/webhooks).
+Voir [Écouter les webhooks](/build/cli/listen) et [Webhooks](/build/reliability).
 
 </Steps>
 
@@ -115,9 +115,9 @@ Voir [Écouter les webhooks](/build/cli/listen) et [Webhooks](/build/webhooks).
 | --- | --- |
 | API complète du SDK TypeScript | [SDK TypeScript](/build/sdks/typescript) |
 | Autres langages | [Python](/build/sdks/python) · [Go](/build/sdks/go) · [PHP](/build/sdks/php) |
-| Checkout hébergé | [Checkout](/build/checkout) |
-| Facturation récurrente | [Abonnements](/build/subscriptions) |
-| Gestion des erreurs | [Gestion des erreurs](/build/advanced-guides/error-handling) |
+| Checkout hébergé | [Checkout](/build/accept/checkout) |
+| Facturation récurrente | [Abonnements](/build/billing/subscriptions) |
+| Gestion des erreurs | [Gestion des erreurs](/build/reliability/error-handling) |
 
 ## Deux types d'identifiants
 
@@ -131,6 +131,6 @@ Voir [Écouter les webhooks](/build/cli/listen) et [Webhooks](/build/webhooks).
 
 ## Suite
 
-- [Effectuer un paiement de test](/start/first-payment) : parcours CLI et cURL
+- [Comment tester un paiement ?](/start/first-payment) : parcours CLI et cURL
 - [Choisir une intégration](/build/choose-integration) : checkout hébergé, liens, abonnements
-- [Passer en production](/start/go-live) : check-list de mise en ligne
+- [Passer en production](/start/go-live) : passer des clés de test aux clés live

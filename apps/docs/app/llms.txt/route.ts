@@ -11,11 +11,12 @@ export const revalidate = false;
 /** Slugs referenced in llms.txt output (validated by `pnpm docs:drift`). */
 const LLMS_CURATED_SLUGS = [
   'start/integration-journey',
-  'build/guides/verify-payments',
-  'build/guides/payment-lifecycle',
+  'build/reliability/verify-payments',
+  'build/reliability/payment-lifecycle',
   'build/payment-channels',
   'api/payment-state-machine',
   'build/mcp',
+  'build/accept/checkout',
 ] as const;
 void LLMS_CURATED_SLUGS;
 
@@ -67,7 +68,7 @@ export async function GET() {
     '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, usage billing, or payouts).',
   );
   lines.push(
-    `3. Use the [REST API hub](${docsOrigin}/api) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
+    `3. Use the [API hub](${docsOrigin}/api) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
   );
   lines.push('');
 
@@ -100,10 +101,13 @@ export async function GET() {
   );
   const integrationJourney = pageBySlugPath(pages, 'start/integration-journey');
   const paymentMethodsHub = pageBySlugPath(pages, 'build/payment-channels');
-  const verifyPayments = pageBySlugPath(pages, 'build/guides/verify-payments');
+  const verifyPayments = pageBySlugPath(
+    pages,
+    'build/reliability/verify-payments',
+  );
   const paymentLifecycle = pageBySlugPath(
     pages,
-    'build/guides/payment-lifecycle',
+    'build/reliability/payment-lifecycle',
   );
   const sandboxPayments = pageBySlugPath(pages, 'start/sandbox-payments');
   if (integrationJourney) {
@@ -131,6 +135,23 @@ export async function GET() {
       `- Test cards and MoMo sandbox behavior: [${sandboxPayments.data.title ?? 'Sandbox payments'}](${docsOrigin}${sandboxPayments.url}).`,
     );
   }
+  lines.push('');
+
+  lines.push('## Markets');
+  lines.push('');
+  lines.push(
+    `Coverage map. Details: [Payment channels](${docsOrigin}/build/payment-channels).`,
+  );
+  lines.push('');
+  lines.push(
+    "- **Côte d'Ivoire, Senegal, and UEMOA:** Wave (`XOF`), cards, and SPI on hosted checkout.",
+  );
+  lines.push(
+    '- **MTN:** CI plus CM, GH, UG, ZM, BJ, CG, SZ, GN, ZA, LR, NG.',
+  );
+  lines.push(
+    '- **Not lomi. rails:** Orange Money and Apple Pay. Djamo is coming for CI and SN.',
+  );
   lines.push('');
 
   lines.push('## Authentication and environments');
@@ -191,7 +212,7 @@ export async function GET() {
   );
   if (cardCharge) {
     lines.push(
-      `- **Embedded card charge (Elements-style)** → [${cardCharge.data.title ?? 'Card charge'}](${docsOrigin}${cardCharge.url}) (**not available yet**: \`POST /charge/card\` returns \`503 service_unavailable\`; use [hosted checkout](/build/checkout) for cards).`,
+      `- **Embedded card charge (Elements-style)** → [${cardCharge.data.title ?? 'Card charge'}](${docsOrigin}${cardCharge.url}) (**not available yet**: \`POST /charge/card\` returns \`503 service_unavailable\`; use [hosted checkout](/build/accept/checkout) for cards).`,
     );
   }
   const pr = pages.find(
@@ -208,7 +229,10 @@ export async function GET() {
       `- **Subscriptions** → explore [${subList.data.title ?? 'Subscriptions'}](${docsOrigin}${subList.url}) (list, cancel, per-customer).`,
     );
   }
-  const usageBillingGuide = pageBySlugPath(pages, 'build/usage-billing');
+  const usageBillingGuide = pageBySlugPath(
+    pages,
+    'build/billing/usage-billing',
+  );
   const metersCreate = pages.find(
     (p) => p.slugs[2] === 'MetersController_create',
   );
@@ -231,10 +255,10 @@ export async function GET() {
   }
   lines.push('');
 
-  lines.push('## REST API by domain');
+  lines.push('## API by domain');
   lines.push('');
   lines.push(
-    `Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](${docsOrigin}/api).`,
+    `Each item links into the generated endpoint pages for that resource group. Primary hub: [API](${docsOrigin}/api).`,
   );
   lines.push('');
   for (const folder of REST_API_SECTION_ORDER) {
@@ -250,7 +274,7 @@ export async function GET() {
   lines.push('## Agent onboarding & MCP OAuth');
   lines.push('');
   lines.push(
-    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/*\` REST API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes).`,
+    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/*\` API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes).`,
   );
   lines.push('');
   lines.push('**Credential types:**');
@@ -354,6 +378,12 @@ export async function GET() {
   if (mcp) {
     lines.push(`- [${mcp.data.title ?? 'MCP'}](${docsOrigin}${mcp.url})`);
   }
+  const taskGuide = pageBySlugPath(pages, 'build/accept/checkout');
+  if (taskGuide) {
+    lines.push(
+      `- [${taskGuide.data.title ?? 'Checkout'}](${docsOrigin}${taskGuide.url}), REST / MCP / CLI / SDK for the same job`,
+    );
+  }
   lines.push('');
 
   lines.push('## Document map (browse by section)');
@@ -424,7 +454,7 @@ export async function GET() {
   lines.push('## Common questions');
   lines.push('');
   lines.push(
-    `**Where do schemas live?** Use the [REST API](${docsOrigin}/api) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
+    `**Where do schemas live?** Use the [API](${docsOrigin}/api) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
   );
   const txHub = firstApiPageInFolder(pages, 'transactions');
   if (txHub) {

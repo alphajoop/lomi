@@ -303,6 +303,95 @@ if (existsSync(paths.docsLlmsRoute)) {
       'docs llms.txt route must document canonical MCP OAuth resource /oauth-protected-resource/mcp',
     );
   }
+  const staleLlmsSlugs = [
+    'build/guides/verify-payments',
+    'build/guides/payment-lifecycle',
+    'build/tasks',
+  ];
+  for (const slug of staleLlmsSlugs) {
+    if (docsLlms.includes(slug)) {
+      throw new Error(
+        `docs llms.txt route must not reference moved slug ${slug}`,
+      );
+    }
+  }
+}
+
+const docsDiscoveryPath = join(docsRoot, 'lib/seo/agent-discovery.ts');
+const docsSkillRoute = join(
+  docsRoot,
+  'app/.well-known/agent-skills/lomi-payments/SKILL.md/route.ts',
+);
+const docsAgentCardRoute = join(
+  docsRoot,
+  'app/.well-known/agent.json/route.ts',
+);
+const docsAiCatalogRoute = join(
+  docsRoot,
+  'app/.well-known/ai-catalog.json/route.ts',
+);
+const docsMcpCardRoute = join(
+  docsRoot,
+  'app/.well-known/mcp/server-card.json/route.ts',
+);
+const docsAgentsMdRoute = join(docsRoot, 'app/agents.md/route.ts');
+
+for (const [label, filePath] of [
+  ['docs agent-discovery', docsDiscoveryPath],
+  ['docs SKILL.md route', docsSkillRoute],
+  ['docs agent.json route', docsAgentCardRoute],
+  ['docs ai-catalog route', docsAiCatalogRoute],
+  ['docs MCP server-card route', docsMcpCardRoute],
+  ['docs agents.md route', docsAgentsMdRoute],
+]) {
+  if (!existsSync(filePath)) {
+    throw new Error(`Missing ${label}: ${filePath}`);
+  }
+}
+
+const docsDiscovery = readFileSync(docsDiscoveryPath, 'utf-8');
+if (!docsDiscovery.includes("AGENT_SKILL_NAME = 'lomi-payments'")) {
+  throw new Error('docs agent-discovery must publish skill name lomi-payments');
+}
+if (!docsDiscovery.includes('MCP_ORIGIN')) {
+  throw new Error('docs agent-discovery must import MCP_ORIGIN for the hosted MCP URL');
+}
+if (!docsDiscovery.includes('BRAND_DEFINITION')) {
+  throw new Error('docs agent-discovery must reuse BRAND_DEFINITION');
+}
+if (docsDiscovery.includes('/build/tasks')) {
+  throw new Error(
+    'docs agent-discovery must not link the removed /build/tasks hub',
+  );
+}
+
+if (agentCard) {
+  const brandFactsPath = join(docsRoot, 'lib/seo/brand-facts.ts');
+  const brandFacts = existsSync(brandFactsPath)
+    ? readFileSync(brandFactsPath, 'utf-8')
+    : '';
+  if (
+    isStringValue(agentCard.description) &&
+    !brandFacts.includes(agentCard.description)
+  ) {
+    throw new Error(
+      'docs brand-facts BRAND_DEFINITION must match website agent.json description',
+    );
+  }
+  for (const capability of agentCard.capabilities ?? []) {
+    if (!docsDiscovery.includes(`'${capability}'`)) {
+      throw new Error(
+        `docs agent-discovery must include website capability ${capability}`,
+      );
+    }
+  }
+  if (agentCard.authentication?.headerName === 'X-API-KEY') {
+    if (!docsDiscovery.includes("headerName: 'X-API-KEY'")) {
+      throw new Error(
+        'docs agent-discovery authentication header must match website agent.json',
+      );
+    }
+  }
 }
 
 globalThis.console.log('verify-agent-contracts: ok');

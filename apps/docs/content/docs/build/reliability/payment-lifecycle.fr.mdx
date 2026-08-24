@@ -1,0 +1,57 @@
+---
+title: 'Cycle de vie des paiements et reversements'
+description: 'Comment les statuts encaissement et décaissement s’articulent, liens vers la machine à états, soldes et webhooks.'
+docType: explanation
+---
+
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Cette page est la **carte marchande** des statuts de paiement et de reversement. Pour les tableaux de transition et diagrammes complets, voir **[Machine à états du paiement](/api/payment-state-machine)**.
+
+## Encaissement
+
+| Phase | Statut typique | Impact pour vous |
+| --- | --- | --- |
+| Le client commence | `pending` | UI en attente ; ne pas livrer |
+| Confirmation prestataire | `completed` | Crédit solde test/live ; livrer après [vérification](/build/reliability/verify-payments) |
+| Délai / abandon | `failed` ou `expired` | Libérer le stock ; proposer une nouvelle tentative |
+| Remboursement | `refunded` | Annuler la livraison si besoin |
+
+**Test vs live :** les clés test complètent souvent le mobile money immédiatement ; en live le statut reste `pending` jusqu’à approbation sur l’appareil.
+
+## Décaissement (reversements et remboursements)
+
+Les reversements passent par `pending` → `processing` → `completed` ou `failed`. Considérez **`completed`** comme « fonds sortis de la plateforme ».
+
+### Retraits vs bénéficiaires
+
+- **Retraits** : fonds de votre solde lomi. vers vos propres moyens (mobile money, banque, etc.).
+- **Virements vers bénéficiaires** : fonds envoyés vers un compte tiers (prestataires, partenaires, routage des remboursements).
+
+Certains flux **valident le solde à la création** et **débitent ou finalisent à la complétion**. Un virement peut être accepté tout en étant encore en cours. Si le solde évolue avant le règlement, **la complétion peut échouer**.
+
+### Frais et plafonds
+
+Les frais dépendent de la configuration tarifaire de l’organisation, du prestataire et du moyen (banque locale vs internationale), et de la devise. Les retraits peuvent imposer des montants min/max et des caps par période. Voir [Tarification marchand d’enregistrement](/start/merchant-of-record/pricing).
+
+### Échecs
+
+Les échecs peuvent venir de coordonnées invalides, d’un refus prestataire ou d’un solde insuffisant au règlement. Consultez le statut dans l’API. Voir [Virements](/build/money/payouts) et [Remboursements](/build/money/refunds).
+
+## Soldes et règlement
+
+Les paiements `completed` mettent à jour votre solde marchand selon les frais et délais de disponibilité. Voir [Solde et règlement](/build/money/balance-and-settlement).
+
+## Les webhooks relient tout
+
+1. [Configurer les webhooks](/build/reliability)
+2. [Gestion des webhooks](/build/reliability/handling-webhooks)
+3. [Fiabilité des webhooks](/build/reliability/webhook-reliability)
+
+## Voir aussi
+
+- [Comportement checkout](/build/accept/checkout-behavior)
+- [Simuler les erreurs](/build/reliability/simulate-errors)
+- [Transactions](/build/money/transactions)

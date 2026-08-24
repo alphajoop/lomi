@@ -1,12 +1,12 @@
 ---
-title: 'Référence API'
+title: Vue d’ensemble
 description: 'Utilisez l’API marchande publique lomi. pour accepter des paiements, gérer les objets commerce, déplacer l’argent et traiter les événements opérationnels.'
 index: true
 ---
 
 La référence API documente l’API marchande publique : les endpoints qu’un développeur doit utiliser depuis une intégration serveur. Elle n’expose volontairement pas les services internes de providers, organisations, administration marchande ou agents.
 
-Si vous choisissez encore votre chemin d’intégration, commencez par [Quelle intégration de paiement choisir ?](/build/choose-integration).
+Si vous choisissez encore votre chemin d’intégration, commencez par [Parcours d’intégration](/start/integration-journey) ou [Quelle intégration choisir ?](/build/choose-integration).
 
 ## URLs de base
 
@@ -21,18 +21,18 @@ Envoyez la clé secrète dans l’en-tête `X-API-Key` depuis votre serveur.
 
 | Objectif | API |
 | --- | --- |
-| Checkout hébergé | [Checkout sessions](/api/checkout-sessions) |
-| URLs de paiement partageables | [Payment links](/api/payment-links) |
-| Demandes de paiement créées par backend | [Payment requests](/api/payment-requests) |
-| Flux Wave, MTN MoMo et carte plus bas niveau | [Encaissements directs avancés](/api/charge) |
+| Checkout hébergé | [Sessions de checkout](/api/checkout-sessions) |
+| URLs de paiement partageables | [Liens de paiement](/api/payment-links) |
+| Demandes de paiement créées par le backend | [Demandes de paiement](/api/payment-requests) |
+| Flux Wave, MTN et carte plus bas niveau | [Encaissements directs avancés](/api/charge) |
 
-## Gérer le commerce
+## Gérer votre commerce
 
 | Objectif | API |
 | --- | --- |
-| Clients et sessions de portail client | [Customers](/api/customers) |
-| Produits, prix et catalogues | [Products](/api/products) |
-| Facturation récurrente et abonnements clients | [Subscriptions](/api/subscriptions) |
+| Clients et sessions de portail client | [Clients](/api/customers) |
+| Produits, prix et catalogues | [Produits](/api/products) |
+| Facturation récurrente et abonnements clients | [Abonnements](/api/subscriptions) |
 | Codes promo et performance des coupons | [Coupons](/api/coupons) |
 
 ## Déplacer et réconcilier l’argent
@@ -41,8 +41,8 @@ Envoyez la clé secrète dans l’en-tête `X-API-Key` depuis votre serveur.
 | --- | --- |
 | Lire les soldes disponibles et en attente | [Soldes](/api/balances) |
 | Inspecter les enregistrements de paiement | [Transactions](/api/transactions) |
-| Créer et inspecter des remboursements | [Refunds](/api/refunds) |
-| Créer et inspecter des virements | [Payouts](/api/payouts) |
+| Créer et inspecter des remboursements | [Remboursements](/api/refunds) |
+| Créer et inspecter des reversements | [Reversements](/api/payouts) |
 
 ## Opérer de façon fiable
 
@@ -55,12 +55,12 @@ Envoyez la clé secrète dans l’en-tête `X-API-Key` depuis votre serveur.
 - Les guides expliquent les décisions produit et les flux complets.
 - Les pages API décrivent les opérations HTTP exactes.
 - Les encaissements directs sont avancés ; le checkout hébergé reste la recommandation par défaut.
-- Utilisez la sandbox pour développer et le live seulement après la [checklist de production](/start/go-live).
+- Utilisez la sandbox pour développer et le live seulement après [Que vérifier avant le live ?](/start/go-live).
 
 ## Règles de contrat
 
 - **Montants :** les champs `amount` publics sont des entiers en unités mineures. `10000` vaut 10 000 XOF, ou 100,00 USD/EUR. Envoyez toujours `currency_code`.
-- **Idempotence :** `Idempotency-Key` est obligatoire sur `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts` et `POST /charge/*`. Voir [Clés d’idempotence](/build/advanced-guides/idempotency-keys).
+- **Idempotence :** `Idempotency-Key` est obligatoire sur `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts` et `POST /charge/*`. Voir [Clés d’idempotence](/build/reliability/idempotency-keys).
 - **Listes :** interrogez avec `cursor` et `limit` (défaut 20, max 100). Réponse `{ object: "list", data, has_more, next_cursor, limit }`.
 - **Erreurs :** `{ error: { code, message, details }, request_id }`. Voir [Gestion des erreurs](/api/errors).
 - **Limites :** les réponses réussies incluent `X-RateLimit-Remaining` et les en-têtes IETF `RateLimit` / `RateLimit-Policy`. Un `429` inclut `Retry-After`.

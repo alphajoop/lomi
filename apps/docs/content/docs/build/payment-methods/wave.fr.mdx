@@ -1,5 +1,5 @@
 ---
-title: 'Comment accepter les paiements Wave ?'
+title: 'Comment accepter Wave ?'
 description: 'Mobile money Wave via checkout hébergé ou POST /charge/wave, comportement asynchrone en live et exigence XOF.'
 docType: how-to
 ---
@@ -9,7 +9,20 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-Wave est le rail mobile money principal pour l’**UEMOA (XOF)**. Préférez [checkout hébergé](/build/checkout) ou [liens de paiement](/build/payment-links).
+Wave est le rail mobile money principal pour l’**UEMOA (XOF)**. Préférez [checkout hébergé](/build/accept/checkout) ou [liens de paiement](/build/accept/payment-links).
+
+## En bref
+
+| | |
+| --- | --- |
+| Approbation | Redirection ou URL de lancement (`wave_launch_url` / `checkout_url`) |
+| Règlement | Test : souvent à la création. Live : après approbation dans Wave, puis `available_at` |
+| Direct vs hébergé | Hébergé et `POST /charge/wave` |
+| Remboursement | Transactions Wave `completed` |
+| Min / max | - |
+| Devise | `XOF` |
+
+Mêmes colonnes que [Canaux de paiement](/build/payment-channels#channel-capabilities).
 
 ## Checkout hébergé (recommandé)
 
@@ -22,7 +35,7 @@ Wave est le rail mobile money principal pour l’**UEMOA (XOF)**. Préférez [ch
 
 `POST /charge/wave` exige le **XOF**. La réponse contient `wave_launch_url` ou `checkout_url`.
 
-Voir [API Charges](/api/charge/ChargesController_createWaveCharge) et [Charges directes](/build/direct-charges).
+Voir [API Charges](/api/charge/ChargesController_createWaveCharge) et [Charges directes](/build/accept/direct-charges).
 
 ## Test vs live
 
@@ -32,7 +45,7 @@ Voir [API Charges](/api/charge/ChargesController_createWaveCharge) et [Charges d
 | Statut | Souvent `completed` rapidement | Démarre en `pending` |
 
 <Callout type="info">
-  En live, ne livrez pas sur la seule redirection. Voir [Vérifier les paiements](/build/guides/verify-payments).
+  En live, ne livrez pas sur la seule redirection. Voir [Vérifier les paiements](/build/reliability/verify-payments).
 </Callout>
 
 ## Reversements

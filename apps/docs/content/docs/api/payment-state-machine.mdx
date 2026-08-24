@@ -47,7 +47,7 @@ Platform `transaction_status` is reflected in `provider_payment_status` on linke
 | `expired` | `expired` |
 | `refunded` | `refunded` |
 
-See [Transactions](/build/transactions) for field names in API responses.
+See [Transactions](/build/money/transactions) for field names in API responses.
 
 ## Status updates: idempotency and metadata
 
@@ -71,14 +71,14 @@ Expired rows carry `expiration_info` in metadata describing why they closed.
 2. **Balances** update via an idempotent path (`metadata.balance_updated` prevents double crediting).
 3. **Subscriptions** linked to the transaction may move from `pending` to `active`.
 
-For balance timing, see [Balance and settlement](/build/balance-and-settlement).
+For balance timing, see [Balance and settlement](/build/money/balance-and-settlement).
 
 ## Related guides
 
-- [Payment lifecycle (Build)](/build/guides/payment-lifecycle)
-- [Verify payments](/build/guides/verify-payments)
-- [Checkout behavior](/build/payments/checkout-behavior)
-- [Handling webhooks](/build/advanced-guides/handling-webhooks)
+- [Payment lifecycle (Build)](/build/reliability/payment-lifecycle)
+- [Verify payments](/build/reliability/verify-payments)
+- [Checkout behavior](/build/accept/checkout-behavior)
+- [Handling webhooks](/build/reliability/handling-webhooks)
 
 <Accordions type="single">
   <Accordion title="For contributors" id="for-contributors">

@@ -1,0 +1,183 @@
+---
+title: 'Open source'
+description: 'lomi. publishes integrator tooling and documentation as open source. Payment processing runs on our hosted platform, not as a self-hosted product today.'
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+lomi. follows a **hosted-first** model. Merchants integrate via our cloud API, dashboard, and checkout. We are **not** offering self-hosted payment processing at this time.
+
+Our **long-term direction** is to open the monorepo progressively, more apps, more source, and eventually a supported path for operators who self-host with their own provider agreements and compliance. That future state is not available yet; see [Roadmap](#roadmap) for what is public today.
+
+We still publish source for transparency and for integrator tooling (SDKs, CLI, plugins, docs). In line with that vision, we follow a **dual-license approach**.
+
+Our project is primarily licensed under the **GNU Affero General Public License (AGPL)**, allowing the open-source community to freely use, modify, and redistribute our software. However, the AGPL requires that anyone using the software, especially when providing it as a service, **must also make the source code available to the public**. Therefore, if you wish to use **lomi.** without sharing your modifications, i.e. incorporating it into closed-source products, or use it commercially to offer similar products or services, **a commercial license is required**.
+
+Certain components are covered exclusively by our **commercial license**, designed for businesses that need additional features or usage flexibility. This **dual-licensing model** lets us serve both the open-source community and enterprise partners.
+
+<Callout type="info">
+  See the monorepo [LICENSE](https://github.com/lomiafrica/lomi.?tab=License-1-ov-file) file for the complete terms of both licenses.
+</Callout>
+
+## What is open source today?
+
+| Area | Availability |
+| :--- | :--- |
+| Hosted payment platform (API, dashboard, checkout, MoR) | ✅ Production, [sign up](https://lomi.africa/sign-up) |
+| API and webhooks | ✅ Hosted only |
+| SDKs, CLI, MCP, plugins | ✅ Integrator tooling (source + packages) |
+| Documentation website | ✅ Open source (`apps/docs`) |
+| Merchant dashboard, checkout, storefront | 🔒 Hosted product (source opening progressively) |
+| Admin | 🔒 Proprietary |
+
+<Callout type="warn">
+  **Not self-hostable today.** Running payment processing requires lomi.’s hosted infrastructure, Merchant of Record, provider agreements, compliance, and operational stack. Local clones are for **development and contribution**, not for operating your own payment processor.
+</Callout>
+
+## Hosted platform
+
+For production payments, use the hosted platform on [lomi.africa](https://lomi.africa/sign-up). You get built-in payment channels, Merchant of Record coverage, automatic updates, and dedicated support.
+
+### Quick comparison
+
+| Feature | Open-source tooling | Hosted platform |
+| :------ | :-----------------: | :-------------: |
+| API and webhooks | Integrate against hosted API | ✅ |
+| Built-in payment channels | - | ✅ |
+| Merchant dashboard and checkout | - | ✅ |
+| SDKs, CLI, MCP, plugins | ✅ Source + packages | ✅ |
+| Self-hosting the payment stack | On the roadmap | - |
+| Automatic updates | - | ✅ |
+| Dedicated support | Community | ✅ |
+
+### Support options
+
+The hosted platform includes:
+
+- 24/7 technical support
+- Priority issue resolution
+- Implementation assistance
+
+### Resources
+
+- [Monorepo on GitHub](https://github.com/lomiafrica/lomi.)
+- [Contributing](/resources/contributing)
+- [Manifesto](/resources/manifesto)
+- [Community](/resources/community)
+- [Status page](https://status.lomi.africa)
+
+## Roadmap
+
+We are progressively open-sourcing the monorepo. **Self-hosting the full payment stack is a long-term objective**, not something we support in production today. The path looks like: publish more source → document operator requirements (providers, MoR, compliance) → offer a supported self-host option when the stack is complete and safe to run without lomi.’s hosted services.
+
+What is open today:
+
+- **Currently open source**:
+  - Documentation website: **`apps/docs`** (this site)
+  - CLI (**`apps/cli`**), integrator tool; build on the hosted API, not platform ops
+  - API service: **`apps/api`**
+  - SDKs: **`apps/sdks`**
+  - E-commerce plugins: separate repos under `apps/plugins/`, [woo](https://github.com/lomiafrica/woo), [magento](https://github.com/lomiafrica/magento), [prestashop](https://github.com/lomiafrica/prestashop), [shopify](https://github.com/lomiafrica/shopify), [bubble](https://github.com/lomiafrica/bubble)
+  - MCP server (**`apps/mcp`**), integrator tool; merchant API in your IDE, not platform ops
+  - Events boilerplate (separate repo): **[lomiafrica/events](https://github.com/lomiafrica/events/)**
+
+- **Opening soon**:
+  - Merchant dashboard: **`apps/dashboard`**
+
+- **Proprietary**:
+  - Admin dashboard: **`apps/admin`**
+
+- **Hosted product (source not fully public yet)**:
+  - Checkout: **`apps/checkout`**
+  - Storefront: **`apps/storefront`**
+  - Customer portal: **`apps/customers`**
+  - Marketing website: **`apps/website`**
+
+Many files, especially database migrations and core payment logic, are marked `/* @proprietary license */` even inside AGPL-licensed apps.
+
+## Monorepo layout
+
+```text filename="Project structure"
+└── lomi./
+    ├── README.md
+    ├── CONTRIBUTING.md
+    ├── LICENSE
+    ├── pnpm-workspace.yaml
+    ├── tooling/          # shared eslint, knip, tsconfig, postcss, scripts (not a package)
+    ├── packages/
+    │   ├── ui/           # @lomi./ui — shared React primitives (workspace-internal)
+    │   ├── shared/       # @lomi./shared — format helpers, json-value, generated Database types
+    │   ├── queries/      # @lomi./queries — injected RPC wrappers
+    │   ├── pay/          # @lomi./pay — hosted checkout/storefront form chrome (React 19)
+    │   └── receipt-pdf/  # @lomi./receipt-pdf — receipt PDF (workspace + npm)
+    └── apps/
+        ├── admin/        # Internal admin (proprietary)
+        ├── api/          # NestJS payment API (open source)
+        ├── checkout/     # Hosted checkout (hosted product)
+        ├── cli/          # Rust CLI (integrator tool; open source)
+        ├── customers/    # Customer portal (hosted product)
+        ├── dashboard/    # Merchant dashboard (opening soon)
+        ├── design/       # Shared design assets
+        ├── docs/         # Developer documentation (open source, this app)
+        ├── jumbo/        # Mobile POS (MPOS) merchant app
+        ├── mcp/          # MCP server (integrator tool; open source)
+        ├── plugins/      # WooCommerce, Magento, PrestaShop, Shopify, Bubble, references
+        ├── sdks/         # TypeScript, Python, PHP, Go SDKs (open source)
+        ├── storefront/   # Merchant storefront (hosted product)
+        └── website/      # Marketing site (hosted product)
+```
+
+## `@lomi./ui` vs docs lomi-ui
+
+These are **not** the same thing. Do not merge them.
+
+| | `@lomi./ui` (`packages/ui`) | lomi-ui (`apps/docs/components/lomi-ui/`) |
+| --- | --- | --- |
+| Audience | lomi. product apps (dashboard, admin, checkout, storefront, website, customers) and docs **chrome** | External merchants building their own React checkout |
+| Distribution | Private workspace package (never npm) | Public copy-paste via `lomi ui add` / docs registry |
+| Contents | Shared primitives + vendored interior.dev | Payment provider selector, customer form, mobile-money card, etc. |
+
+Docs **chrome** (layout, preview helpers, scripts) may import `@lomi./ui` and `@lomi./shared` via `file:`. The merchant **lomi-ui registry** under `apps/docs/components/lomi-ui/` must stay self-contained and must **not** import those private packages.
+
+## Merchant dashboard (`apps/dashboard`)
+
+The dashboard is the merchant back-office (transactions, payment links, settings, analytics). It is a **hosted product** today; source is opening progressively.
+
+High-level layout:
+
+```text filename="Merchant dashboard (apps/dashboard)"
+└── apps/dashboard/
+    ├── package.json
+    ├── .env.example
+    ├── src/              # React app (Vite)
+    ├── supabase/         # Canonical DB migrations and edge functions
+    │   └── migrations/
+    └── public/           # Static assets
+```
+
+Database migrations under `supabase/migrations/` are the schema source of truth for the platform. They are not a recipe for running your own payment stack without lomi.’s hosted services and provider agreements.
+
+## Contributing
+
+We welcome contributions to open-source areas and documentation. Open an issue or submit a pull request on the [lomi. monorepo](https://github.com/lomiafrica/lomi.).
+
+Before contributing:
+
+1. Read our [Code of Conduct](https://github.com/lomiafrica/lomi.?tab=coc-ov-file)
+2. Review our [Security Policy](https://github.com/lomiafrica/lomi.?tab=security-ov-file)
+3. Do not modify files marked with `/* @proprietary license */`
+
+See [Contributing](/resources/contributing) and the monorepo [CONTRIBUTING.md](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md).
+
+## Need help deciding?
+
+If you have questions about open source vs the hosted platform, contact [hello@lomi.africa](mailto:hello@lomi.africa).
+
+To learn more about our vision, visit our [blog](https://lomi.africa/blog) or use the [pricing tool](https://lomi.africa/pricing).
+
+## Useful links
+
+- **Discord**: [Discord community](https://discord.gg/yb4FnBmh)
+- **X**: [@lomiafrica](https://twitter.com/lomiafrica)
+- **GitHub**: [Issues](https://github.com/lomiafrica/lomi./issues) and [pull requests](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md)
+- **Email**: [hello@lomi.africa](mailto:hello@lomi.africa)

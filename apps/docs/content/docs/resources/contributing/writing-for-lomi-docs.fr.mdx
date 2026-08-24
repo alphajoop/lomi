@@ -27,9 +27,9 @@ Définissez `docType` dans le frontmatter des nouveaux guides :
 | Type | Usage | Exemples |
 | --- | --- | --- |
 | `tutorial` | Parcours d'apprentissage linéaire | [Parcours d'intégration](/start/integration-journey) |
-| `how-to` | Étapes orientées tâche | [Vérifier les paiements](/build/guides/verify-payments) |
+| `how-to` | Étapes orientées tâche | [Vérifier les paiements](/build/reliability/verify-payments) |
 | `explanation` | Concepts et compromis | [Choisir l'intégration](/build/choose-integration), [Statuts des paiements](/api/payment-state-machine) |
-| `reference` | Schémas et endpoints | Pages d'opération REST API |
+| `reference` | Schémas et endpoints | Pages d'opération API |
 
 ## Voix et structure
 
@@ -53,7 +53,7 @@ Les guides rédigés à la main doivent lier vers les références canoniques au
 - Les montants en **XOF** utilisent les **centimes** (unités mineures entières) sauf documentation contraire d'un champ API.
 - **L'environnement suit la clé API**: `lomi_sk_test_…` vs `lomi_sk_live_…` ; une mauvaise clé contre un environnement renvoie **401**.
 - Le **mobile money live est asynchrone**: confirmez avec les webhooks et `GET /transactions/{id}` avant de livrer les commandes.
-- **Ne jamais faire confiance au seul succès côté client**: voir [Vérifier les paiements](/build/guides/verify-payments).
+- **Ne jamais faire confiance au seul succès côté client**: voir [Vérifier les paiements](/build/reliability/verify-payments).
 
 ## Politique bilingue
 
@@ -67,7 +67,7 @@ Voir [Rédaction référence API](/resources/contributing/api-reference-authorin
 
 - [Paiements sandbox](/start/sandbox-payments)
 - [Choisir l'intégration](/build/choose-integration)
-- [Recevoir les webhooks](/build/advanced-guides/handling-webhooks)
+- [Recevoir les webhooks](/build/reliability/handling-webhooks)
 - [Statuts des paiements](/api/payment-state-machine)
 
 ## Contrôles anti-dérive

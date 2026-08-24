@@ -1,0 +1,151 @@
+---
+title: "Clés d’idempotence"
+description: "L’idempotence garantit qu’une requête API, en cas de nouvel essai après erreur réseau ou délai dépassé, ne soit pas appliquée plusieurs fois par inadvertance, essentiel pour les paiements ou remboursements afin d’éviter les doublons.
+"
+---
+
+## Fonctionnement
+
+Pour une requête potentiellement mutante (`POST`, `PATCH`, `DELETE`), vous pouvez fournir une `Idempotency-Key` unique dans l’en-tête.
+
+1.  **Clé unique :** générez une chaîne distincte (ex. UUID) pour chaque opération, elle représente l’_intention_ d’agir.
+2.  **En-tête :** envoyez-la dans `Idempotency-Key`.
+3.  **Première requête :** lomi. traite la requête et enregistre le résultat lié à la clé.
+4.  **Requêtes suivantes (même clé) :** avec la **même clé** dans les 24 h, lomi. **ne retravaille pas** l’opération et renvoie la **même réponse** (succès ou erreur) qu’à l’origine.
+
+`Idempotency-Key` est **obligatoire** sur les écritures financières : `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts` et `POST /charge/*`. Une clé manquante renvoie `400` `idempotency_key_required`. Une réponse rejouée ajoute `Idempotency-Cache-Hit: true`. Une même clé avec un autre corps renvoie `409` `idempotency_key_reused`. Un doublon en cours renvoie `409` `idempotency_in_progress` (réessayez avec la même clé).
+
+## Utiliser les clés d’idempotence
+
+Ajoutez l’en-tête `Idempotency-Key` à vos appels. Les SDK lomi. exposent généralement une option dédiée.
+
+```typescript filename="Using idempotency key with Node.js SDK"
+import { LomiSDK } from '@lomi./sdk';
+import { v4 as uuidv4 } from 'uuid';
+
+const lomi = new LomiSDK({ apiKey: process.env.LOMI_SECRET_KEY! });
+
+// Generate a unique key *before* making the request
+const idempotencyKey = uuidv4(); // e.g., 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
+
+try {
+  const session = await lomi.checkoutSessions.createCheckoutSession(
+    {
+      merchant_id: 'your_merchant_id',
+      amount: 1000,
+      currency_code: 'XOF',
+      success_url: 'https://example.com/success',
+      cancel_url: 'https://example.com/cancel',
+      // ... other params
+    },
+    {
+      // Pass the key in the request options
+      idempotencyKey: idempotencyKey,
+    },
+  );
+  console.log(
+    'Checkout session created/retrieved:',
+    session.data.checkout_session_id,
+  );
+  // Store the key and the result (session ID) associated with your operation
+} catch (error) {
+  console.error('Failed to create checkout session:', error);
+  // Handle the error
+}
+```
+
+```typescript filename="Using idempotency key with direct API calls (fetch)"
+import { v4 as uuidv4 } from 'uuid';
+
+const idempotencyKey = uuidv4();
+const apiKey = process.env.LOMI_SECRET_KEY;
+const apiUrl = 'https://api.lomi.africa/checkout-sessions'; // Use correct endpoint
+
+async function createSessionDirectly() {
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Idempotency-Key': idempotencyKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        merchant_id: 'your_merchant_id',
+        amount: 1000,
+        currency_code: 'XOF',
+        success_url: 'https://example.com/success',
+        cancel_url: 'https://example.com/cancel',
+        // ... other params
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Handle API error (response.status, data.error)
+      console.error(`API Error (${response.status}):`, data.error);
+      return;
+    }
+
+    console.log(
+      'Checkout session created/retrieved:',
+      data.data.checkout_session_id,
+    );
+  } catch (networkError) {
+    console.error('Network error during request:', networkError);
+    // Implement retry logic here if appropriate, reusing the SAME idempotencyKey
+  }
+}
+
+createSessionDirectly();
+```
+
+## Génération des clés
+
+Chaque opération distincte doit avoir une clé propre.
+
+- **UUID** : méthode recommandée, UUID v4 par tentative.
+  ```typescript
+  import { v4 as uuidv4 } from 'uuid';
+  const key = uuidv4();
+  ```
+- **Clés déterministes** : dérivées de l’opération (ex. utilisateur + commande + horodatage), veillez à l’unicité réelle et aux collisions.
+
+## Cycle de vie
+
+- lomi. conserve clés et réponses associées **24 heures**.
+- Après expiration, une clé peut théoriquement être réutilisée ; des UUID uniques restent plus sûrs.
+- Réutiliser une clé avec un **corps de requête différent** dans la fenêtre de 24 h peut provoquer une erreur.
+
+## Gestion des erreurs
+
+Si vous réessayez avec une clé déjà traitée avec succès, vous recevez à nouveau la réponse d’origine (`200 OK`).
+
+Si la requête initiale a échoué (ex. `400`), un nouvel essai avec la même clé renverra la même erreur ; il ne suffit pas de réessayer sans corriger la requête.
+
+Erreurs liées à l’idempotence (rares avec des UUID corrects) :
+
+- **`409` `idempotency_key_reused` :** la clé a été réutilisée avec un autre corps de requête dans les 24 h.
+- **`409` `idempotency_in_progress` :** une requête avec cette clé est encore en cours. Réessayez avec la même clé.
+- **`400` `idempotency_key_required` :** une écriture financière n’a pas envoyé l’en-tête.
+
+## Bonnes pratiques
+
+1.  **Requêtes mutantes :** utilisez surtout des clés pour `POST`, `PATCH`, `DELETE` lorsque les doublons posent problème.
+2.  **Unicité :** privilégiez UUID v4 ou équivalent robuste.
+3.  **Réessais réseau :** en cas d’échec réseau ou timeout sans réponse claire de lomi., réessayez avec la **même clé d’idempotence**.
+4.  **Pas de réessai client sans changement :** pour un `4xx` (sauf éventuellement `429`), ne réutilisez pas la même clé, corrigez la requête et générez une **nouvelle** clé.
+5.  **Journalisation (optionnel) :** stockez la clé avec votre enregistrement métier (ex. commande) pour suivre les réessais.
+
+## Cas courants
+
+- **Paiements / sessions de paiement :** éviter de facturer deux fois si la requête a expiré alors que lomi. l’avait déjà traitée.
+- **Remboursements :** éviter plusieurs remboursements accidentels.
+- **Clients / produits / webhooks :** limiter les doublons lors des réessais.
+
+## Étapes suivantes
+
+- [Gestion des erreurs](/build/reliability/error-handling)
+- [Recevoir les webhooks](/build/reliability/handling-webhooks)
+- [Référence API](/api)

@@ -1,0 +1,22 @@
+---
+title: 'Remboursements'
+description: 'Comment fonctionnent les remboursements pour les paiements traités via lomi.'
+---
+
+Les remboursements des paiements traités via lomi. sont initiés par le marchand (tableau de bord, API, MCP ou CLI) ou, dans des cas limités, par lomi. pour limiter les litiges.
+
+## Remboursements initiés par le marchand
+
+- Les remboursements totaux et partiels sont disponibles sur les transactions completed, sous réserve des règles prestataires et du solde disponible.
+- Guide produit : [Remboursements](/build/money/refunds). API : [Créer un remboursement](/api/refunds/RefundsController_create).
+- Les frais de remboursement sont dans [Tarification](/start/merchant-of-record/pricing).
+
+## Remboursements initiés par la plateforme
+
+lomi. peut émettre un remboursement dans les 60 jours suivant un achat lorsque c’est le moyen pratique d’éviter un chargeback. L’objectif est de protéger le marchand des frais réseau, pas de remplacer votre politique client.
+
+## Votre politique client
+
+Publiez une politique de remboursement claire sur votre checkout et votre site. lomi. ne remplace pas cette politique pour les biens et services que vous vendez.
+
+Barème : [Tarification](/start/merchant-of-record/pricing). Conditions : [lomi.africa/terms](https://lomi.africa/terms).

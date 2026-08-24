@@ -3,6 +3,7 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import * as FilesComponents from 'fumadocs-ui/components/files';
 import * as TabsComponents from 'fumadocs-ui/components/tabs';
+import type { ComponentProps } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
@@ -29,6 +30,14 @@ import {
   IntegrationSurfaceGroup,
 } from '@/components/docs/integration-surface-group';
 import { McpOperationIndex } from '@/components/docs/mcp-operation-index';
+import {
+  DocsContactForm,
+  DocsSecurityForm,
+} from '@/components/docs/docs-support-form';
+import { DocsTierCallout } from '@/components/docs/docs-tier-callout';
+import { PricingTable } from '@/components/docs/pricing-table';
+import { TaskSurfaces } from '@/components/docs/task-surfaces';
+import { PersonalizedCodeSurface } from '@/components/docs/personalized-code-surface';
 
 function lucideIconsAsMdx(): MDXComponents {
   const components: MDXComponents = {};
@@ -41,9 +50,15 @@ function lucideIconsAsMdx(): MDXComponents {
 }
 
 export function getMDXComponents(components?: MDXComponents) {
+  const DefaultPre = defaultMdxComponents.pre ?? 'pre';
   return {
     ...lucideIconsAsMdx(),
     ...defaultMdxComponents,
+    pre: (props: ComponentProps<'pre'>) => (
+      <PersonalizedCodeSurface>
+        <DefaultPre {...props} />
+      </PersonalizedCodeSurface>
+    ),
     Callout,
     DocsDownloadButton,
     McpOauthConnect,
@@ -68,6 +83,11 @@ export function getMDXComponents(components?: MDXComponents) {
     IntegrationSurfaceGroup,
     IntegrationSurface,
     McpOperationIndex,
+    DocsContactForm,
+    DocsSecurityForm,
+    DocsTierCallout,
+    PricingTable,
+    TaskSurfaces,
     ...components,
   } satisfies MDXComponents;
 }

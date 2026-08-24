@@ -33,9 +33,9 @@ apps/docs/public/docs/images/
 
 ---
 
-## Your checklist
+## Files to capture
 
-Copy this list and tick as you go:
+Capture each pair in light and dark:
 
 - [ ] `start/create-account-light.webp` + `start/create-account-dark.webp`
 - [ ] `start/api-keys-light.webp` + `start/api-keys-dark.webp`
@@ -256,7 +256,7 @@ Copy this list and tick as you go:
 | ----------- | ---------------------------------------------------------------------------------------------------- |
 | **Save as** | `build/woocommerce-webhook-dashboard-light.webp` and `build/woocommerce-webhook-dashboard-dark.webp` |
 | **Open**    | dashboard.lomi.africa → **Developers → Webhooks** → endpoint with Woo store URL                      |
-| **Show**    | `PAYMENT_SUCCEEDED` and `REFUND_COMPLETED` enabled (or event checklist visible).                     |
+| **Show**    | `PAYMENT_SUCCEEDED` and `REFUND_COMPLETED` enabled (or events visible).                     |
 
 ---
 

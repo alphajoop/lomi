@@ -23,5 +23,8 @@ export async function GET(
 }
 
 export function generateStaticParams() {
-  return source.getPages('en').map((page) => ({ slug: page.slugs }));
+  return source
+    .getPages('en')
+    .map((page) => ({ slug: page.slugs }))
+    .filter((page) => (page.slug?.length ?? 0) > 0);
 }

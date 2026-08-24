@@ -118,7 +118,7 @@ function buildApiSections(): BookSection[] {
   }
 
   const guideFiles = ADVANCED_GUIDE_ORDER.map((name) =>
-    docsPath('build/advanced-guides', name),
+    docsPath('build/reliability', name),
   ).filter((path) => existsSync(path));
 
   return [
@@ -134,7 +134,6 @@ function buildServicesSections(): BookSection[] {
       files: existingFiles([
         docsPath('start/overview.fr.mdx'),
         docsPath('start/integration-journey.fr.mdx'),
-        docsPath('build/fundamentals/index.fr.mdx'),
         docsPath('build/platform/organizations.fr.mdx'),
         docsPath('build/platform/merchants.fr.mdx'),
         docsPath('build/platform/customers.fr.mdx'),
@@ -143,18 +142,17 @@ function buildServicesSections(): BookSection[] {
     {
       title: 'lomi. Network',
       files: existingFiles([
-        docsPath('resources/network/index.fr.mdx'),
-        docsPath('resources/network/onboarding-journey.fr.mdx'),
+        docsPath('resources/network.fr.mdx'),
       ]),
     },
     {
       title: 'Produits et catalogue',
       files: existingFiles([
-        docsPath('build/products.fr.mdx'),
-        docsPath('build/digital-products.fr.mdx'),
-        docsPath('build/subscriptions.fr.mdx'),
-        docsPath('build/usage-billing.fr.mdx'),
-        docsPath('build/discount-coupons.fr.mdx'),
+        docsPath('build/billing/products.fr.mdx'),
+        docsPath('build/accept/digital-products.fr.mdx'),
+        docsPath('build/billing/subscriptions.fr.mdx'),
+        docsPath('build/billing/usage-billing.fr.mdx'),
+        docsPath('build/billing/discount-coupons.fr.mdx'),
       ]),
     },
     {
@@ -166,39 +164,36 @@ function buildServicesSections(): BookSection[] {
         docsPath('build/payment-methods/mtn-momo.fr.mdx'),
         docsPath('build/payment-methods/spi.fr.mdx'),
         docsPath('build/mobile-money.fr.mdx'),
-        docsPath('build/checkout.fr.mdx'),
-        docsPath('build/payment-links.fr.mdx'),
-        docsPath('build/payment-requests.fr.mdx'),
-        docsPath('build/direct-charges.fr.mdx'),
-        docsPath('build/payments/charges.fr.mdx'),
-        docsPath('build/payments/checkout-behavior.fr.mdx'),
-        docsPath('build/payments/payout-lifecycle.fr.mdx'),
+        docsPath('build/accept/checkout.fr.mdx'),
+        docsPath('build/accept/payment-links.fr.mdx'),
+        docsPath('build/accept/payment-requests.fr.mdx'),
+        docsPath('build/accept/direct-charges.fr.mdx'),
+        docsPath('build/accept/checkout-behavior.fr.mdx'),
+        docsPath('build/reliability/payment-lifecycle.fr.mdx'),
       ]),
     },
     {
       title: 'Cycle de vie et opérations',
       files: existingFiles([
-        docsPath('build/guides/payment-lifecycle.fr.mdx'),
-        docsPath('build/guides/verify-payments.fr.mdx'),
-        docsPath('build/fundamentals/transactions.fr.mdx'),
-        docsPath('build/transactions.fr.mdx'),
-        docsPath('build/fundamentals/webhooks.fr.mdx'),
-        docsPath('build/webhooks.fr.mdx'),
-        docsPath('build/refunds.fr.mdx'),
-        docsPath('build/disputes.fr.mdx'),
-        docsPath('build/payouts.fr.mdx'),
-        docsPath('build/balance-and-settlement.fr.mdx'),
-        docsPath('build/radar.fr.mdx'),
-        docsPath('build/customer-portal.fr.mdx'),
+        docsPath('build/reliability/payment-lifecycle.fr.mdx'),
+        docsPath('build/reliability/verify-payments.fr.mdx'),
+        docsPath('build/money/transactions.fr.mdx'),
+        docsPath('build/reliability/index.fr.mdx'),
+        docsPath('build/money/refunds.fr.mdx'),
+        docsPath('build/money/disputes.fr.mdx'),
+        docsPath('build/money/payouts.fr.mdx'),
+        docsPath('build/money/balance-and-settlement.fr.mdx'),
+        docsPath('build/money/radar.fr.mdx'),
+        docsPath('build/billing/customer-portal.fr.mdx'),
       ]),
     },
     {
       title: 'Merchant of Record',
       files: existingFiles([
-        docsPath('resources/merchant-of-record/index.fr.mdx'),
-        docsPath('resources/merchant-of-record/pricing.fr.mdx'),
-        docsPath('resources/merchant-of-record/acceptable-use.fr.mdx'),
-        docsPath('resources/merchant-of-record/account-reviews.fr.mdx'),
+        docsPath('start/merchant-of-record/index.fr.mdx'),
+        docsPath('start/merchant-of-record/pricing.fr.mdx'),
+        docsPath('start/merchant-of-record/acceptable-use.fr.mdx'),
+        docsPath('start/merchant-of-record/account-reviews.fr.mdx'),
       ]),
     },
   ].filter((section) => section.files.length > 0);

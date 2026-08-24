@@ -1,0 +1,63 @@
+---
+title: Solde et règlement
+description: Fonctionnement des soldes marchands, des frais et de la disponibilité des fonds après un paiement réussi.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Les soldes sont mis à jour lorsqu’une transaction passe en **`completed`**. Cette page explique le fonctionnement des soldes, des frais et de la disponibilité des fonds après un paiement réussi.
+
+<TaskSurfaces task="reconcile-settlements" />
+
+<Callout type="warn">
+  **`completed` n’est pas disponible.** Un paiement Mobile Money encore `pending` n’est pas un échec. Confirmez le statut avec [Vérifier les paiements](/build/reliability/verify-payments). Utilisez `GET /settlements` pour l’objet de réconciliation de ce que vous pouvez retirer.
+</Callout>
+
+<DocsScreenshot name="build/balance" alt="Vue d’ensemble du solde marchand dans le tableau de bord" />
+
+<Callout type="info">
+  En environnement **test**, les paiements complétés créditent uniquement votre **solde de test** du tableau de bord, pas votre solde retirable en production. Voir **[Paiements en bac à sable](/start/sandbox-payments)**.
+</Callout>
+
+## Quand les soldes changent
+
+- Le **solde net dû au marchand** augmente du montant **net** de la transaction (brut moins frais de plateforme).
+- Les mises à jour ne s’appliquent qu’aux transactions **`completed`**.
+- Un **indicateur en métadonnée** indique quand les soldes ont déjà été appliqués pour cette transaction, afin qu’une nouvelle tentative ne crédite pas deux fois.
+
+## Délai de disponibilité
+
+Chaque transaction enregistre un horodatage **`available_at`** calculé à partir des paramètres de paiement de l’organisation :
+
+- `NOW() + get_payment_availability_delay(organization, provider, payment_method)` ;
+- exemple : certaines configurations carte imposent une **fenêtre différée** avant disponibilité ; Mobile Money peut être **immédiat**.
+
+Le tableau de bord peut distinguer montants **disponibles** et **en attente / en cours de compensation** selon ces règles.
+
+## Règlement multi-devises
+
+Lorsque vous acceptez des paiements dans plusieurs devises, lomi. peut convertir les montants pour la comptabilisation des frais et du règlement. Votre solde tableau de bord est crédité dans la devise de règlement de votre organisation selon vos réglages produit.
+
+Les champs API « disponible » vs « en attente » figurent dans [Soldes](/api/balances).
+
+## Périodes de règlement (API)
+
+Les fonds deviennent retirables lorsque `available_at` est passé. Pour la comptabilité, regroupez les paiements complétés par **date de disponibilité** et devise :
+
+- **`GET /settlements`** : liste les périodes avec totaux brut, frais et net par `{currency}:{YYYY-MM-DD}` (date UTC de `available_at`).
+- **`GET /settlements/{id}/transactions`** : lignes d’une période ; les sommes doivent correspondre aux totaux de la période.
+
+Le `status` de chaque période est `available` lorsque toutes les transactions sous-jacentes sont passées `available_at`, sinon `pending`. Il s’agit d’une réconciliation au niveau organisation, distincte des lots de virement des prestataires Paystack ou Flutterwave.
+
+Voir [Lister les périodes de règlement](/api/settlements/SettlementsController_findAll) et [Lister les transactions de règlement](/api/settlements/SettlementsController_findTransactions).
+
+## Coupons et complétion
+
+Les compteurs de coupons évoluent en général lorsque la transaction est complétée, pas au moment où le coupon est simplement saisi au tunnel.
+
+## Pages connexes
+
+- [Machine à états du paiement](/api/payment-state-machine)
+- [Lister les périodes de règlement](/api/settlements/SettlementsController_findAll)
+- [Cycle de vie des virements](/build/reliability/payment-lifecycle)
+- [Codes de réduction](/build/billing/discount-coupons)

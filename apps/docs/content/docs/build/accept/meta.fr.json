@@ -1,0 +1,16 @@
+{
+  "title": "Encaisser des paiements",
+  "description": "Checkout hébergé, liens, demandes, widget intégré et charges directes.",
+  "icon": "ShoppingBag",
+  "pages": [
+    "checkout",
+    "payment-links",
+    "payment-requests",
+    "embed-widget",
+    "direct-charges",
+    "whatsapp-commerce",
+    "digital-products",
+    "checkout-behavior",
+    "payment-elements"
+  ]
+}

@@ -1,6 +1,6 @@
 ---
-title: 'Comment accepter le mobile money ?'
-description: 'Utilisez le checkout hébergé, les liens de paiement ou des flux directs pour accepter Wave, MTN MoMo, SPI et les moyens locaux.'
+title: 'Accepter le mobile money ?'
+description: 'Utilisez le checkout hébergé, les liens de paiement ou des flux directs pour accepter Wave, MTN, SPI et les moyens locaux.'
 ---
 
 import { Callout } from '@/components/docs/docs-callout';
@@ -18,7 +18,7 @@ Le mobile money permet d'accepter des paiements depuis les portefeuilles mobiles
 Avant d'intégrer le mobile money :
 
 1. Un compte lomi. avec des clés API **test** ou **live**: voir [Clés API](/start/api-keys).
-2. Un URL **webhook** HTTPS pour le statut final en mode live, voir [Webhooks](/build/webhooks).
+2. Un URL **webhook** HTTPS pour le statut final en mode live, voir [Webhooks](/build/reliability).
 3. **Numéro de téléphone** client au format E.164 (par exemple `+2250707070707`).
 
 ## Fonctionnement des paiements mobile money
@@ -40,12 +40,37 @@ Le mobile money est **asynchrone en mode live**. Affichez toujours un état en a
 
 | Chemin | À utiliser quand |
 | --- | --- |
-| [Checkout hébergé](/build/checkout) | Votre app crée la commande et redirige le client |
-| [Liens de paiement](/build/payment-links) | Vous voulez une URL partageable pour factures, services ou ventes simples |
-| [Demandes de paiement](/build/payment-requests) | Votre backend crée une demande pour un flux dans votre app |
-| [API de charge directe](/build/direct-charges) | Vous avez besoin d'un contrôle bas niveau et comprenez l'UX prestataire |
+| [Checkout hébergé](/build/accept/checkout) | Votre app crée la commande et redirige le client |
+| [Liens de paiement](/build/accept/payment-links) | Vous voulez une URL partageable pour factures, services ou ventes simples |
+| [Demandes de paiement](/build/accept/payment-requests) | Votre backend crée une demande pour un flux dans votre app |
+| [API de charge directe](/build/accept/direct-charges) | Vous avez besoin d'un contrôle bas niveau et comprenez l'UX prestataire |
 
 La plupart des marchands devraient commencer par le **checkout hébergé** ou les **liens de paiement**.
+
+## Trois recettes
+
+Chaque recette se termine de la même façon : attendre le webhook, puis `GET /transactions/{id}`. Voir [Vérifier les paiements](/build/reliability/verify-payments).
+
+### 1. Wave hébergé
+
+1. Créez une session checkout avec `currency_code: "XOF"`.
+2. Redirigez le client vers `checkout_url`.
+3. Le client choisit Wave et approuve dans l’app Wave.
+4. Traitez `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`, puis `GET /transactions/{id}` avant de livrer.
+
+### 2. Wave direct (URL de lancement)
+
+1. `POST /charge/wave` avec XOF et `name` plus `phoneNumber`.
+2. Redirigez ou deep-link vers `wave_launch_url` ou `checkout_url` (`next_action.type: redirect`).
+3. En live, le statut reste en attente jusqu’au paiement dans Wave.
+4. Webhook plus `GET /transactions/{id}` avant de livrer.
+
+### 3. MTN direct (push)
+
+1. `POST /charge/mtn` avec montant, devise, `countryCode` et MSISDN.
+2. Le client reçoit une invite sur le téléphone (`next_action.type: await_webhook`). Pas de redirection.
+3. En live, le statut reste `PENDING` jusqu’à l’approbation PIN.
+4. Webhook plus `GET /transactions/{id}` avant de livrer.
 
 ## API directe: Wave
 
@@ -69,7 +94,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
   }'
 ```
 
-## API directe: MTN MoMo
+## API directe: MTN
 
 `POST /charge/mtn` avec montant, devise, `countryCode` et numéro de téléphone client. La réponse inclut **`next_action`** (`type: await_webhook` avec `status`) ainsi que `data.status`.
 
@@ -92,7 +117,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
 
 Avant de fournir la valeur au client, confirmez le statut final et le montant :
 
-- **Webhooks**: enregistrez votre endpoint et traitez `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. Voir [Recevoir les webhooks](/build/advanced-guides/handling-webhooks).
+- **Webhooks**: enregistrez votre endpoint et traitez `PAYMENT_SUCCEEDED` / `PAYMENT_FAILED`. Voir [Recevoir les webhooks](/build/reliability/handling-webhooks).
 - **Récupérer la transaction**: `GET /transactions/{id}` avec le `transaction_id` de la réponse charge.
 
 ## Test vs live
@@ -108,6 +133,6 @@ Instructions complètes : [Paiements sandbox: mobile money](/start/sandbox-payme
 ## Suite
 
 - [Canaux de paiement](/build/payment-channels)
-- [Charges directes](/build/direct-charges)
-- [Solde et règlement](/build/balance-and-settlement)
-- [Remboursements](/build/refunds)
+- [Charges directes](/build/accept/direct-charges)
+- [Solde et règlement](/build/money/balance-and-settlement)
+- [Remboursements](/build/money/refunds)

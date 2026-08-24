@@ -1,5 +1,5 @@
 ---
-title: 'Which payment integration should I choose?'
+title: 'Which integration to choose?'
 description: 'Choose between hosted checkout, payment links, payment requests, direct charges, subscriptions, ecommerce extensions, and UI components.'
 docType: explanation
 ---
@@ -12,30 +12,30 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 Choose the simplest integration that gives your customer the right payment experience. You can combine multiple lomi. products later.
 
 <Callout type="info" title="Try it in 5 minutes">
-  New to lomi.? Compare REST API, SDK, CLI, and MCP in [How you call lomi.](/start/integration-journey#how-you-call-lomi). For a golden path: [CLI quickstart](/start/cli-quickstart) for terminal-first setup, or [SDK quickstart](/start/sdk-quickstart) to call the API from your code.
+  New to lomi.? Compare API, SDK, CLI, and MCP in [How to use lomi.](/start/integration-journey#how-you-call-lomi). For a golden path: [CLI quickstart](/start/cli-quickstart) for terminal-first setup, or [SDK quickstart](/start/sdk-quickstart) to call the API from your code.
 </Callout>
 
 ## Start here
 
 | If you need | Use | Why |
 | --- | --- | --- |
-| A complete checkout page | [Hosted checkout](/build/checkout) | Fastest production path for apps and stores |
-| Checkout on your site (iframe) | [Embed checkout widget](/build/embed-widget) | Full lomi. checkout UI without leaving your page |
-| Social selling on WhatsApp | [WhatsApp Commerce](/build/whatsapp-commerce) | Connect WhatsApp in the dashboard and share payment links in chat |
-| A URL you can share anywhere | [Payment links](/build/payment-links) | Good for invoices, services, events, and no-code sales |
-| A backend-created payment request | [Payment requests](/build/payment-requests) | Good when your app controls the order flow |
-| Mobile money-first collection | [Mobile money](/build/mobile-money) | Good for Wave, MTN MoMo, and SPI-heavy flows |
+| A complete checkout page | [Hosted checkout](/build/accept/checkout) | Fastest production path for apps and stores |
+| Checkout on your site (iframe) | [Embed checkout widget](/build/accept/embed-widget) | Full lomi. checkout UI without leaving your page |
+| Social selling on WhatsApp | [WhatsApp Commerce](/build/accept/whatsapp-commerce) | Connect WhatsApp in the dashboard and share payment links in chat |
+| A URL you can share anywhere | [Payment links](/build/accept/payment-links) | Good for invoices, services, events, and no-code sales |
+| A backend-created payment request | [Payment requests](/build/accept/payment-requests) | Good when your app controls the order flow |
+| Mobile money-first collection | [Mobile money](/build/mobile-money) | Good for Wave, MTN, and SPI-heavy flows |
 | Embedded card collection | [Cards](/build/payment-methods/cards) | Good when you own the UI and need card entry inside your app |
-| Recurring billing | [Subscriptions](/build/subscriptions) | Good for SaaS, memberships, and recurring services |
-| Customer self-service (billing, subscriptions) | [Customer portal](/build/customer-portal) | Hosted portal for payment history, plan changes, and cancellations |
+| Recurring billing | [Subscriptions](/build/billing/subscriptions) | Good for SaaS, memberships, and recurring services |
+| Customer self-service (billing, subscriptions) | [Customer portal](/build/billing/customer-portal) | Hosted portal for payment history, plan changes, and cancellations |
 | Store plugin checkout | [E-commerce extensions](/build/ecommerce-extensions) | Good for WooCommerce, Magento, PrestaShop, Shopify, and Bubble |
-| Hosted product catalog | [Products](/build/products) + [store.lomi.africa](https://store.lomi.africa) | Good when you want a lomi.-hosted shop without a third-party platform |
+| Hosted product catalog | [Products](/build/billing/products) + [store.lomi.africa](https://store.lomi.africa) | Good when you want a lomi.-hosted shop without a third-party platform |
 | AI assistant / agent access | [MCP](/build/mcp) | Cursor, Claude Desktop, and other MCP clients calling the merchant API |
 | Copy-paste checkout UI | [lomi. UI](/build/lomi-ui) | Good when you want UI primitives inside your app |
 | Typed API access in your code | [SDKs](/build/sdks) | TypeScript, Python, Go, and PHP clients with typed methods and error handling |
-| Terminal-first setup and testing | [CLI](/build/cli/overview) | Authenticate, scaffold projects, create sandbox checkouts, and forward webhooks |
+| Terminal-first setup and testing | [CLI](/build/cli) | Authenticate, scaffold projects, create sandbox checkouts, and forward webhooks |
 | Compare channels by country | [Payment channels](/build/payment-channels) | Country × currency × channel matrix |
-| Server-side Wave / MTN / card | [Direct charges](/build/direct-charges) | When you own the payment UI end-to-end |
+| Server-side Wave / MTN / card | [Direct charges](/build/accept/direct-charges) | When you own the payment UI end-to-end |
 
 <DocsScreenshot name="build/choose-integration" alt="Hosted checkout payment method selection (Wave, MTN, cards, and more)" />
 
@@ -66,7 +66,7 @@ Every serious integration should include:
 - Webhook handling for final reconciliation.
 - Idempotency for create-style payment operations when retries are possible.
 
-Before go-live, run [Simulate errors](/build/guides/simulate-errors) in sandbox to exercise failure and pending states.
+Before go-live, run [Simulate errors](/build/reliability/simulate-errors) in sandbox to exercise failure and pending states.
 
 ## Next steps
 
@@ -75,12 +75,12 @@ Before go-live, run [Simulate errors](/build/guides/simulate-errors) in sandbox 
 - [Integration journey](/start/integration-journey)
 - [Make a test payment](/start/first-payment)
 - [Sandbox payments](/start/sandbox-payments)
-- [Simulate errors](/build/guides/simulate-errors)
+- [Simulate errors](/build/reliability/simulate-errors)
 
 **Build**
 
-- [Hosted checkout](/build/checkout) · [Products](/build/products) · [Payment channels](/build/payment-channels)
-- [Webhooks](/build/webhooks) · [Verify payments](/build/guides/verify-payments)
+- [Hosted checkout](/build/accept/checkout) · [Products](/build/billing/products) · [Payment channels](/build/payment-channels)
+- [Webhooks](/build/reliability) · [Verify payments](/build/reliability/verify-payments)
 
 **Reference apps & API**
 

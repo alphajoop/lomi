@@ -1,0 +1,16 @@
+{
+  "title": "Accept payments",
+  "description": "Hosted checkout, payment links, requests, embed, and direct charges.",
+  "icon": "ShoppingBag",
+  "pages": [
+    "checkout",
+    "payment-links",
+    "payment-requests",
+    "embed-widget",
+    "direct-charges",
+    "whatsapp-commerce",
+    "digital-products",
+    "checkout-behavior",
+    "payment-elements"
+  ]
+}

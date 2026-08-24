@@ -11,8 +11,7 @@ export function Customisation() {
         code="npx @lomi.cli@latest"
         lang="bash"
         wrapper={{
-          className: 'my-0 rounded-sm border-fd-border shadow-none',
-          keepBackground: true,
+          className: 'my-0',
         }}
       />
     </div>

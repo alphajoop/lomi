@@ -1,0 +1,12 @@
+{
+  "title": "Facturation",
+  "description": "Produits, abonnements, facturation à l’usage, portail client et coupons.",
+  "icon": "Receipt",
+  "pages": [
+    "products",
+    "subscriptions",
+    "usage-billing",
+    "customer-portal",
+    "discount-coupons"
+  ]
+}

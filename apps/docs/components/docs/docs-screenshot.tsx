@@ -9,6 +9,9 @@ type DocsScreenshotProps = {
   alt: string;
 };
 
+const screenshotImageClassName =
+  'absolute inset-0 m-0 size-full max-w-none object-cover object-center shadow-none';
+
 /** Theme-aware doc screenshot with graceful fallback when WebP assets are not yet captured. */
 export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
   const base = `/docs/images/${name}`;
@@ -39,12 +42,12 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
   }
 
   return (
-    <figure className="not-prose my-6 overflow-hidden rounded-lg border border-border aspect-video w-full">
+    <figure className="not-prose relative my-6 aspect-video w-full overflow-hidden rounded-lg border border-border">
       {missingTheme !== 'light' ? (
         <Image
           src={`${base}-light.webp`}
           alt={alt}
-          className="block size-full object-cover object-center dark:hidden"
+          className={`${screenshotImageClassName} dark:hidden`}
           loading="lazy"
           width={1280}
           height={720}
@@ -55,7 +58,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
         <Image
           src={`${base}-dark.webp`}
           alt={alt}
-          className="hidden size-full object-cover object-center dark:block"
+          className={`${screenshotImageClassName} hidden dark:block`}
           loading="lazy"
           width={1280}
           height={720}
@@ -66,7 +69,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
         <Image
           src={`${base}-dark.webp`}
           alt={alt}
-          className="block size-full object-cover object-center dark:hidden"
+          className={`${screenshotImageClassName} dark:hidden`}
           loading="lazy"
           width={1280}
           height={720}
@@ -77,7 +80,7 @@ export function DocsScreenshot({ name, alt }: DocsScreenshotProps) {
         <Image
           src={`${base}-light.webp`}
           alt={alt}
-          className="hidden size-full object-cover object-center dark:block"
+          className={`${screenshotImageClassName} hidden dark:block`}
           loading="lazy"
           width={1280}
           height={720}

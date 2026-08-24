@@ -502,7 +502,7 @@ export interface paths {
         put?: never;
         /**
          * Créer un remboursement
-         * @description Refunds a completed transaction (card, Wave, or MTN MoMo). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN MoMo requires a RequestToPay reference on the original transaction.
+         * @description Refunds a completed transaction (card, Wave, or MTN). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN requires a RequestToPay reference on the original transaction.
          */
         post: operations["RefundsController_create"];
         delete?: never;
@@ -1183,8 +1183,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create MTN MoMo charge
-         * @description Initiates an MTN Mobile Money RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.
+         * Create MTN charge
+         * @description Initiates an MTN RequestToPay. With a test API key the transaction completes in the ledger without calling the MTN sandbox.
          */
         post: operations["ChargesController_createMtnCharge"];
         delete?: never;
@@ -2187,7 +2187,7 @@ export interface components {
         CreateRefundDto: {
             /**
              * Format: uuid
-             * @description UUID of a completed transaction (card, Wave, or MTN MoMo)
+             * @description UUID of a completed transaction (card, Wave, or MTN)
              */
             transaction_id: string;
             /** @description Amount to refund (same currency as the transaction) */

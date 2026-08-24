@@ -26,8 +26,9 @@ import { t as translate } from '@/lib/i18n/translations';
 import { orama } from '@/lib/orama/client';
 import type { OramaCloudSearchParams } from '@orama/core';
 import type { SortedResult } from 'fumadocs-core/search';
+import { DOCS_SEARCH_SUGGESTED_HREFS } from '@/lib/search/aliases';
+import type { DocsSearchTag } from '@/lib/search/tags';
 
-// Define types for Orama search results
 interface OramaHit {
   id: string;
   document: {
@@ -36,17 +37,50 @@ interface OramaHit {
     title?: string;
     breadcrumbs?: string[];
     description?: string;
+    locale?: string;
     structured?: {
       contents?: string[];
     };
   };
 }
 
+function oramaConfigured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_ORAMA_API_KEY &&
+      process.env.NEXT_PUBLIC_ORAMA_PROJECT_ID,
+  );
+}
+
+function suggestedResults(): SortedResult[] {
+  return DOCS_SEARCH_SUGGESTED_HREFS.map((href) => ({
+    type: 'page' as const,
+    id: `suggest:${href}`,
+    url: href,
+    content: href,
+  }));
+}
+
+async function searchLocal(
+  query: string,
+  locale: string,
+  tag: DocsSearchTag | undefined,
+): Promise<SortedResult[]> {
+  const params = new URLSearchParams({ query, locale });
+  if (tag) params.set('tag', tag);
+  const response = await fetch(`/api/search?${params.toString()}`);
+  if (!response.ok) return [];
+  const body: unknown = await response.json();
+  if (!Array.isArray(body)) return [];
+  return body as SortedResult[];
+}
+
 export default function CustomSearchDialog(props: SharedProps) {
   const [open, setOpen] = useState(false);
-  const [tag, setTag] = useState<string | undefined>();
+  const [tag, setTag] = useState<DocsSearchTag | undefined>();
   const [search, setSearch] = useState('');
-  const [results, setResults] = useState<SortedResult[] | null>(null);
+  const [results, setResults] = useState<SortedResult[] | 'empty' | null>(
+    'empty',
+  );
   const [isLoading, setIsLoading] = useState(false);
   const { currentLanguage } = useTranslation();
   const t = (key: string) => String(translate(key, currentLanguage));
@@ -54,80 +88,65 @@ export default function CustomSearchDialog(props: SharedProps) {
   const items = [
     {
       name: t('search.all'),
-      value: undefined,
+      description: t('search.allDescription'),
+      value: undefined as DocsSearchTag | undefined,
     },
     {
       name: t('search.core'),
       description: t('search.fundamentalsDescription'),
-      value: 'core',
+      value: 'core' as const,
     },
     {
       name: t('search.apiReference'),
       description: t('search.apiReferenceDescription'),
-      value: 'reference',
+      value: 'reference' as const,
+    },
+    {
+      name: t('search.resources'),
+      description: t('search.resourcesDescription'),
+      value: 'resources' as const,
     },
   ];
 
-  // Custom search implementation using Orama client directly
   useEffect(() => {
     let cancelled = false;
 
     async function performSearch() {
       if (!search || search.trim().length === 0) {
-        setResults(null);
+        setResults('empty');
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
       try {
-        const apiKey = process.env.NEXT_PUBLIC_ORAMA_API_KEY;
-        const projectId = process.env.NEXT_PUBLIC_ORAMA_PROJECT_ID;
-        const datasourceId = process.env.NEXT_PUBLIC_ORAMA_DATASOURCE_ID;
-
-        if (!apiKey || !projectId) {
-          console.error(
-            'Orama search is not configured. Missing environment variables:',
-            {
-              hasApiKey: !!apiKey,
-              hasProjectId: !!projectId,
-            },
+        if (!oramaConfigured()) {
+          const local = await searchLocal(
+            search,
+            currentLanguage,
+            tag,
           );
-          setResults([]);
-          setIsLoading(false);
+          if (!cancelled) setResults(local);
           return;
         }
 
+        const datasourceId = process.env.NEXT_PUBLIC_ORAMA_DATASOURCE_ID;
         const searchOptions: OramaCloudSearchParams = {
           term: search,
           limit: 10,
+          where: {
+            locale: { eq: currentLanguage },
+            ...(tag ? { tag: { eq: tag } } : {}),
+          },
         };
 
         if (datasourceId) {
           searchOptions.datasources = [datasourceId];
         }
 
-        // Add tag filter if specified
-        if (tag) {
-          searchOptions.where = {
-            tag: { eq: tag },
-          };
-        }
-
         const response = await orama.search(searchOptions);
-
         if (cancelled) return;
 
-        // Debug: log the raw response structure (only in development)
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Orama search response:', {
-            count: response?.count,
-            hitsCount: response?.hits?.length,
-            firstHit: response?.hits?.[0],
-          });
-        }
-
-        // Transform Orama Cloud results to fumadocs format
         if (response && response.hits && Array.isArray(response.hits)) {
           const transformedResults: SortedResult[] = [];
           const searchLower = search.toLowerCase();
@@ -136,16 +155,13 @@ export default function CustomSearchDialog(props: SharedProps) {
             const doc = hit.document || {};
             const pageUrl = doc.url || doc.id || hit.id;
             const pageTitle = doc.title || 'Untitled';
-
-            // Add breadcrumb context to the page title
             const breadcrumbText =
               doc.breadcrumbs &&
               Array.isArray(doc.breadcrumbs) &&
               doc.breadcrumbs.length > 0
-                ? doc.breadcrumbs.join(' › ') + ' › '
+                ? `${doc.breadcrumbs.join(' › ')} › `
                 : '';
 
-            // Main page result with breadcrumb prefix
             transformedResults.push({
               type: 'page' as const,
               id: doc.id || hit.id,
@@ -153,7 +169,6 @@ export default function CustomSearchDialog(props: SharedProps) {
               content: breadcrumbText + pageTitle,
             });
 
-            // Add description as a text result if it exists and contains the search term
             if (
               doc.description &&
               doc.description.toLowerCase().includes(searchLower)
@@ -166,27 +181,23 @@ export default function CustomSearchDialog(props: SharedProps) {
               });
             }
 
-            // Add matching content sections as text results
             if (
               doc.structured?.contents &&
               Array.isArray(doc.structured.contents)
             ) {
-              // Find all content sections that contain the search term
               const matchingContents = doc.structured.contents
                 .filter(
                   (content: string) =>
                     content.toLowerCase().includes(searchLower) &&
                     content.length > 20,
                 )
-                .slice(0, 2); // Limit to 2 matching sections per page
+                .slice(0, 2);
 
               matchingContents.forEach((content: string, idx: number) => {
                 const maxLength = 120;
                 const index = content.toLowerCase().indexOf(searchLower);
-
                 let excerpt = content;
                 if (content.length > maxLength) {
-                  // Center the excerpt around the match
                   const start = Math.max(0, index - 40);
                   const end = Math.min(content.length, start + maxLength);
                   excerpt =
@@ -210,36 +221,27 @@ export default function CustomSearchDialog(props: SharedProps) {
           setResults([]);
         }
       } catch (error) {
-        // Log error details for debugging
         console.error('Search error:', error);
-
-        // Check if it's a configuration error
-        if (
-          error instanceof Error &&
-          error.message.includes('not configured')
-        ) {
-          console.error(
-            'Orama search configuration error. Please check your environment variables.',
-          );
-        }
-
-        if (!cancelled) {
-          setResults([]);
+        try {
+          const local = await searchLocal(search, currentLanguage, tag);
+          if (!cancelled) setResults(local);
+        } catch {
+          if (!cancelled) setResults([]);
         }
       } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
+        if (!cancelled) setIsLoading(false);
       }
     }
 
-    const timeoutId = setTimeout(performSearch, 300); // Debounce search
+    const timeoutId = setTimeout(performSearch, 300);
 
     return () => {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [search, tag]);
+  }, [search, tag, currentLanguage]);
+
+  const listItems = results === 'empty' ? suggestedResults() : results;
 
   return (
     <SearchDialog
@@ -255,7 +257,7 @@ export default function CustomSearchDialog(props: SharedProps) {
           <SearchDialogInput />
           <SearchDialogClose />
         </SearchDialogHeader>
-        <SearchDialogList items={results} />
+        <SearchDialogList items={listItems} />
         <SearchDialogFooter className="flex flex-row flex-wrap gap-2 items-center">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger
@@ -272,12 +274,13 @@ export default function CustomSearchDialog(props: SharedProps) {
               <ChevronDown className="size-3.5 text-fd-muted-foreground" />
             </PopoverTrigger>
             <PopoverContent className="flex flex-col p-1 gap-1" align="start">
-              {items.map((item, i) => {
+              {items.map((item) => {
                 const isSelected = item.value === tag;
 
                 return (
                   <button
-                    key={i}
+                    key={item.name}
+                    type="button"
                     onClick={() => {
                       setTag(item.value);
                       setOpen(false);

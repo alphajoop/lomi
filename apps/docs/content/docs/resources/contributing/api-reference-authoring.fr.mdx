@@ -1,9 +1,9 @@
 ---
-title: Rédaction de la référence API REST
-description: Comment nous maintenons la section API REST écrite à la main, l'alignons sur OpenAPI et évitons une génération destructive accidentelle.
+title: Rédaction de la référence API
+description: Comment nous maintenons la section API écrite à la main, l'alignons sur OpenAPI et évitons une génération destructive accidentelle.
 ---
 
-La référence REST publique vit sous `content/docs/api/` dans l'app docs. **Le texte narratif et les exemples sont rédigés manuellement en MDX** avec une structure de sections fixe, pas de wrappers `<APIPage />` autogénérés. Le `apps/docs/openapi.json` commité est l'**artefact de contrat et de validation** machine, pas la source de vérité du texte.
+La référence API publique vit sous `content/docs/api/` dans l'app docs. **Le texte narratif et les exemples sont rédigés manuellement en MDX** avec une structure de sections fixe, pas de wrappers `<APIPage />` autogénérés. Le `apps/docs/openapi.json` commité est l'**artefact de contrat et de validation** machine, pas la source de vérité du texte.
 
 ## Workflow sûr (par défaut)
 

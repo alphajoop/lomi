@@ -1,0 +1,13 @@
+{
+  "title": "Mouvements d’argent",
+  "description": "Transactions, remboursements, litiges, Radar, reversements et règlements.",
+  "icon": "Banknote",
+  "pages": [
+    "transactions",
+    "refunds",
+    "disputes",
+    "radar",
+    "payouts",
+    "balance-and-settlement"
+  ]
+}

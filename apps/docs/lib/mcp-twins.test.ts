@@ -34,8 +34,8 @@ test('does not twin MCP-excluded operations', () => {
 test('renders bilingual twin labels', () => {
   assert.equal(translate('twins.mcp', 'en'), 'Same operation in MCP');
   assert.equal(translate('twins.mcp', 'fr'), 'Même opération en MCP');
-  assert.equal(translate('twins.rest', 'en'), 'Same operation in REST API');
-  assert.equal(translate('twins.rest', 'fr'), 'Même opération en API REST');
+  assert.equal(translate('twins.rest', 'en'), 'Same operation in the API');
+  assert.equal(translate('twins.rest', 'fr'), 'Même opération dans l’API');
   assert.equal(translate('twins.action', 'en'), 'action');
   assert.equal(translate('twins.action', 'fr'), 'action');
 });

@@ -17,9 +17,9 @@ Connect your **Bubble.io** app to **lomi. hosted checkout**. Shoppers pay on a s
 
 <Callout type="info" title="Related products">
   - **API keys**: [Dashboard → Developers → API keys](/start/api-keys)
-  - **Webhooks**: [Dashboard webhooks](/build/webhooks) — subscribe to **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**
-  - **Hosted checkout**: [Checkout](/build/checkout), where shoppers pay after redirect
-  - **Embed widget**: [Embed widget](/build/embed-widget), alternative when you want a button on a Bubble page
+  - **Webhooks**: [Dashboard webhooks](/build/reliability) — subscribe to **`PAYMENT_SUCCEEDED`** and **`REFUND_COMPLETED`**
+  - **Hosted checkout**: [Checkout](/build/accept/checkout), where shoppers pay after redirect
+  - **Embed widget**: [Embed widget](/build/accept/embed-widget), alternative when you want a button on a Bubble page
 </Callout>
 
 ## Before you start
@@ -103,15 +103,15 @@ When you are ready for real payments:
 2. Paste your **Live secret key** and **Live webhook secret** (create a **live** webhook endpoint in the dashboard pointing at your live Bubble URL).
 3. Run one small real payment and confirm the Thing completes.
 
-See also [Verify payments](/build/guides/verify-payments).
+See also [Verify payments](/build/reliability/verify-payments).
 
 ## Refunds, embed mode, and reference
 
 **Refunds**: issue from the [dashboard](https://dashboard.lomi.africa); the `REFUND_COMPLETED` webhook updates your Thing.
 
-**Embed mode**: set the **lomi. Pay button** (or **Open checkout embed**) to `embed` to keep shoppers in your app; listen for `oncomplete` or the `lomi:checkout-complete` window event. This reuses the [embed widget](/build/embed-widget).
+**Embed mode**: set the **lomi. Pay button** (or **Open checkout embed**) to `embed` to keep shoppers in your app; listen for `oncomplete` or the `lomi:checkout-complete` window event. This reuses the [embed widget](/build/accept/embed-widget).
 
-**Webhook headers**: `X-Lomi-Event`, `X-Lomi-Signature` (HMAC-SHA256 hex of the raw body). Details: [Handling webhooks](/build/advanced-guides/handling-webhooks) and [Webhooks](/build/webhooks).
+**Webhook headers**: `X-Lomi-Event`, `X-Lomi-Signature` (HMAC-SHA256 hex of the raw body). Details: [Handling webhooks](/build/reliability/handling-webhooks) and [Webhooks](/build/reliability).
 
 ## For developers
 

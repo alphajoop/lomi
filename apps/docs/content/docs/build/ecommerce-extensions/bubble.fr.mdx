@@ -17,9 +17,9 @@ Connectez votre application **Bubble.io** au **checkout hébergé lomi.**. Le cl
 
 <Callout type="info" title="Produits associés">
   - **Clés API** : [Tableau de bord → Développeurs → Clés API](/start/api-keys)
-  - **Webhooks** : [Webhooks du tableau de bord](/build/webhooks) — abonnez-vous à **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**
-  - **Checkout hébergé** : [Checkout](/build/checkout), où le client paie après redirection
-  - **Widget d’intégration** : [Widget d’intégration](/build/embed-widget), alternative pour un bouton sur une page Bubble
+  - **Webhooks** : [Webhooks du tableau de bord](/build/reliability) — abonnez-vous à **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**
+  - **Checkout hébergé** : [Checkout](/build/accept/checkout), où le client paie après redirection
+  - **Widget d’intégration** : [Widget d’intégration](/build/accept/embed-widget), alternative pour un bouton sur une page Bubble
 </Callout>
 
 ## Avant de commencer
@@ -103,15 +103,15 @@ Quand vous êtes prêt pour des paiements réels :
 2. Collez votre **clé secrète live** et votre **secret de webhook live** (créez un endpoint de webhook **live** dans le tableau de bord pointant vers votre URL Bubble live).
 3. Effectuez un petit paiement réel et vérifiez que le Thing se complète.
 
-Voir aussi [Vérifier les paiements](/build/guides/verify-payments).
+Voir aussi [Vérifier les paiements](/build/reliability/verify-payments).
 
 ## Remboursements, mode intégré et référence
 
 **Remboursements** : depuis le [tableau de bord](https://dashboard.lomi.africa) ; le webhook `REFUND_COMPLETED` met à jour votre Thing.
 
-**Mode intégré** : réglez le **lomi. Pay button** (ou **Open checkout embed**) sur `embed` pour garder le client dans votre application ; écoutez `oncomplete` ou l’événement window `lomi:checkout-complete`. Cela réutilise le [widget d’intégration](/build/embed-widget).
+**Mode intégré** : réglez le **lomi. Pay button** (ou **Open checkout embed**) sur `embed` pour garder le client dans votre application ; écoutez `oncomplete` ou l’événement window `lomi:checkout-complete`. Cela réutilise le [widget d’intégration](/build/accept/embed-widget).
 
-**En-têtes de webhook** : `X-Lomi-Event`, `X-Lomi-Signature` (HMAC-SHA256 hex du corps brut). Détails : [Traiter les webhooks](/build/advanced-guides/handling-webhooks) et [Webhooks](/build/webhooks).
+**En-têtes de webhook** : `X-Lomi-Event`, `X-Lomi-Signature` (HMAC-SHA256 hex du corps brut). Détails : [Traiter les webhooks](/build/reliability/handling-webhooks) et [Webhooks](/build/reliability).
 
 ## Pour les développeurs
 

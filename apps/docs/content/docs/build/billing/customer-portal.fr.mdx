@@ -1,0 +1,227 @@
+---
+title: Portail client
+description: Intégrez un portail client hébergé avec sessions de lancement, auth OTP/magic link et accès limité au périmètre client.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from '@/components/docs/docs-callout';
+
+Le portail client lomi. est un espace de compte hébergé sur `customers.lomi.africa` où vos utilisateurs finaux peuvent :
+
+<DocsScreenshot name="build/customer-portal" alt="Portail client lomi. pour l’historique et les abonnements" />
+
+- Consulter l'historique des paiements et ouvrir les reçus / factures disponibles
+- Voir et gérer leurs abonnements (pause, reprise, annulation en fin de période, annulation de l'annulation)
+- Ajouter, supprimer et définir des cartes enregistrées par défaut (si activé dans la politique portail)
+- Réessayer un paiement d'abonnement échoué dans le portail avant le repli checkout
+- Télécharger les achats numériques depuis la bibliothèque
+
+Ce guide décrit l'intégration recommandée en production.
+
+## Architecture (recommandée)
+
+1. Votre backend marchand crée une session de lancement du portail à usage unique.
+2. Vous redirigez ou ouvrez l'`launch_url` renvoyée.
+3. Le portail hébergé consomme le jeton une fois et demande au client de se vérifier via :
+   - Lien magique e-mail, ou
+   - OTP SMS
+4. Une session portail est créée, bornée à `(organization_id, customer_id, environment)`.
+5. Le client ne voit que ses propres enregistrements.
+
+<Callout type="warn">
+  Ne créez pas de sessions de lancement depuis le navigateur. Appelez l'API depuis votre backend uniquement.
+</Callout>
+
+## Créer une session de lancement
+
+Utilisez `POST /customers/{id}/portal` :
+
+- `return_url` (optionnel)
+- `flow_type` (optionnel) : `portal_home`, `subscription_cancel`, `subscription_manage`
+- `flow_subscription_id` (optionnel, obligatoire pour `subscription_cancel`)
+- `flow_after_completion_url` (optionnel)
+
+Les détails de l’URL et des exemples de corps figurent dans [Clients](/api/customers/CustomersController_createPortalSession).
+
+## Modèle d'éligibilité
+
+Un client peut accéder au portail uniquement si :
+
+1. Il appartient à votre organisation dans l'environnement demandé, et
+2. Il possède au moins un enregistrement de facturation (transaction ou abonnement).
+
+Cela évite d'exposer un portail vide à des contacts qui n'ont jamais payé.
+
+## Exemple de bout en bout
+
+<Tabs items={["TypeScript", "cURL"]}>
+<Tab value="TypeScript">
+```typescript
+import axios from "axios";
+
+const apiKey = process.env.LOMI_SECRET_KEY!;
+const customerId = "2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265";
+
+const { data } = await axios.post(
+  `https://api.lomi.africa/customers/${customerId}/portal`,
+  {
+    return_url: "https://merchant.example.com/account",
+    flow_type: "subscription_cancel",
+    flow_subscription_id: "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
+    flow_after_completion_url:
+      "https://merchant.example.com/account/subscription-cancelled",
+  },
+  {
+    headers: {
+      "X-API-KEY": apiKey,
+      "Content-Type": "application/json",
+    },
+  },
+);
+
+// Rediriger le client vers le portail hébergé
+return data.launch_url;
+```
+</Tab>
+<Tab value="cURL">
+```bash
+curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265/portal" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "return_url": "https://merchant.example.com/account",
+    "flow_type": "subscription_cancel",
+    "flow_subscription_id": "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
+  }'
+```
+</Tab>
+</Tabs>
+
+## Accéder au portail
+
+Trois façons d'y mener vos clients :
+
+### 1. URL org par défaut (connexion en libre-service)
+
+```
+https://customers.lomi.africa/o/{slug-de-votre-org}
+```
+
+Le client saisit l'e-mail ou le téléphone utilisé au checkout. Aucun appel API marchand requis. Copiez cette URL depuis **Paramètres → Checkout → Storefront → Portail client**.
+
+### 2. Lancement préauthentifié (application marchande)
+
+Quand le client est déjà identifié dans votre app, créez une session de lancement côté serveur et redirigez vers `launch_url`. Si la session inclut un `customer_id`, le portail **ignore le second OTP** (lancement de confiance).
+
+```typescript
+import { CustomersService } from "@lomi/sdk";
+
+const { launch_url } = await CustomersService.createPortalLaunchSession(customerId, {
+  return_url: "https://your-app.com/account",
+});
+redirect(launch_url);
+```
+
+Exemple Next.js (`app/billing/route.ts`) :
+
+```typescript
+import { redirect } from "next/navigation";
+import { CustomersService } from "@lomi/sdk";
+
+export async function GET() {
+  const customerId = await getLoggedInCustomerId();
+  const { launch_url } = await CustomersService.createPortalLaunchSession(customerId, {});
+  redirect(launch_url);
+}
+```
+
+### 3. E-mails transactionnels
+
+Les reçus client incluent l'URL portail de votre org (`customers.lomi.africa/o/{slug}`) pour revenir depuis la boîte mail.
+
+## API headless (optionnel)
+
+Pour des interfaces portail sur mesure, utilisez le jeton bearer de session portail après un lancement de confiance ou un flux OTP :
+
+- `GET /customer-portal/me`
+- `GET /customer-portal/transactions`
+- `GET /customer-portal/subscriptions`
+- `POST /customer-portal/subscriptions/{id}/actions`
+- `GET /customer-portal/payment-methods`
+- `POST /customer-portal/payment-methods/setup-intent`
+- `POST /customer-portal/payment-methods/{id}/default`
+- `DELETE /customer-portal/payment-methods/{id}`
+- `POST /customer-portal/subscriptions/{id}/retry-payment`
+
+Passez `Authorization: Bearer <portal_session_token>`.
+
+### Moyens de paiement
+
+Quand `allow_payment_method_update` est activé dans la politique portail (défaut : oui), les clients peuvent :
+
+1. Créer une intention de configuration carte via `POST /customer-portal/payment-methods/setup-intent`
+2. Confirmer l'intention côté client avec votre SDK carte
+3. Persister la carte via votre flux d'attache (le portail hébergé appelle la edge function après confirmation)
+
+Utilisez `POST /customer-portal/payment-methods/{id}/default` pour définir la carte par défaut et synchroniser les abonnements actifs. `DELETE /customer-portal/payment-methods/{id}` supprime une carte (bloqué si c'est la seule carte d'un abonnement facturable).
+
+### Reprise après échec de paiement
+
+Pour les abonnements carte `past_due`, `POST /customer-portal/subscriptions/{id}/retry-payment` tente un prélèvement hors session avec la carte par défaut. En cas de succès, le renouvellement est enregistré et le dunning est levé. En cas d'échec, la réponse peut inclure un repli `checkout_url` (même chemin que le dunning de renouvellement automatique).
+
+Le portail hébergé expose aussi **Réessayer le paiement** à côté de **Payer maintenant** sur les actions d'abonnement.
+
+## Intégration dashboard
+
+Depuis **Paramètres → Checkout → Storefront**, configurez le portail client :
+
+- Autoriser pause / reprise / annulation
+- Lien magique e-mail et OTP SMS
+- **Mise à jour des moyens de paiement** : permettre d'ajouter, supprimer et définir des cartes par défaut
+- **Liste blanche des URL de retour**: requise pour `return_url` et `flow_after_completion_url` depuis votre backend
+
+Depuis **Clients**, ouvrez un client avec historique de facturation et cliquez sur **Ouvrir le portail client** pour lancer le flux hébergé dans un nouvel onglet (identique à la session de lancement API).
+
+## Annulation d'abonnement
+
+L'annulation initiée par le client est **en fin de période** par défaut : l'accès continue jusqu'à `next_billing_date`, puis l'abonnement passe à `cancelled`. Le client peut **annuler l'annulation** avant cette date depuis le portail.
+
+Planifiez `finalize_cancel_at_period_end_subscriptions()` quotidiennement (ex. pg_cron) pour appliquer automatiquement les annulations en fin de période.
+
+## Contrôles de sécurité
+
+- Les jetons de lancement sont à usage unique et de courte durée (15 min)
+- Les jetons sont hachés au repos
+- Les challenges OTP / lien magique sont hachés, expirants et limités en tentatives
+- Les sessions portail sont hachées, révocables et prolongées à l'activité
+- Les requêtes sont bornées organisation / client au niveau des fonctions SQL
+- Des événements d'audit couvrent lancement, challenge, session et actions sur abonnements
+
+## Configuration production
+
+**Obligatoire** pour l'app portail hébergée (`apps/customers`) :
+
+- `CUSTOMER_PORTAL_COOKIE_SECRET`, scelle les cookies de handoff et de flux (16 caractères minimum)
+- `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SECRET_KEY`, accès RPC et e-mail lien magique
+
+**Optionnel** :
+
+- `CUSTOMER_PORTAL_SMS_WEBHOOK_URL`, POST `{ to, body }` vers votre passerelle SMS. Sans cela, les OTP ne sont journalisés qu'en non-production.
+
+Les URL de lancement et les liens magiques utilisent par défaut `https://customers.lomi.africa` et l'origine de la requête. Aucune variable d'environnement d'URL de base supplémentaire n'est requise en production.
+
+Également :
+
+- Garantir que la clé API reste côté serveur marchand.
+- Ajouter les URL de retour marchandes à la liste blanche avant d'utiliser `return_url` dans l'API.
+- Planifier `finalize_cancel_at_period_end_subscriptions()` quotidiennement (cron inclus dans `run_to_prod.sql`).
+- Surveiller les échecs de lancement / session / challenge et les abus.
+- Harmoniser la normalisation téléphone / e-mail avec votre CRM.
+
+## Dépannage
+
+- **404 client introuvable** : mauvais ID client ou organisation incorrecte.
+- **400 flux invalide** : `flow_type` non supporté ou `flow_subscription_id` manquant.
+- **URL de lancement expirée** : jeton réutilisé ou expiré.
+- **Blocage après saisie du contact** : aucun enregistrement de facturation éligible.

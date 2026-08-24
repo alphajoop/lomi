@@ -5,20 +5,177 @@ description: Installez et utilisez l’outil en ligne de commande lomi. pour l�
 
 import { Callout } from '@/components/docs/docs-callout';
 
-# CLI lomi.
-
-La **CLI lomi.** est un outil en ligne de commande pour travailler avec la plateforme de paiement lomi. depuis le terminal : authentification, génération de projets SDK, serveur webhook local, sessions de checkout, liens de paiement et règles pour Cursor, Claude et autres assistants IA.
+La **CLI lomi.** est distribuée via **npm** sous le nom `lomi.cli`. Elle sert à s’authentifier, générer des projets SDK, tester les webhooks en local, créer des sessions de checkout et des liens de paiement, et installer des règles pour les assistants IA.
 
 <Callout type="info" title="Pour qui">
-  La CLI lomi. s’adresse aux **développeurs qui intègrent** l’API marchande hébergée depuis le terminal, authentification, génération de projets SDK, tests de webhooks et checkouts sandbox.
+  La CLI lomi. s’adresse aux **développeurs qui intègrent** l’API marchande hébergée depuis le terminal : authentification, génération de projets SDK, tests de webhooks et checkouts sandbox.
+
+  Le premier lancement (npm install, login, premier checkout) est sur [Démarrer avec le CLI](/start/cli-quickstart). Cette page est la référence d’installation (Homebrew, sources, plateformes) et le reste des commandes.
 
   Elle **ne sert pas** à exploiter la plateforme interne de lomi., le tableau de bord admin ni l’auto-hébergement du traitement des paiements. Les marchands qui n’utilisent que le tableau de bord web n’ont pas besoin de la CLI.
 </Callout>
 
+Les commandes `lomi` et `lomi.` fonctionnent toutes les deux après installation.
+
+## Installation
+
+<Steps>
+
+### npm (recommandé)
+
+**Node.js 18+** requis (uniquement pour télécharger le binaire natif à l’installation).
+
+```bash filename="Terminal"
+npm install -g lomi.cli
+```
+
+Ou avec pnpm :
+
+```bash filename="Terminal"
+pnpm add -g lomi.cli
+```
+
+L’installation npm télécharge le binaire adapté à votre plateforme depuis [GitHub Releases](https://github.com/lomiafrica/lomi./releases).
+
+### Homebrew
+
+```bash filename="Terminal"
+brew tap lomiafrica/tap
+brew install lomi
+```
+
+### Depuis les sources
+
+```bash filename="Terminal"
+git clone https://github.com/lomiafrica/lomi.
+cd lomi./apps/cli
+cargo install --path .
+```
+
+</Steps>
+
+### Vérifier l’installation
+
+```bash filename="Terminal"
+lomi --version
+lomi --help
+```
+
+### Dépannage de l’installation
+
+| Symptôme | Cause probable | Action |
+| --- | --- | --- |
+| `lomi: command not found` après `npm install -g` | binaire npm global absent du `PATH` | `npm prefix -g` puis ajouter le dossier `bin` au `PATH`, ou `npx lomi.cli --version` |
+| Installé mais `lomi --version` échoue (**glibc** / **`GLIBC_X.XX' not found**) | Binaire compilé pour une glibc plus récente que votre Linux | [Homebrew](#homebrew), [release GitHub](https://github.com/lomiafrica/lomi./releases), ou [compilation depuis les sources](#depuis-les-sources) |
+| OK sur macOS, échec sur une CI Linux ancienne | Images CI avec glibc ancienne | Build source en CI ou image plus récente (glibc ≥ 2.39 pour les binaires npm Linux à ce jour) |
+
+<Callout type="info">
+  npm exige seulement **Node.js 18+** pour télécharger le binaire natif ; le CLI ne s’exécute pas sur Node. Si `npm install -g lomi.cli` réussit mais le binaire ne démarre pas, c’est un problème de **compatibilité plateforme**, pas de version Node.
+</Callout>
+
+### Plateformes supportées
+
+| Plateforme | Installation |
+| --- | --- |
+| macOS (Apple Silicon) | npm, Homebrew, GitHub Release |
+| macOS (Intel) | npm, Homebrew, GitHub Release |
+| Linux (x64) | npm, Homebrew, GitHub Release |
+| Windows (x64) | Bientôt disponible |
+
+## Démarrage rapide
+
+<Steps>
+
+### Connexion
+
+```bash filename="Terminal"
+lomi login
+```
+
+### Vérifier le statut
+
+```bash filename="Terminal"
+lomi status
+```
+
+### Initialiser un projet
+
+```bash filename="Terminal"
+cd mon-app
+lomi init
+```
+
+### Règles agent IA (optionnel)
+
+Installe les règles Cursor, `CLAUDE.md`, `AGENTS.md`, instructions VS Code et `llms.txt`. Voir [Installer les règles agent](/build/cli/install-rules).
+
+### Écouter les webhooks (recommandé)
+
+```bash filename="Terminal"
+lomi listen http://localhost:3000/webhooks
+```
+
+Reçoit de vrais webhooks sandbox via relais cloud, sans ngrok. Voir [Écouter les webhooks](/build/cli/listen).
+
+### Lancer le serveur webhook local
+
+```bash filename="Terminal"
+lomi dev
+```
+
+Démarre un récepteur webhook sur `http://localhost:4242/webhook`. Voir [Serveur de développement local](/build/cli/dev).
+
+</Steps>
+
+## Aperçu des commandes
+
+| Commande | Description |
+| --- | --- |
+| `lomi login` | Authentification navigateur |
+| `lomi logout` | Supprimer les identifiants d’un profil |
+| `lomi whoami` | Profil actif |
+| `lomi status` | Connexion et API |
+| `lomi init` | Générer les fichiers SDK |
+| `lomi quickstart` | Parcours rapide et prochaines étapes |
+| `lomi listen` | Relais webhook cloud (sandbox) |
+| `lomi dev` | Serveur webhook local |
+| `lomi probe` | Vérifications d'intégration |
+| `lomi checkout create` | Créer une session checkout |
+| `lomi payments create` | Créer un lien de paiement |
+| `lomi transactions list` / `get` | Lister ou récupérer une transaction |
+| `lomi refunds create` / `list` / `get` | Remboursements |
+| `lomi install-rules` | Documentation pour assistants IA |
+| `lomi update` | Mettre à jour `@lomi./sdk` |
+| `lomi list-profiles` | Lister les profils |
+| `lomi switch` | Changer de profil |
+
+Référence complète : [Commandes](/build/cli/commands).
+
+## Options globales
+
+| Option | Description |
+| --- | --- |
+| `--profile <nom>` | Profil à utiliser (défaut : `default`) |
+| `-a, --api-url <url>` | URL de base de l’API |
+| `-l, --log-level <niveau>` | `debug`, `info`, `warn`, `error` |
+| `--skip-telemetry` | Désactiver la télémétrie |
+| `--json` | Sortie JSON (par défaut si stdout n’est pas un TTY) |
+| `-h, --help` | Aide pour la CLI ou une sous-commande |
+| `--version` | Afficher la version |
+
+## Deux types d’identifiants
+
+<Callout type="info" emoji="💡" title="Jeton CLI vs clé API">
+  **`lomi login`** enregistre un **jeton CLI** global, utilisé par les commandes CLI.
+
+  **`lomi init`** écrit la **clé API secrète** (`LOMI_SECRET_KEY`) dans le `.env` du projet, utilisée par le **SDK dans votre code applicatif**.
+</Callout>
+
+## Autres pages CLI
+
 <div className="not-prose my-8">
 
 <Cards className="gap-4">
-  <Card title="Premiers pas" href="/build/cli/overview" description="Installation via npm, Homebrew ou source. Vérification avec lomi --version." />
   <Card title="Authentification" href="/build/cli/auth" description="Flux device dans le navigateur, profils et jetons CI." />
   <Card title="Initialiser un projet" href="/build/cli/init" description="Client SDK, exemples et fichier .env." />
   <Card title="Référence des commandes" href="/build/cli/commands" description="Toutes les commandes, options et parcours types." />

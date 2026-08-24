@@ -1,9 +1,12 @@
 ---
-title: 'Quels moyens de paiement lomi. prend-il en charge ?'
+title: 'Quels moyens de paiement ?'
 description: 'Matrice pays, devise et canal pour le checkout hébergé et les charges directes en Afrique de l’Ouest francophone et sur les marchés MTN.'
 ---
 
 import { Callout } from '@/components/docs/docs-callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
 
 Utilisez cette page pour confirmer les rails et devises avant de choisir une intégration. Pour chaque canal, voir les [guides par canal](/build/payment-methods/wave). Pour l’arbre de décision, voir [Quelle intégration choisir ?](/build/choose-integration).
 
@@ -11,30 +14,40 @@ Utilisez cette page pour confirmer les rails et devises avant de choisir une int
   La disponibilité exacte dépend des prestataires activés pour votre organisation dans le portail. Contactez le support si un canal manque.
 </Callout>
 
+## Capacités par canal [#channel-capabilities]
+
+Mêmes colonnes sur chaque page rail. Une cellule vide (`-`) signifie que nous ne publions pas de chiffre, pas que le rail est illimité.
+
+| Canal | Approbation | Règlement | Direct vs hébergé | Remboursement | Min / max | Guide |
+| --- | --- | --- | --- | --- | --- | --- |
+| Wave | Redirection ou URL de lancement (`wave_launch_url` / `checkout_url`) | Test : souvent à la création. Live : après approbation dans Wave, puis `available_at` | Hébergé et `POST /charge/wave` | Transactions Wave `completed` | - | [Wave](/build/payment-methods/wave) |
+| MTN | Push / PIN sur le téléphone (`next_action: await_webhook`) | Test : souvent `completed` immédiat. Live : reste `PENDING` jusqu’à approbation, puis `available_at` | Hébergé et `POST /charge/mtn` | Transactions MTN `completed` (remboursements live asynchrones) | - | [MTN](/build/payment-methods/mtn-momo) |
+| SPI | Hébergé : opérateur, USSD ou app sur la page checkout | Après le paiement hébergé, puis `available_at` | Hébergé uniquement | Pas listé sur `POST /refunds` | - | [SPI](/build/payment-methods/spi) |
+| Cartes | 3DS hébergé si l’émetteur l’exige | Après `completed` ; certains réglages carte retardent `available_at` | Hébergé. `POST /charge/card` renvoie `503` | Transactions carte `completed` | - | [Cartes](/build/payment-methods/cards) |
+
+**Par défaut :** checkout hébergé ou liens de paiement. Charges directes si vous maîtrisez l’UI et le comportement asynchrone.
+
+### Pas des rails lomi.
+
+| Canal | Statut |
+| --- | --- |
+| Orange Money | Pas un rail lomi. |
+| Apple Pay | Pas un rail lomi. |
+| Djamo | Bientôt pour la Côte d’Ivoire et le Sénégal |
+
 <Callout type="info">
   La prise en charge **Djamo** pour la Côte d'Ivoire et le Sénégal arrive bientôt.
 </Callout>
-
-## Chemin recommandé par canal
-
-| Canal | Checkout hébergé / liens | API directe | Guide |
-| --- | --- | --- | --- |
-| Cartes (Visa, Mastercard, Amex, …) | Oui | `POST /charge/card` + Payment Elements | [Cartes](/build/payment-methods/cards) |
-| Wave | Oui | `POST /charge/wave` | [Wave](/build/payment-methods/wave) |
-| MTN MoMo | Oui | `POST /charge/mtn` | [MTN MoMo](/build/payment-methods/mtn-momo) |
-| SPI, virement | Oui (hébergé) | Préférez le checkout hébergé sauf indication contraire | [SPI](/build/payment-methods/spi) |
-
-**Par défaut :** checkout hébergé ou liens de paiement. Charges directes si vous maîtrisez l’UI et le comportement asynchrone.
 
 ## Marchés et devises
 
 | Région / focus | Devises principales | Mobile money | Cartes |
 | --- | --- | --- | --- |
 | UEMOA (Wave) | `XOF` | Wave | Oui |
-| Pays MTN (voir tableau) | `XOF`, `XAF`, `GHS`, `UGX`, `ZMW`, `NGN`, `ZAR`, … | MTN MoMo | Oui (si activé) |
+| Pays MTN (voir tableau) | `XOF`, `XAF`, `GHS`, `UGX`, `ZMW`, `NGN`, `ZAR`, … | MTN | Oui (si activé) |
 | Cartes internationales | `USD`, `EUR` (selon produit) | - | Oui |
 
-## MTN MoMo: pays pris en charge
+## MTN: pays pris en charge [#mtn-momo-supported-countries]
 
 | Pays | Indicatif | Environnement MTN |
 | --- | --- | --- |
@@ -76,6 +89,6 @@ L’environnement est déterminé par la **clé API** (`lomi_sk_test_...` vs `lo
 ## Voir aussi
 
 - [Mobile money](/build/mobile-money)
-- [Charges directes](/build/direct-charges)
+- [Charges directes](/build/accept/direct-charges)
 - [Paiements sandbox](/start/sandbox-payments)
 - [API Prestataires](/api/providers/ProvidersController_findAll)

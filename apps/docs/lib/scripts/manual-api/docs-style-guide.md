@@ -43,7 +43,7 @@ Body sections typically include: overview, request, response, errors, related li
 When drafting or reviewing, compare against:
 
 - `apps/docs/content/docs/start/sandbox-payments.mdx`
-- `apps/docs/content/docs/build/usage-billing.mdx`
+- `apps/docs/content/docs/build/billing/usage-billing.mdx`
 - `apps/docs/content/docs/api/organizations/OrganizationsController_updateRadarSettings.mdx`
 
 ## CI and tooling

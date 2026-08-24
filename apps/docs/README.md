@@ -25,7 +25,7 @@ The REST section under `content/docs/api/` is **hand-authored MDX** with parity 
 
 ## Support
 
-Contact [hello@lomi.africa](mailto:hello@lomi.africa) or visit our [support center](https://docs.lomi.africa/resources/support).
+Contact [hello@lomi.africa](mailto:hello@lomi.africa) or visit our [support center](https://docs.lomi.africa/start/support).
 
 ## License
 

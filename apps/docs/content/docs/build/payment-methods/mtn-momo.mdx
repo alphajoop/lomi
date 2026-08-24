@@ -1,6 +1,6 @@
 ---
-title: 'How do I accept MTN MoMo payments?'
-description: 'MTN Mobile Money across CI and regional markets, hosted checkout, POST /charge/mtn, and country codes.'
+title: 'How do I accept MTN?'
+description: "Accept MTN in Côte d'Ivoire and regional markets, hosted checkout, POST /charge/mtn, and country codes."
 docType: how-to
 ---
 
@@ -9,7 +9,19 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-MTN MoMo supports multiple countries beyond UEMOA. Use [hosted checkout](/build/checkout) unless you need `POST /charge/mtn`.
+MTN supports multiple countries beyond UEMOA. Use [hosted checkout](/build/accept/checkout) unless you need `POST /charge/mtn`.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Approval | Push / PIN on the customer's phone (`next_action: await_webhook`) |
+| Settlement | Test: often immediate `completed`. Live: stays `PENDING` until approve, then `available_at` |
+| Direct vs hosted | Hosted and `POST /charge/mtn` |
+| Refund | Completed MTN transactions (live refunds are async) |
+| Min / max | - |
+
+Same columns as [Payment channels](/build/payment-channels#channel-capabilities).
 
 ## Direct charge essentials
 
@@ -29,15 +41,15 @@ Sandbox MSISDN patterns and test behavior: [Sandbox payments: MTN](/start/sandbo
 ## Verify before fulfill
 
 <Callout type="warn">
-  Live MTN flows are **asynchronous**. Poll `GET /transactions/{id}` or use webhooks; see [Verify payments](/build/guides/verify-payments).
+  Live MTN flows are **asynchronous**. Poll `GET /transactions/{id}` or use webhooks; see [Verify payments](/build/reliability/verify-payments).
 </Callout>
 
 ## Refunds
 
-Live MTN refunds require the original payment’s provider reference and may use the Disbursement API asynchronously. Test refunds are ledger-only. See [Refunds](/build/refunds).
+Live MTN refunds require the original payment’s provider reference and may use the Disbursement API asynchronously. Test refunds are ledger-only. See [Refunds](/build/money/refunds).
 
 ## Related
 
-- [MTN MoMo developer portal](https://momodeveloper.mtn.com/)
+- [MTN developer portal](https://momodeveloper.mtn.com/)
 - [Mobile money](/build/mobile-money)
-- [Direct charges](/build/direct-charges)
+- [Direct charges](/build/accept/direct-charges)

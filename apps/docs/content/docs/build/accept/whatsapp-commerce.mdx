@@ -1,0 +1,28 @@
+---
+title: 'How does WhatsApp work?'
+description: 'Connect WhatsApp in the dashboard, share payment links in chat, and send transactional notifications when configured.'
+---
+
+WhatsApp Commerce on lomi. combines **payment links**, **hosted checkout**, and optional **WhatsApp channel** setup in the merchant dashboard. It is built for merchants who already sell through WhatsApp, Instagram, and SMS in francophone West Africa.
+
+## Connect WhatsApp in the dashboard
+
+1. Open **Settings → Channels → WhatsApp** in the [dashboard](https://dashboard.lomi.africa).
+2. Complete embedded signup to connect your business number through Kapso.
+3. Use WhatsApp for **transactional template notifications** (payment receipts, renewal reminders) where enabled on your account. lomi. does not expose free-form WhatsApp messaging through the merchant API.
+
+## Collect payment in chat
+
+- Create a [payment link](/build/accept/payment-links) from the dashboard or API and paste the URL in WhatsApp.
+- Customers pay on **lomi. Checkout** with Wave, MTN, cards, and other methods enabled for your organization.
+- Store `whatsapp_number` on [customers](/api/customers) for checkout prefill and operational follow-up.
+
+## Related integrations
+
+- [Relay](https://lomi.africa/relay) on lomi.africa covers store plugins plus social selling in one story.
+- [Payment links](/build/accept/payment-links) for no-code sales without a website.
+- [Hosted checkout](/build/accept/checkout) when your backend creates checkout sessions for every order.
+
+## Webhooks and fulfillment
+
+Confirm payment with webhooks and `GET /transactions/{id}` before you ship goods or grant access. See [Verify payments](/build/reliability/verify-payments).

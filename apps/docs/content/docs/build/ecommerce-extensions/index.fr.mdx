@@ -1,5 +1,5 @@
 ---
-title: Extensions e‑commerce
+title: Aperçu
 description:
   Extensions officielles ou maintenues pour un paiement hébergé avec lomi.
   WooCommerce, Magento 2 et PrestaShop partagent le même contrat d’API
@@ -9,13 +9,11 @@ description:
 import { Cards, Card } from 'fumadocs-ui/components/card';
 import { Callout } from '@/components/docs/docs-callout';
 
-# Extensions e‑commerce
-
 Installez lomi. sur votre boutique sans recoder le tunnel de paiement. Ces modules créent des **sessions de paiement hébergées**, envoient le client vers la **page lomi. Checkout**, puis confirment le paiement via les **URL de retour** et les **webhooks marchands**.
 
 ## Contrat technique partagé
 
-WooCommerce, Magento 2 et PrestaShop n’utilent que l’**API REST publique** lomi. (`/checkout-sessions`). Ils **n’appellent pas** les RPC Supabase ni les endpoints internes Nest.
+WooCommerce, Magento 2 et PrestaShop n’utilisent que l’**API publique** lomi. (`/checkout-sessions`). Ils **n’appellent pas** les RPC Supabase ni les endpoints internes Nest.
 
 | Point | Contrat |
 | --- | --- |
@@ -29,9 +27,9 @@ WooCommerce, Magento 2 et PrestaShop n’utilent que l’**API REST publique** 
 Formulation canonique à côté du code :
 
 - [Contrat technique partagé](#contrat-technique-partagé) (cette page)
-- [Vérifier les paiements](/build/guides/verify-payments) et [Traiter les webhooks](/build/advanced-guides/handling-webhooks)
+- [Vérifier les paiements](/build/reliability/verify-payments) et [Traiter les webhooks](/build/reliability/handling-webhooks)
 
-Avant la mise en production : [Intégration API](/start/first-payment), [Authentification](/api/authentication) et [Webhooks](/build/webhooks).
+Avant la mise en production : [Intégration API](/start/first-payment), [Authentification](/api/authentication) et [Webhooks](/build/reliability).
 
 ## Où télécharger chaque extension
 
@@ -81,8 +79,8 @@ Avant la mise en production : [Intégration API](/start/first-payment), [Authen
 
 Pas sur une plateforme prise en charge, ou vous construisez un tunnel personnalisé ? Ces options offrent le même checkout hébergé sans extension de boutique :
 
-- **[Widget d’intégration](/build/embed-widget)**, un bouton et une fenêtre de checkout à intégrer sur n’importe quel site (y compris Bubble et HTML personnalisé).
-- **[Checkout hébergé](/build/checkout)**, la page lomi. vers laquelle vos extensions redirigent les clients.
+- **[Widget d’intégration](/build/accept/embed-widget)**, un bouton et une fenêtre de checkout à intégrer sur n’importe quel site (y compris Bubble et HTML personnalisé).
+- **[Checkout hébergé](/build/accept/checkout)**, la page lomi. vers laquelle vos extensions redirigent les clients.
 - **[Storefront](https://store.lomi.africa)**, pages produits marchandes et parcours d’abonnement (`display_on_storefront` sur le catalogue).
 - **[lomi-ui](/build/lomi-ui)**, des composants de checkout à copier-coller quand vous voulez votre propre UI.
 - **[CLI](/build/cli)**, créer et tester des sessions de paiement depuis votre terminal.
@@ -93,8 +91,8 @@ Pas sur une plateforme prise en charge, ou vous construisez un tunnel personnali
 | Vous voulez… | Utilisez |
 | --- | --- |
 | Ajouter les paiements à une boutique prise en charge (Woo, Magento, PrestaShop, Shopify, Bubble) | L’**extension** de cette plateforme |
-| Ajouter un bouton de paiement à un site personnalisé ou une page no-code | **[Widget d’intégration](/build/embed-widget)** |
+| Ajouter un bouton de paiement à un site personnalisé ou une page no-code | **[Widget d’intégration](/build/accept/embed-widget)** |
 | Garder votre propre UI de checkout sans recoder la plomberie de paiement | Les composants **[lomi-ui](/build/lomi-ui)** |
 | Un contrôle total depuis votre propre backend | L’**[API publique](/start/first-payment)** (`POST /checkout-sessions`) |
-| Vendre depuis un catalogue hébergé (sans plugin boutique) | **[Storefront](https://store.lomi.africa)** avec [Produits](/build/products) (`display_on_storefront`) |
+| Vendre depuis un catalogue hébergé (sans plugin boutique) | **[Storefront](https://store.lomi.africa)** avec [Produits](/build/billing/products) (`display_on_storefront`) |
 | Automatiser ou tester depuis un terminal ou des agents IA | **[CLI](/build/cli)** ou **[MCP](/build/mcp)** |

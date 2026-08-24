@@ -1,0 +1,107 @@
+---
+title: 'Pricing'
+description: 'Transparent fees at a 20% discount vs. competition.'
+---
+
+Standard (fixed) pricing uses a stable fee schedule. Volume-tiered pricing starts on Starter and decreases as monthly processed volume grows. Exact rates for your organization are in **Billing → Pricing** in the dashboard and may differ by payment method and provider.
+
+- **Dynamic (volume-tiered):** you start on the **Starter** tier, then rates decrease automatically as your monthly processed volume grows into Growth, Professional, and Enterprise.
+- **Fixed (standard):** fees stay the same regardless of monthly volume, best when you want predictable costs.
+- **Custom:** negotiated pricing for specific business models, risk profiles, or high-volume needs.
+
+Starter dynamic rates are typically configured at or above standard fixed rates so merchants who expect to grow benefit from lower tiers over time. Compare both plans in **Billing → Pricing** before switching.
+
+You can switch between standard and volume-based pricing **at most once per calendar month** from the dashboard. Organizations on **custom** negotiated fees cannot self-serve a switch to volume-based pricing.
+
+<DocsTierCallout />
+
+## How dynamic pricing works
+
+With dynamic pricing, your organization is assigned to a tier based on **last closed month** processed volume in **F CFA** (all currencies converted, not same-day sales). As your volume increases, your transaction rates decrease automatically.
+
+- Tier assignment uses **total processed volume converted to F CFA**: sales in XOF, USD, and EUR all count toward your monthly tier.
+- Tier rates apply across payment processing (Mobile Money, cards, POS) and selected payout/other fees.
+- Non-tier fees can still apply (for example refunds, disputes, international card surcharges, or subscription-related add-ons).
+
+## Volume tiers (F CFA monthly revenue)
+
+<PricingTable kind="volume-tiers" />
+
+## Dynamic tier fees
+
+Rates below apply when your organization is on the **volume-tiered** plan, based on your current tier.
+
+<PricingTable kind="dynamic" />
+
+For current tier thresholds and live rates, use the pricing view in your dashboard or the public pricing page at [lomi.africa/pricing](https://lomi.africa/pricing).
+
+## Fixed default fees
+
+These rates apply on the **fixed** plan.
+
+### F CFA
+
+<PricingTable kind="fixed-xof" />
+
+### USD and EUR
+
+<PricingTable kind="fixed-intl" />
+
+Provider-specific Mobile Money rates (MTN, Wave, Moov, Airtel) follow the same percentage and fixed structure for your active plan and tier.
+
+### Worked examples
+
+<PricingTable kind="examples" />
+
+<Callout type="info">
+  You can add discounts or additional fees (like delivery, taxes, or even
+  transaction fees) directly from the merchant dashboard to customize pricing
+  or absorb processing costs.
+</Callout>
+
+## Fixed and custom pricing
+
+Not every business should be on volume-tiered pricing:
+
+- **Fixed** is useful when you want predictable fees for finance planning.
+- **Custom** is useful when your payment mix, ticket size, geography, or compliance setup needs a tailored schedule.
+
+Custom pricing can include bespoke combinations of percentage and fixed components, and can vary by payment method and currency.
+
+## Refunds and disputes
+
+<PricingTable kind="refunds" />
+
+<Callout type="info">
+  lomi. reserves the right to issue refunds at our discretion within 60 days of
+  a purchase. This helps proactively reduce disputes and chargebacks. We only
+  exercise this right to help minimize chargebacks and reduce associated fees on
+  your behalf.
+</Callout>
+
+Transaction fees are calculated from:
+
+`transaction fee = (percentage × amount) + fixed amount`
+
+Depending on your pricing mode, currency, and method, the fee can include base processing, provider-specific adjustments, and optional add-ons.
+
+**Important:**
+
+- Payment providers impose monitoring programs, penalties, and higher chargeback costs for sellers with high chargeback rates.
+- lomi. monitors chargeback rates on your account to stay within network thresholds.
+- If chargebacks rise significantly, your account may be reviewed or payouts paused until the issue is resolved.
+
+In some low-amount flows, only the percentage component may apply based on your organization fee configuration.
+
+## Payout fees
+
+<PricingTable kind="payouts" />
+
+<Callout type="info">
+  lomi. does not add markup on merchant withdrawals where the platform fee is
+  zero. Third-party operator fees may still apply on certain payout routes.
+</Callout>
+
+For the up-to-date fee values (F CFA/USD/EUR and any add-ons), rely on your live pricing configuration in the dashboard and on [lomi.africa/pricing](https://lomi.africa/pricing).
+
+> Contact our [sales team](mailto:hello@lomi.africa) to discuss **custom options** tailored to your business needs.

@@ -49,7 +49,7 @@ export function DocsSidebarLocaleAndTheme({
             aria-label="Documentation language"
             className={cn(
               r,
-              'h-full min-w-0 max-w-24 cursor-pointer appearance-none bg-transparent pe-4 text-left text-xs',
+              'h-full min-w-0 max-w-24 cursor-pointer appearance-none bg-transparent pe-5 text-left text-xs',
               'text-fd-muted-foreground outline-none',
               'focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none',
             )}
@@ -68,7 +68,7 @@ export function DocsSidebarLocaleAndTheme({
             ))}
           </select>
           <ChevronDown
-            className="pointer-events-none absolute inset-e-1.5 top-1/2 size-3.5 -translate-y-1/2 text-fd-muted-foreground/70"
+            className="pointer-events-none absolute inset-e-2.5 top-1/2 size-3.5 -translate-y-1/2 text-fd-muted-foreground/70"
             aria-hidden
           />
         </label>

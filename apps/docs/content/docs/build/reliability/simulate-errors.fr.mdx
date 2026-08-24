@@ -1,0 +1,74 @@
+---
+title: 'Comment simuler les erreurs ?'
+description: 'Testez refus, authentification 3DS, mobile money asynchrone et échecs webhook avant la mise en production.'
+docType: how-to
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Utilisez cet index en **bac à sable**. Cette page est la **matrice des scénarios**. Les numéros de carte et le comportement MoMo détaillés sont dans **[Paiements en bac à sable](/start/sandbox-payments)**. Comment structurer les tests : **[Guide des tests](/build/reliability/testing)**.
+
+<Callout type="warn">
+  Exécutez ces scénarios uniquement avec des **clés test** (`lomi_sk_test_...`).
+</Callout>
+
+## Matrice de scénarios
+
+| Scénario | Déclencheur | Résultat attendu | Détail |
+| --- | --- | --- | --- |
+| Carte acceptée | `4242 4242 4242 4242` | `completed` | [Bac à sable: cartes](/start/sandbox-payments#testing-card-payments) |
+| Carte refusée | PAN de refus du tableau test | `failed` | Idem |
+| 3D Secure | Cartes test auth | `requires_action` | [Bac à sable](/start/sandbox-payments) |
+| Wave (test) | Wave sur checkout test | Souvent `completed` immédiat | [Wave](/build/payment-methods/wave) |
+| MTN (test) | `POST /charge/mtn` | `completed` immédiat | [MTN](/build/payment-methods/mtn-momo) |
+| MoMo direct `pending` (test) | `X-Scenario-Key: pending` sur `POST /charge/mtn` ou `/charge/wave` | Charge reste `PENDING` ; pas d’auto-complétion | [Bac à sable : scénarios](/start/sandbox-payments#testing-mobile-money) |
+| MoMo direct `failed` (test) | `X-Scenario-Key: failed` sur `POST /charge/mtn` ou `/charge/wave` | Réponse d’erreur `400` | Même section |
+| MTN (live) | numéro de téléphone réel, clé live | `PENDING` | [Vérifier les paiements](/build/reliability/verify-payments) |
+| Expiration | Dépassement TTL session/transaction | `expired` / `failed` | [Machine à états](/api/payment-state-machine) |
+| Signature webhook invalide | POST sans `X-Lomi-Signature` | 4xx + retries lomi. | [Gestion webhooks](/build/reliability/handling-webhooks) |
+| Webhook dupliqué | Rejouer le même `id` | Déduplication côté vous | [Fiabilité webhooks](/build/reliability/webhook-reliability) |
+| Reversement solde insuffisant | Règles test payout | `400` / `failed` | [Reversements test](/start/sandbox-payments#payouts-in-test-mode) |
+| Clé API invalide | Mauvais `X-API-Key` | `401` | [Authentification](/api/authentication) |
+| Limite de débit | Rafale de requêtes en test | `429` | [Gestion des erreurs](/build/reliability/error-handling) |
+| 3DS carte via `X-Scenario-Key` | Pas pris en charge | Utilisez les PAN de test | [Paiements sandbox](/start/sandbox-payments#testing-card-payments) |
+| MoMo redirect vs push via en-tête | Pas pris en charge | Wave = URL de lancement ; MTN = push | [Mobile money](/build/mobile-money) |
+| Payout `insufficient_balance` via `X-Scenario-Key` | Pas pris en charge | Suivez les règles payout test (Wave live uniquement) | [Reversements test](/start/sandbox-payments#payouts-in-test-mode) |
+| Ouvrir un litige en sandbox | Pas pris en charge | Événements réseau carte en live uniquement | [Litiges](/build/money/disputes) |
+
+## Scénarios de charge directe (clé test uniquement)
+
+Sur **`POST /charge/mtn`** et **`POST /charge/wave`**, envoyez `X-Scenario-Key` pour outrepasser le comportement test par défaut. Cela s’applique aux **charges directes uniquement**: le checkout hébergé et les charges carte ne lisent pas encore cet en-tête.
+
+| Valeur d’en-tête | Comportement |
+| --- | --- |
+| *(omis)* | Par défaut : la charge test se complète automatiquement et crédite le solde test |
+| `pending` | La charge reste `PENDING` ; pas d’auto-complétion (polling ou webhook) |
+| `failed` | La requête échoue avec `400` |
+
+```bash
+# Garder la charge en attente (CI / tests de relance)
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+
+# Simuler un échec prestataire
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "X-Scenario-Key: failed" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
+
+## Automatisation
+
+Voir [Guide de tests](/build/reliability/testing) et les recettes `curl` du bac à sable.
+
+## Voir aussi
+
+- [Parcours d’intégration](/start/integration-journey)
+- [Passer en production](/start/go-live)

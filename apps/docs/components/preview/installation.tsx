@@ -30,7 +30,7 @@ function InstallCommand({ code }: { code: string }) {
   return (
     <div
       ref={containerRef}
-      className="docs-installation-code relative overflow-x-auto bg-zinc-100 px-4 py-2.5 pr-10 text-[0.8125rem] dark:bg-zinc-800"
+      className="docs-installation-code relative overflow-x-auto pr-10 text-[13px]"
     >
       <button
         type="button"
@@ -88,7 +88,7 @@ export function Installation({ name }: { name: string }) {
 
   return (
     <Tabs
-      className="not-prose my-6 overflow-hidden rounded-sm border border-fd-border bg-fd-card text-fd-card-foreground"
+      className="docs-well not-prose my-6 overflow-hidden rounded-[9px]"
       defaultValue="npx"
     >
       <TabsList className="flex flex-col gap-3 text-sm items-start border-0 bg-transparent p-3 pb-2 not-prose sm:flex-row">
@@ -113,11 +113,9 @@ export function Installation({ name }: { name: string }) {
         <TabsContent
           key={tab.value}
           value={tab.value}
-          className="mt-0 border-t border-fd-border p-0 data-[state=inactive]:hidden"
+          className="mt-0 border-t border-[color:var(--docs-hairline)] p-0 data-[state=inactive]:hidden"
         >
-          <InstallCommand
-            code={commands[tab.value]}
-          />
+          <InstallCommand code={commands[tab.value]} />
         </TabsContent>
       ))}
     </Tabs>

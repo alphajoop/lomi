@@ -1,0 +1,12 @@
+{
+  "title": "Billing",
+  "description": "Products, subscriptions, usage billing, customer portal, and coupons.",
+  "icon": "Receipt",
+  "pages": [
+    "products",
+    "subscriptions",
+    "usage-billing",
+    "customer-portal",
+    "discount-coupons"
+  ]
+}

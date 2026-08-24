@@ -1,0 +1,117 @@
+---
+title: 'Comment utiliser les charges ?'
+description: 'Encaissements Wave, MTN et carte initiés côté serveur lorsque vous contrôlez l’UI de paiement.'
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Les charges directes permettent d’encaisser via `POST /charge/*` depuis votre serveur. Contrairement aux [sessions checkout](/build/accept/checkout) hébergées, vous construisez le parcours client.
+
+<Callout type="warn">
+  **Les charges directes carte et Switch ne sont pas encore disponibles.** `POST /charge/card` et `POST /charge/switch` sont désactivés le temps de finaliser les rails carte, et les appeler aujourd’hui renvoie `503 service_unavailable`. Utilisez le [checkout hébergé](/build/accept/checkout) ou les [liens de paiement](/build/accept/payment-links) pour les cartes. Seules les charges directes mobile money Wave et MTN sont actives.
+</Callout>
+
+<Callout type="warn">
+  Préférez le [checkout hébergé](/build/accept/checkout) ou les [liens de paiement](/build/accept/payment-links) sauf si vous avez besoin d’un flux mobile money sur mesure. Les charges directes exigent la gestion des états en attente et des webhooks.
+</Callout>
+
+## Quand utiliser les charges directes
+
+Utilisez-les pour encaisser rapidement sans réutiliser un moyen de paiement enregistré, paiement ponctuel orchestré.
+
+| Rail | Endpoint | Étape client |
+| --- | --- | --- |
+| Wave | `POST /charge/wave` | Ouvrir `wave_launch_url` ou `checkout_url` |
+| MTN | `POST /charge/mtn` | Approuver sur le téléphone ; en live le statut démarre en `PENDING` |
+| Carte | `POST /charge/card` | **Pas encore disponible**: utilisez le [checkout hébergé](/build/accept/checkout) |
+| Switch (carte côté serveur) | `POST /charge/switch` | **Pas encore disponible**: utilisez le [checkout hébergé](/build/accept/checkout) |
+
+## Implémentation de référence
+
+Exemple exécutable dans le monorepo :
+
+- Chemin : `apps/plugins/references/direct-charge-integration-reference`
+- Scripts cURL : `curl/create-wave-charge.sh`, `curl/create-mtn-charge.sh`
+
+```bash
+cd apps/plugins/references/direct-charge-integration-reference
+pnpm install && cp .env.example .env
+pnpm run dev
+```
+
+## Flux carte (résumé)
+
+<Callout type="warn">
+  Pas encore disponible. Les étapes ci-dessous décrivent le flux carte prévu ; `POST /charge/card` et `POST /charge/switch` renvoient actuellement `503 service_unavailable`. Utilisez le [checkout hébergé](/build/accept/checkout) pour les cartes.
+</Callout>
+
+1. `POST /charge/card` avec montant, devise et `customer_id` ou (`customer_email` + `customer_name`).
+2. Monter Payment Elements avec `lomi_pk_...` et le `client_secret` retourné.
+3. Écouter `PAYMENT_SUCCEEDED` pour la livraison.
+
+## Flux mobile money (résumé)
+
+1. `POST /charge/wave` ou `POST /charge/mtn` avec montant, devise et téléphone E.164.
+2. Rediriger ou guider le client selon la réponse.
+3. Avant de livrer, confirmez le **statut** et le **montant** finaux via webhooks ou `GET /transactions/{id}`.
+
+Voir [Mobile money](/build/mobile-money).
+
+### Champs de requête Wave
+
+`POST /charge/wave`
+
+| Champ | Type | Obligatoire | Description |
+| --- | --- | --- | --- |
+| `amount` | `number` | Oui | Montant (minimum 100). |
+| `currency` | `string` | Oui | Doit être `XOF`. |
+| `customer` | `object` | Oui | Détails client. |
+| `customer.name` | `string` | Oui | Nom complet. |
+| `customer.email` | `string` | Non | E-mail. |
+| `customer.phoneNumber` | `string` | Non | Téléphone E.164 (ex. `+2250102030405`). |
+| `description` | `string` | Non | Description. |
+| `successUrl` | `string` | Non | Redirection après succès. |
+| `errorUrl` | `string` | Non | Redirection après échec. |
+| `environment` | `string` | Non | `live` ou `test` (défaut `live`). |
+
+Une réponse `201` inclut `transactionId`, `checkoutUrl` et la session Wave. `POST /charge/mtn` suit le même schéma.
+
+Les endpoints carte (`POST /charge/card`, …) sont dans la référence REST. Ils renvoient aujourd’hui `503 service_unavailable`.
+
+## Scénarios bac à sable (clé test uniquement)
+
+Avec une clé API **test**, les charges directes Wave et MTN se complètent automatiquement par défaut. Pour tester les chemins asynchrones ou les échecs en CI, envoyez `X-Scenario-Key` :
+
+| Valeur | Résultat |
+| --- | --- |
+| `pending` | La charge reste `PENDING` (pas d’auto-complétion) |
+| `failed` | Erreur `400` |
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/charge/mtn" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "X-Scenario-Key: pending" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":1000,"currency":"XOF","customer_phone":"+2250700000000"}'
+```
+
+Le checkout hébergé et les charges carte directes ne prennent **pas** encore en charge cet en-tête. Voir [Simuler les erreurs](/build/reliability/simulate-errors) et [Paiements en bac à sable](/start/sandbox-payments#testing-mobile-money).
+
+## lomi. Network
+
+Les opérateurs peuvent créer des charges pour les comptes membres :
+
+```http
+POST /charge/wave HTTP/1.1
+X-API-KEY: lomi_sk_live_operator_...
+Lomi-Account: acct_1234567890
+```
+
+Voir [lomi. Network](/build/platform/network).
+
+## Voir aussi
+
+- [Créer une charge Wave](/api/charge/ChargesController_createWaveCharge)
+- [Créer une charge MTN](/api/charge/ChargesController_createMtnCharge)
+- [Créer une charge carte](/api/charge/ChargesController_createCardCharge)
+- [Traiter les webhooks](/build/reliability/handling-webhooks)

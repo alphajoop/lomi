@@ -1,0 +1,193 @@
+---
+title: Transactions
+description: Retrieve transaction history and details with advanced filtering.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from '@/components/docs/docs-callout';
+
+The Transactions API provides read-only access to transaction history for your organization. Transactions are automatically created when payments are processed through Checkout sessions or Payment links.
+
+<Callout type="info">
+  **Behavior:** how statuses transition, when balances credit, and how expiration works, see **[Payment state machine](/api/payment-state-machine)** and **[Balance and settlement](/build/money/balance-and-settlement)**.
+</Callout>
+
+<Callout type="info">
+  lomi. Network Operators can add `Lomi-Account: acct_...` to read transactions for a connected Member Account when the membership has `transaction.read`.
+</Callout>
+
+## List transactions
+
+Retrieve all transactions with advanced filtering options.
+
+### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `provider` | `string` | Filter by payment provider code (example: `WAVE`, cards channel code) |
+| `status` | `string` | Filter by status. Comma-separated for multiple (e.g., `completed,pending`) |
+| `type` | `string` | Filter by transaction type. Comma-separated (e.g., `payment,refund`) |
+| `currency` | `string` | Filter by currency code. Comma-separated (e.g., `XOF,USD`) |
+| `paymentMethod` | `string` | Filter by payment method. Comma-separated (e.g., `MOBILE_MONEY,CARDS`) |
+| `startDate` | `string` | Filter from this date (ISO 8601 format) |
+| `endDate` | `string` | Filter up to this date (ISO 8601 format) |
+| `isPos` | `boolean` | Filter POS transactions only |
+| `page` | `number` | Page number (default: `1`) |
+| `pageSize` | `number` | Items per page (default: `50`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'live',
+});
+
+// List with filters
+const transactions = await lomi.transactions.list({
+  status: 'completed',
+  provider: 'WAVE',
+  startDate: '2024-01-01T00:00:00Z',
+  endDate: '2024-12-31T23:59:59Z',
+  page: 1,
+  pageSize: 50,
+});
+
+console.log(`Found ${transactions.length} transactions`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_SECRET_KEY"],
+    environment="test"
+)
+
+# List with filters
+transactions = client.transactions.list(
+    status="completed",
+    provider="WAVE",
+    startDate="2024-01-01T00:00:00Z",
+    endDate="2024-12-31T23:59:59Z",
+    page=1,
+    pageSize=50
+)
+
+print(f"Found {len(transactions)} transactions")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/transactions?status=completed&provider=WAVE&startDate=2024-01-01T00:00:00Z&page=1&pageSize=50" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+</Tab>
+
+</Tabs>
+
+Network transaction read:
+
+```bash
+curl -X GET "https://api.lomi.africa/transactions?status=completed" \
+  -H "X-API-KEY: $LOMI_OPERATOR_API_KEY" \
+  -H "Lomi-Account: acct_1234567890"
+```
+
+### Response
+
+```json
+[
+  {
+    "transaction_id": "tx_abc123...",
+    "organization_id": "org_xyz789...",
+    "customer_id": "cus_def456...",
+    "gross_amount": 10000,
+    "net_amount": 9700,
+    "fee_amount": 300,
+    "currency_code": "XOF",
+    "status": "completed",
+    "type": "payment",
+    "provider_code": "WAVE",
+    "payment_method_code": "MOBILE_MONEY",
+    "description": "Payment for Order #12345",
+    "metadata": {
+      "order_id": "ORD-12345"
+    },
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": "2024-01-15T10:31:00Z"
+  }
+]
+```
+
+---
+
+## Get a transaction
+
+Retrieve details of a specific transaction by ID.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const tx = await lomi.transactions.get('tx_abc123...');
+console.log(`Amount: ${tx.gross_amount} ${tx.currency_code}`);
+console.log(`Status: ${tx.status}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+tx = client.transactions.get('tx_abc123...')
+print(f"Amount: {tx['gross_amount']} {tx['currency_code']}")
+print(f"Status: {tx['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/transactions/tx_abc123..." \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Transaction Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `transaction_id` | `string` | Unique transaction identifier |
+| `organization_id` | `string` | Organization that owns this transaction |
+| `customer_id` | `string` | Associated customer (if any) |
+| `gross_amount` | `number` | Total amount charged |
+| `net_amount` | `number` | Amount after fees |
+| `fee_amount` | `number` | Total fees deducted |
+| `currency_code` | `string` | Currency (e.g., `XOF`, `USD`) |
+| `status` | `string` | `pending`, `completed`, `failed`, `refunded` |
+| `type` | `string` | `payment`, `refund`, `payout` |
+| `provider_code` | `string` | Payment provider (e.g., `WAVE`) |
+| `payment_method_code` | `string` | Payment method (e.g., `MOBILE_MONEY`, `CARDS`) |
+| `description` | `string` | Transaction description |
+| `metadata` | `object` | Custom metadata passed during payment |
+| `created_at` | `string` | ISO 8601 timestamp |
+| `updated_at` | `string` | ISO 8601 timestamp |
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `401` | Invalid or missing API key |
+| `404` | Transaction not found or access denied |
+| `429` | Rate limit exceeded |

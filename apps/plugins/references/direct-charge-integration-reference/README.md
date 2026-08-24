@@ -9,7 +9,7 @@ For hosted checkout sessions, see [`../payment-integration-sdk-reference`](../pa
 | Flow | Server route | lomi API |
 | --- | --- | --- |
 | Wave mobile money | `POST /api/charge/wave` | `POST /charge/wave` |
-| MTN MoMo | `POST /api/charge/mtn` | `POST /charge/mtn` |
+| MTN | `POST /api/charge/mtn` | `POST /charge/mtn` |
 | Embedded card | `POST /api/charge/card` | `POST /charge/card` |
 | Card status | `GET /api/charge/card/:id` | `GET /charge/card/{id}` |
 | Cancel card charge | `POST /api/charge/card/:id/cancel` | `POST /charge/card/{id}/cancel` |

@@ -111,7 +111,7 @@ Messages from origins other than the checkout host are ignored.
 
 ## Webhooks
 
-Embed completion callbacks are for UX only. Reconcile payments with [webhooks](https://docs.lomi.africa/build/webhooks).
+Embed completion callbacks are for UX only. Reconcile payments with [webhooks](https://docs.lomi.africa/build/reliability).
 
 ## Sandbox / local dev
 
@@ -148,7 +148,7 @@ Manual checklist:
 
 ## Docs
 
-Full guide: [Embed checkout widget](https://docs.lomi.africa/build/embed-widget)
+Full guide: [Embed checkout widget](https://docs.lomi.africa/build/accept/embed-widget)
 
 ## License
 

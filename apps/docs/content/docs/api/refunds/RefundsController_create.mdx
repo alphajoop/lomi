@@ -11,7 +11,7 @@ operationId: RefundsController_create
 
 Create refund
 
-Refunds a **completed** transaction on **card**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.
+Refunds a **completed** transaction on **card**, **Wave**, or **MTN**. Merchant balance updates immediately when the refund is recorded.
 
 
 ### When to use this
@@ -20,11 +20,11 @@ Use for buyer reversals on eligible completed transactions; supports full and pa
 
 ### Good to know
 
-**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only; no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.
+**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN test:** ledger-only; no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.
 
 ### See also
 
-[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/refunds)
+[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/money/refunds)
 
 
 ## Authentication
@@ -66,7 +66,7 @@ Schema: `CreateRefundDto`
 
 | Field | Required | Type | Description |
 | --- | --- | --- | --- |
-| `transaction_id` | Yes | `string` | UUID of a completed transaction (card, Wave, or MTN MoMo) |
+| `transaction_id` | Yes | `string` | UUID of a completed transaction (card, Wave, or MTN) |
 | `amount` | Yes | `number` | Amount to refund (same currency as the transaction) |
 | `reason` | No | `string` | Reason for the refund |
 | `refund_type` | No | `enum ("full", "partial")` | Full or partial refund. If omitted, full when amount equals transaction gross amount. |

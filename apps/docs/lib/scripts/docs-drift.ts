@@ -34,12 +34,16 @@ async function checkAllFrenchSiblings(errors: string[]): Promise<void> {
 
 const LLMS_REQUIRED_SLUGS = [
   'start/integration-journey',
-  'build/guides/verify-payments',
-  'build/guides/payment-lifecycle',
+  'build/reliability/verify-payments',
+  'build/reliability/payment-lifecycle',
   'build/payment-channels',
   'api/payment-state-machine',
   'build/mcp',
+  'build/accept/checkout',
 ] as const;
+
+/** Published fees must come from `@lomi./shared` via `<PricingTable />`, not MDX literals. */
+const FEE_LITERAL_RE = /[0-9]+(?:[.,][0-9]+)?\s*%\s*\+\s*[0-9]/;
 
 const INTERNAL_LINK_RE = /\]\(\/(start|build|api|resources)\/([^)\s#]+)/g;
 
@@ -115,7 +119,7 @@ async function checkInternalLinks(
     [
       'content/docs/start/integration-journey*.mdx',
       'content/docs/build/choose-integration*.mdx',
-      'content/docs/build/guides/**/*.mdx',
+      'content/docs/build/reliability/**/*.mdx',
       'content/docs/build/payment-methods/**/*.mdx',
     ],
     { cwd: DOCS_ROOT },
@@ -312,6 +316,18 @@ async function checkLlmsTxtRoute(errors: string[]): Promise<void> {
   }
 }
 
+async function checkFeeLiterals(errors: string[]): Promise<void> {
+  const files = await glob('**/*.mdx', { cwd: CONTENT_ROOT });
+  for (const file of files) {
+    const content = await fs.readFile(path.join(CONTENT_ROOT, file), 'utf-8');
+    if (FEE_LITERAL_RE.test(content)) {
+      errors.push(
+        `Bare fee literal in ${file}: use <PricingTable /> / @lomi./shared instead of "% + N F CFA" in MDX`,
+      );
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const errors: string[] = [];
   const validSlugs = await collectValidSlugs();
@@ -323,6 +339,7 @@ async function main(): Promise<void> {
   await checkAllFrenchSiblings(errors);
   await checkInternalLinks(errors, validSlugs);
   await checkLlmsTxtRoute(errors);
+  await checkFeeLiterals(errors);
 
   if (errors.length > 0) {
     for (const e of errors) console.error(e);

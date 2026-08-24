@@ -1,0 +1,13 @@
+{
+  "title": "Money movement",
+  "description": "Transactions, refunds, disputes, Radar, payouts, and settlement.",
+  "icon": "Banknote",
+  "pages": [
+    "transactions",
+    "refunds",
+    "disputes",
+    "radar",
+    "payouts",
+    "balance-and-settlement"
+  ]
+}

@@ -43,7 +43,7 @@
         {
           "name": "charges",
           "title": "Charges",
-          "label": "Wave, MTN MoMo, and embedded card charges",
+          "label": "Wave, MTN, and embedded card charges",
           "path": "charges.md",
           "applyTo": "**/*.{ts,tsx,js,jsx}"
         },
@@ -110,7 +110,7 @@
         {
           "name": "charges",
           "title": "Charges",
-          "label": "Wave, MTN MoMo, and embedded card charges",
+          "label": "Wave, MTN, and embedded card charges",
           "path": "charges.md",
           "applyTo": "**/*.{ts,tsx,js,jsx}"
         },

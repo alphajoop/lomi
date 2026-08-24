@@ -1,6 +1,6 @@
 ---
-title: 'Comment accepter MTN MoMo ?'
-description: 'MTN Mobile Money en CI et région, checkout hébergé, POST /charge/mtn et codes pays.'
+title: 'Comment accepter MTN ?'
+description: "Accepter MTN en Côte d'Ivoire et dans la région, checkout hébergé, POST /charge/mtn et codes pays."
 docType: how-to
 ---
 
@@ -9,7 +9,19 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-MTN MoMo couvre plusieurs pays. Utilisez le [checkout hébergé](/build/checkout) sauf besoin de `POST /charge/mtn`.
+MTN couvre plusieurs pays. Utilisez le [checkout hébergé](/build/accept/checkout) sauf besoin de `POST /charge/mtn`.
+
+## En bref
+
+| | |
+| --- | --- |
+| Approbation | Push / PIN sur le téléphone (`next_action: await_webhook`) |
+| Règlement | Test : souvent `completed` immédiat. Live : reste `PENDING` jusqu’à approbation, puis `available_at` |
+| Direct vs hébergé | Hébergé et `POST /charge/mtn` |
+| Remboursement | Transactions MTN `completed` (remboursements live asynchrones) |
+| Min / max | - |
+
+Mêmes colonnes que [Canaux de paiement](/build/payment-channels#channel-capabilities).
 
 ## Charge directe
 
@@ -29,15 +41,15 @@ Bac à sable : [Paiements en bac à sable: MTN](/start/sandbox-payments).
 ## Vérifier avant livraison
 
 <Callout type="warn">
-  En live, les flux MTN sont **asynchrones**. Interrogez `GET /transactions/{id}` ou utilisez les webhooks ; voir [Vérifier les paiements](/build/guides/verify-payments).
+  En live, les flux MTN sont **asynchrones**. Interrogez `GET /transactions/{id}` ou utilisez les webhooks ; voir [Vérifier les paiements](/build/reliability/verify-payments).
 </Callout>
 
 ## Remboursements
 
-Les remboursements MTN en live exigent la référence prestataire du paiement d’origine et peuvent utiliser l’API Disbursement de façon asynchrone. Les remboursements test sont uniquement comptables. Voir [Remboursements](/build/refunds).
+Les remboursements MTN en live exigent la référence prestataire du paiement d’origine et peuvent utiliser l’API Disbursement de façon asynchrone. Les remboursements test sont uniquement comptables. Voir [Remboursements](/build/money/refunds).
 
 ## Voir aussi
 
-- [Portail développeur MTN MoMo](https://momodeveloper.mtn.com/)
+- [Portail développeur MTN](https://momodeveloper.mtn.com/)
 - [Mobile money](/build/mobile-money)
-- [Charges directes](/build/direct-charges)
+- [Charges directes](/build/accept/direct-charges)

@@ -27,9 +27,9 @@ Set `docType` in frontmatter on new guide pages:
 | Type | Use for | Examples |
 | --- | --- | --- |
 | `tutorial` | Linear learning path | [Integration journey](/start/integration-journey) |
-| `how-to` | Task-focused steps | [Verify payments](/build/guides/verify-payments) |
+| `how-to` | Task-focused steps | [Verify payments](/build/reliability/verify-payments) |
 | `explanation` | Concepts and trade-offs | [Choose integration](/build/choose-integration), [Payment state machine](/api/payment-state-machine) |
-| `reference` | Schemas and endpoints | REST API operation pages |
+| `reference` | Schemas and endpoints | API operation pages |
 
 ## Voice and structure
 
@@ -46,7 +46,7 @@ Hand-authored guides should link to canonical references instead of duplicating 
 - Amounts in **XOF** use **centimes** (integer minor units) unless a specific API field documents otherwise.
 - **API key determines environment**: `lomi_sk_test_…` vs `lomi_sk_live_…`; wrong key against an environment returns **401**.
 - **Live mobile money is asynchronous**: confirm with webhooks and `GET /transactions/{id}` before fulfilling orders.
-- **Never trust client-only success**: see [Verify payments](/build/guides/verify-payments).
+- **Never trust client-only success**: see [Verify payments](/build/reliability/verify-payments).
 
 ## Bilingual policy
 
@@ -60,7 +60,7 @@ See [API reference authoring](/resources/contributing/api-reference-authoring) a
 
 - [Sandbox payments](/start/sandbox-payments)
 - [Choose integration](/build/choose-integration)
-- [Handling webhooks](/build/advanced-guides/handling-webhooks)
+- [Handling webhooks](/build/reliability/handling-webhooks)
 - [Payment state machine](/api/payment-state-machine)
 
 ## Drift checks

@@ -1,9 +1,11 @@
 {
   "title": "Platform",
-  "description": "Manage customers, merchants, and organizations with the lomi. API.",
+  "description": "Manage customers, merchants, organizations, and Network operators with the lomi. API.",
+  "icon": "Building2",
   "pages": [
     "customers",
     "merchants",
-    "organizations"
+    "organizations",
+    "network"
   ]
 }

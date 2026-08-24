@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       path.startsWith('/api/') ? 'weekly' : 'monthly'
     ) as 'weekly' | 'monthly';
     const priority =
-      path === '/start/overview' ? 1 : path.startsWith('/start/') ? 0.9 : 0.7;
+      path === '/' ? 1 : path.startsWith('/start/') ? 0.9 : 0.7;
 
     return {
       url: `${origin}${path}`,

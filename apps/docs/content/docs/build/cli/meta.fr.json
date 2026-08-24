@@ -1,0 +1,16 @@
+{
+  "title": "CLI",
+  "description": "Installer et utiliser l’outil en ligne de commande lomi. pour l’authentification, les projets, les webhooks et les paiements.",
+  "icon": "Terminal",
+  "pages": [
+    "auth",
+    "init",
+    "quickstart-command",
+    "commands",
+    "dev",
+    "listen",
+    "install-rules",
+    "configuration",
+    "ui"
+  ]
+}

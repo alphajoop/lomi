@@ -1,0 +1,327 @@
+---
+title: Abonnements
+description: Gérez les abonnements clients récurrents.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from '@/components/docs/docs-callout';
+
+L’API Subscriptions permet de lister et récupérer des **instances d’abonnement** (un client sur un plan récurrent). Elles sont en général créées lorsque des clients souscrivent à un produit récurrent via une session ou un lien de paiement.
+
+<TaskSurfaces task="bill-monthly" />
+
+<DocsScreenshot name="build/subscriptions" alt="Détail d’un abonnement dans le tableau de bord lomi." />
+
+<Callout type="info">
+  Les SDK exposent des helpers **`/subscriptions`** pour lister, récupérer, mettre à jour et résilier des abonnements. Exemples par route et transitions de statut : **[Abonnements](/api/subscriptions)**. Les champs immuables et les règles d’annulation suivent les descriptions OpenAPI de chaque opération.
+</Callout>
+
+<Callout type="info">
+  Pour les parcours d’inscription (essais, types de premier paiement, montants de session), voir **[Comportement du tunnel : Abonnements](/build/accept/checkout-behavior#subscription-checkout)**.
+</Callout>
+
+## Comment les abonnements sont créés
+
+Les instances d’abonnement sont créées lorsqu’un client achète un **produit récurrent** via :
+
+- [Checkout hébergé](/build/accept/checkout) ou [liens de paiement](/build/accept/payment-links) avec un `product_id` récurrent
+- Votre parcours d’inscription vitrine
+
+Il n’existe pas d’API autonome « créer un abonnement » pour l’inscription : le checkout ou le lien crée l’instance après le premier paiement réussi (ou les règles d’essai du produit).
+
+Surveillez les **événements webhook** pour suivre les confirmations de paiement à chaque cycle. Écoutez `SUBSCRIPTION_RENEWED` et les `PAYMENT_FAILED` liés au renouvellement ; voir [Comportement du tunnel : Abonnements](/build/accept/checkout-behavior#subscription-checkout).
+
+## Renouvellements et paiements échoués
+
+lomi. utilise **deux chemins de renouvellement**, selon le moyen de paiement du client :
+
+### Abonnements carte (automatique)
+
+Lorsque l’inscription a enregistré une carte (`provider_customer_id` + `provider_payment_method_id`), les renouvellements s’exécutent **hors session** à `next_billing_date`. Un job quotidien débite la carte enregistrée et enregistre la transaction de renouvellement.
+
+- Webhook : **`SUBSCRIPTION_RENEWED`** en cas de succès
+- Webhook : **`PAYMENT_FAILED`** en cas d’échec de renouvellement (avec relances processeur / dunning si configuré)
+
+### Abonnements Wave / MTN (checkout de renouvellement manuel)
+
+Le mobile money n’expose pas de jeton hors session comme les cartes. Sans moyen de paiement carte, lomi. **ne débite pas automatiquement** le portefeuille. À la place :
+
+1. Des **crons de notification** envoient par e-mail ou message un **lien checkout de renouvellement hébergé** avant `next_billing_date`.
+2. Le client paie sur ce lien ; les webhooks confirment le cycle.
+3. Si le client ne paie pas à temps, le **traitement des impayés** peut passer l’abonnement en `past_due`, `paused` ou `cancelled` selon `failed_payment_action` du produit.
+
+Cela correspond au fonctionnement des rails mobile money en production (approbation PIN, pas de mandat permanent). C’est intentionnel, pas une fonctionnalité carte manquante.
+
+<Callout type="info">
+  **Raccourci support :** « Pourquoi mon abonnement Wave ne s’est pas débité automatiquement ? » → Les renouvellements mobile money exigent que le client ouvre le lien de renouvellement et approuve le paiement. Les cartes se renouvellent automatiquement si un moyen de paiement a été enregistré à l’inscription.
+</Callout>
+
+Votre intégration doit :
+
+1. **Écouter `SUBSCRIPTION_RENEWED`** : cycle facturé avec succès ; prolonger l’accès ou envoyer un reçu.
+2. **Écouter `PAYMENT_FAILED`** sur les transactions de renouvellement : le client peut devoir payer via le lien de renouvellement ou mettre à jour une carte dans le [portail client](/build/billing/customer-portal).
+3. **Interroger ou lister les abonnements** via `GET /subscriptions` (avec filtres optionnels `customer_id` ou `status`) si les webhooks sont retardés ; utilisez uniquement `status` et `next_billing_date` de la réponse API.
+
+Annulez ou mettez en pause via `POST /subscriptions/{id}/cancel` ou `PATCH /subscriptions/{id}` comme documenté dans l’[API Abonnements](/api/subscriptions).
+
+Pour les produits **à l’usage / facturation à la consommation** (appels API, crédits, sièges), voir **[Facturation à l’usage](/build/billing/usage-billing)**: les abonnements metered sont distincts des abonnements récurrents checkout.
+
+## Lister les abonnements
+
+**Référence API :** [Lister les abonnements](/api/subscriptions/SubscriptionsController_findAll), `page` et `pageSize`.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'live',
+});
+
+const subscriptions = await lomi.subscriptions.list({
+  page: 1,
+  pageSize: 20,
+});
+
+subscriptions.forEach(sub => {
+  console.log(`${sub.id}: ${sub.status} - ${sub.amount} ${sub.currency_code}`);
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_SECRET_KEY"],
+    environment="test"
+)
+
+subscriptions = client.subscriptions.list(page=1, pageSize=20)
+
+for sub in subscriptions:
+    print(f"{sub['id']}: {sub['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Abonnements d’un client
+
+**Référence API :** [Abonnements par client](/api/subscriptions/CustomersController_getSubscriptions)
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const customerSubs = await lomi.customers.getSubscriptions('cus_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+customer_subs = client.subscriptions.get_by_customer('cus_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir un abonnement
+
+**Référence API :** [Obtenir un abonnement](/api/subscriptions/SubscriptionsController_findOne)
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const subscription = await lomi.subscriptions.get('sub_abc123...');
+console.log(`Status: ${subscription.status}`);
+console.log(`Next billing: ${subscription.current_period_end}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+subscription = client.subscriptions.get('sub_abc123...')
+print(f"Status: {subscription['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Cycle de vie d’un abonnement
+
+Les abonnements sont créés lorsqu’un client finalise le tunnel pour un produit **récurrent** (tunnel hébergé, lien de paiement, vitrine ou session API avec `product_type: recurring`). Statuts typiques :
+
+| Statut | Signification |
+|--------|----------------|
+| `pending` | Créé mais pas encore actif (rare à l’inscription). |
+| `trial` | Essai gratuit en cours ; pas de prélèvement avant la fin de l’essai. |
+| `active` | Payant et renouvelé selon l’échéance. |
+| `past_due` | Échec de renouvellement ; nouvelles tentatives ou action marchande. |
+| `paused` | Facturation en pause (p. ex. après échec si le produit est configuré pour pauser). |
+| `cancelled` | Annulé par le marchand ou le client. |
+| `expired` | Durée fixe terminée ou essai converti sans moyen de paiement. |
+
+Le **premier paiement** est défini sur le produit via `first_payment_type` :
+
+| Valeur | Premier prélèvement au tunnel |
+|--------|-------------------------------|
+| `initial` | Tarif récurrent complet (ou montant au prorata selon les règles). |
+| `non_initial` | **0** à l’inscription ; premier prélèvement à la première échéance. |
+| `prorated` | Montant partiel pour le reste de la période en cours. |
+
+**Essais** (`trial_enabled` + `trial_period_days`) : montant à l’inscription **0**. le processeur carte enregistre la carte pour la facturation ultérieure ; le mobile money peut finaliser sans paiement immédiat. Après l’essai, le statut passe à `active` et la facturation démarre à `next_billing_date`.
+
+**Renouvellements** automatiques avec moyen carte enregistré. Sans moyen (fréquent en mobile money), lomi. peut basculer vers un **lien de renouvellement manuel** pour le client.
+
+---
+
+## Interface de facturation dans votre application
+
+Si vos clients gèrent leurs abonnements dans **votre** application (et non le portail client lomi.) :
+
+1. Appelez les API lomi. lors des annulations, pauses, upgrades ou reprises (`POST /subscriptions/{id}/cancel`, `PATCH /subscriptions/{id}`, etc.).
+2. Écoutez les webhooks **`SUBSCRIPTION_UPDATED`** et **`SUBSCRIPTION_CANCELLED`** (mêmes événements que le changement vienne de votre API, du portail ou d’un cron).
+3. Réconciliez les droits d’accès avec `GET /subscriptions/{id}` lorsque vous avez besoin de l’état de référence.
+
+lomi. est la source de vérité de la facturation ; n’annulez pas uniquement dans votre base sans appeler l’API.
+
+---
+
+## Annuler un abonnement
+
+**Référence API :** [Annuler un abonnement](/api/subscriptions/SubscriptionsController_cancel)
+
+Passez `cancel_at_period_end: true` pour annuler en fin de période ; omettez ou mettez `false` pour une annulation immédiate. `cancellation_reason` est optionnel.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const cancelled = await lomi.subscriptions.cancel('sub_abc123...');
+
+const scheduledCancel = await lomi.subscriptions.cancel('sub_abc123...', {
+  cancel_at_period_end: true,
+  cancellation_reason: 'Customer requested cancellation',
+});
+
+console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+# Annuler immédiatement
+cancelled = client.subscriptions.cancel('sub_abc123...')
+
+# Annuler en fin de période
+scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
+    "cancel_at_period_end": True,
+    "cancellation_reason": "Customer requested cancellation"
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cancel_at_period_end": true,
+    "cancellation_reason": "Customer requested cancellation"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Annuler une résiliation planifiée
+
+**Référence API :** [Annuler la résiliation](/api/subscriptions/SubscriptionsController_resume)
+
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../resume" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+---
+
+## Changer de plan
+
+**Référence API :** [Changer de plan](/api/subscriptions/SubscriptionsController_changePlan)
+
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../change-plan" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"price_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"}'
+```
+
+---
+
+## Webhooks
+
+Abonnez-vous à ces événements en **SCREAMING_SNAKE_CASE** (comme sur [Webhooks](/build/reliability)) :
+
+| Événement | Description |
+|-----------|-------------|
+| `SUBSCRIPTION_CREATED` | Nouvel abonnement après inscription réussie (y compris essai). |
+| `SUBSCRIPTION_UPDATED` | Abonnement modifié (pause, reprise, changement de plan, annulation planifiée, etc.). Charge utile avec `previous_attributes`. |
+| `SUBSCRIPTION_RENEWED` | Cycle de facturation renouvelé avec succès. |
+| `SUBSCRIPTION_CANCELLED` | Abonnement annulé ou expiré. |
+
+Les **échecs de paiement** au renouvellement n’émettent pas de webhook abonnement dédié. Écoutez **`PAYMENT_FAILED`** sur la transaction du renouvellement et surveillez le `status` (`past_due`, `paused`, etc.) via l’API.
+
+lomi. n’émet pas de webhook pour l’enregistrement de carte en essai (`setup_intent.succeeded`). Écoutez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription, pas au chargement du formulaire carte.
+
+**Notifications client :** les inscriptions en essai ou à 0 € (sans transaction de paiement complétée) déclenchent un **e-mail de confirmation d’inscription** si `customer_notifications.subscription_signups.email` est activé (par défaut : oui). Les inscriptions avec premier paiement reçoivent le reçu de transaction standard.
+
+---
+
+## API associée
+
+- [Lister les abonnements](/api/subscriptions/SubscriptionsController_findAll)
+- [Obtenir un abonnement](/api/subscriptions/SubscriptionsController_findOne)
+- [Abonnements par client](/api/subscriptions/CustomersController_getSubscriptions)
+- [Annuler un abonnement](/api/subscriptions/SubscriptionsController_cancel)
+- [Annuler la résiliation](/api/subscriptions/SubscriptionsController_resume)
+- [Changer de plan](/api/subscriptions/SubscriptionsController_changePlan)
+- [Mettre à jour un abonnement](/api/subscriptions/SubscriptionsController_update)
+- [Comportement du tunnel : abonnements](/build/accept/checkout-behavior#subscription-checkout)
+- [Portail client](/build/billing/customer-portal)

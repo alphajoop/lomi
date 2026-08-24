@@ -1,0 +1,58 @@
+---
+title: 'Comment vérifier un paiement ?'
+description: 'Confirmez le statut côté serveur via l’API et les webhooks, ne vous fiez jamais à la seule redirection navigateur.'
+docType: how-to
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Le client peut fermer le navigateur, perdre le réseau ou atteindre votre `success_url` avant la fin du traitement lomi. surtout en **mobile money** et avec les cartes **3D Secure**. La redirection est un indice UX, pas une preuve de paiement.
+
+<Callout type="warn" title="Ne livrez pas sur la seule redirection">
+  N’expédiez pas, ne débloquez pas de contenu et ne marquez pas une facture payée uniquement à partir des paramètres de `success_url` ou du JavaScript client. Vérifiez toujours côté serveur.
+</Callout>
+
+## Ordre de vérification recommandé
+
+1. **Webhook**: lomi. envoie un POST HTTPS quand la transaction atteint un état final (préféré pour les rails asynchrones).
+2. **Lecture API**: `GET /transactions/{id}` ou liste filtrée lorsque vous avez l’identifiant issu de la session checkout ou de la charge.
+3. **Tableau de bord**: opérations manuelles et support ; pas pour l’automatisation en production.
+
+## Checkout hébergé
+
+Après le paiement du client :
+
+1. Stockez votre `order_id` interne dans les `metadata` de la session checkout à la création.
+2. Sur `success_url`, affichez un état « traitement en cours »-pas « payé »-jusqu’à confirmation backend.
+3. À réception de `transaction.completed` (ou de votre type d’événement), faites correspondre `metadata.order_id` puis livrez.
+
+Voir [Machine à états du paiement](/api/payment-state-machine) et [Gestion des webhooks](/build/reliability/handling-webhooks).
+
+## Charges directes (Wave, MTN, carte)
+
+| Rail | Quand vérifier |
+| --- | --- |
+| **Wave (live)** | Après approbation dans l’app Wave, webhook ou polling transaction |
+| **MTN (live)** | Démarre en `PENDING` ; vérifier avant livraison |
+| **MTN / Wave (test)** | Peut se compléter immédiatement ; vérifier quand même côté serveur en tests |
+| **Carte** | Après confirmation `client_secret` ; gérer `requires_action` |
+
+## Idempotence à la livraison
+
+Votre handler (worker webhook ou poll API) doit être **idempotent** : traiter deux fois le même `transaction_id` ou le même `id` d’événement webhook ne doit pas livrer en double. Stockez les IDs d’événements traités ou utilisez des contraintes sur `order_id` + `status = fulfilled`.
+
+## À confirmer avant de livrer
+
+- `success_url` affiche « en attente » jusqu’à confirmation serveur
+- Le endpoint webhook vérifie `X-Lomi-Signature` sur le corps brut
+- La livraison n’a lieu que si `transaction_status` est `completed`
+- Remboursements et litiges ont un chemin d’annulation
+
+## Voir aussi
+
+- [Parcours d’intégration](/start/integration-journey)
+- [Lister les transactions](/api/transactions/TransactionsController_findAll)
+- [Paiements en bac à sable](/start/sandbox-payments)

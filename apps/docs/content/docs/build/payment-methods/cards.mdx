@@ -1,5 +1,5 @@
 ---
-title: 'How do I accept card payments?'
+title: 'How do I accept cards?'
 description: 'Choose hosted checkout for most card flows, or embedded card collection when your app needs full UI control.'
 docType: how-to
 ---
@@ -12,7 +12,19 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 For most teams, card payments should start with hosted checkout. Use embedded card collection only when your product needs card entry inside your own UI.
 
-Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment Elements](/build/payments/lomi-payment-elements) and `POST /charge/card`.
+## At a glance
+
+| | |
+| --- | --- |
+| Approval | Hosted 3DS when the issuer requires it |
+| Settlement | After `completed`; some card setups delay `available_at` |
+| Direct vs hosted | Hosted. `POST /charge/card` returns `503` |
+| Refund | Completed card transactions |
+| Min / max | - |
+
+Same columns as [Payment channels](/build/payment-channels#channel-capabilities).
+
+Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment Elements](/build/accept/payment-elements) and `POST /charge/card`.
 
 <DocsScreenshot name="build/cards" alt="Card payment form on lomi. hosted checkout" />
 
@@ -28,21 +40,21 @@ Cards work on **hosted checkout** (fastest) or **embedded** flows with [Payment 
 ## Hosted checkout (recommended)
 
 1. Create a checkout session.
-2. Customer selects **Card** and enters details on lomi.. page.
+2. Customer selects **Card** and enters details on the lomi. page.
 3. Handle 3D Secure when the test card or issuer requires authentication.
 4. Verify with webhooks before fulfilling.
 
 ## Embedded card charge
 
 <Callout type="warn">
-  Embedded card charges (`POST /charge/card`) and Switch charges (`POST /charge/switch`) are not available yet and currently return `503 service_unavailable`. Use [hosted checkout](/build/checkout) for cards today.
+  Embedded card charges (`POST /charge/card`) and Switch charges (`POST /charge/switch`) are not available yet and currently return `503 service_unavailable`. Use [hosted checkout](/build/accept/checkout) for cards today.
 </Callout>
 
 1. `POST /charge/card` → receive `client_secret`.
 2. Confirm with Payment Elements on your site.
 3. Poll or webhook for final `transaction_status`.
 
-See [Charges API](/api/charge/ChargesController_createCardCharge) and the [direct charge reference app](/build/direct-charges#reference-implementation).
+See [Charges API](/api/charge/ChargesController_createCardCharge) and the [direct charge reference app](/build/accept/direct-charges#reference-implementation).
 
 ## Sandbox test cards
 
@@ -64,8 +76,8 @@ See [Charges API](/api/charge/ChargesController_createCardCharge) and the [direc
 
 ## Related
 
-- [Hosted checkout](/build/checkout)
-- [Payment Elements](/build/payments/lomi-payment-elements)
-- [Verify payments](/build/guides/verify-payments)
-- [Simulate errors](/build/guides/simulate-errors)
+- [Hosted checkout](/build/accept/checkout)
+- [Payment Elements](/build/accept/payment-elements)
+- [Verify payments](/build/reliability/verify-payments)
+- [Simulate errors](/build/reliability/simulate-errors)
 - [Sandbox payments](/start/sandbox-payments)

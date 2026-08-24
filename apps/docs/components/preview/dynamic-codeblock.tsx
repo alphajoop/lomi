@@ -34,8 +34,8 @@ export default function Example() {
         code={code}
         options={{
           themes: {
-            light: 'catppuccin-latte',
-            dark: 'catppuccin-mocha',
+            light: 'github-light',
+            dark: 'vesper',
           },
         }}
       />

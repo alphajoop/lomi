@@ -1,0 +1,107 @@
+---
+title: 'Tarification'
+description: 'Des frais transparents avec 20 % de réduction par rapport à la concurrence.'
+---
+
+La tarification **fixe (standard)** repose sur une grille stable. La tarification par volume commence au palier Starter, puis baisse à mesure que le volume mensuel augmente. Les taux exacts de votre organisation sont dans **Facturation → Tarification** et peuvent varier selon le moyen de paiement et le prestataire.
+
+- **Dynamique (par paliers de volume) :** vous commencez au palier **Starter**, puis les taux baissent automatiquement (Growth, Professional, Enterprise).
+- **Fixe (standard) :** grille stable quel que soit le volume, idéal pour une prévision financière.
+- **Sur mesure :** tarification négociée selon le modèle économique, le profil de risque ou les volumes.
+
+Le palier Starter dynamique est en général configuré au moins au niveau du standard fixe. Comparez les deux modes dans **Facturation → Tarification** avant de changer.
+
+Vous pouvez passer d’un mode à l’autre **au plus une fois par mois calendaire**. Les organisations en tarification **sur mesure** ne peuvent pas basculer seules vers le mode volume.
+
+<DocsTierCallout />
+
+## Fonctionnement de la tarification dynamique
+
+Avec la tarification dynamique, votre palier est basé sur le volume **F CFA** du **dernier mois clos** (toutes devises converties, pas les ventes du jour). Plus le volume augmente, plus vos taux baissent.
+
+- L’attribution du palier repose sur le **volume total traité converti en F CFA** : les ventes en XOF, USD et EUR comptent toutes.
+- Les taux par palier s’appliquent au traitement (Mobile Money, cartes, TPE) et à certains frais de virement.
+- Des frais hors paliers peuvent s’appliquer (remboursements, litiges, cartes internationales, abonnements).
+
+## Paliers de volume (revenu mensuel F CFA)
+
+<PricingTable kind="volume-tiers" />
+
+## Frais par palier dynamique
+
+Ces taux s’appliquent si votre organisation est sur le plan **par volume**, selon votre palier actuel.
+
+<PricingTable kind="dynamic" />
+
+Pour les seuils et taux live, utilisez la vue tarification du tableau de bord ou [lomi.africa/pricing](https://lomi.africa/pricing).
+
+## Frais fixes par défaut
+
+Ces taux s’appliquent sur le plan **fixe**.
+
+### F CFA
+
+<PricingTable kind="fixed-xof" />
+
+### USD et EUR
+
+<PricingTable kind="fixed-intl" />
+
+Les taux Mobile Money par prestataire (MTN, Wave, Moov, Airtel) suivent la même structure pourcentage + fixe selon votre plan et palier.
+
+### Exemples
+
+<PricingTable kind="examples" />
+
+<Callout type="info">
+  Vous pouvez ajouter des remises ou des frais (livraison, taxes, ou même des
+  frais de transaction) depuis le tableau de bord pour personnaliser le prix
+  ou absorber les coûts de traitement.
+</Callout>
+
+## Fixe et sur mesure
+
+Tous les commerces n’ont pas intérêt à la tarification par volume :
+
+- **Fixe** convient quand vous voulez des frais prévisibles.
+- **Sur mesure** convient quand le mix de paiements, le ticket, la géographie ou la conformité demandent une grille adaptée.
+
+La tarification sur mesure peut combiner pourcentage et fixe, et varier par moyen de paiement et devise.
+
+## Remboursements et litiges
+
+<PricingTable kind="refunds" />
+
+<Callout type="info">
+  lomi. peut émettre un remboursement à notre discrétion dans les 60 jours
+  suivant un achat. L’objectif est de limiter les litiges et chargebacks, pas
+  de remplacer votre politique client.
+</Callout>
+
+Les frais de transaction se calculent ainsi :
+
+`frais = (pourcentage × montant) + montant fixe`
+
+Selon le mode, la devise et le moyen, le frais peut inclure le traitement de base, des ajustements prestataire et des extras.
+
+**Important :**
+
+- Les prestataires imposent des programmes de suivi et des pénalités aux vendeurs avec un taux de chargeback élevé.
+- lomi. surveille ce taux pour rester dans les seuils des réseaux.
+- Si les chargebacks augmentent fortement, le compte peut être examiné ou les payouts suspendus le temps de corriger.
+
+Sur certains flux de petit montant, seul le pourcentage peut s’appliquer selon la configuration de l’organisation.
+
+## Frais de payout
+
+<PricingTable kind="payouts" />
+
+<Callout type="info">
+  lomi. n’ajoute pas de marge sur les retraits marchands lorsque le frais
+  plateforme est zéro. Des frais opérateur tiers peuvent encore s’appliquer
+  sur certaines routes.
+</Callout>
+
+Pour les valeurs à jour, fiez-vous à la configuration live du tableau de bord et à [lomi.africa/pricing](https://lomi.africa/pricing).
+
+> Contactez l’[équipe commerciale](mailto:hello@lomi.africa) pour discuter d’**options sur mesure**.

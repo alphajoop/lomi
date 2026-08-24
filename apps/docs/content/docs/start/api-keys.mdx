@@ -1,5 +1,5 @@
 ---
-title: 'Where do I find my API keys?'
+title: 'Where are my API keys?'
 description: 'Find your test and live keys, understand which key belongs where, and store them safely.'
 ---
 
@@ -47,6 +47,20 @@ curl -sS \
 ```
 
 If the request returns `401`, check that you copied the full secret key and that your server is loading the environment variable.
+
+## Request headers [#request-headers]
+
+Send these on merchant REST calls. Header names are case-insensitive.
+
+| Header | Required | When |
+| --- | --- | --- |
+| `X-API-Key` (or `X-API-KEY`) | Yes | Every merchant request. Alias: `x-lomi-api-key`. `Authorization: Bearer <secret>` is also accepted. |
+| `Content-Type` | On JSON bodies | `application/json` for POST/PATCH with a body |
+| `Idempotency-Key` | On money-moving writes | Required on `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts`, and `POST /charge/*`. See [Idempotency keys](/build/reliability/idempotency-keys). |
+| `X-Scenario-Key` | No | Sandbox **direct** Wave/MTN only (`pending` or `failed`). Hosted checkout and cards ignore it. See [Simulate errors](/build/reliability/simulate-errors). |
+| `Lomi-Account` | No | lomi. Network: operator key targeting a member `acct_...`. See [Network](/build/platform/network). |
+
+There is no request tracing header today.
 
 ## Next steps
 

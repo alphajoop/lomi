@@ -1,0 +1,16 @@
+---
+index: true
+title: 'Reliability'
+description: 'Webhooks, payment verification, testing, and the operational practices that keep an integration safe in production.'
+---
+
+Use this folder for the operational layer of a lomi. integration: receive events, confirm payments, and test failure paths.
+
+- **[Handling webhooks](/build/reliability/handling-webhooks):** receive, verify, and subscribe to events.
+- **[Webhook reliability](/build/reliability/webhook-reliability):** retries, duplicates, timeouts, and delivery logs.
+- **[Verify payments](/build/reliability/verify-payments):** confirm status with the API and webhooks, never from the browser redirect alone.
+- **[Payment lifecycle](/build/reliability/payment-lifecycle):** how money-in and money-out statuses connect.
+- **[Testing](/build/reliability/testing):** how to structure sandbox and production tests.
+- **[Simulate errors](/build/reliability/simulate-errors):** the scenario matrix for declines, pending Mobile Money, and webhook failures.
+
+Test credentials and card numbers live on [Sandbox payments](/start/sandbox-payments). Error codes live on [Errors](/api/errors).

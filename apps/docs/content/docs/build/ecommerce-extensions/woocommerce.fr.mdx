@@ -17,9 +17,9 @@ Connectez votre boutique **WordPress / WooCommerce** au **checkout hébergé lom
 
 <Callout type="info" title="Produits associés">
   - **Clés API** : [Tableau de bord → Développeurs → Clés API](/start/api-keys)
-  - **Webhooks** : [Webhooks du tableau de bord](/build/webhooks) — abonnez-vous à **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**
-  - **Checkout hébergé** : [Checkout](/build/checkout), où le client paie après redirection
-  - **Abonnements** : [Abonnements](/build/subscriptions), produits récurrents via checkout
+  - **Webhooks** : [Webhooks du tableau de bord](/build/reliability) — abonnez-vous à **`PAYMENT_SUCCEEDED`** et **`REFUND_COMPLETED`**
+  - **Checkout hébergé** : [Checkout](/build/accept/checkout), où le client paie après redirection
+  - **Abonnements** : [Abonnements](/build/billing/subscriptions), produits récurrents via checkout
 </Callout>
 
 ## Avant de commencer
@@ -168,7 +168,7 @@ Si la commande reste **Pending payment**, vérifiez le secret webhook et l’év
 2. Collez la **clé secrète live** et le **secret webhook live** (endpoint live dans le tableau de bord, même URL WooCommerce).
 3. Effectuez un petit paiement réel de contrôle.
 
-Voir aussi [Vérifier les paiements](/build/guides/verify-payments).
+Voir aussi [Vérifier les paiements](/build/reliability/verify-payments).
 
 ---
 
@@ -178,7 +178,7 @@ Voir aussi [Vérifier les paiements](/build/guides/verify-payments).
 
 **WooCommerce Subscriptions**: Associez chaque produit à un **lomi price ID** dans l’onglet **lomi.** de la fiche produit.
 
-**En-têtes webhook**: `X-Lomi-Event`, `X-Lomi-Signature`. Détails : [Gérer les webhooks](/build/advanced-guides/handling-webhooks).
+**En-têtes webhook**: `X-Lomi-Event`, `X-Lomi-Signature`. Détails : [Gérer les webhooks](/build/reliability/handling-webhooks).
 
 ---
 

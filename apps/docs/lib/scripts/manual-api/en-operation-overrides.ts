@@ -51,17 +51,17 @@ export const EN_OPERATION_COPY = {
     caveats:
       'Follow the provider instructions in the response; UX is rail-specific (USSD, app redirect, etc.).',
     related:
-      '[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Direct charges](/build/accept/direct-charges) · [Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   ChargesController_createMtnCharge: {
-    summary: 'Create MTN MoMo charge',
-    body: 'Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox. Responses include **`next_action`** (`await_webhook` with `status`) alongside `data.status`.',
+    summary: 'Create MTN charge',
+    body: 'Starts a payer-facing MTN RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox. Responses include **`next_action`** (`await_webhook` with `status`) alongside `data.status`.',
     whenToUse:
       'Use for server-initiated MTN collection when you are **not** using a hosted checkout session.',
     caveats:
       'Live charges require MTN connected for your organization and a valid MSISDN. Refunds on live MTN payments use the Disbursement refund API via [Create refund](/api/refunds/RefundsController_create).',
     related:
-      '[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
+      '[Mobile money](/build/mobile-money) · [Direct charges](/build/accept/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)',
   },
   CheckoutSessionsController_create: {
     summary: 'Create checkout session',
@@ -182,7 +182,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use for support queues, reconciliation, and automation on `DISPUTE_*` webhooks.',
     related:
-      '[Get dispute](/api/disputes/DisputesController_findOne) · [Disputes guide](/build/disputes)',
+      '[Get dispute](/api/disputes/DisputesController_findOne) · [Disputes guide](/build/money/disputes)',
   },
   DisputesController_findOne: {
     summary: 'Get dispute',
@@ -190,7 +190,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use after `DISPUTE_CREATED` or when drilling into a row from the disputes list.',
     related:
-      '[List disputes](/api/disputes/DisputesController_findAll) · [Disputes guide](/build/disputes)',
+      '[List disputes](/api/disputes/DisputesController_findAll) · [Disputes guide](/build/money/disputes)',
   },
   ChargesController_createCardCharge: {
     summary: 'Create embedded card charge',
@@ -210,7 +210,7 @@ export const EN_OPERATION_COPY = {
     caveats:
       'Submitting raw card credentials requires a PCI-DSS-compliant integration. Follow `next_action` for 3DS redirects and `retry_other_rail` when the primary rail declines.',
     related:
-      '[Create card charge](/api/charge/ChargesController_createCardCharge) · [Direct charges](/build/direct-charges)',
+      '[Create card charge](/api/charge/ChargesController_createCardCharge) · [Direct charges](/build/accept/direct-charges)',
   },
   ChargesController_getCardCharge: {
     summary: 'Get embedded card charge',
@@ -320,13 +320,13 @@ export const EN_OPERATION_COPY = {
   },
   RefundsController_create: {
     summary: 'Create refund',
-    body: 'Refunds a **completed** transaction on **card**, **Wave**, or **MTN MoMo**. Merchant balance updates immediately when the refund is recorded.',
+    body: 'Refunds a **completed** transaction on **card**, **Wave**, or **MTN**. Merchant balance updates immediately when the refund is recorded.',
     whenToUse:
       'Use for buyer reversals on eligible completed transactions; supports full and partial amounts.',
     caveats:
-      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN MoMo live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN MoMo test:** ledger-only; no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.',
+      '**Card:** customer credit on the card network is completed separately by operations. **Wave partial:** requires a customer phone on file (beneficiary payout). **MTN live:** the original payment must have a provider reference (RequestToPay UUID stored as `provider_checkout_id`); lomi. calls the MTN Disbursement refund API and polls until completion. **MTN test:** ledger-only; no MTN API call. Partial MTN refunds also require a customer phone on file. For subscription-linked payments, pass optional `subscription_action`: `default` (cancel on initial full refund, pause on renewal full refund), `cancel`, `pause`, or `none`. Partial refunds never change the subscription unless the cumulative refund reaches the full transaction amount.',
     related:
-      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/refunds)',
+      '[List refunds](/api/refunds/RefundsController_findAll) · [Retrieve transaction](/api/transactions/TransactionsController_findOne) · [Refunds guide](/build/money/refunds)',
   },
   RefundsController_findAll: {
     summary: 'List refunds',
@@ -347,7 +347,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use before toggling Radar in your own settings UI or to confirm org configuration in support tools.',
     related:
-      '[Update Radar settings](/api/organizations/OrganizationsController_updateRadarSettings) · [lomi. Radar guide](/build/radar)',
+      '[Update Radar settings](/api/organizations/OrganizationsController_updateRadarSettings) · [lomi. Radar guide](/build/money/radar)',
   },
   OrganizationsController_updateRadarSettings: {
     summary: 'Update Radar settings',
@@ -365,7 +365,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use for fraud review queues, exports, and correlating `PAYMENT_RISK_*` webhook payloads.',
     related:
-      '[Get risk assessment](/api/risk-assessments/RadarController_findOne) · [lomi. Radar guide](/build/radar)',
+      '[Get risk assessment](/api/risk-assessments/RadarController_findOne) · [lomi. Radar guide](/build/money/radar)',
   },
   RadarController_findOne: {
     summary: 'Get risk assessment',
@@ -595,7 +595,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'First step in usage billing: create a meter before ingesting usage events or enrolling customers on usage-based products.',
     related:
-      '[Usage billing guide](/build/usage-billing) · [Record usage event](/api/usage/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)',
+      '[Usage billing guide](/build/billing/usage-billing) · [Record usage event](/api/usage/UsageEventsController_ingest) · [List meters](/api/meters/MetersController_findAll)',
   },
   MetersController_findAll: {
     summary: 'List meters',
@@ -652,7 +652,7 @@ export const EN_OPERATION_COPY = {
     caveats:
       'Returns `202 Accepted`. Confirm `processing_status` via webhooks or polling `GET /usage/events/{id}`.',
     related:
-      '[Usage billing guide](/build/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage/UsageEventsController_createUsageSubscription)',
+      '[Usage billing guide](/build/billing/usage-billing) · [Create meter](/api/meters/MetersController_create) · [Create usage subscription](/api/usage/UsageEventsController_createUsageSubscription)',
   },
   UsageEventsController_createUsageSubscription: {
     summary: 'Create a usage subscription',
@@ -660,7 +660,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'After creating a usage-based product and meter; enroll each customer before sending usage events tied to a subscription.',
     related:
-      '[Usage billing guide](/build/usage-billing) · [Products guide](/build/products) · [Subscription usage](/api/subscriptions/SubscriptionsController_getUsage)',
+      '[Usage billing guide](/build/billing/usage-billing) · [Products guide](/build/billing/products) · [Subscription usage](/api/subscriptions/SubscriptionsController_getUsage)',
   },
   UsageBillingController_listPeriods: {
     summary: 'List usage billing periods',
@@ -668,7 +668,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use for invoicing windows, period-close reconciliation, or support lookups.',
     related:
-      '[Get subscription usage](/api/subscriptions/SubscriptionsController_getUsage) · [Usage billing guide](/build/usage-billing)',
+      '[Get subscription usage](/api/subscriptions/SubscriptionsController_getUsage) · [Usage billing guide](/build/billing/usage-billing)',
   },
   SubscriptionsController_getUsage: {
     summary: 'Get meter usage for a subscription',
@@ -685,7 +685,7 @@ export const EN_OPERATION_COPY = {
       'Use for finance reporting that combines subscription MRR with metered usage and one-off charges.',
     caveats: 'Requires `start_date` and `end_date` query parameters.',
     related:
-      '[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Usage billing guide](/build/usage-billing)',
+      '[Organization metrics](/api/organizations/OrganizationsController_getMetrics) · [Usage billing guide](/build/billing/usage-billing)',
   },
   UsageBillingController_creditWallet: {
     summary: 'Credit prepaid usage units',
@@ -701,7 +701,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use when feature access is tied to plan entitlements rather than raw meter balance alone.',
     related:
-      '[Check entitlement](/api/usage/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/usage-billing)',
+      '[Check entitlement](/api/usage/UsageBillingController_checkEntitlement) · [Usage billing guide](/build/billing/usage-billing)',
   },
   UsageBillingController_checkEntitlement: {
     summary: 'Check customer entitlement',

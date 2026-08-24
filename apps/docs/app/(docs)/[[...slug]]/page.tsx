@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import {
   type ComponentProps,
   type ComponentType,
@@ -57,7 +57,7 @@ const DEFAULT_DOC_SLUG = ['start', 'overview'] as const;
 
 function effectiveSlug(slug: string[] | undefined): string[] {
   if (slug && slug.length > 0) return slug;
-  return [...DEFAULT_DOC_SLUG];
+  return [];
 }
 
 function getFallbackLanguage(locale: Language): Language {
@@ -99,10 +99,6 @@ export default async function Page({
   params: Promise<{ slug?: string[] }>;
 }) {
   const resolvedParams = await params;
-  if (!resolvedParams.slug || resolvedParams.slug.length === 0) {
-    redirect(`/${DEFAULT_DOC_SLUG.join('/')}`);
-  }
-
   const slug = effectiveSlug(resolvedParams.slug);
   const locale = await getDocsLocale();
   const { page, resolvedLocale } = resolvePageForLocale(slug, locale);
@@ -119,8 +115,8 @@ export default async function Page({
   const lastModified = pageData.lastModified;
   const origin = getDocsSiteOrigin();
   const pagePath = page.url.startsWith('/') ? page.url : `/${page.url}`;
-  const canonicalUrl = `${origin}${pagePath}`;
-  const overviewUrl = `${origin}/${DEFAULT_DOC_SLUG.join('/')}`;
+  const canonicalUrl = `${origin}${pagePath === '/' ? '' : pagePath}`;
+  const docsHomeUrl = origin;
   const structuredData = [
     {
       '@context': 'https://schema.org',
@@ -144,9 +140,9 @@ export default async function Page({
           '@type': 'ListItem',
           position: 1,
           name: 'lomi. docs',
-          item: overviewUrl,
+          item: docsHomeUrl,
         },
-        ...(canonicalUrl === overviewUrl
+        ...(canonicalUrl === docsHomeUrl
           ? []
           : [
               {
@@ -160,7 +156,8 @@ export default async function Page({
     },
   ];
   const isOverview =
-    slug.length === 2 && slug[0] === 'start' && slug[1] === 'overview';
+    slug.length === DEFAULT_DOC_SLUG.length &&
+    slug.every((part, index) => part === DEFAULT_DOC_SLUG[index]);
   const method =
     'method' in page.data && isString(page.data.method)
       ? page.data.method

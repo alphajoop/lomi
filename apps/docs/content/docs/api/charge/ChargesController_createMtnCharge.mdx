@@ -1,6 +1,6 @@
 ---
-title: "Create MTN MoMo charge"
-description: "Create MTN MoMo charge"
+title: "Create MTN charge"
+description: "Create MTN charge"
 full: true
 method: post
 path: /charge/mtn
@@ -9,9 +9,9 @@ operationId: ChargesController_createMtnCharge
 
 ## Overview
 
-Create MTN MoMo charge
+Create MTN charge
 
-Starts a payer-facing MTN Mobile Money RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox. Responses include **`next_action`** (`await_webhook` with `status`) alongside `data.status`.
+Starts a payer-facing MTN RequestToPay charge. With a **test** API key the transaction completes in the ledger without calling the MTN sandbox. Responses include **`next_action`** (`await_webhook` with `status`) alongside `data.status`.
 
 
 ### When to use this
@@ -24,7 +24,7 @@ Live charges require MTN connected for your organization and a valid MSISDN. Ref
 
 ### See also
 
-[Mobile money](/build/mobile-money) · [Direct charges](/build/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
+[Mobile money](/build/mobile-money) · [Direct charges](/build/accept/direct-charges) · [Create Wave charge](/api/charge/ChargesController_createWaveCharge) · [Create refund](/api/refunds/RefundsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication

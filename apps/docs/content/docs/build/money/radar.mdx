@@ -1,0 +1,82 @@
+---
+title: lomi. Radar
+description: Screen incoming card and mobile-money charges with risk assessments, webhooks, and metered billing.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+**lomi. Radar** evaluates **incoming** charges (card, MTN, Wave) before they complete. It is separate from [Disputes](/build/money/disputes) (card chargebacks after the fact) and from platform payout controls described in [Payouts](/build/money/payouts).
+
+<Callout type="info">
+  Radar is **opt-in** per organization. Enable it with `PATCH /organizations/radar-settings` (`enabled: true`). Default is off for existing merchants.
+</Callout>
+
+## Enable Radar
+
+```bash
+curl -X PATCH "https://api.lomi.africa/organizations/radar-settings" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "enabled": true, "mode": "block" }'
+```
+
+| Field | Values | Meaning |
+| --- | --- | --- |
+| `enabled` | `true` / `false` | Turn screening on or off |
+| `mode` | `monitor` | Flag risky charges but allow them |
+| `mode` | `block` | Reject charges that trigger block rules |
+| `stripe_radar_passthrough` | `true` (default) | Merge card-network risk signals after card capture |
+
+## Built-in rules (v1)
+
+| Rule | Rails | Default action |
+| --- | --- | --- |
+| `high_value_charge` | card, MTN, Wave | Flag ≥ 500,000 XOF |
+| `velocity_charges_1h` | all | Block > 20 charges / customer / hour |
+| `repeat_phone_24h` | MTN, Wave | Flag same phone across customers |
+| `card_country_mismatch` | card | Flag billing country outside WAEMU |
+
+## List risk assessments
+
+```bash
+curl "https://api.lomi.africa/risk-assessments?decision=flag&page=1&pageSize=50" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+Optional filters: `decision` (`allow`, `flag`, `block`), `rail` (`card`, `mtn`, `wave`), `startDate`, `endDate`.
+
+Example row:
+
+```json
+{
+  "assessment_id": "…",
+  "transaction_id": "…",
+  "rail": "mtn",
+  "decision": "flag",
+  "risk_score": 45,
+  "signals": [{ "rule": "repeat_phone_24h", "action": "flag", "detail": "…" }],
+  "amount": 10000,
+  "currency_code": "XOF"
+}
+```
+
+## Webhooks
+
+Subscribe to:
+
+- `PAYMENT_RISK_FLAGGED`, charge allowed but flagged for review
+- `PAYMENT_RISK_BLOCKED`, charge blocked when `mode` is `block`
+
+Payload includes `assessment_id`, `transaction_id`, `rail`, `decision`, `risk_score`, `signals`, `amount`, and `currency_code`.
+
+## Disputes vs Radar vs payout controls
+
+| | **Disputes** | **Radar** | **Payout controls** |
+| --- | --- | --- | --- |
+| Timing | After chargeback | Before/during charge | At withdrawal |
+| API | `GET /disputes` | `GET /risk-assessments` | None (internal) |
+| Dashboard | Settings → Support → Disputes | Transactions risk badge | Withdrawal error message |
+
+## Metering
+
+When Radar is enabled and a `radar_screen` meter is configured, each screening emits a usage event billed through [Usage billing](/build/billing/usage-billing).

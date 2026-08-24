@@ -1,22 +1,18 @@
 /* @proprietary license */
 
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
+import { DocsAppLayout, DocsMobileSectionSwitch } from '@/components/docs/docs-sidebar';
+import { DocsMobileSearchBanner } from '@/components/docs/docs-mobile-search-banner';
+import { DocsSidebarLocaleAndTheme } from '@/components/docs/sidebar-locale-theme';
 import { baseOptions, linkItems, logo } from '@/lib/utils/layout.shared';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 import { isString } from '@lomi./shared';
-// import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import type { CSSProperties, ReactNode } from 'react';
 import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
 import type { Folder, Node, Root } from 'fumadocs-core/page-tree';
 import { t as translate } from '@/lib/i18n/translations';
 import type { Language } from '@/lib/i18n/config';
-// import { Sparkles } from 'lucide-react';
-// import { AISearchTrigger } from '@/components/ai';
-// import { cn } from '@/lib/cn';
-// import { buttonVariants } from '@lomi./ui/button';
 import 'katex/dist/katex.min.css';
-import { DocsOnboardingChecklist } from '@/components/docs/docs-onboarding-checklist';
 
 function getFirstPageUrl(node: Folder): string | undefined {
   if (node.index?.url) return node.index.url;
@@ -39,6 +35,8 @@ const SECTION_LABEL_KEYS = {
   'First steps': 'section.firstSteps',
   'API reference': 'section.apiReference',
   'REST API': 'section.restApi',
+  'API': 'section.restApi',
+  'Référence API': 'section.restApi',
   Basics: 'section.basics',
   Implementation: 'section.implementation',
   Community: 'section.community',
@@ -52,7 +50,7 @@ const SECTION_DESCRIPTION_KEYS = {
     'sectionDescription.build',
   'Authentication, errors, data models, and endpoint reference for the lomi. API.':
     'sectionDescription.apiReference',
-  'Support, changelog, merchant policies, open-source material, and contributor documentation.':
+  'Support, merchant policies, open-source material, and contributor documentation.':
     'sectionDescription.resources',
   'Developers use lomi. to reliably accept payments in West Africa.':
     'sectionDescription.firstSteps',
@@ -166,50 +164,36 @@ export default async function Layout({ children }: { children: ReactNode }) {
   });
 
   return (
-    <DocsLayout
+    <DocsAppLayout
       {...base}
       i18n={false}
       tree={pageTree}
       tabs={tabs}
+      sidebar={{
+        defaultOpenLevel: 0,
+        banner: (
+          <div key="docs-mobile-chrome" className="contents">
+            <DocsMobileSearchBanner />
+            <DocsMobileSectionSwitch />
+          </div>
+        ),
+        footer: (
+          <div
+            key="docs-mobile-locale-theme"
+            className="docs-mobile-locale-theme-footer md:hidden"
+          >
+            <DocsSidebarLocaleAndTheme />
+          </div>
+        ),
+      }}
       // just icon items
       links={linkItems?.filter((item) => item.type === 'icon') ?? []}
-      searchToggle={
-        {
-          /*
-        components: {
-          lg: (
-            <div className="flex gap-1.5 max-md:hidden">
-              <LargeSearchToggle className="flex-1" />
-            </div>
-          ),
-        },
-        */
-        }
-      }
       nav={{
         ...base.nav,
         title: <>{logo}</>,
-        // children: (
-        //   <AISearchTrigger
-        //     className={cn(
-        //       buttonVariants({
-        //         variant: 'secondary',
-        //         size: 'sm',
-        //         className:
-        //           'absolute left-1/2 top-1/2 -translate-1/2 text-fd-muted-foreground rounded-sm gap-2 md:hidden',
-        //       }),
-        //     )}
-        //   >
-        //     <Sparkles className="size-4.5 fill-current" />
-        //     Ask AI
-        //   </AISearchTrigger>
-        // ),
-      }}
-      sidebar={{
-        banner: <DocsOnboardingChecklist />,
       }}
     >
       {children}
-    </DocsLayout>
+    </DocsAppLayout>
   );
 }

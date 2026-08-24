@@ -15,11 +15,23 @@ Follow this guide before you write production code. Each step links to the detai
   New here? Start with [What is lomi.?](/start/overview), then follow this journey step by step.
 </Callout>
 
-Hosted checkout, payment links, subscriptions, and the other products below all go through the same merchant API. The choice of **what to build** is independent of **how you call lomi.**: REST API, SDK, CLI, or MCP.
+Hosted checkout, payment links, subscriptions, and the other products below all go through the same merchant API. The choice of **what to build** is independent of **how you use lomi.**: API, SDK, CLI, or MCP.
 
-## How you call lomi.
+## In sandbox you can
 
-Pick the surface that matches how you work. Each card is a starting point. The full walkthroughs stay on their own pages: [REST API](/api), [SDK quickstart](/start/sdk-quickstart), [CLI quickstart](/start/cli-quickstart), and [MCP](/build/mcp).
+- Pay with [test cards](/start/sandbox-payments)
+- Let Wave and MTN auto-complete on test keys
+- Send `X-Scenario-Key: pending` or `failed` on direct Wave/MTN charges
+- Forward webhooks with `lomi listen`
+
+## In live you cannot
+
+- Auto-complete Mobile Money (the customer must approve on device)
+- Use test PANs (they only work with test keys)
+
+## How to use lomi.
+
+Pick the surface that matches how you work. Each tab is a starting point. The full walkthroughs stay on their own pages: [API](/api), [SDK quickstart](/start/sdk-quickstart), [CLI quickstart](/start/cli-quickstart), and [MCP](/build/mcp).
 
 <IntegrationSurfaceGroup id="how-you-call-lomi">
 
@@ -28,9 +40,9 @@ Pick the surface that matches how you work. Each card is a starting point. The f
   title="Call the HTTP contract directly"
   identifier="POST /checkout-sessions"
   href="/api"
-  hrefLabel="Open the REST API reference"
+  hrefLabel="Open the API reference"
 >
-  Use REST when you want the exact request and response, a language without an official SDK, or to compare against OpenAPI. Send your secret key as `X-API-Key` (`LOMI_SECRET_KEY`). `Idempotency-Key` is required on money-moving writes.
+  Use the API when you want the exact request and response, a language without an official SDK, or to compare against OpenAPI. Send your secret key as `X-API-Key` (`LOMI_SECRET_KEY`). `Idempotency-Key` is required on money-moving writes.
 
   Create a sandbox checkout:
 
@@ -146,19 +158,19 @@ lomi. supports multiple integration options depending on your stack:
 
 | If you need | Start with |
 | --- | --- |
-| A complete checkout page | [Hosted checkout](/build/checkout) |
-| Checkout embedded on your site | [Embed checkout widget](/build/embed-widget) |
-| A shareable URL | [Payment links](/build/payment-links) |
-| A backend-created payment request | [Payment requests](/build/payment-requests) |
-| Server-initiated mobile money or embedded cards | [Direct charges](/build/direct-charges) |
-| Recurring billing | [Subscriptions](/build/subscriptions) via checkout or links |
+| A complete checkout page | [Hosted checkout](/build/accept/checkout) |
+| Checkout embedded on your site | [Embed checkout widget](/build/accept/embed-widget) |
+| A shareable URL | [Payment links](/build/accept/payment-links) |
+| A backend-created payment request | [Payment requests](/build/accept/payment-requests) |
+| Server-initiated mobile money or embedded cards | [Direct charges](/build/accept/direct-charges) |
+| Recurring billing | [Subscriptions](/build/billing/subscriptions) via checkout or links |
 | Store plugin (WooCommerce, Shopify, etc.) | [E-commerce extensions](/build/ecommerce-extensions) |
 
-Define what you sell in [Products](/build/products) before you create checkout sessions or subscription plans.
+Define what you sell in [Products](/build/billing/products) before you create checkout sessions or subscription plans.
 
-Most teams should start with **hosted checkout**. Use [Which payment integration should I choose?](/build/choose-integration) and [Payment channels](/build/payment-channels) to confirm Wave, MTN, and card coverage for your markets.
+Most teams should start with **hosted checkout**. Use [Which integration to choose?](/build/choose-integration) and [Payment channels](/build/payment-channels) to confirm Wave, MTN, and card coverage for your markets.
 
-That product choice is independent of REST API, SDK, CLI, or MCP. See [How you call lomi.](#how-you-call-lomi).
+That product choice is independent of API, SDK, CLI, or MCP. See [How to use lomi.](#how-you-call-lomi).
 
 ## Step 3: Test end-to-end
 
@@ -166,9 +178,9 @@ Test your integration thoroughly using sandbox credentials:
 
 1. [Make a test payment](/start/first-payment): CLI or API checkout session.
 2. Use [Sandbox payments](/start/sandbox-payments) for test cards, Wave, and MTN behavior.
-3. Exercise failure paths with [Simulate errors](/build/guides/simulate-errors).
-4. Fix issues using [Error handling](/build/advanced-guides/error-handling) and [Idempotency keys](/build/advanced-guides/idempotency-keys).
-5. For checkout edge cases (subscriptions, trials, pending mobile money), see [Checkout behavior](/build/payments/checkout-behavior) and per-channel guides under [Payment channels](/build/payment-channels#recommended-path-by-channel).
+3. Exercise failure paths with [Simulate errors](/build/reliability/simulate-errors).
+4. Fix issues using [Error handling](/build/reliability/error-handling) and [Idempotency keys](/build/reliability/idempotency-keys).
+5. For checkout edge cases (subscriptions, trials, pending mobile money), see [Checkout behavior](/build/accept/checkout-behavior) and per-channel guides under [Payment channels](/build/payment-channels#channel-capabilities).
 
 The same first checkout can be created from [REST](#call-api), [SDK](#call-sdk), [CLI](#call-cli), or [MCP](#call-mcp). The CLI and cURL paths are spelled out in [Make a test payment](/start/first-payment). The SDK and MCP paths are in [Get started with the SDK](/start/sdk-quickstart) and [MCP](/build/mcp).
 
@@ -177,41 +189,41 @@ The same first checkout can be created from [REST](#call-api), [SDK](#call-sdk),
 Webhooks are especially useful for payment methods and events that happen outside your application's control, such as mobile money approval and subscription renewals.
 
 1. Register an HTTPS endpoint in the [dashboard](https://lomi.africa/portal).
-2. Follow [Setting up webhooks](/build/webhooks) and [Handling webhooks](/build/advanced-guides/handling-webhooks).
+2. Follow [Setting up webhooks](/build/reliability) and [Handling webhooks](/build/reliability/handling-webhooks).
 3. Verify signatures from the raw request body before you parse JSON.
 
-**Subscription renewals:** Card subscriptions renew off-session; listen for `SUBSCRIPTION_RENEWED` and renewal `PAYMENT_FAILED`. **Wave and MTN subscriptions** use a **manual renewal checkout link** sent before each billing date, the customer must pay that link; there is no silent wallet debit. See [Subscriptions: Renewals](/build/subscriptions#renewals-and-failed-payments).
+**Subscription renewals:** Card subscriptions renew off-session; listen for `SUBSCRIPTION_RENEWED` and renewal `PAYMENT_FAILED`. **Wave and MTN subscriptions** use a **manual renewal checkout link** sent before each billing date, the customer must pay that link; there is no silent wallet debit. See [Subscriptions: Renewals](/build/billing/subscriptions#renewals-and-failed-payments).
 
 ## Step 5: Go live
 
-When sandbox flows pass your checklist:
+When sandbox flows work end to end:
 
 1. Complete account verification and payout setup.
 2. Switch servers to `lomi_sk_live_...` and `https://api.lomi.africa`.
-3. Run the [go-live checklist](/start/go-live) and process one small live payment with webhook verification.
+3. Follow [What to check before live?](/start/go-live) and process one small live payment with webhook verification.
 
 ## Next steps
 
 ### Confirm payments in production
 
-- [Verify payments](/build/guides/verify-payments)
-- [Payment lifecycle](/build/guides/payment-lifecycle)
+- [Verify payments](/build/reliability/verify-payments)
+- [Payment lifecycle](/build/reliability/payment-lifecycle)
 - [Payment state machine](/api/payment-state-machine)
 
 ### Operate after go-live
 
-- [Transactions](/build/transactions) · [Refunds](/build/refunds) · [Payouts](/build/payouts) · [Disputes](/build/disputes)
-- [Balance and settlement](/build/balance-and-settlement) · [Radar (fraud)](/build/radar)
+- [Transactions](/build/money/transactions) · [Refunds](/build/money/refunds) · [Payouts](/build/money/payouts) · [Disputes](/build/money/disputes)
+- [Balance and settlement](/build/money/balance-and-settlement) · [Radar (fraud)](/build/money/radar)
 
 ### Catalog, billing, and customers
 
-- [Products](/build/products) · [Usage billing](/build/usage-billing) · [Discount coupons](/build/discount-coupons)
-- [Customer portal](/build/customer-portal) · [Customers](/build/platform/customers)
+- [Products](/build/billing/products) · [Usage billing](/build/billing/usage-billing) · [Discount coupons](/build/billing/discount-coupons)
+- [Customer portal](/build/billing/customer-portal) · [Customers](/build/platform/customers)
 - [Merchants](/build/platform/merchants) · [Organizations](/build/platform/organizations)
 
 ### Tools and hardening
 
 - [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp) · [lomi. UI](/build/lomi-ui)
 - [E-commerce extensions](/build/ecommerce-extensions) (WooCommerce, Shopify, Magento, PrestaShop)
-- [Advanced guides](/build/advanced-guides) (error handling, testing, CI/CD, webhook reliability)
+- [Advanced guides](/build/reliability) (error handling, testing, CI/CD, webhook reliability)
 - [CLI quickstart](/start/cli-quickstart) · [SDK quickstart](/start/sdk-quickstart)

@@ -1,5 +1,12 @@
 /* @proprietary license */
 
+import {
+  ADD_ON_SUBSCRIPTION_PERCENT,
+  FIXED_FEES_CARD_INTL,
+  FIXED_FEES_XOF,
+  formatFee,
+} from '@lomi./shared';
+
 /** English canonical brand copy (llms.txt, agent corpus, JSON-LD). */
 export const BRAND_NAME = 'lomi.';
 
@@ -23,7 +30,7 @@ export const MARKETING_ORIGIN = 'https://lomi.africa';
 export type BrandFaqItem = { question: string; answer: string };
 
 export const BRAND_WHEN_TO_USE: readonly string[] = [
-  'Accept Wave, MTN MoMo, SPI, cards, and other local payment methods through one integration.',
+  'Accept Wave, MTN, SPI, cards, and other local payment methods through one integration.',
   'Send customers to hosted checkout instead of building payment collection from scratch.',
   'Create payment links for invoices, services, events, donations, or product sales.',
   'Run recurring payments and customer subscriptions.',
@@ -33,15 +40,15 @@ export const BRAND_WHEN_TO_USE: readonly string[] = [
 
 export const BRAND_UEMOA_MOBILE_MONEY: readonly string[] = [
   'Primary market: UEMOA (francophone West Africa).',
-  'Mobile money rails include Wave and MTN MoMo; SPI connects 64+ mobile money operators and banks.',
+  'Mobile money rails include Wave and MTN; SPI connects 64+ mobile money operators and banks.',
   'Live mobile-money payments are asynchronous: confirm final status via webhooks and GET /transactions/{id}.',
   'Amounts in XOF use integer centimes (minor units) unless a field documents otherwise.',
   'API keys: lomi_sk_test_* (sandbox) and lomi_sk_live_* (live); the key selects environment, not the hostname alone.',
 ];
 
 export const BRAND_COMPARISONS: readonly string[] = [
-  `${BRAND_NAME} is payment infrastructure for UEMOA with hosted checkout, payment links, payouts, and subscriptions—not a generic global card-only gateway.`,
-  `Unlike using Wave or MTN MoMo APIs alone, ${BRAND_NAME} offers one REST API and MCP surface for multiple rails and reconciliation.`,
+  `${BRAND_NAME} is payment infrastructure for UEMOA with hosted checkout, payment links, payouts, and subscriptions, not a generic global card-only gateway.`,
+  `Unlike using Wave or MTN APIs alone, ${BRAND_NAME} offers one API and MCP surface for multiple rails and reconciliation.`,
   `Compared to global gateways focused outside West Africa, ${BRAND_NAME} optimizes for francophone UEMOA merchants, XOF, and local mobile money behavior.`,
 ];
 
@@ -54,6 +61,13 @@ export const BRAND_INTEGRATION_STEPS: readonly string[] = [
   'OpenAPI: apps/docs/openapi.json (merchant API); agent-openapi.json for provisioning/MCP partner routes.',
 ];
 
+export const BRAND_FEE_FACTS: readonly string[] = [
+  `Fixed Mobile Money: ${formatFee(FIXED_FEES_XOF.mobileMoney)}`,
+  `Fixed cards (XOF): ${formatFee(FIXED_FEES_XOF.cards)}`,
+  `Fixed cards (USD/EUR): ${formatFee(FIXED_FEES_CARD_INTL)}`,
+  `Subscription add-on: +${ADD_ON_SUBSCRIPTION_PERCENT}%`,
+];
+
 export const BRAND_NUMERIC_FACTS: readonly string[] = [
   `Sandbox API: ${API_SANDBOX_ORIGIN}`,
   `Live API: ${API_LIVE_ORIGIN}`,
@@ -61,6 +75,7 @@ export const BRAND_NUMERIC_FACTS: readonly string[] = [
   'Auth header: X-API-KEY with lomi_sk_test_* or lomi_sk_live_*',
   'XOF amounts: integer centimes (minor units)',
   'Marketing site: https://lomi.africa',
+  ...BRAND_FEE_FACTS,
 ];
 
 export const BRAND_FAQ: readonly BrandFaqItem[] = [
@@ -70,12 +85,12 @@ export const BRAND_FAQ: readonly BrandFaqItem[] = [
   },
   {
     question: 'What is the best payment API for francophone West Africa?',
-    answer: `${BRAND_NAME} provides hosted checkout, Mobile Money (Wave, MTN MoMo, SPI), cards, payouts, subscriptions, and REST/MCP APIs for UEMOA. Documentation: https://docs.lomi.africa/llms.txt`,
+    answer: `${BRAND_NAME} provides hosted checkout, Mobile Money (Wave, MTN, SPI), cards, payouts, subscriptions, and REST/MCP APIs for UEMOA. Documentation: https://docs.lomi.africa/llms.txt`,
   },
   {
     question:
       "How do I accept Mobile Money online in Senegal or Côte d'Ivoire?",
-    answer: `Use ${BRAND_NAME} hosted checkout or payment links with Wave and MTN MoMo rails; confirm async payments via webhooks. See docs payment methods and sandbox guides.`,
+    answer: `Use ${BRAND_NAME} hosted checkout or payment links with Wave and MTN rails; confirm async payments via webhooks. See docs payment methods and sandbox guides.`,
   },
   {
     question: 'Where is lomi MCP and OpenAPI for agents?',
@@ -88,6 +103,6 @@ export const BRAND_FAQ: readonly BrandFaqItem[] = [
   },
   {
     question: 'Payment API documentation for Mobile Money in UEMOA',
-    answer: `See https://docs.lomi.africa/build/payment-channels and the REST API hub; agent corpus at https://docs.lomi.africa/agents/uemoa-mobile-money`,
+    answer: `See https://docs.lomi.africa/build/payment-channels and the API hub; agent corpus at https://docs.lomi.africa/agents/uemoa-mobile-money`,
   },
 ];

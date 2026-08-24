@@ -1,5 +1,5 @@
 ---
-title: 'Qu’est-ce que SPI et comment l’utiliser ?'
+title: 'Qu’est-ce que SPI ?'
 description: 'Réseau SPI et checkout hébergé en Afrique de l’Ouest.'
 docType: explanation
 ---
@@ -8,15 +8,27 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-**SPI** relie opérateurs mobile money et banques en Afrique de l’Ouest. sur lomi., les moyens SPI apparaissent sur le **checkout hébergé** avec Wave, MTN et cartes.
+**SPI** relie opérateurs mobile money et banques en Afrique de l’Ouest. Sur lomi., les moyens SPI apparaissent sur le **checkout hébergé** avec Wave, MTN et cartes.
+
+## En bref
+
+| | |
+| --- | --- |
+| Approbation | Hébergé : opérateur, USSD ou app sur la page checkout |
+| Règlement | Après le paiement hébergé, puis `available_at` |
+| Direct vs hébergé | Hébergé uniquement |
+| Remboursement | Pas listé sur `POST /refunds` |
+| Min / max | - |
+
+Mêmes colonnes que [Canaux de paiement](/build/payment-channels#channel-capabilities).
 
 ## Intégration
 
-Utilisez [checkout hébergé](/build/checkout) ou [liens de paiement](/build/payment-links).
+Utilisez [checkout hébergé](/build/accept/checkout) ou [liens de paiement](/build/accept/payment-links).
 
 ## Reversements
 
-Certains rails de reversement passent par SPI. Voir [Reversements](/build/payouts).
+Certains rails de reversement passent par SPI. Voir [Reversements](/build/money/payouts).
 
 ## Voir aussi
 

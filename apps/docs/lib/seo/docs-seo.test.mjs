@@ -51,6 +51,33 @@ test('legacy content redirects stay unprefixed', () => {
   assert.doesNotMatch(configSource, /source:\s*'\/en\//);
 });
 
+test('robots.txt does not block sitemap API reference pages', async () => {
+  const { isRobotsDisallowedPath, ROBOTS_DISALLOW } = await import(
+    './robots-policy.ts'
+  );
+
+  assert.equal(isRobotsDisallowedPath('/api/checkout-sessions'), false);
+  assert.equal(
+    isRobotsDisallowedPath(
+      '/api/checkout-sessions/CheckoutSessionsController_create',
+    ),
+    false,
+  );
+  assert.equal(isRobotsDisallowedPath('/api/authentication'), false);
+  assert.equal(isRobotsDisallowedPath('/start/overview'), false);
+  assert.equal(isRobotsDisallowedPath('/api/search'), true);
+  assert.equal(isRobotsDisallowedPath('/api/proxy'), true);
+  assert.equal(isRobotsDisallowedPath('/tryit/handoff'), true);
+
+  const robotsSource = read('app/robots.ts');
+  assert.doesNotMatch(robotsSource, /disallow:\s*\[[^\]]*['"]\/api\/['"]/);
+  assert.match(robotsSource, /ROBOTS_DISALLOW/);
+  assert.ok(ROBOTS_DISALLOW.includes('/api/search'));
+
+  const sitemapSource = read('app/sitemap.ts');
+  assert.match(sitemapSource, /path\.startsWith\('\/api\/'\)/);
+});
+
 test('page metadata emits locale-aware Open Graph and structured data', () => {
   const pageSource = read('app/(docs)/[[...slug]]/page.tsx');
   const docsLayoutSource = read('app/(docs)/layout.tsx');

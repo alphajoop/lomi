@@ -1,0 +1,59 @@
+---
+title: 'Payment and payout lifecycle'
+description: 'How money-in and money-out statuses connect, links to the canonical state machine, balances, and webhooks.'
+docType: explanation
+---
+
+import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
+
+<DocsAgentIndex />
+
+Use this page as the **merchant-facing map** for payment and payout status. For the full transition tables and diagrams, see **[Payment state machine](/api/payment-state-machine)**.
+
+## Money in (payments)
+
+| Phase | Typical status | What it means for you |
+| --- | --- | --- |
+| Customer starts pay | `pending` | Show a pending UI; do not fulfill |
+| Provider confirms | `completed` | Credit test/live balance; safe to fulfill after [verification](/build/reliability/verify-payments) |
+| Timeout / abandon | `failed` or `expired` | Release inventory; offer retry |
+| Refund issued | `refunded` | Reverse fulfillment if applicable |
+
+**Test vs live:** test keys often complete mobile money immediately; live keys stay `pending` until the customer approves on device.
+
+## Money out (payouts and refunds)
+
+Payouts move through `pending` → `processing` → `completed` or `failed`. Treat **`completed`** as “funds left the platform” for withdrawals and beneficiary payouts.
+
+### Withdrawals vs beneficiaries
+
+- **Withdrawals**: funds from your lomi. balance to your own payout method (mobile money, bank, and similar).
+- **Beneficiary payouts**: funds sent to a third-party account (vendors, partners, or refund routing).
+
+Some flows **validate balance at creation** and **debit or finalize on completion**. A payout can be accepted while still processing. If the balance changes before final settlement, **completion can fail** and the payout may be marked failed or reversed according to provider rules.
+
+### Fees and limits
+
+Payout fees depend on organization fee configuration (including tiered overrides), provider and payment method (for example local vs international bank), and currency. Withdrawal flows can enforce minimum/maximum amounts and per-period caps. Exact numbers are configured per organization and provider. See [Merchant of record pricing](/start/merchant-of-record/pricing).
+
+### Failure and retries
+
+Failures may occur due to invalid account details, provider rejection, or insufficient balance at settlement time. Check payout status and metadata in the API. See [Payouts](/build/money/payouts) and [Refunds](/build/money/refunds).
+
+## Balances and settlement
+
+Completed payments update your merchant balance according to fee rules and availability windows. See [Balance and settlement](/build/money/balance-and-settlement).
+
+## Webhooks tie it together
+
+Configure webhooks so your system reacts when status changes without polling:
+
+1. [Setting up webhooks](/build/reliability)
+2. [Handling webhooks](/build/reliability/handling-webhooks)
+3. [Webhook reliability](/build/reliability/webhook-reliability)
+
+## Related
+
+- [Checkout behavior](/build/accept/checkout-behavior)
+- [Simulate errors](/build/reliability/simulate-errors)
+- [Transactions](/build/money/transactions)

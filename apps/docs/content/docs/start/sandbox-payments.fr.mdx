@@ -1,17 +1,23 @@
 ---
-title: 'Comment tester en sécurité dans la sandbox ?'
+title: 'Comment tester en sandbox ?'
 description: 'Utilisez les clés de test, les moyens de paiement de test, les soldes de test et la vérification webhook avant le passage en production.'
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from '@/components/docs/docs-callout';
 
-L’**environnement de test** lomi. vous permet d’exécuter des parcours de paiement complets, checkout hébergé, formulaire carte intégré et mobile money, sans mouvement de fonds réels ni impact sur les soldes live. Cette page est la référence unique pour **simuler les paiements** : quels numéros de carte utiliser, le comportement de Wave et MTN MoMo en test, et ce que vous devez observer dans le tableau de bord et via les webhooks.
+L’**environnement de test** lomi. vous permet d’exécuter des parcours de paiement complets, checkout hébergé, formulaire carte intégré et mobile money, sans mouvement de fonds réels ni impact sur les soldes live. Cette page est la **référence des identifiants et moyens de test** : quels numéros de carte utiliser, le comportement de Wave et MTN en test, et ce que vous devez observer dans le tableau de bord et via les webhooks.
+
+Comment structurer les tests : [Guide des tests](/build/reliability/testing). Matrice des scénarios (refus, Mobile Money en attente, échecs webhook) : [Simuler les erreurs](/build/reliability/simulate-errors).
 
 Pour les clés API, les URL de base et les limites, voir **[Authentification](/start/api-keys)**. Pour votre première requête authentifiée, voir **[Intégration API](/start/first-payment)**.
 
 <Callout type="warn">
   Les transactions de test n’affectent jamais les soldes live, la trésorerie plateforme ni les virements sortants. Les e-mails et messages WhatsApp clients ne sont pas envoyés en mode test.
+</Callout>
+
+<Callout type="warn">
+  Ne faites pas de test de charge sur la sandbox. Les limites de débit s’appliquent ; la sandbox sert à la correction, pas à la capacité. La sandbox ne peut pas ouvrir un litige carte : il n’y a pas de déclencheur de test. Les litiges n’apparaissent que depuis des événements réseau carte en live. Voir [Litiges](/build/money/disputes).
 </Callout>
 
 ## Environnement de test en bref
@@ -46,9 +52,9 @@ POST /checkout-sessions  →  { "checkout_url": "https://…" }  →  paiement c
 | --- | --- |
 | **Clé API test ou live** | Les ressources portent `"environment": "test"` ou `"live"` |
 | **Lien de paiement ou session checkout** | Le checkout hébergé suit l’environnement de ce lien ou de cette session |
-| **Même environnement partout** | **Solde test** vs comptes live ; paiements **carte**, **Wave** ou **MTN MoMo** dans cet environnement |
+| **Même environnement partout** | **Solde test** vs comptes live ; paiements **carte**, **Wave** ou **MTN** dans cet environnement |
 
-**API REST**
+**API**
 
 Toute requête authentifiée avec une clé secrète de test s’exécute en mode test. Les sessions checkout, payment intents, liens de paiement et transactions créés portent `"environment": "test"`.
 
@@ -70,7 +76,7 @@ Lorsqu’une transaction de test passe à **`completed`** :
 
 Les **e-mails** et **WhatsApp** clients sont ignorés en mode test.
 
-Pour le fonctionnement des soldes live après complétion, voir **[Soldes et règlement](/build/balance-and-settlement)**.
+Pour le fonctionnement des soldes live après complétion, voir **[Soldes et règlement](/build/money/balance-and-settlement)**.
 
 ## Tester les paiements par carte
 
@@ -170,7 +176,7 @@ Testez l’authentification sur votre **checkout hébergé** ou **formulaire car
 
 ### Formulaires carte intégrés
 
-Avec **[lomi Payment Elements](/build/payments/lomi-payment-elements)** ou l’API Payment Intents : créez un payment intent avec **`lomi_sk_test_…`**, montez l’UI carte avec **`lomi_pk_test_…`**, puis confirmez avec le **`client_secret`** retourné. Utilisez les numéros de test ci-dessus dans le champ carte.
+Avec **[lomi Payment Elements](/build/accept/payment-elements)** ou l’API Payment Intents : créez un payment intent avec **`lomi_sk_test_…`**, montez l’UI carte avec **`lomi_pk_test_…`**, puis confirmez avec le **`client_secret`** retourné. Utilisez les numéros de test ci-dessus dans le champ carte.
 
 ## Tester le mobile money
 
@@ -185,7 +191,7 @@ En mode test, lomi. crée une transaction **completed** et crédite votre **sold
 3. Saisir un numéro valide au format **E.164** (par ex. `+225 07 00 00 00 00` pour la Côte d’Ivoire).
 4. Compléter ou annuler sur l’écran Wave ; vérifier transaction et solde de test.
 
-### MTN MoMo
+### MTN
 
 En mode test, la transaction est aussi **completed** et le solde de test est crédité à l’initiation du paiement MTN. Les mises à jour de statut en test sont traitées comme réussies pour le grand livre. Le checkout utilise le **bac à sable MTN** lorsque la session est en test.
 
@@ -195,7 +201,7 @@ En mode test, la transaction est aussi **completed** et le solde de test est cr�
 2. Saisir un numéro de téléphone valide pour le pays (format international).
 3. Vérifier la transaction completed dans la vue test du tableau de bord.
 
-Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur MTN MoMo](https://momodeveloper.mtn.com/).
+Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur MTN](https://momodeveloper.mtn.com/).
 
 **Pays pris en charge (checkout hébergé)**
 
@@ -220,7 +226,7 @@ Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur 
 | --- | --- | --- |
 | **Cartes** | Après confirmation carte réussie | Jamais |
 | **Wave** | À la création de la transaction de test | Jamais |
-| **MTN MoMo** | À la création de la transaction de test | Jamais |
+| **MTN** | À la création de la transaction de test | Jamais |
 
 ## Virements en mode test
 
@@ -232,7 +238,7 @@ Avec une **clé API test**, `POST /payouts` se comporte ainsi :
 | `bank`, `spi` | `self` | Retraits test selon les enregistrements applicables |
 | `spi` | `beneficiary` | Peut créer des bénéficiaires en attente (pas de Wave live) |
 
-Les virements **Wave** vers un tiers exigent `recipient.name` et `recipient.phone` avec une **clé live**. Le numéro n’a pas besoin de correspondre à un `payout_method_id`. Voir **[Virements](/build/payouts)**.
+Les virements **Wave** vers un tiers exigent `recipient.name` et `recipient.phone` avec une **clé live**. Le numéro n’a pas besoin de correspondre à un `payout_method_id`. Voir **[Virements](/build/money/payouts)**.
 
 `GET /payouts` avec une clé test ne liste que les **retraits test** ; les virements bénéficiaires live sont exclus.
 
@@ -283,13 +289,13 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/card" \
   }'
 ```
 
-Utilisez le `client_secret` avec **`lomi_pk_test_…`** côté client. Voir **[Encaissements directs](/build/payments/charges)** et **[lomi Payment Elements](/build/payments/lomi-payment-elements)**.
+Utilisez le `client_secret` avec **`lomi_pk_test_…`** côté client. Voir **[Encaissements directs](/build/accept/direct-charges)** et **[lomi Payment Elements](/build/accept/payment-elements)**.
 
 </Tab>
 
 <Tab value="Lien de paiement">
 
-Créez des liens en mode **Test** dans le tableau de bord, ou via l’API avec votre clé de test pour `environment: test`. Voir **[Liens de paiement](/build/payment-links)**.
+Créez des liens en mode **Test** dans le tableau de bord, ou via l’API avec votre clé de test pour `environment: test`. Voir **[Liens de paiement](/build/accept/payment-links)**.
 
 </Tab>
 
@@ -299,7 +305,7 @@ Créez des liens en mode **Test** dans le tableau de bord, ou via l’API avec v
 
 Utilisez des clés API **test** et les flux de [Paiements en bac à sable](/start/sandbox-payments).
 
-1. **Créez un produit récurrent** avec `trial_enabled: true` ou `first_payment_type: non_initial` (voir [Produits](/build/products)).
+1. **Créez un produit récurrent** avec `trial_enabled: true` ou `first_payment_type: non_initial` (voir [Produits](/build/billing/products)).
 2. **Lien de paiement ou session**: ouvrez le tunnel hébergé ou l’URL S’abonner de la vitrine avec le `product_id` récurrent.
 3. **Essai + carte**: utilisez `4242 4242 4242 4242` ; le tunnel enregistre la carte via SetupIntent avec **0** dû aujourd’hui. Attendez **`SUBSCRIPTION_CREATED`** à la fin de l’inscription.
 4. **Essai + Wave / MTN**: complétez les coordonnées ; l’inscription doit réussir **sans prélèvement** en mode test.
@@ -315,7 +321,7 @@ Les renouvellements planifiés en test utilisent des dates futures ; inspectez `
 3. Les paiements de test réussis émettent des événements comme **`PAYMENT_SUCCEEDED`** avec `"environment": "test"` le cas échéant.
 4. Utilisez **Test webhook** pour envoyer un exemple `PAYMENT_SUCCEEDED` sans paiement réel.
 
-Voir **[Webhooks](/build/webhooks)**. Pour l’automatisation, voir le **[Guide de tests](/build/advanced-guides/testing)**.
+Voir **[Webhooks](/build/reliability)**. Pour l’automatisation, voir le **[Guide de tests](/build/reliability/testing)**.
 
 ## Dépannage
 
@@ -333,14 +339,14 @@ Voir **[Webhooks](/build/webhooks)**. Pour l’automatisation, voir le **[Guide 
 
 - **[Authentification](/start/api-keys)**: clés, environnements, sécurité
 - **[Intégration API](/start/first-payment)**: première requête et index API
-- **[Sessions checkout](/build/checkout)**: API checkout hébergé
-- **[Encaissements directs](/build/payments/charges)**: Wave, MTN et carte (`POST /charge/card`)
-- **[Liens de paiement](/build/payment-links)**: liens réutilisables
-- **[lomi Payment Elements](/build/payments/lomi-payment-elements)**: UI carte côté client
-- **[Webhooks](/build/webhooks)**: abonnements aux événements
-- **[Soldes et règlement](/build/balance-and-settlement)**: règles des soldes live
-- **[Guide de tests](/build/advanced-guides/testing)**: automatisation, CI, écouteurs webhook
+- **[Sessions checkout](/build/accept/checkout)**: API checkout hébergé
+- **[Encaissements directs](/build/accept/direct-charges)**: Wave, MTN et carte (`POST /charge/card`)
+- **[Liens de paiement](/build/accept/payment-links)**: liens réutilisables
+- **[lomi Payment Elements](/build/accept/payment-elements)**: UI carte côté client
+- **[Webhooks](/build/reliability)**: abonnements aux événements
+- **[Soldes et règlement](/build/money/balance-and-settlement)**: règles des soldes live
+- **[Guide de tests](/build/reliability/testing)**: automatisation, CI, écouteurs webhook
 
 ## Passer en production
 
-Passez aux clés live uniquement quand votre intégration est validée de bout en bout. Voir la [checklist de mise en production](/start/go-live).
+Passez aux clés live uniquement quand votre intégration est validée de bout en bout. Voir [Que vérifier avant le live ?](/start/go-live).

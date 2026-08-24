@@ -1,0 +1,17 @@
+{
+  "title": "Reliability",
+  "description": "Webhooks, retries, idempotency, errors, security, and testing.",
+  "icon": "ShieldCheck",
+  "pages": [
+    "handling-webhooks",
+    "webhook-reliability",
+    "verify-payments",
+    "payment-lifecycle",
+    "error-handling",
+    "idempotency-keys",
+    "security-best-practices",
+    "testing",
+    "simulate-errors",
+    "ci-cd"
+  ]
+}

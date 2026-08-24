@@ -1,5 +1,5 @@
 ---
-title: 'How do I accept Wave payments?'
+title: 'How do I accept Wave?'
 description: 'Wave mobile money via hosted checkout or POST /charge/wave, with async live behavior and XOF requirements.'
 docType: how-to
 ---
@@ -9,7 +9,20 @@ import { DocsAgentIndex } from '@/components/docs/docs-agent-index';
 
 <DocsAgentIndex />
 
-Wave is the primary mobile-money rail for **UEMOA (XOF)** merchants. Most teams should use [hosted checkout](/build/checkout) or [payment links](/build/payment-links) first.
+Wave is the primary mobile-money rail for **UEMOA (XOF)** merchants. Most teams should use [hosted checkout](/build/accept/checkout) or [payment links](/build/accept/payment-links) first.
+
+## At a glance
+
+| | |
+| --- | --- |
+| Approval | Redirect or launch URL (`wave_launch_url` / `checkout_url`) |
+| Settlement | Test: often when the charge is created. Live: after the customer approves in Wave, then `available_at` |
+| Direct vs hosted | Hosted and `POST /charge/wave` |
+| Refund | Completed Wave transactions |
+| Min / max | - |
+| Currency | `XOF` |
+
+Same columns as [Payment channels](/build/payment-channels#channel-capabilities).
 
 ## Hosted checkout (recommended)
 
@@ -43,7 +56,7 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/charge/wave" \
   }'
 ```
 
-See [Charges API](/api/charge/ChargesController_createWaveCharge) and [Direct charges](/build/direct-charges).
+See [Charges API](/api/charge/ChargesController_createWaveCharge) and [Direct charges](/build/accept/direct-charges).
 
 ## Test vs live
 
@@ -53,7 +66,7 @@ See [Charges API](/api/charge/ChargesController_createWaveCharge) and [Direct ch
 | Status | Usually `completed` quickly | Starts `pending` |
 
 <Callout type="info">
-  In live mode, never fulfill on redirect alone. See [Verify payments](/build/guides/verify-payments).
+  In live mode, never fulfill on redirect alone. See [Verify payments](/build/reliability/verify-payments).
 </Callout>
 
 ## Payouts

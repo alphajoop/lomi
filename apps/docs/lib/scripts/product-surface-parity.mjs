@@ -22,16 +22,16 @@ const errors = [];
 /** Expected product pages: path -> docs path segment on docs.lomi.africa */
 const PRODUCT_PAGES = {
   '/relay': '/build/ecommerce-extensions',
-  '/subscriptions': '/build/subscriptions',
-  '/usage-billing': '/build/usage-billing',
-  '/whatsapp-commerce': '/build/whatsapp-commerce',
-  '/customer-portal': '/build/customer-portal',
-  '/direct-charges': '/build/direct-charges',
-  '/invoicing': '/build/payment-requests',
-  '/network': '/resources/network',
-  '/radar': '/build/radar',
+  '/subscriptions': '/build/billing/subscriptions',
+  '/usage-billing': '/build/billing/usage-billing',
+  '/whatsapp-commerce': '/build/accept/whatsapp-commerce',
+  '/customer-portal': '/build/billing/customer-portal',
+  '/direct-charges': '/build/accept/direct-charges',
+  '/invoicing': '/build/accept/payment-requests',
+  '/network': '/build/platform/network',
+  '/radar': '/build/money/radar',
   '/mcp': '/build/mcp',
-  '/payment-links': '/build/payment-links',
+  '/payment-links': '/build/accept/payment-links',
 };
 
 function readFile(rel) {

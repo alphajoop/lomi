@@ -43,7 +43,7 @@ Our platform simplifies product, services, usage, and subscription billing while
 
 ## Roadmap
 
-We are progressively open-sourcing the monorepo toward **eventual self-hosting** for operators with their own provider and compliance setup. That is not available in production today. See [docs.lomi.africa/resources/open-source/codebase](https://docs.lomi.africa/resources/open-source/codebase) for the current public tree.
+We are progressively open-sourcing the monorepo toward **eventual self-hosting** for operators with their own provider and compliance setup. That is not available in production today. See [docs.lomi.africa/resources/open-source](https://docs.lomi.africa/resources/open-source) for the current public tree.
 
 - **Currently open-source**:
   - Documentation website: **[apps/docs](./apps/docs)**

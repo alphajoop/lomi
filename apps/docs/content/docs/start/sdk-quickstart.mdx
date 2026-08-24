@@ -8,7 +8,7 @@ The **lomi. SDK** is the fastest way to call the lomi. API from your application
 This guide uses the **TypeScript SDK** (`@lomi./sdk`). The same flow applies to [Python](/build/sdks/python), [Go](/build/sdks/go), and [PHP](/build/sdks/php).
 
 <Callout type="info">
-  Comparing REST API, SDK, CLI, and MCP? Start with [How you call lomi.](/start/integration-journey#how-you-call-lomi), then use this page for the full SDK workflow.
+  Comparing API, SDK, CLI, and MCP? Start with [How to use lomi.](/start/integration-journey#how-you-call-lomi), then use this page for the full SDK workflow.
 </Callout>
 
 <Steps>
@@ -105,7 +105,7 @@ Forward events to your local server with the CLI, no ngrok required:
 lomi listen http://localhost:3000/webhooks
 ```
 
-See [Listen for webhooks](/build/cli/listen) and [Webhooks](/build/webhooks).
+See [Listen for webhooks](/build/cli/listen) and [Webhooks](/build/reliability).
 
 </Steps>
 
@@ -115,9 +115,9 @@ See [Listen for webhooks](/build/cli/listen) and [Webhooks](/build/webhooks).
 | --- | --- |
 | Full TypeScript SDK API | [TypeScript SDK](/build/sdks/typescript) |
 | Other languages | [Python](/build/sdks/python) · [Go](/build/sdks/go) · [PHP](/build/sdks/php) |
-| Hosted checkout | [Checkout](/build/checkout) |
-| Recurring billing | [Subscriptions](/build/subscriptions) |
-| Error handling | [Error handling](/build/advanced-guides/error-handling) |
+| Hosted checkout | [Checkout](/build/accept/checkout) |
+| Recurring billing | [Subscriptions](/build/billing/subscriptions) |
+| Error handling | [Error handling](/build/reliability/error-handling) |
 
 ## Two kinds of credentials
 
@@ -133,4 +133,4 @@ See [Listen for webhooks](/build/cli/listen) and [Webhooks](/build/webhooks).
 
 - [Make a test payment](/start/first-payment): CLI and cURL paths
 - [Choose an integration](/build/choose-integration): hosted checkout, links, subscriptions
-- [Go live](/start/go-live): production checklist
+- [Go live](/start/go-live): switch from test keys to live keys

@@ -1,6 +1,8 @@
 {
+  "title": "Contributing",
   "pages": [
     "index",
+    "overview",
     "writing-for-lomi-docs",
     "maintaining-cli-mcp",
     "api-reference-authoring",

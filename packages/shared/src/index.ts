@@ -93,6 +93,18 @@ export {
 } from "./processing-fee.js";
 export type { ProcessingFeeRate } from "./processing-fee.js";
 export {
+  VOLUME_TIER_XOF,
+  DYNAMIC_FEES_XOF,
+  FIXED_FEES_XOF,
+  FIXED_FEES_CARD_INTL,
+  ADD_ON_INTERNATIONAL_CARDS_PERCENT,
+  ADD_ON_SUBSCRIPTION_PERCENT,
+  CHARGEBACK_INTL_FIXED,
+  formatFee,
+  calculateFee,
+} from "./pricing.js";
+export type { PricingTier, FeeParts } from "./pricing.js";
+export {
   optimizeImage,
   extractStorageObjectPath,
   processStorageUrl,

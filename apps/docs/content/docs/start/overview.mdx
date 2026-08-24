@@ -5,11 +5,13 @@ description: 'lomi. is an open-source payment processing platform built for fran
 
 lomi. is a payment platform for businesses selling in francophone West Africa. It gives you one place to accept card and mobile money payments, send payment links, run hosted checkout, manage customers and subscriptions, receive webhooks, and reconcile transactions and payouts.
 
+The docs landing map at [/](/) lists Start, Build, and API. Pick a surface (API, SDK, CLI, or MCP) on [How to use lomi.](/start/integration-journey#how-you-call-lomi), then open the product guide when you need the full story.
+
 ## When should I use lomi.?
 
 Use lomi. when you want to:
 
-- Accept Wave, MTN MoMo, SPI, cards, and other local payment methods through one integration.
+- Accept Wave, MTN, SPI, cards, and other local payment methods through one integration.
 - Send a customer to a hosted checkout instead of building payment collection from scratch.
 - Create payment links for invoices, services, events, donations, or product sales.
 - Run recurring payments and customer subscriptions.
@@ -22,7 +24,7 @@ The West African payment landscape is fragmented across many providers. That oft
 
 lomi. addresses this with:
 
-- **APIs**: one integration for cards, MTN MoMo, Wave, SPI (64+ mobile money operators and banks), and more.
+- **APIs**: one integration for cards, MTN, Wave, SPI (64+ mobile money operators and banks), and more.
 - **Dashboard**: a web back-office to sell goods, services, subscriptions, and more.
 - **Mobile app**: a soft POS to sell on the go and withdraw earnings.
 - **Control**: reconciliation, refunds, payouts, hosted checkout, payment links, embeddable elements, direct charge APIs, and reporting.
@@ -34,7 +36,7 @@ lomi. addresses this with:
 lomi. is built for visibility into fees, transaction flows, and payout processing:
 
 - **Hosted platform**: production payments run on lomi.’s cloud, [create an account](https://lomi.africa/sign-up). The payment stack is **not self-hostable today**.
-- **Open source**: integrator tooling and documentation are published progressively, see [codebase structure](/resources/open-source/codebase).
+- **Open source**: integrator tooling and documentation are published progressively, see [open source](/resources/open-source).
 - **Community governance**: roadmap and product input via GitHub issues and pull requests.
 - **Compliance**: BCEAO licensing (in fieri), PCI DSS level 4, certified card partners, GDPR and MACP with data flows through Cape Town and Dublin.
 
@@ -47,17 +49,17 @@ Most teams should start with one of these paths:
 | Goal | Best starting point |
 | --- | --- |
 | Follow the full sandbox-to-live path | [Integration journey](/start/integration-journey) |
-| Compare REST API, SDK, CLI, and MCP | [How you call lomi.](/start/integration-journey#how-you-call-lomi) |
+| Compare API, SDK, CLI, and MCP | [How to use lomi.](/start/integration-journey#how-you-call-lomi) |
 | Get running from the terminal | [CLI quickstart](/start/cli-quickstart) |
 | Call the API from your app | [SDK quickstart](/start/sdk-quickstart) |
 | Let an AI assistant call lomi. | [MCP](/build/mcp) |
 | Accept a first online payment | [Make a test payment](/start/first-payment) |
-| Add checkout to an app or store | [Hosted checkout](/build/checkout) |
-| Sell without writing checkout code | [Payment links](/build/payment-links) |
-| Define your catalog before checkout | [Products](/build/products) |
+| Add checkout to an app or store | [Hosted checkout](/build/accept/checkout) |
+| Sell without writing checkout code | [Payment links](/build/accept/payment-links) |
+| Define your catalog before checkout | [Products](/build/billing/products) |
 | Compare every integration option | [Choose an integration](/build/choose-integration) |
-| Connect your backend to events | [Webhooks](/build/webhooks) |
-| Let customers manage billing | [Customer portal](/build/customer-portal) |
+| Connect your backend to events | [Webhooks](/build/reliability) |
+| Let customers manage billing | [Customer portal](/build/billing/customer-portal) |
 | WooCommerce or Shopify store | [E-commerce extensions](/build/ecommerce-extensions) |
 
 ## How does the platform fit together?
@@ -71,7 +73,7 @@ The typical flow is:
 5. Confirm the result from the API, dashboard, or webhook.
 6. Move to live keys when your integration is ready.
 
-The API reference has exact request and response details. The Build guides explain which product to use and how to ship the flow.
+The API reference has exact request and response details. The product guides explain which product to use and how to ship the flow.
 
 ## What should I read next?
 
@@ -85,6 +87,6 @@ The API reference has exact request and response details. The Build guides expla
 
 **After your first payment works**
 
-- [Choose an integration](/build/choose-integration) · [Products](/build/products) · [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp)
-- [Simulate errors](/build/guides/simulate-errors) · [Checkout behavior](/build/payments/checkout-behavior)
-- [Transactions](/build/transactions) · [Refunds](/build/refunds) · [Payouts](/build/payouts) · [Radar](/build/radar)
+- [Choose an integration](/build/choose-integration) · [Products](/build/billing/products) · [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp)
+- [Simulate errors](/build/reliability/simulate-errors) · [Checkout behavior](/build/accept/checkout-behavior)
+- [Transactions](/build/money/transactions) · [Refunds](/build/money/refunds) · [Payouts](/build/money/payouts) · [Radar](/build/money/radar)

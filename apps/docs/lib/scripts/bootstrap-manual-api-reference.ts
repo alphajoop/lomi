@@ -166,7 +166,7 @@ async function main(): Promise<void> {
   );
 
   const rootMeta = {
-    title: 'REST API',
+    title: 'API',
     description:
       'Payment and commerce endpoints. Reference pages are hand-written; the OpenAPI JSON export remains the schema contract.',
     root: true,

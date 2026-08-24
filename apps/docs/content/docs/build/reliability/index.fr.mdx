@@ -1,0 +1,16 @@
+---
+index: true
+title: 'Fiabilité'
+description: 'Webhooks, vérification des paiements, tests et pratiques opérationnelles pour une intégration sûre en production.'
+---
+
+Ce dossier couvre la couche opérationnelle d’une intégration lomi. : recevoir les événements, confirmer les paiements, tester les cas d’échec.
+
+- **[Traiter les webhooks](/build/reliability/handling-webhooks) :** recevoir, vérifier et s’abonner aux événements.
+- **[Fiabilité des webhooks](/build/reliability/webhook-reliability) :** relances, doublons, délais et journaux de livraison.
+- **[Vérifier les paiements](/build/reliability/verify-payments) :** confirmer le statut via l’API et les webhooks, jamais via la seule redirection navigateur.
+- **[Cycle de vie des paiements](/build/reliability/payment-lifecycle) :** comment les statuts encaissement et décaissement s’articulent.
+- **[Tests](/build/reliability/testing) :** structurer les tests sandbox et production.
+- **[Simuler les erreurs](/build/reliability/simulate-errors) :** matrice des scénarios (refus, Mobile Money en attente, échecs webhook).
+
+Les identifiants et numéros de carte de test sont sur [Paiements sandbox](/start/sandbox-payments). Les codes d’erreur sont sur [Erreurs](/api/errors).

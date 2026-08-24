@@ -14,6 +14,7 @@ import { Toaster } from 'sonner';
 import type { Language } from '@/lib/i18n/config';
 import { languages } from '@/lib/i18n/config';
 import { t as translate } from '@/lib/i18n/translations';
+import { DocsWorkspaceProvider } from '@/lib/docs/workspace-context';
 import { isString } from '@lomi./shared';
 
 const SearchDialog = dynamic(() => import('@/components/ui/search'), {
@@ -89,8 +90,10 @@ function RootProviderWithLanguage({ children }: { children: ReactNode }) {
       }}
     >
       <TooltipProvider>
-        {children}
-        <Toaster />
+        <DocsWorkspaceProvider>
+          {children}
+          <Toaster />
+        </DocsWorkspaceProvider>
       </TooltipProvider>
     </RootProvider>
   );

@@ -5,11 +5,13 @@ description: "lomi. est une plateforme open source de traitement des paiements c
 
 lomi. est une plateforme de paiement pour les entreprises qui vendent en Afrique de l’Ouest francophone. Elle vous permet d’accepter les cartes et le mobile money, d’envoyer des liens de paiement, d’utiliser un checkout hébergé, de gérer les clients et abonnements, de recevoir des webhooks et de suivre les transactions et les reversements.
 
+La carte d’accueil [/](/) liste Démarrer, Construire et API. Choisissez une surface (API, SDK, CLI ou MCP) dans [Comment utiliser lomi.](/start/integration-journey#how-you-call-lomi), puis ouvrez le guide produit si vous avez besoin du détail.
+
 ## Quand utiliser lomi. ?
 
 Utilisez lomi. si vous voulez :
 
-- Accepter Wave, MTN MoMo, SPI, les cartes et d’autres moyens de paiement locaux avec une seule intégration.
+- Accepter Wave, MTN, SPI, les cartes et d’autres moyens de paiement locaux avec une seule intégration.
 - Rediriger vos clients vers un checkout hébergé au lieu de construire toute la collecte de paiement.
 - Créer des liens de paiement pour des factures, services, événements, dons ou produits.
 - Gérer des paiements récurrents et des abonnements clients.
@@ -22,7 +24,7 @@ Le paysage des paiements en Afrique de l’Ouest est fragmenté entre de nombreu
 
 lomi. y répond avec :
 
-- **APIs** : une intégration pour cartes, MTN MoMo, Wave, SPI (64+ opérateurs mobile money et banques), et plus.
+- **APIs** : une intégration pour cartes, MTN, Wave, SPI (64+ opérateurs mobile money et banques), et plus.
 - **Tableau de bord** : back-office web pour vendre biens, services, abonnements, etc.
 - **Application mobile** : soft-POS pour vendre en mobilité et retirer vos revenus.
 - **Contrôle** : rapprochement, remboursements, reversements, checkout hébergé, liens de paiement, éléments intégrables, API de charges directes et rapports.
@@ -34,33 +36,33 @@ lomi. y répond avec :
 lomi. vise la visibilité sur les frais, les flux de transaction et les reversements :
 
 - **Plateforme hébergée** : les paiements en production passent par le cloud lomi., [créer un compte](https://lomi.africa/sign-up). Le stack paiement **n’est pas auto-hébergeable aujourd’hui**.
-- **Open source** : outils d’intégration et documentation publiés progressivement, voir la [structure du code](/resources/open-source/codebase).
+- **Open source** : outils d’intégration et documentation publiés progressivement, voir [open source](/resources/open-source).
 - **Gouvernance communautaire** : feuille de route et retours via issues et pull requests GitHub.
 - **Conformité** : agrément BCEAO (en cours), PCI DSS niveau 4, partenaires carte certifiés, RGPD et MACP avec flux hébergés notamment au Cap et à Dublin.
 
 Pour la vision produit complète, voir le [manifeste](/resources/manifesto).
 
-## Que construire en premier ?
+## Par quoi commencer ?
 
 La plupart des équipes commencent par l’un de ces chemins :
 
 | Objectif | Point de départ recommandé |
 | --- | --- |
 | Suivre le parcours sandbox → live | [Parcours d’intégration](/start/integration-journey) |
-| Comparer API REST, SDK, CLI et MCP | [Comment appeler lomi.](/start/integration-journey#how-you-call-lomi) |
+| Comparer API, SDK, CLI et MCP | [Comment utiliser lomi.](/start/integration-journey#how-you-call-lomi) |
 | Démarrer depuis le terminal | [Démarrer avec le CLI](/start/cli-quickstart) |
 | Appeler l’API depuis votre app | [Démarrer avec le SDK](/start/sdk-quickstart) |
-| Laisser un assistant IA appeler lomi. | [MCP](/build/mcp) |
-| Accepter un premier paiement en ligne | [Faire un paiement de test](/start/first-payment) |
-| Ajouter un checkout à une app ou boutique | [Checkout hébergé](/build/checkout) |
-| Vendre sans coder un checkout complet | [Liens de paiement](/build/payment-links) |
-| Définir le catalogue avant le checkout | [Produits](/build/products) |
+| Laisser un assistant IA utiliser lomi. | [MCP](/build/mcp) |
+| Accepter un premier paiement en ligne | [Comment tester un paiement ?](/start/first-payment) |
+| Ajouter un checkout à une app ou boutique | [Checkout hébergé](/build/accept/checkout) |
+| Vendre sans coder un checkout complet | [Liens de paiement](/build/accept/payment-links) |
+| Définir le catalogue avant le checkout | [Produits](/build/billing/products) |
 | Comparer les options d’intégration | [Choisir une intégration](/build/choose-integration) |
-| Connecter votre backend aux événements | [Webhooks](/build/webhooks) |
-| Laisser les clients gérer la facturation | [Portail client](/build/customer-portal) |
+| Connecter votre backend aux événements | [Webhooks](/build/reliability) |
+| Laisser les clients gérer la facturation | [Portail client](/build/billing/customer-portal) |
 | Boutique WooCommerce ou Shopify | [Extensions e‑commerce](/build/ecommerce-extensions) |
 
-## Comment la plateforme s’assemble ?
+## Comment la plateforme s’organise ?
 
 Le parcours habituel est simple :
 
@@ -71,7 +73,7 @@ Le parcours habituel est simple :
 5. Confirmez le résultat via l’API, le tableau de bord ou un webhook.
 6. Passez aux clés live quand l’intégration est prête.
 
-La référence API donne les détails exacts des requêtes et réponses. Les guides Build expliquent quel produit utiliser et comment livrer le flux.
+La référence API donne les détails exacts des requêtes et réponses. Les guides produit expliquent quel produit utiliser et comment livrer le flux.
 
 ## Que lire ensuite ?
 
@@ -80,11 +82,11 @@ La référence API donne les détails exacts des requêtes et réponses. Les gui
 - [Parcours d’intégration](/start/integration-journey)
 - [Créer un compte](/start/create-account)
 - [Trouver vos clés API](/start/api-keys)
-- [Faire un paiement de test](/start/first-payment)
+- [Comment tester un paiement ?](/start/first-payment)
 - [Tester en sécurité dans la sandbox](/start/sandbox-payments)
 
 **Après le premier paiement**
 
-- [Choisir une intégration](/build/choose-integration) · [Produits](/build/products) · [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp)
-- [Simuler des erreurs](/build/guides/simulate-errors) · [Comportement checkout](/build/payments/checkout-behavior)
-- [Transactions](/build/transactions) · [Remboursements](/build/refunds) · [Reversements](/build/payouts) · [Radar](/build/radar)
+- [Choisir une intégration](/build/choose-integration) · [Produits](/build/billing/products) · [SDKs](/build/sdks) · [CLI](/build/cli) · [MCP](/build/mcp)
+- [Simuler des erreurs](/build/reliability/simulate-errors) · [Comportement checkout](/build/accept/checkout-behavior)
+- [Transactions](/build/money/transactions) · [Remboursements](/build/money/refunds) · [Reversements](/build/money/payouts) · [Radar](/build/money/radar)

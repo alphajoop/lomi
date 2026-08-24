@@ -1,9 +1,11 @@
 {
   "title": "Plateforme",
-  "description": "G\u00e9rez clients, marchands et organisations avec l\u2019API lomi.",
+  "description": "Gérez clients, marchands, organisations et opérateurs Network avec l’API lomi.",
+  "icon": "Building2",
   "pages": [
     "customers",
     "merchants",
-    "organizations"
+    "organizations",
+    "network"
   ]
 }

@@ -1,0 +1,89 @@
+---
+title: Litiges
+description: Consulter les litiges carte (`GET /disputes`) et réagir aux webhooks `DISPUTE_*`.
+---
+
+import { Callout } from '@/components/docs/docs-callout';
+
+Les litiges sont créés automatiquement lorsque le réseau carte envoie des événements `charge.dispute.*` pour les paiements **carte**. Utilisez l'API en lecture, les webhooks marchands, ou **Paramètres → Support → Litiges** dans le [tableau de bord](https://dashboard.lomi.africa).
+
+Un taux de chargeback élevé peut suspendre les payouts. Voir [Tarification](/start/merchant-of-record/pricing) pour les frais de litige publiés.
+
+<Callout type="info">
+  La v1 couvre l'**accès en lecture** et les webhooks marchands (`DISPUTE_CREATED`, `DISPUTE_UPDATED`, `DISPUTE_CLOSED`). La soumission de preuves et les litiges MoMo ne sont pas encore pris en charge. Soumettez les preuves dans le tableau de bord de votre processeur carte jusqu'à l'arrivée d'un flux intégré.
+</Callout>
+
+<Callout type="warn">
+  La sandbox ne peut pas ouvrir un litige. Il n’y a pas de jeton de test. Les litiges apparaissent depuis des événements réseau carte en live sur les paiements carte.
+</Callout>
+
+## Quand utiliser cette API
+
+- **Support / opérations**: lister les litiges ouverts et les relier aux clients et transactions.
+- **Automatisation**: sur `DISPUTE_CREATED`, suspendre une livraison, notifier Slack ou ouvrir un ticket.
+- **Réconciliation**: faire correspondre `stripe_dispute_id` et `transaction_id` à vos commandes internes.
+
+## Lister les litiges
+
+```bash
+curl "https://api.lomi.africa/disputes?page=1&pageSize=50" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+### Paramètres de requête
+
+| Paramètre | Type | Description |
+| --- | --- | --- |
+| `page` | `number` | Numéro de page (défaut `1`) |
+| `pageSize` | `number` | Taille de page (défaut `50`) |
+| `status` | `pending` \| `resolved` \| `closed` | Filtrer par statut lomi. |
+| `startDate` | ISO 8601 | Litiges créés à partir de cette date |
+| `endDate` | ISO 8601 | Litiges créés jusqu'à cette date |
+
+<Callout type="warn">
+  lomi. stocke un statut simplifié (`pending`, `resolved`, `closed`). Les issues réseau carte (`won`, `lost`, etc.) apparaissent dans `resolution_details` tandis que le statut est souvent `resolved`. Les webhooks `DISPUTE_CLOSED` peuvent être envoyés même si le statut stocké est `resolved` plutôt que `closed`.
+</Callout>
+
+### Champs de réponse (élément de liste)
+
+| Champ | Description |
+| --- | --- |
+| `dispute_id` | Identifiant du litige lomi. |
+| `transaction_id` | Transaction de paiement liée |
+| `customer_id` | Client payeur |
+| `amount`, `currency_code` | Montant contesté |
+| `fee_amount` | Frais de litige débités, le cas échéant |
+| `reason` | Motif réseau carte (ex. `fraudulent`, `duplicate`) |
+| `status` | `pending`, `resolved` ou `closed` |
+| `stripe_dispute_id`, `stripe_charge_id` | Références processeur |
+| `resolution_date`, `resolution_details` | Issue une fois résolu |
+| `customer_name`, `customer_email` | Client |
+
+## Obtenir un litige
+
+```bash
+curl "https://api.lomi.africa/disputes/{dispute_id}" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+La réponse détaillée inclut aussi `evidence_details`, `transaction_gross_amount` et `transaction_status`.
+
+## Webhooks
+
+Abonnez-vous aux événements litige lors de la [création d'un webhook](/build/reliability).
+
+| Événement | Déclencheur |
+| --- | --- |
+| `DISPUTE_CREATED` | Le porteur a ouvert un litige |
+| `DISPUTE_UPDATED` | Statut ou preuves modifiés côté processeur |
+| `DISPUTE_CLOSED` | Le processeur a envoyé `charge.dispute.closed` |
+
+## Tableau de bord
+
+**Paramètres → Support → Litiges** : liste des contestations, fiche détail, lien vers la transaction. Nécessite la permission `transaction.read`.
+
+## Voir aussi
+
+- [Remboursements](/build/money/refunds)
+- [Webhooks](/build/reliability)
+- [Cartes](/build/payment-methods/cards)

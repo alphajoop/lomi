@@ -188,7 +188,7 @@ function labelsForLanguage(lang: DocsLanguage): Labels {
     baseUrls: 'Base URLs:',
     responseFallback: '_See OpenAPI responses for this operation._\n',
     authenticationText:
-      'Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/api)). Use a **test** key against `${servers[0]}` and a **live** key against `${servers[1]}`.',
+      'Merchant routes require an API key in the `X-API-KEY` header (see [Overview](/api)). Use a **test** key against `${servers[0]}` and a **live** key against `${servers[1]}`.',
     errorsText:
       'Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.',
     guidanceWhenToUse: 'When to use this',

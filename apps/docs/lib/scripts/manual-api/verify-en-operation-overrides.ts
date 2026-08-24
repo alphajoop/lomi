@@ -7,7 +7,6 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
 import { isPublicRestApiOperation } from '@/lib/scripts/manual-api/constants';
 import { collectPublicOperations, isEnOperationId } from '@/lib/scripts/manual-api/render-operation-mdx';
 

@@ -7,6 +7,7 @@ import {
   COOKIE_TRYIT_USE_TEST_KEY,
 } from '@/lib/tryit/constants';
 import { docsApiGet, getDocsSessionToken } from '@/lib/docs-session';
+import { resolveTestSecretApiKey } from '@/lib/resolve-test-api-key';
 
 type TryitContextResponse = {
   signedIn: boolean;
@@ -27,6 +28,9 @@ export async function GET() {
       organizations: [] as { id: string; name: string }[],
       selectedOrganizationId: null as string | null,
       needsOrganizationChoice: false,
+      testApiKey: null as string | null,
+      pricingPlan: null,
+      volumeTier: null,
     });
   }
 
@@ -44,6 +48,9 @@ export async function GET() {
       organizations,
       selectedOrganizationId: null,
       needsOrganizationChoice: false,
+      testApiKey: null,
+      pricingPlan: null,
+      volumeTier: null,
     });
   }
 
@@ -54,6 +61,12 @@ export async function GET() {
         ? organizations[0]!.id
         : null;
 
+  const testApiKey = selectedOrganizationId
+    ? await resolveTestSecretApiKey({
+        activeOrganizationId: selectedOrganizationId,
+      })
+    : null;
+
   return NextResponse.json({
     signedIn: true,
     useTestKey,
@@ -61,5 +74,8 @@ export async function GET() {
     selectedOrganizationId,
     needsOrganizationChoice:
       organizations.length > 1 && selectedOrganizationId === null,
+    testApiKey: testApiKey?.startsWith('lomi_sk_test_') ? testApiKey : null,
+    pricingPlan: null,
+    volumeTier: null,
   });
 }

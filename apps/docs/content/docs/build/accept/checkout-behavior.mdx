@@ -1,0 +1,212 @@
+---
+title: Checkout behavior
+description: Sessions, payment links, amounts, coupons, and expiry rules for hosted checkout.
+---
+
+Checkout combines **checkout sessions**, **payment links**, **products/prices**, **coupons**, and **provider** flows. This page explains cross-cutting rules; endpoint details remain in each resource page.
+
+## Checkout sessions
+
+- Sessions are typically **time-bound** (default expiration window is documented on [Checkout sessions](/build/accept/checkout)).
+- Status progresses (e.g. open → completed/expired) as the customer pays or time runs out.
+- **`price_id`** on the session selects which product price applies; amount may be derived or validated against the product’s prices.
+
+## Payment links
+
+- **Product** links resolve amount from catalog prices. When **`price_id`** is set, the initial checkout session uses that price row’s suggested `amount` (not only the product default).
+- **Instant** links use a fixed amount you supply.
+- Multi-line flows may set **`has_line_items`** in session metadata; totals aggregate line items, optional shipping/tax, and product-linked fees where configured.
+- **Pay-what-you-want products** must use a **single-product** link or session. Multi-item carts reject PWYW line items (`line_items_pwyw_not_supported`).
+
+## Pay what you want
+
+Flexible pricing is available for **one-time** products only (`pricing_model: pay_what_you_want` on a price row):
+
+- **Per-unit pricing**: the customer chooses a unit price; total = unit × `quantity`.
+- **`amount` on the price**: suggested unit price pre-filled at checkout (defaults to `minimum_amount` if omitted when creating the product).
+- **Bounds**: `minimum_amount` (required) and optional `maximum_amount` cap what the customer may pay per unit. The API and database **reject** prices where suggested `amount` is outside `[minimum_amount, maximum_amount]`.
+- **Payment links**: product links pre-fill the suggested amount from the linked `price_id` (or default price); the hosted checkout page lets the buyer adjust within bounds before paying.
+- **API sessions**: when creating a checkout session with `product_id`/`price_id`, pass `amount` as the product subtotal or omit it to use the suggested price × quantity. See [Checkout sessions](/build/accept/checkout) and [Products](/build/billing/products).
+
+<Callout type="warning">
+  **Do not include pay-what-you-want prices in multi-item checkout.** Use a dedicated single-product payment link or checkout session for donations and flexible pricing. Cart APIs return `line_items_pwyw_not_supported`.
+</Callout>
+
+## Subscription checkout
+
+Recurring products (`product_type: recurring`) create a **subscription instance** when signup completes. This applies to hosted checkout, payment links, storefront subscribe flows, and API-created sessions with a recurring `product_id`.
+
+<Callout type="warning">
+  **Do not mix recurring and one-time products in a single cart checkout.** Multi-line `create_checkout_session_with_line_items` is intended for one-time products. Sell subscriptions via a dedicated session or payment link for the recurring product.
+</Callout>
+
+### First payment and trials
+
+Product fields control the **first checkout charge** (see [Products](/build/billing/products)):
+
+| Setting | Signup charge |
+|---------|----------------|
+| `first_payment_type: initial` | Charge the recurring price (or prorated portion). |
+| `first_payment_type: non_initial` | **$0** at signup; first charge on `next_billing_date`. |
+| `first_payment_type: prorated` | Partial charge for the rest of the current billing period. |
+| `trial_enabled: true` | **$0** for `trial_period_days`; billing starts after the trial. |
+
+Hosted checkout and storefront resolve the display total from server-side signup terms. The **checkout session `amount`** may still reflect the **catalog price** so session creation passes validation (`amount` must be &gt; 0), while the customer is charged **$0** or only a card setup is collected for card trials.
+
+### Payment methods at signup
+
+| Provider | Trial / $0 signup |
+|----------|---------------------|
+| **Cards** | SetupIntent saves the card; no charge until trial ends or first billing date. |
+| **Wave / MTN** | Signup completes without an immediate charge when `requires_payment` is false. |
+| **Paid signup** | Normal payment flow; first transaction type is `instalment` and links to the new subscription. |
+
+### Renewals and failures
+
+lomi. uses different renewal mechanics by payment rail:
+
+| Rail | Renewal behavior |
+| --- | --- |
+| **Cards** | Off-session charge on the saved card payment method on `next_billing_date`. |
+| **Wave / MTN** | No saved off-session token. Before each cycle, lomi. sends a **manual renewal checkout link** (email/WhatsApp). The customer must approve payment on their phone. |
+
+**Why mobile money is manual:** Wave and MTN require per-payment customer approval. lomi. does not auto-debit wallets for subscription cycles without a card on file.
+
+- Failed renewals may set subscription status to `past_due` or `paused` depending on `failed_payment_action` on the product (`continue`, `pause`, `cancel`).
+- Overdue subscriptions that never receive payment may be failed by scheduled dunning after the grace window.
+- Listen for **`SUBSCRIPTION_RENEWED`** and **`PAYMENT_FAILED`** (renewal transactions), not a separate `subscription.payment_failed` event.
+
+See [Subscriptions: Renewals and failed payments](/build/billing/subscriptions#renewals-and-failed-payments) for the full model.
+
+### Fixed-term subscriptions
+
+Optional product **metadata** keys (set via API `metadata` or dashboard):
+
+| Key | Description |
+|-----|-------------|
+| `subscription_length` | `"automatic"` (default) or a fixed term strategy. |
+| `fixed_charges` | Number of billing cycles before the subscription expires. |
+
+See [Subscriptions](/build/billing/subscriptions) for lifecycle and webhook details.
+
+## Coupons
+
+- Validation enforces **dates**, **usage limits**, **customer type** (new vs returning), **scope** (org-wide vs specific products), and **quantity** caps.
+- Multiple coupons (when supported) apply **sequentially** to a running amount, see [Discount coupons](/build/billing/discount-coupons) and [Coupon logic examples](/build/billing/discount-coupons).
+
+## Cross-currency
+
+When session currency differs from a product price currency, server logic may **convert** for validation so the paid amount matches the configured price in another currency.
+
+## Checkout form fields
+
+Control which customer fields appear on the hosted checkout form and whether they are required. Override per [payment link](/build/accept/payment-links) or set flags on each [checkout session](/build/accept/checkout). Organization defaults for **email**, **phone**, and **billing address** are configured in the dashboard under **Settings → Checkout**. **`require_name`** is available on payment links and checkout sessions via the API (defaults to required when unset).
+
+Each `require_*` flag is a boolean. When `true`, the field is **shown and required** before payment. When `false`, behavior depends on the field (see below). Passing `customer_name`, `customer_email`, or `customer_phone` on a session only **pre-fills** values; it does not change which fields are shown.
+
+### System field flags
+
+| Field | API flag | Default when unset | When `true` | When `false` |
+| --- | --- | --- | --- | --- |
+| Name | `require_name` | `true` | Name field shown and required | Name field hidden |
+| Email | `require_email` | `true` | Email field shown and required | Email field hidden |
+| Phone | `require_phone` | `false` | Phone field shown and required | See [Email and phone together](#email-and-phone-together) |
+| Billing address | `require_billing_address` | `false` | Billing address fields shown and required | Billing address hidden |
+
+### `require_name`
+
+- **`true` (default):** The full name field is shown. The customer must enter a non-empty value to continue.
+- **`false`:** The name field is hidden on the form. Checkout still creates or updates the customer with a display name using the first available value: name (if provided elsewhere), email, phone, then `"Customer"`.
+
+Use `customer_name` on a checkout session to pre-fill the name when the field is visible.
+
+### `require_email`
+
+- **`true` (default):** The email field is shown and required. The value must contain `@`.
+- **`false`:** The email field is hidden. Checkout does not ask for email even if `customer_email` was passed for pre-fill.
+
+Hiding email affects how `require_phone` is interpreted (see below).
+
+### `require_phone`
+
+- **`true`:** The phone field is shown and required. The number must be valid for the selected country.
+- **`false` (default):** Behavior depends on whether email is visible:
+  - If email is **visible**, phone is shown as **optional**.
+  - If email is **hidden**, phone is **hidden** too (unless you set `require_phone: true`).
+
+Use `customer_phone` on a checkout session to pre-fill the phone when the field is visible.
+
+### Email and phone together
+
+After flags are resolved, hosted checkout applies these rules:
+
+| `require_email` | `require_phone` | What the customer sees |
+| --- | --- | --- |
+| `true` | `false` | Email required, phone optional |
+| `true` | `true` | Email required, phone required |
+| `false` | `true` | Email hidden, phone required |
+| `false` | `false` | No email or phone fields |
+
+<Callout type="warning">
+  **At least one contact field:** The API rejects `require_name: false` together with `require_email: false` and `require_phone: false` unless you pass `customer_name` or `customer_id` on the session. Checkout must be able to identify the customer from name, email, or phone.
+</Callout>
+
+### Common combinations
+
+| Goal | Flags |
+| --- | --- |
+| Phone-only checkout | `require_name: false`, `require_email: false`, `require_phone: true`, `require_billing_address: false` |
+| Email only (no phone) | `require_email: true`, `require_phone: false` (phone hidden when email hidden is false, phone stays optional) |
+| Hide name, collect email | `require_name: false`, `require_email: true` |
+| Minimal contact (email + optional phone) | Defaults, omit flags or set `require_phone: false` |
+
+Example, **phone-only** session:
+
+```json
+{
+  "amount": 1000,
+  "currency_code": "XOF",
+  "title": "Phone-only checkout",
+  "require_name": false,
+  "require_email": false,
+  "require_phone": true,
+  "require_billing_address": false
+}
+```
+
+The customer sees only the phone field (plus the optional WhatsApp toggle). Name, email, and billing address are hidden.
+
+<Callout type="info">
+  **Mobile money:** When the phone field is visible but optional, **Wave** and **MTN** still require a valid phone number at payment time. Card and other methods may proceed without phone when it is optional.
+</Callout>
+
+### Resolution order
+
+When a customer opens checkout, flags merge from most specific to least:
+
+1. **Checkout session** (`require_name`, `require_email`, `require_phone`, `require_billing_address` on `POST /checkout-sessions`)
+2. **Payment link** (same flags on the link that created the session)
+3. **Organization checkout settings** (dashboard defaults)
+4. **Platform defaults** (name required, email required, phone optional, billing address hidden)
+
+Pass `customer_name`, `customer_email`, `customer_phone`, and address fields on the session to **pre-fill** the form; they do not change which fields are shown.
+
+### Custom fields
+
+Organizations can define **custom checkout fields** (text, checkbox, terms, etc.) in dashboard checkout settings. They apply to hosted checkout, payment links, and storefront unless overridden in session or link `metadata.custom_fields`.
+
+### Advanced: `fields` array
+
+On `POST /checkout-sessions` and `POST /payment-links`, you may pass a `fields` array, an ordered list of system and custom field definitions with `visibility` set to `hidden`, `optional`, or `required`. When present, it **overrides** the `require_*` booleans. Most integrations should use the boolean flags; use `fields` only when you need fine-grained ordering or mixed optional/required custom fields via API.
+
+## Customer identity
+
+Checkout may **auto-create or merge** customer records when contact fields are provided, so downstream webhooks and transactions always attach to a stable `customer_id` where possible.
+
+## Related pages
+
+- [Checkout sessions](/build/accept/checkout)
+- [Payment links](/build/accept/payment-links)
+- [Products](/build/billing/products)
+- [Subscriptions](/build/billing/subscriptions)
+- [Payment state machine](/api/payment-state-machine)

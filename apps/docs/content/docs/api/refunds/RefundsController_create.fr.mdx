@@ -11,7 +11,7 @@ operationId: RefundsController_create
 
 Créer un remboursement
 
-Refunds a completed transaction (card, Wave, or MTN MoMo). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN MoMo requires a RequestToPay reference on the original transaction.
+Refunds a completed transaction (card, Wave, or MTN). Merchant balance updates immediately. Supports full and partial refunds. In test mode, MTN refunds are ledger-only (no MTN API call). In live mode, MTN requires a RequestToPay reference on the original transaction.
 
 
 ### Quand l’utiliser
@@ -20,11 +20,11 @@ Pour annuler tout ou partie d’un paiement éligible déjà terminé (rembourse
 
 ### À savoir
 
-**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN MoMo (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN MoMo (test) :** uniquement comptable; pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
+**Carte :** le crédit client sur le réseau carte est finalisé séparément par nos équipes. **Wave partiel :** nécessite un numéro de téléphone client enregistré (paiement bénéficiaire). **MTN (live) :** le paiement d’origine doit avoir une référence prestataire (UUID RequestToPay, `provider_checkout_id`) ; lomi. appelle l’API Disbursement MTN et interroge le statut jusqu’à complétion. **MTN (test) :** uniquement comptable; pas d’appel API MTN. Les remboursements partiels MTN exigent aussi un téléphone client. Pour les paiements liés à un abonnement, utilisez `subscription_action` (optionnel) : `default`, `cancel`, `pause` ou `none`. Un remboursement partiel ne modifie l’abonnement que si le cumul atteint le montant total de la transaction.
 
 ### Voir aussi
 
-[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Remboursements](/build/refunds)
+[Lister les remboursements](/api/refunds/RefundsController_findAll) · [Récupérer une transaction](/api/transactions/TransactionsController_findOne) · [Remboursements](/build/money/refunds)
 
 
 ## Authentification
@@ -66,7 +66,7 @@ Schéma: `CreateRefundDto`
 
 | Champ | Obligatoire | Type | Description |
 | --- | --- | --- | --- |
-| `transaction_id` | Oui | `string` | UUID of a completed transaction (card, Wave, or MTN MoMo) |
+| `transaction_id` | Oui | `string` | UUID of a completed transaction (card, Wave, or MTN) |
 | `amount` | Oui | `number` | Amount to refund (same currency as the transaction) |
 | `reason` | Non | `string` | Reason for the refund |
 | `refund_type` | Non | `enum ("full", "partial")` | Full or partial refund. If omitted, full when amount equals transaction gross amount. |

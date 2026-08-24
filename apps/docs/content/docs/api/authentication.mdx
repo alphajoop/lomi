@@ -23,6 +23,8 @@ HTTP header names are case-insensitive; clients may send `` `X-API-Key` `` or ``
 
 Replace `your_api_key` with your specific secret API key.
 
+The compact request-header table (idempotency, scenario key, Network) lives on **[API keys](/start/api-keys#request-headers)**.
+
 ## Network account targeting
 
 Approved lomi. Network Operators can target a connected Member Account by adding the optional `` `Lomi-Account` `` header.
@@ -34,7 +36,7 @@ X-API-Key: your_operator_api_key
 Lomi-Account: acct_1234567890
 ```
 
-When `` `Lomi-Account` `` is absent, requests behave like normal merchant API calls. When it is present, the API key organization is the Operator and the `` `acct_...` `` account is the target Member Account. See **[lomi. Network](/resources/network)** for supported endpoints and required capabilities.
+When `` `Lomi-Account` `` is absent, requests behave like normal merchant API calls. When it is present, the API key organization is the Operator and the `` `acct_...` `` account is the target Member Account. See **[lomi. Network](/build/platform/network)** for supported endpoints and required capabilities.
 
 ## Test vs. Live environments
 
@@ -49,7 +51,7 @@ Use the test environment to develop and test your integration without processing
 - **Rate Limits:** 120 requests per minute / 20,000 requests per day.
 - **Data:** Uses simulated data. Responses may include environment flags like `` `"environment": "test"` ``.
 
-To simulate card and mobile money payments (test card numbers, Wave, MTN MoMo), see **[Sandbox payments](/start/sandbox-payments)**.
+To simulate card and mobile money payments (test card numbers, Wave, MTN), see **[Sandbox payments](/start/sandbox-payments)**.
 
 ### Live environment
 
