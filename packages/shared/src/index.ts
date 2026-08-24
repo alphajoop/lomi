@@ -180,4 +180,27 @@ export type {
   BrowserSessionTokens,
 } from "./browser-session.js";
 export { getPayButtonForeground } from "./button-contrast.js";
+export {
+  AGENT_POW_ISSUE_PER_HOUR,
+  AGENT_REGISTER_GLOBAL_PER_HOUR,
+  AGENT_REGISTER_PER_HOUR,
+  AGENT_REGISTER_POW_DEFAULT_DIFFICULTY,
+  AGENT_REGISTER_POW_MAX_DIFFICULTY,
+  AGENT_REGISTER_POW_TTL_MS,
+  BOOTSTRAP_DAILY_ACCOUNT_LIMIT,
+  BOOTSTRAP_RATE_LIMIT_PER_MINUTE,
+  agentRegisterPowDigest,
+  countLeadingZeroBits,
+  fingerprintAgentRegisterIp,
+  issueAgentRegisterPowChallenge,
+  sha256Bytes,
+  solveAgentRegisterPow,
+  verifyAgentRegisterPow,
+} from "./agent-register-pow.js";
+export type {
+  AgentRegisterPowChallenge,
+  AgentRegisterPowIssueInput,
+  AgentRegisterPowVerifyInput,
+  AgentRegisterPowVerifyResult,
+} from "./agent-register-pow.js";
 

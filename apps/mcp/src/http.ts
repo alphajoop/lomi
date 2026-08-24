@@ -422,7 +422,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
   const basePath = mcpHttpBasePath();
 
-  const mcpPostHandler = async (req: Request, res: Response): Promise<void> => {
+  const mcpPostHandler = (guest: boolean) => async (req: Request, res: Response): Promise<void> => {
     const headerRequestId = req.headers['x-request-id'];
     const requestId =
       (isString(headerRequestId) && headerRequestId.trim()) ||
@@ -477,6 +477,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
         } else if (!sessionId) {
           // New session: require credentials first, then an MCP initialize body.
           if (
+            !guest &&
             !hasResolvedSessionCredential(
               resolvedMerchantKey,
               resolvedProvisioningKey,
@@ -556,6 +557,7 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
           const server = wireMcpServer({
             manifest,
             mode: 'http',
+            guest,
             merchantAccessLevel: sessionState.merchantAccessLevel,
             getApiKey: () =>
               resolveMerchantKey(
@@ -579,6 +581,12 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
               sessionState.merchantApiKey = secretKey;
               if (sessionState.sessionId) {
                 registry.updateMerchantApiKey(sessionState.sessionId, secretKey);
+              }
+            },
+            onProvisioningKeyDiscovered: (key) => {
+              sessionState.provisioningApiKey = key;
+              if (sessionState.sessionId) {
+                registry.updateProvisioningApiKey(sessionState.sessionId, key);
               }
             },
           });
@@ -709,9 +717,13 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
     });
   };
 
-  app.post(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpPostHandler);
+  app.post(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpPostHandler(false));
   app.get(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpGetHandler);
   app.delete(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpDeleteHandler);
+
+  app.post(`${basePath}/guest`, rateLimitMiddleware, mcpPostHandler(true));
+  app.get(`${basePath}/guest`, rateLimitMiddleware, mcpGetHandler);
+  app.delete(`${basePath}/guest`, rateLimitMiddleware, mcpDeleteHandler);
 
   app.use(
     (err: ExpressError, _req: Request, res: Response, next: NextFunction) => {

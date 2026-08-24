@@ -6,13 +6,26 @@ import {
   type JsonObject,
   type JsonValue,
 } from "@lomi./shared";
+import { attachNextSteps } from './next-steps.js';
 
 export type LomiHttpResult = {
   status: number;
   statusText: string;
   bodyText: string;
   contentType: string | null;
+  retryAfter?: number;
+  pathTemplate?: string;
+  method?: string;
 };
+
+function parseRetryAfterSeconds(header: string | null): number | undefined {
+  if (!header) return undefined;
+  const seconds = Number.parseInt(header.trim(), 10);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds;
+  const at = Date.parse(header);
+  if (!Number.isFinite(at)) return undefined;
+  return Math.max(0, Math.ceil((at - Date.now()) / 1000));
+}
 
 function serializeQueryValue(value: JsonValue | undefined): string | undefined {
   if (value === undefined || value === null) return undefined;
@@ -134,12 +147,16 @@ export async function callLomiRest(
 
       const contentType = res.headers.get('content-type');
       const bodyText = await res.text();
+      const retryAfter = parseRetryAfterSeconds(res.headers.get('retry-after'));
 
       return {
         status: res.status,
         statusText: res.statusText,
         bodyText,
         contentType,
+        retryAfter,
+        pathTemplate: spec.pathTemplate,
+        method: spec.method,
       };
     } catch (err) {
       clearTimeout(timer);
@@ -181,6 +198,11 @@ export function formatHttpResult(result: LomiHttpResult): string {
       body: parsed,
     };
   }
+
+  attachNextSteps(envelope, result, {
+    pathTemplate: result.pathTemplate,
+    method: result.method,
+  });
 
   return JSON.stringify(envelope, null, 2);
 }

@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, Clipboard } from 'lucide-react';
 import {
   Tabs,
@@ -12,8 +12,8 @@ import {
 } from 'fumadocs-ui/components/tabs.unstyled';
 import { DynamicCodeBlock } from 'fumadocs-ui/components/dynamic-codeblock';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
-import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import { cn } from '@lomi./ui/cn';
+import { copyTextNow } from '@/lib/docs/copy-text';
 
 const codeThemes = {
   light: 'github-light',
@@ -22,10 +22,15 @@ const codeThemes = {
 
 function InstallCommand({ code }: { code: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [checked, onCopy] = useCopyButton(() => {
-    const pre = containerRef.current?.querySelector('pre');
-    navigator.clipboard.writeText(pre?.textContent ?? code);
-  });
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const id = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(id);
+  }, [copied]);
+
+  const checked = copied;
 
   return (
     <div
@@ -43,7 +48,10 @@ function InstallCommand({ code }: { code: string }) {
             size: 'icon-xs',
           }),
         )}
-        onClick={onCopy}
+        onClick={() => {
+          const pre = containerRef.current?.querySelector('pre');
+          if (copyTextNow(pre?.textContent ?? code)) setCopied(true);
+        }}
       >
         {checked ? <Check /> : <Clipboard />}
       </button>

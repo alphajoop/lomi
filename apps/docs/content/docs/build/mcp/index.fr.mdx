@@ -72,6 +72,7 @@ Votre **`LOMI_SECRET_KEY`** ouvre l’accès au point de terminaison MCP héberg
 | | URL |
 | --- | --- |
 | Point de terminaison MCP | `https://mcp.lomi.africa/mcp` |
+| Bootstrap invité (sans clé) | `https://mcp.lomi.africa/mcp/guest` |
 | Santé (optionnel) | `https://mcp.lomi.africa/health` |
 | Prêt (optionnel) | `https://mcp.lomi.africa/ready` |
 
@@ -103,6 +104,12 @@ Config avec clé API (repli) :
 ```
 
 Remplacez `YOUR_LOMI_SECRET_KEY` par votre vraie clé API, puis redémarrez votre client MCP.
+
+## Bootstrap agent sandbox (sans clé)
+
+Si le client n’a pas encore de clé marchande, connectez `https://mcp.lomi.africa/mcp/guest` (sans en-têtes). Appelez **`lomi_register_agent`** : le serveur résout une courte preuve de travail et la session MCP adopte une clé `lomi_prov_*` sandbox uniquement.
+
+Puis `lomi_provision action=create_account`. L’argent live exige encore `lomi_provision action=request_live` et l’approbation humaine sur [dashboard.lomi.africa/connect/go-live](https://dashboard.lomi.africa/connect/go-live).
 
 ## OpenCode
 
@@ -167,6 +174,7 @@ En HTTP MCP, les appels utilisent l’environnement API associé à votre `LOMI_
 
 - Les outils marchands sont **~22 outils ressource** nommés `lomi_<resource>` avec un `action` obligatoire (par exemple `lomi_customers` avec `action=list`). Les alias mécaniques `lomi_post_*` / `lomi_get_*` ne sont pas enregistrés.
 - **`lomi_search_tools`**: recherche dans le catalogue d’outils quand le client charge les outils à la demande.
+- **`lomi_register_agent`**: émet une clé de provisioning sandbox (session invitée ou authentifiée).
 - Provisioning : `lomi_provision` et `lomi_partners` (même schéma `action`).
 - **Ressources**: `lomi://docs/getting-started`, `lomi://docs/errors`, `lomi://tools/index`.
 - **Prompts**: `provision_merchant_from_zero` (onboarding 0→1), `onboard_merchant` (intégration après inscription), `debug_failed_payment`, `setup_webhook`.

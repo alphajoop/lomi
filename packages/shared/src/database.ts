@@ -17736,6 +17736,7 @@ export type Database = {
           created_at: string
           environment: string
           expires_at: string
+          grant_type: string
           is_active: boolean
           scope: string
           token_id: string
@@ -21940,6 +21941,10 @@ export type Database = {
         Args: { p_email: string; p_user_id: string }
         Returns: string
       }
+      get_or_create_bootstrap_partner: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_or_create_walk_in_customer: {
         Args: { p_merchant_id?: string; p_organization_id: string }
         Returns: string
@@ -25061,6 +25066,7 @@ export type Database = {
         Returns: {
           client_id: string
           client_name: string
+          created_at: string
           grant_types: string[]
           is_active: boolean
           redirect_uris: string[]
@@ -27889,7 +27895,7 @@ export type Database = {
         | "subscriptions"
         | "customers"
       platform_partner_status: "pending" | "active" | "suspended"
-      platform_partner_type: "partner" | "self_service"
+      platform_partner_type: "partner" | "self_service" | "bootstrap"
       pricing_model: "standard" | "pay_what_you_want" | "tiered" | "volume"
       pricing_plan_type: "fixed" | "volume_tiered" | "custom"
       product_fulfillment_type: "digital" | "physical" | "hybrid"
@@ -27910,7 +27916,7 @@ export type Database = {
         | "succeeded"
         | "expired"
         | "refunded"
-      provisioning_key_kind: "platform" | "partner_subkey" | "self_service"
+      provisioning_key_kind: "platform" | "partner_subkey" | "self_service" | "bootstrap"
       qr_code_type: "static" | "dynamic"
       radar_decision: "allow" | "flag" | "block"
       radar_mode: "monitor" | "block"
@@ -29001,7 +29007,7 @@ export const Constants = {
         "customers",
       ],
       platform_partner_status: ["pending", "active", "suspended"],
-      platform_partner_type: ["partner", "self_service"],
+      platform_partner_type: ["partner", "self_service", "bootstrap"],
       pricing_model: ["standard", "pay_what_you_want", "tiered", "volume"],
       pricing_plan_type: ["fixed", "volume_tiered", "custom"],
       product_fulfillment_type: ["digital", "physical", "hybrid"],
@@ -29024,7 +29030,7 @@ export const Constants = {
         "expired",
         "refunded",
       ],
-      provisioning_key_kind: ["platform", "partner_subkey", "self_service"],
+      provisioning_key_kind: ["platform", "partner_subkey", "self_service", "bootstrap"],
       qr_code_type: ["static", "dynamic"],
       radar_decision: ["allow", "flag", "block"],
       radar_mode: ["monitor", "block"],

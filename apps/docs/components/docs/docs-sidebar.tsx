@@ -159,7 +159,7 @@ export function DocsMobileSectionSwitch() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         type="button"
-        className="docs-mobile-section-switch flex items-center gap-2 rounded-lg md:hidden"
+        className="docs-mobile-section-switch flex items-center gap-2 rounded-lg border md:hidden"
         title={t('docs.shell.sectionNav')}
       >
         {selected?.icon ? (

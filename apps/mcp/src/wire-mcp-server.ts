@@ -15,6 +15,8 @@ import {
   getOptionalPartnerKey,
   getOptionalProvisioningKey,
 } from './env-config.js';
+import { registerSearchToolsMetaTool } from './register-search-tools.js';
+import { registerLomiRegisterAgent } from './register-agent.js';
 import { validateJsonValue } from "@lomi./shared";
 
 export type WireMcpServerOptions = {
@@ -32,6 +34,15 @@ export type WireMcpServerOptions = {
    * the agent can drive the full merchant REST API without reconnecting.
    */
   onMerchantKeyDiscovered?: (secretKey: string) => void;
+  /**
+   * Invoked when lomi_register_agent mints a sandbox provisioning key.
+   */
+  onProvisioningKeyDiscovered?: (key: string) => void;
+  /**
+   * Guest bootstrap transport: register_agent, search, provisioning (no partner
+   * or merchant REST tools), plus docs resources.
+   */
+  guest?: boolean;
 };
 
 /** Create and wire tools, resources, and prompts on an MCP server instance. */
@@ -45,23 +56,46 @@ export function wireMcpServer(options: WireMcpServerOptions): McpServer {
     getPartnerKey = getOptionalPartnerKey,
     merchantAccessLevel = 'full',
     onMerchantKeyDiscovered,
+    onProvisioningKeyDiscovered,
+    guest = false,
   } = options;
   const server = new McpServer(
     { name: 'lomi.', version: manifest.apiVersion },
     {
-      instructions: buildServerInstructions(mode),
+      instructions: buildServerInstructions(mode, guest),
     },
   );
+  registerLomiRegisterAgent(server, { onProvisioningKeyDiscovered });
   registerProvisioningTools(server, provisioningManifest, {
     getProvisioningKey,
     getPartnerKey,
     onMerchantKeyDiscovered,
+    skipPartner: guest,
   });
-  registerMerchantTools(server, manifest, {
-    getApiKey,
-    readOnlyOnly: merchantAccessLevel === 'read',
-  });
+  if (!guest) {
+    registerMerchantTools(server, manifest, {
+      getApiKey,
+      readOnlyOnly: merchantAccessLevel === 'read',
+    });
+  } else {
+    registerSearchToolsOnGuest(server, manifest, provisioningManifest);
+  }
   registerLomiResources(server, manifest);
-  registerLomiPrompts(server, manifest, provisioningManifest);
+  if (!guest) {
+    registerLomiPrompts(server, manifest, provisioningManifest);
+  }
   return server;
+}
+
+function registerSearchToolsOnGuest(
+  server: import('@modelcontextprotocol/sdk/server/mcp.js').McpServer,
+  merchantManifest: ToolsManifest,
+  provisioningManifest: ProvisioningToolsManifest,
+): void {
+  const combined = {
+    ...merchantManifest,
+    tools: [...provisioningManifest.tools, ...merchantManifest.tools],
+    toolCount: provisioningManifest.tools.length + merchantManifest.tools.length,
+  };
+  registerSearchToolsMetaTool(server, combined);
 }

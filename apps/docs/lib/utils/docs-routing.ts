@@ -38,6 +38,12 @@ export function normalizeDocsPath(path: string): string {
   return withLeading.replace(/\/+$/, '') || '/';
 }
 
+/** Canonical markdown endpoint for page Copy / Open-in-LLM actions. */
+export function buildDocsMarkdownUrl(pageUrl: string): string {
+  const path = normalizeDocsPath(pageUrl);
+  return path === '/' ? '/llms.mdx' : `/llms.mdx${path}`;
+}
+
 export function isDocsMachinePath(pathname: string): boolean {
   if (MACHINE_EXACT_PATHS.has(pathname)) {
     return true;

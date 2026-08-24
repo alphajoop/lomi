@@ -1,10 +1,9 @@
 /* @proprietary license */
 
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Check, ChevronDown, Copy, ExternalLinkIcon } from 'lucide-react';
 import { cn } from '@lomi./ui/cn';
-import { useCopyButton } from 'fumadocs-ui/utils/use-copy-button';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
 import {
   Popover,
@@ -12,8 +11,15 @@ import {
   PopoverTrigger,
 } from 'fumadocs-ui/components/ui/popover';
 import { cva } from 'class-variance-authority';
+import { copyTextNow } from '@/lib/docs/copy-text';
+import { getVisibleDocsMarkdown } from '@/lib/docs/visible-docs-markdown';
 
 const cache = new Map<string, string>();
+
+function looksLikeHtml(content: string): boolean {
+  const trimmed = content.trimStart();
+  return trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html');
+}
 
 export function LLMCopyButton({
   /**
@@ -23,36 +29,30 @@ export function LLMCopyButton({
 }: {
   markdownUrl: string;
 }) {
-  const [isLoading, setLoading] = useState(false);
-  const [checked, onClick] = useCopyButton(async () => {
-    const cached = cache.get(markdownUrl);
-    if (cached) return navigator.clipboard.writeText(cached);
+  const [copied, setCopied] = useState(false);
 
-    setLoading(true);
+  useEffect(() => {
+    if (cache.has(markdownUrl)) return;
+    const controller = new AbortController();
+    void fetch(markdownUrl, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const content = await response.text();
+        if (!looksLikeHtml(content)) cache.set(markdownUrl, content);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [markdownUrl]);
 
-    try {
-      const response = await fetch(markdownUrl);
-      const content = await response.text();
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch markdown (${response.status})`);
-      }
-
-      const trimmed = content.trimStart();
-      if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html')) {
-        throw new Error('Received HTML instead of markdown');
-      }
-
-      cache.set(markdownUrl, content);
-      await navigator.clipboard.writeText(content);
-    } finally {
-      setLoading(false);
-    }
-  });
+  useEffect(() => {
+    if (!copied) return;
+    const id = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(id);
+  }, [copied]);
 
   return (
     <button
-      disabled={isLoading}
+      type="button"
       className={cn(
         buttonVariants({
           color: 'secondary',
@@ -60,9 +60,12 @@ export function LLMCopyButton({
           className: 'gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground',
         }),
       )}
-      onClick={onClick}
+      onClick={() => {
+        const markdown = cache.get(markdownUrl) ?? getVisibleDocsMarkdown();
+        if (copyTextNow(markdown)) setCopied(true);
+      }}
     >
-      {checked ? <Check /> : <Copy />}
+      {copied ? <Check /> : <Copy />}
       Copy
     </button>
   );

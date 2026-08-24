@@ -3,7 +3,6 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import * as FilesComponents from 'fumadocs-ui/components/files';
 import * as TabsComponents from 'fumadocs-ui/components/tabs';
-import type { ComponentProps } from 'react';
 import type { MDXComponents } from 'mdx/types';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
@@ -37,7 +36,7 @@ import {
 import { DocsTierCallout } from '@/components/docs/docs-tier-callout';
 import { PricingTable } from '@/components/docs/pricing-table';
 import { TaskSurfaces } from '@/components/docs/task-surfaces';
-import { PersonalizedCodeSurface } from '@/components/docs/personalized-code-surface';
+import { DocsHighlightedPre } from '@/components/docs/docs-highlighted-pre';
 
 function lucideIconsAsMdx(): MDXComponents {
   const components: MDXComponents = {};
@@ -50,15 +49,10 @@ function lucideIconsAsMdx(): MDXComponents {
 }
 
 export function getMDXComponents(components?: MDXComponents) {
-  const DefaultPre = defaultMdxComponents.pre ?? 'pre';
   return {
     ...lucideIconsAsMdx(),
     ...defaultMdxComponents,
-    pre: (props: ComponentProps<'pre'>) => (
-      <PersonalizedCodeSurface>
-        <DefaultPre {...props} />
-      </PersonalizedCodeSurface>
-    ),
+    pre: DocsHighlightedPre,
     Callout,
     DocsDownloadButton,
     McpOauthConnect,

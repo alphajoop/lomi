@@ -16,7 +16,10 @@ import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source, type Page as DocsPageModel } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
-import { buildDocsAlternates } from '@/lib/utils/docs-routing';
+import {
+  buildDocsAlternates,
+  buildDocsMarkdownUrl,
+} from '@/lib/utils/docs-routing';
 import type { Language } from '@/lib/i18n/config';
 import { Wrapper } from '@/components/preview/wrapper';
 import type { MDXComponents } from 'mdx/types';
@@ -191,9 +194,9 @@ export default async function Page({
             {mcpTwin ? <DocsTwinLink twin={mcpTwin} locale={locale} /> : null}
           </div>
           <div className="docs-page-actions">
-            <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
+            <LLMCopyButton markdownUrl={buildDocsMarkdownUrl(page.url)} />
             <ViewOptions
-              markdownUrl={`${page.url}.mdx`}
+              markdownUrl={buildDocsMarkdownUrl(page.url)}
               githubUrl={`https://github.com/lomiafrica/lomi./tree/main/apps/docs/content/docs/${page.path}`}
             />
           </div>

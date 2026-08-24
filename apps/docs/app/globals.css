@@ -536,6 +536,10 @@ button:active:focus {
     margin-inline-end: var(--docs-sidebar-inset);
   }
 
+  #nd-docs-layout[data-sidebar-collapsed='true'] [data-toc-popover] {
+    margin-inline: var(--docs-sidebar-inset);
+  }
+
   #nd-docs-layout [data-toc-popover] > header {
     overflow: hidden;
     border-bottom-width: 0;
@@ -555,6 +559,18 @@ button:active:focus {
 
 #nd-sidebar[data-collapsed='true'][data-hovered='true'] {
   box-shadow: var(--docs-sidebar-float);
+}
+
+/* Collapsed desktop: fumadocs sets --fd-sidebar-col to 0, so the article
+   hugs the left while the TOC (or popover end inset) still reserves the
+   right. Keep a start column at least as wide as the end gutter. */
+@media (min-width: 768px) {
+  #nd-docs-layout[data-sidebar-collapsed='true'] {
+    --fd-sidebar-col: max(
+      var(--fd-toc-width),
+      var(--docs-sidebar-inset)
+    ) !important;
+  }
 }
 
 #nd-sidebar .docs-mobile-search-banner,
@@ -644,7 +660,7 @@ button:active:focus {
 #nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 > button:not([data-search-full]),
 #nd-sidebar-mobile
   > div.flex.flex-col.gap-3.p-4.pb-2
-  > button:not([data-search-full]) {
+  > button:not([data-search-full]):not(.docs-mobile-section-switch) {
   gap: 0.5rem;
   border-color: transparent;
   background: var(--docs-sidebar-well);
@@ -669,13 +685,13 @@ button:active:focus {
   > button:not([data-search-full]):hover,
 #nd-sidebar-mobile
   > div.flex.flex-col.gap-3.p-4.pb-2
-  > button:not([data-search-full]):hover,
+  > button:not([data-search-full]):not(.docs-mobile-section-switch):hover,
 #nd-sidebar
   > div.flex.flex-col.gap-3.p-4.pb-2
   > button:not([data-search-full])[data-state='open'],
 #nd-sidebar-mobile
   > div.flex.flex-col.gap-3.p-4.pb-2
-  > button:not([data-search-full])[data-state='open'] {
+  > button:not([data-search-full]):not(.docs-mobile-section-switch)[data-state='open'] {
   background: var(--docs-sidebar-well);
   color: var(--foreground);
 }
@@ -862,6 +878,7 @@ button:active:focus {
 
   #nd-sidebar-mobile [data-search-full],
   #nd-sidebar-mobile .docs-mobile-section-switch {
+    appearance: none;
     border-radius: var(--docs-sidebar-radius);
   }
 
@@ -871,7 +888,8 @@ button:active:focus {
     width: 100%;
     align-items: center;
     gap: 0.5rem;
-    overflow: hidden;
+    border-width: 1px;
+    border-style: solid;
     border-color: transparent;
     background: var(--docs-sidebar-well);
     padding: 0.625rem 0.75rem;
@@ -916,16 +934,17 @@ button:active:focus {
     gap: 0.75rem;
   }
 
-  #nd-sidebar-mobile [data-sidebar-locale-theme] label {
+  #nd-sidebar-mobile .docs-locale-switch {
+    appearance: none;
     height: 2.75rem;
     max-width: none;
     flex: 1 1 auto;
+    gap: 0.5rem;
     padding-inline: 0.75rem;
+    font-size: 15px;
   }
 
-  #nd-sidebar-mobile [data-sidebar-locale-theme] select {
-    max-width: none;
-    flex: 1 1 auto;
+  #nd-sidebar-mobile .docs-locale-switch span {
     font-size: 15px;
   }
 
@@ -994,6 +1013,12 @@ button:active:focus {
     letter-spacing: 0.11em;
     text-transform: uppercase;
     color: var(--muted-foreground);
+  }
+
+  .docs-locale-menu button {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 15px;
   }
 }
 
@@ -1132,9 +1157,21 @@ button:active:focus {
 }
 
 @media (max-width: 767.98px) {
-  .docs-page-header .docs-page-actions {
-    display: none;
+  .docs-page-header {
+    flex-wrap: wrap;
   }
+
+  .docs-page-header-main {
+    flex: 1 1 100%;
+  }
+
+  .docs-page-header .docs-page-actions {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Keep Copy visible on small screens; Beecargo shows it on a second row. */
 
   #nd-subnav {
     background: var(--background);

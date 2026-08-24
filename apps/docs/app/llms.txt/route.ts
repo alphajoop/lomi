@@ -183,6 +183,10 @@ export async function GET() {
     'Choose the path that matches your UX, not every merchant needs every API. **Prefer hosted checkout or payment links** unless you need direct charges.',
   );
   lines.push('');
+  lines.push(
+    '**MCP checkout (agents):** 1. `lomi_checkout action=create` and persist `id` plus `checkout_url`. 2. Send the customer `checkout_url`. 3. Create a webhook (`lomi_webhooks action=create`) and persist the signing secret. 4. After the webhook, confirm with `lomi_transactions action=get` before fulfilling. Guest bootstrap without a key: connect `https://mcp.lomi.africa/mcp/guest`, call `lomi_register_agent`, then `lomi_provision action=create_account`. Live still needs `lomi_provision action=request_live` and human approval at https://dashboard.lomi.africa/connect/go-live.',
+  );
+  lines.push('');
   const hostedCheckout = pages.find(
     (p) => p.slugs[2] === 'CheckoutSessionsController_create',
   );

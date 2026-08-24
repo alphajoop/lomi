@@ -27,6 +27,8 @@ export type ProvisioningToolRegistrationContext = {
    * so the session can adopt it and unlock the full merchant REST surface.
    */
   onMerchantKeyDiscovered?: (secretKey: string) => void;
+  /** Skip partner-auth tools (used on the guest bootstrap transport). */
+  skipPartner?: boolean;
 };
 
 function authModeFor(tool: ManifestTool): ProvisioningAuthMode {
@@ -169,6 +171,7 @@ export function registerProvisioningTools(
   };
 
   for (const tool of manifest.tools) {
+    if (ctx?.skipPartner && authModeFor(tool) === 'partner') continue;
     registerOneProvisioningTool(server, tool, fullCtx);
   }
 }

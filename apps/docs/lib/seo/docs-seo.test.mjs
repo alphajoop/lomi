@@ -13,6 +13,17 @@ function read(relativePath) {
   return readFileSync(join(docsRoot, relativePath), 'utf8');
 }
 
+test('docs markdown copy URLs point at the llms.mdx route', async () => {
+  const { buildDocsMarkdownUrl } = await import('../utils/docs-routing.ts');
+  assert.equal(buildDocsMarkdownUrl('/start/overview'), '/llms.mdx/start/overview');
+  assert.equal(buildDocsMarkdownUrl('start/overview'), '/llms.mdx/start/overview');
+  assert.equal(buildDocsMarkdownUrl('/'), '/llms.mdx');
+
+  const pageSource = read('app/(docs)/[[...slug]]/page.tsx');
+  assert.match(pageSource, /buildDocsMarkdownUrl\(page\.url\)/);
+  assert.doesNotMatch(pageSource, /\$\{page\.url\}\.mdx/);
+});
+
 test('docs pages use unprefixed self-canonical URLs for all languages', () => {
   const alternates = buildDocsAlternates('/start/overview');
 

@@ -104,6 +104,11 @@ export function getMcpResourceUrl(): string {
   return `${protocol}://${host}${normalizedPath}`;
 }
 
+/** Unauthenticated bootstrap transport (`/mcp/guest`). */
+export function getMcpGuestResourceUrl(): string {
+  return `${getMcpResourceUrl()}/guest`;
+}
+
 export function buildProtectedResourceMetadata() {
   const resource = getMcpResourceUrl();
   const issuer = getOAuthIssuer();

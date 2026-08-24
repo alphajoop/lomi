@@ -1,5 +1,6 @@
 import type { ToolsManifest } from './manifest.js';
 import {
+  getMcpGuestResourceUrl,
   getMcpResourceUrl,
   getOAuthIssuer,
   getProtectedResourceMetadataUrl,
@@ -21,6 +22,11 @@ export function buildMcpServerCard(manifest: ToolsManifest) {
       {
         type: 'streamable-http',
         url: getMcpResourceUrl(),
+      },
+      {
+        type: 'streamable-http',
+        url: getMcpGuestResourceUrl(),
+        name: 'guest',
       },
     ],
     authentication: {
@@ -45,6 +51,7 @@ export function buildMcpWellKnown(manifest: ToolsManifest) {
   const origin = new URL(resource).origin;
   return {
     mcp: resource,
+    mcp_guest: getMcpGuestResourceUrl(),
     server_card: `${origin}/server-card`,
     catalog: `${origin}/.well-known/mcp/catalog.json`,
     authorization_server: `${getOAuthIssuer()}/.well-known/oauth-authorization-server`,

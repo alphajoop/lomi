@@ -209,6 +209,47 @@ describe('createHttpApplication', () => {
     expect(wwwAuth).toMatch(/oauth-protected-resource\/mcp/);
   });
 
+  it('POST /mcp/guest initialize is not 401 when gated', async () => {
+    process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    delete process.env.LOMI_PROVISIONING_KEY;
+    delete process.env.LOMI_SECRET_KEY;
+    delete process.env.X_API_KEY;
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp/guest`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'initialize',
+        id: 1,
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'guest-test', version: '0' },
+        },
+      }),
+    });
+    expect(res.status).not.toBe(401);
+    expect(res.status).toBe(200);
+  });
+
+  it('GET /mcp/guest without a session is not 401 when gated', async () => {
+    process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp/guest`);
+    expect(res.status).not.toBe(401);
+    expect(res.status).toBe(400);
+  });
+
   it('GET /mcp with lomi_oat_* bearer passes transport gate when gated', async () => {
     process.env.LOMI_MCP_BEARER_TOKEN = 'secret-gate';
     process.env.INTERNAL_API_KEY = 'test-internal-key';
@@ -331,6 +372,7 @@ describe('createHttpApplication', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as JsonObject;
     expect(body.mcp).toBe('https://mcp.lomi.africa/mcp');
+    expect(body.mcp_guest).toBe('https://mcp.lomi.africa/mcp/guest');
     expect(Array.isArray(body.tools_preview)).toBe(true);
   });
 
