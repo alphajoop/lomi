@@ -148,7 +148,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
         $folder: node,
         icon: node.icon ? (
           <div
-            className="[&_svg]:size-full rounded-sm size-full text-(--tab-color) max-md:bg-(--tab-color)/10 max-md:border max-md:p-1.5"
+            className="[&_svg]:size-full rounded-sm size-full text-(--tab-color)"
             style={
               // SAFETY: Boundary value matches the asserted domain type at this call site.
               {

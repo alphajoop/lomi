@@ -159,11 +159,13 @@ export function DocsMobileSectionSwitch() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         type="button"
-        className="docs-mobile-section-switch md:hidden"
+        className="docs-mobile-section-switch flex items-center gap-2 rounded-lg md:hidden"
         title={t('docs.shell.sectionNav')}
       >
         {selected?.icon ? (
-          <div className="size-4 shrink-0 empty:hidden">{selected.icon}</div>
+          <div className="docs-mobile-section-icon size-4 shrink-0">
+            {selected.icon}
+          </div>
         ) : null}
         <span className="min-w-0 flex-1 truncate text-start text-sm font-medium">
           {selected?.title}
@@ -186,7 +188,9 @@ export function DocsMobileSectionSwitch() {
               }}
             >
               {tab.icon ? (
-                <div className="size-4 shrink-0 empty:hidden">{tab.icon}</div>
+                <div className="docs-mobile-section-icon size-4 shrink-0">
+                  {tab.icon}
+                </div>
               ) : null}
               <span className="min-w-0 flex-1 text-sm font-medium leading-none">
                 {tab.title}
