@@ -1,5 +1,6 @@
 # Editor
-.cursor/
+.cursor/*
+!.cursor/mcp.json
 .vscode/
 
 # Environment
