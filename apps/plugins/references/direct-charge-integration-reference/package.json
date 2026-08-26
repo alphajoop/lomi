@@ -1,0 +1,33 @@
+{
+  "name": "lomi-direct-charge-integration-reference",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reference integration for lomi direct charges (Wave, MTN, card via @lomi./sdk Payment Elements)",
+  "main": "server/index.js",
+  "packageManager": "pnpm@9.15.5",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build:client": "node scripts/bundle-client.mjs",
+    "dev": "pnpm run build:client && node --watch server/index.js",
+    "start": "pnpm run build:client && node server/index.js",
+    "verify": "node --check server/index.js"
+  },
+  "dependencies": {
+    "@lomi./sdk": "^1.5.11",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "axios": "^1.18.1",
+      "body-parser": "^1.20.6",
+      "fast-uri": "^3.1.5"
+    }
+  }
+}

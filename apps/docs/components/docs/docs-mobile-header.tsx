@@ -53,7 +53,7 @@ export function DocsMobileHeader() {
           : 'z-30 flex h-16 shrink-0 items-center justify-between gap-4 bg-background pl-5 pr-2 pt-2 md:hidden [grid-area:header] sticky top-(--fd-docs-row-1) max-md:layout:[--fd-header-height:4rem]'
       }
     >
-      <Link href="/" className="inline-flex items-center">
+      <Link href="/start/overview" className="inline-flex items-center">
         <Logo width={68} height={34} priority />
       </Link>
       <button

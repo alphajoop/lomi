@@ -56,11 +56,12 @@ function compiledDocsPageData(
   return data as DocsPageModel['data'] & CompiledDocsPageData;
 }
 
+/** `/` 301s here in `next.config.mjs`; there is no root index page. */
 const DEFAULT_DOC_SLUG = ['start', 'overview'] as const;
 
 function effectiveSlug(slug: string[] | undefined): string[] {
   if (slug && slug.length > 0) return slug;
-  return [];
+  return [...DEFAULT_DOC_SLUG];
 }
 
 function getFallbackLanguage(locale: Language): Language {
@@ -118,8 +119,8 @@ export default async function Page({
   const lastModified = pageData.lastModified;
   const origin = getDocsSiteOrigin();
   const pagePath = page.url.startsWith('/') ? page.url : `/${page.url}`;
-  const canonicalUrl = `${origin}${pagePath === '/' ? '' : pagePath}`;
-  const docsHomeUrl = origin;
+  const canonicalUrl = `${origin}${pagePath}`;
+  const docsHomeUrl = `${origin}/${DEFAULT_DOC_SLUG.join('/')}`;
   const structuredData = [
     {
       '@context': 'https://schema.org',
@@ -325,6 +326,5 @@ export async function generateMetadata({
 
 export function generateStaticParams() {
   const list = source.getPages('en').map((p) => ({ slug: p.slugs }));
-  const withoutEmpty = list.filter((p) => (p.slug?.length ?? 0) > 0);
-  return [{ slug: [] }, ...withoutEmpty];
+  return list.filter((p) => (p.slug?.length ?? 0) > 0);
 }

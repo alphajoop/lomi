@@ -448,7 +448,7 @@ export async function GET() {
   lines.push('## Contact and support');
   lines.push('');
   lines.push('- Website: https://lomi.africa');
-  lines.push(`- Documentation: ${docsOrigin}`);
+  lines.push(`- Documentation: ${docsOrigin}/start/overview`);
   lines.push('- Email: hello@lomi.africa');
   lines.push('- GitHub: https://github.com/lomiafrica/lomi./');
   lines.push('- Discord: https://discord.gg/33syDfh9');

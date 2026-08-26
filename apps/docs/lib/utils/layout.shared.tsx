@@ -19,6 +19,8 @@ export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
       title: logo,
+      // `/` 301s to the overview; link straight there so the logo never bounces.
+      url: '/start/overview',
     },
     // see fumadocs-ui navigation links
     links: linkItems,

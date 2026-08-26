@@ -55,7 +55,7 @@ const MOVED_DOC_REDIRECTS = [
   ['/build/advanced-guides/testing', '/build/reliability/testing'],
   ['/build/advanced-guides/ci-cd', '/build/reliability/ci-cd'],
   ['/build/cli/overview', '/build/cli'],
-  ['/build/tasks', '/'],
+  ['/build/tasks', '/start/overview'],
   ['/build/tasks/take-a-payment', '/build/accept/checkout'],
   ['/build/tasks/bill-monthly', '/build/billing/subscriptions'],
   ['/build/tasks/meter-usage', '/build/billing/usage-billing'],
@@ -133,6 +133,11 @@ const config = {
   },
   async redirects() {
     return [
+      {
+        source: '/',
+        destination: '/start/overview',
+        permanent: true,
+      },
       {
         source: '/core/introduction/what-is-lomi',
         destination: '/start/overview',

@@ -2,7 +2,12 @@
 
 /** Extra search terms keyed by unprefixed docs path (locale-agnostic). */
 export const DOCS_SEARCH_ALIASES: Record<string, readonly string[]> = {
-  '/': [
+  '/start/overview': [
+    'what is lomi',
+    'getting started',
+    'introduction',
+    'uemoa',
+    'west africa',
     'docs home',
     'documentation',
     'welcome',
@@ -11,13 +16,6 @@ export const DOCS_SEARCH_ALIASES: Record<string, readonly string[]> = {
     'how do I',
     'same job',
     'rest mcp cli',
-  ],
-  '/start/overview': [
-    'what is lomi',
-    'getting started',
-    'introduction',
-    'uemoa',
-    'west africa',
   ],
   '/start/integration-journey': [
     'quickstart',
@@ -187,7 +185,6 @@ export const DOCS_SEARCH_ALIASES: Record<string, readonly string[]> = {
 };
 
 export const DOCS_SEARCH_SUGGESTED_HREFS = [
-  '/',
   '/start/overview',
   '/start/integration-journey',
   '/start/api-keys',
