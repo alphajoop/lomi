@@ -14,6 +14,7 @@ node_modules/
 # Build
 *.tsbuildinfo
 
-# Local
-package.json
+# Local umbrella installer (anti-slop). Only the repo-root file.
+# Do not ignore nested package.json — Railway/Docker clones cannot see them.
+/package.json
 /oxlint.config.ts

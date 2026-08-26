@@ -1,0 +1,9 @@
+{
+  "name": "@lomi./sdk-scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./public-sdk-operations": "./public-sdk-operations.js"
+  }
+}
