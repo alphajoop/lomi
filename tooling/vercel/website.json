@@ -1,0 +1,51 @@
+{
+  "functions": {
+    "apps/website/src/app/api/**/*.ts": {
+      "maxDuration": 300
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel-insights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.sanity.io https://res.cloudinary.com https://avatars.githubusercontent.com blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.api.sanity.io wss://*.supabase.co https://api.github.com https://cloud.orama.run https://collections.orama.com; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        }
+      ]
+    }
+  ],
+  "installCommand": "node tooling/scripts/install-app-with-packages.mjs apps/website",
+  "buildCommand": "pnpm --dir apps/website build",
+  "devCommand": "pnpm --dir apps/website dev",
+  "framework": "nextjs",
+  "outputDirectory": "apps/website/.next",
+  "regions": ["iad1"],
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
+  }
+}

@@ -72,11 +72,11 @@
       "destination": "/api/$1"
     }
   ],
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
-  "devCommand": "next dev",
+  "installCommand": "node tooling/scripts/install-app-with-packages.mjs apps/docs",
+  "buildCommand": "pnpm --dir apps/docs build",
+  "devCommand": "pnpm --dir apps/docs dev",
   "framework": "nextjs",
-  "outputDirectory": ".next",
+  "outputDirectory": "apps/docs/.next",
   "regions": ["iad1"],
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"

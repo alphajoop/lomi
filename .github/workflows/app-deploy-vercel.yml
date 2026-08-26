@@ -76,6 +76,14 @@ jobs:
             echo "dir=${GITHUB_WORKSPACE}/${{ steps.checkout-app.outputs.app-path }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Point umbrella Vercel deploys at the app
+        if: ${{ inputs.working-directory-mode == 'umbrella' && (inputs.app == 'admin' || inputs.app == 'website') }}
+        run: |
+          set -euo pipefail
+          test -f "tooling/vercel/${{ inputs.app }}.json"
+          cp "tooling/vercel/${{ inputs.app }}.json" vercel.json
+          git add -f vercel.json
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v42.2.0
         with:

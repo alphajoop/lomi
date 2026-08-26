@@ -10,6 +10,8 @@ on:
       - "packages/**"
       - "pnpm-workspace.yaml"
       - "package.json"
+      - "tooling/scripts/install-app-with-packages.mjs"
+      - "tooling/vercel/website.json"
       - ".github/workflows/app-deploy-website.yml"
       - ".github/workflows/app-deploy-vercel.yml"
       - ".github/actions/checkout-app-submodule/**"
@@ -56,8 +58,8 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: ${{ steps.checkout-app.outputs.app-path }}/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-        working-directory: ${{ steps.checkout-app.outputs.app-path }}
+      - name: Install website with workspace packages
+        run: node tooling/scripts/install-app-with-packages.mjs apps/website
       - run: pnpm lint
         working-directory: ${{ steps.checkout-app.outputs.app-path }}
         env:
@@ -77,7 +79,7 @@ jobs:
       app: website
       repository: lomiafrica/website
       submodule-path: apps/website
-      working-directory-mode: app
+      working-directory-mode: umbrella
       workflow-ref: ${{ inputs.ref }}
       vercel-target: production
     secrets:
