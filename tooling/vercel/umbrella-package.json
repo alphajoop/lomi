@@ -1,9 +1,6 @@
 {
   "private": true,
   "name": "lomi-umbrella",
-  "engines": {
-    "node": "22.x"
-  },
   "dependencies": {
     "next": "^16.3.1"
   }

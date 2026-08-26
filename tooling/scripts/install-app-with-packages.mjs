@@ -10,9 +10,11 @@
  * Admin/dashboard use `workspace:*`; the installer rewrites those to `file:`
  * for this run so Vercel does not need a root workspace.
  *
- * Umbrella Vercel uploads (website/admin) use npm: those projects default to
- * Node 24, and even Node 22 + PATH pnpm hits ERR_INVALID_THIS talking to the
- * registry. Docs keeps pnpm (app lockfile, Node 22, already shipping).
+ * Umbrella Vercel uploads (website/admin) use npm so they can keep the
+ * project Node version (24.x). pnpm on those uploads hits ERR_INVALID_THIS
+ * talking to the registry. Do not pin engines.node or a root .node-version
+ * to 22: Vercel treats that as an override of the project 24.x setting.
+ * Docs keeps pnpm on its own project Node 22.x.
  * Website also links apps/website/node_modules/next to the upload root:
  * @vercel/next resolves next/package.json from cwd, not the app directory.
  *
