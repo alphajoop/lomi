@@ -13,12 +13,21 @@
  * Umbrella Vercel uploads (website/admin) use npm: those projects default to
  * Node 24, and even Node 22 + PATH pnpm hits ERR_INVALID_THIS talking to the
  * registry. Docs keeps pnpm (app lockfile, Node 22, already shipping).
+ * Website also links apps/website/node_modules/next to the upload root:
+ * @vercel/next resolves next/package.json from cwd, not the app directory.
  *
  * Usage: node tooling/scripts/install-app-with-packages.mjs <app-dir>
  *   e.g. node tooling/scripts/install-app-with-packages.mjs apps/docs
  */
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -70,6 +79,37 @@ function neededPackageDirs(pkg) {
 
 function useNpm(appRel) {
   return Boolean(process.env.VERCEL) && appRel !== "apps/docs";
+}
+
+function rewritePnpmScriptsForNpm(appDir) {
+  const pkgPath = path.join(appDir, "package.json");
+  const pkg = readPackage(appDir);
+  if (!pkg.scripts) return;
+  let changed = false;
+  for (const [name, script] of Object.entries(pkg.scripts)) {
+    if (typeof script !== "string" || !/\bpnpm\s/.test(script)) continue;
+    pkg.scripts[name] = script.replace(/\bpnpm\s+/g, "npm run ");
+    changed = true;
+  }
+  if (!changed) return;
+  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  console.log(
+    `==> rewrote pnpm scripts to npm run in ${path.relative(ROOT, pkgPath)}`,
+  );
+}
+
+function hoistNextForVercelBuilder(appRel) {
+  const from = path.join(ROOT, appRel, "node_modules", "next");
+  if (!existsSync(path.join(from, "package.json"))) {
+    console.error(`next was not installed at ${path.relative(ROOT, from)}`);
+    process.exit(1);
+  }
+  const toDir = path.join(ROOT, "node_modules");
+  const to = path.join(toDir, "next");
+  mkdirSync(toDir, { recursive: true });
+  rmSync(to, { recursive: true, force: true });
+  symlinkSync(from, to);
+  console.log(`==> linked node_modules/next -> ${path.relative(ROOT, from)}`);
 }
 
 function excludeAdminGrowthAgentFromTsc(appDir) {
@@ -166,7 +206,13 @@ function main() {
   if (useNpm(appRel) && appRel === "apps/admin") {
     excludeAdminGrowthAgentFromTsc(appDir);
   }
+  if (useNpm(appRel) && appRel === "apps/website") {
+    rewritePnpmScriptsForNpm(appDir);
+  }
   installFileApp(appRel, pkg, { frozen: !rewritten });
+  if (useNpm(appRel) && appRel === "apps/website") {
+    hoistNextForVercelBuilder(appRel);
+  }
 }
 
 main();
