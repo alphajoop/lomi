@@ -67,10 +67,7 @@ const MOVED_DOC_REDIRECTS = [
   ['/build/guides/simulate-errors', '/build/reliability/simulate-errors'],
   ['/build/guides/payment-lifecycle', '/build/reliability/payment-lifecycle'],
   ['/resources/support', '/start/support'],
-  [
-    '/resources/security',
-    '/build/reliability/security-best-practices',
-  ],
+  ['/resources/security', '/build/reliability/security-best-practices'],
   ['/resources/network', '/build/platform/network'],
   ['/resources/network/onboarding-journey', '/build/platform/network'],
   ['/resources/merchant-of-record', '/start/merchant-of-record'],
@@ -107,7 +104,6 @@ const MOVED_DOC_REDIRECTS = [
   permanent: true,
 }));
 
-
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
@@ -133,11 +129,6 @@ const config = {
   },
   async redirects() {
     return [
-      {
-        source: '/',
-        destination: '/start/overview',
-        permanent: true,
-      },
       {
         source: '/core/introduction/what-is-lomi',
         destination: '/start/overview',

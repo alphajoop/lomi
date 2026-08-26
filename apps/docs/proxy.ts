@@ -1,8 +1,12 @@
 /* @proprietary license */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { discoveryLinkHeaderValue } from '@/lib/seo/agent-discovery';
 import {
+  discoveryLinkHeaderValue,
+  wantsDocsMarkdown,
+} from '@/lib/seo/agent-discovery';
+import {
+  docsMarkdownAcceptRewritePath,
   isDocsMachinePath,
   parseDocsLocalePath,
 } from '@/lib/utils/docs-routing';
@@ -30,27 +34,65 @@ function maybeRedirectLocalePrefix(request: NextRequest): NextResponse | null {
   return NextResponse.redirect(url, 301);
 }
 
-function withDiscoveryLink(request: NextRequest, response: NextResponse) {
+function withDiscoveryHeaders(
+  request: NextRequest,
+  response: NextResponse,
+): NextResponse {
   response.headers.set(
     'Link',
     discoveryLinkHeaderValue(request.nextUrl.origin),
   );
+  const vary = response.headers.get('Vary');
+  if (vary) {
+    const hasAccept = vary
+      .split(',')
+      .some((part) => part.trim().toLowerCase() === 'accept');
+    if (!hasAccept) {
+      response.headers.set('Vary', `${vary}, Accept`);
+    }
+  } else {
+    response.headers.set('Vary', 'Accept');
+  }
   return response;
 }
 
+/**
+ * HTML `/` 301s to `/start/overview` here (not in next.config) so
+ * `Accept: text/markdown` can rewrite `/` to the overview markdown mirror.
+ */
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (isDocsMachinePath(pathname)) {
-    return withDiscoveryLink(request, NextResponse.next());
+    return withDiscoveryHeaders(request, NextResponse.next());
   }
 
   const localePrefixRedirect = maybeRedirectLocalePrefix(request);
   if (localePrefixRedirect) {
-    return withDiscoveryLink(request, localePrefixRedirect);
+    return withDiscoveryHeaders(request, localePrefixRedirect);
   }
 
-  return withDiscoveryLink(request, NextResponse.next());
+  const wantsMarkdown = wantsDocsMarkdown(
+    request.headers.get('accept'),
+    request.headers.get('user-agent'),
+  );
+
+  if (pathname === '/' && !wantsMarkdown) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/start/overview';
+    return withDiscoveryHeaders(request, NextResponse.redirect(url, 301));
+  }
+
+  if (wantsMarkdown) {
+    const markdownPath = docsMarkdownAcceptRewritePath(pathname);
+    if (markdownPath) {
+      const url = request.nextUrl.clone();
+      url.pathname = markdownPath;
+      return withDiscoveryHeaders(request, NextResponse.rewrite(url));
+    }
+  }
+
+  return withDiscoveryHeaders(request, NextResponse.next());
 }
 
 export const config = {

@@ -15,8 +15,14 @@ function read(relativePath) {
 
 test('docs markdown copy URLs point at the llms.mdx route', async () => {
   const { buildDocsMarkdownUrl } = await import('../utils/docs-routing.ts');
-  assert.equal(buildDocsMarkdownUrl('/start/overview'), '/llms.mdx/start/overview');
-  assert.equal(buildDocsMarkdownUrl('start/overview'), '/llms.mdx/start/overview');
+  assert.equal(
+    buildDocsMarkdownUrl('/start/overview'),
+    '/llms.mdx/start/overview',
+  );
+  assert.equal(
+    buildDocsMarkdownUrl('start/overview'),
+    '/llms.mdx/start/overview',
+  );
   assert.equal(buildDocsMarkdownUrl('/'), '/llms.mdx');
 
   const pageSource = read('app/(docs)/[[...slug]]/page.tsx');
@@ -33,6 +39,20 @@ test('docs pages use unprefixed self-canonical URLs for all languages', () => {
     fr: 'https://docs.lomi.africa/start/overview',
     en: 'https://docs.lomi.africa/start/overview',
   });
+});
+
+test('markdown Accept rewrites docs pages to the llms.mdx mirror', async () => {
+  const { docsMarkdownAcceptRewritePath } =
+    await import('../utils/docs-routing.ts');
+
+  assert.equal(docsMarkdownAcceptRewritePath('/'), '/start/overview.mdx');
+  assert.equal(
+    docsMarkdownAcceptRewritePath('/start/overview'),
+    '/start/overview.mdx',
+  );
+  assert.equal(docsMarkdownAcceptRewritePath('/llms.txt'), null);
+  assert.equal(docsMarkdownAcceptRewritePath('/start/overview.mdx'), null);
+  assert.equal(docsMarkdownAcceptRewritePath('/llms.mdx/start/overview'), null);
 });
 
 test('dynamic sitemap is the only docs sitemap source', () => {
@@ -55,17 +75,23 @@ test('docs locale is resolved from the language cookie, not the URL', () => {
 
 test('legacy content redirects stay unprefixed', () => {
   const configSource = read('next.config.mjs');
+  const proxySource = read('proxy.ts');
 
   assert.match(configSource, /core\/introduction\/what-is-lomi/);
   assert.match(configSource, /source:\s*'\/build\/lomi-ui\/quick-start'/);
   assert.match(configSource, /destination:\s*'\/build\/lomi-ui'/);
   assert.doesNotMatch(configSource, /source:\s*'\/en\//);
+  assert.doesNotMatch(
+    configSource,
+    /source:\s*'\/'\s*,\s*\n\s*destination:\s*'\/start\/overview'/,
+  );
+  assert.match(proxySource, /pathname === '\/'/);
+  assert.match(proxySource, /\/start\/overview/);
 });
 
 test('robots.txt does not block sitemap API reference pages', async () => {
-  const { isRobotsDisallowedPath, ROBOTS_DISALLOW } = await import(
-    './robots-policy.ts'
-  );
+  const { isRobotsDisallowedPath, ROBOTS_DISALLOW } =
+    await import('./robots-policy.ts');
 
   assert.equal(isRobotsDisallowedPath('/api/checkout-sessions'), false);
   assert.equal(
@@ -101,6 +127,19 @@ test('page metadata emits locale-aware Open Graph and structured data', () => {
   assert.doesNotMatch(ogSource, /getPage\(slug\.slice\(0, -1\), 'en'\)/);
   assert.doesNotMatch(layoutSource, /buildDocsAlternates/);
   assert.match(notFoundSource, /index:\s*false/);
+  assert.match(notFoundSource, /buildDocsNotFoundMarkdown/);
   assert.doesNotMatch(docsLayoutSource, /localizeDocsPath/);
   assert.doesNotMatch(pageSource, /localizeDocsPath/);
+});
+
+test('docs markdown 404s and Accept negotiation live in proxy and llms.mdx', () => {
+  const proxySource = read('proxy.ts');
+  const markdownRoute = read('app/llms.mdx/[...slug]/route.ts');
+
+  assert.match(proxySource, /docsMarkdownAcceptRewritePath/);
+  assert.match(proxySource, /wantsDocsMarkdown/);
+  assert.match(proxySource, /Vary/);
+  assert.match(markdownRoute, /status:\s*404/);
+  assert.match(markdownRoute, /buildDocsNotFoundMarkdown/);
+  assert.doesNotMatch(markdownRoute, /from 'next\/navigation'/);
 });

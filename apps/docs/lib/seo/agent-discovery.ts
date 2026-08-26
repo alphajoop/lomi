@@ -328,3 +328,37 @@ export function buildDocsAgentsMarkdown(origin = getDocsSiteOrigin()): string {
     '',
   ].join('\n');
 }
+
+const DOCS_MARKDOWN_BOTS =
+  /ora-agent|GPTBot|ClaudeBot|ChatGPT-User|Claude-User|PerplexityBot|Perplexity-User|Google-Extended|Applebot-Extended|DeepSeekBot/i;
+
+export function wantsDocsMarkdown(
+  accept: string | null,
+  userAgent: string | null,
+): boolean {
+  if (accept?.includes('text/markdown')) {
+    return true;
+  }
+  return Boolean(userAgent && DOCS_MARKDOWN_BOTS.test(userAgent));
+}
+
+export function buildDocsNotFoundMarkdown(
+  origin = getDocsSiteOrigin(),
+): string {
+  const urls = docsDiscoveryUrls(origin);
+  return [
+    '# Not found',
+    '',
+    'This path does not exist on docs.lomi.africa.',
+    '',
+    '## Where to look next',
+    '',
+    `- Overview: ${origin}/start/overview`,
+    `- Sitemap: ${origin}/sitemap.xml`,
+    `- llms.txt: ${urls.llms}`,
+    `- OpenAPI: ${urls.openapi}`,
+    `- Agents: ${urls.agentsMarkdown}`,
+    `- Marketing site: ${MARKETING_ORIGIN}`,
+    '',
+  ].join('\n');
+}

@@ -12,6 +12,7 @@ export type DocsLegacyPrefixLocale =
 const MACHINE_EXACT_PATHS = new Set([
   '/llms.txt',
   '/llms-full.txt',
+  '/llms.mdx',
   '/sitemap.xml',
   '/robots.txt',
   '/openapi.json',
@@ -49,6 +50,20 @@ export function isDocsMachinePath(pathname: string): boolean {
     return true;
   }
   return MACHINE_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+export function docsMarkdownAcceptRewritePath(pathname: string): string | null {
+  const path = normalizeDocsPath(pathname);
+  if (path.endsWith('.mdx') || path.startsWith('/llms.mdx')) {
+    return null;
+  }
+  if (isDocsMachinePath(path)) {
+    return null;
+  }
+  if (path === '/') {
+    return '/start/overview.mdx';
+  }
+  return `${path}.mdx`;
 }
 
 type ParsedDocsLocalePath = {

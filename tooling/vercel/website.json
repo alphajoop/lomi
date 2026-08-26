@@ -1,4 +1,18 @@
 {
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.lomi.africa" }],
+      "destination": "https://lomi.africa/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.lomi.africa" }],
+      "destination": "https://lomi.africa/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -4,13 +4,27 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getLLMText } from '@/lib/utils/get-llm-text';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
-import { notFound } from 'next/navigation';
+import {
+  DISCOVERY_MARKDOWN_HEADERS,
+  buildDocsNotFoundMarkdown,
+} from '@/lib/seo/agent-discovery';
 import type { Language } from '@/lib/i18n/config';
 
 export const revalidate = false;
 
 function fallbackLocale(locale: Language): Language {
   return locale === 'fr' ? 'en' : 'fr';
+}
+
+function markdownHeaders(cacheControl?: string): Headers {
+  const headers = new Headers({
+    ...DISCOVERY_MARKDOWN_HEADERS,
+    Vary: 'Accept, User-Agent',
+  });
+  if (cacheControl) {
+    headers.set('Cache-Control', cacheControl);
+  }
+  return headers;
 }
 
 export async function GET(
@@ -22,12 +36,15 @@ export async function GET(
   const page =
     source.getPage(slug, locale) ??
     source.getPage(slug, fallbackLocale(locale));
-  if (!page) notFound();
+  if (!page) {
+    return new NextResponse(buildDocsNotFoundMarkdown(), {
+      status: 404,
+      headers: markdownHeaders('public, max-age=0, must-revalidate'),
+    });
+  }
 
   return new NextResponse(await getLLMText(page), {
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-    },
+    headers: markdownHeaders(),
   });
 }
 
