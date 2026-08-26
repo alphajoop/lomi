@@ -72,9 +72,22 @@ function useNpm(appRel) {
   return Boolean(process.env.VERCEL) && appRel !== "apps/docs";
 }
 
+function excludeAdminGrowthAgentFromTsc(appDir) {
+  const tsconfigPath = path.join(appDir, "tsconfig.json");
+  if (!existsSync(tsconfigPath)) return;
+  const tsconfig = JSON.parse(readFileSync(tsconfigPath, "utf8"));
+  const exclude = new Set(tsconfig.exclude ?? []);
+  exclude.add("src/growth/agent");
+  tsconfig.exclude = [...exclude];
+  writeFileSync(tsconfigPath, `${JSON.stringify(tsconfig, null, 2)}\n`);
+  console.log(
+    `==> excluded src/growth/agent from ${path.relative(ROOT, tsconfigPath)}`,
+  );
+}
+
 function installDeps(appRel, dir, { frozen }) {
   if (useNpm(appRel)) {
-    run("npm", ["install"], dir);
+    run("npm", ["install", "--ignore-scripts"], dir);
     return;
   }
   const args = ["install", "--ignore-workspace"];
@@ -150,6 +163,9 @@ function main() {
   }
 
   const { pkg, rewritten } = rewriteWorkspaceSpecsToFile(appDir);
+  if (useNpm(appRel) && appRel === "apps/admin") {
+    excludeAdminGrowthAgentFromTsc(appDir);
+  }
   installFileApp(appRel, pkg, { frozen: !rewritten });
 }
 
