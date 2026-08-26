@@ -35,8 +35,8 @@
     }
   ],
   "installCommand": "node tooling/scripts/install-app-with-packages.mjs apps/website",
-  "buildCommand": "pnpm --dir apps/website build",
-  "devCommand": "pnpm --dir apps/website dev",
+  "buildCommand": "npm --prefix apps/website run build",
+  "devCommand": "npm --prefix apps/website run dev",
   "framework": "nextjs",
   "outputDirectory": "apps/website/.next",
   "regions": ["iad1"],

@@ -8,9 +8,11 @@
  * Docs/website use `file:../../packages/*` and must pass `--ignore-workspace`
  * so the parent `pnpm-workspace.yaml` does not swallow the install.
  * Admin/dashboard use `workspace:*`; the installer rewrites those to `file:`
- * for this run so Vercel does not need a root workspace. Umbrella uploads
- * also stage `engines.node` 22.x (website/admin projects default to 24.x,
- * where pnpm's registry client hits ERR_INVALID_THIS).
+ * for this run so Vercel does not need a root workspace.
+ *
+ * Umbrella Vercel uploads (website/admin) use npm: those projects default to
+ * Node 24, and even Node 22 + PATH pnpm hits ERR_INVALID_THIS talking to the
+ * registry. Docs keeps pnpm (app lockfile, Node 22, already shipping).
  *
  * Usage: node tooling/scripts/install-app-with-packages.mjs <app-dir>
  *   e.g. node tooling/scripts/install-app-with-packages.mjs apps/docs
@@ -66,6 +68,30 @@ function neededPackageDirs(pkg) {
   });
 }
 
+function useNpm(appRel) {
+  return Boolean(process.env.VERCEL) && appRel !== "apps/docs";
+}
+
+function installDeps(appRel, dir, { frozen }) {
+  if (useNpm(appRel)) {
+    run("npm", ["install"], dir);
+    return;
+  }
+  const args = ["install", "--ignore-workspace"];
+  if (frozen && existsSync(path.join(dir, "pnpm-lock.yaml"))) {
+    args.push("--frozen-lockfile");
+  }
+  run("pnpm", args, dir);
+}
+
+function runBuildScript(appRel, dir) {
+  if (useNpm(appRel)) {
+    run("npm", ["run", "build"], dir);
+    return;
+  }
+  run("pnpm", ["run", "build"], dir);
+}
+
 function rewriteWorkspaceSpecsToFile(appDir) {
   const pkgPath = path.join(appDir, "package.json");
   const pkg = readPackage(appDir);
@@ -98,18 +124,14 @@ function installFileApp(appRel, pkg, { frozen }) {
   const appDir = path.join(ROOT, appRel);
   for (const rel of neededPackageDirs(pkg)) {
     const dir = path.join(ROOT, rel);
-    run("pnpm", ["install", "--ignore-workspace"], dir);
+    installDeps(appRel, dir, { frozen: false });
     const packageJson = readPackage(dir);
     if (packageJson.scripts?.build) {
-      run("pnpm", ["run", "build"], dir);
+      runBuildScript(appRel, dir);
     }
   }
 
-  const args = ["install", "--ignore-workspace"];
-  if (frozen && existsSync(path.join(appDir, "pnpm-lock.yaml"))) {
-    args.push("--frozen-lockfile");
-  }
-  run("pnpm", args, appDir);
+  installDeps(appRel, appDir, { frozen });
 }
 
 function main() {

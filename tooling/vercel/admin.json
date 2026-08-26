@@ -1,7 +1,7 @@
 {
   "installCommand": "node tooling/scripts/install-app-with-packages.mjs apps/admin",
-  "buildCommand": "pnpm --dir apps/admin run build",
-  "devCommand": "pnpm --dir apps/admin run dev",
+  "buildCommand": "npm --prefix apps/admin run build",
+  "devCommand": "npm --prefix apps/admin run dev",
   "framework": "vite",
   "outputDirectory": "apps/admin/dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/" }],
