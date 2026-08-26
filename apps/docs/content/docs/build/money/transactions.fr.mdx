@@ -168,7 +168,7 @@ curl -X GET "https://api.lomi.africa/transactions/tx_abc123..." \
 | `net_amount` | `number` | Montant après frais |
 | `fee_amount` | `number` | Frais prélevés |
 | `currency_code` | `string` | Devise (ex. `XOF`, `USD`) |
-| `status` | `string` | `pending`, `completed`, `failed`, `refunded` |
+| `status` | `string` | `pending`, `completed`, `held`, `failed`, `refunded`, `expired`. `held` est une retenue plateforme: le paiement a abouti mais les fonds ne sont pas retirables. Les marchands voient cela comme « en revue ». |
 | `type` | `string` | `payment`, `refund`, `payout` |
 | `provider_code` | `string` | Prestataire (`WAVE`, etc.) |
 | `payment_method_code` | `string` | Moyen de paiement (ex. `MOBILE_MONEY`, `CARDS`) |

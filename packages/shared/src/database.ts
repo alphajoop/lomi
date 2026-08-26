@@ -10,32 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
-  }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -539,8 +514,6 @@ export type Database = {
           organization_id: string
           request_fingerprint: string
           response_payload: Json
-          status: string
-          expires_at: string
           target_organization_id: string | null
         }
         Insert: {
@@ -555,8 +528,6 @@ export type Database = {
           organization_id: string
           request_fingerprint: string
           response_payload: Json
-          status?: string
-          expires_at?: string
           target_organization_id?: string | null
         }
         Update: {
@@ -571,8 +542,6 @@ export type Database = {
           organization_id?: string
           request_fingerprint?: string
           response_payload?: Json
-          status?: string
-          expires_at?: string
           target_organization_id?: string | null
         }
         Relationships: [
@@ -8374,7 +8343,6 @@ export type Database = {
       organizations: {
         Row: {
           allowed_currencies: Database["public"]["Enums"]["currency_code"][]
-          api_access_suspended: boolean
           arr: number
           created_at: string
           default_currency: Database["public"]["Enums"]["currency_code"]
@@ -8412,7 +8380,6 @@ export type Database = {
         }
         Insert: {
           allowed_currencies?: Database["public"]["Enums"]["currency_code"][]
-          api_access_suspended?: boolean
           arr?: number
           created_at?: string
           default_currency?: Database["public"]["Enums"]["currency_code"]
@@ -8450,7 +8417,6 @@ export type Database = {
         }
         Update: {
           allowed_currencies?: Database["public"]["Enums"]["currency_code"][]
-          api_access_suspended?: boolean
           arr?: number
           created_at?: string
           default_currency?: Database["public"]["Enums"]["currency_code"]
@@ -11808,6 +11774,9 @@ export type Database = {
           fee_amount: number
           fee_structure_id: string | null
           gross_amount: number
+          held_at: string | null
+          held_by: string | null
+          hold_reason: string | null
           integration_source: Database["public"]["Enums"]["integration_source"]
           is_bnpl: boolean
           is_pos: boolean
@@ -11859,6 +11828,9 @@ export type Database = {
           fee_amount: number
           fee_structure_id?: string | null
           gross_amount: number
+          held_at?: string | null
+          held_by?: string | null
+          hold_reason?: string | null
           integration_source?: Database["public"]["Enums"]["integration_source"]
           is_bnpl?: boolean
           is_pos?: boolean
@@ -11910,6 +11882,9 @@ export type Database = {
           fee_amount?: number
           fee_structure_id?: string | null
           gross_amount?: number
+          held_at?: string | null
+          held_by?: string | null
+          hold_reason?: string | null
           integration_source?: Database["public"]["Enums"]["integration_source"]
           is_bnpl?: boolean
           is_pos?: boolean
@@ -13112,6 +13087,10 @@ export type Database = {
           pricing_plan_type: Database["public"]["Enums"]["pricing_plan_type"]
         }[]
       }
+      admin_hold_transaction: {
+        Args: { p_reason?: string; p_transaction_id: string }
+        Returns: Json
+      }
       admin_issue_partner_management_key: {
         Args: { p_name?: string; p_partner_id: string }
         Returns: {
@@ -13195,6 +13174,10 @@ export type Database = {
       admin_reject_growth_reply: {
         Args: { p_id: string; p_reason?: string }
         Returns: undefined
+      }
+      admin_release_held_transaction: {
+        Args: { p_transaction_id: string }
+        Returns: Json
       }
       admin_resolve_live_activation_request: {
         Args: {
@@ -17736,7 +17719,6 @@ export type Database = {
           created_at: string
           environment: string
           expires_at: string
-          grant_type: string
           is_active: boolean
           scope: string
           token_id: string
@@ -20204,6 +20186,8 @@ export type Database = {
           customer_name: string
           environment: string
           gross_amount: number
+          held_at: string
+          hold_reason: string
           organization_name: string
           provider_code: Database["public"]["Enums"]["provider_code"]
           refunded_amount: number
@@ -21939,10 +21923,6 @@ export type Database = {
       }
       get_or_create_self_service_partner: {
         Args: { p_email: string; p_user_id: string }
-        Returns: string
-      }
-      get_or_create_bootstrap_partner: {
-        Args: Record<PropertyKey, never>
         Returns: string
       }
       get_or_create_walk_in_customer: {
@@ -24724,46 +24704,6 @@ export type Database = {
           response_payload: Json
         }[]
       }
-      claim_api_idempotency_record: {
-        Args: {
-          p_organization_id: string
-          p_environment: string
-          p_endpoint_route: string
-          p_idempotency_key: string
-          p_request_fingerprint: string
-        }
-        Returns: {
-          kind: string
-          response_payload: Json
-        }[]
-      }
-      complete_api_idempotency_record: {
-        Args: {
-          p_organization_id: string
-          p_environment: string
-          p_endpoint_route: string
-          p_idempotency_key: string
-          p_request_fingerprint: string
-          p_response_payload: Json
-        }
-        Returns: undefined
-      }
-      release_api_idempotency_record: {
-        Args: {
-          p_organization_id: string
-          p_environment: string
-          p_endpoint_route: string
-          p_idempotency_key: string
-        }
-        Returns: undefined
-      }
-      set_organization_api_access_suspended: {
-        Args: {
-          p_organization_id: string
-          p_suspended: boolean
-        }
-        Returns: undefined
-      }
       manage_organization_fee_type: {
         Args: {
           p_acting_merchant_id?: string
@@ -25066,7 +25006,6 @@ export type Database = {
         Returns: {
           client_id: string
           client_name: string
-          created_at: string
           grant_types: string[]
           is_active: boolean
           redirect_uris: string[]
@@ -27895,7 +27834,7 @@ export type Database = {
         | "subscriptions"
         | "customers"
       platform_partner_status: "pending" | "active" | "suspended"
-      platform_partner_type: "partner" | "self_service" | "bootstrap"
+      platform_partner_type: "partner" | "self_service"
       pricing_model: "standard" | "pay_what_you_want" | "tiered" | "volume"
       pricing_plan_type: "fixed" | "volume_tiered" | "custom"
       product_fulfillment_type: "digital" | "physical" | "hybrid"
@@ -27916,7 +27855,7 @@ export type Database = {
         | "succeeded"
         | "expired"
         | "refunded"
-      provisioning_key_kind: "platform" | "partner_subkey" | "self_service" | "bootstrap"
+      provisioning_key_kind: "platform" | "partner_subkey" | "self_service"
       qr_code_type: "static" | "dynamic"
       radar_decision: "allow" | "flag" | "block"
       radar_mode: "monitor" | "block"
@@ -28032,6 +27971,7 @@ export type Database = {
         | "failed"
         | "refunded"
         | "expired"
+        | "held"
       transaction_type: "payment" | "instalment"
       usage_aggregation: "sum" | "max" | "last_during_period" | "last_ever"
       usage_frequency:
@@ -28091,456 +28031,6 @@ export type Database = {
         | "failed"
         | "expired"
         | "ignored"
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      buckets_analytics: {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          format: string
-          id: string
-          name: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          format?: string
-          id?: string
-          name?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      buckets_vectors: {
-        Row: {
-          created_at: string
-          id: string
-          type: Database["storage"]["Enums"]["buckettype"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          type?: Database["storage"]["Enums"]["buckettype"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          user_metadata: Json | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          user_metadata?: Json | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          metadata: Json | null
-          owner_id: string | null
-          upload_signature: string
-          user_metadata: Json | null
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          metadata?: Json | null
-          owner_id?: string | null
-          upload_signature: string
-          user_metadata?: Json | null
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          metadata?: Json | null
-          owner_id?: string | null
-          upload_signature?: string
-          user_metadata?: Json | null
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vector_indexes: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id: string
-          metadata_configuration: Json | null
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          data_type: string
-          dimension: number
-          distance_metric: string
-          id?: string
-          metadata_configuration?: Json | null
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          data_type?: string
-          dimension?: number
-          distance_metric?: string
-          id?: string
-          metadata_configuration?: Json | null
-          name?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vector_indexes_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets_vectors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      allow_any_operation: {
-        Args: { expected_operations: string[] }
-        Returns: boolean
-      }
-      allow_only_operation: {
-        Args: { expected_operation: string }
-        Returns: boolean
-      }
-      can_insert_object: {
-        Args: { bucketid: string; metadata: Json; name: string; owner: string }
-        Returns: undefined
-      }
-      extension: { Args: { name: string }; Returns: string }
-      filename: { Args: { name: string }; Returns: string }
-      foldername: { Args: { name: string }; Returns: string[] }
-      get_common_prefix: {
-        Args: { p_delimiter: string; p_key: string; p_prefix: string }
-        Returns: string
-      }
-      get_size_by_bucket: {
-        Args: never
-        Returns: {
-          bucket_id: string
-          size: number
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-          prefix_param: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          _bucket_id: string
-          delimiter_param: string
-          max_keys?: number
-          next_token?: string
-          prefix_param: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      operation: { Args: never; Returns: string }
-      search: {
-        Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
-          prefix: string
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_by_timestamp: {
-        Args: {
-          p_bucket_id: string
-          p_level: number
-          p_limit: number
-          p_prefix: string
-          p_sort_column: string
-          p_sort_column_after: string
-          p_sort_order: string
-          p_start_after: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-      search_v2: {
-        Args: {
-          bucket_name: string
-          levels?: number
-          limits?: number
-          prefix: string
-          sort_column?: string
-          sort_column_after?: string
-          sort_order?: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
-    }
-    Enums: {
-      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -28666,9 +28156,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       account_top_up_status: [
@@ -29007,7 +28494,7 @@ export const Constants = {
         "customers",
       ],
       platform_partner_status: ["pending", "active", "suspended"],
-      platform_partner_type: ["partner", "self_service", "bootstrap"],
+      platform_partner_type: ["partner", "self_service"],
       pricing_model: ["standard", "pay_what_you_want", "tiered", "volume"],
       pricing_plan_type: ["fixed", "volume_tiered", "custom"],
       product_fulfillment_type: ["digital", "physical", "hybrid"],
@@ -29030,7 +28517,7 @@ export const Constants = {
         "expired",
         "refunded",
       ],
-      provisioning_key_kind: ["platform", "partner_subkey", "self_service", "bootstrap"],
+      provisioning_key_kind: ["platform", "partner_subkey", "self_service"],
       qr_code_type: ["static", "dynamic"],
       radar_decision: ["allow", "flag", "block"],
       radar_mode: ["monitor", "block"],
@@ -29149,6 +28636,7 @@ export const Constants = {
         "failed",
         "refunded",
         "expired",
+        "held",
       ],
       transaction_type: ["payment", "instalment"],
       usage_aggregation: ["sum", "max", "last_during_period", "last_ever"],
@@ -29214,11 +28702,6 @@ export const Constants = {
         "expired",
         "ignored",
       ],
-    },
-  },
-  storage: {
-    Enums: {
-      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
     },
   },
 } as const

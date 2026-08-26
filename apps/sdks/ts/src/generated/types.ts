@@ -6757,6 +6757,7 @@ export type Database = {
         | "failed"
         | "refunded"
         | "expired"
+        | "held"
 ;
       transaction_type: "payment" | "instalment";
       usage_aggregation: "sum" | "max" | "last_during_period" | "last_ever";

@@ -38,6 +38,28 @@ export async function adminDeleteBroadcastCampaign(
   return callRpc(client, "admin_delete_broadcast_campaign", args, "admin_delete_broadcast_campaign", options);
 }
 
+export async function adminHoldTransaction(
+  client: TypedSupabaseClient,
+  args: DbFunctions["admin_hold_transaction"]["Args"],
+  options?: SupabaseRpcOptions<DbFunctions["admin_hold_transaction"]["Returns"]> | null,
+): Promise<DbFunctions["admin_hold_transaction"]["Returns"] | null | boolean> {
+  if (options === null) {
+    return callRpc(client, "admin_hold_transaction", args, "admin_hold_transaction", { fallbackValue: null });
+  }
+  return callRpc(client, "admin_hold_transaction", args, "admin_hold_transaction", options);
+}
+
+export async function adminReleaseHeldTransaction(
+  client: TypedSupabaseClient,
+  args: DbFunctions["admin_release_held_transaction"]["Args"],
+  options?: SupabaseRpcOptions<DbFunctions["admin_release_held_transaction"]["Returns"]> | null,
+): Promise<DbFunctions["admin_release_held_transaction"]["Returns"] | null | boolean> {
+  if (options === null) {
+    return callRpc(client, "admin_release_held_transaction", args, "admin_release_held_transaction", { fallbackValue: null });
+  }
+  return callRpc(client, "admin_release_held_transaction", args, "admin_release_held_transaction", options);
+}
+
 export async function adminDeleteBroadcastCampaignForOrg(
   client: TypedSupabaseClient,
   args: DbFunctions["admin_delete_broadcast_campaign_for_org"]["Args"],

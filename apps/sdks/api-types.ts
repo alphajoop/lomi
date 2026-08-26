@@ -6569,7 +6569,7 @@ export type Database = {
         | 'past_due'
         | 'trial';
       transaction_status:
-        'pending' | 'completed' | 'failed' | 'refunded' | 'expired';
+        'pending' | 'completed' | 'failed' | 'refunded' | 'expired' | 'held';
       transaction_type: 'payment' | 'instalment';
       usage_aggregation: 'sum' | 'max' | 'last_during_period' | 'last_ever';
       usage_frequency:

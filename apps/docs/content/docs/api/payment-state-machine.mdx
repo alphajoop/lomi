@@ -18,6 +18,9 @@ stateDiagram-v2
   pending --> failed: provider decline or hard failure
   pending --> expired: timeout or session expiry
   completed --> refunded: refund processed
+  completed --> held: platform risk hold
+  held --> completed: hold released
+  held --> refunded: refund processed
   failed --> [*]
   expired --> [*]
   refunded --> [*]
@@ -31,6 +34,7 @@ In **test**, new payments often start as `completed` immediately. In **live**, t
 | --- | --- |
 | `pending` | Payment initiated; final outcome not yet confirmed (typical in **live**). |
 | `completed` | Payment succeeded; merchant balance and fees settle per platform rules. |
+| `held` | Captured payment frozen by the platform. Not withdrawable and excluded from revenue until released or refunded. |
 | `failed` | Payment did not succeed (including some expiration paths). |
 | `expired` | Pending payment timed out. |
 | `refunded` | Refund processed against the original payment. |
@@ -42,6 +46,7 @@ Platform `transaction_status` is reflected in `provider_payment_status` on linke
 | Transaction status | Provider payment status |
 | --- | --- |
 | `completed` | `succeeded` |
+| `held` | `succeeded` |
 | `pending` | `processing` |
 | `failed` | `cancelled` |
 | `expired` | `expired` |

@@ -173,7 +173,7 @@ curl -X GET "https://api.lomi.africa/transactions/tx_abc123..." \
 | `net_amount` | `number` | Amount after fees |
 | `fee_amount` | `number` | Total fees deducted |
 | `currency_code` | `string` | Currency (e.g., `XOF`, `USD`) |
-| `status` | `string` | `pending`, `completed`, `failed`, `refunded` |
+| `status` | `string` | `pending`, `completed`, `held`, `failed`, `refunded`, `expired`. `held` is a platform risk hold: the charge succeeded but the funds are not withdrawable. Merchants see this as under review. |
 | `type` | `string` | `payment`, `refund`, `payout` |
 | `provider_code` | `string` | Payment provider (e.g., `WAVE`) |
 | `payment_method_code` | `string` | Payment method (e.g., `MOBILE_MONEY`, `CARDS`) |

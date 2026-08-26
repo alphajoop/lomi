@@ -18,6 +18,9 @@ stateDiagram-v2
   pending --> failed: refus ou échec
   pending --> expired: délai dépassé
   completed --> refunded: remboursement
+  completed --> held: retenue plateforme
+  held --> completed: retenue levée
+  held --> refunded: remboursement
   failed --> [*]
   expired --> [*]
   refunded --> [*]
@@ -31,6 +34,7 @@ En **test**, un paiement est souvent `completed` tout de suite. En **production*
 | --- | --- |
 | `pending` | Paiement lancé, résultat pas encore connu (fréquent en production). |
 | `completed` | Paiement réussi ; le solde est crédité selon les règles lomi. |
+| `held` | Paiement capturé mais bloqué par la plateforme. Non retirable, hors revenus tant que la retenue n'est pas levée ou remboursée. |
 | `failed` | Le paiement n'a pas abouti. |
 | `expired` | Le client n'a pas finalisé à temps. |
 | `refunded` | Remboursement effectué sur ce paiement. |
@@ -42,6 +46,7 @@ Chaque statut transaction a un équivalent côté prestataire :
 | Statut transaction | Statut prestataire |
 | --- | --- |
 | `completed` | `succeeded` |
+| `held` | `succeeded` |
 | `pending` | `processing` |
 | `failed` | `cancelled` |
 | `expired` | `expired` |

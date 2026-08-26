@@ -143,6 +143,8 @@ export function getStatusColor(status: string): string {
       return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
     case "pending":
       return "bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300";
+    case "held":
+      return "bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300";
     default:
       return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
   }
