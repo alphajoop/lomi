@@ -141,5 +141,10 @@ test('docs markdown 404s and Accept negotiation live in proxy and llms.mdx', () 
   assert.match(proxySource, /Vary/);
   assert.match(markdownRoute, /status:\s*404/);
   assert.match(markdownRoute, /buildDocsNotFoundMarkdown/);
+  assert.match(markdownRoute, /getLLMTextFallback/);
   assert.doesNotMatch(markdownRoute, /from 'next\/navigation'/);
+
+  const configSource = read('next.config.mjs');
+  assert.match(configSource, /outputFileTracingIncludes/);
+  assert.match(configSource, /content\/docs/);
 });

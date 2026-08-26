@@ -110,6 +110,12 @@ const config = {
   devIndicators: false,
   transpilePackages: ['@lomi./ui', '@lomi./shared'],
   serverExternalPackages: ['prettier'],
+  // `/llms.mdx/*` re-reads MDX at request time (locale cookie). Include the
+  // content tree so Vercel serverless does not ENOENT after generateStaticParams.
+  outputFileTracingIncludes: {
+    '/llms.mdx/[...slug]': ['./content/docs/**/*'],
+    '/llms.mdx': ['./content/docs/**/*'],
+  },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

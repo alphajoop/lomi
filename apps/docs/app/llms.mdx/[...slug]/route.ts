@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 import { type NextRequest, NextResponse } from 'next/server';
-import { getLLMText } from '@/lib/utils/get-llm-text';
+import { getLLMText, getLLMTextFallback } from '@/lib/utils/get-llm-text';
 import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 import {
@@ -43,9 +43,15 @@ export async function GET(
     });
   }
 
-  return new NextResponse(await getLLMText(page), {
-    headers: markdownHeaders(),
-  });
+  try {
+    return new NextResponse(await getLLMText(page), {
+      headers: markdownHeaders(),
+    });
+  } catch {
+    return new NextResponse(getLLMTextFallback(page), {
+      headers: markdownHeaders(),
+    });
+  }
 }
 
 export function generateStaticParams() {

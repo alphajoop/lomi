@@ -46,8 +46,15 @@ import {
 import {
   buildAuthorizationServerPointer,
   buildMcpCatalog,
+  buildMcpIndexHtml,
+  buildMcpIndexMarkdown,
+  buildMcpNotFoundMarkdown,
   buildMcpServerCard,
   buildMcpWellKnown,
+  MCP_ROBOTS_TXT,
+  wantsMcpHtml,
+  wantsMcpJson,
+  wantsMcpMarkdown,
 } from './discovery.js';
 import { isJsonObject, isString, type JsonValue } from "@lomi./shared";
 import type { McpRequestStore } from './mcp-request-context.js';
@@ -377,6 +384,36 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
 
   app.get('/server-card', (_req, res) => {
     res.status(200).json(buildMcpServerCard(manifest));
+  });
+
+  app.get('/robots.txt', (_req, res) => {
+    res
+      .status(200)
+      .type('text/plain; charset=utf-8')
+      .send(MCP_ROBOTS_TXT);
+  });
+
+  app.get('/', (req, res) => {
+    const accept = isString(req.headers.accept) ? req.headers.accept : undefined;
+    const userAgent = isString(req.headers['user-agent'])
+      ? req.headers['user-agent']
+      : undefined;
+    res.setHeader('Vary', 'Accept, User-Agent');
+    if (wantsMcpMarkdown(accept, userAgent)) {
+      res
+        .status(200)
+        .type('text/markdown; charset=utf-8')
+        .send(buildMcpIndexMarkdown(manifest));
+      return;
+    }
+    if (wantsMcpHtml(accept) || !wantsMcpJson(accept)) {
+      res
+        .status(200)
+        .type('text/html; charset=utf-8')
+        .send(buildMcpIndexHtml(manifest));
+      return;
+    }
+    res.status(200).json(buildMcpWellKnown(manifest));
   });
 
   app.get('/health', (_req, res) => {
@@ -724,6 +761,37 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   app.post(`${basePath}/guest`, rateLimitMiddleware, mcpPostHandler(true));
   app.get(`${basePath}/guest`, rateLimitMiddleware, mcpGetHandler);
   app.delete(`${basePath}/guest`, rateLimitMiddleware, mcpDeleteHandler);
+
+  app.use((req, res) => {
+    const accept = isString(req.headers.accept) ? req.headers.accept : undefined;
+    const userAgent = isString(req.headers['user-agent'])
+      ? req.headers['user-agent']
+      : undefined;
+    res.setHeader('Vary', 'Accept, User-Agent');
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      if (wantsMcpMarkdown(accept, userAgent)) {
+        res
+          .status(404)
+          .type('text/markdown; charset=utf-8')
+          .send(buildMcpNotFoundMarkdown());
+        return;
+      }
+      if (wantsMcpHtml(accept)) {
+        res
+          .status(404)
+          .type('text/html; charset=utf-8')
+          .send(
+            `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Not found</title></head><body><h1>Not found</h1><p>No resource at this path on the lomi. MCP host. See <a href="/">the MCP landing</a>, <a href="https://docs.lomi.africa/build/mcp">MCP docs</a>, or <a href="/server-card">the server card</a>.</p></body></html>`,
+          );
+        return;
+      }
+    }
+    res.status(404).json({
+      error: 'Not Found',
+      error_code: 'not_found',
+      message: 'No resource at this path. GET / for MCP discovery.',
+    });
+  });
 
   app.use(
     (err: ExpressError, _req: Request, res: Response, next: NextFunction) => {

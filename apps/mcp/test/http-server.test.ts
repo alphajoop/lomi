@@ -388,6 +388,54 @@ describe('createHttpApplication', () => {
     expect(body.name).toBe('io.lomi/mcp');
   });
 
+  it('GET / returns HTML with an H1 for browsers', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/`, {
+      headers: { Accept: 'text/html' },
+    });
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toMatch(/text\/html/);
+    const body = await res.text();
+    expect(body).toContain('<h1>lomi. MCP</h1>');
+    expect(body).toContain('https://mcp.lomi.africa/mcp');
+  });
+
+  it('GET / returns markdown when Accept is text/markdown', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/`, {
+      headers: { Accept: 'text/markdown' },
+    });
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toMatch(/text\/markdown/);
+    const body = await res.text();
+    expect(body).toContain('# lomi. MCP');
+    expect(body).toContain('https://docs.lomi.africa/build/mcp');
+  });
+
+  it('GET unknown path returns markdown 404 when Accept is text/markdown', async () => {
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/no-such-agent-path`, {
+      headers: { Accept: 'text/markdown' },
+    });
+    expect(res.status).toBe(404);
+    expect(res.headers.get('content-type')).toMatch(/text\/markdown/);
+    const body = await res.text();
+    expect(body).toContain('# Not found');
+    expect(body).toContain('https://docs.lomi.africa/build/mcp');
+  });
+
   it('GET /.well-known/oauth-authorization-server points at the API issuer', async () => {
     process.env.LOMI_OAUTH_ISSUER = 'https://api.lomi.africa';
     const manifest = parseManifest(validateJsonValue(manifestJson));
