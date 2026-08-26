@@ -19949,6 +19949,139 @@
         ]
       }
     },
+    "/settlements/instant": {
+      "post": {
+        "description": "Rail mode records a Nitro fee on an existing payout. Advance mode unlocks held card funds up to the org cap. Requires Idempotency-Key.",
+        "operationId": "SettlementsController_createInstant",
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/LomiVersion"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["mode", "amount", "currency_code"],
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": ["advance", "rail"]
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 50000
+                  },
+                  "currency_code": {
+                    "type": "string",
+                    "example": "XOF"
+                  },
+                  "payout_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Required for rail mode after a payout is created"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Instant settlement recorded"
+          },
+          "400": {
+            "description": "Ineligible or invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Request an instant settlement (Nitro)",
+        "tags": [
+          "Settlements"
+        ]
+      }
+    },
+    "/settlements/instant/{id}": {
+      "get": {
+        "description": "Returns a Nitro instant-settlement request by id.",
+        "operationId": "SettlementsController_getInstant",
+        "parameters": [
+          {
+            "name": "Lomi-Account",
+            "in": "header",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "acct_1234567890"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/LomiVersion"
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Nitro request UUID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Nitro request"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get an instant settlement (Nitro request)",
+        "tags": [
+          "Settlements"
+        ]
+      }
+    },
     "/settlements/{id}/transactions": {
       "get": {
         "description": "Returns completed transactions whose available_at falls on the settlement date for the given currency.",

@@ -114,7 +114,7 @@ export class SubscriptionsService {
     }
 
     /**
-     * Annuler une résiliation planifiée
+     * Resume subscription
      * @see OpenAPI `SubscriptionsController_resume`
      */
     public async resume(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['SubscriptionResponseDto']> {

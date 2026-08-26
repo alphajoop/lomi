@@ -226,7 +226,9 @@
       "title": "Settlements",
       "actions": {
         "list": "GET /settlements",
-        "transactions": "GET /settlements/{id}/transactions"
+        "transactions": "GET /settlements/{id}/transactions",
+        "create_instant": "POST /settlements/instant",
+        "get_instant": "GET /settlements/instant/{id}"
       }
     },
     {

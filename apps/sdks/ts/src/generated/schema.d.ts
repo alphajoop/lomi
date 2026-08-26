@@ -977,6 +977,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/settlements/instant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request an instant settlement (Nitro)
+         * @description Rail mode records a Nitro fee on an existing payout. Advance mode unlocks held card funds up to the org cap. Requires Idempotency-Key.
+         */
+        post: operations["SettlementsController_createInstant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/instant/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an instant settlement (Nitro request)
+         * @description Returns a Nitro instant-settlement request by id.
+         */
+        get: operations["SettlementsController_getInstant"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/settlements/{id}/transactions": {
         parameters: {
             query?: never;
@@ -3225,9 +3265,24 @@ export interface components {
         UsageSubscriptionResponseDto: {
             subscription_id: string;
         };
+        ErrorResponse: {
+            error: {
+                /** @example validation_failed */
+                code: string;
+                message: string;
+                details?: unknown;
+            };
+            /** Format: uuid */
+            request_id: string;
+        };
     };
     responses: never;
-    parameters: never;
+    parameters: {
+        /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+        LomiVersion: string;
+        /** @description Required unique key for money-moving writes. Replays return the original response. */
+        IdempotencyKey: string;
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;
@@ -3240,7 +3295,10 @@ export interface operations {
                 /** @description Filtrer par code devise (XOF, USD, EUR) */
                 currency?: "XOF" | "USD" | "EUR";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3255,6 +3313,118 @@ export interface operations {
                     "application/json": components["schemas"]["AccountBalanceResponseDto"][];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     AccountsController_getBalanceBreakdown: {
@@ -3263,7 +3433,10 @@ export interface operations {
                 /** @description Devise cible pour la conversion (XOF, USD, EUR) */
                 target_currency?: "XOF" | "USD" | "EUR";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3278,12 +3451,127 @@ export interface operations {
                     "application/json": components["schemas"]["BalanceBreakdownResponseDto"][];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     AccountsController_checkAvailableBalance: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3303,12 +3591,127 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     OrganizationsController_findAll: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3323,12 +3726,127 @@ export interface operations {
                     "application/json": components["schemas"]["OrganizationResponseDto"][];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     OrganizationsController_getMetrics: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3343,6 +3861,118 @@ export interface operations {
                     "application/json": components["schemas"]["OrganizationMetricsResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     OrganizationsController_getRadarSettings: {
@@ -3351,6 +3981,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -3363,6 +3995,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     OrganizationsController_updateRadarSettings: {
@@ -3371,6 +4115,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -3387,12 +4133,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     OrganizationsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3407,12 +4268,117 @@ export interface operations {
                     "application/json": components["schemas"]["OrganizationResponseDto"];
                 };
             };
-            /** @description Organisation introuvable ou accès refusé */
-            404: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3429,6 +4395,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -3442,6 +4410,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     RadarController_findOne: {
@@ -3450,6 +4530,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description Risk assessment ID */
@@ -3465,12 +4547,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MerchantsController_getDetails: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Merchant UUID */
                 id: unknown;
@@ -3487,26 +4684,127 @@ export interface operations {
                     "application/json": components["schemas"]["MerchantResponseDto"];
                 };
             };
-            /** @description Merchant ID mismatch */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
             403: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Merchant not found */
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     MerchantsController_getMrr: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Merchant UUID */
                 id: unknown;
@@ -3523,12 +4821,127 @@ export interface operations {
                     "application/json": components["schemas"]["MerchantMrrResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MerchantsController_getArr: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Merchant UUID */
                 id: unknown;
@@ -3545,6 +4958,118 @@ export interface operations {
                     "application/json": components["schemas"]["MerchantArrResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MerchantsController_getBalance: {
@@ -3552,7 +5077,10 @@ export interface operations {
             query: {
                 currency_code: "XOF" | "USD" | "EUR";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Merchant UUID */
                 id: unknown;
@@ -3569,12 +5097,117 @@ export interface operations {
                     "application/json": components["schemas"]["MerchantBalanceResponseDto"];
                 };
             };
-            /** @description Missing currency_code */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3584,7 +5217,10 @@ export interface operations {
                 /** @description Filter by provider. Use CARD for card payments (Visa, Mastercard, Apple Pay, Google Pay). */
                 provider_code?: "CARD" | "WAVE" | "MTN" | "SPI";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -3596,6 +5232,118 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3626,6 +5374,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -3641,12 +5391,117 @@ export interface operations {
                     "application/json": components["schemas"]["TransactionResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3656,6 +5511,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description UUID de la transaction */
@@ -3674,19 +5531,117 @@ export interface operations {
                     "application/json": components["schemas"]["TransactionResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Transaction introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3707,6 +5662,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -3734,12 +5691,117 @@ export interface operations {
                     };
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3749,6 +5811,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -3783,19 +5847,117 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerResponseDto"];
                 };
             };
-            /** @description Données d'entrée invalides */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3805,6 +5967,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description UUID du client */
@@ -3823,26 +5987,127 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Client introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     CustomersController_remove: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du client */
                 id: string;
@@ -3863,19 +6128,117 @@ export interface operations {
                     };
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Client introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3885,6 +6248,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description UUID du client */
@@ -3921,26 +6286,117 @@ export interface operations {
                     "application/json": components["schemas"]["CustomerResponseDto"];
                 };
             };
-            /** @description Données d'entrée invalides */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Client introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -3952,7 +6408,10 @@ export interface operations {
                 pageSize?: number;
                 page?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du client */
                 id: string;
@@ -3968,6 +6427,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     CustomersController_getTransactions: {
@@ -3976,6 +6547,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description UUID du client */
@@ -3994,26 +6567,127 @@ export interface operations {
                     "application/json": components["schemas"]["TransactionResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Client introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     CustomersController_getSubscriptions: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du client */
                 id: string;
@@ -4031,26 +6705,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Client introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     CustomersController_createPortalSession: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du client */
                 id: string;
@@ -4081,19 +6856,117 @@ export interface operations {
                     "application/json": components["schemas"]["PortalLaunchSessionResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Client introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -4109,7 +6982,10 @@ export interface operations {
                 /** @description Filtrer par statut */
                 status?: "pending" | "completed" | "failed" | "expired";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4129,19 +7005,129 @@ export interface operations {
                     };
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     PaymentRequestsController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4173,26 +7159,127 @@ export interface operations {
                     "application/json": components["schemas"]["PaymentRequestResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou erreur de validation */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     PaymentRequestsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de la demande */
                 id: string;
@@ -4210,19 +7297,117 @@ export interface operations {
                     "application/json": components["schemas"]["PaymentRequestResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Demande introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -4238,6 +7423,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -4251,14 +7438,130 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     RefundsController_create: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path?: never;
             cookie?: never;
@@ -4278,12 +7581,117 @@ export interface operations {
                     "application/json": components["schemas"]["CreateRefundResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou type non pris en charge */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -4293,6 +7701,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description Refund ID */
@@ -4311,6 +7721,118 @@ export interface operations {
                     "application/json": components["schemas"]["RefundListItemDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     ProductsController_findAll: {
@@ -4323,7 +7845,10 @@ export interface operations {
                 /** @description Filtrer par statut actif */
                 isActive?: boolean;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4338,19 +7863,127 @@ export interface operations {
                     "application/json": components["schemas"]["ProductResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     ProductsController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4365,26 +7998,127 @@ export interface operations {
                     "application/json": components["schemas"]["ProductResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou erreur de validation */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     ProductsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du produit */
                 id: string;
@@ -4402,26 +8136,127 @@ export interface operations {
                     "application/json": components["schemas"]["ProductResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Produit introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     ProductsController_addPrice: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du produit */
                 id: string;
@@ -4439,33 +8274,127 @@ export interface operations {
                     "application/json": components["schemas"]["PriceResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou nombre maximal de prix dépassé */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Produit introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     ProductsController_setDefaultPrice: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du prix */
                 priceId: string;
@@ -4485,19 +8414,117 @@ export interface operations {
                     "application/json": components["schemas"]["ProductResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Produit ou prix introuvable */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -4513,7 +8540,10 @@ export interface operations {
                 /** @description Numéro de page */
                 page?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4528,19 +8558,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     SubscriptionsController_getUsage: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de l’abonnement */
                 id: string;
@@ -4555,12 +8693,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     SubscriptionsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de l’abonnement */
                 id: string;
@@ -4578,26 +8831,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Abonnement introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     SubscriptionsController_update: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de l’abonnement */
                 id: unknown;
@@ -4615,12 +8969,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     SubscriptionsController_resume: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de l’abonnement */
                 id: string;
@@ -4637,12 +9106,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     SubscriptionsController_changePlan: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de l’abonnement */
                 id: string;
@@ -4666,12 +9250,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     SubscriptionsController_cancel: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de l’abonnement */
                 id: string;
@@ -4696,26 +9395,127 @@ export interface operations {
                     "application/json": components["schemas"]["SubscriptionResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Abonnement introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     DiscountCouponsController_findAll: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4730,19 +9530,127 @@ export interface operations {
                     "application/json": components["schemas"]["DiscountCouponResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     DiscountCouponsController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4757,26 +9665,127 @@ export interface operations {
                     "application/json": components["schemas"]["DiscountCouponResponseDto"];
                 };
             };
-            /** @description Données invalides ou code déjà utilisé */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     DiscountCouponsController_getPerformance: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du coupon */
                 id: string;
@@ -4803,26 +9812,127 @@ export interface operations {
                     };
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Coupon introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     DiscountCouponsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du coupon */
                 id: string;
@@ -4840,19 +9950,117 @@ export interface operations {
                     "application/json": components["schemas"]["DiscountCouponResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Coupon introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -4866,7 +10074,10 @@ export interface operations {
                 /** @description Filtrer par statut de session (valeur checkout_session_status) */
                 status?: "open" | "completed" | "expired";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -4881,21 +10092,130 @@ export interface operations {
                     "application/json": components["schemas"]["CheckoutSessionResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     CheckoutSessionsController_create: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path?: never;
             cookie?: never;
@@ -4987,26 +10307,127 @@ export interface operations {
                     "application/json": components["schemas"]["CheckoutSessionResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou erreur de validation */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     CheckoutSessionsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID de la session */
                 id: string;
@@ -5024,19 +10445,117 @@ export interface operations {
                     "application/json": components["schemas"]["CheckoutSessionResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Session introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -5052,7 +10571,10 @@ export interface operations {
                 /** @description Filtrer par type de lien */
                 linkType?: "product" | "instant";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5072,19 +10594,127 @@ export interface operations {
                     };
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     PaymentLinksController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5150,26 +10780,127 @@ export interface operations {
                     "application/json": components["schemas"]["PaymentLinkResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou erreur de validation */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     PaymentLinksController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du lien de paiement */
                 id: string;
@@ -5187,19 +10918,117 @@ export interface operations {
                     "application/json": components["schemas"]["PaymentLinkResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Lien introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -5212,7 +11041,10 @@ export interface operations {
                 startDate?: string;
                 status?: string;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5225,12 +11057,129 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     PayoutsUnifiedController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5245,19 +11194,127 @@ export interface operations {
                     "application/json": components["schemas"]["CreatePayoutResponseDto"];
                 };
             };
-            /** @description Entrée invalide ou rail non pris en charge */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     PayoutsUnifiedController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Payout ID */
                 id: unknown;
@@ -5273,6 +11330,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     DisputesController_findAll: {
@@ -5287,6 +11456,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path?: never;
             cookie?: never;
@@ -5300,6 +11471,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     DisputesController_findOne: {
@@ -5308,6 +11591,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description Dispute ID */
@@ -5324,6 +11609,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     SettlementsController_findAll: {
@@ -5335,7 +11732,10 @@ export interface operations {
                 end_date?: string;
                 start_date?: string;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5348,6 +11748,203 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SettlementsController_createInstant: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
+                "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    mode: "advance" | "rail";
+                    /** @example 50000 */
+                    amount: number;
+                    /** @example XOF */
+                    currency_code: string;
+                    /**
+                     * Format: uuid
+                     * @description Required for rail mode after a payout is created
+                     */
+                    payout_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Instant settlement recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Ineligible or invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SettlementsController_getInstant: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
+                "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
+            path: {
+                /** @description Nitro request UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Nitro request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     SettlementsController_findTransactions: {
@@ -5356,7 +11953,10 @@ export interface operations {
                 pageSize?: number;
                 page?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Settlement id, format {currency}:{YYYY-MM-DD} */
                 id: unknown;
@@ -5371,6 +11971,118 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -5388,7 +12100,10 @@ export interface operations {
                 /** @description Filtrer par identifiant de webhook */
                 webhookId: string;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5403,19 +12118,127 @@ export interface operations {
                     "application/json": components["schemas"]["WebhookDeliveryLogResponseDto"][];
                 };
             };
-            /** @description Clé API invalide ou manquante */
-            401: {
+            /** @description Bad request */
+            400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     WebhookDeliveryLogsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description UUID du journal */
                 id: string;
@@ -5433,19 +12256,117 @@ export interface operations {
                     "application/json": components["schemas"]["WebhookDeliveryLogResponseDto"];
                 };
             };
-            /** @description Clé API invalide ou manquante */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Journal introuvable ou accès refusé */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -5472,7 +12393,10 @@ export interface operations {
                 /** @description Log stream to query */
                 type: "api_request" | "api_error" | "webhook_delivery" | "activity";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5487,19 +12411,117 @@ export interface operations {
                     "application/json": components["schemas"]["LogListResponseDto"];
                 };
             };
-            /** @description Invalid query parameters */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Invalid or missing API key */
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -5509,7 +12531,10 @@ export interface operations {
                 /** @description Log stream to query */
                 type: "api_request" | "api_error" | "webhook_delivery" | "activity";
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Log entry UUID */
                 id: string;
@@ -5527,26 +12552,127 @@ export interface operations {
                     "application/json": components["schemas"]["LogEntryResponseDto"];
                 };
             };
-            /** @description Invalid or missing API key */
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
             401: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            /** @description Log not found or access denied */
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
             404: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     WebhooksController_findAll: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5561,12 +12687,127 @@ export interface operations {
                     "application/json": components["schemas"]["WebhookResponseDto"][];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     WebhooksController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5579,12 +12820,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     WebhooksController_test: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Webhook UUID */
                 id: unknown;
@@ -5599,12 +12955,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     WebhooksController_retryDelivery: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Delivery log UUID */
                 deliveryId: unknown;
@@ -5621,12 +13092,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     WebhooksController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5641,12 +13227,127 @@ export interface operations {
                     "application/json": components["schemas"]["WebhookResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     WebhooksController_remove: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Webhook UUID */
                 id: unknown;
@@ -5661,12 +13362,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     WebhooksController_update: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5693,14 +13509,130 @@ export interface operations {
                     "application/json": components["schemas"]["WebhookResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     ChargesController_createWaveCharge: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path?: never;
             cookie?: never;
@@ -5720,21 +13652,130 @@ export interface operations {
                     "application/json": components["schemas"]["WaveChargeResponseDto"];
                 };
             };
-            /** @description Invalid input or Wave API error */
+            /** @description Bad request */
             400: {
                 headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
     ChargesController_createMtnCharge: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path?: never;
             cookie?: never;
@@ -5754,14 +13795,130 @@ export interface operations {
                     "application/json": components["schemas"]["MtnChargeResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     ChargesController_createSwitchCharge: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path?: never;
             cookie?: never;
@@ -5781,14 +13938,130 @@ export interface operations {
                     "application/json": components["schemas"]["SwitchChargeResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     ChargesController_createCardCharge: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path?: never;
             cookie?: never;
@@ -5808,6 +14081,118 @@ export interface operations {
                     "application/json": components["schemas"]["CardChargeResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     ChargesController_getCardCharge: {
@@ -5816,6 +14201,8 @@ export interface operations {
             header?: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
             };
             path: {
                 /** @description Card payment id (pi_...) */
@@ -5834,14 +14221,130 @@ export interface operations {
                     "application/json": components["schemas"]["CardChargeResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     ChargesController_cancelCardCharge: {
         parameters: {
             query?: never;
-            header?: {
+            header: {
                 /** @description Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. */
                 "Lomi-Account"?: string;
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+                /** @description Required unique key for money-moving writes. Replays return the original response. */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
             path: {
                 /** @description Card payment id (pi_...) */
@@ -5858,6 +14361,118 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MetersController_findAll: {
@@ -5866,7 +14481,10 @@ export interface operations {
                 isActive?: boolean;
                 productId?: unknown;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5880,12 +14498,127 @@ export interface operations {
                     "application/json": components["schemas"]["MeterResponseDto"][];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MetersController_create: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5899,12 +14632,127 @@ export interface operations {
                     "application/json": components["schemas"]["MeterResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MetersController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Meter ID */
                 id: unknown;
@@ -5919,6 +14767,118 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeterResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -5926,7 +14886,10 @@ export interface operations {
     MetersController_update: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Meter ID */
                 id: unknown;
@@ -5943,12 +14906,127 @@ export interface operations {
                     "application/json": components["schemas"]["MeterResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     MetersController_getBalance: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5962,6 +15040,118 @@ export interface operations {
                     "application/json": components["schemas"]["MeterBalanceResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     UsageEventsController_findAll: {
@@ -5973,7 +15163,10 @@ export interface operations {
                 page_size?: number;
                 page?: number;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -5987,12 +15180,127 @@ export interface operations {
                     "application/json": components["schemas"]["UsageEventListItemDto"][];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     UsageEventsController_ingest: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6000,10 +15308,124 @@ export interface operations {
         responses: {
             202: {
                 headers: {
+                    /** @description Poll this URL for processing_status */
+                    Location?: string;
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["UsageEventResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -6011,7 +15433,10 @@ export interface operations {
     UsageEventsController_findOne: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path: {
                 /** @description Event ID */
                 id: unknown;
@@ -6028,12 +15453,127 @@ export interface operations {
                     "application/json": components["schemas"]["UsageEventListItemDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     UsageEventsController_createUsageSubscription: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6047,6 +15587,118 @@ export interface operations {
                     "application/json": components["schemas"]["UsageSubscriptionResponseDto"];
                 };
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     UsageBillingController_listPeriods: {
@@ -6056,7 +15708,10 @@ export interface operations {
                 page?: number;
                 subscription_id?: unknown;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6067,6 +15722,118 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -6076,7 +15843,10 @@ export interface operations {
                 end_date: unknown;
                 start_date: unknown;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6088,12 +15858,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     UsageBillingController_creditWallet: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6104,6 +15989,118 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };
@@ -6113,7 +16110,10 @@ export interface operations {
                 feature_key: unknown;
                 customer_id: unknown;
             };
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6125,12 +16125,127 @@ export interface operations {
                 };
                 content?: never;
             };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
     UsageBillingController_createEntitlement: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned. */
+                "Lomi-Version"?: components["parameters"]["LomiVersion"];
+            };
             path?: never;
             cookie?: never;
         };
@@ -6141,6 +16256,118 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict (including idempotency_key_reused / idempotency_in_progress) */
+            409: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    /** @description IETF rate limit remaining (draft-ietf-httpapi-ratelimit-headers) */
+                    RateLimit?: string;
+                    /** @description IETF rate limit policy */
+                    "RateLimit-Policy"?: string;
+                    "X-RateLimit-Limit"?: string;
+                    "X-RateLimit-Remaining"?: string;
+                    "Retry-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
         };
     };

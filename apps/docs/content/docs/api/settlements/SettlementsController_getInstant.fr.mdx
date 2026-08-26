@@ -1,0 +1,83 @@
+---
+title: "Get an instant settlement (Nitro request)"
+description: "Get an instant settlement (Nitro request)"
+full: true
+method: get
+path: /settlements/instant/{id}
+operationId: SettlementsController_getInstant
+---
+
+## Aperçu
+
+Récupérer un règlement instantané (demande Nitro)
+
+Renvoie une demande de règlement instantané Nitro par identifiant.
+
+
+### Quand l’utiliser
+
+Utilisez après `POST /settlements/instant` ou depuis un webhook pour confirmer le statut, les frais et le montant net.
+
+### Voir aussi
+
+[Demander un règlement instantané](/api/settlements/SettlementsController_createInstant) · [Lister les périodes de règlement](/api/settlements/SettlementsController_findAll)
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Vue d’ensemble](/api)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Endpoint
+
+`GET /settlements/instant/{id}`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres d’URL
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | - | Nitro request UUID |
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### En-têtes
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | Non | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Nitro request |
+| `404` | Not found |
+
+## Erreurs
+
+Les erreurs suivent un format JSON standard. **401** : clé manquante ou invalide. **404** : ressource introuvable. **429** : trop de requêtes. Pour les créations, envoyez une clé d’idempotence si votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/settlements/instant/value" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY"
+```
+
+## OpenAPI
+
+- **operationId**: `SettlementsController_getInstant`
+- **Operation**: `GET /settlements/instant/{id}`
+
+Schémas complets et **Try it** : [référence API](/api).

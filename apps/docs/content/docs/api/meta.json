@@ -4,12 +4,6 @@
   "root": true,
   "icon": "BookOpen",
   "pages": [
-    "index",
-    "authentication",
-    "errors",
-    "data-models",
-    "payment-state-machine",
-    "---Endpoints---",
     "checkout-sessions",
     "payment-links",
     "payment-requests",

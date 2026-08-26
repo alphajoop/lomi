@@ -1,15 +1,24 @@
-import { Document, Image, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Page, Text, View } from "@react-pdf/renderer";
 import { formatAddressLines, formatContactLines } from "./format-address";
 import { formatCurrencyForReceipt } from "./format-utils";
 import { registerReceiptFonts } from "./fonts";
 import {
-  PDF_BACKGROUND,
+  PDF_BAND_RECEIPT,
   PDF_BORDER_COLOR,
   PDF_FONT_SIZE,
   PDF_LABEL_COLOR,
-  PDF_PAGE_PADDING,
-  PDF_TEXT_COLOR,
+  PDF_MUTED_BORDER,
+  PDF_TOTALS_WIDTH,
 } from "./tokens";
+import {
+  PdfContactLine,
+  PdfDocumentHeader,
+  PdfLegalFooter,
+  PdfSectionLabel,
+  PdfTopBand,
+  PDF_PAGE_CHROME_STYLE,
+} from "./pdf-chrome";
+import { resolveSupportEmail } from "./legal";
 import type { ReceiptAddress, ReceiptDocumentData } from "./types";
 
 registerReceiptFonts();
@@ -26,19 +35,10 @@ function AddressBlock({
 
   return (
     <View style={{ flex: 1, marginBottom: 20 }}>
+      <PdfSectionLabel>{label}</PdfSectionLabel>
       <Text
         style={{
-          fontSize: PDF_FONT_SIZE.label,
-          fontWeight: 500,
-          color: PDF_LABEL_COLOR,
-          marginBottom: 4,
-        }}
-      >
-        {label}
-      </Text>
-      <Text
-        style={{
-          fontSize: PDF_FONT_SIZE.body,
+          fontSize: 10,
           fontWeight: 600,
           marginBottom: 3,
         }}
@@ -50,7 +50,8 @@ function AddressBlock({
           key={`addr-${index.toString()}`}
           style={{
             fontSize: PDF_FONT_SIZE.body,
-            lineHeight: 1.4,
+            lineHeight: 1.45,
+            color: "#6B7280",
             marginBottom: 2,
           }}
         >
@@ -62,9 +63,9 @@ function AddressBlock({
           key={`contact-${index.toString()}`}
           style={{
             fontSize: PDF_FONT_SIZE.body,
-            lineHeight: 1.4,
+            lineHeight: 1.45,
             marginBottom: 2,
-            color: PDF_LABEL_COLOR,
+            color: "#6B7280",
           }}
         >
           {line}
@@ -74,13 +75,7 @@ function AddressBlock({
   );
 }
 
-function DetailRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <View
       style={{
@@ -89,7 +84,7 @@ function DetailRow({
         marginBottom: 4,
       }}
     >
-      <Text style={{ fontSize: PDF_FONT_SIZE.label, fontWeight: 500 }}>
+      <Text style={{ fontSize: PDF_FONT_SIZE.label, fontWeight: 600 }}>
         {label}
       </Text>
       <Text style={{ fontSize: PDF_FONT_SIZE.label, maxWidth: "55%" }}>
@@ -116,68 +111,33 @@ function getStatusColor(status: string): string {
 }
 
 export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
-  const currentYear = new Date().getFullYear();
+  const supportEmail = resolveSupportEmail(data.from.email);
 
   return (
     <Document>
-      <Page
-        wrap
-        size="A4"
-        style={{
-          padding: PDF_PAGE_PADDING,
-          backgroundColor: PDF_BACKGROUND,
-          color: PDF_TEXT_COLOR,
-          fontFamily: "Inter",
-          fontWeight: 400,
-        }}
-      >
+      <Page wrap size="A4" style={PDF_PAGE_CHROME_STYLE}>
+        <PdfTopBand color={PDF_BAND_RECEIPT} />
+        <PdfDocumentHeader
+          title={data.title}
+          meta={[
+            { label: "Receipt ID", value: data.transactionId },
+            { label: "Date", value: data.date },
+            { label: "Payment method", value: data.paymentMethod },
+          ]}
+        />
+
         <View
           style={{
-            marginBottom: 20,
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "flex-start",
+            marginBottom: 22,
           }}
         >
-          <View style={{ flex: 1, minWidth: 0, marginRight: 20 }}>
-            <Text
-              style={{
-                fontSize: PDF_FONT_SIZE.title,
-                fontWeight: 500,
-                marginBottom: 8,
-              }}
-            >
-              {data.title}
-            </Text>
-            <View style={{ flexDirection: "column", gap: 4 }}>
-              <Text style={{ fontSize: PDF_FONT_SIZE.label }}>
-                Receipt ID: {data.transactionId}
-              </Text>
-              <Text style={{ fontSize: PDF_FONT_SIZE.label }}>
-                Date: {data.date}
-              </Text>
-              <Text style={{ fontSize: PDF_FONT_SIZE.label }}>
-                Payment method: {data.paymentMethod}
-              </Text>
-            </View>
+          <View style={{ width: "36%" }}>
+            <AddressBlock label="From" address={data.from} />
           </View>
-
-          {data.logoUrl ? (
-            <View style={{ maxWidth: 220, flexShrink: 0 }}>
-              <Image
-                src={data.logoUrl}
-                style={{ height: 72, objectFit: "contain" }}
-              />
-            </View>
-          ) : null}
-        </View>
-
-        <View style={{ flexDirection: "row", marginTop: 12 }}>
-          <View style={{ flex: 1, marginRight: 10 }}>
-            <AddressBlock label="Billed by" address={data.from} />
-          </View>
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <AddressBlock label="Billed to" address={data.to} />
+          <View style={{ width: "38%", marginLeft: "auto" }}>
+            <AddressBlock label="Bill to" address={data.to} />
           </View>
         </View>
 
@@ -190,29 +150,47 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
           </View>
         ) : null}
 
-        <View style={{ marginTop: 8 }}>
+        <View>
           <View
             style={{
               flexDirection: "row",
               borderBottomWidth: 0.5,
               borderBottomColor: PDF_BORDER_COLOR,
               paddingBottom: 5,
-              marginBottom: 5,
+              marginBottom: 8,
             }}
           >
-            <Text style={{ flex: 3, fontSize: PDF_FONT_SIZE.label, fontWeight: 500 }}>
+            <Text
+              style={{
+                flex: 3.4,
+                fontSize: PDF_FONT_SIZE.label,
+                fontWeight: 500,
+                color: PDF_LABEL_COLOR,
+              }}
+            >
               Description
             </Text>
             {data.showQuantityAndPrice ? (
               <Text
-                style={{ flex: 1, fontSize: PDF_FONT_SIZE.label, fontWeight: 500 }}
+                style={{
+                  flex: 0.6,
+                  fontSize: PDF_FONT_SIZE.label,
+                  fontWeight: 500,
+                  color: PDF_LABEL_COLOR,
+                }}
               >
                 Qty
               </Text>
             ) : null}
             {data.showQuantityAndPrice ? (
               <Text
-                style={{ flex: 1, fontSize: PDF_FONT_SIZE.label, fontWeight: 500 }}
+                style={{
+                  flex: 1,
+                  fontSize: PDF_FONT_SIZE.label,
+                  fontWeight: 500,
+                  color: PDF_LABEL_COLOR,
+                  textAlign: "right",
+                }}
               >
                 Price
               </Text>
@@ -222,6 +200,7 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
                 flex: 1,
                 fontSize: PDF_FONT_SIZE.label,
                 fontWeight: 500,
+                color: PDF_LABEL_COLOR,
                 textAlign: "right",
               }}
             >
@@ -235,22 +214,36 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
               wrap={false}
               style={{
                 flexDirection: "row",
-                paddingVertical: 5,
+                paddingBottom: 12,
+                marginBottom: 4,
+                borderBottomWidth: 0.5,
+                borderBottomColor: PDF_MUTED_BORDER,
                 alignItems: "flex-start",
               }}
             >
-              <View style={{ flex: 3, paddingRight: 16 }}>
-                <Text style={{ fontSize: PDF_FONT_SIZE.body }}>
+              <View style={{ flex: 3.4, paddingRight: 14 }}>
+                <Text
+                  style={{
+                    fontSize: PDF_FONT_SIZE.body,
+                    fontWeight: item.isFee ? 400 : 600,
+                  }}
+                >
                   {item.description}
                 </Text>
               </View>
               {data.showQuantityAndPrice ? (
-                <Text style={{ flex: 1, fontSize: PDF_FONT_SIZE.body }}>
+                <Text style={{ flex: 0.6, fontSize: PDF_FONT_SIZE.body }}>
                   {!item.isFee ? String(item.quantity) : ""}
                 </Text>
               ) : null}
               {data.showQuantityAndPrice ? (
-                <Text style={{ flex: 1, fontSize: PDF_FONT_SIZE.body }}>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: PDF_FONT_SIZE.body,
+                    textAlign: "right",
+                  }}
+                >
                   {!item.isFee
                     ? formatCurrencyForReceipt(item.unitPrice, data.currency)
                     : ""}
@@ -269,68 +262,76 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
           ))}
         </View>
 
-        <View
-          style={{
-            marginTop: 32,
-            alignItems: "flex-end",
-            marginLeft: "auto",
-            width: 250,
-          }}
-        >
-          {data.isMerchantReceipt &&
-          data.platformFee &&
-          data.platformFee > 0.01 ? (
-            <>
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginBottom: 5,
-                  width: "100%",
-                }}
-              >
-                <Text style={{ fontSize: PDF_FONT_SIZE.label, flex: 1 }}>
-                  Subtotal
-                </Text>
-                <Text style={{ fontSize: PDF_FONT_SIZE.label, textAlign: "right" }}>
-                  {formatCurrencyForReceipt(data.subtotal ?? 0, data.currency)}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginBottom: 5,
-                  width: "100%",
-                }}
-              >
-                <Text style={{ fontSize: PDF_FONT_SIZE.label, flex: 1 }}>
-                  Fees
-                </Text>
-                <Text style={{ fontSize: PDF_FONT_SIZE.label, textAlign: "right" }}>
-                  -{" "}
-                  {formatCurrencyForReceipt(data.platformFee, data.currency)}
-                </Text>
-              </View>
-            </>
-          ) : null}
+        <View style={{ alignItems: "flex-end", marginTop: 16 }}>
+          <View style={{ width: PDF_TOTALS_WIDTH }}>
+            {data.isMerchantReceipt &&
+            data.platformFee &&
+            data.platformFee > 0.01 ? (
+              <>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: 5,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: PDF_FONT_SIZE.label,
+                      color: PDF_LABEL_COLOR,
+                    }}
+                  >
+                    Subtotal
+                  </Text>
+                  <Text style={{ fontSize: PDF_FONT_SIZE.label }}>
+                    {formatCurrencyForReceipt(
+                      data.subtotal ?? 0,
+                      data.currency,
+                    )}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: 5,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: PDF_FONT_SIZE.label,
+                      color: PDF_LABEL_COLOR,
+                    }}
+                  >
+                    Fees
+                  </Text>
+                  <Text style={{ fontSize: PDF_FONT_SIZE.label }}>
+                    -{" "}
+                    {formatCurrencyForReceipt(data.platformFee, data.currency)}
+                  </Text>
+                </View>
+              </>
+            ) : null}
 
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 5,
-              borderTopWidth: 0.5,
-              borderTopColor: PDF_BORDER_COLOR,
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: PDF_FONT_SIZE.label, marginRight: 10 }}>
-              {data.totalLabel}
-            </Text>
-            <Text style={{ fontSize: PDF_FONT_SIZE.total }}>
-              {formatCurrencyForReceipt(data.totalAmount, data.currency)}
-            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderTopWidth: 0.5,
+                borderTopColor: PDF_BORDER_COLOR,
+                paddingTop: 6,
+                marginTop: 2,
+              }}
+            >
+              <Text style={{ fontSize: PDF_FONT_SIZE.label, fontWeight: 600 }}>
+                {data.totalLabel}
+              </Text>
+              <Text style={{ fontSize: PDF_FONT_SIZE.total, fontWeight: 600 }}>
+                {formatCurrencyForReceipt(data.totalAmount, data.currency)}
+              </Text>
+            </View>
+            <PdfContactLine email={supportEmail} kind="receipt" />
           </View>
         </View>
 
@@ -341,8 +342,7 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
               marginTop: 24,
               padding: 12,
               borderWidth: 0.5,
-              borderColor: "#e2e8f0",
-              borderRadius: 4,
+              borderColor: PDF_MUTED_BORDER,
             }}
           >
             <Text
@@ -374,7 +374,12 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ fontSize: PDF_FONT_SIZE.label, fontWeight: 500 }}>
+                  <Text
+                    style={{
+                      fontSize: PDF_FONT_SIZE.label,
+                      fontWeight: 600,
+                    }}
+                  >
                     Status
                   </Text>
                   <Text
@@ -391,33 +396,7 @@ export function ReceiptPdfDocument({ data }: { data: ReceiptDocumentData }) {
           </View>
         ) : null}
 
-        <View
-          style={{
-            position: "absolute",
-            bottom: PDF_PAGE_PADDING,
-            left: PDF_PAGE_PADDING,
-            right: PDF_PAGE_PADDING,
-            borderTopWidth: 0.5,
-            borderTopColor: "#e2e8f0",
-            paddingTop: 10,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: PDF_FONT_SIZE.footer,
-              color: PDF_LABEL_COLOR,
-              textAlign: "right",
-              marginBottom: 4,
-            }}
-          >
-            Please contact hello@lomi.africa with any questions regarding this
-            receipt.
-          </Text>
-          <Text style={{ fontSize: PDF_FONT_SIZE.footer, color: PDF_LABEL_COLOR }}>
-            Powered by lomi. | © {currentYear} lomi. Technologies Africa S.A
-            — All rights reserved
-          </Text>
-        </View>
+        <PdfLegalFooter />
       </Page>
     </Document>
   );

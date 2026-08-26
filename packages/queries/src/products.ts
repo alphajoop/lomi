@@ -58,4 +58,19 @@ export async function fetchProducts(
   };
 }
 
+export type ActiveSubscriptionsByProductRow =
+  Database["public"]["Functions"]["get_active_subscriptions_by_product"]["Returns"][number];
+
+export async function getActiveSubscriptionsByProduct(
+  client: TypedSupabaseClient,
+  args: Database["public"]["Functions"]["get_active_subscriptions_by_product"]["Args"],
+): Promise<ActiveSubscriptionsByProductRow[]> {
+  const data = await handleSupabaseRpc(
+    rpc(client, "get_active_subscriptions_by_product", args),
+    "get_active_subscriptions_by_product",
+    null,
+  );
+  return data ?? [];
+}
+
 export * from "./products-ops.js";

@@ -11,6 +11,19 @@ export class SettlementsService {
     constructor(private readonly client: LomiClient) {}
 
     /**
+     * Request an instant settlement (Nitro)
+     * @see OpenAPI `SettlementsController_createInstant`
+     */
+    public async createInstant(body: NonNullable<paths['/settlements/instant']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
+            method: 'POST',
+            url: '/settlements/instant',
+            body,
+            ...options,
+        });
+    }
+
+    /**
      * List settlement periods
      * @see OpenAPI `SettlementsController_findAll`
      */
@@ -69,6 +82,19 @@ export class SettlementsService {
             url: '/settlements/{id}/transactions',
             path: { id: id },
             query: params,
+            ...options,
+        });
+    }
+
+    /**
+     * Get an instant settlement (Nitro request)
+     * @see OpenAPI `SettlementsController_getInstant`
+     */
+    public async getInstant(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {
+        return requestWithClient<unknown>(this.client, {
+            method: 'GET',
+            url: '/settlements/instant/{id}',
+            path: { id: id },
             ...options,
         });
     }

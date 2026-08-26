@@ -36,7 +36,7 @@ export class OrganizationsService {
     }
 
     /**
-     * Get Radar settings for the organization
+     * Get Radar settings
      * @see OpenAPI `OrganizationsController_getRadarSettings`
      */
     public async getRadarSettings(options?: import("../../request-options.js").LomiRequestOptions): Promise<unknown> {

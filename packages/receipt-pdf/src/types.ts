@@ -91,6 +91,7 @@ export interface ReceiptBuildOptions {
   organizationRegion?: string;
   organizationPostalCode?: string;
   organizationCountry?: string;
+  organizationEmail?: string;
   receiptTitle?: string;
   isMerchantReceipt?: boolean;
   formatPaymentMethod: (code: string | null | undefined) => string;

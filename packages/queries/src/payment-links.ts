@@ -33,6 +33,36 @@ export async function createPaymentLink(
   return handleSupabaseRpc(rpc(client, "create_payment_link", args), "create_payment_link");
 }
 
+export async function getPaymentLink(
+  client: TypedSupabaseClient,
+  args?: DbFunctions["get_payment_link"]["Args"],
+): Promise<DbFunctions["get_payment_link"]["Returns"] | null>;
+export async function getPaymentLink(
+  client: TypedSupabaseClient,
+  args: DbFunctions["get_payment_link"]["Args"],
+  options: { expectReturnValue: false },
+): Promise<boolean>;
+export async function getPaymentLink(
+  client: TypedSupabaseClient,
+  args: DbFunctions["get_payment_link"]["Args"],
+  options: SupabaseRpcOptions<DbFunctions["get_payment_link"]["Returns"]> | null,
+): Promise<DbFunctions["get_payment_link"]["Returns"] | null>;
+export async function getPaymentLink(
+  client: TypedSupabaseClient,
+  args: DbFunctions["get_payment_link"]["Args"] = emptyRpcArgs<"get_payment_link">(),
+  options?: SupabaseRpcOptions<DbFunctions["get_payment_link"]["Returns"]> | null,
+): Promise<DbFunctions["get_payment_link"]["Returns"] | null | boolean> {
+  if (options === null) {
+    return handleSupabaseRpc(rpc(client, "get_payment_link", args), "get_payment_link", {
+      fallbackValue: null,
+    });
+  }
+  if (options !== undefined) {
+    return handleSupabaseRpc(rpc(client, "get_payment_link", args), "get_payment_link", options);
+  }
+  return handleSupabaseRpc(rpc(client, "get_payment_link", args), "get_payment_link");
+}
+
 export async function fetchPaymentLinks(
   client: TypedSupabaseClient,
   args?: DbFunctions["fetch_payment_links"]["Args"],

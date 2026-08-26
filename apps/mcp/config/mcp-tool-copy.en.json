@@ -175,6 +175,10 @@
     "title": "List transactions in a settlement",
     "description": "List the transactions included in one settlement period (settlement_id {currency}:{date}). Use to reconcile a payout against underlying payments."
   },
+  "GET /settlements/instant/{id}": {
+    "title": "Get an instant settlement",
+    "description": "Retrieve one Nitro instant-settlement request by id, including mode, fee, net amount, and status."
+  },
   "GET /subscriptions": {
     "title": "List subscriptions",
     "description": "List subscriptions with status (active, canceled, past_due). Filter to audit recurring billing."
@@ -302,6 +306,10 @@
   "POST /refunds": {
     "title": "Create refund",
     "description": "Refund a payment fully or partially back to the customer. Pass the transaction id and optional amount. Use for returns and support."
+  },
+  "POST /settlements/instant": {
+    "title": "Request an instant settlement",
+    "description": "Nitro: record a rail fee on an existing payout, or unlock held card funds (advance) up to the org cap. Requires Idempotency-Key. Advance stays off until ops approves a limit."
   },
   "POST /subscriptions/{id}/cancel": {
     "title": "Cancel subscription",

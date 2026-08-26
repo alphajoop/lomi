@@ -56,7 +56,7 @@ Si la requête renvoie `401`, vérifiez que la clé secrète est complète et qu
 | --- | --- | --- |
 | `X-API-Key` (ou `X-API-KEY`) | Oui | Chaque requête marchande. Alias : `x-lomi-api-key`. `Authorization: Bearer <secret>` est aussi accepté. |
 | `Content-Type` | Sur un corps JSON | `application/json` pour POST/PATCH avec un corps |
-| `Idempotency-Key` | Sur les écritures qui bougent de l’argent | Obligatoire sur `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts` et `POST /charge/*`. Voir [Clés d’idempotence](/build/reliability/idempotency-keys). |
+| `Idempotency-Key` | Sur les écritures qui bougent de l’argent | Obligatoire sur `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts`, `POST /settlements/instant` et `POST /charge/*`. Voir [Clés d’idempotence](/build/reliability/idempotency-keys). |
 | `X-Scenario-Key` | Non | Sandbox Wave/MTN **direct** uniquement (`pending` ou `failed`). Le checkout hébergé et les cartes l’ignorent. Voir [Simuler des erreurs](/build/reliability/simulate-errors). |
 | `Lomi-Account` | Non | lomi. Network : clé opérateur ciblant un membre `acct_...`. Voir [Network](/build/platform/network). |
 

@@ -11,4 +11,5 @@ export * from "./network.js";
 export * from "./overview.js";
 export * from "./provisioning.js";
 export * from "./support.js";
+export * from "./insurance.js";
 export { rpc } from "../rpc.js";

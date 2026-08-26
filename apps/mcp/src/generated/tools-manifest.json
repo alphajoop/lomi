@@ -2171,11 +2171,11 @@
     {
       "name": "lomi_settlements",
       "title": "Settlements",
-      "description": "Settlements. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List settlement periods (GET /settlements). No extra required fields.\n- `transactions` — List transactions in a settlement (GET /settlements/{id}/transactions). Required: id.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
+      "description": "Settlements. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List settlement periods (GET /settlements). No extra required fields.\n- `transactions` — List transactions in a settlement (GET /settlements/{id}/transactions). Required: id.\n- `create_instant` — Request an instant settlement (POST /settlements/instant). Required: body.\n- `get_instant` — Get an instant settlement (GET /settlements/instant/{id}). Required: id.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Settlements"
       ],
-      "write": false,
+      "write": true,
       "inputSchema": {
         "type": "object",
         "additionalProperties": true,
@@ -2187,9 +2187,16 @@
             "type": "string",
             "enum": [
               "list",
-              "transactions"
+              "transactions",
+              "create_instant",
+              "get_instant"
             ],
-            "description": "Which REST operation to run. One of: list, transactions."
+            "description": "Which REST operation to run. One of: list, transactions, create_instant, get_instant."
+          },
+          "body": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
           "currency": {
             "type": "string",
@@ -2199,9 +2206,18 @@
             "type": "string",
             "description": "End Date"
           },
+          "header_Lomi-Account": {
+            "type": "string",
+            "example": "acct_1234567890",
+            "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
           "id": {
             "example": "XOF:2026-06-01",
             "description": "Settlement id, format {currency}:{YYYY-MM-DD}"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
           "page": {
             "type": "number",
@@ -2217,10 +2233,10 @@
           }
         }
       },
-      "readOnly": true,
+      "readOnly": false,
       "destructive": false,
       "alwaysLoad": false,
-      "searchHint": "get list settlements transactions",
+      "searchHint": "create_instant get get_instant instant list post settlements transactions",
       "actions": {
         "list": {
           "operationKey": "GET /settlements",
@@ -2260,6 +2276,44 @@
           "wantsBody": false,
           "title": "List transactions in a settlement",
           "description": "List the transactions included in one settlement period (settlement_id {currency}:{date}). Use to reconcile a payout against underlying payments.",
+          "tags": [
+            "Settlements"
+          ],
+          "requiredInput": [
+            "id"
+          ]
+        },
+        "create_instant": {
+          "operationKey": "POST /settlements/instant",
+          "method": "post",
+          "pathTemplate": "/settlements/instant",
+          "pathParamNames": [],
+          "queryParamNames": [],
+          "operationId": "SettlementsController_createInstant",
+          "write": true,
+          "wantsBody": true,
+          "title": "Request an instant settlement",
+          "description": "Nitro: record a rail fee on an existing payout, or unlock held card funds (advance) up to the org cap. Requires Idempotency-Key. Advance stays off until ops approves a limit.",
+          "tags": [
+            "Settlements"
+          ],
+          "requiredInput": [
+            "body"
+          ]
+        },
+        "get_instant": {
+          "operationKey": "GET /settlements/instant/{id}",
+          "method": "get",
+          "pathTemplate": "/settlements/instant/{id}",
+          "pathParamNames": [
+            "id"
+          ],
+          "queryParamNames": [],
+          "operationId": "SettlementsController_getInstant",
+          "write": false,
+          "wantsBody": false,
+          "title": "Get an instant settlement",
+          "description": "Retrieve one Nitro instant-settlement request by id, including mode, fee, net amount, and status.",
           "tags": [
             "Settlements"
           ],

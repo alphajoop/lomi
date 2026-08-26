@@ -381,7 +381,25 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use for accounting reconciliation before requesting payouts or exporting withdrawable totals by day.',
     related:
-      '[List settlement transactions](/api/settlements/SettlementsController_findTransactions)',
+      '[List settlement transactions](/api/settlements/SettlementsController_findTransactions) · [Request instant settlement](/api/settlements/SettlementsController_createInstant)',
+  },
+  SettlementsController_createInstant: {
+    summary: 'Request an instant settlement (Nitro)',
+    body: 'Rail mode records a Nitro fee on an existing payout. Advance mode unlocks held card funds up to the organization cap. Requires `Idempotency-Key`. Advance stays off until ops approves a limit.',
+    whenToUse:
+      'Use after creating a Wave or SPI payout (rail) or to release held card balance (advance) when Nitro is enabled for the organization.',
+    caveats:
+      'Rail requires `payout_id`. Advance is live-only, excludes disputed transactions, and fails when the org cap is exceeded. Not a loan and not insurance.',
+    related:
+      '[Get instant settlement](/api/settlements/SettlementsController_getInstant) · [Create payout](/api/payouts/PayoutsUnifiedController_create)',
+  },
+  SettlementsController_getInstant: {
+    summary: 'Get an instant settlement (Nitro request)',
+    body: 'Returns one Nitro instant-settlement request by UUID, scoped to this API key organization.',
+    whenToUse:
+      'Use after `POST /settlements/instant` or from a webhook to confirm status, fee, and net amount.',
+    related:
+      '[Request instant settlement](/api/settlements/SettlementsController_createInstant) · [List settlement periods](/api/settlements/SettlementsController_findAll)',
   },
   SettlementsController_findTransactions: {
     summary: 'List settlement transactions',
@@ -389,7 +407,7 @@ export const EN_OPERATION_COPY = {
     whenToUse:
       'Use to drill into a settlement row and match ledger movements to individual payments.',
     related:
-      '[List settlement periods](/api/settlements/SettlementsController_findAll)',
+      '[List settlement periods](/api/settlements/SettlementsController_findAll) · [Request instant settlement](/api/settlements/SettlementsController_createInstant)',
   },
   SubscriptionsController_cancel: {
     summary: 'Cancel subscription',

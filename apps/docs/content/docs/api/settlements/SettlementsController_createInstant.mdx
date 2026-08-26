@@ -1,0 +1,111 @@
+---
+title: "Request an instant settlement (Nitro)"
+description: "Request an instant settlement (Nitro)"
+full: true
+method: post
+path: /settlements/instant
+operationId: SettlementsController_createInstant
+---
+
+## Overview
+
+Request an instant settlement (Nitro)
+
+Rail mode records a Nitro fee on an existing payout. Advance mode unlocks held card funds up to the organization cap. Requires `Idempotency-Key`. Advance stays off until ops approves a limit.
+
+
+### When to use this
+
+Use after creating a Wave or SPI payout (rail) or to release held card balance (advance) when Nitro is enabled for the organization.
+
+### Good to know
+
+Rail requires `payout_id`. Advance is live-only, excludes disputed transactions, and fails when the org cap is exceeded. Not a loan and not insurance.
+
+### See also
+
+[Get instant settlement](/api/settlements/SettlementsController_getInstant) · [Create payout](/api/payouts/PayoutsUnifiedController_create)
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Overview](/api)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`POST /settlements/instant`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+_No query parameters._
+
+
+### Headers
+
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `Lomi-Account` | header | No | - | Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account. |
+
+### Request body
+
+JSON request payload.
+
+Schema: `object`
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `mode` | Yes | `enum ("advance", "rail")` | - |
+| `amount` | Yes | `number` | - |
+| `currency_code` | Yes | `string` | - |
+| `payout_id` | No | `string` | Required for rail mode after a payout is created |
+
+Example body:
+
+```json
+{
+  "mode": "advance",
+  "amount": 50000,
+  "currency_code": "XOF"
+}
+```
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `201` | Instant settlement recorded |
+| `400` | Ineligible or invalid request |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/settlements/instant" \
+  -H "X-API-KEY: $LOMI_SECRET_KEY" \
+  -H "Idempotency-Key: $IDEMPOTENCY_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"mode":"advance","amount":50000,"currency_code":"XOF"}'
+```
+
+## OpenAPI
+
+- **operationId**: `SettlementsController_createInstant`
+- **Operation**: `POST /settlements/instant`
+
+Full schemas and **Try it**: [API reference](/api). Machine-readable contract: repo `apps/docs/openapi.json`.

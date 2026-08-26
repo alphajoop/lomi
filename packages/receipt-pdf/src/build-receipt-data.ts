@@ -218,8 +218,7 @@ export function buildReceiptDocumentData(
   options: ReceiptBuildOptions,
 ): ReceiptDocumentData {
   const isMerchantReceipt = options.isMerchantReceipt ?? false;
-  const currency =
-    transaction.currency || transaction.currency_code || "XOF";
+  const currency = transaction.currency || transaction.currency_code || "XOF";
   const { items, subtotal, platformFee } = buildReceiptLineItems(
     transaction,
     isMerchantReceipt,
@@ -233,14 +232,12 @@ export function buildReceiptDocumentData(
   const totalLabel = isMerchantReceipt ? "Amount received" : "Total paid";
 
   const logoUrl =
-    options.organizationLogo &&
-    options.organizationLogo !== DEFAULT_LOGO_URL
+    options.organizationLogo && options.organizationLogo !== DEFAULT_LOGO_URL
       ? options.organizationLogo
       : undefined;
 
   const formatBilling =
-    options.formatBillingFrequency ??
-    ((frequency) => frequency || "N/A");
+    options.formatBillingFrequency ?? ((frequency) => frequency || "N/A");
   const formatStatus =
     options.formatSubscriptionStatus ?? formatSubscriptionStatus;
 
@@ -258,6 +255,7 @@ export function buildReceiptDocumentData(
       region: options.organizationRegion,
       postalCode: options.organizationPostalCode,
       country: options.organizationCountry,
+      email: options.organizationEmail,
     },
     to: {
       name: stripEmojis(transaction.customer_name || "Valued Customer"),

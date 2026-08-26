@@ -1,7 +1,9 @@
 {
   "title": "Settlements",
   "pages": [
+    "SettlementsController_createInstant",
     "SettlementsController_findAll",
-    "SettlementsController_findTransactions"
+    "SettlementsController_findTransactions",
+    "SettlementsController_getInstant"
   ]
 }

@@ -1,6 +1,16 @@
 import type { ReactNode } from "react";
 import { formatAddressLines, formatContactLines } from "./format-address";
 import { formatCurrencyForReceipt } from "./format-utils";
+import {
+  HtmlContactLine,
+  HtmlDocumentBand,
+  HtmlDocumentHeader,
+  HtmlLegalFooter,
+  HtmlMetaRow,
+  HtmlSectionLabel,
+} from "./html-chrome";
+import { resolveSupportEmail } from "./legal";
+import { PDF_BAND_RECEIPT } from "./tokens";
 import type { ReceiptDocumentData, ReceiptLayoutLabels } from "./types";
 
 function truncateId(id: string, maxLength = 20): string {
@@ -20,15 +30,17 @@ function AddressSection({
 
   return (
     <div>
-      <p className="text-[11px] text-[#878787] mb-2">{label}</p>
-      <p className="text-[11px] font-semibold text-foreground">{address.name}</p>
+      <HtmlSectionLabel>{label}</HtmlSectionLabel>
+      <p className="text-[11px] font-semibold text-foreground">
+        {address.name}
+      </p>
       {addressLines.map((line) => (
-        <p key={line} className="text-[11px] text-muted-foreground leading-5">
+        <p key={line} className="text-[11px] text-[#6B7280] leading-5">
           {line}
         </p>
       ))}
       {contactLines.map((line) => (
-        <p key={line} className="text-[11px] text-muted-foreground leading-5">
+        <p key={line} className="text-[11px] text-[#6B7280] leading-5">
           {line}
         </p>
       ))}
@@ -39,8 +51,10 @@ function AddressSection({
 function DetailPair({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-start gap-4 text-[11px]">
-      <span className="font-medium text-foreground shrink-0">{label}</span>
-      <span className="text-muted-foreground text-right break-all">{value}</span>
+      <span className="font-semibold text-foreground shrink-0">{label}</span>
+      <span className="text-muted-foreground text-right break-all">
+        {value}
+      </span>
     </div>
   );
 }
@@ -48,41 +62,29 @@ function DetailPair({ label, value }: { label: string; value: string }) {
 export function ReceiptLayout({
   data,
   labels,
-  organizationBadge,
   actions,
 }: {
   data: ReceiptDocumentData;
   labels: ReceiptLayoutLabels;
-  organizationBadge?: ReactNode;
   actions?: ReactNode;
 }) {
-  return (
-    <div className="bg-card border border-border rounded-sm overflow-hidden">
-      <div className="p-6 md:p-8 bg-white dark:bg-card">
-        {organizationBadge ? (
-          <div className="flex justify-center mb-6">{organizationBadge}</div>
-        ) : null}
+  const supportEmail = resolveSupportEmail(data.from.email);
 
-        <div className="mb-6">
-          <h1 className="text-[21px] font-medium text-foreground mb-2 leading-tight text-center">
-            {data.title}
-          </h1>
-          <div className="flex flex-col gap-1 text-[11px] text-muted-foreground text-center">
-            <p>
-              <span className="text-[#878787]">{labels.receiptId}:</span>{" "}
-              <span title={data.transactionId}>
-                {truncateId(data.transactionId)}
-              </span>
-            </p>
-            <p>
-              <span className="text-[#878787]">{labels.date}:</span> {data.date}
-            </p>
-            <p>
-              <span className="text-[#878787]">{labels.paymentMethod}:</span>{" "}
-              {data.paymentMethod}
-            </p>
-          </div>
-        </div>
+  return (
+    <div className="bg-card border border-border rounded-sm overflow-hidden relative">
+      <HtmlDocumentBand color={PDF_BAND_RECEIPT} />
+      <div className="px-6 md:px-8 pt-10 pb-6 bg-white dark:bg-card">
+        <HtmlDocumentHeader title={data.title}>
+          <HtmlMetaRow
+            label={labels.receiptId}
+            value={truncateId(data.transactionId)}
+          />
+          <HtmlMetaRow label={labels.date} value={data.date} />
+          <HtmlMetaRow
+            label={labels.paymentMethod}
+            value={data.paymentMethod}
+          />
+        </HtmlDocumentHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <AddressSection label={labels.billedBy} address={data.from} />
@@ -98,9 +100,9 @@ export function ReceiptLayout({
           </div>
         ) : null}
 
-        <div className="mt-5 font-mono">
+        <div className="mt-5">
           <div
-            className={`grid ${data.showQuantityAndPrice ? "grid-cols-[1.5fr_12%_12%_15%]" : "grid-cols-[1.5fr_15%]"} gap-4 items-end pb-1 mb-2 border-b border-border`}
+            className={`grid ${data.showQuantityAndPrice ? "grid-cols-[1.5fr_12%_12%_15%]" : "grid-cols-[1.5fr_15%]"} gap-4 items-end pb-1 mb-2 border-b border-[#111111]`}
           >
             <div className="text-[11px] text-[#878787]">
               {labels.description}
@@ -121,9 +123,9 @@ export function ReceiptLayout({
           {data.lineItems.map((item, index) => (
             <div
               key={`${item.description}-${index.toString()}`}
-              className={`grid ${data.showQuantityAndPrice ? "grid-cols-[1.5fr_12%_12%_15%]" : "grid-cols-[1.5fr_15%]"} gap-4 items-start py-2 border-b border-border/60`}
+              className={`grid ${data.showQuantityAndPrice ? "grid-cols-[1.5fr_12%_12%_15%]" : "grid-cols-[1.5fr_15%]"} gap-4 items-start py-2 border-b border-[#E2E8F0]`}
             >
-              <div className="text-[11px] text-foreground self-start">
+              <div className="text-[11px] text-foreground self-start font-semibold">
                 {item.description}
               </div>
               {data.showQuantityAndPrice ? (
@@ -146,13 +148,13 @@ export function ReceiptLayout({
         </div>
 
         <div className="mt-10 flex justify-end">
-          <div className="w-full max-w-[250px]">
+          <div className="w-full max-w-[320px]">
             {data.isMerchantReceipt &&
             data.platformFee &&
             data.platformFee > 0.01 ? (
               <>
                 {labels.subtotal ? (
-                  <div className="flex justify-between text-[11px] mb-2">
+                  <div className="flex justify-between text-[11px] mb-2 text-[#878787]">
                     <span>{labels.subtotal}</span>
                     <span>
                       {formatCurrencyForReceipt(
@@ -163,7 +165,7 @@ export function ReceiptLayout({
                   </div>
                 ) : null}
                 {labels.fees ? (
-                  <div className="flex justify-between text-[11px] mb-2 text-red-600 dark:text-red-400">
+                  <div className="flex justify-between text-[11px] mb-2">
                     <span>{labels.fees}</span>
                     <span>
                       -{" "}
@@ -176,17 +178,20 @@ export function ReceiptLayout({
                 ) : null}
               </>
             ) : null}
-            <div className="flex justify-between items-center border-t border-border pt-2">
-              <span className="text-[11px]">{data.totalLabel}</span>
-              <span className="text-[21px]">
+            <div className="flex justify-between items-center border-t border-[#111111] pt-2">
+              <span className="text-[11px] font-semibold">
+                {data.totalLabel}
+              </span>
+              <span className="text-[21px] font-semibold">
                 {formatCurrencyForReceipt(data.totalAmount, data.currency)}
               </span>
             </div>
+            <HtmlContactLine email={supportEmail} kind="receipt" />
           </div>
         </div>
 
         {data.subscription ? (
-          <div className="mt-8 p-4 border border-border rounded-sm text-[11px]">
+          <div className="mt-8 p-4 border border-[#E2E8F0] text-[11px]">
             <p className="font-semibold mb-3">Subscription details</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <DetailPair label="Plan" value={data.subscription.planName} />
@@ -203,9 +208,9 @@ export function ReceiptLayout({
           </div>
         ) : null}
 
-        {actions ? (
-          <div className="mt-6 pt-4 border-t border-border">{actions}</div>
-        ) : null}
+        <HtmlLegalFooter />
+
+        {actions ? <div className="mt-6 pt-4">{actions}</div> : null}
       </div>
     </div>
   );

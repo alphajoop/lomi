@@ -173,6 +173,20 @@ export const FR_OPERATION_COPY = {
       'Utilisez après création ou depuis des flux webhook pour confirmer les détails.',
     related: '[Créer un remboursement](/api/refunds/RefundsController_create)',
   },
+  SettlementsController_createInstant: {
+    whenToUse:
+      'Utilisez après un retrait Wave ou SPI (rail) ou pour débloquer un solde carte retenu (avance) lorsque Nitro est activé pour l’organisation.',
+    caveats:
+      'Le rail exige `payout_id`. L’avance est live uniquement, exclut les transactions en litige et échoue si le plafond d’organisation est dépassé. Ce n’est ni un prêt ni une assurance.',
+    related:
+      '[Récupérer un règlement instantané](/api/settlements/SettlementsController_getInstant) · [Créer un retrait](/api/payouts/PayoutsUnifiedController_create)',
+  },
+  SettlementsController_getInstant: {
+    whenToUse:
+      'Utilisez après `POST /settlements/instant` ou depuis un webhook pour confirmer le statut, les frais et le montant net.',
+    related:
+      '[Demander un règlement instantané](/api/settlements/SettlementsController_createInstant) · [Lister les périodes de règlement](/api/settlements/SettlementsController_findAll)',
+  },
   SubscriptionsController_cancel: {
     whenToUse:
       'Utilisez pour arrêter la facturation récurrente à la fin de période ou immédiatement selon votre flux.',

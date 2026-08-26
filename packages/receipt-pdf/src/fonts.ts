@@ -23,4 +23,6 @@ export function registerReceiptFonts() {
       },
     ],
   });
+
+  Font.registerHyphenationCallback((word) => [word]);
 }

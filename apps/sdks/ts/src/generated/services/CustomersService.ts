@@ -24,7 +24,7 @@ export class CustomersService {
     }
 
     /**
-     * Créer une session de lancement du portail client
+     * Create customer portal session
      * @see OpenAPI `CustomersController_createPortalSession`
      */
     public async createPortalSession(id: string, body: NonNullable<paths['/customers/{id}/portal']['post']['requestBody']>['content']['application/json'], options?: import("../../request-options.js").LomiRequestOptions): Promise<components['schemas']['PortalLaunchSessionResponseDto']> {
@@ -78,7 +78,7 @@ export class CustomersService {
     }
 
     /**
-     * Abonnements d’un client
+     * List subscriptions for customer
      * @see OpenAPI `CustomersController_getSubscriptions`
      */
     public async getSubscriptions(id: string, options?: import("../../request-options.js").LomiRequestOptions): Promise<(NonNullable<NonNullable<paths['/customers/{id}/subscriptions']['get']['responses'][200]>['content']>['application/json'])> {

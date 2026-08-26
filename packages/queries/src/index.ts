@@ -31,6 +31,7 @@ export type { OrganizationProviderRow } from "./providers.js";
 
 export * from "./products.js";
 export type {
+  ActiveSubscriptionsByProductRow,
   FetchProductsArgs,
   FetchProductsResult,
   FetchProductsRow,
@@ -45,6 +46,7 @@ export type { ApiKey, CliToken } from "./api-keys.js";
 export * from "./analytics.js";
 export * from "./assistant.js";
 export * from "./billing.js";
+export * from "./bookings.js";
 export * from "./conversion.js";
 export * from "./coupons.js";
 export * from "./customers.js";
@@ -54,7 +56,10 @@ export * from "./exports.js";
 export * from "./feedback.js";
 export * from "./fees.js";
 export * from "./integrations.js";
+export * from "./insurance.js";
 export * from "./invoicing.js";
+export * from "./member-limits.js";
+export * from "./nitro.js";
 export * from "./kyc.js";
 export * from "./logs.js";
 export * from "./meters.js";

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-16T20:09:53.172Z",
+  "generatedAt": "2026-08-25T23:42:55.345Z",
   "sdk": {
     "accounts": [
       "checkBalance",
@@ -112,9 +112,11 @@
       "listAssessments"
     ],
     "settlements": [
+      "createInstant",
       "findAll",
       "findAllAll",
-      "findTransactions"
+      "findTransactions",
+      "getInstant"
     ],
     "subscriptions": [
       "cancel",
