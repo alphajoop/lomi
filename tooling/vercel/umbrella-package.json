@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "name": "lomi-umbrella",
+  "engines": {
+    "node": "22.x"
+  }
+}

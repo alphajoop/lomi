@@ -81,8 +81,13 @@ jobs:
         run: |
           set -euo pipefail
           test -f "tooling/vercel/${{ inputs.app }}.json"
+          test -f tooling/vercel/umbrella-package.json
           cp "tooling/vercel/${{ inputs.app }}.json" vercel.json
           git add -f vercel.json
+          # Vercel website/admin projects are Node 24.x; pnpm's registry
+          # client hits ERR_INVALID_THIS there. engines.node overrides it.
+          cp tooling/vercel/umbrella-package.json package.json
+          git add -f package.json
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v42.2.0
