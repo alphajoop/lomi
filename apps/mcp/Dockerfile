@@ -10,11 +10,15 @@ COPY packages/shared ./packages/shared
 COPY apps/sdks/scripts ./apps/sdks/scripts
 COPY apps/mcp/package.json apps/mcp/pnpm-lock.yaml ./apps/mcp/
 
-WORKDIR /app/apps/mcp
 RUN corepack enable \
-    && corepack prepare pnpm@9.15.9 --activate \
-    && pnpm install --frozen-lockfile \
-    && pnpm exec tsc -p /app/packages/shared/tsconfig.build.json
+    && corepack prepare pnpm@9.15.9 --activate
+
+WORKDIR /app/packages/shared
+RUN pnpm install \
+    && pnpm exec tsc -p tsconfig.build.json
+
+WORKDIR /app/apps/mcp
+RUN pnpm install --frozen-lockfile
 
 COPY apps/mcp/tsconfig.json ./
 COPY apps/mcp/src ./src
