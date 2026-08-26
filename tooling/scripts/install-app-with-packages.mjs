@@ -7,7 +7,10 @@
  * so Git clones and umbrella uploads cannot `pnpm install` at the repo root.
  * Docs/website use `file:../../packages/*` and must pass `--ignore-workspace`
  * so the parent `pnpm-workspace.yaml` does not swallow the install.
- * Admin/dashboard use `workspace:*` and need an ephemeral root manifest.
+ * Admin/dashboard use `workspace:*`; the installer rewrites those to `file:`
+ * for this run so Vercel does not need a root workspace. Pin pnpm 9: Vercel
+ * website/admin projects are Node 24, and pnpm 10's registry client hits
+ * ERR_INVALID_THIS there.
  *
  * Usage: node tooling/scripts/install-app-with-packages.mjs <app-dir>
  *   e.g. node tooling/scripts/install-app-with-packages.mjs apps/docs
@@ -34,6 +37,8 @@ const FILE_SPEC_TO_DIR = {
   "@lomi./receipt-pdf": "packages/receipt-pdf",
 };
 
+let pnpmInvocation = ["pnpm"];
+
 function run(command, args, cwd) {
   console.log(`==> (${path.relative(ROOT, cwd) || "."}) ${command} ${args.join(" ")}`);
   const result = spawnSync(command, args, {
@@ -45,18 +50,16 @@ function run(command, args, cwd) {
   if (status !== 0) process.exit(status);
 }
 
+function runPnpm(args, cwd) {
+  run(pnpmInvocation[0], [...pnpmInvocation.slice(1), ...args], cwd);
+}
+
 function readPackage(dir) {
   return JSON.parse(readFileSync(path.join(dir, "package.json"), "utf8"));
 }
 
 function dependencyMap(pkg) {
   return { ...pkg.dependencies, ...pkg.devDependencies };
-}
-
-function usesWorkspaceProtocol(pkg) {
-  return Object.values(dependencyMap(pkg)).some((spec) =>
-    String(spec).startsWith("workspace:"),
-  );
 }
 
 function neededPackageDirs(pkg) {
@@ -69,59 +72,61 @@ function neededPackageDirs(pkg) {
   });
 }
 
-function ensureWorkspaceRoot() {
-  const pkgPath = path.join(ROOT, "package.json");
-  if (!existsSync(pkgPath)) {
-    writeFileSync(
-      pkgPath,
-      `${JSON.stringify(
-        {
-          name: "lomi-umbrella",
-          private: true,
-          packageManager: "pnpm@10.14.0",
-        },
-        null,
-        2,
-      )}\n`,
-    );
-    console.log("==> wrote ephemeral root package.json for workspace install");
-  }
-
-  const dashboardPkg = path.join(ROOT, "apps/dashboard/package.json");
-  const adminPkg = path.join(ROOT, "apps/admin/package.json");
-  if (existsSync(dashboardPkg) && existsSync(adminPkg)) return;
-
-  const members = ["packages/*", "!packages/pay"];
-  if (existsSync(dashboardPkg)) members.push("apps/dashboard");
-  if (existsSync(adminPkg)) members.push("apps/admin");
-  writeFileSync(
-    path.join(ROOT, "pnpm-workspace.yaml"),
-    `packages:\n${members.map((entry) => `  - "${entry}"\n`).join("")}`,
+function enablePnpm9() {
+  const result = spawnSync(
+    "corepack",
+    ["prepare", "pnpm@9.15.9", "--activate"],
+    { cwd: ROOT, stdio: "inherit", env: process.env },
   );
-  console.log("==> narrowed pnpm-workspace.yaml to present workspace members");
+  if ((result.status ?? 1) === 0) return;
+  console.log("==> corepack prepare failed; using npx pnpm@9.15.9");
+  pnpmInvocation = ["npx", "--yes", "pnpm@9.15.9"];
 }
 
-function installWorkspaceApp(appRel, pkg) {
-  ensureWorkspaceRoot();
-  run("pnpm", ["install", "--filter", `${pkg.name}...`], ROOT);
+function rewriteWorkspaceSpecsToFile(appDir) {
+  const pkgPath = path.join(appDir, "package.json");
+  const pkg = readPackage(appDir);
+  let changed = false;
+  for (const field of ["dependencies", "devDependencies"]) {
+    const deps = pkg[field];
+    if (!deps) continue;
+    for (const [name, spec] of Object.entries(deps)) {
+      if (!String(spec).startsWith("workspace:")) continue;
+      const dir = FILE_SPEC_TO_DIR[name];
+      if (!dir) {
+        console.error(`no file: mapping for workspace dep ${name}`);
+        process.exit(1);
+      }
+      let rel = path.relative(appDir, path.join(ROOT, dir));
+      if (!rel.startsWith(".")) rel = `./${rel}`;
+      deps[name] = `file:${rel}`;
+      changed = true;
+    }
+  }
+  if (!changed) return { pkg, rewritten: false };
+  writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+  console.log(
+    `==> rewrote workspace:* to file: in ${path.relative(ROOT, pkgPath)}`,
+  );
+  return { pkg, rewritten: true };
 }
 
-function installFileApp(appRel, pkg) {
+function installFileApp(appRel, pkg, { frozen }) {
   const appDir = path.join(ROOT, appRel);
   for (const rel of neededPackageDirs(pkg)) {
     const dir = path.join(ROOT, rel);
-    run("pnpm", ["install", "--ignore-workspace"], dir);
+    runPnpm(["install", "--ignore-workspace"], dir);
     const packageJson = readPackage(dir);
     if (packageJson.scripts?.build) {
-      run("pnpm", ["run", "build"], dir);
+      runPnpm(["run", "build"], dir);
     }
   }
 
   const args = ["install", "--ignore-workspace"];
-  if (existsSync(path.join(appDir, "pnpm-lock.yaml"))) {
+  if (frozen && existsSync(path.join(appDir, "pnpm-lock.yaml"))) {
     args.push("--frozen-lockfile");
   }
-  run("pnpm", args, appDir);
+  runPnpm(args, appDir);
 }
 
 function main() {
@@ -139,12 +144,10 @@ function main() {
     process.exit(1);
   }
 
-  const pkg = readPackage(appDir);
-  if (usesWorkspaceProtocol(pkg)) {
-    installWorkspaceApp(appRel, pkg);
-    return;
-  }
-  installFileApp(appRel, pkg);
+  enablePnpm9();
+
+  const { pkg, rewritten } = rewriteWorkspaceSpecsToFile(appDir);
+  installFileApp(appRel, pkg, { frozen: !rewritten });
 }
 
 main();
