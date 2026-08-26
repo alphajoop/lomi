@@ -87,7 +87,7 @@ function excludeAdminGrowthAgentFromTsc(appDir) {
 
 function installDeps(appRel, dir, { frozen }) {
   if (useNpm(appRel)) {
-    run("npm", ["install", "--ignore-scripts"], dir);
+    run("npm", ["install", "--ignore-scripts", "--include=dev"], dir);
     return;
   }
   const args = ["install", "--ignore-workspace"];
