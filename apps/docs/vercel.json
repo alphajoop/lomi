@@ -72,11 +72,11 @@
       "destination": "/api/$1"
     }
   ],
-  "installCommand": "node tooling/scripts/install-app-with-packages.mjs apps/docs",
-  "buildCommand": "pnpm --dir apps/docs build",
-  "devCommand": "pnpm --dir apps/docs dev",
+  "installCommand": "node lib/scripts/vercel-install.mjs || node apps/docs/lib/scripts/vercel-install.mjs",
+  "buildCommand": "pnpm build || pnpm --dir apps/docs build",
+  "devCommand": "next dev",
   "framework": "nextjs",
-  "outputDirectory": "apps/docs/.next",
+  "outputDirectory": ".next",
   "regions": ["iad1"],
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
