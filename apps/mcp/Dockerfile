@@ -14,7 +14,7 @@ WORKDIR /app/apps/mcp
 RUN corepack enable \
     && corepack prepare pnpm@9.15.9 --activate \
     && pnpm install --frozen-lockfile \
-    && pnpm --dir /app/packages/shared run build
+    && pnpm exec tsc -p /app/packages/shared/tsconfig.build.json
 
 COPY apps/mcp/tsconfig.json ./
 COPY apps/mcp/src ./src
