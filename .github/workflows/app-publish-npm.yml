@@ -52,7 +52,7 @@ jobs:
       - name: Install and build
         working-directory: apps/sdks/ts
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install --ignore-workspace --frozen-lockfile
           pnpm run build
 
       - name: Publish if version is new
@@ -83,7 +83,7 @@ jobs:
       - name: Install, test, and build
         working-directory: apps/sdks/embed
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install --ignore-workspace --frozen-lockfile
           pnpm test
           pnpm run build
 
