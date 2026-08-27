@@ -36,8 +36,6 @@ test('docs pages use unprefixed self-canonical URLs for all languages', () => {
   assert.equal(alternates.canonical, 'https://docs.lomi.africa/start/overview');
   assert.deepEqual(alternates.languages, {
     'x-default': 'https://docs.lomi.africa/start/overview',
-    fr: 'https://docs.lomi.africa/start/overview',
-    en: 'https://docs.lomi.africa/start/overview',
   });
 });
 
@@ -58,8 +56,9 @@ test('markdown Accept rewrites docs pages to the llms.mdx mirror', async () => {
 test('dynamic sitemap is the only docs sitemap source', () => {
   assert.equal(existsSync(join(docsRoot, 'public/sitemap.xml')), false);
   assert.doesNotMatch(read('lib/scripts/post-build.ts'), /generateSitemap/);
-  assert.match(read('app/sitemap.ts'), /buildDocsAlternates/);
+  assert.doesNotMatch(read('app/sitemap.ts'), /buildDocsAlternates/);
   assert.doesNotMatch(read('app/sitemap.ts'), /localizeDocsPath/);
+  assert.doesNotMatch(read('app/sitemap.ts'), /alternates:/);
 });
 
 test('docs locale is resolved from the language cookie, not the URL', () => {
@@ -70,6 +69,8 @@ test('docs locale is resolved from the language cookie, not the URL', () => {
   assert.match(localeSource, /\bcookies\b/);
   assert.match(localeSource, /lomi\.language|Cookies\.Language/);
   assert.match(proxySource, /301/);
+  assert.match(proxySource, /developers\.lomi\.africa/);
+  assert.match(proxySource, /docs\.lomi\.africa/);
   assert.match(routingSource, /Paths are never locale-prefixed/);
 });
 

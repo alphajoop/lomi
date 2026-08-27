@@ -56,11 +56,37 @@ function withDiscoveryHeaders(
   return response;
 }
 
+const DOCS_LEGACY_HOST = 'developers.lomi.africa';
+const DOCS_CANONICAL_HOST = 'docs.lomi.africa';
+
+function requestHost(request: NextRequest): string {
+  return request.headers.get('host')?.split(':')[0]?.toLowerCase() ?? '';
+}
+
+function maybeRedirectDevelopersHost(
+  request: NextRequest,
+): NextResponse | null {
+  if (requestHost(request) !== DOCS_LEGACY_HOST) {
+    return null;
+  }
+
+  const url = request.nextUrl.clone();
+  url.hostname = DOCS_CANONICAL_HOST;
+  url.protocol = 'https:';
+  url.port = '';
+  return NextResponse.redirect(url, 301);
+}
+
 /**
  * HTML `/` 301s to `/start/overview` here (not in next.config) so
  * `Accept: text/markdown` can rewrite `/` to the overview markdown mirror.
  */
 export default function proxy(request: NextRequest) {
+  const developersRedirect = maybeRedirectDevelopersHost(request);
+  if (developersRedirect) {
+    return developersRedirect;
+  }
+
   const { pathname } = request.nextUrl;
 
   if (isDocsMachinePath(pathname)) {

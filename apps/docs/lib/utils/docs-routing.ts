@@ -103,8 +103,6 @@ export function buildDocsAlternates(basePath: string): Metadata['alternates'] {
     canonical: url,
     languages: {
       'x-default': url,
-      fr: url,
-      en: url,
     },
   };
 }
