@@ -2,18 +2,68 @@ name: lomi · release · cli
 
 on:
   push:
+    branches: [main]
+    paths:
+      - apps/cli/Cargo.toml
+      - apps/cli/npm/package.json
+      - apps/cli/src/**
+      - .github/workflows/app-release-cli.yml
     tags:
-      - 'cli-v*'
+      - "cli-v*"
   workflow_dispatch:
 
 permissions:
   contents: write
+  id-token: write
 
 env:
   REPO_DIR: src
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      skip: ${{ steps.meta.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          path: ${{ env.REPO_DIR }}
+
+      - id: meta
+        working-directory: ${{ env.REPO_DIR }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CARGO_VER="$(sed -n 's/^version = "\([^"]*\)"/\1/p' apps/cli/Cargo.toml | head -1)"
+          NPM_VER="$(node -p "require('./apps/cli/npm/package.json').version")"
+          if [[ "${{ github.ref }}" == refs/tags/cli-v* ]]; then
+            VER="${GITHUB_REF_NAME#cli-v}"
+          else
+            VER="$CARGO_VER"
+          fi
+          if [[ "$CARGO_VER" != "$NPM_VER" ]]; then
+            echo "Cargo.toml ($CARGO_VER) and apps/cli/npm ($NPM_VER) versions must match" >&2
+            exit 1
+          fi
+          if [[ "$VER" != "$CARGO_VER" ]]; then
+            echo "Tag version ($VER) does not match Cargo.toml ($CARGO_VER)" >&2
+            exit 1
+          fi
+          TAG="cli-v${VER}"
+          SKIP=false
+          if npm view "lomi.cli@${VER}" version >/dev/null 2>&1; then
+            echo "lomi.cli@${VER} already on npm"
+            SKIP=true
+          fi
+          echo "version=${VER}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "skip=${SKIP}" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: version
+    if: needs.version.outputs.skip != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -65,9 +115,9 @@ jobs:
           path: dist/${{ matrix.asset }}
 
   release:
-    needs: build
+    needs: [version, build]
     runs-on: ubuntu-latest
-    if: always() && !cancelled() && startsWith(github.ref, 'refs/tags/cli-v')
+    if: always() && !cancelled() && needs.version.outputs.skip != 'true' && needs.build.result == 'success'
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -77,13 +127,15 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          name: ${{ needs.version.outputs.tag }}
           files: artifacts/*
           generate_release_notes: true
 
   publish-npm:
-    needs: release
+    needs: [version, release]
     runs-on: ubuntu-latest
-    if: always() && !cancelled() && needs.release.result == 'success' && startsWith(github.ref, 'refs/tags/cli-v')
+    if: always() && !cancelled() && needs.version.outputs.skip != 'true' && needs.release.result == 'success'
     defaults:
       run:
         working-directory: ${{ env.REPO_DIR }}/apps/cli/npm
@@ -94,17 +146,19 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
-      - name: Sync npm version with tag
-        run: |
-          VERSION="${GITHUB_REF_NAME#cli-v}"
-          npm pkg set version="$VERSION"
+      - name: Latest npm (OIDC trusted publishing)
+        run: npm install -g npm@latest
+        working-directory: ${{ env.REPO_DIR }}
+
+      - name: Sync npm version
+        run: npm pkg set version="${{ needs.version.outputs.version }}"
 
       - name: Verify release binaries exist on GitHub
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          TAG="${{ needs.version.outputs.tag }}"
           BASE="https://github.com/${{ github.repository }}/releases/download/${TAG}"
           for asset in lomi-x86_64-apple-darwin lomi-aarch64-apple-darwin lomi-x86_64-unknown-linux-gnu; do
             echo "Checking ${BASE}/${asset}"
@@ -113,5 +167,3 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

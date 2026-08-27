@@ -1,23 +1,15 @@
 name: lomi · release · sdks
 
+# npm packages (@lomi./sdk, @lomi./embed, @lomi./receipt-pdf) publish from
+# app-publish-npm.yml via Trusted Publisher. This workflow is PyPI only.
+
 on:
   workflow_dispatch:
     inputs:
-      sdk:
-        description: 'Which SDK to publish'
-        required: true
-        type: choice
-        options:
-          - typescript
-          - python
-          - embed
-          - mcp
-          - receipt-pdf
-          - all
       version_bump:
-        description: 'Version bump type (patch/minor/major) or skip'
+        description: Version bump type (patch/minor/major) or skip
         required: false
-        default: 'skip'
+        default: skip
         type: choice
         options:
           - skip
@@ -26,72 +18,20 @@ on:
           - major
 
 jobs:
-  publish-typescript:
-    name: Publish TypeScript SDK
-    runs-on: ubuntu-latest
-    if: inputs.sdk == 'typescript' || inputs.sdk == 'all'
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
-          cache-dependency-path: apps/sdks/ts/pnpm-lock.yaml
-
-      - name: Bump version
-        if: inputs.version_bump != 'skip'
-        working-directory: apps/sdks/ts
-        run: npm version ${{ inputs.version_bump }} --no-git-tag-version
-
-      - name: Install dependencies and build
-        working-directory: apps/sdks
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm run generate:ts
-
-      - name: Publish to npm
-        working-directory: apps/sdks/ts
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Commit version bump
-        if: inputs.version_bump != 'skip'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/sdks/ts/package.json
-          git diff --staged --quiet || git commit -m "chore(sdks): release @lomi./sdk $(node -p "require('./apps/sdks/ts/package.json').version")"
-          git push
-
   publish-python:
     name: Publish Python SDK
     runs-on: ubuntu-latest
-    if: inputs.sdk == 'python' || inputs.sdk == 'all'
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Checkout Python SDK submodule
-        run: |
-          bash .github/scripts/init-submodules.sh apps/sdks/python
+        run: bash .github/scripts/init-submodules.sh apps/sdks/python
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install build tools
         run: |
@@ -102,7 +42,6 @@ jobs:
         if: inputs.version_bump != 'skip'
         working-directory: apps/sdks/python
         run: |
-          # Simple version bumping for setup.py
           python -c "
           import re
           with open('setup.py', 'r') as f:
@@ -120,7 +59,7 @@ jobs:
           elif bump_type == 'patch':
               patch += 1
           new_version = f'{major}.{minor}.{patch}'
-          content = re.sub(r'VERSION = \"[^\"]+\"', f'VERSION = \"{new_version}\"', content)
+          content = content.replace(f'VERSION = \"{version}\"', f'VERSION = \"{new_version}\"')
           with open('setup.py', 'w') as f:
               f.write(content)
           print(f'Bumped version from {version} to {new_version}')
@@ -140,117 +79,3 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-
-  publish-mcp:
-    name: Publish MCP Server
-    runs-on: ubuntu-latest
-    if: inputs.sdk == 'mcp' || inputs.sdk == 'all'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Bump version
-        if: inputs.version_bump != 'skip'
-        working-directory: apps/mcp
-        run: npm version ${{ inputs.version_bump }} --no-git-tag-version
-
-      - name: Install dependencies, test, and build
-        working-directory: apps/mcp
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm test
-          pnpm run build
-
-      - name: Publish to npm
-        working-directory: apps/mcp
-        run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-embed:
-    name: Publish Embed SDK
-    runs-on: ubuntu-latest
-    if: inputs.sdk == 'embed' || inputs.sdk == 'all'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
-          cache-dependency-path: apps/sdks/embed/pnpm-lock.yaml
-
-      - name: Bump version
-        if: inputs.version_bump != 'skip'
-        working-directory: apps/sdks/embed
-        run: npm version ${{ inputs.version_bump }} --no-git-tag-version
-
-      - name: Install dependencies, test, and build
-        working-directory: apps/sdks/embed
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm test
-          pnpm run build
-
-      - name: Publish to npm
-        working-directory: apps/sdks/embed
-        run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-receipt-pdf:
-    name: Publish @lomi./receipt-pdf
-    runs-on: ubuntu-latest
-    if: inputs.sdk == 'receipt-pdf' || inputs.sdk == 'all'
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
-          cache-dependency-path: packages/receipt-pdf/pnpm-lock.yaml
-
-      - name: Bump version
-        if: inputs.version_bump != 'skip'
-        working-directory: packages/receipt-pdf
-        run: npm version ${{ inputs.version_bump }} --no-git-tag-version
-
-      - name: Install dependencies and build
-        working-directory: packages/receipt-pdf
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm run build
-
-      - name: Publish to npm
-        working-directory: packages/receipt-pdf
-        run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

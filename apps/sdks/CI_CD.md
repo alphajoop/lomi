@@ -37,36 +37,20 @@ Change back to `'false'`
 
 ## 📦 SDK Publishing Workflow
 
-**File:** `.github/workflows/publish-sdks.yml`
+npm kits publish from **`app-publish-npm.yml`** with Trusted Publisher (OIDC). No `NPM_TOKEN`.
 
-This workflow publishes SDKs to their respective package registries.
+1. Bump only the patch in that package's `package.json` (`1.6.0` → `1.6.1`).
+2. Push `main`, or run **lomi · publish · npm**.
+3. CI publishes if that version is not on npm yet. Same version is a no-op.
 
-### How to Publish
+CLI (`lomi.cli`) publishes from **`app-release-cli.yml`**: bump `apps/cli/Cargo.toml` and `apps/cli/npm/package.json` to the same patch, push `main`. CI builds binaries, cuts `cli-v*`, then publishes.
 
-1. Go to **Actions** tab in GitHub
-2. Select **Publish SDKs** workflow
-3. Click **Run workflow**
-4. Choose SDK to publish (typescript/javascript/python/embed/all)
-5. Optionally choose version bump (skip/patch/minor/major)
-6. Click **Run workflow** button
-
-### Required Secrets
-
-Before using the publish workflow, set these secrets in GitHub repository settings:
-
-- `NPM_TOKEN` - For publishing TypeScript & JavaScript SDKs to npm
-- `PYPI_TOKEN` - For publishing Python SDK to PyPI
-
-**To create tokens:**
-
-**npm:** https://www.npmjs.com → Account Settings → Access Tokens → Generate New Token (Automation)  
-**PyPI:** https://pypi.org → Account Settings → API tokens → Add API token
+Python still uses **`app-release-sdks.yml`** and `PYPI_TOKEN`.
 
 ## 📋 Current Published Packages
 
 ### TypeScript SDK
 - **Package:** `@lomi./sdk`
-- **Version:** `1.5.11` ✅
 - **Install:** `npm i @lomi./sdk`
 - **Registry:** https://www.npmjs.com/package/@lomi./sdk
 
@@ -87,15 +71,7 @@ Before using the publish workflow, set these secrets in GitHub repository settin
 - **Version:** `0.2.0`
 - **Install:** `npm i @lomi./embed`
 - **Registry:** https://www.npmjs.com/package/@lomi./embed
-- **Publish:** GitHub Actions → Publish SDKs → `embed`, or locally:
-
-```bash
-cd apps/sdks/embed
-npm ci
-npm test
-npm run build
-npm publish --access public
-```
+- **Publish:** bump the patch in `apps/sdks/embed/package.json` and push `main` (`app-publish-npm.yml`).
 
 ## 🚀 Quick Commands
 

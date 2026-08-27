@@ -1,0 +1,125 @@
+name: lomi · publish · npm
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/sdks/ts/package.json
+      - apps/sdks/ts/src/**
+      - apps/sdks/embed/package.json
+      - apps/sdks/embed/src/**
+      - packages/receipt-pdf/package.json
+      - packages/receipt-pdf/src/**
+      - .github/workflows/app-publish-npm.yml
+      - .github/scripts/npm-publish-if-new.sh
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Which npm package to publish
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - sdk
+          - embed
+          - receipt-pdf
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish-sdk:
+    name: Publish @lomi./sdk
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' || inputs.package == 'all' || inputs.package == 'sdk'
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: pnpm
+          cache-dependency-path: apps/sdks/ts/pnpm-lock.yaml
+
+      - name: Latest npm (OIDC trusted publishing)
+        run: npm install -g npm@latest
+
+      - name: Install and build
+        working-directory: apps/sdks/ts
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Publish if version is new
+        run: bash .github/scripts/npm-publish-if-new.sh apps/sdks/ts
+
+  publish-embed:
+    name: Publish @lomi./embed
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' || inputs.package == 'all' || inputs.package == 'embed'
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: pnpm
+          cache-dependency-path: apps/sdks/embed/pnpm-lock.yaml
+
+      - name: Latest npm (OIDC trusted publishing)
+        run: npm install -g npm@latest
+
+      - name: Install, test, and build
+        working-directory: apps/sdks/embed
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm run build
+
+      - name: Publish if version is new
+        run: bash .github/scripts/npm-publish-if-new.sh apps/sdks/embed
+
+  publish-receipt-pdf:
+    name: Publish @lomi./receipt-pdf
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'push' || inputs.package == 'all' || inputs.package == 'receipt-pdf'
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          cache: pnpm
+          cache-dependency-path: packages/receipt-pdf/pnpm-lock.yaml
+
+      - name: Latest npm (OIDC trusted publishing)
+        run: npm install -g npm@latest
+
+      - name: Install and build
+        working-directory: packages/receipt-pdf
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Publish if version is new
+        run: bash .github/scripts/npm-publish-if-new.sh packages/receipt-pdf
