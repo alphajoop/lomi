@@ -24,14 +24,4 @@ pnpm install
 pnpm run build
 ```
 
-## Publish to npm
-
-Same `@lomi.` scope as `@lomi./sdk`. From this directory:
-
-```bash
-npm login
-pnpm run build
-pnpm publish --access public
-```
-
-Or `pnpm run publish:npm`. Set `NPM_TOKEN` in CI secrets to run the GitHub Actions publish workflow.
+Private workspace package. Dashboard and checkout consume it in-tree. Do not publish to npm.

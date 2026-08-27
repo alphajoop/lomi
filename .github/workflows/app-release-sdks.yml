@@ -1,7 +1,7 @@
 name: lomi · release · sdks
 
-# npm packages (@lomi./sdk, @lomi./embed, @lomi./receipt-pdf) publish from
-# app-publish-npm.yml via Trusted Publisher. This workflow is PyPI only.
+# npm packages (@lomi./sdk, @lomi./embed) publish from app-publish-npm.yml
+# via Trusted Publisher. @lomi./receipt-pdf stays private. This workflow is PyPI only.
 
 on:
   workflow_dispatch:
