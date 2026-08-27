@@ -27,6 +27,7 @@ export const DISCOVERY_MARKDOWN_HEADERS = {
   'Cache-Control': 'public, max-age=86400, s-maxage=86400',
   'Access-Control-Allow-Origin': '*',
   'Accept-Ranges': 'none',
+  Vary: 'Accept, Accept-Encoding, User-Agent',
 } as const;
 
 const MCP_MEDIA_TYPE = 'application/mcp-server-card+json';

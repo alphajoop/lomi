@@ -19,7 +19,6 @@ function fallbackLocale(locale: Language): Language {
 function markdownHeaders(cacheControl?: string): Headers {
   const headers = new Headers({
     ...DISCOVERY_MARKDOWN_HEADERS,
-    Vary: 'Accept, User-Agent',
   });
   if (cacheControl) {
     headers.set('Cache-Control', cacheControl);

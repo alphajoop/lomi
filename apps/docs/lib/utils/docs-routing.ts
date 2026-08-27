@@ -9,10 +9,14 @@ export const DOCS_LEGACY_PREFIX_LOCALES = ['en', 'fr'] as const;
 export type DocsLegacyPrefixLocale =
   (typeof DOCS_LEGACY_PREFIX_LOCALES)[number];
 
+export const DOCS_NOT_FOUND_MARKDOWN_PATH = '/not-found.md';
+export const DOCS_OVERVIEW_MARKDOWN_PATH = '/llms.mdx/start/overview';
+
 const MACHINE_EXACT_PATHS = new Set([
   '/llms.txt',
   '/llms-full.txt',
   '/llms.mdx',
+  DOCS_NOT_FOUND_MARKDOWN_PATH,
   '/sitemap.xml',
   '/robots.txt',
   '/openapi.json',
@@ -52,18 +56,23 @@ export function isDocsMachinePath(pathname: string): boolean {
   return MACHINE_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
+/**
+ * Rewrite Accept: text/markdown to the `/llms.mdx` route handler.
+ * Do not rewrite to `/*.mdx` and hope `next.config` chains; proxy rewrites
+ * skip config rewrites, so that path used to render HTML.
+ */
 export function docsMarkdownAcceptRewritePath(pathname: string): string | null {
   const path = normalizeDocsPath(pathname);
-  if (path.endsWith('.mdx') || path.startsWith('/llms.mdx')) {
+  if (path.startsWith('/llms.mdx') || path.endsWith('.mdx')) {
     return null;
   }
   if (isDocsMachinePath(path)) {
     return null;
   }
   if (path === '/') {
-    return '/start/overview.mdx';
+    return DOCS_OVERVIEW_MARKDOWN_PATH;
   }
-  return `${path}.mdx`;
+  return buildDocsMarkdownUrl(path);
 }
 
 type ParsedDocsLocalePath = {

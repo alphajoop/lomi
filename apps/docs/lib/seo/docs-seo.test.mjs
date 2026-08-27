@@ -43,12 +43,17 @@ test('markdown Accept rewrites docs pages to the llms.mdx mirror', async () => {
   const { docsMarkdownAcceptRewritePath } =
     await import('../utils/docs-routing.ts');
 
-  assert.equal(docsMarkdownAcceptRewritePath('/'), '/start/overview.mdx');
+  assert.equal(docsMarkdownAcceptRewritePath('/'), '/llms.mdx/start/overview');
   assert.equal(
     docsMarkdownAcceptRewritePath('/start/overview'),
-    '/start/overview.mdx',
+    '/llms.mdx/start/overview',
+  );
+  assert.equal(
+    docsMarkdownAcceptRewritePath('/this-path-does-not-exist'),
+    '/llms.mdx/this-path-does-not-exist',
   );
   assert.equal(docsMarkdownAcceptRewritePath('/llms.txt'), null);
+  assert.equal(docsMarkdownAcceptRewritePath('/not-found.md'), null);
   assert.equal(docsMarkdownAcceptRewritePath('/start/overview.mdx'), null);
   assert.equal(docsMarkdownAcceptRewritePath('/llms.mdx/start/overview'), null);
 });
@@ -145,7 +150,21 @@ test('docs markdown 404s and Accept negotiation live in proxy and llms.mdx', () 
   assert.match(markdownRoute, /getLLMTextFallback/);
   assert.doesNotMatch(markdownRoute, /from 'next\/navigation'/);
 
+  const notFoundMarkdown = read('app/not-found.md/route.ts');
+  assert.match(notFoundMarkdown, /status:\s*404/);
+  assert.match(notFoundMarkdown, /buildDocsNotFoundMarkdown/);
+  assert.match(notFoundMarkdown, /DISCOVERY_MARKDOWN_HEADERS/);
+
+  const routingSource = read('lib/utils/docs-routing.ts');
+  assert.match(routingSource, /\/llms\.mdx/);
+  assert.doesNotMatch(routingSource, /return `\$\{path\}\.mdx`/);
+
   const configSource = read('next.config.mjs');
   assert.match(configSource, /outputFileTracingIncludes/);
   assert.match(configSource, /content\/docs/);
+  const markdownHeadersSource = read('lib/seo/agent-discovery.ts');
+  assert.match(
+    markdownHeadersSource,
+    /Vary:\s*'Accept, Accept-Encoding, User-Agent'/,
+  );
 });
