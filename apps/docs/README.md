@@ -1,6 +1,6 @@
 # Documentation
 
-Welcome to the documentation of [lomi.](https://lomi.africa), the open-source payment processing platform powering francophone West African businesses. This repository contains the code for lomi. documentation.
+Welcome to the documentation of [lomi.](https://lomi.africa), a payment processing platform for francophone West African businesses. This repository contains the documentation site.
 
 ## Getting started
 
