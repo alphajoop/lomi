@@ -31,7 +31,7 @@ Révoquez une application depuis **Développeurs → Clés API → Connecter MCP
 
 ## Pour commencer
 
-1. Cliquez sur **Ajouter à Cursor**, **Ajouter à Claude**, **Ajouter à OpenCode** ou **Ajouter à Codex** ci-dessus (ou collez le JSON URL seule ci-dessous).
+1. Cliquez sur **Ajouter à Cursor**, **Ajouter à Grok Bot**, **Ajouter à Claude**, **Ajouter à OpenCode** ou **Ajouter à Codex** ci-dessus (ou collez le JSON URL seule ci-dessous).
 2. À la première connexion, le client reçoit un `401`, récupère `https://mcp.lomi.africa/.well-known/oauth-protected-resource/mcp`, puis ouvre **Connect with lomi.**
 3. Connectez-vous au tableau de bord, choisissez votre organisation et approuvez l’accès (lecture seule par défaut).
 4. Le client peut appeler les outils MCP tout de suite.
@@ -123,6 +123,15 @@ opencode mcp auth lomi
 ```bash
 codex mcp add lomi --url https://mcp.lomi.africa/mcp
 codex mcp login lomi
+```
+
+## Plugin agent (Cursor, Codex, Copilot)
+
+Installez le plugin lomi. depuis le marketplace de votre client quand il est disponible ([lomiafrica/agent-plugin](https://github.com/lomiafrica/agent-plugin)). Vous pouvez toujours vous connecter directement avec l’URL MCP ci-dessus ; le plugin n’est pas obligatoire.
+
+```bash
+codex plugin marketplace add lomiafrica/agent-plugin
+codex plugin add lomi@lomi
 ```
 
 ## Découverte

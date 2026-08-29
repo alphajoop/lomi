@@ -78,3 +78,11 @@
 	path = apps/api
 	url = https://github.com/lomiafrica/api.git
 	branch = main
+[submodule "apps/tools/anti-slop"]
+	path = apps/tools/anti-slop
+	url = https://github.com/lomiafrica/anti-slop.git
+	branch = main
+[submodule "apps/agent-plugin"]
+	path = apps/agent-plugin
+	url = https://github.com/lomiafrica/agent-plugin.git
+	branch = main

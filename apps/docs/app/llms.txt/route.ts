@@ -278,7 +278,7 @@ export async function GET() {
   lines.push('## Agent onboarding & MCP OAuth');
   lines.push('');
   lines.push(
-    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/*\` API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes).`,
+    `Agents can onboard **new merchants** (0→1) via MCP provisioning tools or the \`/provisioning/*\` API. Full guide: [MCP for AI clients](${docsOrigin}/build/mcp). Machine contract: \`apps/docs/agent-openapi.json\` (provisioning + partner routes). Optional marketplace install: [lomiafrica/agent-plugin](https://github.com/lomiafrica/agent-plugin); the hosted MCP URL works without the plugin.`,
   );
   lines.push('');
   lines.push('**Credential types:**');

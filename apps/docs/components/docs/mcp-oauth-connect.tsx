@@ -2,16 +2,18 @@
 
 'use client';
 
-import { useCallback, type ReactNode } from 'react';
+import { Fragment, useCallback, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import {
   ClaudeBrandIcon,
   CodexBrandIcon,
   CursorBrandIcon,
+  GrokBrandIcon,
   OpenCodeBrandIcon,
 } from '@/components/docs/ai-brand-icons';
 import {
   CLAUDE_CONNECTORS_URL,
+  GROK_CONNECTORS_URL,
   MCP_OAUTH_ENDPOINT,
   buildCodexOauthCommand,
   buildCursorOauthDeeplink,
@@ -72,6 +74,10 @@ export function McpOauthConnect({ className }: { className?: string }) {
     window.open(CLAUDE_CONNECTORS_URL, '_blank', 'noopener,noreferrer');
   }, [onCopy]);
 
+  const onGrok = useCallback(() => {
+    void onCopy(MCP_OAUTH_ENDPOINT, 'mcpConnect.grokUrlCopied');
+  }, [onCopy]);
+
   const clientUi: Record<
     McpOauthClientId,
     { icon: ReactNode; onClick: () => void }
@@ -105,15 +111,35 @@ export function McpOauthConnect({ className }: { className?: string }) {
       {CLIENT_ORDER.map((client) => {
         const ui = clientUi[client];
         return (
-          <button
-            key={client}
-            type="button"
-            className={buttonClass}
-            onClick={ui.onClick}
-          >
-            {ui.icon}
-            {t(LABEL_KEY[client])}
-          </button>
+          <Fragment key={client}>
+            {client === 'cursor' ? (
+              <a className={buttonClass} href={buildCursorOauthDeeplink()}>
+                {ui.icon}
+                {t(LABEL_KEY[client])}
+              </a>
+            ) : (
+              <button
+                type="button"
+                className={buttonClass}
+                onClick={ui.onClick}
+              >
+                {ui.icon}
+                {t(LABEL_KEY[client])}
+              </button>
+            )}
+            {client === 'cursor' ? (
+              <a
+                className={buttonClass}
+                href={GROK_CONNECTORS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={onGrok}
+              >
+                <GrokBrandIcon className="size-4 shrink-0" />
+                {t('mcpConnect.addGrok')}
+              </a>
+            ) : null}
+          </Fragment>
         );
       })}
     </div>

@@ -374,8 +374,19 @@ export function mcpMaxResultCharsFromEnv(): number {
   );
 }
 
-/** When true, trust X-Forwarded-For for MCP rate limiting (set behind Railway/CDN). */
+/** When true, trust CF-Connecting-IP / X-Forwarded-For for MCP rate limiting (set behind Railway/CDN). */
 export function mcpTrustProxy(): boolean {
   const v = process.env.LOMI_MCP_TRUST_PROXY?.trim().toLowerCase();
   return v === '1' || v === 'true' || v === 'yes';
+}
+
+/** Rightmost X-Forwarded-For hops trusted as proxies when trust proxy is on. */
+export function mcpTrustedProxyHops(): number {
+  return parseEnvIntInRange(
+    process.env.LOMI_MCP_TRUSTED_PROXY_HOPS,
+    'LOMI_MCP_TRUSTED_PROXY_HOPS',
+    1,
+    1,
+    8,
+  );
 }

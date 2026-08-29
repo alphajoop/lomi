@@ -81,3 +81,19 @@ export function OpenCodeBrandIcon({ className }: BrandIconProps) {
     </span>
   );
 }
+
+/** Grok Bot face, vectorized from the product mark. Eyes are punch-outs so fill follows currentColor. */
+export function GrokBrandIcon({ className }: BrandIconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      fillRule="evenodd"
+      aria-hidden
+      focusable="false"
+    >
+      <path d="M12 0a12 12 0 1 0 0 24a12 12 0 1 0 0-24zM14.189 5.591 13.265 7.665A.89.89 24 0 0 14.891 8.389L15.815 6.315A.89.89 24 0 0 14.189 5.591zM19.319 4.641 18.395 6.715A.89.89 24 0 0 20.021 7.439L20.945 5.365A.89.89 24 0 0 19.319 4.641z" />
+    </svg>
+  );
+}

@@ -33,6 +33,7 @@ import {
   mcpRateLimitRpm,
   mcpSessionTtlMs,
   mcpTrustProxy,
+  mcpTrustedProxyHops,
 } from './env-config.js';
 import { extractSessionMerchantApiKey, extractSessionPartnerKey, extractSessionProvisioningKey, extractOAuthAccessToken } from './session-merchant-key.js';
 import { McpSessionRegistry, type MerchantAccessLevel } from './session-registry.js';
@@ -132,24 +133,62 @@ async function resolveMerchantGrantFromRequest(
 const TRANSPORT_UNAUTHORIZED_MESSAGE =
   'Missing credentials: complete OAuth in your browser (recommended), send x-lomi-api-key / x-api-key, or Authorization: Bearer <lomi_sk_…>. See https://docs.lomi.africa/build/mcp';
 
-function oauthUnauthorizedChallenge(): string {
+function oauthUnauthorizedChallenge(error?: string): string {
   const metadataUrl = getProtectedResourceMetadataUrl();
-  return `Bearer resource_metadata="${metadataUrl}"`;
+  return error
+    ? `Bearer resource_metadata="${metadataUrl}", error="${error}"`
+    : `Bearer resource_metadata="${metadataUrl}"`;
+}
+
+function applyOauthCors(res: Response): void {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Expose-Headers',
+    'WWW-Authenticate, Mcp-Session-Id',
+  );
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Authorization, Content-Type, Accept, MCP-Session-Id, MCP-Protocol-Version',
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
 }
 
 /** Rolling 60s window per IP for MCP routes */
 type RateBucket = { count: number; windowStart: number };
 
+function normalizeClientIp(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed.toLowerCase() === 'unknown') return null;
+  if (trimmed.startsWith('::ffff:')) return trimmed.slice('::ffff:'.length);
+  return trimmed;
+}
+
+/** Prefer CF-Connecting-IP; else rightmost trusted XFF hop; else socket peer. */
 function clientIp(req: Request): string {
   if (mcpTrustProxy()) {
-    const xf = req.headers['x-forwarded-for'];
-    if (isString(xf)) {
-      const first = xf.split(',')[0]?.trim();
-      if (first) return first;
+    const cf = req.headers['cf-connecting-ip'];
+    if (isString(cf)) {
+      const normalized = normalizeClientIp(cf);
+      if (normalized) return normalized;
     }
-    if (Array.isArray(xf) && xf[0]) return xf[0].trim();
+    const forwarded = req.headers['x-forwarded-for'];
+    if (isString(forwarded) && forwarded.length > 0) {
+      const parts = forwarded
+        .split(',')
+        .map((part) => normalizeClientIp(part))
+        .filter((part): part is string => Boolean(part));
+      if (parts.length > 0) {
+        const hops = mcpTrustedProxyHops();
+        const index = Math.max(0, parts.length - hops);
+        return parts[index] ?? parts[parts.length - 1]!;
+      }
+    }
+    if (Array.isArray(forwarded) && forwarded[0]) {
+      const normalized = normalizeClientIp(forwarded[0]);
+      if (normalized) return normalized;
+    }
   }
-  return req.socket.remoteAddress ?? 'unknown';
+  return normalizeClientIp(req.socket.remoteAddress ?? '') ?? 'unknown';
 }
 
 function bearerTokenMatches(presented: string, tokens: string[]): boolean {
@@ -169,25 +208,32 @@ function bearerTokenMatches(presented: string, tokens: string[]): boolean {
 function checkMcpRateLimit(
   buckets: Map<string, RateBucket>,
   ip: string,
-): { ok: true } | { ok: false; retryAfterSec: number } {
+):
+  | { ok: true; limit: number; remaining: number; resetAt: number }
+  | { ok: false; limit: number; remaining: 0; resetAt: number; retryAfterSec: number } {
   const rpm = mcpRateLimitRpm();
-  if (rpm <= 0) return { ok: true };
   const now = Date.now();
   const windowMs = 60_000;
+  if (rpm <= 0) {
+    return { ok: true, limit: 0, remaining: 0, resetAt: now + windowMs };
+  }
   let b = buckets.get(ip);
   if (!b || now - b.windowStart >= windowMs) {
     b = { count: 0, windowStart: now };
     buckets.set(ip, b);
   }
   b.count += 1;
+  const resetAt = b.windowStart + windowMs;
   if (b.count > rpm) {
-    const retryAfterSec = Math.max(
-      1,
-      Math.ceil((windowMs - (now - b.windowStart)) / 1000),
-    );
-    return { ok: false, retryAfterSec };
+    const retryAfterSec = Math.max(1, Math.ceil((resetAt - now) / 1000));
+    return { ok: false, limit: rpm, remaining: 0, resetAt, retryAfterSec };
   }
-  return { ok: true };
+  return {
+    ok: true,
+    limit: rpm,
+    remaining: Math.max(0, rpm - b.count),
+    resetAt,
+  };
 }
 
 function createLomiMcpExpressApp(hostOpts: ReturnType<typeof listenHostOptions>): Express {
@@ -263,9 +309,28 @@ async function bearerAuthMiddleware(
     return;
   }
 
-  // Primary path: shaped merchant/provisioning key, or introspected OAuth token.
-  if (await resolveTransportCredential(req)) {
+  if (
+    extractSessionMerchantApiKey(req) ||
+    extractSessionProvisioningKey(req) ||
+    extractSessionPartnerKey(req)
+  ) {
     next();
+    return;
+  }
+
+  const oauthToken = extractOAuthAccessToken(req);
+  if (oauthToken) {
+    if (await resolveTransportCredential(req)) {
+      next();
+      return;
+    }
+    applyOauthCors(res);
+    res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge('invalid_token'));
+    res.status(401).json({
+      error: 'Unauthorized',
+      error_code: 'invalid_oauth_token',
+      message: 'OAuth access token is invalid, expired, or revoked.',
+    });
     return;
   }
 
@@ -275,6 +340,7 @@ async function bearerAuthMiddleware(
     return;
   }
 
+  applyOauthCors(res);
   res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge());
   res.status(401).json({
     error: 'Unauthorized',
@@ -344,6 +410,18 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   ): void {
     const ip = clientIp(req);
     const rl = checkMcpRateLimit(rateBuckets, ip);
+    if (rl.limit > 0) {
+      const resetDelaySec = Math.max(
+        0,
+        Math.ceil((rl.resetAt - Date.now()) / 1000),
+      );
+      res.setHeader('X-RateLimit-Limit', String(rl.limit));
+      res.setHeader('X-RateLimit-Remaining', String(rl.remaining));
+      res.setHeader('X-RateLimit-Reset', String(Math.floor(rl.resetAt / 1000)));
+      res.setHeader('RateLimit-Limit', String(rl.limit));
+      res.setHeader('RateLimit-Remaining', String(rl.remaining));
+      res.setHeader('RateLimit-Reset', String(resetDelaySec));
+    }
     if (rl.ok) {
       next();
       return;
@@ -360,34 +438,49 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
   const protectedResourceMetadataPattern =
     /^\/\.well-known\/oauth-protected-resource(\/.*)?$/;
 
-  function serveProtectedResourceMetadata(_req: Request, res: Response): void {
-    res.status(200).json(buildProtectedResourceMetadata());
+  function sendDiscoveryJson(res: Response, body: unknown): void {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
+    applyOauthCors(res);
+    res.status(200).json(body);
   }
 
+  function serveProtectedResourceMetadata(_req: Request, res: Response): void {
+    sendDiscoveryJson(res, buildProtectedResourceMetadata());
+  }
+
+  app.options(protectedResourceMetadataPattern, (_req, res) => {
+    applyOauthCors(res);
+    res.status(204).end();
+  });
   app.get(
     protectedResourceMetadataPattern,
     rateLimitMiddleware,
     serveProtectedResourceMetadata,
   );
 
+  app.options('/.well-known/oauth-authorization-server', (_req, res) => {
+    applyOauthCors(res);
+    res.status(204).end();
+  });
   app.get('/.well-known/oauth-authorization-server', rateLimitMiddleware, (_req, res) => {
-    res.status(200).json(buildAuthorizationServerPointer());
+    sendDiscoveryJson(res, buildAuthorizationServerPointer());
   });
 
   app.get('/.well-known/mcp', rateLimitMiddleware, (_req, res) => {
-    res.status(200).json(buildMcpWellKnown(manifest));
+    sendDiscoveryJson(res, buildMcpWellKnown(manifest));
   });
 
   app.get('/.well-known/mcp.json', rateLimitMiddleware, (_req, res) => {
-    res.status(200).json(buildMcpWellKnown(manifest));
+    sendDiscoveryJson(res, buildMcpWellKnown(manifest));
   });
 
   app.get('/.well-known/mcp/catalog.json', rateLimitMiddleware, (_req, res) => {
-    res.status(200).json(buildMcpCatalog(manifest));
+    sendDiscoveryJson(res, buildMcpCatalog(manifest));
   });
 
   app.get('/server-card', rateLimitMiddleware, (_req, res) => {
-    res.status(200).json(buildMcpServerCard(manifest));
+    sendDiscoveryJson(res, buildMcpServerCard(manifest));
   });
 
   app.get('/robots.txt', (_req, res) => {
@@ -526,7 +619,12 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
               resolvedPartnerKey,
             )
           ) {
-            res.setHeader('WWW-Authenticate', oauthUnauthorizedChallenge());
+            const staleOAuth = Boolean(extractOAuthAccessToken(req));
+            applyOauthCors(res);
+            res.setHeader(
+              'WWW-Authenticate',
+              oauthUnauthorizedChallenge(staleOAuth ? 'invalid_token' : undefined),
+            )
             res.status(401).json({
               jsonrpc: '2.0',
               error: {
@@ -758,10 +856,17 @@ export function createHttpApplication(manifest: ToolsManifest): Express {
     });
   };
 
+  function oauthCorsPreflight(_req: Request, res: Response): void {
+    applyOauthCors(res);
+    res.status(204).end();
+  }
+
+  app.options(basePath, oauthCorsPreflight);
   app.post(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpPostHandler(false));
   app.get(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpGetHandler);
   app.delete(basePath, rateLimitMiddleware, bearerAuthMiddleware, mcpDeleteHandler);
 
+  app.options(`${basePath}/guest`, oauthCorsPreflight);
   app.post(`${basePath}/guest`, rateLimitMiddleware, mcpPostHandler(true));
   app.get(`${basePath}/guest`, rateLimitMiddleware, mcpGetHandler);
   app.delete(`${basePath}/guest`, rateLimitMiddleware, mcpDeleteHandler);

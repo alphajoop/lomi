@@ -479,6 +479,21 @@
       ],
       "owner": "tools",
       "risk": "low"
+    },
+    {
+      "id": "anti-slop",
+      "path": "apps/tools/anti-slop",
+      "kind": "tool",
+      "manager": "pnpm",
+      "workspace": false,
+      "submodule": true,
+      "required": false,
+      "capabilities": [
+        "install",
+        "typecheck"
+      ],
+      "owner": "tools",
+      "risk": "low"
     }
   ]
 }

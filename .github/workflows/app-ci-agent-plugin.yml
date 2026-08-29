@@ -1,0 +1,30 @@
+name: lomi · ci · agent-plugin
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "apps/agent-plugin/**"
+      - ".gitmodules"
+      - ".github/workflows/app-ci-agent-plugin.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/agent-plugin/**"
+      - ".gitmodules"
+      - ".github/workflows/app-ci-agent-plugin.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: false
+      - name: Init agent-plugin
+        run: bash .github/scripts/init-submodules.sh apps/agent-plugin
+      - name: Validate manifests
+        run: node apps/agent-plugin/scripts/validate.mjs

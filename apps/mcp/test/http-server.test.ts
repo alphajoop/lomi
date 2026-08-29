@@ -176,6 +176,8 @@ describe('createHttpApplication', () => {
 
     const body = (await res.json()) as JsonObject;
     expect(body.resource).toBe('https://mcp.lomi.africa/mcp');
+    expect(res.headers.get('access-control-allow-origin')).toBe('*');
+    expect(res.headers.get('cache-control')).toMatch(/max-age=/);
   });
 
   it('POST /mcp without session credentials returns WWW-Authenticate challenge', async () => {
@@ -207,6 +209,43 @@ describe('createHttpApplication', () => {
     expect(wwwAuth).toMatch(/Bearer/);
     expect(wwwAuth).toMatch(/resource_metadata/);
     expect(wwwAuth).toMatch(/oauth-protected-resource\/mcp/);
+  });
+
+  it('POST /mcp with a stale OAuth token returns invalid_token challenge', async () => {
+    delete process.env.LOMI_MCP_BEARER_TOKEN;
+    delete process.env.LOMI_PROVISIONING_KEY;
+    delete process.env.LOMI_SECRET_KEY;
+    delete process.env.X_API_KEY;
+    delete process.env.INTERNAL_API_KEY;
+    delete process.env.CRON_SECRET;
+    process.env.LOMI_MCP_RESOURCE_URL = 'https://mcp.lomi.africa/mcp';
+    const manifest = parseManifest(validateJsonValue(manifestJson));
+    const app = createHttpApplication(manifest);
+    const ctx = await listen(app);
+    server = ctx.server;
+    const res = await fetch(`http://127.0.0.1:${ctx.port}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer lomi_oat_stale',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'initialize',
+        id: 1,
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'test', version: '0' },
+        },
+      }),
+    });
+    expect(res.status).toBe(401);
+    const wwwAuth = res.headers.get('www-authenticate');
+    expect(wwwAuth).toMatch(/invalid_token/);
+    expect(wwwAuth).toMatch(/resource_metadata/);
+    const body = (await res.json()) as JsonObject;
+    expect(body.error_code).toBe('invalid_oauth_token');
   });
 
   it('POST /mcp/guest initialize is not 401 when gated', async () => {
@@ -451,5 +490,6 @@ describe('createHttpApplication', () => {
     expect(body.authorization_endpoint).toBe(
       'https://api.lomi.africa/oauth/authorize',
     );
+    expect(res.headers.get('access-control-allow-origin')).toBe('*');
   });
 });
