@@ -60,7 +60,7 @@ export function wireMcpServer(options: WireMcpServerOptions): McpServer {
     guest = false,
   } = options;
   const server = new McpServer(
-    { name: 'lomi.', version: manifest.apiVersion },
+    { name: 'lomi', title: 'lomi.', version: manifest.apiVersion },
     {
       instructions: buildServerInstructions(mode, guest),
     },

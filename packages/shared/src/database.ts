@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -1881,6 +1881,7 @@ export type Database = {
           organization_id: string
           payment_mode: Database["public"]["Enums"]["service_payment_mode"]
           price: number
+          public_id: string
           service_id: string
           updated_at: string
         }
@@ -1903,6 +1904,7 @@ export type Database = {
           organization_id: string
           payment_mode?: Database["public"]["Enums"]["service_payment_mode"]
           price: number
+          public_id?: string
           service_id?: string
           updated_at?: string
         }
@@ -1925,6 +1927,7 @@ export type Database = {
           organization_id?: string
           payment_mode?: Database["public"]["Enums"]["service_payment_mode"]
           price?: number
+          public_id?: string
           service_id?: string
           updated_at?: string
         }
@@ -2124,6 +2127,7 @@ export type Database = {
           payment_request_id: string | null
           price_id: string | null
           product_id: string | null
+          public_id: string
           qr_code_data: Json | null
           qr_code_type: Database["public"]["Enums"]["qr_code_type"] | null
           quantity: number
@@ -2175,6 +2179,7 @@ export type Database = {
           payment_request_id?: string | null
           price_id?: string | null
           product_id?: string | null
+          public_id?: string
           qr_code_data?: Json | null
           qr_code_type?: Database["public"]["Enums"]["qr_code_type"] | null
           quantity?: number
@@ -2226,6 +2231,7 @@ export type Database = {
           payment_request_id?: string | null
           price_id?: string | null
           product_id?: string | null
+          public_id?: string
           qr_code_data?: Json | null
           qr_code_type?: Database["public"]["Enums"]["qr_code_type"] | null
           quantity?: number
@@ -2743,6 +2749,7 @@ export type Database = {
           pdf_url: string | null
           price_id: string | null
           product_id: string | null
+          public_id: string
           recurrence_rule_id: string | null
           recurring_sequence: number | null
           scheduled_at: string | null
@@ -2791,6 +2798,7 @@ export type Database = {
           pdf_url?: string | null
           price_id?: string | null
           product_id?: string | null
+          public_id?: string
           recurrence_rule_id?: string | null
           recurring_sequence?: number | null
           scheduled_at?: string | null
@@ -2839,6 +2847,7 @@ export type Database = {
           pdf_url?: string | null
           price_id?: string | null
           product_id?: string | null
+          public_id?: string
           recurrence_rule_id?: string | null
           recurring_sequence?: number | null
           scheduled_at?: string | null
@@ -3249,6 +3258,7 @@ export type Database = {
           phone_number: string | null
           postal_code: string | null
           provider_customer_id: string | null
+          public_id: string
           spi_alias_mbno: string | null
           spi_alias_shid: string | null
           spi_primary_alias: string | null
@@ -3273,6 +3283,7 @@ export type Database = {
           phone_number?: string | null
           postal_code?: string | null
           provider_customer_id?: string | null
+          public_id?: string
           spi_alias_mbno?: string | null
           spi_alias_shid?: string | null
           spi_primary_alias?: string | null
@@ -3297,6 +3308,7 @@ export type Database = {
           phone_number?: string | null
           postal_code?: string | null
           provider_customer_id?: string | null
+          public_id?: string
           spi_alias_mbno?: string | null
           spi_alias_shid?: string | null
           spi_primary_alias?: string | null
@@ -3347,6 +3359,7 @@ export type Database = {
           max_quantity_per_use: number | null
           max_uses: number | null
           organization_id: string
+          public_id: string
           scope_type: string
           updated_at: string
           usage_frequency_limit: Database["public"]["Enums"]["usage_frequency"]
@@ -3372,6 +3385,7 @@ export type Database = {
           max_quantity_per_use?: number | null
           max_uses?: number | null
           organization_id: string
+          public_id?: string
           scope_type?: string
           updated_at?: string
           usage_frequency_limit?: Database["public"]["Enums"]["usage_frequency"]
@@ -3397,6 +3411,7 @@ export type Database = {
           max_quantity_per_use?: number | null
           max_uses?: number | null
           organization_id?: string
+          public_id?: string
           scope_type?: string
           updated_at?: string
           usage_frequency_limit?: Database["public"]["Enums"]["usage_frequency"]
@@ -3422,6 +3437,7 @@ export type Database = {
           dispute_id: string
           evidence_details: Json | null
           fee_amount: number
+          public_id: string
           reason: string
           resolution_date: string | null
           resolution_details: string | null
@@ -3439,6 +3455,7 @@ export type Database = {
           dispute_id?: string
           evidence_details?: Json | null
           fee_amount?: number
+          public_id?: string
           reason: string
           resolution_date?: string | null
           resolution_details?: string | null
@@ -3456,6 +3473,7 @@ export type Database = {
           dispute_id?: string
           evidence_details?: Json | null
           fee_amount?: number
+          public_id?: string
           reason?: string
           resolution_date?: string | null
           resolution_details?: string | null
@@ -5645,6 +5663,7 @@ export type Database = {
           onboarding_status: Database["public"]["Enums"]["onboarding_status"]
           phone_number: string | null
           preferred_language: string
+          public_id: string
           referral_code: string | null
           retry_payment_every: number | null
           subscription_notifications: Json | null
@@ -5666,6 +5685,7 @@ export type Database = {
           onboarding_status?: Database["public"]["Enums"]["onboarding_status"]
           phone_number?: string | null
           preferred_language?: string
+          public_id?: string
           referral_code?: string | null
           retry_payment_every?: number | null
           subscription_notifications?: Json | null
@@ -5687,6 +5707,7 @@ export type Database = {
           onboarding_status?: Database["public"]["Enums"]["onboarding_status"]
           phone_number?: string | null
           preferred_language?: string
+          public_id?: string
           referral_code?: string | null
           retry_payment_every?: number | null
           subscription_notifications?: Json | null
@@ -5774,6 +5795,7 @@ export type Database = {
           name: string
           organization_id: string
           product_id: string | null
+          public_id: string
           updated_at: string
         }
         Insert: {
@@ -5785,6 +5807,7 @@ export type Database = {
           name: string
           organization_id: string
           product_id?: string | null
+          public_id?: string
           updated_at?: string
         }
         Update: {
@@ -5796,6 +5819,7 @@ export type Database = {
           name?: string
           organization_id?: string
           product_id?: string | null
+          public_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -8365,6 +8389,7 @@ export type Database = {
           pricing_plan_type:
             | Database["public"]["Enums"]["pricing_plan_type"]
             | null
+          public_id: string
           radar_enabled: boolean
           slug: string | null
           status: Database["public"]["Enums"]["organization_status"]
@@ -8402,6 +8427,7 @@ export type Database = {
           pricing_plan_type?:
             | Database["public"]["Enums"]["pricing_plan_type"]
             | null
+          public_id?: string
           radar_enabled?: boolean
           slug?: string | null
           status?: Database["public"]["Enums"]["organization_status"]
@@ -8439,6 +8465,7 @@ export type Database = {
           pricing_plan_type?:
             | Database["public"]["Enums"]["pricing_plan_type"]
             | null
+          public_id?: string
           radar_enabled?: boolean
           slug?: string | null
           status?: Database["public"]["Enums"]["organization_status"]
@@ -8581,6 +8608,7 @@ export type Database = {
           organization_id: string
           price_id: string | null
           product_id: string | null
+          public_id: string
           quantity: number
           require_billing_address: boolean
           require_email: boolean
@@ -8609,6 +8637,7 @@ export type Database = {
           organization_id: string
           price_id?: string | null
           product_id?: string | null
+          public_id?: string
           quantity?: number
           require_billing_address?: boolean
           require_email?: boolean
@@ -8637,6 +8666,7 @@ export type Database = {
           organization_id?: string
           price_id?: string | null
           product_id?: string | null
+          public_id?: string
           quantity?: number
           require_billing_address?: boolean
           require_email?: boolean
@@ -8761,6 +8791,7 @@ export type Database = {
           organization_id: string
           payment_link: string | null
           payment_reference: string | null
+          public_id: string
           request_id: string
           spi_account_number: string | null
           spi_bulk_instruction_id: string | null
@@ -8807,6 +8838,7 @@ export type Database = {
           organization_id: string
           payment_link?: string | null
           payment_reference?: string | null
+          public_id?: string
           request_id?: string
           spi_account_number?: string | null
           spi_bulk_instruction_id?: string | null
@@ -8853,6 +8885,7 @@ export type Database = {
           organization_id?: string
           payment_link?: string | null
           payment_reference?: string | null
+          public_id?: string
           request_id?: string
           spi_account_number?: string | null
           spi_bulk_instruction_id?: string | null
@@ -9128,6 +9161,7 @@ export type Database = {
           payout_id: string
           payout_method_id: string | null
           provider_code: Database["public"]["Enums"]["provider_code"] | null
+          public_id: string
           status: Database["public"]["Enums"]["payout_status"]
           updated_at: string
         }
@@ -9146,6 +9180,7 @@ export type Database = {
           payout_id?: string
           payout_method_id?: string | null
           provider_code?: Database["public"]["Enums"]["provider_code"] | null
+          public_id?: string
           status?: Database["public"]["Enums"]["payout_status"]
           updated_at?: string
         }
@@ -9164,6 +9199,7 @@ export type Database = {
           payout_id?: string
           payout_method_id?: string | null
           provider_code?: Database["public"]["Enums"]["provider_code"] | null
+          public_id?: string
           status?: Database["public"]["Enums"]["payout_status"]
           updated_at?: string
         }
@@ -10038,6 +10074,7 @@ export type Database = {
           price_id: string
           pricing_model: Database["public"]["Enums"]["pricing_model"]
           product_id: string
+          public_id: string
           updated_at: string
         }
         Insert: {
@@ -10057,6 +10094,7 @@ export type Database = {
           price_id?: string
           pricing_model?: Database["public"]["Enums"]["pricing_model"]
           product_id: string
+          public_id?: string
           updated_at?: string
         }
         Update: {
@@ -10076,6 +10114,7 @@ export type Database = {
           price_id?: string
           pricing_model?: Database["public"]["Enums"]["pricing_model"]
           product_id?: string
+          public_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -10230,6 +10269,7 @@ export type Database = {
           organization_id: string
           product_id: string
           product_type: Database["public"]["Enums"]["product_type"]
+          public_id: string
           sku: string | null
           track_inventory: boolean | null
           trial_enabled: boolean
@@ -10265,6 +10305,7 @@ export type Database = {
           organization_id: string
           product_id?: string
           product_type?: Database["public"]["Enums"]["product_type"]
+          public_id?: string
           sku?: string | null
           track_inventory?: boolean | null
           trial_enabled?: boolean
@@ -10300,6 +10341,7 @@ export type Database = {
           organization_id?: string
           product_id?: string
           product_type?: Database["public"]["Enums"]["product_type"]
+          public_id?: string
           sku?: string | null
           track_inventory?: boolean | null
           trial_enabled?: boolean
@@ -10713,6 +10755,7 @@ export type Database = {
           environment: string
           fee_amount: number
           metadata: Json | null
+          public_id: string
           reason: string | null
           refund_id: string
           refunded_amount: number
@@ -10740,6 +10783,7 @@ export type Database = {
           environment?: string
           fee_amount?: number
           metadata?: Json | null
+          public_id?: string
           reason?: string | null
           refund_id?: string
           refunded_amount: number
@@ -10767,6 +10811,7 @@ export type Database = {
           environment?: string
           fee_amount?: number
           metadata?: Json | null
+          public_id?: string
           reason?: string | null
           refund_id?: string
           refunded_amount?: number
@@ -11546,6 +11591,7 @@ export type Database = {
           price_id: string | null
           product_id: string
           provider_payment_method_id: string | null
+          public_id: string
           start_date: string
           status: Database["public"]["Enums"]["subscription_status"]
           subscription_id: string
@@ -11563,6 +11609,7 @@ export type Database = {
           price_id?: string | null
           product_id: string
           provider_payment_method_id?: string | null
+          public_id?: string
           start_date: string
           status?: Database["public"]["Enums"]["subscription_status"]
           subscription_id?: string
@@ -11580,6 +11627,7 @@ export type Database = {
           price_id?: string | null
           product_id?: string
           provider_payment_method_id?: string | null
+          public_id?: string
           start_date?: string
           status?: Database["public"]["Enums"]["subscription_status"]
           subscription_id?: string
@@ -11787,6 +11835,7 @@ export type Database = {
           price_id: string | null
           product_id: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
+          public_id: string
           quantity: number
           spi_account_number: string | null
           spi_bulk_instruction_id: string | null
@@ -11841,6 +11890,7 @@ export type Database = {
           price_id?: string | null
           product_id?: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
+          public_id?: string
           quantity?: number
           spi_account_number?: string | null
           spi_bulk_instruction_id?: string | null
@@ -11895,6 +11945,7 @@ export type Database = {
           price_id?: string | null
           product_id?: string | null
           provider_code?: Database["public"]["Enums"]["provider_code"]
+          public_id?: string
           quantity?: number
           spi_account_number?: string | null
           spi_bulk_instruction_id?: string | null
@@ -12315,6 +12366,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -12336,6 +12388,7 @@ export type Database = {
           last_triggered_at?: string | null
           metadata?: Json | null
           organization_id: string
+          public_id?: string
           retry_count?: number | null
           spi_event_types?: string[] | null
           supports_spi?: boolean
@@ -12357,6 +12410,7 @@ export type Database = {
           last_triggered_at?: string | null
           metadata?: Json | null
           organization_id?: string
+          public_id?: string
           retry_count?: number | null
           spi_event_types?: string[] | null
           supports_spi?: boolean
@@ -13317,6 +13371,10 @@ export type Database = {
       }
       advance_usage_subscription_billing_date: {
         Args: { p_subscription_id: string }
+        Returns: string
+      }
+      allocate_public_id: {
+        Args: { p_prefix: string; p_table: string }
         Returns: string
       }
       api_internal_base_url: { Args: never; Returns: string }
@@ -15073,6 +15131,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -16345,6 +16404,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -16868,6 +16928,7 @@ export type Database = {
           postal_code: string
           primary_payment_method: string
           primary_provider: string
+          public_id: string
           refund_amount: number
           spend_currency: Database["public"]["Enums"]["currency_code"]
           total_count: number
@@ -17227,6 +17288,7 @@ export type Database = {
           organization_id: string
           organization_logo_url: string
           organization_name: string
+          public_id: string
         }[]
       }
       fetch_merchant_preferences: { Args: never; Returns: Json }
@@ -17980,6 +18042,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -18026,6 +18089,7 @@ export type Database = {
           product_id: string
           product_images: string[]
           product_name: string
+          public_id: string
           quantity: number
           success_url: string
           title: string
@@ -18279,6 +18343,7 @@ export type Database = {
           prices: Json
           product_id: string
           product_type: Database["public"]["Enums"]["product_type"]
+          public_id: string
           sku: string
           total_count: number
           track_inventory: boolean
@@ -18983,6 +19048,7 @@ export type Database = {
           provider_checkout_id: string
           provider_code: Database["public"]["Enums"]["provider_code"]
           provider_transaction_id: string
+          public_id: string
           qr_code_id: string
           qr_code_name: string
           qr_code_product_id: string
@@ -19964,6 +20030,7 @@ export type Database = {
           organization_id: string
           phone_number: string
           pricing_plan_type: Database["public"]["Enums"]["pricing_plan_type"]
+          public_id: string
           status: Database["public"]["Enums"]["organization_status"]
           total_fees: number
           total_revenue: number
@@ -21747,6 +21814,7 @@ export type Database = {
           name: string
           organization_id: string
           product_id: string | null
+          public_id: string
           updated_at: string
         }
         SetofOptions: {
@@ -22132,6 +22200,7 @@ export type Database = {
           organization_id: string
           payment_request: Json
           pdf_url: string
+          public_id: string
           status: Database["public"]["Enums"]["invoice_status"]
           total_count: number
           updated_at: string
@@ -22993,6 +23062,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -23578,6 +23648,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -23608,6 +23679,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -24121,6 +24193,7 @@ export type Database = {
           payment_url: string
           price_id: string
           product_id: string
+          public_id: string
           sent_at: string
           status: Database["public"]["Enums"]["invoice_status"]
           subscription_id: string
@@ -24222,6 +24295,7 @@ export type Database = {
           name: string
           organization_id: string
           product_id: string | null
+          public_id: string
           updated_at: string
         }[]
         SetofOptions: {
@@ -25616,6 +25690,10 @@ export type Database = {
         }
         Returns: number
       }
+      resolve_checkout_session_id: {
+        Args: { p_identifier: string }
+        Returns: string
+      }
       resolve_checkout_subscription_id: {
         Args: {
           p_create_if_missing?: boolean
@@ -25696,6 +25774,10 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["currency_code"]
       }
+      resolve_organization_id: {
+        Args: { p_identifier: string }
+        Returns: string
+      }
       resolve_organization_logo_url_for_email: {
         Args: { p_default_logo_url?: string; p_logo_url: string }
         Returns: string
@@ -25704,6 +25786,7 @@ export type Database = {
         Args: { p_identifier: string }
         Returns: string
       }
+      resolve_product_id: { Args: { p_identifier: string }; Returns: string }
       resolve_subscription_refund_action: {
         Args: {
           p_explicit_action?: string
@@ -25729,6 +25812,10 @@ export type Database = {
       }
       resolve_tier_id_for_volume_xof: {
         Args: { p_volume_xof: number }
+        Returns: string
+      }
+      resolve_transaction_id: {
+        Args: { p_identifier: string }
         Returns: string
       }
       resolve_transaction_product: {
@@ -26408,6 +26495,7 @@ export type Database = {
           pdf_url: string | null
           price_id: string | null
           product_id: string | null
+          public_id: string
           recurrence_rule_id: string | null
           recurring_sequence: number | null
           scheduled_at: string | null
@@ -26765,6 +26853,7 @@ export type Database = {
           last_triggered_at: string | null
           metadata: Json | null
           organization_id: string
+          public_id: string
           retry_count: number | null
           spi_event_types: string[] | null
           supports_spi: boolean
@@ -26840,6 +26929,7 @@ export type Database = {
           organization_id: string
           price_id: string | null
           product_id: string | null
+          public_id: string
           quantity: number
           require_billing_address: boolean
           require_email: boolean

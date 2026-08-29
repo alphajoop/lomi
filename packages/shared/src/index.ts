@@ -181,6 +181,19 @@ export type {
 } from "./browser-session.js";
 export { getPayButtonForeground } from "./button-contrast.js";
 export {
+  PUBLIC_ID_ALPHABET,
+  PUBLIC_ID_BODY_LENGTH,
+  PUBLIC_ID_PREFIXES,
+  formatPublicId,
+  isPublicId,
+  isPublicIdPrefix,
+  isUuid,
+  normalizePublicId,
+  publicIdPrefix,
+  publicIdsMatch,
+} from "./public-id.js";
+export type { PublicIdKind } from "./public-id.js";
+export {
   AGENT_POW_ISSUE_PER_HOUR,
   AGENT_REGISTER_GLOBAL_PER_HOUR,
   AGENT_REGISTER_PER_HOUR,

@@ -131,7 +131,7 @@ export function CheckoutSubmitButton({
         disabled={disabled || paymentStatus === 'processing'}
         className={cn(
           'relative inline-flex h-12 w-full select-none items-center justify-center rounded-[9px] px-3 text-[13px] font-semibold outline-none transition-[border-color,box-shadow,background-color] duration-150',
-          'shadow-[inset_0_1.5px_0_rgba(255,255,255,0.18),inset_0_-1px_0_rgba(28,25,23,0.12),0_1px_2px_rgba(28,25,23,0.12)]',
+          'shadow-none',
           paymentStatus === 'success' && '!bg-green-700 hover:!bg-green-800',
           paymentStatus === 'error' && '!bg-red-800 hover:!bg-red-900',
           paymentStatus === 'processing' && 'disabled:opacity-100',

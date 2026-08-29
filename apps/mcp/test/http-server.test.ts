@@ -425,6 +425,7 @@ describe('createHttpApplication', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as JsonObject;
     expect(body.name).toBe('io.lomi/mcp');
+    expect(body.title).toBe('lomi.');
   });
 
   it('GET / returns HTML with an H1 for browsers', async () => {

@@ -22,6 +22,7 @@ export type MerchantOrganization = {
   merchant_role: string;
   allow_staff_impersonation?: boolean;
   is_current?: boolean;
+  public_id?: string | null;
 };
 
 export type OrganizationDetails = {
@@ -41,6 +42,7 @@ export type OrganizationDetails = {
   storefront_enabled: boolean;
   slug?: string | null;
   has_payout_pin?: boolean;
+  public_id?: string | null;
 };
 
 function parseMerchantOrganizationRow(
@@ -56,6 +58,7 @@ function parseMerchantOrganizationRow(
     organization_name: organizationName,
     organization_logo_url: readString(object, "organization_logo_url") ?? null,
     merchant_role: merchantRole,
+    public_id: readString(object, "public_id") ?? null,
   };
 
   const allowStaffImpersonation = readBoolean(
@@ -143,6 +146,7 @@ function parseOrganizationDetailsRow(
     postal_code: readString(value, "postal_code") ?? null,
     storefront_enabled: storefrontEnabled,
     slug: readString(value, "slug") ?? null,
+    public_id: readString(value, "public_id") ?? null,
   };
 
   const hasPayoutPin = readBoolean(value, "has_payout_pin");

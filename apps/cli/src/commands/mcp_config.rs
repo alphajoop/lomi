@@ -46,7 +46,7 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
     let snippet = match args.target.as_str() {
         "cursor" => serde_json::json!({
             "mcpServers": {
-                "lomi": {
+                "lomi.": {
                     "url": format!("{}/mcp", args.url.trim_end_matches('/')),
                     "headers": {
                         "x-lomi-api-key": api_key.clone().unwrap_or_else(|| key_placeholder.to_string())
@@ -56,7 +56,7 @@ async fn run_config(common: &CommonOptions, args: McpConfigArgs) -> Result<()> {
         }),
         "claude" => serde_json::json!({
             "mcpServers": {
-                "lomi": {
+                "lomi.": {
                     "type": "http",
                     "url": format!("{}/mcp", args.url.trim_end_matches('/')),
                     "headers": {

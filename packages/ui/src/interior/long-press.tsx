@@ -201,7 +201,7 @@ export function LongPressButton({
           ? "translate-y-px border-stone-200 bg-stone-100/70 shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)] dark:border-white/[0.08] dark:bg-[#1D1D1A] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.45)]"
           : fired
             ? "border-[#4568FF] bg-[#4568FF]/[0.07] dark:border-[#93B0FF] dark:bg-[#93B0FF]/[0.12]"
-            : "border-stone-200 bg-white shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06),0_1px_2px_rgba(28,25,23,0.08)] hover:bg-stone-50 dark:border-white/[0.16] dark:bg-[#252522] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_1px_2px_rgba(0,0,0,0.4)] dark:hover:bg-[#2A2A27]"
+            : "border-stone-200 bg-white shadow-none hover:bg-stone-50 dark:border-white/[0.16] dark:bg-[#252522] dark:hover:bg-[#2A2A27]"
       } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${className}`}
       style={{ touchAction: "manipulation", WebkitTouchCallout: "none" }}
       {...bind}

@@ -291,7 +291,7 @@ export function LiveActivity({
               if (phase === "running") setHovered(false);
               else onDismiss?.();
             }}
-            className="pointer-events-auto relative overflow-hidden rounded-[11px] border border-stone-200 bg-white shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),0_1px_2px_rgba(28,25,23,0.07),0_16px_36px_-18px_rgba(28,25,23,0.5)] dark:border-white/[0.16] dark:bg-[#252522] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_2px_12px_rgba(0,0,0,0.55)]"
+            className="pointer-events-auto relative overflow-hidden rounded-[11px] border border-stone-200 bg-white shadow-[0_16px_36px_-18px_rgba(28,25,23,0.5)] dark:border-white/[0.16] dark:bg-[#252522] dark:shadow-[0_2px_12px_rgba(0,0,0,0.55)]"
           >
             <motion.div
               ref={compactRef}
@@ -334,7 +334,7 @@ export function LiveActivity({
                     type="button"
                     tabIndex={expanded ? 0 : -1}
                     onClick={activity.action.onClick}
-                    className="inline-flex h-[24px] shrink-0 select-none items-center whitespace-nowrap rounded-[6px] border border-stone-200 bg-white px-2 text-[11px] font-medium text-stone-700 shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06),0_1px_2px_rgba(28,25,23,0.08)] outline-none transition-[background-color,border-color,box-shadow] duration-150 hover:bg-stone-50 focus-visible:border-[#4568FF] active:translate-y-px dark:border-white/[0.16] dark:bg-[#2A2A27] dark:text-stone-100 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_1px_2px_rgba(0,0,0,0.4)] dark:hover:bg-[#32322E] dark:focus-visible:border-[#93B0FF]"
+                    className="inline-flex h-[24px] shrink-0 select-none items-center whitespace-nowrap rounded-[6px] border border-stone-200 bg-white px-2 text-[11px] font-medium text-stone-700 shadow-none outline-none transition-[background-color,border-color,box-shadow] duration-150 hover:bg-stone-50 focus-visible:border-[#4568FF] active:translate-y-px dark:border-white/[0.16] dark:bg-[#2A2A27] dark:text-stone-100 dark:hover:bg-[#32322E] dark:focus-visible:border-[#93B0FF]"
                   >
                     {activity.action.label}
                   </button>

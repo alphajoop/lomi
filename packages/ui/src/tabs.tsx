@@ -26,7 +26,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm border-none px-3 py-1 text-[13px] font-medium outline-none transition-all hover:bg-stone-200/70 hover:text-stone-700 focus-visible:outline-none focus-visible:border-[#4568FF] focus-visible:shadow-[0_1px_2px_rgba(28,25,23,0.08),0_10px_20px_-14px_rgba(69,104,255,0.6)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-stone-800 data-[state=active]:shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),0_1px_2px_rgba(28,25,23,0.08)] dark:hover:bg-[#2A2A27] dark:hover:text-stone-200 dark:data-[state=active]:bg-[#252522] dark:data-[state=active]:text-stone-100",
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm border-none px-3 py-1 text-[13px] font-medium outline-none transition-all hover:bg-stone-200/70 hover:text-stone-700 focus-visible:outline-none focus-visible:border-[#4568FF] focus-visible:shadow-[0_0_0_2px_rgba(69,104,255,0.28)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-stone-800 data-[state=active]:shadow-none dark:hover:bg-[#2A2A27] dark:hover:text-stone-200 dark:data-[state=active]:bg-[#252522] dark:data-[state=active]:text-stone-100",
       className,
     )}
     {...props}

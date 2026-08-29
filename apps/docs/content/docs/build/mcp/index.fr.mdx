@@ -81,7 +81,7 @@ Config URL seule (OAuth) :
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "url": "https://mcp.lomi.africa/mcp"
     }
   }
@@ -93,7 +93,7 @@ Config avec clé API (repli) :
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "url": "https://mcp.lomi.africa/mcp",
       "headers": {
         "x-lomi-api-key": "YOUR_LOMI_SECRET_KEY"
@@ -150,7 +150,7 @@ Lance le serveur MCP sur votre machine, pas de jeton de transport. Idéal pour l
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "command": "npx",
       "args": ["-y", "@lomi./mcp"],
       "env": {
@@ -208,7 +208,7 @@ Exemple HTTP pour un nouveau marchand (provisioning seul tant que vous n’avez 
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "url": "https://mcp.lomi.africa/mcp",
       "headers": {
         "x-lomi-provisioning-key": "YOUR_LOMI_PROVISIONING_KEY"

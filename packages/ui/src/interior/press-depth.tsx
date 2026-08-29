@@ -150,7 +150,7 @@ export type PressDepthProps = {
 
 export function PressDepth({
   children,
-  depth = 4,
+  depth: _depth = 4,
   tilt = 7,
   disabled = false,
   type = "button",
@@ -172,36 +172,23 @@ export function PressDepth({
       data-pressed={pressed ? "" : undefined}
       onClick={onClick}
       style={{
-        paddingBottom: depth,
         touchAction: "manipulation",
         WebkitTapHighlightColor: "transparent",
       }}
       className="group relative inline-flex select-none rounded-md align-middle outline-none disabled:opacity-50"
       {...bind}
     >
-      <span
-        aria-hidden
-        style={{ top: depth }}
-        className="absolute inset-x-0 bottom-0 rounded-md bg-stone-300 dark:bg-white/25"
-      />
       <motion.span
         initial={false}
         animate={{
-          y: pressed ? depth : 0,
+          y: pressed ? 1 : 0,
           rotateX: lean ? -lean.y * tilt : 0,
           rotateY: lean ? lean.x * tilt : 0,
         }}
         transition={reduced ? { duration: 0 } : PRESS}
         style={{ transformPerspective: 340 }}
-        className={`relative inline-flex h-9 items-center justify-center gap-2 rounded-md border border-stone-200 bg-white px-3.5 text-[13px] font-medium text-stone-700 group-focus-visible:ring-2 group-focus-visible:ring-stone-400 dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:group-focus-visible:ring-stone-500 ${className}`}
+        className={`relative inline-flex h-9 items-center justify-center gap-2 rounded-md border border-stone-200 bg-white px-3.5 text-[13px] font-medium text-stone-700 shadow-none group-focus-visible:ring-2 group-focus-visible:ring-stone-400 dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 dark:group-focus-visible:ring-stone-500 ${className}`}
       >
-        <motion.span
-          aria-hidden
-          initial={false}
-          animate={{ opacity: pressed ? 0 : 1 }}
-          transition={reduced ? { duration: 0 } : PRESS}
-          className="pointer-events-none absolute inset-0 rounded-md shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06)] dark:shadow-[inset_0_1.5px_0_rgba(255,255,255,0.09)]"
-        />
         {children}
       </motion.span>
     </button>

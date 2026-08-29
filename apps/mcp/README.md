@@ -35,7 +35,7 @@ Example Cursor / Claude Desktop config:
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "command": "npx",
       "args": ["-y", "@lomi./mcp"],
       "env": {

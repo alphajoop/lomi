@@ -81,7 +81,7 @@ URL-only config (OAuth):
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "url": "https://mcp.lomi.africa/mcp"
     }
   }
@@ -93,7 +93,7 @@ API-key config (fallback):
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "url": "https://mcp.lomi.africa/mcp",
       "headers": {
         "x-lomi-api-key": "YOUR_LOMI_SECRET_KEY"
@@ -150,7 +150,7 @@ Runs the MCP server on your machine, no transport token needed. Good for local d
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "command": "npx",
       "args": ["-y", "@lomi./mcp"],
       "env": {
@@ -208,7 +208,7 @@ Hosted HTTP example for a brand-new merchant (provisioning only until you have `
 ```json
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "url": "https://mcp.lomi.africa/mcp",
       "headers": {
         "x-lomi-provisioning-key": "YOUR_LOMI_PROVISIONING_KEY"

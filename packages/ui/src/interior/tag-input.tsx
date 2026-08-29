@@ -344,7 +344,7 @@ export function TagInput({
                 className={`flex h-6 max-w-full shrink-0 select-none items-center gap-1 rounded-[6px] border pl-2 pr-1.5 text-[12.5px] transition-[background-color,border-color,box-shadow,color] duration-150 ${
                   lit
                     ? "border-stone-800 bg-stone-800 text-white shadow-[0_1px_2px_rgba(28,25,23,0.18)] dark:border-stone-100 dark:bg-stone-100 dark:text-stone-900 dark:shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
-                    : "border-stone-200 bg-white text-stone-800 shadow-[inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(28,25,23,0.06),0_1px_2px_rgba(28,25,23,0.08)] dark:border-white/[0.16] dark:bg-[#2A2A27] dark:text-stone-200 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_1px_2px_rgba(0,0,0,0.4)]"
+                    : "border-stone-200 bg-white text-stone-800 shadow-none dark:border-white/[0.16] dark:bg-[#2A2A27] dark:text-stone-200"
                 }`}
               >
                 <span className="truncate">{tag}</span>

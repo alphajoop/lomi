@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "lomi": {
+    "lomi.": {
       "command": "npx",
       "args": ["-y", "@lomi./mcp"],
       "env": {
