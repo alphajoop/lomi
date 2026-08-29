@@ -49,7 +49,7 @@ We are progressively open-sourcing the monorepo toward **eventual self-hosting**
   - Documentation website: **[apps/docs](./apps/docs)**
   - CLI: **[apps/cli](./apps/cli)**
   - Merchant MCP server: **[apps/mcp](./apps/mcp)**
-  - Agent plugin (marketplace install): **[apps/agent-plugin](./apps/agent-plugin)** ([lomiafrica/agent-plugin](https://github.com/lomiafrica/agent-plugin))
+  - Agent plugin (marketplace install): **[apps/tools/agent-plugin](./apps/tools/agent-plugin)** ([lomiafrica/agent-plugin](https://github.com/lomiafrica/agent-plugin))
   - SDKs: **[apps/sdks](./apps/sdks)**
   - E-commerce plugins: **[apps/plugins](./apps/plugins)**
   - Events boilerplate (separate repo): **[lomiafrica/events](https://github.com/lomiafrica/events/)**

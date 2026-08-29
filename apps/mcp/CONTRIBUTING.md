@@ -40,5 +40,5 @@ pnpm test
 ## Related
 
 - [Maintaining CLI and MCP](https://docs.lomi.africa/resources/contributing/maintaining-cli-mcp), roles and boundaries
-- Marketplace packaging: [`apps/agent-plugin`](../agent-plugin) ([lomiafrica/agent-plugin](https://github.com/lomiafrica/agent-plugin))
+- Marketplace packaging: [`apps/tools/agent-plugin`](../tools/agent-plugin) ([lomiafrica/agent-plugin](https://github.com/lomiafrica/agent-plugin))
 - Monorepo [CONTRIBUTING.md](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md)

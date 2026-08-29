@@ -4,13 +4,13 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - "apps/agent-plugin/**"
+      - "apps/tools/agent-plugin/**"
       - ".gitmodules"
       - ".github/workflows/app-ci-agent-plugin.yml"
   pull_request:
     branches: [main]
     paths:
-      - "apps/agent-plugin/**"
+      - "apps/tools/agent-plugin/**"
       - ".gitmodules"
       - ".github/workflows/app-ci-agent-plugin.yml"
 
@@ -25,6 +25,6 @@ jobs:
         with:
           submodules: false
       - name: Init agent-plugin
-        run: bash .github/scripts/init-submodules.sh apps/agent-plugin
+        run: bash .github/scripts/init-submodules.sh apps/tools/agent-plugin
       - name: Validate manifests
-        run: node apps/agent-plugin/scripts/validate.mjs
+        run: node apps/tools/agent-plugin/scripts/validate.mjs

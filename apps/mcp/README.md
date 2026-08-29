@@ -6,7 +6,7 @@ MCP server that exposes the **lomi. merchant API** to AI clients (Cursor, Claude
 
 Integration guide: [docs.lomi.africa/build/mcp](https://docs.lomi.africa/build/mcp)
 
-Portable marketplace packaging (Agent Plugins 1.0 + Cursor / Codex manifests) lives in [`../agent-plugin`](../agent-plugin/README.md). The hosted MCP URL works without the plugin.
+Portable marketplace packaging (Agent Plugins 1.0 + Cursor / Codex manifests) lives in [`../tools/agent-plugin`](../tools/agent-plugin/README.md). The hosted MCP URL works without the plugin.
 
 ## Hosted MCP (HTTP)
 

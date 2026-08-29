@@ -494,6 +494,19 @@
       ],
       "owner": "tools",
       "risk": "low"
+    },
+    {
+      "id": "agent-plugin",
+      "path": "apps/tools/agent-plugin",
+      "kind": "tool",
+      "manager": "none",
+      "workspace": false,
+      "submodule": true,
+      "required": false,
+      "capabilities": [],
+      "owner": "tools",
+      "risk": "low",
+      "notes": "Marketplace packaging; validate with node apps/tools/agent-plugin/scripts/validate.mjs."
     }
   ]
 }
