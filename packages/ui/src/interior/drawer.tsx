@@ -312,8 +312,8 @@ export function Drawer({
 
   const edge =
     side === "right"
-      ? "right-0 rounded-l-[14px] border-l"
-      : "left-0 rounded-r-[14px] border-r";
+      ? "right-0 rounded-l-sm border-l"
+      : "left-0 rounded-r-sm border-r";
 
   const [host, setHost] = useState<HTMLElement | null>(null);
   useEffect(() => {

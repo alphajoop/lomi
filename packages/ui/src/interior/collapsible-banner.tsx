@@ -189,12 +189,12 @@ export function CollapsibleBanner({
             : { height: DISCLOSE, opacity: { duration: 0.14, ease: EASE } }
         }
         style={{ overflow: "hidden" }}
-        className="rounded-[11px]"
+        className="rounded-sm"
       >
         <div
           role="region"
           aria-labelledby={titleId}
-          className={`rounded-[11px] border border-stone-200 bg-white shadow-[0_4px_10px_-8px_rgba(28,25,23,0.45)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)] ${className}`}
+          className={`rounded-sm border border-stone-200 bg-white shadow-[0_4px_10px_-8px_rgba(28,25,23,0.45)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)] ${className}`}
         >
           <div className="flex items-center gap-2.5 p-2.5">
             <span

@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "./cn";
+import { interiorSurface } from "./tokens";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -9,7 +10,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-md border border-stone-200 bg-white text-stone-700 shadow-none dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200",
+      interiorSurface,
       className,
     )}
     {...props}

@@ -296,7 +296,7 @@ export function FilterGrid<T>({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98, transition: leave }}
                 transition={step}
-                className="min-w-0 overflow-hidden rounded-[11px] border border-stone-200 bg-white p-2.5 shadow-[0_1px_2px_rgba(28,25,23,0.06),0_4px_10px_-8px_rgba(28,25,23,0.45)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)]"
+                className="min-w-0 overflow-hidden rounded-sm border border-stone-200 bg-white p-2.5 shadow-[0_1px_2px_rgba(28,25,23,0.06),0_4px_10px_-8px_rgba(28,25,23,0.45)] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)]"
               >
                 {renderItem(item)}
               </motion.li>

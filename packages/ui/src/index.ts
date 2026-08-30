@@ -1,5 +1,7 @@
 export { cn } from "./cn";
 export {
+  interiorRadiusPx,
+  interiorRadiusClass,
   interiorSurface,
   interiorControl,
   interiorField,

@@ -349,7 +349,7 @@ function DeckCard({
         transformOrigin: "50% 100%",
         touchAction: "pan-y",
       }}
-      className={`absolute inset-x-5 top-0 select-none overflow-hidden rounded-[14px] border border-stone-200 bg-white dark:border-white/[0.16] dark:bg-[#1D1D1A] ${
+      className={`absolute inset-x-5 top-0 select-none overflow-hidden rounded-sm border border-stone-200 bg-white dark:border-white/[0.16] dark:bg-[#1D1D1A] ${
         active
           ? "cursor-grab shadow-[0_1px_2px_rgba(28,25,23,0.06),0_16px_32px_-18px_rgba(28,25,23,0.55)] active:cursor-grabbing dark:shadow-[0_2px_16px_rgba(0,0,0,0.6)]"
           : "shadow-[0_1px_2px_rgba(28,25,23,0.05),0_6px_14px_-12px_rgba(28,25,23,0.4)] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)]"
@@ -428,7 +428,7 @@ export function SwipeDeck<T>({
         aria-label={label}
         aria-describedby={hintId}
         style={{ height: height + 26 }}
-        className="relative w-full overflow-hidden rounded-[14px] outline-none focus-visible:shadow-[0_0_0_1px_#4568FF] dark:focus-visible:shadow-[0_0_0_1px_#93B0FF]"
+        className="relative w-full overflow-hidden rounded-sm outline-none focus-visible:shadow-[0_0_0_1px_#4568FF] dark:focus-visible:shadow-[0_0_0_1px_#93B0FF]"
         {...deck.deckProps}
       >
         <div className="absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-20px),transparent)]">
@@ -438,7 +438,7 @@ export function SwipeDeck<T>({
             animate={{ opacity: deck.done ? 1 : 0 }}
             transition={reduced ? { duration: 0 } : CROSSFADE}
             style={{ height }}
-            className="absolute inset-x-5 top-0 z-0 grid place-items-center rounded-[14px] bg-stone-100/70 px-4 text-center text-[12.5px] text-stone-500 shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)] dark:bg-[#252522] dark:text-stone-400 dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.45)]"
+            className="absolute inset-x-5 top-0 z-0 grid place-items-center rounded-sm bg-stone-100/70 px-4 text-center text-[12.5px] text-stone-500 shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)] dark:bg-[#252522] dark:text-stone-400 dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.45)]"
           >
             {emptyLabel}
           </motion.div>

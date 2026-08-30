@@ -60,7 +60,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
 const sheetVariants = cva(
-  "fixed z-40 gap-3 border-stone-200 bg-white p-6 text-stone-700 shadow-[0_8px_32px_-12px_rgba(28,25,23,0.28)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.55)]",
+  "fixed z-40 gap-3 rounded-sm border-stone-200 bg-white p-6 text-stone-700 shadow-[0_8px_32px_-12px_rgba(28,25,23,0.28)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.55)]",
   {
     variants: {
       side: {
@@ -110,7 +110,7 @@ const SheetContent = React.forwardRef<
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-md opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus-visible:border-[#4568FF] disabled:pointer-events-none data-[state=open]:bg-secondary">
+        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus-visible:border-[#4568FF] disabled:pointer-events-none data-[state=open]:bg-secondary">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>

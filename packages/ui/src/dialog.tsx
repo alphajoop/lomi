@@ -61,7 +61,7 @@ const DialogContent = React.forwardRef<
         <DialogPrimitive.Content
           ref={ref}
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-3 border border-stone-200 bg-white p-6 text-stone-700 shadow-[0_16px_40px_-24px_rgba(28,25,23,0.35)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:rounded-md dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:shadow-[0_16px_40px_-24px_rgba(0,0,0,0.55)]",
+            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-3 border border-stone-200 bg-white p-6 text-stone-700 shadow-[0_16px_40px_-24px_rgba(28,25,23,0.35)] duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:rounded-sm dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:shadow-[0_16px_40px_-24px_rgba(0,0,0,0.55)]",
             variant === "slide-up"
               ? "data-[state=closed]:slide-out-to-bottom-[48%] data-[state=open]:slide-in-from-bottom-[48%] data-[state=open]:duration-500 data-[state=closed]:duration-300"
               : "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[52%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
@@ -83,7 +83,7 @@ const DialogContent = React.forwardRef<
                 <span className="sr-only">Close</span>
               </Button>
             ) : (
-              <DialogPrimitive.Close className="absolute right-4 top-4 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-[#2A2A27] px-1.5 py-1.5 rounded-md transition-colors focus:outline-none focus-visible:border-[#4568FF]">
+              <DialogPrimitive.Close className="absolute right-4 top-4 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-[#2A2A27] px-1.5 py-1.5 rounded-sm transition-colors focus:outline-none focus-visible:border-[#4568FF]">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
               </DialogPrimitive.Close>

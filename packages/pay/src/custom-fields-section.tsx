@@ -33,23 +33,9 @@ export function CustomCheckoutFieldsSection({
     }));
   };
 
-  const renderField = (
-    field: CheckoutCustomFieldDefinition,
-    index: number,
-    total: number,
-  ) => {
+  const renderField = (field: CheckoutCustomFieldDefinition) => {
     const value = customFieldValues[field.id] || "";
-    const isFirst = index === 0;
-    const isLast = index === total - 1;
-
-    let roundingClass = "rounded-none";
-    if (isFirst && isLast) {
-      roundingClass = "rounded-md";
-    } else if (isFirst) {
-      roundingClass = "rounded-tl rounded-tr";
-    } else if (isLast) {
-      roundingClass = "rounded-bl rounded-br";
-    }
+    const roundingClass = "rounded-none";
 
     const baseClassName = `${roundingClass} w-full bg-white text-gray-900 border-gray-300 placeholder:text-sm text-sm h-10`;
 
@@ -105,11 +91,11 @@ export function CustomCheckoutFieldsSection({
       <label className="block text-sm font-normal text-gray-700 select-none">
         {t("checkout.custom_fields.title")}
       </label>
-      <div className="rounded-md shadow-sm shadow-black/[.04]">
+      <div className="checkout-field-stack overflow-hidden rounded-sm shadow-sm shadow-black/[.04]">
         {customFields.map((field, index) => (
           <div key={field.id} className={index > 0 ? "flex -mt-px" : "flex"}>
             <div className="w-full">
-              {renderField(field, index, customFields.length)}
+              {renderField(field)}
             </div>
           </div>
         ))}

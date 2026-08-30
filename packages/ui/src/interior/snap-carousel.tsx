@@ -373,7 +373,7 @@ export function SnapCarousel({
               }
             : {}),
         }}
-        className="relative overflow-hidden rounded-[14px] py-1.5 outline-none focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.1] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF]"
+        className="relative overflow-hidden rounded-sm py-1.5 outline-none focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-[#93B0FF]/[0.1] dark:focus-visible:shadow-[inset_0_0_0_1px_#93B0FF]"
         {...car.viewportProps}
       >
         <motion.div

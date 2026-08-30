@@ -319,7 +319,7 @@ export function WizardSteps({
         role="group"
         aria-label={position}
         style={{ height }}
-        className="relative overflow-hidden rounded-[11px] border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.06),0_4px_10px_-8px_rgba(28,25,23,0.45)] outline-none transition-[border-color,box-shadow] duration-150 focus-visible:border-[#4568FF] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)] dark:focus-visible:border-[#93B0FF]"
+        className="relative overflow-hidden rounded-sm border border-stone-200 bg-white shadow-[0_1px_2px_rgba(28,25,23,0.06),0_4px_10px_-8px_rgba(28,25,23,0.45)] outline-none transition-[border-color,box-shadow] duration-150 focus-visible:border-[#4568FF] dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:shadow-[0_1px_6px_rgba(0,0,0,0.45)] dark:focus-visible:border-[#93B0FF]"
       >
         <AnimatePresence initial={false} custom={direction}>
           <motion.div

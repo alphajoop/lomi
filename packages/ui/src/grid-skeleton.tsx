@@ -29,7 +29,7 @@ export function GridSkeleton({
   bgColor = "var(--skeleton-bg, #f8f9fa)",
   gridColor = "var(--skeleton-grid, rgba(230, 230, 230, 0.4))",
   overlayColor = "var(--skeleton-overlay, rgba(255, 255, 255, 0.7))",
-  roundedClassName = "rounded-lg",
+  roundedClassName = "rounded-sm",
 }: GridSkeletonProps) {
   useEffect(() => {
     const styleId = "skeleton-dynamic-styles";

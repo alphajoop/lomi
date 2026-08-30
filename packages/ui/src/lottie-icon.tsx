@@ -3,12 +3,39 @@ import {
   useRef,
   useEffect,
   memo,
+  type CSSProperties,
+  type ComponentType,
   type ReactElement,
   type ReactNode,
+  type Ref,
 } from "react";
 import LottieModule, { type LottieRefCurrentProps } from "lottie-react";
 
-const Lottie = LottieModule;
+type LottieProps = {
+  lottieRef?: Ref<LottieRefCurrentProps>;
+  animationData: object;
+  autoplay?: boolean;
+  loop?: boolean;
+  style?: CSSProperties;
+};
+
+function resolveLottieComponent(exported: unknown): ComponentType<LottieProps> {
+  let current = exported;
+  while (current && typeof current !== "function") {
+    if (typeof current !== "object" || !("default" in current)) {
+      break;
+    }
+    current = current.default;
+  }
+  if (typeof current !== "function") {
+    throw new Error("lottie-react did not export a React component");
+  }
+  // SAFETY: typeof current === "function" is the React component lottie-react exports
+  // (Vite CJS interop may wrap it as { default: Component }).
+  return current as ComponentType<LottieProps>;
+}
+
+const Lottie = resolveLottieComponent(LottieModule);
 
 /** Minimal JSON object shape used while recoloring Lottie vectors. */
 type JsonObject = { [key: string]: JsonValue };

@@ -3,13 +3,13 @@ import { cva } from "class-variance-authority";
 const interiorSurface =
   "border border-stone-200 bg-white text-stone-700 shadow-none hover:bg-stone-50 dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:hover:bg-[#2A2A27]";
 
-const settingsButtonAction = `relative rounded-md font-medium transition-[border-color,box-shadow,background-color] duration-150 ${interiorSurface}`;
+const settingsButtonAction = `relative rounded-sm font-medium transition-[border-color,box-shadow,background-color] duration-150 ${interiorSurface}`;
 
 const liveButton =
   "bg-brand-600 text-white border-transparent shadow-none hover:brightness-110 focus-visible:brightness-110 dark:bg-sky-900 dark:text-sky-300 dark:hover:brightness-100 dark:hover:bg-sky-800 dark:hover:text-sky-200";
 
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer touch-manipulation items-center justify-center gap-2 whitespace-nowrap rounded-md text-[13px] font-medium outline-none ring-offset-background transition-[border-color,box-shadow,background-color] duration-150 select-none focus-visible:outline-none focus-visible:border-[#4568FF] focus-visible:shadow-[0_0_0_2px_rgba(69,104,255,0.28)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_0_0_2px_rgba(147,176,255,0.35)]",
+  "inline-flex cursor-pointer touch-manipulation items-center justify-center gap-2 whitespace-nowrap rounded-sm text-[13px] font-medium outline-none ring-offset-background transition-[border-color,box-shadow,background-color] duration-150 select-none focus-visible:outline-none focus-visible:border-[#4568FF] focus-visible:shadow-[0_0_0_2px_rgba(69,104,255,0.28)] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_0_0_2px_rgba(147,176,255,0.35)]",
   {
     variants: {
       variant: {

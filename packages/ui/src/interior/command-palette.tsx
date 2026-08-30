@@ -237,7 +237,7 @@ export function CommandPalette({
   const surface = (
     <div
       ref={panelRef}
-      className={`overflow-hidden rounded-[14px] border border-stone-200 bg-white dark:border-white/[0.16] dark:bg-[#1D1D1A] ${
+      className={`overflow-hidden rounded-sm border border-stone-200 bg-white dark:border-white/[0.16] dark:bg-[#1D1D1A] ${
         overlaid
           ? "w-full max-w-[520px] shadow-[0_1px_2px_rgba(28,25,23,0.07),0_28px_56px_-24px_rgba(24,22,20,0.5)] dark:shadow-[0_3px_16px_rgba(0,0,0,0.65)]"
           : ""

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { cn } from "../cn";
+import { interiorRadiusPx } from "../tokens";
 
 const CELL = { type: "spring", stiffness: 520, damping: 34, mass: 0.45 } as const;
 const CROSSFADE = { type: "spring", stiffness: 260, damping: 34, mass: 0.8 } as const;
@@ -252,8 +254,11 @@ export function LoadingButton({
           }
           run();
         }}
-        className={`relative inline-flex h-9 select-none items-center justify-center rounded-md border border-stone-200 bg-white px-3.5 text-[13px] font-medium text-stone-700 shadow-none outline-none transition-[border-color,box-shadow,background-color] duration-150 hover:bg-stone-50 focus-visible:border-[#4568FF] focus-visible:shadow-[0_0_0_2px_rgba(69,104,255,0.28)] disabled:opacity-50 dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:hover:bg-[#2A2A27] dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_0_0_2px_rgba(147,176,255,0.35)] ${className}`}
-        style={{ borderRadius: 9, touchAction: "manipulation" }}
+        className={cn(
+          "relative inline-flex h-9 select-none items-center justify-center rounded-sm border border-stone-200 bg-white px-3.5 text-[13px] font-medium text-stone-700 shadow-none outline-none transition-[border-color,box-shadow,background-color] duration-150 hover:bg-stone-50 focus-visible:border-[#4568FF] focus-visible:shadow-[0_0_0_2px_rgba(69,104,255,0.28)] disabled:opacity-50 dark:border-white/[0.16] dark:bg-[#252522] dark:text-stone-200 dark:hover:bg-[#2A2A27] dark:focus-visible:border-[#93B0FF] dark:focus-visible:shadow-[0_0_0_2px_rgba(147,176,255,0.35)]",
+          className,
+        )}
+        style={{ borderRadius: interiorRadiusPx, touchAction: "manipulation" }}
       >
         <span aria-hidden className="relative grid place-items-center">
           {faces.map((face) => (

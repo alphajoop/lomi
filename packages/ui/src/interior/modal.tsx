@@ -426,7 +426,7 @@ export function Modal({
             aria-describedby={description ? descriptionId : undefined}
             variants={variants.panel}
             style={{ maxWidth, maxHeight }}
-            className={`relative flex w-full flex-col overflow-hidden rounded-[14px] border border-stone-200 bg-white text-stone-700 shadow-[0_28px_56px_-24px_rgba(24,22,20,0.45)] outline-none dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 ${className}`}
+            className={`relative flex w-full flex-col overflow-hidden rounded-sm border border-stone-200 bg-white text-stone-700 shadow-[0_28px_56px_-24px_rgba(24,22,20,0.45)] outline-none dark:border-white/[0.16] dark:bg-[#1D1D1A] dark:text-stone-200 ${className}`}
           >
             <div className="flex shrink-0 items-start gap-3 px-4 pb-3 pt-4">
               <div className="min-w-0 flex-1">

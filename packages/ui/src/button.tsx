@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "motion/react";
 import Spinner from "./spinner";
 import { cn } from "./cn";
 import { buttonVariants } from "./button-variants";
+import { interiorRadiusPx } from "./tokens";
 
 const CELL = { type: "spring", stiffness: 520, damping: 34, mass: 0.45 } as const;
 
@@ -56,7 +57,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         <Slot
           className={cn(buttonVariants({ variant, size, className }))}
           ref={ref}
-          style={{ borderRadius: 9, touchAction: "manipulation", ...style }}
+          style={{ borderRadius: interiorRadiusPx, touchAction: "manipulation", ...style }}
           aria-disabled={isDisabled || undefined}
           {...props}
         >
@@ -120,7 +121,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         whileTap={isDisabled || reduced ? undefined : { y: 1 }}
         transition={CELL}
-        style={{ borderRadius: 9, touchAction: "manipulation", ...style }}
+        style={{ borderRadius: interiorRadiusPx, touchAction: "manipulation", ...style }}
         {...props}
       >
         {content}
