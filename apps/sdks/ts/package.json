@@ -58,15 +58,15 @@
     }
   },
   "dependencies": {
-    "@stripe/stripe-js": "^4.1.0",
-    "axios": "^1.18.1",
-    "form-data": "^4.0.6",
-    "@lomi./shared": "file:../../../packages/shared"
+    "@lomi./shared": "file:../../../packages/shared",
+    "@stripe/stripe-js": "^4.10.0",
+    "axios": "^1.20.0",
+    "form-data": "^4.0.6"
   },
   "devDependencies": {
-    "@types/node": "^20.19.25",
+    "@types/node": "^20.19.43",
     "knip": "5.63.0",
-    "openapi-typescript": "^7.8.0",
+    "openapi-typescript": "^7.13.0",
     "openapi-typescript-codegen": "^0.29.0",
     "typescript": "^5.9.3"
   }

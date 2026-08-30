@@ -89,13 +89,13 @@ export type UseModalOptions = {
 };
 
 export type ModalOverlayProps = {
-  ref: React.RefObject<HTMLDivElement | null>;
+  ref: { current: HTMLDivElement | null };
   onPointerDown: (event: React.PointerEvent) => void;
   onClick: (event: React.MouseEvent) => void;
 };
 
 export type ModalPanelProps = {
-  ref: React.RefObject<HTMLDivElement | null>;
+  ref: { current: HTMLDivElement | null };
   role: "dialog";
   "aria-modal": true;
   "aria-labelledby": string;
@@ -123,8 +123,8 @@ export function useModal({
 }: UseModalOptions): UseModalResult {
   const [target, setTarget] = useState<HTMLElement | null>(null);
 
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useMemo(() => ({ current: null as HTMLDivElement | null }), []);
+  const panelRef = useMemo(() => ({ current: null as HTMLDivElement | null }), []);
   const downedOutside = useRef(false);
 
   const baseId = useId();
@@ -397,7 +397,11 @@ export function Modal({
       {open ? (
         <motion.div
           key="modal"
-          {...overlayProps}
+          ref={(node) => {
+            overlayProps.ref.current = node;
+          }}
+          onPointerDown={overlayProps.onPointerDown}
+          onClick={overlayProps.onClick}
           initial="closed"
           animate="open"
           exit="gone"
@@ -411,7 +415,14 @@ export function Modal({
             className="absolute inset-0 bg-stone-900/40 dark:bg-black/65"
           />
           <motion.div
-            {...panelProps}
+            ref={(node) => {
+              panelProps.ref.current = node;
+            }}
+            role={panelProps.role}
+            aria-modal={panelProps["aria-modal"]}
+            aria-labelledby={panelProps["aria-labelledby"]}
+            tabIndex={panelProps.tabIndex}
+            onKeyDown={panelProps.onKeyDown}
             aria-describedby={description ? descriptionId : undefined}
             variants={variants.panel}
             style={{ maxWidth, maxHeight }}

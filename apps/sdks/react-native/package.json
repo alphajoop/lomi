@@ -10,20 +10,26 @@
     "knip": "pnpm dlx knip --no-config-hints"
   },
   "peerDependencies": {
+    "@stripe/stripe-react-native": ">=0.35.0",
     "react": ">=17.0.0",
-    "react-native": ">=0.70.0",
-    "@stripe/stripe-react-native": ">=0.35.0"
+    "react-native": ">=0.70.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.0",
-    "typescript": "^5.0.0"
+    "@types/react": "^19.2.18",
+    "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/lomiafrica/lomi.git",
     "directory": "apps/sdks/react-native"
   },
-  "keywords": ["lomi", "payments", "africa", "react-native", "mobile"],
+  "keywords": [
+    "lomi",
+    "payments",
+    "africa",
+    "react-native",
+    "mobile"
+  ],
   "author": "lomi. <hello@lomi.africa> (https://lomi.africa)",
   "license": "MIT",
   "publishConfig": {
