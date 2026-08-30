@@ -25,6 +25,7 @@
 import {
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   renameSync,
   rmSync,
@@ -100,6 +101,32 @@ function rewritePnpmScriptsForNpm(appDir) {
   writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   console.log(
     `==> rewrote pnpm scripts to npm run in ${path.relative(ROOT, pkgPath)}`,
+  );
+}
+
+function hoistNodeModules(fromDir) {
+  const fromNm = path.join(fromDir, "node_modules");
+  if (!existsSync(fromNm)) return;
+  const toNm = path.join(ROOT, "node_modules");
+  mkdirSync(toNm, { recursive: true });
+  for (const name of readdirSync(fromNm)) {
+    if (name.startsWith(".")) continue;
+    const from = path.join(fromNm, name);
+    const to = path.join(toNm, name);
+    if (name.startsWith("@")) {
+      mkdirSync(to, { recursive: true });
+      for (const child of readdirSync(from)) {
+        const childTo = path.join(to, child);
+        if (existsSync(childTo)) continue;
+        symlinkSync(path.join(from, child), childTo);
+      }
+      continue;
+    }
+    if (existsSync(to)) continue;
+    symlinkSync(from, to);
+  }
+  console.log(
+    `==> hoisted ${path.relative(ROOT, fromNm) || "node_modules"} -> node_modules`,
   );
 }
 
@@ -190,12 +217,17 @@ function installFileApp(appRel, pkg, { frozen }) {
   for (const rel of neededPackageDirs(pkg)) {
     const dir = path.join(ROOT, rel);
     const packageJson = readPackage(dir);
-    if (!packageJson.scripts?.build) continue;
-    installDeps(appRel, dir, { frozen: false });
-    runBuildScript(appRel, dir);
+    if (packageJson.scripts?.build) {
+      installDeps(appRel, dir, { frozen: false });
+      runBuildScript(appRel, dir);
+    } else if (rel === "packages/pay") {
+      run("npm", ["install", "--ignore-scripts", "--omit=dev"], dir);
+    }
+    hoistNodeModules(dir);
   }
 
   installDeps(appRel, appDir, { frozen });
+  hoistNodeModules(appDir);
 }
 
 function main() {
