@@ -229,9 +229,9 @@ function installFileApp(appRel, pkg, { frozen }) {
       run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
     } else {
       // Source-only packages such as @lomi./ui still need runtime deps
-      // (clsx, radix). Omit dev so @types/react 18 does not leak into the
-      // Next 19 typecheck of packages/pay.
-      run("npm", ["install", "--ignore-scripts", "--omit=dev"], dir);
+      // (clsx, radix). Omit dev and peers so React 18 types do not leak
+      // into the Next 19 typecheck of packages/pay.
+      run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
     }
     hoistNodeModules(dir);
   }
