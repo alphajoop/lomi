@@ -42,6 +42,7 @@ const PACKAGE_INSTALL_ORDER = [
   "packages/ui",
   "packages/queries",
   "packages/receipt-pdf",
+  "packages/pay",
 ];
 
 const FILE_SPEC_TO_DIR = {
@@ -49,6 +50,7 @@ const FILE_SPEC_TO_DIR = {
   "@lomi./ui": "packages/ui",
   "@lomi./queries": "packages/queries",
   "@lomi./receipt-pdf": "packages/receipt-pdf",
+  "@lomi./pay": "packages/pay",
 };
 
 function run(command, args, cwd) {
@@ -220,7 +222,12 @@ function main() {
     rewritePnpmScriptsForNpm(appDir);
   }
   installFileApp(appRel, pkg, { frozen: !rewritten });
-  if (useNpm(appRel) && appRel === "apps/website") {
+  if (
+    useNpm(appRel) &&
+    (appRel === "apps/website" ||
+      appRel === "apps/checkout" ||
+      appRel === "apps/storefront")
+  ) {
     hoistNextForVercelBuilder(appRel);
   }
 }
