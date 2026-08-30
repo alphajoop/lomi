@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { handleSupabaseRpcSoft } from "@lomi./shared";
 import { rpc } from "@lomi./queries/checkout-public";
