@@ -18,8 +18,8 @@
  * Website also links apps/website/node_modules/next to the upload root:
  * @vercel/next resolves next/package.json from cwd, not the app directory.
  * Source-only packages (@lomi./ui) still get their own install: Next compiles
- * packages/*/src and cannot see apps/*/node_modules. @lomi./pay installs with
- * --omit=dev --omit=peer so it does not pull a second Next.
+ * those package sources and cannot see the app node_modules tree. @lomi./pay
+ * installs with --omit=dev --omit=peer so it does not pull a second Next.
  *
  * Usage: node tooling/scripts/install-app-with-packages.mjs <app-dir>
  *   e.g. node tooling/scripts/install-app-with-packages.mjs apps/docs
@@ -229,7 +229,7 @@ function installFileApp(appRel, pkg, { frozen }) {
       run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
     } else {
       // Source-only packages such as @lomi./ui still need their own deps.
-      // Next compiles packages/*/src and will not see apps/*/node_modules.
+      // Next compiles those sources and will not see the app node_modules tree.
       installDeps(appRel, dir, { frozen: false });
     }
     hoistNodeModules(dir);
