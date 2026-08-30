@@ -189,11 +189,10 @@ function installFileApp(appRel, pkg, { frozen }) {
   const appDir = path.join(ROOT, appRel);
   for (const rel of neededPackageDirs(pkg)) {
     const dir = path.join(ROOT, rel);
-    installDeps(appRel, dir, { frozen: false });
     const packageJson = readPackage(dir);
-    if (packageJson.scripts?.build) {
-      runBuildScript(appRel, dir);
-    }
+    if (!packageJson.scripts?.build) continue;
+    installDeps(appRel, dir, { frozen: false });
+    runBuildScript(appRel, dir);
   }
 
   installDeps(appRel, appDir, { frozen });
