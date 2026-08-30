@@ -228,9 +228,10 @@ function installFileApp(appRel, pkg, { frozen }) {
       // peerDependencies and breaks checkout typecheck on NextRequest.
       run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
     } else {
-      // Source-only packages such as @lomi./ui still need their own deps.
-      // Next compiles those sources and will not see the app node_modules tree.
-      installDeps(appRel, dir, { frozen: false });
+      // Source-only packages such as @lomi./ui still need runtime deps
+      // (clsx, radix). Omit dev so @types/react 18 does not leak into the
+      // Next 19 typecheck of packages/pay.
+      run("npm", ["install", "--ignore-scripts", "--omit=dev"], dir);
     }
     hoistNodeModules(dir);
   }
