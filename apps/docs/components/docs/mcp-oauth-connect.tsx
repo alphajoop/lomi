@@ -13,7 +13,7 @@ import {
 } from '@/components/docs/ai-brand-icons';
 import {
   CLAUDE_CONNECTORS_URL,
-  GROK_CONNECTORS_URL,
+  GROK_BOT_URL,
   MCP_OAUTH_ENDPOINT,
   buildCodexOauthCommand,
   buildCursorOauthDeeplink,
@@ -74,10 +74,6 @@ export function McpOauthConnect({ className }: { className?: string }) {
     window.open(CLAUDE_CONNECTORS_URL, '_blank', 'noopener,noreferrer');
   }, [onCopy]);
 
-  const onGrok = useCallback(() => {
-    void onCopy(MCP_OAUTH_ENDPOINT, 'mcpConnect.grokUrlCopied');
-  }, [onCopy]);
-
   const clientUi: Record<
     McpOauthClientId,
     { icon: ReactNode; onClick: () => void }
@@ -130,10 +126,9 @@ export function McpOauthConnect({ className }: { className?: string }) {
             {client === 'cursor' ? (
               <a
                 className={buttonClass}
-                href={GROK_CONNECTORS_URL}
+                href={GROK_BOT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={onGrok}
               >
                 <GrokBrandIcon className="size-4 shrink-0" />
                 {t('mcpConnect.addGrok')}

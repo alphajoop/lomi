@@ -66,5 +66,5 @@ export function buildCodexManualCommands(
 
 export const CLAUDE_CONNECTORS_URL = 'https://claude.ai/customize/connectors';
 
-/** Grok Bot custom MCP connectors (paste the hosted URL). */
-export const GROK_CONNECTORS_URL = 'https://grok.com/connectors';
+/** Official Grok Bot install page (Add to Grok Bot). */
+export const GROK_BOT_URL = 'https://x.ai/bot/AI8k2PosuIifICyNJcS1s';
