@@ -9374,6 +9374,48 @@
         "required": [
           "subscription_id"
         ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "error",
+          "request_id"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "validation_failed"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {}
+            }
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "description": "Required unique key for money-moving writes. Replays return the original response.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
       }
     }
   }

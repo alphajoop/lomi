@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "apiVersion": "1.1.0",
+  "apiVersion": "1.2.0",
   "apiTitle": "lomi. Provisioning API",
   "toolCount": 2,
   "tools": [
@@ -32,6 +32,11 @@
               "live_status"
             ],
             "description": "Which REST operation to run. One of: create_account, upload_document, extract, complete, status, api_keys, request_live, live_status."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "idempotency_key": {
             "type": "string",
@@ -232,6 +237,11 @@
               "usage"
             ],
             "description": "Which REST operation to run. One of: mint_key, list_keys, revoke_key, usage."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "idempotency_key": {
             "type": "string",

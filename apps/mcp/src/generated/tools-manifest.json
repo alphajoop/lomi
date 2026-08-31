@@ -37,6 +37,11 @@
             "type": "string",
             "description": "Filtrer par code devise (XOF, USD, EUR)"
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "target_currency": {
             "enum": [
               "XOF",
@@ -114,7 +119,7 @@
     {
       "name": "lomi_checkout",
       "title": "Checkout sessions",
-      "description": "Checkout sessions. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List checkout sessions (GET /checkout-sessions). No extra required fields.\n- `get` — Get checkout session (GET /checkout-sessions/{id}). Required: id.\n- `create` — Create checkout session (POST /checkout-sessions). Required: body.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
+      "description": "Checkout sessions. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List checkout sessions (GET /checkout-sessions). No extra required fields.\n- `get` — Get checkout session (GET /checkout-sessions/{id}). Required: id.\n- `create` — Create checkout session (POST /checkout-sessions). Required: body, header_Idempotency-Key.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Checkout Sessions"
       ],
@@ -140,10 +145,23 @@
             "additionalProperties": true,
             "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
+          "header_Idempotency-Key": {
+            "type": "string",
+            "description": "Required unique key for this write. Replays return the original response."
+          },
           "header_Lomi-Account": {
             "type": "string",
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "type": "string",
@@ -156,12 +174,7 @@
           "limit": {
             "example": 20,
             "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
+            "description": "Page size (max 100)"
           },
           "status": {
             "enum": [
@@ -185,8 +198,8 @@
           "pathTemplate": "/checkout-sessions",
           "pathParamNames": [],
           "queryParamNames": [
-            "offset",
             "limit",
+            "cursor",
             "status"
           ],
           "operationId": "CheckoutSessionsController_findAll",
@@ -234,7 +247,8 @@
             "Checkout Sessions"
           ],
           "requiredInput": [
-            "body"
+            "body",
+            "header_Idempotency-Key"
           ]
         }
       }
@@ -263,6 +277,11 @@
               "performance"
             ],
             "description": "Which REST operation to run. One of: list, get, create, performance."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "type": "string",
@@ -388,6 +407,10 @@
             "additionalProperties": true,
             "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
           "eventType": {
             "type": "string",
             "description": "Filtre sur customer_portal_audit_events.event_type"
@@ -397,6 +420,11 @@
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "type": "string",
             "description": "UUID du client"
@@ -405,15 +433,20 @@
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Page size (max 100)"
+          },
           "page": {
             "example": 1,
             "type": "number",
-            "description": "Page (see lomi. API docs)"
+            "description": "Page"
           },
           "pageSize": {
             "example": 50,
             "type": "number",
-            "description": "PageSize (see lomi. API docs)"
+            "description": "PageSize"
           },
           "search": {
             "type": "string",
@@ -450,8 +483,8 @@
           "pathTemplate": "/customers",
           "pathParamNames": [],
           "queryParamNames": [
-            "pageSize",
-            "page",
+            "limit",
+            "cursor",
             "status",
             "type",
             "search"
@@ -655,6 +688,10 @@
             ],
             "description": "Which REST operation to run. One of: list, get."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor"
+          },
           "endDate": {
             "type": "string",
             "description": "EndDate"
@@ -664,16 +701,17 @@
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "description": "Dispute ID"
           },
-          "page": {
+          "limit": {
             "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
+            "description": "Limit"
           },
           "startDate": {
             "type": "string",
@@ -696,8 +734,8 @@
           "pathTemplate": "/disputes",
           "pathParamNames": [],
           "queryParamNames": [
-            "pageSize",
-            "page",
+            "limit",
+            "cursor",
             "endDate",
             "startDate",
             "status"
@@ -757,6 +795,10 @@
             ],
             "description": "Which REST operation to run. One of: list, get."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
           "end_date": {
             "type": "string",
             "description": "ISO 8601 end timestamp (inclusive)"
@@ -769,6 +811,11 @@
             "type": "boolean",
             "description": "Only failed webhook deliveries"
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "type": "string",
             "description": "Log entry UUID"
@@ -777,11 +824,6 @@
             "example": 25,
             "type": "number",
             "description": "Limit"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset"
           },
           "severity": {
             "enum": [
@@ -840,7 +882,7 @@
             "status",
             "end_date",
             "start_date",
-            "offset",
+            "cursor",
             "limit",
             "type"
           ],
@@ -914,6 +956,11 @@
             ],
             "type": "string",
             "description": "Currency Code"
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "description": "Merchant UUID"
@@ -1039,6 +1086,11 @@
           "customerId": {
             "type": "string",
             "description": "Path parameter \"customerId\" for `/meters/{id}/balances/{customerId}`."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "description": "Meter ID"
@@ -1184,6 +1236,11 @@
             ],
             "description": "Which REST operation to run. One of: list, get, metrics."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "type": "string",
             "description": "Path parameter \"id\" for `/organizations/{id}`."
@@ -1278,6 +1335,15 @@
             "additionalProperties": true,
             "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "type": "string",
             "description": "UUID du lien de paiement"
@@ -1293,7 +1359,7 @@
           "limit": {
             "example": 20,
             "type": "number",
-            "description": "Limit (see lomi. API docs)"
+            "description": "Page size (max 100)"
           },
           "linkType": {
             "enum": [
@@ -1302,11 +1368,6 @@
             ],
             "type": "string",
             "description": "Filtrer par type de lien"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
           }
         }
       },
@@ -1321,8 +1382,8 @@
           "pathTemplate": "/payment-links",
           "pathParamNames": [],
           "queryParamNames": [
-            "offset",
             "limit",
+            "cursor",
             "isActive",
             "linkType"
           ],
@@ -1379,7 +1440,7 @@
     {
       "name": "lomi_payment_requests",
       "title": "Payment requests",
-      "description": "Payment requests. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List payment requests (GET /payment-requests). No extra required fields.\n- `get` — Get payment request (GET /payment-requests/{id}). Required: id.\n- `create` — Create payment request (POST /payment-requests). Required: body.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
+      "description": "Payment requests. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List payment requests (GET /payment-requests). No extra required fields.\n- `get` — Get payment request (GET /payment-requests/{id}). Required: id.\n- `create` — Create payment request (POST /payment-requests). Required: body, header_Idempotency-Key.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Payment Requests"
       ],
@@ -1405,9 +1466,22 @@
             "additionalProperties": true,
             "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
           "customerId": {
             "type": "string",
             "description": "Filtrer par ID client"
+          },
+          "header_Idempotency-Key": {
+            "type": "string",
+            "description": "Required unique key for this write. Replays return the original response."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "type": "string",
@@ -1420,12 +1494,7 @@
           "limit": {
             "example": 20,
             "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
+            "description": "Page size (max 100)"
           },
           "status": {
             "enum": [
@@ -1450,8 +1519,8 @@
           "pathTemplate": "/payment-requests",
           "pathParamNames": [],
           "queryParamNames": [
-            "offset",
             "limit",
+            "cursor",
             "customerId",
             "status"
           ],
@@ -1500,7 +1569,8 @@
             "Payment Requests"
           ],
           "requiredInput": [
-            "body"
+            "body",
+            "header_Idempotency-Key"
           ]
         }
       }
@@ -1508,7 +1578,7 @@
     {
       "name": "lomi_payouts",
       "title": "Payouts",
-      "description": "Payouts. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List payouts (GET /payouts). No extra required fields.\n- `get` — Get payout (GET /payouts/{id}). Required: id.\n- `create` — Create payout (POST /payouts). No extra required fields.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
+      "description": "Payouts. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List payouts (GET /payouts). No extra required fields.\n- `get` — Get payout (GET /payouts/{id}). Required: id.\n- `create` — Create payout (POST /payouts). Required: header_Idempotency-Key.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Payouts"
       ],
@@ -1529,9 +1599,22 @@
             ],
             "description": "Which REST operation to run. One of: list, get, create."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor"
+          },
           "endDate": {
             "type": "string",
             "description": "EndDate"
+          },
+          "header_Idempotency-Key": {
+            "type": "string",
+            "description": "Required unique key for this write. Replays return the original response."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "description": "Payout ID"
@@ -1540,13 +1623,9 @@
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
-          "page": {
+          "limit": {
             "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
+            "description": "Limit"
           },
           "startDate": {
             "type": "string",
@@ -1569,8 +1648,8 @@
           "pathTemplate": "/payouts",
           "pathParamNames": [],
           "queryParamNames": [
-            "pageSize",
-            "page",
+            "limit",
+            "cursor",
             "endDate",
             "startDate",
             "status"
@@ -1619,7 +1698,9 @@
           "tags": [
             "Payouts"
           ],
-          "requiredInput": []
+          "requiredInput": [
+            "header_Idempotency-Key"
+          ]
         }
       }
     },
@@ -1649,6 +1730,15 @@
             ],
             "description": "Which REST operation to run. One of: list, get, create, add_price, set_default_price."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "type": "string",
             "description": "UUID du produit"
@@ -1662,14 +1752,9 @@
             "description": "Filtrer par statut actif"
           },
           "limit": {
-            "example": 15,
+            "example": 20,
             "type": "number",
-            "description": "Limit (see lomi. API docs)"
-          },
-          "offset": {
-            "example": 0,
-            "type": "number",
-            "description": "Offset (see lomi. API docs)"
+            "description": "Page size (max 100)"
           },
           "priceId": {
             "type": "string",
@@ -1688,8 +1773,8 @@
           "pathTemplate": "/products",
           "pathParamNames": [],
           "queryParamNames": [
-            "offset",
             "limit",
+            "cursor",
             "isActive"
           ],
           "operationId": "ProductsController_findAll",
@@ -1804,6 +1889,11 @@
             ],
             "description": "Which REST operation to run. One of: list."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "provider_code": {
             "enum": [
               "CARD",
@@ -1874,6 +1964,11 @@
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "idempotency_key": {
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
@@ -1924,7 +2019,7 @@
     {
       "name": "lomi_refunds",
       "title": "Refunds",
-      "description": "Refunds. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List refunds (GET /refunds). No extra required fields.\n- `get` — Get refund (GET /refunds/{id}). Required: id.\n- `create` — Create refund (POST /refunds). Required: body.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
+      "description": "Refunds. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List refunds (GET /refunds). No extra required fields.\n- `get` — Get refund (GET /refunds/{id}). Required: id.\n- `create` — Create refund (POST /refunds). Required: body, header_Idempotency-Key.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Refunds"
       ],
@@ -1950,14 +2045,27 @@
             "additionalProperties": true,
             "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor"
+          },
           "endDate": {
             "type": "string",
             "description": "EndDate"
+          },
+          "header_Idempotency-Key": {
+            "type": "string",
+            "description": "Required unique key for this write. Replays return the original response."
           },
           "header_Lomi-Account": {
             "type": "string",
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "description": "Refund ID"
@@ -1969,10 +2077,6 @@
           "limit": {
             "type": "number",
             "description": "Limit"
-          },
-          "offset": {
-            "type": "number",
-            "description": "Offset"
           },
           "startDate": {
             "type": "string",
@@ -1995,8 +2099,8 @@
           "pathTemplate": "/refunds",
           "pathParamNames": [],
           "queryParamNames": [
-            "offset",
             "limit",
+            "cursor",
             "endDate",
             "startDate",
             "status"
@@ -2046,7 +2150,8 @@
             "Refunds"
           ],
           "requiredInput": [
-            "body"
+            "body",
+            "header_Idempotency-Key"
           ]
         }
       }
@@ -2074,6 +2179,10 @@
             ],
             "description": "Which REST operation to run. One of: list, get."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor"
+          },
           "decision": {
             "enum": [
               "allow",
@@ -2092,16 +2201,17 @@
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "description": "Risk assessment ID"
           },
-          "page": {
+          "limit": {
             "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
+            "description": "Limit"
           },
           "rail": {
             "enum": [
@@ -2129,8 +2239,8 @@
           "pathTemplate": "/risk-assessments",
           "pathParamNames": [],
           "queryParamNames": [
-            "pageSize",
-            "page",
+            "limit",
+            "cursor",
             "endDate",
             "startDate",
             "rail",
@@ -2171,7 +2281,7 @@
     {
       "name": "lomi_settlements",
       "title": "Settlements",
-      "description": "Settlements. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List settlement periods (GET /settlements). No extra required fields.\n- `transactions` — List transactions in a settlement (GET /settlements/{id}/transactions). Required: id.\n- `create_instant` — Request an instant settlement (POST /settlements/instant). Required: body.\n- `get_instant` — Get an instant settlement (GET /settlements/instant/{id}). Required: id.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
+      "description": "Settlements. Pass required `action` to choose the REST call.\n\nActions:\n- `list` — List settlement periods (GET /settlements). No extra required fields.\n- `transactions` — List transactions in a settlement (GET /settlements/{id}/transactions). Required: id.\n- `create_instant` — Request an instant settlement (POST /settlements/instant). Required: body, header_Idempotency-Key.\n- `get_instant` — Get an instant settlement (GET /settlements/instant/{id}). Required: id.\n\nPass idempotency_key on write actions. Omit fields that do not apply to the chosen action.",
       "tags": [
         "Settlements"
       ],
@@ -2202,14 +2312,27 @@
             "type": "string",
             "description": "Currency"
           },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor"
+          },
           "end_date": {
             "type": "string",
             "description": "End Date"
+          },
+          "header_Idempotency-Key": {
+            "type": "string",
+            "description": "Required unique key for this write. Replays return the original response."
           },
           "header_Lomi-Account": {
             "type": "string",
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "example": "XOF:2026-06-01",
@@ -2219,13 +2342,9 @@
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
-          "page": {
+          "limit": {
             "type": "number",
-            "description": "Page"
-          },
-          "pageSize": {
-            "type": "number",
-            "description": "PageSize"
+            "description": "Limit"
           },
           "start_date": {
             "type": "string",
@@ -2244,8 +2363,8 @@
           "pathTemplate": "/settlements",
           "pathParamNames": [],
           "queryParamNames": [
-            "pageSize",
-            "page",
+            "limit",
+            "cursor",
             "currency",
             "end_date",
             "start_date"
@@ -2268,8 +2387,8 @@
             "id"
           ],
           "queryParamNames": [
-            "pageSize",
-            "page"
+            "limit",
+            "cursor"
           ],
           "operationId": "SettlementsController_findTransactions",
           "write": false,
@@ -2298,7 +2417,8 @@
             "Settlements"
           ],
           "requiredInput": [
-            "body"
+            "body",
+            "header_Idempotency-Key"
           ]
         },
         "get_instant": {
@@ -2356,9 +2476,18 @@
             "additionalProperties": true,
             "description": "JSON request body. Required for write actions that send a body; shape depends on action."
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
           "customer_id": {
             "type": "string",
             "description": "Filtrer par UUID client"
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "type": "string",
@@ -2368,15 +2497,10 @@
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
-          "page": {
-            "example": 1,
+          "limit": {
+            "example": 20,
             "type": "number",
-            "description": "Page (see lomi. API docs)"
-          },
-          "pageSize": {
-            "example": 50,
-            "type": "number",
-            "description": "PageSize (see lomi. API docs)"
+            "description": "Page size (max 100)"
           },
           "status": {
             "type": "string",
@@ -2397,8 +2521,8 @@
           "queryParamNames": [
             "status",
             "customer_id",
-            "pageSize",
-            "page"
+            "limit",
+            "cursor"
           ],
           "operationId": "SubscriptionsController_findAll",
           "write": false,
@@ -2562,6 +2686,10 @@
             "type": "string",
             "description": "Currency (see lomi. API docs)"
           },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor from the previous list response"
+          },
           "endDate": {
             "example": "2024-12-31T23:59:59Z",
             "type": "string",
@@ -2572,6 +2700,11 @@
             "example": "acct_1234567890",
             "description": "Optional lomi. Network account id (`acct_...`). When present, the API key acts as the Operator and the request targets the connected Member Account."
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "type": "string",
             "description": "UUID de la transaction"
@@ -2581,15 +2714,10 @@
             "type": "boolean",
             "description": "Uniquement les transactions points de vente (TPV)"
           },
-          "page": {
-            "example": 1,
+          "limit": {
+            "example": 20,
             "type": "number",
-            "description": "Page (see lomi. API docs)"
-          },
-          "pageSize": {
-            "example": 50,
-            "type": "number",
-            "description": "PageSize (see lomi. API docs)"
+            "description": "Page size (max 100)"
           },
           "paymentMethod": {
             "example": "MOBILE_MONEY,CARDS",
@@ -2632,8 +2760,8 @@
             "isPos",
             "endDate",
             "startDate",
-            "pageSize",
-            "page",
+            "limit",
+            "cursor",
             "paymentMethod",
             "currency",
             "type",
@@ -2704,6 +2832,10 @@
           "code": {
             "description": "Code"
           },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor"
+          },
           "customer_id": {
             "description": "Customer Id"
           },
@@ -2713,6 +2845,11 @@
           "feature_key": {
             "description": "Feature Key"
           },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
+          },
           "id": {
             "description": "Event ID"
           },
@@ -2720,13 +2857,9 @@
             "type": "string",
             "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
           },
-          "page": {
+          "limit": {
             "type": "number",
-            "description": "Page"
-          },
-          "page_size": {
-            "type": "number",
-            "description": "Page Size"
+            "description": "Limit"
           },
           "start_date": {
             "description": "Start Date"
@@ -2794,8 +2927,8 @@
           "pathTemplate": "/usage/periods",
           "pathParamNames": [],
           "queryParamNames": [
-            "page_size",
-            "page",
+            "limit",
+            "cursor",
             "subscription_id"
           ],
           "operationId": "UsageBillingController_listPeriods",
@@ -2855,8 +2988,8 @@
             "status",
             "code",
             "customer_id",
-            "page_size",
-            "page"
+            "limit",
+            "cursor"
           ],
           "operationId": "UsageEventsController_findAll",
           "write": false,
@@ -2948,6 +3081,11 @@
             "example": false,
             "type": "boolean",
             "description": "FailedOnly (see lomi. API docs)"
+          },
+          "header_Lomi-Version": {
+            "type": "string",
+            "example": "1.2.0",
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned."
           },
           "id": {
             "type": "string",
