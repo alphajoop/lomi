@@ -77,7 +77,15 @@ export function formatPublicId(value: string | null | undefined): string | null 
   const trimmed = value.trim();
   if (!trimmed) return null;
   if (isUuid(trimmed)) return trimmed;
-  return normalizePublicId(trimmed);
+
+  const prefix = publicIdPrefix(trimmed);
+  if (!prefix) return normalizePublicId(trimmed);
+
+  const body = normalizePublicId(trimmed).slice(prefix.toUpperCase().length);
+  if (prefix === PUBLIC_ID_PREFIXES.transaction) {
+    return `${prefix.toUpperCase()}${body}`;
+  }
+  return `${prefix}${body}`;
 }
 
 export function publicIdsMatch(
