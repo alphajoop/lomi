@@ -5,11 +5,6 @@
   "framework": "nextjs",
   "outputDirectory": "apps/customers/.next",
   "regions": ["iad1"],
-  "functions": {
-    "apps/customers/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
   "env": {
     "NEXT_TELEMETRY_DISABLED": "1"
   },
