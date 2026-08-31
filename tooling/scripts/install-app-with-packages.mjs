@@ -215,6 +215,31 @@ function rewriteWorkspaceSpecsToFile(appDir) {
   return { pkg, rewritten: true };
 }
 
+function linkNestedFilePackages(appDir) {
+  const pkg = readPackage(appDir);
+  const deps = dependencyMap(pkg);
+  for (const spec of Object.values(deps)) {
+    const match = /^file:packages\/([^/]+)$/.exec(String(spec));
+    if (!match) continue;
+    const pkgName = match[1];
+    const target = path.join(ROOT, "packages", pkgName);
+    if (!existsSync(path.join(target, "package.json"))) {
+      console.error(
+        `missing ${path.relative(ROOT, target)} for nested file: spec`,
+      );
+      process.exit(1);
+    }
+    const destDir = path.join(appDir, "packages");
+    const dest = path.join(destDir, pkgName);
+    mkdirSync(destDir, { recursive: true });
+    rmSync(dest, { recursive: true, force: true });
+    symlinkSync(target, dest);
+    console.log(
+      `==> linked ${path.relative(ROOT, dest)} -> ${path.relative(ROOT, target)}`,
+    );
+  }
+}
+
 function installFileApp(appRel, pkg, { frozen }) {
   const appDir = path.join(ROOT, appRel);
   for (const rel of neededPackageDirs(pkg)) {
@@ -236,6 +261,9 @@ function installFileApp(appRel, pkg, { frozen }) {
     hoistNodeModules(dir);
   }
 
+  // pnpm resolves file:packages/* before preinstall, so the nested
+  // folders must exist before the app install starts.
+  linkNestedFilePackages(appDir);
   installDeps(appRel, appDir, { frozen });
   hoistNodeModules(appDir);
 }
