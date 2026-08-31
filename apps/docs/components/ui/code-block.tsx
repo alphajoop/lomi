@@ -16,12 +16,11 @@ export async function CodeBlock({ code, lang, wrapper }: CodeBlockProps) {
       dark: 'vesper',
     },
     components: {
-      pre: ({
-        node: _node,
-        ...props
-      }: ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => (
-        <Base.Pre {...props} />
-      ),
+      pre: (props: ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => {
+        const rest = { ...props };
+        delete rest.node;
+        return <Base.Pre {...rest} />;
+      },
     },
   });
 

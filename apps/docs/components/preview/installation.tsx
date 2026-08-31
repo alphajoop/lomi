@@ -61,20 +61,20 @@ function InstallCommand({ code }: { code: string }) {
         options={{
           themes: codeThemes,
           components: {
-            pre: ({
-              node: _node,
-              className,
-              ...props
-            }: ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => (
-              <pre
-                {...props}
-                className={cn(
-                  'min-w-full w-max m-0! bg-transparent! p-0!',
-                  '[&_.line]:px-0!',
-                  className,
-                )}
-              />
-            ),
+            pre: (props: ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => {
+              const rest = { ...props };
+              delete rest.node;
+              return (
+                <pre
+                  {...rest}
+                  className={cn(
+                    'min-w-full w-max m-0! bg-transparent! p-0!',
+                    '[&_.line]:px-0!',
+                    rest.className,
+                  )}
+                />
+              );
+            },
           },
         }}
       />

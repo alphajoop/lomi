@@ -30,7 +30,7 @@ const PRODUCT_PAGES = {
   '/invoicing': '/build/accept/payment-requests',
   '/network': '/build/platform/network',
   '/radar': '/build/money/radar',
-  '/mcp': '/build/mcp',
+  '/connect': '/build/mcp',
   '/payment-links': '/build/accept/payment-links',
 };
 
@@ -38,7 +38,7 @@ function readFile(rel) {
   return readFileSync(join(websiteRoot, rel), 'utf-8');
 }
 
-const metadataSrc = readFile('src/lib/product-page-metadata.ts');
+const metadataSrc = readFile('src/lib/product-pages.ts');
 const footerSrc = readFile('src/components/site/footer.tsx');
 const sitemapSrc = readFile('src/app/sitemap.ts');
 const enLocale = JSON.parse(readFile('src/lib/i18n/locales/en.json'));
