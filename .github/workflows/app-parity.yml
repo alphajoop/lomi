@@ -49,6 +49,7 @@ jobs:
           cache-dependency-path: |
             apps/api/pnpm-lock.yaml
             apps/docs/pnpm-lock.yaml
+            apps/mcp/pnpm-lock.yaml
 
       - name: Install API dependencies
         run: node tooling/scripts/install-app-with-packages.mjs apps/api
@@ -77,6 +78,9 @@ jobs:
 
       - name: Install docs dependencies
         run: node tooling/scripts/install-app-with-packages.mjs apps/docs
+
+      - name: Install MCP dependencies
+        run: node tooling/scripts/install-app-with-packages.mjs apps/mcp
 
       - name: Run parity worker
         working-directory: apps/docs

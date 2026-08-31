@@ -1,5 +1,6 @@
 import * as Base from 'fumadocs-ui/components/codeblock';
 import { highlight } from 'fumadocs-core/highlight';
+import type { ComponentPropsWithoutRef } from 'react';
 
 export interface CodeBlockProps {
   code: string;
@@ -15,7 +16,12 @@ export async function CodeBlock({ code, lang, wrapper }: CodeBlockProps) {
       dark: 'vesper',
     },
     components: {
-      pre: Base.Pre,
+      pre: ({
+        node: _node,
+        ...props
+      }: ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => (
+        <Base.Pre {...props} />
+      ),
     },
   });
 

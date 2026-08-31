@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ComponentPropsWithoutRef } from 'react';
 import { Check, Clipboard } from 'lucide-react';
 import {
   Tabs,
@@ -61,13 +61,17 @@ function InstallCommand({ code }: { code: string }) {
         options={{
           themes: codeThemes,
           components: {
-            pre: (props) => (
+            pre: ({
+              node: _node,
+              className,
+              ...props
+            }: ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => (
               <pre
                 {...props}
                 className={cn(
                   'min-w-full w-max m-0! bg-transparent! p-0!',
                   '[&_.line]:px-0!',
-                  props.className,
+                  className,
                 )}
               />
             ),
