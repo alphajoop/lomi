@@ -181,14 +181,23 @@ export type {
 } from "./browser-session.js";
 export { getPayButtonForeground } from "./button-contrast.js";
 export {
+  DEFAULT_PAY_ORIGIN,
   PUBLIC_ID_ALPHABET,
   PUBLIC_ID_BODY_LENGTH,
   PUBLIC_ID_PREFIXES,
+  RESERVED_PAYMENT_LINK_PATH_SEGMENTS,
+  buildPaymentLinkCheckoutUrl,
   formatPublicId,
+  hostedPaymentLinkUrl,
+  isCanonicalPaymentLinkPath,
+  isCheckoutLinkIdentifier,
+  isLegacyPaymentLinkPath,
+  isPaymentLinkPathSegment,
   isPublicId,
   isPublicIdPrefix,
   isUuid,
   normalizePublicId,
+  paymentLinkPathSegment,
   publicIdPrefix,
   publicIdsMatch,
 } from "./public-id.js";

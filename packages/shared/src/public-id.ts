@@ -90,3 +90,104 @@ export function publicIdsMatch(
   }
   return normalizePublicId(left) === normalizePublicId(right);
 }
+
+export const DEFAULT_PAY_ORIGIN = "https://pay.lomi.africa";
+
+export const RESERVED_PAYMENT_LINK_PATH_SEGMENTS = new Set([
+  "api",
+  "checkout",
+  "company",
+  "dev",
+  "i",
+  "instant",
+  "invoicing",
+  "merchant-receipt",
+  "og-preview",
+  "preview",
+  "product",
+  "receipt",
+  "_next",
+]);
+
+function firstPathSegment(pathname: string): string {
+  const first = pathname.replace(/^\/+/, "").split("/")[0] ?? "";
+  try {
+    return decodeURIComponent(first);
+  } catch {
+    return first;
+  }
+}
+
+/** Hosted path body: Crockford id without `plink_`. UUIDs pass through unchanged. */
+export function paymentLinkPathSegment(id: string): string {
+  const trimmed = id.trim();
+  if (!trimmed) return "";
+  if (isUuid(trimmed)) return trimmed;
+  return normalizePublicId(trimmed).replace(/^PLINK_/, "");
+}
+
+export function isPaymentLinkPathSegment(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (RESERVED_PAYMENT_LINK_PATH_SEGMENTS.has(trimmed.toLowerCase())) {
+    return false;
+  }
+  const body = paymentLinkPathSegment(trimmed);
+  if (RESERVED_PAYMENT_LINK_PATH_SEGMENTS.has(body.toLowerCase())) {
+    return false;
+  }
+  if (body.length !== PUBLIC_ID_BODY_LENGTH) return false;
+  for (const ch of body) {
+    if (!PUBLIC_ID_ALPHABET.includes(ch)) return false;
+  }
+  return true;
+}
+
+export function isCheckoutLinkIdentifier(value: string): boolean {
+  return isPaymentLinkPathSegment(value) || isUuid(value.trim());
+}
+
+export function isLegacyPaymentLinkPath(pathname: string): boolean {
+  return (
+    pathname.startsWith("/instant/") || pathname.startsWith("/product/")
+  );
+}
+
+/** Share URL path is `/{body}` only. Old `/instant/` and `/product/` are not canonical. */
+export function isCanonicalPaymentLinkPath(pathname: string): boolean {
+  const rest = pathname.replace(/^\/+/, "").split("/").slice(1).filter(Boolean);
+  if (rest.length > 0) return false;
+  return isPaymentLinkPathSegment(firstPathSegment(pathname));
+}
+
+export function buildPaymentLinkCheckoutUrl(
+  id: string,
+  origin: string = DEFAULT_PAY_ORIGIN,
+): string {
+  const segment = paymentLinkPathSegment(id);
+  return `${origin.replace(/\/$/, "")}/${encodeURIComponent(segment)}`;
+}
+
+/**
+ * Prefer a stored canonical hosted URL (keeps custom domains). Rebuild
+ * `/instant/` and `/product/` paths from the payment-link id.
+ */
+export function hostedPaymentLinkUrl(
+  id: string,
+  storedUrl?: string | null,
+): string {
+  if (storedUrl) {
+    try {
+      const parsed = new URL(storedUrl);
+      if (isCanonicalPaymentLinkPath(parsed.pathname)) {
+        return `${parsed.origin}${parsed.pathname}`;
+      }
+      if (isLegacyPaymentLinkPath(parsed.pathname)) {
+        return buildPaymentLinkCheckoutUrl(id, parsed.origin);
+      }
+    } catch {
+      /* rebuild below */
+    }
+  }
+  return buildPaymentLinkCheckoutUrl(id);
+}
