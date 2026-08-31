@@ -37,7 +37,6 @@ export {
   ProviderApiError,
   type ProviderAuthClient,
 } from "./providers-api";
-export { useCheckoutColors } from "./use-checkout-colors";
 export { createDigitalDownloadHandler } from "./digital-download";
 export { createImageHelpers, type ImageStorageClient } from "./image-helpers";
 export { createHostedCommerceNextConfig } from "./next-config";

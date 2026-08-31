@@ -17,6 +17,9 @@
  * Docs keeps pnpm on its own project Node 22.x.
  * Website also links apps/website/node_modules/next to the upload root:
  * @vercel/next resolves next/package.json from cwd, not the app directory.
+ * Source-only packages (@lomi./ui) still get their own install: Next compiles
+ * those package sources and cannot see the app node_modules tree. @lomi./pay
+ * installs with --omit=dev --omit=peer so it does not pull a second Next.
  *
  * Usage: node tooling/scripts/install-app-with-packages.mjs <app-dir>
  *   e.g. node tooling/scripts/install-app-with-packages.mjs apps/docs
@@ -25,6 +28,7 @@
 import {
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   renameSync,
   rmSync,
@@ -42,6 +46,7 @@ const PACKAGE_INSTALL_ORDER = [
   "packages/ui",
   "packages/queries",
   "packages/receipt-pdf",
+  "packages/pay",
 ];
 
 const FILE_SPEC_TO_DIR = {
@@ -49,6 +54,7 @@ const FILE_SPEC_TO_DIR = {
   "@lomi./ui": "packages/ui",
   "@lomi./queries": "packages/queries",
   "@lomi./receipt-pdf": "packages/receipt-pdf",
+  "@lomi./pay": "packages/pay",
 };
 
 function run(command, args, cwd) {
@@ -98,6 +104,32 @@ function rewritePnpmScriptsForNpm(appDir) {
   writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   console.log(
     `==> rewrote pnpm scripts to npm run in ${path.relative(ROOT, pkgPath)}`,
+  );
+}
+
+function hoistNodeModules(fromDir) {
+  const fromNm = path.join(fromDir, "node_modules");
+  if (!existsSync(fromNm)) return;
+  const toNm = path.join(ROOT, "node_modules");
+  mkdirSync(toNm, { recursive: true });
+  for (const name of readdirSync(fromNm)) {
+    if (name.startsWith(".")) continue;
+    const from = path.join(fromNm, name);
+    const to = path.join(toNm, name);
+    if (name.startsWith("@")) {
+      mkdirSync(to, { recursive: true });
+      for (const child of readdirSync(from)) {
+        const childTo = path.join(to, child);
+        if (existsSync(childTo)) continue;
+        symlinkSync(path.join(from, child), childTo);
+      }
+      continue;
+    }
+    if (existsSync(to)) continue;
+    symlinkSync(from, to);
+  }
+  console.log(
+    `==> hoisted ${path.relative(ROOT, fromNm) || "node_modules"} -> node_modules`,
   );
 }
 
@@ -187,14 +219,25 @@ function installFileApp(appRel, pkg, { frozen }) {
   const appDir = path.join(ROOT, appRel);
   for (const rel of neededPackageDirs(pkg)) {
     const dir = path.join(ROOT, rel);
-    installDeps(appRel, dir, { frozen: false });
     const packageJson = readPackage(dir);
     if (packageJson.scripts?.build) {
+      installDeps(appRel, dir, { frozen: false });
       runBuildScript(appRel, dir);
+    } else if (rel === "packages/pay") {
+      // pay ships TypeScript. A full install pulls a second Next from
+      // peerDependencies and breaks checkout typecheck on NextRequest.
+      run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
+    } else {
+      // Source-only packages such as @lomi./ui still need runtime deps
+      // (clsx, radix). Omit dev and peers so React 18 types do not leak
+      // into the Next 19 typecheck of packages/pay.
+      run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
     }
+    hoistNodeModules(dir);
   }
 
   installDeps(appRel, appDir, { frozen });
+  hoistNodeModules(appDir);
 }
 
 function main() {
@@ -220,7 +263,12 @@ function main() {
     rewritePnpmScriptsForNpm(appDir);
   }
   installFileApp(appRel, pkg, { frozen: !rewritten });
-  if (useNpm(appRel) && appRel === "apps/website") {
+  if (
+    useNpm(appRel) &&
+    (appRel === "apps/website" ||
+      appRel === "apps/checkout" ||
+      appRel === "apps/storefront")
+  ) {
     hoistNextForVercelBuilder(appRel);
   }
 }

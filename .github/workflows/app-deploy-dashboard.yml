@@ -10,6 +10,8 @@ on:
       - "packages/**"
       - "pnpm-workspace.yaml"
       - "package.json"
+      - "tooling/scripts/install-app-with-packages.mjs"
+      - "tooling/vercel/dashboard.json"
       - ".github/workflows/app-deploy-dashboard.yml"
       - ".github/workflows/app-deploy-vercel.yml"
       - ".github/actions/checkout-app-submodule/**"
@@ -19,6 +21,13 @@ on:
         description: Branch to deploy
         type: string
         default: main
+      vercel-target:
+        description: Vercel target (preview or production)
+        type: choice
+        options:
+          - preview
+          - production
+        default: preview
 
 concurrency:
   group: lomi-deploy-dashboard-${{ github.event.client_payload.pr_number || github.ref }}
@@ -37,6 +46,7 @@ jobs:
       working-directory-mode: umbrella
       extra-submodules: apps/api
       workflow-ref: ${{ inputs.ref }}
+      vercel-target: ${{ inputs.vercel-target }}
     secrets:
       REPO_CHECKOUT_PAT: ${{ secrets.REPO_CHECKOUT_PAT }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
