@@ -1,0 +1,39 @@
+{
+  "installCommand": "node tooling/scripts/install-app-with-packages.mjs apps/customers",
+  "buildCommand": "npm --prefix apps/customers run build",
+  "devCommand": "npm --prefix apps/customers run dev",
+  "framework": "nextjs",
+  "outputDirectory": "apps/customers/.next",
+  "regions": ["iad1"],
+  "functions": {
+    "apps/customers/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        }
+      ]
+    }
+  ]
+}

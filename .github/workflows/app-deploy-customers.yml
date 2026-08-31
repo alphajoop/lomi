@@ -10,6 +10,8 @@ on:
       - "packages/**"
       - "pnpm-workspace.yaml"
       - "package.json"
+      - "tooling/scripts/install-app-with-packages.mjs"
+      - "tooling/vercel/customers.json"
       - ".github/workflows/app-deploy-customers.yml"
       - ".github/workflows/app-deploy-vercel.yml"
       - ".github/actions/checkout-app-submodule/**"
@@ -34,7 +36,7 @@ jobs:
       app: customers
       repository: lomiafrica/customers
       submodule-path: apps/customers
-      working-directory-mode: app
+      working-directory-mode: umbrella
       workflow-ref: ${{ inputs.ref }}
     secrets:
       REPO_CHECKOUT_PAT: ${{ secrets.REPO_CHECKOUT_PAT }}
