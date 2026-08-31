@@ -4,7 +4,18 @@
     "/agent/capabilities": {
       "get": {
         "operationId": "AgentCapabilitiesController_getCapabilities",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -16,10 +27,73 @@
         ]
       }
     },
+    "/agent/register/challenge": {
+      "post": {
+        "operationId": "AgentRegisterController_challenge",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Issue a proof-of-work challenge for sandbox agent bootstrap",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/register": {
+      "post": {
+        "operationId": "AgentRegisterController_registerAgent",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Mint a sandbox-only bootstrap provisioning key after solving the PoW challenge",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
     "/agent/events": {
       "get": {
         "operationId": "AgentStreamController_stream",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -39,7 +113,18 @@
     "/agent/subscriptions": {
       "post": {
         "operationId": "AgentSubscriptionsController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Créé"
@@ -57,7 +142,18 @@
       },
       "get": {
         "operationId": "AgentSubscriptionsController_list",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -84,6 +180,16 @@
             "in": "path",
             "description": "Subscription id",
             "schema": {}
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -108,7 +214,18 @@
     "/agent/workflows": {
       "post": {
         "operationId": "AgentWorkflowsController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -144,6 +261,16 @@
             "required": true,
             "in": "path",
             "schema": {}
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -177,6 +304,16 @@
             "required": true,
             "in": "path",
             "schema": {}
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "requestBody": {
@@ -208,7 +345,18 @@
     "/agent/handoff": {
       "post": {
         "operationId": "AgentHandoffController_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -244,6 +392,16 @@
             "required": true,
             "in": "path",
             "schema": {}
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -266,7 +424,18 @@
       "post": {
         "description": "Creates a Supabase auth user and merchant record. Requires terms acceptance metadata.",
         "operationId": "ProvisioningController_createAccount",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": ""
@@ -294,6 +463,16 @@
             "schema": {
               "format": "uuid",
               "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
             }
           }
         ],
@@ -324,6 +503,16 @@
             "schema": {
               "format": "uuid",
               "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
             }
           }
         ],
@@ -356,6 +545,16 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -385,6 +584,16 @@
             "schema": {
               "format": "uuid",
               "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
             }
           }
         ],
@@ -417,6 +626,16 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -447,6 +666,16 @@
             "schema": {
               "format": "uuid",
               "type": "string"
+            }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
             }
           }
         ],
@@ -479,6 +708,16 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -501,7 +740,18 @@
       "post": {
         "description": "Creates a scoped lomi_prov_* key for an end user. The key can be passed to MCP or /provisioning for agent onboarding.",
         "operationId": "PartnersController_mintProvisioningKey",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": ""
@@ -519,7 +769,18 @@
       },
       "get": {
         "operationId": "PartnersController_listProvisioningKeys",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -548,6 +809,16 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
         ],
         "responses": {
@@ -569,7 +840,18 @@
     "/partners/usage": {
       "get": {
         "operationId": "PartnersController_getUsage",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""
@@ -588,66 +870,300 @@
     },
     "/.well-known/oauth-authorization-server": {
       "get": {
-        "tags": [
-          "OAuth"
-        ],
-        "summary": "OAuth 2.1 authorization server metadata (RFC 8414)",
         "operationId": "OAuthController_authorizationServerMetadata",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Authorization server metadata"
+            "description": ""
           }
-        }
+        },
+        "summary": "OAuth 2.1 authorization server metadata (RFC 8414)",
+        "tags": [
+          "OAuth"
+        ]
       }
     },
     "/.well-known/openid-configuration": {
       "get": {
-        "tags": [
-          "OAuth"
-        ],
-        "summary": "OpenID Provider metadata alias of RFC 8414",
         "operationId": "OAuthController_openIdConfiguration",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OIDC discovery document"
+            "description": ""
           }
-        }
+        },
+        "summary": "OpenID Provider metadata alias of RFC 8414 (OAuth 2.1 AS)",
+        "tags": [
+          "OAuth"
+        ]
+      }
+    },
+    "/.well-known/oauth-protected-resource": {
+      "get": {
+        "operationId": "OAuthController_protectedResourceMetadata",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "OAuth protected resource metadata for the REST API (RFC 9728)",
+        "tags": [
+          "OAuth"
+        ]
       }
     },
     "/oauth/register": {
       "post": {
-        "tags": [
-          "OAuth"
-        ],
-        "summary": "Dynamic client registration (RFC 7591)",
         "operationId": "OAuthController_registerClient",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
         "responses": {
           "201": {
-            "description": "Registered client"
+            "description": ""
           }
-        }
+        },
+        "summary": "Dynamic client registration (RFC 7591)",
+        "tags": [
+          "OAuth"
+        ]
+      }
+    },
+    "/oauth/clients/{clientId}": {
+      "get": {
+        "operationId": "OAuthController_publicClient",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Public OAuth client identity (name, redirect URIs, scopes)",
+        "tags": [
+          "OAuth"
+        ]
+      }
+    },
+    "/oauth/authorize": {
+      "get": {
+        "operationId": "OAuthController_authorize",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Start OAuth authorization (redirects to dashboard consent)",
+        "tags": [
+          "OAuth"
+        ]
       }
     },
     "/oauth/token": {
       "post": {
+        "operationId": "OAuthController_token",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "OAuth token endpoint",
         "tags": [
           "OAuth"
-        ],
-        "summary": "OAuth token endpoint",
-        "operationId": "OAuthController_token",
-        "responses": {
-          "200": {
-            "description": "Token response"
+        ]
+      }
+    },
+    "/oauth/introspect": {
+      "post": {
+        "operationId": "OAuthController_introspect",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
           }
-        }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Token introspection (RFC 7662)",
+        "tags": [
+          "OAuth"
+        ]
+      }
+    },
+    "/oauth/introspect/mcp": {
+      "post": {
+        "operationId": "OAuthController_introspectMcp",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "MCP-internal token introspection (includes provisioning_key)",
+        "tags": [
+          "OAuth"
+        ]
+      }
+    },
+    "/oauth/revoke": {
+      "post": {
+        "operationId": "OAuthController_revoke",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Token revocation (RFC 7009)",
+        "tags": [
+          "OAuth"
+        ]
+      }
+    },
+    "/oauth/consent": {
+      "post": {
+        "operationId": "OAuthController_consent",
+        "parameters": [
+          {
+            "name": "Lomi-Version",
+            "in": "header",
+            "required": false,
+            "description": "Optional schema version pin. Echoes OpenAPI info.version (currently 1.2.0). Routes stay unversioned.",
+            "schema": {
+              "type": "string",
+              "example": "1.2.0"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Approve or deny OAuth consent after dashboard login",
+        "tags": [
+          "OAuth"
+        ]
       }
     }
   },
   "info": {
     "title": "API lomi.",
-    "description": "API de traitement des paiements pour les entreprises d'Afrique de l'Ouest francophone.",
-    "version": "1.1.0",
-    "contact": {}
+    "description": "Payment processing API for francophone West African businesses. Routes stay unversioned; OpenAPI info.version is the schema release. Send optional Lomi-Version to pin a known schema. Compatibility is additive: existing fields are not removed without a major info.version bump.",
+    "version": "1.2.0",
+    "contact": {
+      "name": "lomi.",
+      "url": "https://docs.lomi.africa",
+      "email": "hello@lomi.africa"
+    }
   },
   "tags": [
     {
@@ -686,6 +1202,22 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-Lomi-Partner-Key"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://api.lomi.africa/oauth/authorize",
+            "tokenUrl": "https://api.lomi.africa/oauth/token",
+            "refreshUrl": "https://api.lomi.africa/oauth/token",
+            "scopes": {
+              "provisioning.onboard": "Create and complete merchant onboarding",
+              "merchant.read": "Read merchant resources",
+              "merchant.write": "Write merchant resources"
+            }
+          }
+        },
+        "description": "Agent OAuth for MCP and Connect. Merchant REST still uses X-API-KEY by default."
       }
     },
     "schemas": {

@@ -10,7 +10,7 @@ overrides:
   js-yaml: ^4.3.1
   undici: ^5.28.4
   lodash: ^4.17.21
-  postcss: ^8.5.23
+  postcss: ^8.5.26
   vite: ^7.3.5
   yaml: ^2.8.3
   sharp: ^0.35.3

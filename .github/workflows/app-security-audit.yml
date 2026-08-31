@@ -45,8 +45,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: pnpm
-          cache-dependency-path: apps/api/pnpm-lock.yaml
       - name: pnpm audit (high and critical)
         run: pnpm --ignore-workspace audit --audit-level high
 
@@ -70,8 +68,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: pnpm
-          cache-dependency-path: apps/dashboard/pnpm-lock.yaml
       - name: pnpm audit (high and critical)
         run: pnpm --ignore-workspace audit --audit-level high
 
@@ -95,7 +91,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: pnpm
-          cache-dependency-path: apps/checkout/pnpm-lock.yaml
       - name: pnpm audit (high and critical)
         run: pnpm --ignore-workspace audit --audit-level high

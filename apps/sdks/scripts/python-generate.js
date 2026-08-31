@@ -347,7 +347,7 @@ class TestSurface(unittest.TestCase):
         )
         # spot-check newly added surfaces
         self.assertTrue(hasattr(c, "charges"))
-        self.assertTrue(hasattr(c, "payment_intents"))
+        self.assertTrue(hasattr(c, "payment_links"))
 
         expected = sorted(
             name
