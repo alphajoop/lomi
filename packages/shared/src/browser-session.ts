@@ -17,22 +17,26 @@ export function createBrowserSession(options: {
     establishInFlight = (async () => {
       const tokens = await options.getSessionTokens();
       if (!tokens?.access_token) return false;
-      const response = await fetch(
-        `${options.getApiBaseUrl()}/auth/browser-session`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-            "Content-Type": "application/json",
+      try {
+        const response = await fetch(
+          `${options.getApiBaseUrl()}/auth/browser-session`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              Authorization: `Bearer ${tokens.access_token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              audience: options.audience,
+              refresh_token: tokens.refresh_token,
+            }),
           },
-          body: JSON.stringify({
-            audience: options.audience,
-            refresh_token: tokens.refresh_token,
-          }),
-        },
-      );
-      return response.ok;
+        );
+        return response.ok;
+      } catch {
+        return false;
+      }
     })().finally(() => {
       establishInFlight = null;
     });

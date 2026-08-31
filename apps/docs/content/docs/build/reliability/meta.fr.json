@@ -4,6 +4,7 @@
   "icon": "ShieldCheck",
   "pages": [
     "handling-webhooks",
+    "n8n-webhooks",
     "webhook-reliability",
     "verify-payments",
     "payment-lifecycle",

@@ -507,6 +507,7 @@ export type Database = {
           created_at: string
           endpoint_route: string
           environment: string
+          expires_at: string
           idempotency_key: string
           idempotency_record_id: string
           network_account_id: string | null
@@ -514,6 +515,7 @@ export type Database = {
           organization_id: string
           request_fingerprint: string
           response_payload: Json
+          status: string
           target_organization_id: string | null
         }
         Insert: {
@@ -521,13 +523,15 @@ export type Database = {
           created_at?: string
           endpoint_route: string
           environment: string
+          expires_at?: string
           idempotency_key: string
           idempotency_record_id?: string
           network_account_id?: string | null
           network_membership_id?: string | null
           organization_id: string
           request_fingerprint: string
-          response_payload: Json
+          response_payload?: Json
+          status?: string
           target_organization_id?: string | null
         }
         Update: {
@@ -535,6 +539,7 @@ export type Database = {
           created_at?: string
           endpoint_route?: string
           environment?: string
+          expires_at?: string
           idempotency_key?: string
           idempotency_record_id?: string
           network_account_id?: string | null
@@ -542,6 +547,7 @@ export type Database = {
           organization_id?: string
           request_fingerprint?: string
           response_payload?: Json
+          status?: string
           target_organization_id?: string | null
         }
         Relationships: [
@@ -2029,6 +2035,93 @@ export type Database = {
             referencedColumns: ["service_id"]
           },
         ]
+      }
+      browser_session_handoffs: {
+        Row: {
+          aal: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          from_audience: string
+          handoff_id: string
+          supabase_refresh_ciphertext: string | null
+          to_audience: string
+          token_hash: string
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          aal?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          from_audience: string
+          handoff_id?: string
+          supabase_refresh_ciphertext?: string | null
+          to_audience: string
+          token_hash: string
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          aal?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          from_audience?: string
+          handoff_id?: string
+          supabase_refresh_ciphertext?: string | null
+          to_audience?: string
+          token_hash?: string
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      browser_sessions: {
+        Row: {
+          aal: string
+          audience: string
+          created_at: string
+          expires_at: string
+          idle_expires_at: string
+          last_seen_at: string
+          revoked_at: string | null
+          session_id: string
+          supabase_refresh_ciphertext: string | null
+          token_hash: string
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          aal?: string
+          audience: string
+          created_at?: string
+          expires_at: string
+          idle_expires_at: string
+          last_seen_at?: string
+          revoked_at?: string | null
+          session_id?: string
+          supabase_refresh_ciphertext?: string | null
+          token_hash: string
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          aal?: string
+          audience?: string
+          created_at?: string
+          expires_at?: string
+          idle_expires_at?: string
+          last_seen_at?: string
+          revoked_at?: string | null
+          session_id?: string
+          supabase_refresh_ciphertext?: string | null
+          token_hash?: string
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       checkout_session_line_items: {
         Row: {
@@ -6929,6 +7022,45 @@ export type Database = {
           },
         ]
       }
+      notification_outbox: {
+        Row: {
+          attempt_count: number
+          channel: string
+          created_at: string
+          dead_lettered_at: string | null
+          idempotency_key: string
+          last_error: string | null
+          outbox_id: string
+          payload: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          channel: string
+          created_at?: string
+          dead_lettered_at?: string | null
+          idempotency_key: string
+          last_error?: string | null
+          outbox_id?: string
+          payload: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          channel?: string
+          created_at?: string
+          dead_lettered_at?: string | null
+          idempotency_key?: string
+          last_error?: string | null
+          outbox_id?: string
+          payload?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -8367,6 +8499,7 @@ export type Database = {
       organizations: {
         Row: {
           allowed_currencies: Database["public"]["Enums"]["currency_code"][]
+          api_access_suspended: boolean
           arr: number
           created_at: string
           default_currency: Database["public"]["Enums"]["currency_code"]
@@ -8405,6 +8538,7 @@ export type Database = {
         }
         Insert: {
           allowed_currencies?: Database["public"]["Enums"]["currency_code"][]
+          api_access_suspended?: boolean
           arr?: number
           created_at?: string
           default_currency?: Database["public"]["Enums"]["currency_code"]
@@ -8443,6 +8577,7 @@ export type Database = {
         }
         Update: {
           allowed_currencies?: Database["public"]["Enums"]["currency_code"][]
+          api_access_suspended?: boolean
           arr?: number
           created_at?: string
           default_currency?: Database["public"]["Enums"]["currency_code"]
@@ -13657,6 +13792,76 @@ export type Database = {
         }
         Returns: Json
       }
+      browser_handoff_consume: {
+        Args: { p_token_hash: string }
+        Returns: {
+          aal: string
+          from_audience: string
+          handoff_id: string
+          refresh_ciphertext: string
+          to_audience: string
+          user_email: string
+          user_id: string
+        }[]
+      }
+      browser_handoff_create: {
+        Args: {
+          p_aal: string
+          p_expires_at: string
+          p_from_audience: string
+          p_refresh_ciphertext: string
+          p_to_audience: string
+          p_token_hash: string
+          p_user_email: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      browser_session_create: {
+        Args: {
+          p_aal: string
+          p_audience: string
+          p_expires_at: string
+          p_idle_expires_at: string
+          p_refresh_ciphertext: string
+          p_token_hash: string
+          p_user_email: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      browser_session_revoke: {
+        Args: { p_token_hash: string }
+        Returns: boolean
+      }
+      browser_session_revoke_user: {
+        Args: { p_audience?: string; p_user_id: string }
+        Returns: number
+      }
+      browser_session_update_material: {
+        Args: {
+          p_aal: string
+          p_refresh_ciphertext: string
+          p_token_hash: string
+        }
+        Returns: boolean
+      }
+      browser_session_validate: {
+        Args: {
+          p_audience: string
+          p_idle_extension?: string
+          p_token_hash: string
+        }
+        Returns: {
+          aal: string
+          expires_at: string
+          idle_expires_at: string
+          refresh_ciphertext: string
+          session_id: string
+          user_email: string
+          user_id: string
+        }[]
+      }
       build_merchant_subscription_webhook_payload: {
         Args: { p_subscription_id: string; p_transaction_id?: string }
         Returns: Json
@@ -14001,6 +14206,19 @@ export type Database = {
         Args: { p_checkout_session_id: string }
         Returns: boolean
       }
+      claim_api_idempotency_record: {
+        Args: {
+          p_endpoint_route: string
+          p_environment: string
+          p_idempotency_key: string
+          p_organization_id: string
+          p_request_fingerprint: string
+        }
+        Returns: {
+          kind: string
+          response_payload: Json
+        }[]
+      }
       claim_inbound_provider_webhook_event: {
         Args: {
           p_metadata?: Json
@@ -14062,6 +14280,17 @@ export type Database = {
           starter_fixed_amount: number
           starter_percentage: number
         }[]
+      }
+      complete_api_idempotency_record: {
+        Args: {
+          p_endpoint_route: string
+          p_environment: string
+          p_idempotency_key: string
+          p_organization_id: string
+          p_request_fingerprint: string
+          p_response_payload: Json
+        }
+        Returns: undefined
       }
       complete_cli_device_request: {
         Args: { p_device_code: string }
@@ -16151,6 +16380,10 @@ export type Database = {
         Args: { p_organization_id: string }
         Returns: Json
       }
+      dispatch_notification: {
+        Args: { p_channel: string; p_idempotency_key?: string; p_payload: Json }
+        Returns: string
+      }
       duplicate_customer_invoice: {
         Args: {
           p_invoice_id: string
@@ -18234,6 +18467,16 @@ export type Database = {
           provider_code: Database["public"]["Enums"]["provider_code"]
           status: Database["public"]["Enums"]["payout_status"]
           updated_at: string
+        }[]
+      }
+      fetch_pending_notification_outbox_job: {
+        Args: { p_outbox_id: string }
+        Returns: {
+          attempt_count: number
+          channel: string
+          outbox_id: string
+          payload: Json
+          status: string
         }[]
       }
       fetch_pending_webhook_outbox_jobs: {
@@ -21989,6 +22232,7 @@ export type Database = {
           npv: number
         }[]
       }
+      get_or_create_bootstrap_partner: { Args: never; Returns: string }
       get_or_create_self_service_partner: {
         Args: { p_email: string; p_user_id: string }
         Returns: string
@@ -24919,6 +25163,14 @@ export type Database = {
         Args: { p_merchant_id: string }
         Returns: undefined
       }
+      mark_notification_outbox_completed: {
+        Args: { p_outbox_id: string }
+        Returns: undefined
+      }
+      mark_notification_outbox_failed: {
+        Args: { p_dead_letter?: boolean; p_error: string; p_outbox_id: string }
+        Returns: undefined
+      }
       mark_notification_read: {
         Args: { p_notification_id: string }
         Returns: undefined
@@ -25023,6 +25275,10 @@ export type Database = {
       }
       move_product_to_live: { Args: { p_product_id: string }; Returns: string }
       move_webhook_to_live: { Args: { p_webhook_id: string }; Returns: string }
+      notify_notification_outbox_via_api: {
+        Args: { p_outbox_id: string }
+        Returns: undefined
+      }
       notify_usage_invoice_paid: {
         Args: { p_invoice_id: string }
         Returns: undefined
@@ -25645,6 +25901,15 @@ export type Database = {
         }
         Returns: Json
       }
+      release_api_idempotency_record: {
+        Args: {
+          p_endpoint_route: string
+          p_environment: string
+          p_idempotency_key: string
+          p_organization_id: string
+        }
+        Returns: undefined
+      }
       remove_integration: {
         Args: { p_integration: string; p_organization_id: string }
         Returns: Json
@@ -26012,6 +26277,14 @@ export type Database = {
         Args: { p_merchant_id: string; p_refund_id: string }
         Returns: undefined
       }
+      send_marketing_email: {
+        Args: {
+          p_email_key: string
+          p_merchant_id: string
+          p_organization_id: string
+        }
+        Returns: boolean
+      }
       send_merchant_support_confirmation: {
         Args: {
           p_merchant_email: string
@@ -26150,6 +26423,10 @@ export type Database = {
           p_status: Database["public"]["Enums"]["network_membership_status"]
         }
         Returns: boolean
+      }
+      set_organization_api_access_suspended: {
+        Args: { p_organization_id: string; p_suspended: boolean }
+        Returns: undefined
       }
       set_primary_payout_method: {
         Args: { p_organization_id?: string; p_payout_method_id: string }
@@ -27924,7 +28201,7 @@ export type Database = {
         | "subscriptions"
         | "customers"
       platform_partner_status: "pending" | "active" | "suspended"
-      platform_partner_type: "partner" | "self_service"
+      platform_partner_type: "partner" | "self_service" | "bootstrap"
       pricing_model: "standard" | "pay_what_you_want" | "tiered" | "volume"
       pricing_plan_type: "fixed" | "volume_tiered" | "custom"
       product_fulfillment_type: "digital" | "physical" | "hybrid"
@@ -27945,7 +28222,11 @@ export type Database = {
         | "succeeded"
         | "expired"
         | "refunded"
-      provisioning_key_kind: "platform" | "partner_subkey" | "self_service"
+      provisioning_key_kind:
+        | "platform"
+        | "partner_subkey"
+        | "self_service"
+        | "bootstrap"
       qr_code_type: "static" | "dynamic"
       radar_decision: "allow" | "flag" | "block"
       radar_mode: "monitor" | "block"
@@ -28100,6 +28381,9 @@ export type Database = {
         | "DISPUTE_CLOSED"
         | "PAYMENT_RISK_FLAGGED"
         | "PAYMENT_RISK_BLOCKED"
+        | "PAYOUT_CREATED"
+        | "PAYOUT_COMPLETED"
+        | "PAYOUT_FAILED"
       whatsapp_catalog_item_sync_status:
         | "synced"
         | "pending_push"
@@ -28584,7 +28868,7 @@ export const Constants = {
         "customers",
       ],
       platform_partner_status: ["pending", "active", "suspended"],
-      platform_partner_type: ["partner", "self_service"],
+      platform_partner_type: ["partner", "self_service", "bootstrap"],
       pricing_model: ["standard", "pay_what_you_want", "tiered", "volume"],
       pricing_plan_type: ["fixed", "volume_tiered", "custom"],
       product_fulfillment_type: ["digital", "physical", "hybrid"],
@@ -28607,7 +28891,12 @@ export const Constants = {
         "expired",
         "refunded",
       ],
-      provisioning_key_kind: ["platform", "partner_subkey", "self_service"],
+      provisioning_key_kind: [
+        "platform",
+        "partner_subkey",
+        "self_service",
+        "bootstrap",
+      ],
       qr_code_type: ["static", "dynamic"],
       radar_decision: ["allow", "flag", "block"],
       radar_mode: ["monitor", "block"],
@@ -28767,6 +29056,9 @@ export const Constants = {
         "DISPUTE_CLOSED",
         "PAYMENT_RISK_FLAGGED",
         "PAYMENT_RISK_BLOCKED",
+        "PAYOUT_CREATED",
+        "PAYOUT_COMPLETED",
+        "PAYOUT_FAILED",
       ],
       whatsapp_catalog_item_sync_status: [
         "synced",

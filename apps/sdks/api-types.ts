@@ -6603,7 +6603,10 @@ export type Database = {
         | 'DISPUTE_UPDATED'
         | 'DISPUTE_CLOSED'
         | 'PAYMENT_RISK_FLAGGED'
-        | 'PAYMENT_RISK_BLOCKED';
+        | 'PAYMENT_RISK_BLOCKED'
+        | 'PAYOUT_CREATED'
+        | 'PAYOUT_COMPLETED'
+        | 'PAYOUT_FAILED';
     };
   };
 };

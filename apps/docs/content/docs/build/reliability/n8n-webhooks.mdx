@@ -1,0 +1,63 @@
+---
+title: 'n8n webhook recipe'
+description: 'Receive a signed lomi. PAYMENT_SUCCEEDED event in n8n and send a WhatsApp or email confirmation.'
+---
+
+This is the no-code path for the signed-event contract: lomi. POSTs to n8n, you verify `X-Lomi-Signature` on the raw body, then notify the customer. The same pattern works for `REFUND_COMPLETED` once you subscribe to that event.
+
+You do not need a custom server. n8n is the listener.
+
+## What you need
+
+- An n8n Cloud or self-hosted instance
+- A lomi. webhook signing secret (`whsec_…`) from the dashboard
+- A WhatsApp or email node (Twilio, WhatsApp Cloud, Resend, or SMTP)
+
+## 1. Create the webhook in lomi.
+
+1. Dashboard → Developers → Webhooks → Create.
+2. URL: your n8n **Webhook** node production URL (`https://<instance>/webhook/<path>`).
+3. Subscribe to `PAYMENT_SUCCEEDED` (add `REFUND_COMPLETED` if you reverse fulfillment on refunds).
+4. Copy the `whsec_…` secret. Store it as an n8n credential or environment variable. Never put it in a public workflow JSON.
+
+## 2. Webhook node in n8n
+
+- Method: `POST`
+- Response: `Immediately` with HTTP `200` so lomi. does not retry while you send WhatsApp
+- Keep the **raw body**. Do not enable JSON parse before signature check.
+
+## 3. Verify the signature
+
+HMAC-SHA256 **hex** of the **raw** body with the endpoint secret. Compare to `X-Lomi-Signature`. Optional: if `X-Lomi-Timestamp` (ISO-8601, same as the body `timestamp`) is more than 300 seconds old, stop the workflow (replay protection). Do not change the HMAC input to include the timestamp; the signature is body-only.
+
+n8n Code node example:
+
+```javascript
+const crypto = require('crypto');
+const secret = $env.LOMI_WEBHOOK_SECRET;
+const raw = $input.first().json.bodyRaw ?? JSON.stringify($input.first().json);
+const expected = crypto.createHmac('sha256', secret).update(raw).digest('hex');
+const signature = $input.first().json.headers['x-lomi-signature'];
+if (expected !== signature) {
+  throw new Error('Invalid lomi. webhook signature');
+}
+return $input.all();
+```
+
+If your Webhook node already parsed JSON, switch it to binary/raw mode or the HMAC will not match.
+
+## 4. Send WhatsApp or email
+
+From the envelope `data` object (a `Transaction` for `PAYMENT_SUCCEEDED`):
+
+- Amount and currency
+- Customer phone or email
+- `transaction_id` for support
+
+Map those fields into your WhatsApp template or email body. Dedupe on envelope `id` so a retry does not message twice.
+
+## 5. Test
+
+Use **Send test** in the dashboard, or complete a sandbox charge. Delivery logs should show `200`. If you see `401`, n8n (or a proxy in front of it) is requiring an API key; lomi. only sends `X-Lomi-Signature`, `X-Lomi-Event`, and `X-Lomi-Timestamp`.
+
+Details: [Handling webhooks](/build/reliability/handling-webhooks).

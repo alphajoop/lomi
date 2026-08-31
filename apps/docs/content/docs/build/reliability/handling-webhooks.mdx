@@ -141,9 +141,12 @@ For **outbound** webhook HTTP requests, expect only:
 | `Content-Type` | `application/json` |
 | `X-Lomi-Signature` | HMAC-SHA256 (**hex**) of the **raw** JSON body using this endpoint’s webhook signing secret |
 | `X-Lomi-Event` | Same value as top-level `"event"` in the JSON body |
+| `X-Lomi-Timestamp` | ISO-8601 instant when lomi. built the envelope (same value as the body `timestamp`) |
 | `User-Agent` | `lomi.-Webhook/1.0` |
 
 The **`whsec_…` signing secret** is for **you** to verify `X-Lomi-Signature` on the raw body, not a token lomi. places in `Authorization`.
+
+**Replay window (optional):** `X-Lomi-Timestamp` is informational. The HMAC still covers only the raw body, so you can keep existing verifiers unchanged. If you want to reject delayed replays, parse the header as ISO-8601 and drop requests older than **300 seconds**. Do not switch to a `t=…,v1=…` signed-payload scheme; that would break every shipped verifier.
 
 **If delivery logs show HTTP 401**, or a response body like `Authentication required`, that answer almost always comes **from your own server or proxy** (framework auth middleware, API gateway, Cloudflare Access, a catch-all Bearer rule, etc.) **before** your webhook handler runs. lomi. cannot satisfy a custom Bearer or API-key gate on POST.
 
@@ -325,9 +328,12 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 | `SUBSCRIPTION_UPDATED` | A subscription changed (pause, resume, plan change, cancel scheduled, etc.). | `Subscription` (with `previous_attributes`) |
 | `SUBSCRIPTION_RENEWED` | A subscription successfully renews. | `Subscription` |
 | `SUBSCRIPTION_CANCELLED` | A subscription is cancelled or expired. | `Subscription` |
-| `REFUND_COMPLETED` | A refund is successfully processed. | `Refund` |
+| `REFUND_COMPLETED` | A refund is successfully processed (Wave, MTN, cards, π-SPI, and manual). | `Refund` |
 | `REFUND_FAILED` | A refund attempt failed. | `Refund` |
 | `REFUND_CREATED` | A refund attempt was created. | `Refund` |
+| `PAYOUT_CREATED` | A payout or withdrawal was created (`pending`). | `Payout` |
+| `PAYOUT_COMPLETED` | A payout reached `completed`. | `Payout` |
+| `PAYOUT_FAILED` | A payout reached `failed`. | `Payout` |
 | `DISPUTE_CREATED` | A card dispute was opened. | `Dispute` |
 | `DISPUTE_UPDATED` | Dispute status or evidence changed. | `Dispute` |
 | `DISPUTE_CLOSED` | A dispute reached a terminal state. | `Dispute` |

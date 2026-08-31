@@ -60,21 +60,28 @@ export async function postStripePaymentIntent(
       payload = raw;
     }
   }
-  if (!response.ok) {
-    const err = new StripeCheckoutApiError(
-      errorFromPayload(payload, response.status),
-    );
-    if (isJsonObject(payload)) {
-      err.code = readString(payload, "code");
-    }
-    throw err;
-  }
   if (!isJsonObject(payload)) {
+    if (!response.ok) {
+      throw new StripeCheckoutApiError(
+        errorFromPayload(payload, response.status),
+      );
+    }
     throw new StripeCheckoutApiError("Empty Stripe checkout response");
+  }
+  // Nest returns 400 with { success: false, error, code } for Stripe
+  // business errors (amount_too_small). Surface that instead of throwing
+  // so hosted checkout can disable cards instead of killing the session.
+  if (!response.ok || payload.success === false) {
+    return {
+      success: false,
+      error: errorFromPayload(payload, response.status),
+      code: readString(payload, "code"),
+      message: readString(payload, "message"),
+    };
   }
   // SAFETY: Nest Stripe checkout JSON matches the hosted checkout contract.
   return {
     ...(payload as StripeCheckoutIntentResult),
-    success: payload.success !== false,
+    success: true,
   };
 }

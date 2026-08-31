@@ -141,9 +141,12 @@ Pour les requêtes **sortantes** (lomi. → votre serveur), attendez-vous surtou
 | `Content-Type` | `application/json` |
 | `X-Lomi-Signature` | HMAC-SHA256 (**hexadécimal**) du corps JSON **brut**, avec le secret de signature de l’URL |
 | `X-Lomi-Event` | Même valeur que la propriété `"event"` à la racine du JSON |
+| `X-Lomi-Timestamp` | Instant ISO-8601 de construction de l’enveloppe (même valeur que le `timestamp` du corps) |
 | `User-Agent` | `lomi.-Webhook/1.0` |
 
 Le secret **`whsec_…`** sert à **vérifier** `X-Lomi-Signature` sur le corps brut, ce n’est **pas** un jeton que lomi. place dans `Authorization`.
+
+**Fenêtre anti-rejeu (facultative) :** `X-Lomi-Timestamp` est informatif. Le HMAC porte toujours uniquement sur le corps brut, vos vérificateurs existants restent valides. Pour refuser les rejeux trop anciens, parsez l’en-tête en ISO-8601 et ignorez les requêtes de plus de **300 secondes**. N’adoptez pas le schéma `t=…,v1=…` : cela casserait tous les vérificateurs déjà livrés.
 
 Si les journaux de livraison indiquent un **HTTP 401**, ou un corps du type « Authentication required », la réponse vient presque toujours **de votre serveur ou proxy** (middleware d’authentification Express/Nest/etc., passerelle API, Cloudflare Access, règle Bearer globale…) **avant** que votre gestionnaire webhook ne s’exécute.
 
@@ -325,9 +328,12 @@ Lors de la création ou de la mise à jour d’un webhook, vous souscrivez à de
 | `SUBSCRIPTION_UPDATED` | Un abonnement a changé (pause, reprise, plan, annulation planifiée, etc.). | `Subscription` (avec `previous_attributes`) |
 | `SUBSCRIPTION_RENEWED` | Un abonnement est renouvelé avec succès. | `Subscription` |
 | `SUBSCRIPTION_CANCELLED` | Un abonnement est annulé ou expiré. | `Subscription` |
-| `REFUND_COMPLETED` | Un remboursement est traité avec succès. | `Refund` |
+| `REFUND_COMPLETED` | Un remboursement est traité avec succès (Wave, MTN, cartes, π-SPI et manuel). | `Refund` |
 | `REFUND_FAILED` | Une tentative de remboursement échoue. | `Refund` |
 | `REFUND_CREATED` | Une tentative de remboursement est créée. | `Refund` |
+| `PAYOUT_CREATED` | Un versement est créé (`pending`). | `Payout` |
+| `PAYOUT_COMPLETED` | Un versement passe à `completed`. | `Payout` |
+| `PAYOUT_FAILED` | Un versement passe à `failed`. | `Payout` |
 | `DISPUTE_CREATED` | Un litige carte a été ouvert. | `Dispute` |
 | `DISPUTE_UPDATED` | Statut ou preuves du litige mis à jour. | `Dispute` |
 | `DISPUTE_CLOSED` | Un litige a atteint un état terminal. | `Dispute` |
