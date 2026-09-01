@@ -15,6 +15,8 @@
  *   ENABLE_RLS_SQL — override path to 20240828000040_enable_rls.sql
  *
  * Exit 1 = missing grants (drift). Exit 2 = infra / config error.
+ * GRANTs for tables that do not exist in the target database are skipped
+ * (logged as notice), not treated as drift.
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -81,12 +83,24 @@ function expectedValuesSql(expected) {
   return values.join(",\n    ");
 }
 
+function presentTablesCte() {
+  return `
+present AS (
+  SELECT c.relname AS table_name
+  FROM pg_catalog.pg_class c
+  JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public'
+    AND c.relkind = 'r'
+)`;
+}
+
 function buildAuditSql(expected) {
   return `
 WITH expected(table_name, privilege_type) AS (
   VALUES
     ${expectedValuesSql(expected)}
 ),
+${presentTablesCte().trim()},
 actual AS (
   SELECT table_name, privilege_type
   FROM information_schema.role_table_grants
@@ -95,9 +109,30 @@ actual AS (
 )
 SELECT e.table_name, e.privilege_type AS missing_privilege
 FROM expected e
+INNER JOIN present p USING (table_name)
 LEFT JOIN actual a USING (table_name, privilege_type)
 WHERE a.privilege_type IS NULL
 ORDER BY e.table_name, e.privilege_type;
+`.trim();
+}
+
+function buildAbsentTablesSql(expected) {
+  const values = [...expected.keys()]
+    .sort()
+    .map((table) => `('${table}')`)
+    .join(",\n    ");
+  return `
+WITH expected(table_name) AS (
+  VALUES
+    ${values}
+),
+${presentTablesCte().trim()}
+SELECT e.table_name
+FROM expected e
+WHERE NOT EXISTS (
+  SELECT 1 FROM present p WHERE p.table_name = e.table_name
+)
+ORDER BY e.table_name;
 `.trim();
 }
 
@@ -107,6 +142,7 @@ WITH expected(table_name, privilege_type) AS (
   VALUES
     ${expectedValuesSql(expected)}
 ),
+${presentTablesCte().trim()},
 actual AS (
   SELECT table_name, privilege_type
   FROM information_schema.role_table_grants
@@ -116,11 +152,31 @@ actual AS (
 missing AS (
   SELECT e.table_name, e.privilege_type AS missing_privilege
   FROM expected e
+  INNER JOIN present p USING (table_name)
   LEFT JOIN actual a USING (table_name, privilege_type)
   WHERE a.privilege_type IS NULL
 )
 SELECT COALESCE(json_agg(row_to_json(m) ORDER BY m.table_name, m.missing_privilege), '[]'::json)
 FROM missing m;
+`.trim();
+}
+
+function buildPsqlJsonAbsentTablesSql(expected) {
+  const values = [...expected.keys()]
+    .sort()
+    .map((table) => `('${table}')`)
+    .join(",\n    ");
+  return `
+WITH expected(table_name) AS (
+  VALUES
+    ${values}
+),
+${presentTablesCte().trim()}
+SELECT COALESCE(json_agg(e.table_name ORDER BY e.table_name), '[]'::json)
+FROM expected e
+WHERE NOT EXISTS (
+  SELECT 1 FROM present p WHERE p.table_name = e.table_name
+);
 `.trim();
 }
 
@@ -187,6 +243,8 @@ function main() {
   const auditSql = buildAuditSql(expected);
   if (process.argv.includes("--sql")) {
     console.log(auditSql);
+    console.log("\n-- tables named in GRANTs but not present in the database --");
+    console.log(buildAbsentTablesSql(expected));
     return;
   }
 
@@ -195,10 +253,21 @@ function main() {
   const dashboardRoot = path.resolve(path.dirname(enableRlsPath), "../..");
 
   let rows;
+  let absentTables = [];
   try {
-    rows = databaseUrl
-      ? runPsqlQuery(buildPsqlJsonAuditSql(expected), databaseUrl)
-      : runLinkedQuery(auditSql, dashboardRoot);
+    if (databaseUrl) {
+      rows = runPsqlQuery(buildPsqlJsonAuditSql(expected), databaseUrl);
+      absentTables = runPsqlQuery(
+        buildPsqlJsonAbsentTablesSql(expected),
+        databaseUrl,
+      );
+    } else {
+      rows = runLinkedQuery(auditSql, dashboardRoot);
+      absentTables = runLinkedQuery(
+        buildAbsentTablesSql(expected),
+        dashboardRoot,
+      );
+    }
   } catch (err) {
     console.error(
       "Failed to run grant audit. Set SUPABASE_DB_URL for psql, use --sql, or ensure `supabase db query --linked` works.",
@@ -208,10 +277,24 @@ function main() {
   }
 
   if (!Array.isArray(rows)) rows = [];
+  if (!Array.isArray(absentTables)) absentTables = [];
+  const absentNames = absentTables.map((row) =>
+    typeof row === "string" ? row : row.table_name,
+  );
 
+  if (absentNames.length > 0) {
+    console.log(
+      `notice: skipping ${absentNames.length} expected table(s) not present in the database:`,
+    );
+    for (const name of absentNames) {
+      console.log(`  - ${name}`);
+    }
+  }
+
+  const presentCount = expected.size - absentNames.length;
   if (rows.length === 0) {
     console.log(
-      `OK: authenticated grants match ${expected.size} tables from ${path.basename(enableRlsPath)}`,
+      `OK: authenticated grants match ${presentCount} present tables from ${path.basename(enableRlsPath)}`,
     );
     process.exit(0);
   }

@@ -90,6 +90,9 @@ jobs:
               ;;
           esac
 
+      - name: Checkout
+        uses: actions/checkout@v5
+
       # GitHub-hosted runners are IPv4-only; the direct Supabase host is IPv6-only.
       - name: Set up IPv6 egress
         uses: ./.github/actions/setup-ipv6-warp

@@ -13,7 +13,7 @@ Pour une requête potentiellement mutante (`POST`, `PATCH`, `DELETE`), vous pouv
 3.  **Première requête :** lomi. traite la requête et enregistre le résultat lié à la clé.
 4.  **Requêtes suivantes (même clé) :** avec la **même clé** dans les 24 h, lomi. **ne retravaille pas** l’opération et renvoie la **même réponse** (succès ou erreur) qu’à l’origine.
 
-`Idempotency-Key` est **obligatoire** sur les écritures financières : `POST /checkout-sessions`, `POST /payment-requests`, `POST /refunds`, `POST /payouts`, `POST /settlements/instant` et `POST /charge/*`. Une clé manquante renvoie `400` `idempotency_key_required`. Une réponse rejouée ajoute `Idempotency-Cache-Hit: true`. Une même clé avec un autre corps renvoie `409` `idempotency_key_reused`. Un doublon en cours renvoie `409` `idempotency_in_progress` (réessayez avec la même clé).
+`Idempotency-Key` est **obligatoire** sur les écritures financières : `POST /payment-requests`, `POST /refunds`, `POST /payouts`, `POST /settlements/instant` et `POST /charge/*`. Une clé manquante renvoie `400` `idempotency_key_required`. `POST /checkout-sessions` accepte une clé optionnelle (recommandée pour les réessais). Créer une page de checkout hébergée ne capture pas les fonds. Une réponse rejouée ajoute `Idempotency-Cache-Hit: true`. Une même clé avec un autre corps renvoie `409` `idempotency_key_reused`. Un doublon en cours renvoie `409` `idempotency_in_progress` (réessayez avec la même clé).
 
 ## Utiliser les clés d’idempotence
 
