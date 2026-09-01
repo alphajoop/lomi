@@ -18,8 +18,11 @@
  * Website also links apps/website/node_modules/next to the upload root:
  * @vercel/next resolves next/package.json from cwd, not the app directory.
  * Source-only packages (@lomi./ui) still get their own install: Next compiles
- * those package sources and cannot see the app node_modules tree. @lomi./pay
- * installs with --omit=dev --omit=peer so it does not pull a second Next.
+ * those package sources and cannot see the app node_modules tree. Docs keeps
+ * pnpm for that install (npm 10 `--omit=peer` crashes with edgesOut on Node
+ * 22, and a restored `.pnpm` tree from cache makes it worse). Website/admin
+ * npm deploys still use `npm install --omit=dev --omit=peer`. @lomi./pay
+ * installs with the same omit flags so it does not pull a second Next.
  *
  * Usage: node tooling/scripts/install-app-with-packages.mjs <app-dir>
  *   e.g. node tooling/scripts/install-app-with-packages.mjs apps/docs
@@ -167,6 +170,14 @@ function excludeAdminGrowthAgentFromTsc(appDir) {
   );
 }
 
+function wipeCachedNodeModules(dir) {
+  if (!process.env.VERCEL && !process.env.CI) return;
+  const nm = path.join(dir, "node_modules");
+  if (!existsSync(nm)) return;
+  rmSync(nm, { recursive: true, force: true });
+  console.log(`==> removed cached ${path.relative(ROOT, nm)}`);
+}
+
 function installDeps(appRel, dir, { frozen }) {
   if (useNpm(appRel)) {
     run("npm", ["install", "--ignore-scripts", "--include=dev"], dir);
@@ -175,6 +186,27 @@ function installDeps(appRel, dir, { frozen }) {
   const args = ["install", "--ignore-workspace"];
   if (frozen && existsSync(path.join(dir, "pnpm-lock.yaml"))) {
     args.push("--frozen-lockfile");
+  } else if (!existsSync(path.join(dir, "pnpm-lock.yaml"))) {
+    args.push("--no-frozen-lockfile");
+  }
+  run("pnpm", args, dir);
+}
+
+function installSourceOnlyPackage(appRel, dir) {
+  wipeCachedNodeModules(dir);
+  if (useNpm(appRel)) {
+    run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
+    return;
+  }
+  const args = [
+    "install",
+    "--ignore-workspace",
+    "--ignore-scripts",
+    "--prod",
+    "--config.auto-install-peers=false",
+  ];
+  if (!existsSync(path.join(dir, "pnpm-lock.yaml"))) {
+    args.push("--no-frozen-lockfile");
   }
   run("pnpm", args, dir);
 }
@@ -248,15 +280,11 @@ function installFileApp(appRel, pkg, { frozen }) {
     if (packageJson.scripts?.build) {
       installDeps(appRel, dir, { frozen: false });
       runBuildScript(appRel, dir);
-    } else if (rel === "packages/pay") {
-      // pay ships TypeScript. A full install pulls a second Next from
-      // peerDependencies and breaks checkout typecheck on NextRequest.
-      run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
     } else {
       // Source-only packages such as @lomi./ui still need runtime deps
-      // (clsx, radix). Omit dev and peers so React 18 types do not leak
-      // into the Next 19 typecheck of packages/pay.
-      run("npm", ["install", "--ignore-scripts", "--omit=dev", "--omit=peer"], dir);
+      // (clsx, radix). Omit dev and peers so React 18 types / a second
+      // Next (pay) do not leak into the consuming app.
+      installSourceOnlyPackage(appRel, dir);
     }
     hoistNodeModules(dir);
   }

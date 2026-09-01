@@ -72,8 +72,8 @@
       "destination": "/api/$1"
     }
   ],
-  "installCommand": "node lib/scripts/vercel-install.mjs || node apps/docs/lib/scripts/vercel-install.mjs",
-  "buildCommand": "pnpm build || pnpm --dir apps/docs build",
+  "installCommand": "if [ -f lib/scripts/vercel-install.mjs ]; then node lib/scripts/vercel-install.mjs; else node apps/docs/lib/scripts/vercel-install.mjs; fi",
+  "buildCommand": "if [ -f apps/docs/package.json ]; then pnpm --dir apps/docs build; else pnpm build; fi",
   "devCommand": "next dev",
   "framework": "nextjs",
   "outputDirectory": ".next",
