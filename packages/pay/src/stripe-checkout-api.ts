@@ -7,9 +7,19 @@ import {
   type JsonValue,
 } from "@lomi./shared";
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "https://api.lomi.africa"
-).replace(/\/+$/, "");
+function resolveApiBaseUrl(): string {
+  const configured = (
+    process.env.NEXT_PUBLIC_API_URL || "https://api.lomi.africa"
+  ).replace(/\/+$/, "");
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+  ) {
+    return `${window.location.origin}/__lomi-api`;
+  }
+  return configured;
+}
 
 export class StripeCheckoutApiError extends Error {
   code?: string;
@@ -44,7 +54,7 @@ export async function postStripePaymentIntent(
   body: JsonInputObject,
 ): Promise<StripeCheckoutIntentResult> {
   const response = await fetch(
-    `${API_BASE_URL}/checkout/stripe/payment-intent`,
+    `${resolveApiBaseUrl()}/checkout/stripe/payment-intent`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

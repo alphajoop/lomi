@@ -141,7 +141,7 @@ export function PersonalInformationSection({
               value={rawNameInput}
               onChange={handleFullNameChange}
               placeholder={t("checkout.personal_info.full_name")}
-              className="rounded-none w-full bg-white text-gray-900 border-gray-300 focus:bg-white dark:bg-white dark:text-gray-900 dark:border-gray-300 dark:focus:bg-white dark:placeholder:text-gray-500 placeholder:text-base md:placeholder:text-sm input-checkout text-base md:text-sm h-10"
+              className={`${showEmail || showPhone ? "rounded-tl rounded-tr" : "rounded-sm"} w-full bg-white text-gray-900 border-gray-300 focus:bg-white dark:bg-white dark:text-gray-900 dark:border-gray-300 dark:focus:bg-white dark:placeholder:text-gray-500 placeholder:text-base md:placeholder:text-sm input-checkout text-base md:text-sm h-10`}
               required={requireName}
               autoComplete="name"
             />
@@ -177,7 +177,7 @@ export function PersonalInformationSection({
                 value={customerDetails.email}
                 onChange={handleGenericCustomerInputChange}
                 placeholder={t("checkout.personal_info.email")}
-                className="rounded-none w-full bg-white text-gray-900 border-gray-300 placeholder:text-base md:placeholder:text-sm text-base md:text-sm h-10"
+                className={`${showName ? "rounded-none" : "rounded-tl rounded-tr"} w-full bg-white text-gray-900 border-gray-300 placeholder:text-base md:placeholder:text-sm text-base md:text-sm h-10`}
                 required={requireEmail}
                 ref={emailInputRef}
                 autoComplete="email"

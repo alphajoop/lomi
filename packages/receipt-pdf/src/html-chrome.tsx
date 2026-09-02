@@ -52,9 +52,11 @@ export function HtmlMetaRow({
 export function HtmlDocumentHeader({
   title,
   children,
+  logoSrc,
 }: {
   title: ReactNode;
   children?: ReactNode;
+  logoSrc?: string | null;
 }) {
   return (
     <div className="flex justify-between items-start gap-4 mb-6">
@@ -62,7 +64,17 @@ export function HtmlDocumentHeader({
         <div className="text-[21px] font-semibold leading-6 mb-2">{title}</div>
         <div className="flex flex-col gap-0.5">{children}</div>
       </div>
-      <HtmlWordmark />
+      {logoSrc ? (
+        <img
+          src={logoSrc}
+          alt=""
+          width={56}
+          height={21}
+          className="h-[21px] w-[56px] shrink-0 object-contain"
+        />
+      ) : (
+        <HtmlWordmark />
+      )}
     </div>
   );
 }

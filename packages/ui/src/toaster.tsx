@@ -26,11 +26,15 @@ function getDefaultOptions(
   const titleClass =
     stylePreset === "dashboard"
       ? "text-foreground! normal-case!"
-      : "text-text! normal-case!";
+      : isDark
+        ? "text-white! normal-case!"
+        : "text-zinc-900! normal-case!";
   const descriptionClass =
     stylePreset === "dashboard"
       ? "text-muted-foreground!"
-      : "text-text-muted!";
+      : isDark
+        ? "text-white/70!"
+        : "text-zinc-600!";
   const buttonClass = isDark
     ? stylePreset === "dashboard"
       ? "bg-white/10! hover:bg-white/15! text-foreground!"

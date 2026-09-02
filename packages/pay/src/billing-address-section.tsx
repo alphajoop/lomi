@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@lomi./ui/input";
 import { ChevronDown } from "lucide-react";
 import { getBillingCountriesWithDetectedFirst } from "@lomi./shared";
@@ -28,7 +28,7 @@ interface BillingAddressSectionProps {
   onDetectedCountry?: (country: string) => void;
 }
 
-const MIN_TEXTAREA_HEIGHT = "39px";
+const MIN_TEXTAREA_HEIGHT = "40px";
 
 export function BillingAddressSection({
   t,
@@ -41,8 +41,21 @@ export function BillingAddressSection({
 }: BillingAddressSectionProps) {
   const addressTextareaRef = useRef<HTMLTextAreaElement>(null);
   const postalCodeInputRef = useRef<HTMLInputElement>(null);
+  const [countryListReady, setCountryListReady] = useState(false);
 
-  const COUNTRIES = getBillingCountriesWithDetectedFirst(detectedCountry);
+  useEffect(() => {
+    setCountryListReady(true);
+  }, []);
+
+  // Node and the browser disagree on some Intl country display names
+  // (e.g. Falkland Islands). Rendering the list only after mount keeps
+  // SSR HTML identical to the first client paint so checkout clicks work.
+  const effectiveDetectedCountry = countryListReady
+    ? detectedCountry
+    : undefined;
+  const COUNTRIES = countryListReady
+    ? getBillingCountriesWithDetectedFirst(effectiveDetectedCountry)
+    : [];
 
   useEffect(() => {
     const textarea = addressTextareaRef.current;
@@ -170,7 +183,7 @@ export function BillingAddressSection({
             name="country"
             value={
               customerDetails.country ||
-              (detectedCountry ? detectedCountry : "")
+              (effectiveDetectedCountry ? effectiveDetectedCountry : "")
             }
             onChange={handleCustomerInputChange}
             className="flex h-10 w-full border border-gray-300 bg-white px-3 py-2 text-base md:text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none text-gray-900"
@@ -178,7 +191,7 @@ export function BillingAddressSection({
             ref={countrySelectRef as React.Ref<HTMLSelectElement>}
             autoComplete="country-name"
           >
-            {!detectedCountry && (
+            {!effectiveDetectedCountry && (
               <option value="" className="text-gray-400">
                 {t("checkout.billing_address.country")}
               </option>
@@ -216,7 +229,7 @@ export function BillingAddressSection({
             value={customerDetails.address}
             onChange={handleTextareaChange}
             placeholder={t("checkout.billing_address.address")}
-            className="rounded-none rounded-bl w-[70%] bg-white text-gray-900 border border-gray-300 border-r-0 placeholder:text-base md:placeholder:text-sm text-base md:text-sm px-3 py-2 resize-vertical overflow-y-auto focus:ring-0 focus:outline-none focus:border-gray-300"
+            className="box-border h-10 min-h-10 rounded-none rounded-bl w-[70%] bg-white text-gray-900 border border-gray-300 border-r-0 placeholder:text-base md:placeholder:text-sm text-base md:text-sm px-3 py-2 resize-vertical overflow-y-auto focus:ring-0 focus:outline-none focus:border-gray-300"
             rows={1}
             style={{ minHeight: MIN_TEXTAREA_HEIGHT }}
             autoComplete="street-address"
@@ -227,7 +240,7 @@ export function BillingAddressSection({
             value={customerDetails.postalCode}
             onChange={handleCustomerInputChange}
             placeholder={t("checkout.billing_address.postal_code")}
-            className="rounded-none rounded-br w-[30%] bg-white text-gray-900 border border-gray-300 border-l-0 placeholder:text-base md:placeholder:text-sm text-base md:text-sm px-3 py-2 focus:ring-0 focus:outline-none focus:border-gray-300"
+            className="box-border min-h-10 self-stretch rounded-none rounded-br w-[30%] bg-white text-gray-900 border border-gray-300 border-l-0 placeholder:text-base md:placeholder:text-sm text-base md:text-sm px-3 py-2 focus:ring-0 focus:outline-none focus:border-gray-300"
             style={{ minHeight: MIN_TEXTAREA_HEIGHT }}
             autoComplete="postal-code"
           />
