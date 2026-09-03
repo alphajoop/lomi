@@ -128,8 +128,8 @@ export function PersonalInformationSection({
   }
 
   return (
-    <div className="customer-information-section space-y-2.5 translate-y-1.5">
-      <label className="block text-sm font-normal text-gray-700 select-none">
+    <div className="customer-information-section checkout-form-section space-y-2.5">
+      <label className="checkout-form-title block text-sm font-normal text-gray-700 select-none">
         {t("checkout.personal_info.title")}
       </label>
       <div className="checkout-field-stack overflow-hidden rounded-sm shadow-sm shadow-black/4">

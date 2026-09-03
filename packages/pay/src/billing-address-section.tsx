@@ -173,8 +173,8 @@ export function BillingAddressSection({
   };
 
   return (
-    <div className="space-y-2.5 billing-address-section">
-      <label className="block text-sm font-normal text-gray-700 select-none">
+    <div className="checkout-form-section space-y-2.5 billing-address-section">
+      <label className="checkout-form-title block text-sm font-normal text-gray-700 select-none">
         {t("checkout.billing_address.title")}
       </label>
       <div className="checkout-field-stack overflow-hidden rounded-sm shadow-sm shadow-black/[.04]">

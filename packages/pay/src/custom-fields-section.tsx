@@ -87,8 +87,8 @@ export function CustomCheckoutFieldsSection({
   };
 
   return (
-    <div className="space-y-2.5 translate-y-0.5">
-      <label className="block text-sm font-normal text-gray-700 select-none">
+    <div className="checkout-form-section space-y-2.5">
+      <label className="checkout-form-title block text-sm font-normal text-gray-700 select-none">
         {t("checkout.custom_fields.title")}
       </label>
       <div className="checkout-field-stack overflow-hidden rounded-sm shadow-sm shadow-black/[.04]">

@@ -8,7 +8,6 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 import { CheckIcon, ChevronDown, PencilIcon, Phone } from "lucide-react";
 import { cn } from "./cn";
 import { Button } from "./button";
-import { interiorField } from "./tokens";
 
 const PhoneInputCompactContext = createContext(false);
 
@@ -369,104 +368,15 @@ export function WhatsAppNumberInput({
 }: WhatsAppNumberInputProps) {
   return (
     <div className={cn("whatsapp-input-container", className)}>
-      <div className="relative">
-        <div
-          className={cn(
-            "flex h-10 w-full overflow-hidden rounded-sm bg-transparent",
-            interiorField,
-            "px-0",
-          )}
-        >
-          <RPNInput.default
-            className="flex w-full"
-            international
-            defaultCountry={defaultCountry}
-            flagComponent={WhatsAppFlag}
-            countrySelectComponent={WhatsAppCountrySelect}
-            inputComponent={WhatsAppField}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            smartCaret={false}
-            countryCallingCodeEditable={false}
-            disabled={disabled}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const WhatsAppField = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => (
-  <input
-    ref={ref}
-    className={cn(
-      "flex h-full w-full min-w-0 rounded-l-none rounded-r-[9px] border-0 bg-transparent px-3 text-[13px] text-stone-700 outline-none placeholder:text-stone-400 dark:text-stone-200 dark:placeholder:text-stone-500",
-      className,
-    )}
-    {...props}
-    autoComplete="tel"
-    data-lpignore="true"
-    data-form-type="other"
-  />
-));
-WhatsAppField.displayName = "WhatsAppField";
-
-function WhatsAppCountrySelect({
-  disabled,
-  value,
-  onChange,
-  options,
-}: CountrySelectProps) {
-  return (
-    <div className="relative inline-flex h-10 items-center self-stretch rounded-l-[9px] border-0 border-r border-stone-200 bg-transparent pe-2 ps-3 text-stone-700 dark:border-white/[0.16] dark:text-stone-200">
-      <div className="inline-flex items-center gap-1" aria-hidden="true">
-        <WhatsAppFlag country={value} countryName={value} />
-        <span className="text-stone-400">
-          <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
-        </span>
-      </div>
-      <select
+      <PhoneNumberInput
+        value={value}
+        onChange={onChange}
+        defaultCountry={defaultCountry}
+        placeholder={placeholder}
+        className="pr-10"
         disabled={disabled}
-        value={value || ""}
-        onChange={(event) => {
-          const nextCountry = parsePhoneCountry(event.target.value);
-          if (nextCountry !== undefined) {
-            onChange(nextCountry);
-          }
-        }}
-        className="absolute inset-0 text-sm opacity-0"
-        aria-label="Select country"
-        data-lpignore="true"
-      >
-        <option value="">Select country</option>
-        {options
-          .filter((x) => x.value)
-          .map((option) => (
-            <option key={option.value || "empty"} value={option.value}>
-              {option.label}{" "}
-              {option.value
-                ? `+${RPNInput.getCountryCallingCode(option.value)}`
-                : ""}
-            </option>
-          ))}
-      </select>
+        directEdit
+      />
     </div>
-  );
-}
-
-function WhatsAppFlag({ country, countryName }: RPNInput.FlagProps) {
-  const Flag = flags[country];
-  return (
-    <span className="w-5 overflow-hidden rounded-[3px]">
-      {Flag ? (
-        <Flag title={countryName} />
-      ) : (
-        <Phone size={16} className="text-green-500" aria-hidden="true" />
-      )}
-    </span>
   );
 }
